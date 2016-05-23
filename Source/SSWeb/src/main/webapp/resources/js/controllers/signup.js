@@ -93,6 +93,7 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
         	LoginService.signup($scope.accountRegistration).then(function (response) {
            	 $rootScope.userId=response.data.userId;
            	 $rootScope.companyId=response.data.companyId;
+           	 hideOverlay();
            	 $location.path('/linkedin').replace();
            }, function (error) {
            	showError($scope.getErrorMessage(error.data));

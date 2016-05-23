@@ -32,6 +32,7 @@
 	var companyId = eval('('+'${companyId}'+')');
 </script> 
 <body ng-app="SocialSurvey" ng-controller="newSignupController">
+<div class="overlay-loader hide"></div>
 <div id="toast-container" class="toast-container">
 		<span id="overlay-toast" class="overlay-toast"></span>
 	</div>
