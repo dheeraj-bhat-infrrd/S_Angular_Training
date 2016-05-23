@@ -27,11 +27,12 @@
 ></script>
 </head>
 
-<script type="text/javascript">
+<!-- <script type="text/javascript">
 	var userId = eval('('+'${userId}'+')');
 	var companyId = eval('('+'${companyId}'+')');
-</script> 
+</script>  -->
 <body ng-app="SocialSurvey" ng-controller="newSignupController">
+<div class="overlay-loader hide"></div>
 <div id="toast-container" class="toast-container">
 		<span id="overlay-toast" class="overlay-toast"></span>
 	</div>
