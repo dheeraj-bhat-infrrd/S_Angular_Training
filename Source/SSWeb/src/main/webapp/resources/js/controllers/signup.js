@@ -2,9 +2,6 @@ app.controller('newSignupController', ['$scope', '$location', '$rootScope', 'Use
 	$rootScope.userId=userId;
 	$rootScope.companyId=companyId;
 	
-//	$rootScope.userId=1256;
-//	$rootScope.companyId=59;
-	
 	$scope.phoneRegEx = {
         'translation': {
             d: {
@@ -175,10 +172,6 @@ app.controller('signupcompleteController', ['$scope','$location','$rootScope','L
 
 
 app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', '$rootScope', function ($scope, $http, $location, UserProfileService, $rootScope) {
-	
-	/*$rootScope.userId = 196;*/
-	
-
 	if(angular.isUndefined($rootScope.userProfile) || $rootScope.userProfile == null || $rootScope.userProfile == {}){
 		UserProfileService.getUserProfile($rootScope.userId).then(function(response){ 
 			$rootScope.userProfile = response.data;
@@ -208,7 +201,6 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 	}*/
     
     $scope.saveProfile = function () {
-    	
     	$location.path('/profiledetail').replace();
     	/*$('#reg-phone1').val($rootScope.userProfile.phone1.number);*/
     };
@@ -245,8 +237,6 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 }]);
 
 app.controller('companyController', ['$scope', '$location', 'CompanyProfileService', '$rootScope', function ($scope, $location, CompanyProfileService, $rootScope) {
-	/*$scope.countrycode=='ax';*/
-	$rootScope.companyId=251;
 	$scope.usa=true;
 	$scope.canada=false;
 	$scope.india=false;

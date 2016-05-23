@@ -70,7 +70,7 @@ public interface SSApiIntegration
         @Body MultipartFile fileLocal );
     
     
-    @POST ( "users/profile/profileimage/update/{userId}/{logoName}")
+    @POST ( "/users/profile/profileimage/update/{userId}/{logoName}")
     Response uploadUserProfileLogo( @Path ( "userId") String userId, @Path ( "logoName") String logoName,
         @Body MultipartFile fileLocal );
 }
