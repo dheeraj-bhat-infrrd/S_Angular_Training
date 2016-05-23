@@ -85,6 +85,7 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
             showError("Please resolve the captcha and submit!");
             $scope.activate = 0;
         } else {
+        	showOverlay();
         	$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
         	$scope.accountRegistration.phone.number = $('#reg-phone').val();
         	$scope.accountRegistration.phone.countryCode = $('.dial-country-code').html();
@@ -202,9 +203,11 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
     };
     
     $scope.saveProfileDetails = function () {
+    	showOverlay();
     	//$rootScope.userProfile.phone1 = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
     	console.log($rootScope.userProfile);
     	UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response){ 
+    		 hideOverlay();
     		$location.path('/company').replace();
     	}, function (error) {
     	    showError($scope.getErrorMessage(error.data));
@@ -265,8 +268,10 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
     };
     
     $scope.saveCompanyProfileDetails = function () {
+    	showOverlay();
     	/*$rootScope.companyProfile.officePhone = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};*/
     	CompanyProfileService.updateCompanyProfile($rootScope.companyId, 'CPP', $rootScope.companyProfile).then(function(response){ 
+    		 hideOverlay();
     		$location.path('/payment').replace();
     	}, function (error) {
     	    showError($scope.getErrorMessage(error.data));
