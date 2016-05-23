@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -1156,8 +1157,21 @@ public class DashboardController
                 }
                 //JIRA SS-1363 end
 
+                //JIRA SS-473 begin
+                String agentDisclaimer = "";
+                String agentLicenses = "";
+
+                if ( agentSettings.getDisclaimer() != null )
+                    agentDisclaimer = agentSettings.getDisclaimer();
+
+                if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+                    agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+                }
+
                 emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
-                    agentTitle, companyName, survey, surveyLink, logoUrl );
+                    agentTitle, companyName, survey, surveyLink, logoUrl, agentDisclaimer, agentLicenses );
+
+                //JIRA SS-473 end
             } catch ( InvalidInputException e ) {
                 LOG.error( "Exception occurred while trying to send survey reminder mail to : " + customerEmail );
                 throw e;
@@ -1319,8 +1333,21 @@ public class DashboardController
                     }
                     //JIRA SS-1363 end
 
+                    //JIRA SS-473 begin
+                    String agentDisclaimer = "";
+                    String agentLicenses = "";
+
+                    if ( agentSettings.getDisclaimer() != null )
+                        agentDisclaimer = agentSettings.getDisclaimer();
+
+                    if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+                        agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+                    }
+
                     emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
-                        agentTitle, companyName, survey, surveyLink, logoUrl );
+                        agentTitle, companyName, survey, surveyLink, logoUrl, agentDisclaimer, agentLicenses );
+
+                    //JIRA SS-473 end
 
                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
                 } catch ( NumberFormatException e ) {
