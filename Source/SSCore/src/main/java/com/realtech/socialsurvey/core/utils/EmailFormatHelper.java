@@ -96,11 +96,12 @@ public class EmailFormatHelper {
 	}
 
 
-    public String replaceLegends( boolean isSubject, String content, String baseUrl, String logoUrl, String link,
-        String custFirstName, String custLastName, String agentName, String agentSignature, String recipientMailId,
-        String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress, String links, String agentProfileName )
-        throws InvalidInputException
-    {
+	public String replaceLegends( boolean isSubject, String content, String baseUrl, String logoUrl, String link,
+		String custFirstName, String custLastName, String agentName, String agentSignature, String recipientMailId,
+		String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress, String links,
+		String agentProfileName, String companyDisclaimer, String agentDisclaimer, String agentLicense )
+		throws InvalidInputException
+	{
         LOG.info( "Method to replace legends with values called, replaceLegends() started");
         if ( content == null || content.isEmpty() ) {
             LOG.error( "Content passed in replaceLegends is null or empty" );
@@ -129,6 +130,12 @@ public class EmailFormatHelper {
         content = content.replaceAll( "\\[CurrentYear\\]", "" + currentYear );
         content = content.replaceAll( "\\[FullAddress\\]", "" + fullAddress );
         content = content.replaceAll( "\\[AgentProfileName\\]", "" + agentProfileName );
+
+		//JIRA SS-473 begin
+		content = content.replaceAll( "\\[CompanyDisclaimer\\]", companyDisclaimer );
+		content = content.replaceAll( "\\[AgentDisclaimer\\]", agentDisclaimer );
+		content = content.replaceAll( "\\[AgentLicense\\]", agentLicense );
+		//JIRA SS-473 end
         content = content.replaceAll( "null", "" );
         LOG.info( "Method to replace legends with values called, replaceLegends() ended");
         return content;

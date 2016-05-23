@@ -1737,9 +1737,8 @@ public class EmailServicesImpl implements EmailServices
     @Override
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
         String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
-        String surveyLink, String logoUrl ) throws InvalidInputException
+        String surveyLink, String logoUrl, String agentDisclaimer, String agentLicenses ) throws InvalidInputException
     {
-
         LOG.info( "Sending manual survey reminder mail." );
 
         String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
@@ -1783,16 +1782,23 @@ public class EmailServicesImpl implements EmailServices
             mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
                 new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
         }
+
+        //JIRA SS-473 begin
+        String companyDisclaimer = "";
+        if ( companySettings.getDisclaimer() != null )
+            companyDisclaimer = companySettings.getDisclaimer();
+
         //replace legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, surveyLink,
             survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
             survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-            fullAddress, "", user.getProfileName() );
+            fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, surveyLink,
             survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
             survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-            fullAddress, "", user.getProfileName() );
+            fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+        //JIRA SS-473 end
         //send mail
         try {
             sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );

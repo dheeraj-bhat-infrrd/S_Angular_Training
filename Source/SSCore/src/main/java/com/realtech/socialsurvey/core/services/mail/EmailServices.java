@@ -348,7 +348,7 @@ public interface EmailServices
      */
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
         String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
-        String surveyLink, String logoUrl ) throws InvalidInputException;
+        String surveyLink, String logoUrl, String agentDisclaimer, String agentLicenses ) throws InvalidInputException;
 
 
     void sendZillowCallExceededMailToAdmin( int count ) throws InvalidInputException, UndeliveredEmailException;
