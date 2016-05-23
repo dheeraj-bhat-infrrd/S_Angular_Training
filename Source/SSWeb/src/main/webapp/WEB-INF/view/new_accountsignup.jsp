@@ -28,10 +28,10 @@
 ></script>
 </head>
 
-<!-- <script type="text/javascript">
+<script type="text/javascript">
 	var userId = eval('('+'${userId}'+')');
 	var companyId = eval('('+'${companyId}'+')');
-</script>  -->
+</script> 
 <body ng-app="SocialSurvey" ng-controller="newSignupController">
 <div class="overlay-loader hide"></div>
 <div id="toast-container" class="toast-container">
@@ -55,10 +55,6 @@
 <script src="${initParam.resourcesPath}/resources/js/controllers/signup.js"></script> 
 <script src="${initParam.resourcesPath}/resources/js/services/login.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/angular-dropdowns.js"></script>
-
-
-
-
-
+<script src="https://js.braintreegateway.com/v2/braintree.js"></script>
 </body>
 </html>

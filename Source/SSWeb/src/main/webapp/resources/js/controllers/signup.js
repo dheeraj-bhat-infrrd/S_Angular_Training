@@ -1,4 +1,3 @@
-
 app.controller('newSignupController', ['$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService','$window', function ($scope, $location, $rootScope, UserProfileService, CompanyProfileService,$window) {
 	$rootScope.userId=userId;
 	$rootScope.companyId=companyId;
@@ -345,17 +344,40 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 }]);
 
 
-app.controller('paymentController', ['$scope','$http', '$location','$rootScope', function ($scope,$http, $location,$rootScope) {
+app.controller('paymentController', ['$scope','PaymentService', '$location','$rootScope', function ($scope,PaymentService, $location,$rootScope) {
 	
 	$scope.individual=true;
 	$scope.business=false;
 	$scope.enterprise=false;
+	
+	if(angular.isUndefined($scope.paymentPlans) || $scope.paymentPlans == null || $scope.paymentPlans == {}){
+		PaymentService.getPaymentPlans().then(function(response){ 
+			$scope.paymentPlans = response.data;
+		}, function (error) {
+		    showError($scope.getErrorMessage(error.data));
+		});
+	}
+	
+	if(angular.isUndefined($scope.clientToken) || $scope.clientToken == null || $scope.clientToken == {}){
+		PaymentService.getClientToken().then(function(response){ 
+			$scope.clientToken = response.data;
+			braintree.setup($scope.clientToken, 'dropin', {
+				container : 'dropin'
+			});
+		}, function (error) {
+		    showError($scope.getErrorMessage(error.data));
+		});
+	}
 	
 	$scope.back = function (){
     	$location.path('/companydetail').replace();
     }
 	
 	$scope.processPayment = function (){
+		if($scope.individual || $scope.business){
+			// TODO Check if payment has been made by checking an entry is present in license detail..
+			console.log("Check if payment has been made by checking an entry is present in license detail..");
+		}
 		$location.path('/signupcomplete').replace();
 	}
 	
@@ -369,35 +391,20 @@ app.controller('paymentController', ['$scope','$http', '$location','$rootScope',
 	    	$scope.business=false;
 	    	$scope.enterprise=true;
 	    }
+	    $scope.authorize = false;
 	  };
 	  $scope.downGrade = function() {
-		    
-		     if($scope.business){
-		    	$scope.individual=true;
-		    	$scope.business=false;
-		    	$scope.enterprise=false;
-		    }else if($scope.enterprise){
-		    	$scope.individual=false;
-		    	$scope.business=true;
-		    	$scope.enterprise=false;
-		    }
-		  };
-		  $scope.creditcardRegEx = {
-			        'translation': {
-			            d: {
-			                pattern: /[0-9*]/
-			            }
-			           
-			        }
-			    };
-		  $scope.expiryRegEx = {
-			        'translation': {
-			            d: {
-			                pattern: /[0-9*]/
-			            }
-			           
-			        }
-			    };
-$('#creditcard').mask(creditcardFormat, $scope.creditcardRegEx);
-$('#expiryDate').mask(expiryDateFormat, $scope.expiryRegEx);
+	    if($scope.business){
+	    	$scope.individual=true;
+	    	$scope.business=false;
+	    	$scope.enterprise=false;
+	    }else if($scope.enterprise){
+	    	$scope.individual=false;
+	    	$scope.business=true;
+	    	$scope.enterprise=false;
+	    }
+	    $scope.name=null;
+	    $scope.email=null;
+	    $scope.message=null;
+	  };
 }]);

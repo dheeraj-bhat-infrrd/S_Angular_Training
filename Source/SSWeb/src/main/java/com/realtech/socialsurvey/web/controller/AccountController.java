@@ -43,6 +43,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.web.api.SSApiIntegration;
@@ -90,6 +91,9 @@ public class AccountController
 
     @Autowired
     private SocialManagementService socialManagementService;
+
+    @Autowired
+    private Payment gateway;
 
     // LinkedIn
     @Value ( "${LINKED_IN_API_KEY}")
@@ -261,6 +265,16 @@ public class AccountController
         Response response = api.getCompanyStage( companyId );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/getclienttoken", method = RequestMethod.GET)
+    @ResponseBody
+    public String getClientToken() throws JsonProcessingException
+    {
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonStr = mapper.writeValueAsString( gateway.getClientToken() );
+        return jsonStr;
     }
 
 
