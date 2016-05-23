@@ -45,3 +45,13 @@ app.service('LinkedinService',['$http',function($http){
 		return $http.post('/registeraccount/agent/initlinkedinconnection.do',userId);
 	}
 }]);
+
+app.service('PaymentService',['$http',function($http){
+	this.getPaymentPlans=function(){
+		return $http.get('/registeraccount/getpaymentplans.do');
+	}
+	
+	this.getClientToken = function(){
+		return $http.get('/registeraccount/getclienttoken.do');
+	}
+}]);
