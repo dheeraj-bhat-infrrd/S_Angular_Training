@@ -16,6 +16,7 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/intlTelInput.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/angular-dropdowns.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/dropzone.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/countrySelect.css">
@@ -53,6 +54,7 @@
 <script src="${initParam.resourcesPath}/resources/js/app.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/controllers/signup.js"></script> 
 <script src="${initParam.resourcesPath}/resources/js/services/login.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/angular-dropdowns.js"></script>
 
 
 
