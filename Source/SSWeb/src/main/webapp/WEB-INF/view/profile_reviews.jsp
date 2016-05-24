@@ -172,7 +172,12 @@
 					</div>
 				</c:when>
 				<c:otherwise>
-					<div class="ppl-content review-height">${review}</div>
+					<div class="ppl-content review-height">
+					    <span>${review}</span>
+                            <c:if test="${reviewItem.source=='Zillow' }">
+                              <br><span><a class="view-zillow-link" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
+                            </c:if>
+					</div>
 				</c:otherwise>
 			</c:choose>
 			<div class="ppl-share-wrapper clearfix share-plus-height" >
