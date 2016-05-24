@@ -858,7 +858,10 @@ function paintReviews(result){
 			}
 			reviewsHtml +='<span class="review-less-text">' + review.substr(0,250) + '</span><span class="review-more-button">read full review</span>';
 		} else {
-			reviewsHtml += '<div class="ppl-content review-height">'+review;
+			reviewsHtml += '<div class="ppl-content review-height"><span>'+review+'</span>';
+            if(reviewItem.source == "Zillow") {
+                reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a></span>';
+            }
 		}
 		reviewsHtml += '	</div>';
 		reviewsHtml += '	<div class="ppl-share-wrapper clearfix share-plus-height" >';

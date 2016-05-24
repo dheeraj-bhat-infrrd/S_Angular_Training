@@ -217,10 +217,15 @@
 					</div>
 				</c:when>
 				<c:otherwise>
-					<div class="ppl-content review-height">${review}</div>
+					<div class="ppl-content review-height">
+					    <span>${review}</span>
+                    <c:if test="${feedback.source=='Zillow' }">
+                      <br><span><a class="view-zillow-link" href="${feedback.sourceId}"  target="_blank">View on zillow</a></span>
+                    </c:if>
+                    </div>
 				</c:otherwise>
 			</c:choose>
-			
+
 			<div class="ppl-share-wrapper clearfix share-plus-height" >
 				<%-- <div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key" /></div> --%>
 				<!-- <div class="float-left icn-share icn-plus-open" style="display: block;"></div> -->
