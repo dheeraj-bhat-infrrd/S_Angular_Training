@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.web.api.SSApiIntegration;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
@@ -95,6 +97,9 @@ public class AccountController
     @Autowired
     private Payment gateway;
 
+    @Autowired
+    private FileUploadService fileUploadService;
+
     // LinkedIn
     @Value ( "${LINKED_IN_API_KEY}")
     private String linkedInApiKey;
@@ -116,6 +121,15 @@ public class AccountController
 
     @Value ( "${LINKED_IN_PROFILE_URI}")
     private String linkedinProfileUri;
+
+    @Value ( "${AMAZON_LOGO_BUCKET}")
+    private String amazonLogoBucket;
+
+    @Value ( "${CDN_PATH}")
+    private String amazonEndpoint;
+
+    @Value ( "${AMAZON_IMAGE_BUCKET}")
+    private String amazonImageBucket;
 
     private static final String AGENT_UNIT = "agent";
     private static final String BRANCH_UNIT = "branch";
@@ -281,6 +295,7 @@ public class AccountController
     @RequestMapping ( value = "/registeraccount/uploadcompanylogo", method = RequestMethod.POST)
     @ResponseBody
     public String uploadCompanyLogo( @QueryParam ( "companyId") String companyId, MultipartHttpServletRequest request )
+        throws InvalidInputException
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
@@ -288,7 +303,10 @@ public class AccountController
         while ( itr.hasNext() ) {
             String uploadedFile = itr.next();
             MultipartFile file = request.getFile( uploadedFile );
-            Response response = api.uploadCompanyLogo( companyId, file.getOriginalFilename(), file );
+            String logoUrl = fileUploadService.uploadLogo( file, file.getOriginalFilename() );
+            logoUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR
+                + logoUrl;
+            Response response = api.updateCompanyLogo( companyId, logoUrl );
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
         return responseString;
@@ -298,6 +316,7 @@ public class AccountController
     @RequestMapping ( value = "/registeraccount/uploaduserprofilelogo", method = RequestMethod.POST)
     @ResponseBody
     public String uploadUserProfileLogo( @QueryParam ( "userId") String userId, MultipartHttpServletRequest request )
+        throws InvalidInputException, IllegalStateException, IOException
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
@@ -305,7 +324,12 @@ public class AccountController
         while ( itr.hasNext() ) {
             String uploadedFile = itr.next();
             MultipartFile file = request.getFile( uploadedFile );
-            Response response = api.uploadUserProfileLogo( userId, file.getOriginalFilename(), file );
+            File fileLocal = new File( CommonConstants.IMAGE_NAME );
+            file.transferTo( fileLocal );
+            String profileImageUrl = fileUploadService.uploadProfileImageFile( fileLocal, file.getOriginalFilename(), false );
+            profileImageUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
+                + CommonConstants.FILE_SEPARATOR + profileImageUrl;
+            Response response = api.updateUserProfileImage( userId, profileImageUrl );
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
         return responseString;
