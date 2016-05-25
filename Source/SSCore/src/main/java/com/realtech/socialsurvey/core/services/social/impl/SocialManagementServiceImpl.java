@@ -711,18 +711,24 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 profileStage.setOrder( ProfileStages.FACEBOOK_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.FACEBOOK_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN;
+                //Remove from SOCIAL_POST
+                removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
                 break;
 
             case CommonConstants.TWITTER_SOCIAL_SITE:
                 profileStage.setOrder( ProfileStages.TWITTER_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.TWITTER_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_TWITTER_SOCIAL_MEDIA_TOKEN;
+                //Remove from SOCIAL_POST
+                removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
                 break;
 
             case CommonConstants.GOOGLE_SOCIAL_SITE:
                 profileStage.setOrder( ProfileStages.GOOGLE_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.GOOGLE_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_SOCIAL_MEDIA_TOKEN;
+                //Remove from SOCIAL_POST
+                removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
                 break;
 
             case CommonConstants.LINKEDIN_SOCIAL_SITE:
@@ -774,6 +780,41 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         LOG.debug( "Method disconnectSocialNetwork() finished" );
 
         return organizationUnitSettings;
+    }
+
+
+    void removeFromSocialPosts( String collectionName, long entityId, String source ) throws InvalidInputException
+    {
+        LOG.info( "Method to remove social posts started for collectionName : " + collectionName + " entityId : " + entityId
+            + " source : " + source );
+        if ( collectionName == null || collectionName.isEmpty() )
+            throw new InvalidInputException( "Entity type cannot be empty" );
+        if ( entityId <= 0 )
+            throw new InvalidInputException( "Invalid entity Id" );
+        if ( source == null || source.isEmpty() )
+            throw new InvalidInputException( "Source cannot be empty" );
+
+        String entityType = null;
+        switch ( collectionName ) {
+            case CommonConstants.AGENT_SETTINGS_COLLECTION:
+                entityType = CommonConstants.AGENT_ID_COLUMN;
+                break;
+            case CommonConstants.BRANCH_SETTINGS_COLLECTION:
+                entityType = CommonConstants.BRANCH_ID_COLUMN;
+                break;
+            case CommonConstants.REGION_SETTINGS_COLLECTION:
+                entityType = CommonConstants.REGION_ID_COLUMN;
+                break;
+            case CommonConstants.COMPANY_SETTINGS_COLLECTION:
+                entityType = CommonConstants.COMPANY_ID_COLUMN;
+                break;
+            default:
+                throw new InvalidInputException( "Invalid entity type :" + entityType );
+        }
+
+        socialPostDao.removeSocialPostsForEntityAndSource( entityType, entityId, source );
+        LOG.info( "Method to remove social posts finished for collectionName : " + collectionName + " entityId : " + entityId
+            + " source : " + source );
     }
 
 
