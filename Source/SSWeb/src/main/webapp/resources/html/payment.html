@@ -1,13 +1,13 @@
 <script src="../resources/js/dropzone.js"></script>
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
-<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
-	style="padding: 0px;">
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0px;">
 	<div class="reg-left-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
 		<div class="reg-ss-logo"></div>
-		<div><img src="../resources/images/step-3.png" class="stretch" alt="" /></div>
-		<div id="err-nw-wrapper" class="err-nw-wrapper reg-error" >
-			<span class="err-new-close"></span>
-			<span id="err-nw-txt"></span>
+		<div>
+			<img src="../resources/images/step-3.png" class="stretch" alt="" />
+		</div>
+		<div id="err-nw-wrapper" class="err-nw-wrapper reg-error">
+			<span class="err-new-close"></span> <span id="err-nw-txt"></span>
 		</div>
 		<div class="reg-payment-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<div class="reg-payment-container ">
@@ -18,29 +18,23 @@
 					<div class="plan-card cursor_pointer float-left" ng-show="individual" style="background-color: #2BA875; margin-left: 90px;">
 						<h3 style="font-weight: 600 !important">Individual</h3>
 						<p>
-							<span class="price-info">
-								<span class="dollar">$</span>39
-								<span class="cents">95</span>
-							</span><br> 
-							<span class="price-info-sub">per month<br>single user</span><br> 30-day trial 
-							<span class="pay-button"></span>
+							<span class="price-info"> <span class="dollar">$</span>39 <span class="cents">95</span>
+							</span><br> <span class="price-info-sub">per month<br>single user
+							</span><br> 30-day trial <span class="pay-button"></span>
 						</p>
 					</div>
 					<div class="plan-card cursor_pointer float-left" ng-show="business" style="background-color: #4C84C7;">
 						<h3 style="font-weight: 600 !important">Business</h3>
 						<p>
-							<span class="price-info">
-								<span class="dollar">$</span>29
-								<span class="cents">95</span> 
-							</span><br> 
-							<span class="price-info-sub">per month per user<br>minimun 5 users</span><br> 30-day trial 
-							<span class=" pay-button"></span>
+							<span class="price-info"> <span class="dollar">$</span>29 <span class="cents">95</span>
+							</span><br> <span class="price-info-sub">per month per user<br>minimun 5 users
+							</span><br> 30-day trial <span class=" pay-button"></span>
 						</p>
 					</div>
 					<div class="plan-card cursor_pointer float-left" ng-show="enterprise" style="background-color: #7E54B2;">
 						<h3 style="font-weight: 600 !important">Enterprise</h3>
-						<span class="call-us">Call for pricing</span> 
-						<span class="price-info-sub">per month per users <br>minimum 100 users</span>
+						<span class="call-us">Call for pricing</span> <span class="price-info-sub">per month per users <br>minimum 100 users
+						</span>
 						<div class="contact-number">1-888-701-4512</div>
 					</div>
 					<button class="reg-upgrade float-left" ng-click="upGrade()" ng-show="individual||business">
@@ -49,7 +43,7 @@
 				</div>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="individual||business">
-				 <div id="payment-details-form" class="payment-details-form">
+				<div id="payment-details-form" class="payment-details-form">
 					<form id="checkout" method="POST" action="/subscribe.do">
 						<div id="dropin" class="payment-dropin"></div>
 						<div class="clearfix">
@@ -59,11 +53,10 @@
 					</form>
 				</div>
 				<div style="margin: 20px;">
-					<span style="margin-right: 5px;"><input type="checkbox" name="authorize" ng-model="authorize" ng-change="alertUser()"/></span>
-					At the end of my free 30 day trial period,I authorize SocialSurvey to debit my credit card for the monthly subscription fees,under the terms and conditions agreed to be me with SocialSurvey.
+					<span style="margin-right: 5px;"><input type="checkbox" name="authorize" ng-model="authorize" ng-change="alertUser()" /></span> At the end of my free 30 day trial period,I authorize SocialSurvey to debit my credit card for the monthly subscription fees,under the terms and conditions agreed to be me with SocialSurvey.
 				</div>
 				<p style="margin: 20px;">For verification purpose, we will temporarily authorize your card for $1.00. Your card will not be charged for the first 30 days.</p>
-				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top:20px;">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
 					<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
 					<div style="width: 120px; margin: auto;">
 						<button class="reg-next" ng-click="processPayment()" ng-class="{'regen':authorize}">Next</button>
@@ -75,14 +68,13 @@
 					<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">Name *</div>
 					<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">Email *</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<input class="reg-name" type="text" placeholder="Your Name" required ng-model="name"/> 
-						<input class="reg-name float-right" style="margin-left: 2%;" type="email" placeholder="email@example.com" required ng-model="email"/>
+						<input class="reg-name" type="text" placeholder="Your Name" required ng-model="name" /> <input class="reg-name float-right" style="margin-left: 2%;" type="email" placeholder="email@example.com" required ng-model="email" />
 					</div>
 					<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Message *</div>
 					<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<textarea class="reg-details" style="height:100px;padding:10px;" placeholder="Lets us know how we can help." required ng-model="message"></textarea>
+						<textarea class="reg-details" style="height: 100px; padding: 10px;" placeholder="Lets us know how we can help." required ng-model="message"></textarea>
 					</div>
-					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top:20px;">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
 						<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
 						<div style="width: 120px; margin: auto;">
 							<button class="reg-next" type="submit" ng-class="{'regen':enterpriseForm.$valid}">Next</button>
@@ -92,14 +84,15 @@
 			</div>
 		</div>
 	</div>
-	
-	<div class="reg-right-container col-lg-6 col-md-6 col-sm-12 col-xs-12" >
+	<div class="reg-right-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
 		<div class="reg-right-center col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<div ng-show="individual">
 				<div class="reg-Individual">Individual</div>
 				<div class="reg-indiv-detail">Plan Details</div>
 				<div class="reg-right-description " style="width: 80%">
-					<div class="plan-discription">Single user account: <span class="plan-discription-sub">for independent professionals.</span></div>
+					<div class="plan-discription">
+						Single user account: <span class="plan-discription-sub">for independent professionals.</span>
+					</div>
 					<div id="single-user">
 						<ul>
 							<li><span>Survey builder wizard with multiple question types and unlimited questions</span></li>
@@ -114,12 +107,13 @@
 					</div>
 				</div>
 			</div>
-				
 			<div ng-show="business">
 				<div class="reg-Individual">Business</div>
 				<div class="reg-indiv-detail">Plan Details</div>
 				<div class="reg-right-description " style="width: 80%">
-					<div class="plan-discription">Small offices &amp; growing business: <span class="plan-discription-sub">with team management.</span></div>
+					<div class="plan-discription">
+						Small offices &amp; growing business: <span class="plan-discription-sub">with team management.</span>
+					</div>
 					<div id="business">
 						<ul>
 							<li><span class="bold-li">Business includes everything in Individual, and:</span></li>
@@ -134,12 +128,13 @@
 					</div>
 				</div>
 			</div>
-	
 			<div ng-show="enterprise">
 				<div class="reg-Individual">Enterprise</div>
 				<div class="reg-indiv-detail">Plan Details</div>
 				<div class="reg-right-description " style="width: 80%">
-					<div class="plan-discription">Large organizations: <span class="plan-discription-sub">with enhanced customization</span></div>
+					<div class="plan-discription">
+						Large organizations: <span class="plan-discription-sub">with enhanced customization</span>
+					</div>
 					<div id="enterprise">
 						<ul>
 							<li><span class="bold-li">Enterprise includes everything in Individual, Business, and:</span></li>
