@@ -63,25 +63,33 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
     $scope.model = {key: '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'};
     $('#reg-phone').intlTelInput({ utilsScript: "../resources/js/utils.js" });
     $('#reg-phone').mask(phoneFormat, phoneRegEx);
-
+    $('#signInForm').on('click', '.country-list', function() {
+    	$scope.setPhoneNumber();
+    });
+    
+    $scope.setPhoneNumber = function(){
+    	var countryData = $("#reg-phone").intlTelInput("getSelectedCountryData");
+        $('#reg-phone').mask(phoneFormatList[countryData.iso2.toUpperCase()], phoneRegEx);
+        var number = $("#reg-phone").intlTelInput("getNumber");
+        number = number.substring(countryData.dialCode.length + 1, number.length + 1);
+        $scope.accountRegistration.phone = {};
+        $scope.accountRegistration.phone.number = number;
+        $scope.accountRegistration.phone.countryCode = "+"+countryData.dialCode; 
+    }
+    
     $scope.submitLogin = function () {
-    	console.log(vcRecaptchaService.getResponse());
-        if (vcRecaptchaService.getResponse() == "") { //if string is empty
+        if (vcRecaptchaService.getResponse() == "") { 
             showError("Please resolve the captcha and submit!");
             $scope.activate = 0;
         } else {
         	showOverlay();
         	$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-        	if($('#reg-phone').val()!= ""){
-        		$scope.accountRegistration.phone.number = $('#reg-phone').val();
-        		$rootScope.phone=$scope.accountRegistration.phone.number;
-            	$scope.accountRegistration.phone.countryCode = $('.dial-country-code').html();
-        	}
+        	$scope.setPhoneNumber();
         	LoginService.signup($scope.accountRegistration).then(function (response) {
-           	 $rootScope.userId=response.data.userId;
-           	 $rootScope.companyId=response.data.companyId;
-           	 hideOverlay();
-           	 $location.path('/linkedin').replace();
+	           	 $rootScope.userId=response.data.userId;
+	           	 $rootScope.companyId=response.data.companyId;
+	           	 hideOverlay();
+	           	 $location.path('/linkedin').replace();
            }, function (error) {
            	showError($scope.getErrorMessage(error.data));
            });
@@ -154,8 +162,8 @@ app.controller('signupcompleteController', ['$scope','$location','$rootScope','L
 
 app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', '$rootScope', function ($scope, $http, $location, UserProfileService, $rootScope) {
     
-	if(angular.isUndefined($rootScope.userId))
-		$rootScope.userId = 1291;
+//	if(angular.isUndefined($rootScope.userId))
+//		$rootScope.userId = 1291;
 	
 	$('#reg-phone1').intlTelInput({utilsScript: "../resources/js/utils.js"});
     $('#reg-phone1').mask(phoneFormat,phoneRegEx);
@@ -248,8 +256,8 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 
 app.controller('companyController', ['$scope', '$location', 'CompanyProfileService', '$rootScope', function ($scope, $location, CompanyProfileService, $rootScope) {
 	
-	if(angular.isUndefined($rootScope.companyId))
-		$rootScope.companyId = 93;
+//	if(angular.isUndefined($rootScope.companyId))
+//		$rootScope.companyId = 93;
 	
 	$scope.usa=true;
 	$scope.canada=false;
