@@ -258,7 +258,7 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 
 app.controller('companyController', [ '$scope', '$location', 'CompanyProfileService', '$rootScope', function($scope, $location, CompanyProfileService, $rootScope) {
 
-	// if(angular.isUndefined($rootScope.companyId))
+	// if (angular.isUndefined($rootScope.companyId))
 	// $rootScope.companyId = 93;
 
 	$scope.usa = true;
@@ -325,6 +325,9 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	if (angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}) {
 		CompanyProfileService.getCompanyProfile($rootScope.companyId).then(function(response) {
 			$rootScope.companyProfile = response.data;
+			if ($rootScope.companyProfile.industry.verticalsMasterId < 0) {
+				$rootScope.companyProfile.industry = {};
+			}
 			$scope.loadDropzone();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
