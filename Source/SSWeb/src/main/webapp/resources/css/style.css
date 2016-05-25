@@ -501,27 +501,28 @@
 }
 .reg-side-image{
 	background:url(../images/sidebar-survey.png)center no-repeat;
-	width: 201px;
-    height: 322px;
+	width: 280px;
+    height: 450px;
     margin: auto;
     margin-top: 35px;
+    background-size: cover;
 }
 .reg-right-description{
 	color:#fff;
-	font-size: 15px;
+	font-size: 18px;
     opacity: 0.6;
     font-family: 'OpenSans';
      margin: auto;
     
 }
 .reg-line-1{
-	width: 280px;
+	width: 333px;
 }
 .reg-line-3{
-	width: 332px;
+	width: 388px;
 }
 .reg-line-4{
-	width: 185px;
+	width: 221px;
 }
 .reg-side-linkedin-img{
 	background:url(../images/sidebar-import-profile.png)center no-repeat;
@@ -545,25 +546,26 @@
 	color: #fff;
     font-size: 25px;
     width: 225px;
-    margin: 45% auto 20px;
+    margin: 0 auto 20px;
     opacity: 0.6;
 }
 .reg-prof-img{
 	background:url(../images/sidebar-public-profile.png)center no-repeat;
-	width: 300px;
-    height: 207px;
+	width: 400px;
+    height: 270px;
     margin: auto;
     margin-top: 35px;
+    background-size: cover;
 }
 .prof-line-1{
-	width: 314px; 
+	width: 377px; 
     
 }
 .prof-line-2{
-	width:305px;
+	width:367px;
 }
 .prof-line-3{
-	width:334px;
+	width:400px;
 }
 .reg-back{
 	color:#dcdcdc;
