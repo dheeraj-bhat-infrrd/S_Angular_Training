@@ -55,4 +55,6 @@ public interface SocialPostDao {
         throws InvalidInputException;
 
     List<SocialUpdateAction> getSocialConnectionHistoryByEntityIds( String entityType, List<Long> entityIds );
+
+	void removeSocialPostsForEntityAndSource( String entityType, long entityId, String source );
 }
