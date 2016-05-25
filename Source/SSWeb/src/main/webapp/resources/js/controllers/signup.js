@@ -2,19 +2,6 @@ app.controller('newSignupController', ['$scope', '$location', '$rootScope', 'Use
 	$rootScope.userId=userId;
 	$rootScope.companyId=companyId;
 	
-	$scope.phoneRegEx = {
-        'translation': {
-            d: {
-                pattern: /[0-9*]/
-            },
-            /*x:{
-	    	 pattern:/[A-Z*]/
-	     }*/
-        }
-    };
-	
-	$scope.phoneFormat = '(ddd) ddd-dddd';
-	
 	if(!angular.isUndefined($rootScope.userId) && !angular.isUndefined($rootScope.companyId)){
 		var userStageDsiplayOrder = 0;
 		var companyStageDsiplayOrder = 0;
@@ -74,8 +61,9 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
 	$scope.response = null;
     $scope.widgetId = null;
     $scope.model = {key: '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'};
-    
-    
+    $('#reg-phone').intlTelInput({ utilsScript: "../resources/js/utils.js" });
+    $('#reg-phone').mask(phoneFormat, phoneRegEx);
+
     $scope.submitLogin = function () {
     	console.log(vcRecaptchaService.getResponse());
         if (vcRecaptchaService.getResponse() == "") { //if string is empty
@@ -89,8 +77,6 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
         		$rootScope.phone=$scope.accountRegistration.phone.number;
             	$scope.accountRegistration.phone.countryCode = $('.dial-country-code').html();
         	}
-        	
-        	
         	LoginService.signup($scope.accountRegistration).then(function (response) {
            	 $rootScope.userId=response.data.userId;
            	 $rootScope.companyId=response.data.companyId;
@@ -116,12 +102,6 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
         vcRecaptchaService.reload($scope.widgetId);
         $scope.response = null;
     };
-    
-    $('#reg-phone').intlTelInput({
-        utilsScript: "../resources/js/utils.js"
-    });
-    
-    $('#reg-phone').mask($scope.phoneFormat, $scope.phoneRegEx);
 }]);
 
 
@@ -173,25 +153,43 @@ app.controller('signupcompleteController', ['$scope','$location','$rootScope','L
 
 
 app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', '$rootScope', function ($scope, $http, $location, UserProfileService, $rootScope) {
-    $('#reg-phone1').intlTelInput({utilsScript: "../resources/js/utils.js"});
-    $('#reg-phone1').mask($scope.phoneFormat,$scope.phoneRegEx);
+    
+	if(angular.isUndefined($rootScope.userId))
+		$rootScope.userId = 1291;
+	
+	$('#reg-phone1').intlTelInput({utilsScript: "../resources/js/utils.js"});
+    $('#reg-phone1').mask(phoneFormat,phoneRegEx);
     $('#reg-phone2').intlTelInput({utilsScript: "../resources/js/utils.js"});
-    $('#reg-phone2').mask($scope.phoneFormat, $scope.phoneRegEx);
+    $('#reg-phone2').mask(phoneFormat, phoneRegEx);
     
     $scope.loadDropzone = function(){
-    	if(!angular.isUndefined($rootScope.userProfile) && $rootScope.userProfile.profilePhotoUrl != null){
+    	if(!angular.isUndefined($rootScope.userProfile)){
 		    $("div#profileImg").dropzone({ 
 		    	url: "/registeraccount/uploaduserprofilelogo.do?userId="+$rootScope.userId,
 		    	success: function(file, response){
 		    		$rootScope.userProfile.profilePhotoUrl = response;
 		    	},
+				maxFiles: 1,
+			    maxfilesexceeded: function(file) {
+			        this.removeAllFiles();
+			        this.addFile(file);
+			    }, 
 		    	init: function () {
-		    		var fileName = $rootScope.userProfile.profilePhotoUrl.substring($rootScope.userProfile.profilePhotoUrl.lastIndexOf('/')+1);
-		    		var mockFile = { name: fileName, size: 12345 };     
-		    		this.options.addedfile.call(this, mockFile);
-		    		this.options.thumbnail.call(this, mockFile, $rootScope.userProfile.profilePhotoUrl);
-		    		mockFile.previewElement.classList.add('dz-success');
-		    		mockFile.previewElement.classList.add('dz-complete');
+		    		if($rootScope.userProfile.profilePhotoUrl != null){
+			    		var fileName = $rootScope.userProfile.profilePhotoUrl.substring($rootScope.userProfile.profilePhotoUrl.lastIndexOf('/')+1);
+			    		var mockFile = { name: fileName, size: 12345 };     
+			    		this.options.addedfile.call(this, mockFile);
+			    		this.options.thumbnail.call(this, mockFile, $rootScope.userProfile.profilePhotoUrl);
+			    		mockFile.previewElement.classList.add('dz-success');
+			    		mockFile.previewElement.classList.add('dz-complete');
+			    		this.files[0] = mockFile;
+		    		}
+		    		
+		    		this.on( "addedfile", function() { 
+		                if ( this.files[1] != null ){ 
+		                  this.removeFile( this.files[0] ); 
+		                }
+		    		});
 		    	}
 		    });
     	}
@@ -231,7 +229,6 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
     $scope.saveProfileDetails = function () {
     	showOverlay();
     	//$rootScope.userProfile.phone1 = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
-    	console.log($rootScope.userProfile);
     	UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response){ 
     		 hideOverlay();
     		$location.path('/company').replace();
@@ -250,11 +247,15 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 }]);
 
 app.controller('companyController', ['$scope', '$location', 'CompanyProfileService', '$rootScope', function ($scope, $location, CompanyProfileService, $rootScope) {
+	
+	if(angular.isUndefined($rootScope.companyId))
+		$rootScope.companyId = 93;
+	
 	$scope.usa=true;
 	$scope.canada=false;
 	$scope.india=false;
 	$('#reg-phone-office').intlTelInput({utilsScript: "../resources/js/utils.js"});
-	$('#reg-phone-office').mask($scope.phoneFormat, $scope.phoneRegEx);
+	$('#reg-phone-office').mask(phoneFormat, phoneRegEx);
 	$("#country").countrySelect();
 	$scope.selectCountry=function(){
 		var country_code=$('#country_code').val();
@@ -274,29 +275,36 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 	}
 	
 	$scope.loadDropzone = function(){
-    	if(!angular.isUndefined($rootScope.companyProfile) && $rootScope.companyProfile.companyLogo != null){
-    		$("div#logoDrop").dropzone({ 
-    			url: "/registeraccount/uploadcompanylogo.do?companyId="+$rootScope.companyId, 
-    			success: function(file, response){
-    				$rootScope.companyProfile.companyLogo = response;
+		if(!angular.isUndefined($rootScope.companyProfile)){
+			$("div#logoDrop").dropzone({ 
+				url: "/registeraccount/uploadcompanylogo.do?companyId="+$rootScope.companyId, 
+				success: function(file, response){
+					$rootScope.companyProfile.companyLogo = response;
 		    	},
-    			maxFiles: 1,
-    		    maxfilesexceeded: function(file) {
-    		        this.removeAllFiles();
-    		        this.addFile(file);
-    		    }, 
-    	    	init: function () {
-    	    		if($rootScope.companyProfile.companyLogo != null){
-    		    		var fileName = $rootScope.companyProfile.companyLogo.substring($rootScope.companyProfile.companyLogo.lastIndexOf('/')+1);
-    		    		var mockFile = { name: fileName, size: 12345 };     
-    		    		this.options.addedfile.call(this, mockFile);
-    		    		this.options.thumbnail.call(this, mockFile, $rootScope.companyProfile.companyLogo);
-    		    		mockFile.previewElement.classList.add('dz-success');
-    		    		mockFile.previewElement.classList.add('dz-complete');
-    	    		}
-    			}
-    	    });
-    	}
+				maxFiles: 1,
+			    maxfilesexceeded: function(file) {
+			        this.removeAllFiles();
+			        this.addFile(file);
+			    }, 
+		    	init: function () {
+		    		if($rootScope.companyProfile.companyLogo != null){
+			    		var fileName = $rootScope.companyProfile.companyLogo.substring($rootScope.companyProfile.companyLogo.lastIndexOf('/')+1);
+			    		var mockFile = { name: fileName, size: 12345 };     
+			    		this.options.addedfile.call(this, mockFile);
+			    		this.options.thumbnail.call(this, mockFile, $rootScope.companyProfile.companyLogo);
+			    		mockFile.previewElement.classList.add('dz-success');
+			    		mockFile.previewElement.classList.add('dz-complete');
+			    		this.files[0] = mockFile;
+		    		}
+		    		
+		    		this.on( "addedfile", function() { 
+		                if ( this.files[1] != null ){ 
+		                  this.removeFile( this.files[0] ); 
+		                }
+		    		});
+				}
+		    });
+		}
     }
 	
 	if(angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}){
@@ -335,6 +343,8 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 		    showError($scope.getErrorMessage(error.data));
 		});
 	}
+	
+	$scope.ddSelectOptions = $rootScope.industries;
 	
     $scope.saveCompanyProfile = function () {
 		$location.path('/companydetail').replace();
