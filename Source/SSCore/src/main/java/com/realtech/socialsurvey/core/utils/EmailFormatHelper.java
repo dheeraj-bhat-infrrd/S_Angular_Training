@@ -122,7 +122,7 @@ public class EmailFormatHelper {
 
         content = content.replaceAll( "\\[FirstName\\]", "" + custFirstName );
         content = content.replaceAll( "\\[AgentName\\]", "" + agentName );
-        content = content.replaceAll( "\\[AgentSignature\\]", "" + agentSignature );
+		content = content.replace( "[AgentSignature]", "" + agentSignature );
         content = content.replaceAll( "\\[RecipientEmail\\]", "" + recipientMailId );
         content = content.replaceAll( "\\[SenderEmail\\]", "" + senderEmail );
         content = content.replaceAll( "\\[CompanyName\\]", "" + companyName );
@@ -132,9 +132,9 @@ public class EmailFormatHelper {
         content = content.replaceAll( "\\[AgentProfileName\\]", "" + agentProfileName );
 
 		//JIRA SS-473 begin
-		content = content.replaceAll( "\\[CompanyDisclaimer\\]", companyDisclaimer );
-		content = content.replaceAll( "\\[AgentDisclaimer\\]", agentDisclaimer );
-		content = content.replaceAll( "\\[AgentLicense\\]", agentLicense );
+		content = content.replace( "[CompanyDisclaimer]", companyDisclaimer );
+		content = content.replace( "[AgentDisclaimer]", agentDisclaimer );
+		content = content.replace( "[AgentLicense]", agentLicense );
 		//JIRA SS-473 end
         content = content.replaceAll( "null", "" );
         LOG.info( "Method to replace legends with values called, replaceLegends() ended");
