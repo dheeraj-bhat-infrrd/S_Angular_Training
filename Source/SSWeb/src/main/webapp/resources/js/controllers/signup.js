@@ -344,6 +344,8 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 		});
 	}
 	
+	$scope.ddSelectOptions = $rootScope.industries;
+	
     $scope.saveCompanyProfile = function () {
 		$location.path('/companydetail').replace();
     };
