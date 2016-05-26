@@ -179,18 +179,20 @@
 								</div>
 							</c:when>
 							<c:otherwise>
-								<div style="clear:both"><spring:message code="label.completedTransaction.key"/>
-                                       <c:choose>
-									<c:when test="${ not empty feedback.surveyTransactionDate} ">
-										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-						value="${ feedback.surveyTransactionDate}" />"></span>
-									</c:when>
-									<c:otherwise>
-										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-						value="${feedback.modifiedOn}" />"></span>
-									</c:otherwise>
-									</c:choose>
-								</div>
+							    <c:if test="${feedback.source ne 'customer'}">
+                                    <div style="clear:both"><spring:message code="label.completedTransaction.key"/>
+                                           <c:choose>
+                                        <c:when test="${ not empty feedback.surveyTransactionDate} ">
+                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${ feedback.surveyTransactionDate}" />"></span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${feedback.modifiedOn}" />"></span>
+                                        </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </c:if>
 							</c:otherwise>
 						</c:choose>
 							</c:otherwise>

@@ -772,11 +772,13 @@ function paintReviews(result){
 				reviewsHtml +='<div class="ppl-content" style="clear:both;padding-top:0px !important;">'+reviewItem.surveyGeoLocation+'<span>'+reviewItem.surveyType+'</span></div>';
 			
 			}else{
-				reviewsHtml +='<div style="clear:both">Completed transaction in';
-				if(reviewsHtml.surveyTransactionDate !=null){
-					reviewsHtml +=' <span>'+ new Date(reviewItem.surveyTransactionDate).toString("MMMM  yyyy")+'</span></div>';
-				}else{
-					reviewsHtml +=' <span>'+new Date(reviewItem.modifiedOn).toString("MMMM  yyyy")+'</span></div>';
+			    if(reviewItem.source != "customer") {
+                    reviewsHtml +='<div style="clear:both">Completed transaction in';
+                    if(reviewsHtml.surveyTransactionDate !=null){
+                        reviewsHtml +=' <span>'+ new Date(reviewItem.surveyTransactionDate).toString("MMMM  yyyy")+'</span></div>';
+                    }else{
+                        reviewsHtml +=' <span>'+new Date(reviewItem.modifiedOn).toString("MMMM  yyyy")+'</span></div>';
+                    }
 				}
 			}
 			
