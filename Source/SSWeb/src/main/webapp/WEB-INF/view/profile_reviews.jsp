@@ -135,18 +135,20 @@
 							</c:when>
 							
 							<c:otherwise>
-								<div style="clear:both"><spring:message code="label.completedTransaction.key"/>
-                                       <c:choose>
-									<c:when test="${ not empty reviewItem.surveyTransactionDate} ">
-										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-						value="${ reviewItem.surveyTransactionDate}" />"></span>
-									</c:when>
-									<c:otherwise>
-										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-						value="${reviewItem.modifiedOn}" />"></span>
-									</c:otherwise>
-									</c:choose>
-								</div>
+							    <c:if test="${reviewItem.source ne 'customer'}">
+                                    <div style="clear:both"><spring:message code="label.completedTransaction.key"/>
+                                           <c:choose>
+                                        <c:when test="${ not empty reviewItem.surveyTransactionDate} ">
+                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${ reviewItem.surveyTransactionDate}" />"></span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${reviewItem.modifiedOn}" />"></span>
+                                        </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </c:if>
 							</c:otherwise>
 						</c:choose>
 							</c:otherwise>
