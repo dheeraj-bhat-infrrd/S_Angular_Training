@@ -26,7 +26,7 @@
 							</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<div class="rfr_icn icn-fname en-icn-fname"></div>
-								<input id="encompass-username" type="text" class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Username" name="encompass-username" value="${encompassusername}">
+								<input id="encompass-username" type="text" readonly onfocus="$(this).removeAttr('readonly');" class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Username" name="encompass-username" value="${encompassusername}">
 								<div id="encompass-username-error" class="hm-item-err-2"></div>
 							</div>
 						</div>
@@ -50,7 +50,7 @@
 														+ password.substring(password.indexOf("\"") + 1);
 											}
 								%>
-								<input id="encompass-password" type="password" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Password" name="encompass-password" value="<%=formattedPassword%>">
+								<input id="encompass-password" type="password" readonly onfocus="$(this).removeAttr('readonly');" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Password" name="encompass-password" value="<%=formattedPassword%>">
 								<div id="encompass-password-error" class="hm-item-err-2 hide"></div>
 							</div>
 						</div>
