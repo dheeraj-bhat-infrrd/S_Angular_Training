@@ -219,6 +219,9 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 							this.removeFile(this.files[0]);
 						}
 					});
+					 this.on("removedfile", function(file) {
+						 
+					 });
 				}
 			});
 		}
@@ -518,3 +521,4 @@ function showPopUp(header, message) {
 	});
 	$('#overlay-main').show();
 }
+
