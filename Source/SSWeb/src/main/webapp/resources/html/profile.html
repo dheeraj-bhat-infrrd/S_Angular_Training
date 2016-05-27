@@ -13,11 +13,12 @@
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 reg-create-account">Professional Profile</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 30px;">Your Name *</div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<input class=" reg-name" type="text" placeholder="First Name" ng-model="userProfile.firstName" name="profilefirstname" required /> <input class=" reg-name float-right" style="margin-left: 2%;" type="text" ng-model="userProfile.lastName" name="profilelastname" placeholder="Last Name" />
+					<input class=" reg-name" type="text" placeholder="First Name" ng-model="userProfile.firstName" name="profilefirstname" required oninvalid="this.setCustomValidity('Firstname is required.')" oninput="this.setCustomValidity('')"/> 
+					<input class=" reg-name float-right" style="margin-left: 2%;" type="text" ng-model="userProfile.lastName" name="profilelastname" placeholder="Last Name" required oninvalid="this.setCustomValidity('Lastname is required.')" oninput="this.setCustomValidity('')"/>
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Title *</div>
 				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<input class="reg-details" type="text" placeholder="e.g. Manager" ng-model="userProfile.title" name="title" required oninvalid="this.setCustomValidity('Please Enter Title')" oninput="this.setCustomValidity('')" />
+					<input class="reg-details" type="text" placeholder="e.g. Manager" ng-model="userProfile.title" name="title" required oninvalid="this.setCustomValidity('Job title is required.')" oninput="this.setCustomValidity('')" />
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Photo</div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-bottom: 30px;">
