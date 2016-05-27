@@ -59,6 +59,8 @@ app.controller('accountSignupController', [ '$scope', '$location', 'vcRecaptchaS
 	$scope.accountRegistration = {};
 	$scope.response = null;
 	$scope.widgetId = null;
+	$scope.emailFormat = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+	
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
 	};
@@ -66,28 +68,41 @@ app.controller('accountSignupController', [ '$scope', '$location', 'vcRecaptchaS
 		utilsScript : "../resources/js/utils.js"
 	});
 	$('#reg-phone').mask(phoneFormat, phoneRegEx);
-	$('#signInForm').on('click', '.country-list', function() {
-		$scope.setPhoneNumber();
+	$("#reg-phone").on("countrychange", function(e, countryData) {
+		$scope.maskPhoneNumber("reg-phone", countryData);
 	});
 
-	$scope.setPhoneNumber = function() {
-		var countryData = $("#reg-phone").intlTelInput("getSelectedCountryData");
-		$('#reg-phone').mask(phoneFormatList[countryData.iso2.toUpperCase()], phoneRegEx);
-		var number = $("#reg-phone").intlTelInput("getNumber");
-		number = number.substring(countryData.dialCode.length + 1, number.length + 1);
-		$scope.accountRegistration.phone = {};
-		$scope.accountRegistration.phone.number = number;
-		$scope.accountRegistration.phone.countryCode = "+" + countryData.dialCode;
+	$scope.maskPhoneNumber = function(phoneId, countryData) {
+		if (countryData.iso2 == 'us') {
+			$('#' + phoneId).mask(phoneFormat, phoneRegEx);
+		} else {
+			$('#' + phoneId).mask(phoneFormatList[countryData.iso2.toUpperCase()], phoneRegEx);
+		}
+	}
+
+	$scope.getPhoneNumber = function(phoneId) {
+		var countryData = $('#' + phoneId).intlTelInput("getSelectedCountryData");
+		var number = $('#' + phoneId).intlTelInput("getNumber");
+		if (number.indexOf("+1") != -1) {
+			number = number.substring(2, number.length + 1);
+		} else {
+			number = number.substring(countryData.dialCode.length + 1, number.length + 1);
+		}
+		return {
+			"number" : number,
+			"countryCode" : "+" + countryData.dialCode,
+			"extension" : $('#' + phoneId).intlTelInput("getExtension")
+		};
 	}
 
 	$scope.submitLogin = function() {
 		if (vcRecaptchaService.getResponse() == "") {
-			showError("Please resolve the captcha and submit!");
+			showError("Let's make sure you are a real person, please check the box beside I'm not a robot! ");
 			$scope.activate = 0;
 		} else {
 			showOverlay();
 			$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-			$scope.setPhoneNumber();
+			$scope.accountRegistration.phone = $scope.getPhoneNumber("reg-phone");
 			LoginService.signup($scope.accountRegistration).then(function(response) {
 				$rootScope.userId = response.data.userId;
 				$rootScope.companyId = response.data.companyId;
