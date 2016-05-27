@@ -31,7 +31,7 @@
 							<div
 								class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<div class="rfr_icn icn-fname en-icn-fname" ></div>
-								<input id="encompass-username" type="text"
+								<input id="encompass-username" type="text" readonly onfocus="$(this).removeAttr('readonly');"
 									class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left"
 									placeholder="Username" name="encompass-username"
 									value="${encompassusername}">
@@ -52,7 +52,7 @@
 							<div
 								class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<div class="rfr_icn icn-password en-icn-pswd" ></div>
-								<input id="encompass-password" type="password"
+								<input id="encompass-password" type="password" readonly onfocus="$(this).removeAttr('readonly');"
 									class="um-item-row-txt um-item-row-txt-OR en-form-align-left"
 									placeholder="Password" name="encompass-password"
 									value="${encompasspassword}">
