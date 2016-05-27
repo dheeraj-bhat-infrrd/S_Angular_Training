@@ -60,7 +60,7 @@ app.controller('accountSignupController', [ '$scope', '$location', 'vcRecaptchaS
 	$scope.response = null;
 	$scope.widgetId = null;
 	$scope.emailFormat = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-	
+
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
 	};
@@ -219,6 +219,9 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 							this.removeFile(this.files[0]);
 						}
 					});
+					 this.on("removedfile", function(file) {
+						 
+					 });
 				}
 			});
 		}
@@ -498,3 +501,4 @@ function showPopUp(header, message) {
 	});
 	$('#overlay-main').show();
 }
+
