@@ -416,10 +416,12 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	$scope.business = false;
 	$scope.enterprise = false;
 	$scope.authorize = true;
+	var trialEndDate = new Date();
+	trialEndDate.setMonth(trialEndDate.getMonth() + 1);
 
 	$scope.alertUser = function() {
 		if (!$scope.authorize) {
-			showPopUp("Authorize SocialSurvey", "You have to authorize SocialSurvey to debit your credit card for the monthly subscription fees.");
+			showPopUp("Authorize SocialSurvey", "Your authroization for payment is required.  Don't worry, you will not be charged until after your free trial ends on " + formattedDate(trialEndDate) + ".  You may cancel online anytime.");
 		}
 	}
 
@@ -469,7 +471,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	$scope.processPayment = function() {
 		if ($scope.individual || $scope.business) {
 			if (!$scope.authorize) {
-				showPopUp("Authorize SocialSurvey", "Your authroization for payment is required.  Don't worry, you will not be charged until after your free trial ends on [DD/YY/YYYY].  You may cancel online anytime.");
+				showPopUp("Authorize SocialSurvey", "Your authroization for payment is required.  Don't worry, you will not be charged until after your free trial ends on " + formattedDate(trialEndDate) + ".  You may cancel online anytime.");
 			} else {
 				// TODO Check if payment has been made by checking an entry is present in license detail..
 				console.log("Check if payment has been made by checking an entry is present in license detail..");
@@ -520,4 +522,13 @@ function showPopUp(header, message) {
 		$('#overlay-continue').unbind('click');
 	});
 	$('#overlay-main').show();
+}
+
+function formattedDate(date) {
+	var d = new Date(date || Date.now()), month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear();
+	if (month.length < 2)
+		month = '0' + month;
+	if (day.length < 2)
+		day = '0' + day;
+	return [ day, month, year ].join('/');
 }

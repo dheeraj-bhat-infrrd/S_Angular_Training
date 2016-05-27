@@ -45,7 +45,7 @@
 								<%
 								    String password = (String) pageContext.getAttribute("encompasspassword");
 											String formattedPassword = password;
-											if (password.contains("\"")) {
+											if (password != null && password.contains("\"")) {
 												formattedPassword = password.substring(0, password.indexOf("\"")) + "&quot;"
 														+ password.substring(password.indexOf("\"") + 1);
 											}
