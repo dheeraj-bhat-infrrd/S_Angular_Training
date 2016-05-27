@@ -60,7 +60,7 @@ app.controller('accountSignupController', [ '$scope', '$location', 'vcRecaptchaS
 	$scope.response = null;
 	$scope.widgetId = null;
 	$scope.emailFormat = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-	
+
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
 	};
@@ -431,8 +431,28 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	if (angular.isUndefined($scope.clientToken) || $scope.clientToken == null || $scope.clientToken == {}) {
 		PaymentService.getClientToken().then(function(response) {
 			$scope.clientToken = response.data;
-			braintree.setup($scope.clientToken, 'dropin', {
-				container : 'dropin'
+			braintree.setup($scope.clientToken, 'custom', {
+				id : "paymentForm",
+				hostedFields : {
+					number : {
+						selector : "#card-number"
+					},
+					cvv : {
+						selector : "#cvv"
+					},
+					expirationMonth : {
+						selector : "#expiration-month"
+					},
+					expirationYear : {
+						selector : "#expiration-year"
+					},
+					postalCode : {
+						selector : "#zip-code"
+					}
+				},
+				onError : function(error) {
+					
+				}
 			});
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
