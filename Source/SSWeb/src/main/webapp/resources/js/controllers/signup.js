@@ -219,9 +219,9 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 							this.removeFile(this.files[0]);
 						}
 					});
-					 this.on("removedfile", function(file) {
-						 
-					 });
+					this.on("removedfile", function(file) {
+
+					});
 				}
 			});
 		}
@@ -454,7 +454,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 					}
 				},
 				onError : function(error) {
-					
+
 				}
 			});
 		}, function(error) {
@@ -469,7 +469,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	$scope.processPayment = function() {
 		if ($scope.individual || $scope.business) {
 			if (!$scope.authorize) {
-				showPopUp("Authorize SocialSurvey", "You have to authorize SocialSurvey to debit your credit card for the monthly subscription fees.");
+				showPopUp("Authorize SocialSurvey", "Your authroization for payment is required.  Don't worry, you will not be charged until after your free trial ends on [DD/YY/YYYY].  You may cancel online anytime.");
 			} else {
 				// TODO Check if payment has been made by checking an entry is present in license detail..
 				console.log("Check if payment has been made by checking an entry is present in license detail..");
@@ -521,4 +521,3 @@ function showPopUp(header, message) {
 	});
 	$('#overlay-main').show();
 }
-
