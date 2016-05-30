@@ -1,5 +1,5 @@
 var phoneFormat = '(ddd) ddd-dddd x yyyyy';
-var creditcardFormat = 'dddd-dddd-dddd-dddd';
+var creditcardFormat = 'dddd dddd dddd dddd';
 var expiryDateFormat = 'dd/dd';
 var phoneRegEx = {
 	'translation' : {
@@ -11,9 +11,15 @@ var phoneRegEx = {
 		}
 	}
 };
+var digitRegEx = {
+	'translation' : {
+		d : {
+			pattern : /[0-9*]/
+		}
+	}
+};
 
-var app = angular.module('SocialSurvey',
-		[ 'ngRoute', 'vcRecaptcha', 'ngDropdowns' ]).run(function($rootScope) {
+var app = angular.module('SocialSurvey', [ 'ngRoute', 'vcRecaptcha', 'ngDropdowns' ]).run(function($rootScope) {
 	$rootScope.userId;
 	$rootScope.comanyId;
 });
