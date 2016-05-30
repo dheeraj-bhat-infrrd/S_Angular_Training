@@ -243,4 +243,19 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
         }
         LOG.info( "Method updateCompanyIdForSocialPost() finished" );
     }
+
+
+    @Override
+    public void removeSocialPostsForEntityAndSource( String entityType, long entityId, String source )
+    {
+        LOG.info(
+            "Method removeSocialPostsForEntityAndSource() for entityType : " + entityType + " ID : " + entityId + " source : "
+                + source + " started" );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( entityType ).is( entityId ).and( KEY_SOURCE ).is( source ) );
+        mongoTemplate.remove( query, SocialPost.class, CommonConstants.SOCIAL_POST_COLLECTION );
+        LOG.info(
+            "Method removeSocialPostsForEntityAndSource() for entityType : " + entityType + " ID : " + entityId + " source : "
+                + source + " finished" );
+    }
 }

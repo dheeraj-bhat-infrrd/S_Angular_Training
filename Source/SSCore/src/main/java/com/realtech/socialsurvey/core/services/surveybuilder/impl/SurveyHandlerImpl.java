@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -940,15 +941,32 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
                 new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) ) );
         }
+        //JIRA SS-473 begin
+        String agentDisclaimer = "";
+        String agentLicenses = "";
+        String companyDisclaimer = "";
+
+        if ( companySettings != null && companySettings.getDisclaimer() != null )
+            companyDisclaimer = companySettings.getDisclaimer();
+
+        if ( agentSettings.getDisclaimer() != null )
+            agentDisclaimer = agentSettings.getDisclaimer();
+
+        if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+            agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+        }
         //replace the legends
-        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyUrl,
-            custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-            dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+        mailSubject = emailFormatHelper
+            .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyUrl, custFirstName, custLastName, agentName,
+                agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
-        mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyUrl, custFirstName,
-            custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName() );
+        mailBody = emailFormatHelper
+            .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyUrl, custFirstName, custLastName, agentName,
+                agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
+        //JIRA SS-473 end
         //send mail
         try {
             emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(), agentName,
@@ -1080,15 +1098,32 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
                 new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) ) );
         }
+        //JIRA SS-473 begin
+        String agentDisclaimer = "";
+        String agentLicenses = "";
+        String companyDisclaimer = "";
 
+        if ( companySettings != null && companySettings.getDisclaimer() != null )
+            companyDisclaimer = companySettings.getDisclaimer();
+
+        if ( agentSettings.getDisclaimer() != null )
+            agentDisclaimer = agentSettings.getDisclaimer();
+
+        if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+            agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+        }
         //replace the legends
-        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
-            custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName() );
+        mailSubject = emailFormatHelper
+            .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName, custLastName, agentName,
+                agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
-        mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
-            custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName() );
+        mailBody = emailFormatHelper
+            .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName, custLastName, agentName,
+                agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+
+        //JIRA SS-473 end
 
         //send mail
         try {
@@ -1212,19 +1247,35 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
                 logoUrl = appLogoUrl;
             }
+            //JIRA SS-473 begin
+            String agentDisclaimer = "";
+            String agentLicenses = "";
+            String companyDisclaimer = "";
 
-            mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
-                custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+            if ( companySettings != null && companySettings.getDisclaimer() != null )
+                companyDisclaimer = companySettings.getDisclaimer();
+
+            if ( agentSettings.getDisclaimer() != null )
+                agentDisclaimer = agentSettings.getDisclaimer();
+
+            if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+                agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+            }
+            mailBody = emailFormatHelper
+                .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName, custLastName, agentName,
+                    agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                    fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
             String mailSubject = surveyCompletionUnpleasant.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
                 mailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
             }
 
-            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
-                custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+            mailSubject = emailFormatHelper
+                .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName, custLastName, agentName,
+                    agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                    fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            //JIRA SS-473 end
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1359,15 +1410,32 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
                 new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) ) );
         }
+        //JIRA SS-473 begin
+        String agentDisclaimer = "";
+        String agentLicenses = "";
+        String companyDisclaimer = "";
 
+        if ( companySettings != null && companySettings.getDisclaimer() != null )
+            companyDisclaimer = companySettings.getDisclaimer();
+
+        if ( agentSettings.getDisclaimer() != null )
+            agentDisclaimer = agentSettings.getDisclaimer();
+
+        if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+            agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+        }
         //replace legends
-        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, "", custFirstName,
-            custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, links, user.getProfileName() );
+        mailSubject = emailFormatHelper
+            .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, "", custFirstName, custLastName, agentName,
+                agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
-        mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, "", custFirstName,
-            custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, links, user.getProfileName() );
+        mailBody = emailFormatHelper
+            .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, "", custFirstName, custLastName, agentName,
+                agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+        //JIRA SS-473 end
+
         //send mail
         try {
             emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName(),
@@ -1811,14 +1879,32 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) ) );
         }
 
-        //replace the legends
-        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyUrl,
-            custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-            dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+        //JIRA SS-473 begin
+        String agentDisclaimer = "";
+        String agentLicenses = "";
+        String companyDisclaimer = "";
 
-        mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyUrl, custFirstName,
-            custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName() );
+        if ( companySettings != null && companySettings.getDisclaimer() != null )
+            companyDisclaimer = companySettings.getDisclaimer();
+
+        if ( agentSettings.getDisclaimer() != null )
+            agentDisclaimer = agentSettings.getDisclaimer();
+
+        if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+            agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+        }
+        //replace the legends
+        mailSubject = emailFormatHelper
+            .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyUrl, custFirstName, custLastName, agentName,
+                agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+
+        mailBody = emailFormatHelper
+            .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyUrl, custFirstName, custLastName, agentName,
+                agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+
+        //JIRA SS-473 end
 
         //send the mail
         try {
@@ -1863,13 +1949,25 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyCustomer.split( "," ) ) ) );
 
         }
+        //JIRA SS-473 begin
+        String agentDisclaimer = "";
+        String agentLicenses = "";
+        String companyDisclaimer = "";
+
+        if ( companySettings != null && companySettings.getDisclaimer() != null )
+            companyDisclaimer = companySettings.getDisclaimer();
+
         //replace legends
-        mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, appLogoUrl, link, custFirstName,
-            custLastName, user.getFirstName() + " " + user.getLastName(), null, null, null, null, null, null, null, "",
-            user.getProfileName() );
-        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, appLogoUrl, link, custFirstName,
-            custLastName, user.getFirstName() + " " + user.getLastName(), null, null, null, null, null, null, null, "",
-            user.getProfileName() );
+        mailBody = emailFormatHelper
+            .replaceLegends( false, mailBody, applicationBaseUrl, appLogoUrl, link, custFirstName, custLastName,
+                user.getFirstName() + " " + user.getLastName(), null, null, null, null, null, null, null, "",
+                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+        mailSubject = emailFormatHelper
+            .replaceLegends( true, mailSubject, applicationBaseUrl, appLogoUrl, link, custFirstName, custLastName,
+                user.getFirstName() + " " + user.getLastName(), null, null, null, null, null, null, null, "",
+                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+
+        //JIRA SS-473 end
 
         //send mail
         try {

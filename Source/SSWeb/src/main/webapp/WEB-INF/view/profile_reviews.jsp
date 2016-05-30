@@ -135,18 +135,20 @@
 							</c:when>
 							
 							<c:otherwise>
-								<div style="clear:both"><spring:message code="label.completedTransaction.key"/>
-                                       <c:choose>
-									<c:when test="${ not empty reviewItem.surveyTransactionDate} ">
-										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-						value="${ reviewItem.surveyTransactionDate}" />"></span>
-									</c:when>
-									<c:otherwise>
-										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-						value="${reviewItem.modifiedOn}" />"></span>
-									</c:otherwise>
-									</c:choose>
-								</div>
+							    <c:if test="${reviewItem.source ne 'customer'}">
+                                    <div style="clear:both"><spring:message code="label.completedTransaction.key"/>
+                                           <c:choose>
+                                        <c:when test="${ not empty reviewItem.surveyTransactionDate} ">
+                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${ reviewItem.surveyTransactionDate}" />"></span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${reviewItem.modifiedOn}" />"></span>
+                                        </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </c:if>
 							</c:otherwise>
 						</c:choose>
 							</c:otherwise>
@@ -172,7 +174,12 @@
 					</div>
 				</c:when>
 				<c:otherwise>
-					<div class="ppl-content review-height">${review}</div>
+					<div class="ppl-content review-height">
+					    <span>${review}</span>
+                            <c:if test="${reviewItem.source=='Zillow' }">
+                              <br><span><a class="view-zillow-link" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
+                            </c:if>
+					</div>
 				</c:otherwise>
 			</c:choose>
 			<div class="ppl-share-wrapper clearfix share-plus-height" >

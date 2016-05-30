@@ -39,7 +39,11 @@
 						<br />
 						&nbsp&nbsp&nbsp&nbsp[InitiatedDate] : Survey Initiated On,
 						&nbsp&nbsp&nbsp&nbsp[CurrentYear] : Current Year,
-						&nbsp&nbsp&nbsp&nbsp[FullAddress] : Address of SocialSurvey
+						&nbsp&nbsp&nbsp&nbsp[FullAddress] : Address of SocialSurvey,
+						<br />
+						&nbsp&nbsp&nbsp&nbsp[CompanyDisclaimer] : Company's disclaimer,
+						&nbsp&nbsp&nbsp&nbsp[AgentDisclaimer] : User's disclaimer,
+                        &nbsp&nbsp&nbsp&nbsp[AgentLicense] : User's licenses
 						<br />
 						<br />
 						Note: Only [AgentName] is allowed in Mail Subject
