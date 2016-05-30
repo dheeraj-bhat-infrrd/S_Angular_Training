@@ -292,6 +292,18 @@ public class AccountController
     }
 
 
+    @RequestMapping ( value = "/registeraccount/generatehierarchy", method = RequestMethod.POST)
+    @ResponseBody
+    public String generateHierarchy( @QueryParam( "companyId" ) String companyId )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.generateDefaultHierarchy( companyId );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
+    }
+
+
     @RequestMapping ( value = "/registeraccount/uploadcompanylogo", method = RequestMethod.POST)
     @ResponseBody
     public String uploadCompanyLogo( @QueryParam ( "companyId") String companyId, MultipartHttpServletRequest request )

@@ -4400,6 +4400,26 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
     }
 
+    @Transactional
+    @Override
+    public User activateCompanyAdmin( long companyId ) throws InvalidInputException
+    {
+        LOG.info( "UserManagementService.activateCompanyAdmin started" );
+        User companyAdmin = getAdminUserByCompanyId( companyId );
+        if ( companyAdmin == null ) {
+            throw new InvalidInputException( "No company admin exists for companyId : " + companyId );
+        }
+        //Update the USER table status
+        companyAdmin.setStatus( CommonConstants.STATUS_ACTIVE );
+        userDao.update( companyAdmin );
+
+        //Update the user's user profiles
+        userProfileDao.activateAllUserProfilesForUser( companyAdmin );
+
+        LOG.info( "UserManagementService.activateCompanyAdmin finished" );
+        return companyAdmin;
+    }
+
 
     private void sendSurveyReminderEmail( EmailServices emailServices,
         OrganizationManagementService organizationManagementService, SurveyPreInitiation survey, long companyId )
