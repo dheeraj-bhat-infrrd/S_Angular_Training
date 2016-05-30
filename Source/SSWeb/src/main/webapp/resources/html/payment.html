@@ -1,13 +1,15 @@
 <script src="../resources/js/dropzone.js"></script>
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
-<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0px;">
-	<div class="reg-left-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
+<div class="main-reg-wrapper">
+	<div class="reg-left-container">
 		<div class="reg-ss-logo"></div>
-		<div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<img src="../resources/images/step-3.png" class="stretch" alt="" />
 		</div>
-		<div id="err-nw-wrapper" class="err-nw-wrapper reg-error">
-			<span class="err-new-close"></span> <span id="err-nw-txt"></span>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div id="err-nw-wrapper" class="err-nw-wrapper reg-error ">
+				<span class="err-new-close"></span> <span id="err-nw-txt"></span>
+			</div>
 		</div>
 		<div class="reg-payment-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<div class="reg-payment-container ">
@@ -123,16 +125,16 @@
 			</div>
 		</div>
 	</div>
-	<div class="reg-right-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
-		<div class="reg-right-center col-lg-12 col-md-12 col-sm-12 col-xs-12">
-			<div ng-show="individual">
+	<div class="reg-right-container">
+		<div class="reg-right-center ">
+			<div ng-show="individual" class="payment-right-description">
 				<div class="reg-Individual">Individual</div>
 				<div class="reg-indiv-detail">Plan Details</div>
-				<div class="reg-right-description " style="width: 80%">
-					<div class="plan-discription">
-						Single user account: <span class="plan-discription-sub">for independent professionals.</span>
+				<div class="reg-right-description-payment " >
+					<div class="plan-discription" >
+						<span style="opacity:0.8!important;color:#fff;">Single user account: </span><span class="plan-discription-sub">for independent professionals.</span>
 					</div>
-					<div id="single-user">
+					<div id="single-user" class="reg-li">
 						<ul>
 							<li><span>Survey builder wizard with multiple question types and unlimited questions</span></li>
 							<li><span>Social media syndication of your featured reviews</span></li>
@@ -146,14 +148,14 @@
 					</div>
 				</div>
 			</div>
-			<div ng-show="business">
+			<div ng-show="business" class="payment-right-description">
 				<div class="reg-Individual">Business</div>
 				<div class="reg-indiv-detail">Plan Details</div>
-				<div class="reg-right-description " style="width: 80%">
+				<div class="reg-right-description-payment " >
 					<div class="plan-discription">
-						Small offices &amp; growing business: <span class="plan-discription-sub">with team management.</span>
+						<span style="opacity:0.8!important;color:#fff;">Small offices &amp; growing business: </span><span class="plan-discription-sub">with team management.</span>
 					</div>
-					<div id="business">
+					<div id="business" class="reg-li">
 						<ul>
 							<li><span class="bold-li">Business includes everything in Individual, and:</span></li>
 							<li><span>Point-of-sale transaction integrated survey automation with Verified Customer badge</span></li>
@@ -167,14 +169,14 @@
 					</div>
 				</div>
 			</div>
-			<div ng-show="enterprise">
+			<div ng-show="enterprise" class="payment-right-description">
 				<div class="reg-Individual">Enterprise</div>
 				<div class="reg-indiv-detail">Plan Details</div>
-				<div class="reg-right-description " style="width: 80%">
+				<div class="reg-right-description-payment " >
 					<div class="plan-discription">
-						Large organizations: <span class="plan-discription-sub">with enhanced customization</span>
+						<span style="opacity:0.8!important;color:#fff;">Large organizations: </span><span class="plan-discription-sub">with enhanced customization</span>
 					</div>
-					<div id="enterprise">
+					<div id="enterprise" class="reg-li">
 						<ul>
 							<li><span class="bold-li">Enterprise includes everything in Individual, Business, and:</span></li>
 							<li><span>Social media monitoring for keyword based compliance alerts</span></li>
