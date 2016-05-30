@@ -16,6 +16,7 @@ import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -4542,16 +4543,34 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
                 new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
         }
+        //JIRA SS-473 begin
+        String agentDisclaimer = "";
+        String agentLicenses = "";
+        String companyDisclaimer = "";
+
+        if ( companySettings != null && companySettings.getDisclaimer() != null )
+            companyDisclaimer = companySettings.getDisclaimer();
+
+        if ( agentSettings.getDisclaimer() != null )
+            agentDisclaimer = agentSettings.getDisclaimer();
+
+        if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+            agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+        }
         //replace legends
         mailSubject = emailFormatHelper
             .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
                 survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
+                companyDisclaimer, agentDisclaimer, agentLicenses );
 
         mailBody = emailFormatHelper
             .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
                 survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
+                companyDisclaimer, agentDisclaimer, agentLicenses );
+
+        //JIRA SS-473 end
 
         //send mail
         try {
@@ -4695,10 +4714,27 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
             LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
 
+            //JIRA SS-473 begin
+            String agentDisclaimer = "";
+            String agentLicenses = "";
+            String companyDisclaimer = "";
+
+            if ( companySettings != null && companySettings.getDisclaimer() != null )
+                companyDisclaimer = companySettings.getDisclaimer();
+
+            if ( agentSettings.getDisclaimer() != null )
+                agentDisclaimer = agentSettings.getDisclaimer();
+
+            if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+                agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+            }
+
             mailBody = emailFormatHelper
                 .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
                     survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                    companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+                    companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
+                    companyDisclaimer, agentDisclaimer, agentLicenses );
+
             mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName; 
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
@@ -4706,7 +4742,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             mailSubject = emailFormatHelper
                 .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
                     survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                    companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+                    companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
+                    companyDisclaimer, agentDisclaimer, agentLicenses );
+
+            //JIRA SS-473 end
 
         } else {
 
@@ -4722,15 +4761,33 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) ) );
         }
 
+        //JIRA SS-473 begin
+        String agentDisclaimer = "";
+        String agentLicenses = "";
+        String companyDisclaimer = "";
+
+        if ( companySettings != null && companySettings.getDisclaimer() != null )
+            companyDisclaimer = companySettings.getDisclaimer();
+
+        if ( agentSettings.getDisclaimer() != null )
+            agentDisclaimer = agentSettings.getDisclaimer();
+
+        if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+            agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+        }
         //replace the legends
         mailBody = emailFormatHelper
             .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
                 survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
+                companyDisclaimer, agentDisclaimer, agentLicenses );
         mailSubject = emailFormatHelper
             .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
                 survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
+                companyDisclaimer, agentDisclaimer, agentLicenses );
+
+        //JIRA SS-473 end
 
         //send the mail
         try {
