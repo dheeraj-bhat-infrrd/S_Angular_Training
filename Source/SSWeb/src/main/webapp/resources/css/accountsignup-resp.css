@@ -1,0 +1,73 @@
+/* ============== new registration style==============*/
+@media ( max-width :767px) {
+	.reg-right-container {
+		display: none;
+	}
+	.reg-left-container {
+		width: 100%;
+		min-width: initial;
+		max-width: initial;
+	}
+}
+
+@media ( max-width :992px) {
+	.reg-side-image {
+		width: 180px;
+		height: 322px;
+		margin-top;20px;
+	}
+	.reg-right-description {
+		font-size: 13px;
+	}
+	.reg-line-1 {
+		width: 241px;
+	}
+	.reg-line-3 {
+		width: 280px;
+	}
+	.reg-line-4 {
+		width: 160px;
+	}
+	.prof-line-1 {
+    width: 273px;
+	}
+	.prof-line-2 {
+    width: 264px;
+    }
+   .prof-line-3 {
+    width: 289px;
+    }
+    .reg-prof-img {
+    width: 260px;
+    height: 200px;
+    margin-top: 20px;
+    }
+    .payment-right-description{
+	width:100%;
+	margin:auto;
+    }
+	
+}
+
+ @media ( min-width : 1450px) {
+	/*.reg-side-image {
+		width: 350px;
+		height: 490px;
+	}
+	.reg-right-description {
+		font-size: 24px;
+	}
+	.reg-line-1 {
+		width: 444px;
+	}
+	.reg-line-3 {
+		width: 517px;
+	}
+	.reg-line-4 {
+		width: 295px;
+	}*/
+	.reg-left-container{
+	      min-width: 624px
+	}
+	
+} 

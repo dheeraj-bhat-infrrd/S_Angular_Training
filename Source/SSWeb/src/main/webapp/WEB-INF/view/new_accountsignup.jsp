@@ -10,6 +10,7 @@
 <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
+<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/accountsignup-resp.css">
 <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
 <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
