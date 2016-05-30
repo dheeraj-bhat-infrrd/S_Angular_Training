@@ -69,4 +69,7 @@ public interface SSApiIntegration
 
     @PUT ( "/users/profile/profileimage/update/{userId}")
     Response updateUserProfileImage( @Path ( "userId") String userId, @Body String imageUrl );
+
+    @POST ( "/account/company/generate/hierarchy/{companyId}" )
+    Response generateDefaultHierarchy( @Path ( "companyId" ) String companyId );
 }
