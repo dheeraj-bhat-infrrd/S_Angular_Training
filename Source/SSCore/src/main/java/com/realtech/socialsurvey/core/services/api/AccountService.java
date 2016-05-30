@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import org.springframework.transaction.annotation.Transactional;
 
 
 public interface AccountService
@@ -40,4 +41,6 @@ public interface AccountService
 
 
     public List<PaymentPlan> getPaymentPlans();
+
+    public void generateDefaultHierarchy( long companyId ) throws InvalidInputException, SolrException;
 }
