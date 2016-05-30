@@ -410,7 +410,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	}
 } ]);
 
-app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '$rootScope', function($scope, PaymentService, $location, $rootScope) {
+app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '$rootScope', '$filter', function($scope, PaymentService, $location, $rootScope, $filter) {
 
 	$scope.individual = true;
 	$scope.business = false;
@@ -499,8 +499,6 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	if (angular.isUndefined($scope.clientToken) || $scope.clientToken == null || $scope.clientToken == {}) {
 		PaymentService.getClientToken().then(function(response) {
 			$scope.clientToken = response.data;
-			// $scope.validateCardDetails();
-			// $scope.setUpTokenizeBraintree();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
@@ -516,11 +514,11 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 		var cvvValidation2 = cardValidator.cvv($scope.payment.cvv, 4);
 		var postalCodeValidation = cardValidator.postalCode($scope.payment.zipCode);
 
-		if (angular.isUndefined($scope.payment.cardHolderName)) {
+		if (angular.isUndefined($scope.payment.cardHolderName) || $scope.payment.cardHolderName == "" || $scope.payment.cardHolderName == null) {
 			validCardDetails = false;
 			showError($scope.getErrorMessage("Name on Card is required."));
 		}
-		
+
 		if (angular.isUndefined($scope.payment.cardNumber) || !numberValidation.isValid) {
 			validCardDetails = false;
 			showError($scope.getErrorMessage("A valid Credit or Debit Card number is required."));
@@ -561,7 +559,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 		return validCardDetails;
 	}
 
-	$scope.setUpTokenizeBraintree = function() {
+	$scope.setUpTokenizeBraintreeAndMakePayment = function() {
 		var client = new braintree.api.Client({
 			clientToken : $scope.clientToken
 		});
@@ -575,8 +573,14 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 				postalCode : $scope.payment.zipCode
 			}
 		}, function(err, nonce) {
-			console.log(err);
-			console.log(nonce);
+			if (angular.isDefined($scope.selectedPlan) && err == null && nonce != null) {
+				var dataToSend = {"nonce" : nonce, "cardHolderName" : $scope.payment.cardHolderName};
+				PaymentService.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend).then(function(response) {
+					$location.path('/signupcomplete').replace();
+				}, function(error) {
+					showError($scope.getErrorMessage(error.data));
+				});
+			}
 		});
 	}
 
@@ -660,6 +664,20 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	}
 
 	$scope.processPayment = function() {
+		if ($scope.individual) {
+			$scope.selectedPlan = $filter('filter')($scope.paymentPlans, function(plan) {
+				return plan.planName == "Individual";
+			})[0];
+		} else if ($scope.business) {
+			$scope.selectedPlan = $filter('filter')($scope.paymentPlans, function(plan) {
+				return plan.planName == "Business";
+			})[0];
+		} else if ($scope.enterprise) {
+			$scope.selectedPlan = $filter('filter')($scope.paymentPlans, function(plan) {
+				return plan.planName == "Enterprise";
+			})[0];
+		}
+
 		if ($scope.individual || $scope.business) {
 			if ($scope.validateCardDetails()) {
 				if (!$scope.authorize) {
@@ -667,12 +685,17 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 				} else {
 					// TODO Check if payment has been made by checking an entry is present in license detail..
 					console.log("Check if payment has been made by checking an entry is present in license detail..");
-					// $location.path('/signupcomplete').replace();
+					$scope.setUpTokenizeBraintreeAndMakePayment();
 				}
-				$scope.setUpTokenizeBraintree();
 			}
 		} else {
-			// $location.path('/signupcomplete').replace();
+			if (angular.isDefined($scope.selectedPlan)) {
+				PaymentService.makePayment($rootScope.companyId, $scope.selectedPlan.planId, $scope.nonce).then(function(response) {
+					$location.path('/signupcomplete').replace();
+				}, function(error) {
+					showError($scope.getErrorMessage(error.data));
+				});
+			}
 		}
 	}
 
