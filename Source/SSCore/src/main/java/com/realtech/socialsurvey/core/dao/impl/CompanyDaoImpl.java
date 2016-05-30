@@ -105,6 +105,8 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
 
         if ( inCompleteCompany ) {
             criteria.add( Restrictions.sqlRestriction( "COMPANY_ID NOT in (select ld.COMPANY_ID from LICENSE_DETAILS ld)" ) );
+            criteria.add( Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_COMPANY_DELETED ) );
+            
         } else {
             if ( status > -1 ) {
                 criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, status ) );
