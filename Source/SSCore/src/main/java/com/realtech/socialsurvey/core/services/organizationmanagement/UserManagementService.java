@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.vo.UserList;
+import org.springframework.transaction.annotation.Transactional;
 
 
 // JIRA SS-34 BY RM02 BOC
@@ -610,5 +611,13 @@ public interface UserManagementService
 
     public String generateUserEncryptedId( long userId ) throws InvalidInputException;
     public void incompleteSurveyReminderSender();
+
+    /**
+     * Method to activate the company admin on payment completion
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    public User activateCompanyAdmin( long companyId ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

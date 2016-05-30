@@ -189,4 +189,17 @@ public class AccountController
         Company company = organizationManagementService.getCompanyById( Long.parseLong( companyId ) );
         return new ResponseEntity<String>( company.getRegistrationStage(), HttpStatus.OK );
     }
+
+
+    @RequestMapping ( value = "/company/generate/hierarchy/{companyId}", method = RequestMethod.POST)
+    @ApiOperation( value = "Generate default company heirarchy" )
+    public ResponseEntity<?> generateDefaultHierarchyForCompany( @PathVariable ( "companyId") String companyId )
+        throws InvalidInputException, SolrException
+    {
+        //Generate default company hierarchy for company
+        LOGGER.info( "AccountController.generateDefaultHierarchyForCompany started" );
+        accountService.generateDefaultHierarchy( Long.parseLong( companyId ) );
+        LOGGER.info( "AccountController.generateDefaultHierarchyForCompany completed successfully" );
+        return new ResponseEntity<Void>( HttpStatus.OK );
+    }
 }
