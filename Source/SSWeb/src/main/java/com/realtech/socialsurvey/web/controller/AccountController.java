@@ -40,6 +40,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
+import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -294,7 +295,7 @@ public class AccountController
 
     @RequestMapping ( value = "/registeraccount/generatehierarchy", method = RequestMethod.POST)
     @ResponseBody
-    public String generateHierarchy( @QueryParam( "companyId" ) String companyId )
+    public String generateHierarchy( @QueryParam ( "companyId") String companyId )
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
@@ -342,6 +343,23 @@ public class AccountController
             profileImageUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
                 + CommonConstants.FILE_SEPARATOR + profileImageUrl;
             Response response = api.updateUserProfileImage( userId, profileImageUrl );
+            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        }
+        return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/makepayment", method = RequestMethod.POST)
+    @ResponseBody
+    public String makePayment( @QueryParam ( "companyId") String companyId, @QueryParam ( "planId") String planId,
+        @RequestBody com.realtech.socialsurvey.web.entities.Payment payment )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.makePayment( companyId, planId, payment );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        if ( response.getStatus() == HttpStatus.SC_OK ) {
+            response = api.updateCompanyProfileStage( companyId, RegistrationStage.PAYMENT.getCode() );
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
         return responseString;

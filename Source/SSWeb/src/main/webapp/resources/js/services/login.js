@@ -8,19 +8,19 @@ app.service('UserProfileService', [ '$http', function($http) {
 	this.getUserProfile = function(userId) {
 		return $http.get('/registeraccount/getuserprofile.do?userId=' + userId);
 	}
-	
+
 	this.updateUserProfile = function(userId, stage, dataToSend) {
 		return $http.put('/registeraccount/updateuserprofile.do?userId=' + userId + '&stage=' + stage, JSON.stringify(dataToSend));
 	}
-	
+
 	this.getUserStage = function(userId) {
 		return $http.get('/registeraccount/getuserstage.do?userId=' + userId);
 	}
-	
+
 	this.updateUserStage = function(userId, stage) {
 		return $http.put('/registeraccount/updateuserstage.do?userId=' + userId + '&stage=' + stage);
 	}
-	
+
 	this.logoupload = function(userId, formData) {
 		return $http.post('/registeraccount/uploadcompanylogo', JSON.stringify(formData));
 	}
@@ -38,7 +38,7 @@ app.service('CompanyProfileService', [ '$http', function($http) {
 	this.getVerticals = function() {
 		return $http.get('/registeraccount/getverticals.do');
 	}
-	
+
 	this.getCompanyStage = function(companyId) {
 		return $http.get('/registeraccount/getcompanystage.do?companyId=' + companyId);
 	}
@@ -57,5 +57,9 @@ app.service('PaymentService', [ '$http', function($http) {
 
 	this.getClientToken = function() {
 		return $http.get('/registeraccount/getclienttoken.do');
+	}
+
+	this.makePayment = function(companyId, planId, dataToSend) {
+		return $http.post('/registeraccount/makepayment.do?companyId=' + companyId + '&planId=' + planId, JSON.stringify(dataToSend));
 	}
 } ]);
