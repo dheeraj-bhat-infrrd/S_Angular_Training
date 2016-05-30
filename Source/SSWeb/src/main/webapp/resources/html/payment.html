@@ -45,25 +45,64 @@
 				</div>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="individual||business">
-				<div id="payment-details-form" class="payment-details-form">
-					<form id="checkout" method="POST" action="/subscribe.do">
-						<div id="dropin" class="payment-dropin"></div>
-						<div class="clearfix">
-							<input type="submit" class="btn-payment" value='Make Payment' />
+				<form id="paymentForm" ng-submit="processPayment()">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 30px;">Name on Card</div>
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<input id="name-on-card" class="reg-details" type="text" ng-model="payment.nameOnCard" />
 						</div>
-						<input type="hidden" value="4" name="accounttype">
-					</form>
-				</div>
-				<div style="margin: 20px;">
-					<span style="margin-right: 5px;"><input type="checkbox" name="authorize" ng-model="authorize" ng-change="alertUser()" /></span> At the end of my free 30 day trial period,I authorize SocialSurvey to debit my credit card for the monthly subscription fees,under the terms and conditions agreed to be me with SocialSurvey.
-				</div>
-				<p style="margin: 20px;">For verification purpose, we will temporarily authorize your card for $1.00. Your card will not be charged for the first 30 days.</p>
-				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
-					<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
-					<div style="width: 120px; margin: auto;">
-						<button class="reg-next" ng-click="processPayment()" ng-class="{'regen':authorize}">Next</button>
 					</div>
-				</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px">Card Number</div>
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<input id="card-number" class="reg-details" type="text" ng-model="payment.cardNumber" />
+						</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px">Expiry</div>
+						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+							<input id="expiration-month" class="reg-details" type="text" ng-model="payment.expirationMonth" />
+						</div>
+						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+							<input id="expiration-year" class="reg-details" type="text" ng-model="payment.expirationYear" />
+						</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top:20px">CVV</div>
+						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top:20px">Zip Code</div>
+						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+							<input id="cvv" class="reg-details" type="text" ng-model="payment.cvv" />
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
+						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+							<input id="zip-code" class="reg-details" type="text" ng-model="payment.zipCode" />
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="reg-pswd-info col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 5px;">3 digits on back</div>
+						<div class="reg-pswd-info col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 5px;">For US cards only</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px;">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<table>
+								<tr>
+									<td style="vertical-align: top; padding-right: 10px;"><input type="checkbox" name="authorize" ng-model="authorize" ng-change="alertUser()" /></td>
+									<td style="font-size: 14px">At the end of my free 30 day trial period,I authorize SocialSurvey to debit my credit card for the monthly subscription fees,under the terms and conditions agreed to be me with SocialSurvey. <br> <br>For verification purpose, we will temporarily authorize your card for $1.00. Your card will not be charged for the first 30 days.
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
+							<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
+							<div style="width: 120px; margin: auto;">
+								<button type="submit" class="reg-next" ng-click="processPayment()" ng-class="{'regen':authorize}">Next</button>
+							</div>
+						</div>
+					</div>
+				</form>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="enterprise">
 				<form name="enterpriseForm" ng-submit="processPayment()">
