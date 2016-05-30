@@ -416,10 +416,75 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	$scope.business = false;
 	$scope.enterprise = false;
 	$scope.authorize = true;
+	$scope.payment = {};
+	$scope.expirationMonths = [ {
+		"id" : "1",
+		"value" : "1 - Jan"
+	}, {
+		"id" : "2",
+		"value" : "2 - Feb"
+	}, {
+		"id" : "3",
+		"value" : "3 - Mar"
+	}, {
+		"id" : "4",
+		"value" : "4 - Apr"
+	}, {
+		"id" : "5",
+		"value" : "5 - May"
+	}, {
+		"id" : "6",
+		"value" : "6 - Jun"
+	}, {
+		"id" : "7",
+		"value" : "7 - Jul"
+	}, {
+		"id" : "8",
+		"value" : "8 - Aug"
+	}, {
+		"id" : "9",
+		"value" : "9 - Sept"
+	}, {
+		"id" : "10",
+		"value" : "10 - Oct"
+	}, {
+		"id" : "11",
+		"value" : "11 - Nov"
+	}, {
+		"id" : "12",
+		"value" : "12 - Dec"
+	} ];
+	$('#card-number').mask("dddd dddd dddd dddd", digitRegEx);
+	$('#cvv').mask("ddd", digitRegEx);
+	$('#zip-code').mask("ddddd-dddd", digitRegEx);
+
+	var today = new Date();
+	var currentYear = today.getFullYear();
+	var validTillYear = currentYear + 19;
+	$scope.expirationYears = [ {} ];
+	for (var year = currentYear; year <= validTillYear; year++) {
+		$scope.expirationYears.push({
+			"id" : year + "",
+			"value" : year + ""
+		});
+	}
+	var trialEndDate = new Date();
+	trialEndDate.setMonth(trialEndDate.getMonth() + 1);
 
 	$scope.alertUser = function() {
 		if (!$scope.authorize) {
-			showPopUp("Authorize SocialSurvey", "You have to authorize SocialSurvey to debit your credit card for the monthly subscription fees.");
+			showPopUp("Authorize SocialSurvey", "Your authroization for payment is required.  Don't worry, you will not be charged until after your free trial ends on " + formattedDate(trialEndDate) + ".  You may cancel online anytime.");
+		}
+	}
+
+	$scope.onChangeCreditCardNumber = function() {
+		var numberValidation = cardValidator.number($scope.payment.cardNumber);
+		if (numberValidation.card != null) {
+			if (numberValidation.card.code.size == 3) {
+				$('#cvv').mask("ddd", digitRegEx);
+			} else if (numberValidation.card.code.size == 4) {
+				$('#cvv').mask("dddd", digitRegEx);
+			}
 		}
 	}
 
@@ -434,31 +499,159 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	if (angular.isUndefined($scope.clientToken) || $scope.clientToken == null || $scope.clientToken == {}) {
 		PaymentService.getClientToken().then(function(response) {
 			$scope.clientToken = response.data;
-			braintree.setup($scope.clientToken, 'custom', {
-				id : "paymentForm",
-				hostedFields : {
-					number : {
-						selector : "#card-number"
-					},
-					cvv : {
-						selector : "#cvv"
-					},
-					expirationMonth : {
-						selector : "#expiration-month"
-					},
-					expirationYear : {
-						selector : "#expiration-year"
-					},
-					postalCode : {
-						selector : "#zip-code"
-					}
-				},
-				onError : function(error) {
-
-				}
-			});
+			// $scope.validateCardDetails();
+			// $scope.setUpTokenizeBraintree();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
+		});
+	}
+
+	$scope.validateCardDetails = function() {
+		console.log($scope.payment);
+		var validCardDetails = true;
+		var numberValidation = cardValidator.number($scope.payment.cardNumber);
+		var expiryMonValidation = cardValidator.expirationMonth($scope.payment.expirationMonth);
+		var expiryYearValidation = cardValidator.expirationYear($scope.payment.expirationYear);
+		var cvvValidation1 = cardValidator.cvv($scope.payment.cvv, 3);
+		var cvvValidation2 = cardValidator.cvv($scope.payment.cvv, 4);
+		var postalCodeValidation = cardValidator.postalCode($scope.payment.zipCode);
+
+		if (angular.isUndefined($scope.payment.cardHolderName)) {
+			validCardDetails = false;
+			showError($scope.getErrorMessage("Name on Card is required."));
+		}
+		
+		if (angular.isUndefined($scope.payment.cardNumber) || !numberValidation.isValid) {
+			validCardDetails = false;
+			showError($scope.getErrorMessage("A valid Credit or Debit Card number is required."));
+		}
+
+		if (angular.isUndefined($scope.payment.expirationMonth) || !expiryMonValidation.isValid || (expiryYearValidation.isCurrentYear && $scope.payment.expirationMonth < today.getMonth() + 1)) {
+			validCardDetails = false;
+			showError($scope.getErrorMessage("A valid 2 digit Credit or Debit Card expiry month is required."));
+		}
+
+		if (angular.isUndefined($scope.payment.expirationYear) || !expiryYearValidation.isValid) {
+			validCardDetails = false;
+			showError($scope.getErrorMessage("A valid 4 digit Credit or Debit Card expiry year is required."));
+		}
+
+		if (numberValidation.card != null) {
+			if (numberValidation.card.code.size == 3) {
+				if (!cvvValidation1.isValid) {
+					validCardDetails = false;
+					showError($scope.getErrorMessage("Valid 3-digit CVV number which can be found after the account number on the back of your card is required."));
+				}
+			} else if (numberValidation.card.code.size == 4) {
+				if (!cvvValidation2.isValid) {
+					validCardDetails = false;
+					showError($scope.getErrorMessage("Valid 4-digit CVV number which can be found just above the account number on the front of your card is required."));
+				}
+			}
+		} else if (angular.isUndefined($scope.payment.cvv) || (!cvvValidation1.isValid && !cvvValidation2.isValid)) {
+			validCardDetails = false;
+			showError($scope.getErrorMessage("Valid 3-digit or 4-digit CVV number is required."));
+		}
+
+		if (angular.isUndefined($scope.payment.zipCode) || !postalCodeValidation.isValid || ($scope.payment.zipCode.length != 5 && $scope.payment.zipCode.length != 10)) {
+			validCardDetails = false;
+			showError($scope.getErrorMessage("A 5 or 9 digit zip code is required."));
+		}
+
+		return validCardDetails;
+	}
+
+	$scope.setUpTokenizeBraintree = function() {
+		var client = new braintree.api.Client({
+			clientToken : $scope.clientToken
+		});
+		client.tokenizeCard({
+			number : $scope.payment.cardNumber,
+			cardholderName : $scope.payment.cardHolderName,
+			expirationMonth : $scope.payment.expirationMonth,
+			expirationYear : $scope.payment.expirationYear,
+			cvv : $scope.payment.cvv,
+			billingAddress : {
+				postalCode : $scope.payment.zipCode
+			}
+		}, function(err, nonce) {
+			console.log(err);
+			console.log(nonce);
+		});
+	}
+
+	$scope.setUpCustomBrainTree = function() {
+		braintree.setup($scope.clientToken, 'custom', {
+			id : "paymentForm",
+			hostedFields : {
+				number : {
+					selector : "#card-number",
+					placeholder : "e.g. 0000 0000 0000 0000"
+				},
+				cvv : {
+					selector : "#cvv",
+					placeholder : "e.g. 123 or 1234"
+				},
+				expirationMonth : {
+					selector : "#expiration-month",
+					placeholder : "e.g. 01"
+				},
+				expirationYear : {
+					selector : "#expiration-year",
+					placeholder : "e.g. 2020"
+				},
+				postalCode : {
+					selector : "#zip-code",
+					placeholder : "e.g. 12345 or 12345678"
+				},
+				styles : {
+					".invalid" : {
+						"color" : "red",
+					},
+				},
+				onFieldEvent : function(event) {
+					console.log(event);
+					if (event.type === "blur") {
+						if (event.target.fieldKey == "number") {
+							if (event.isEmpty || !event.isValid) {
+								showError($scope.getErrorMessage("A valid Credit or Debit Card number is required."));
+							}
+						} else if (event.target.fieldKey == "expirationMonth") {
+							if (event.isEmpty || !event.isValid) {
+								showError($scope.getErrorMessage("A 2 digit Credit or Debit Card expiry month is required."));
+							}
+						} else if (event.target.fieldKey == "expirationYear") {
+							if (event.isEmpty || !event.isValid) {
+								showError($scope.getErrorMessage("A 4 digit Credit or Debit Card expiry year is required."));
+							}
+						} else if (event.target.fieldKey == "cvv") {
+							if (event.isEmpty || !event.isValid) {
+								if (event.card != null) {
+									if (event.card.code.size == 3) {
+										showError($scope.getErrorMessage("The 3-digit CVV number which can be found after the account number on the back of your card is required."));
+									} else if (event.card.code.size == 4) {
+										showError($scope.getErrorMessage("The 4-digit CVV number which can be found just above the account number on the front of your card is required."));
+									}
+								} else {
+									showError($scope.getErrorMessage("A valid Credit or Debit Card number is required."));
+								}
+							}
+						} else if (event.target.fieldKey == "postalCode") {
+							if (event.isEmpty || !event.isValid) {
+								showError($scope.getErrorMessage("A 5 or 9 digit zip code is required."));
+							}
+						}
+					}
+				}
+			},
+			onPaymentMethodReceived : function(object) {
+				console.log(object.nonce);
+				console.log(object.type);
+				console.log(object.details);
+			},
+			onError : function(error) {
+				showError($scope.getErrorMessage(error.message));
+			}
 		});
 	}
 
@@ -468,15 +661,18 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 
 	$scope.processPayment = function() {
 		if ($scope.individual || $scope.business) {
-			if (!$scope.authorize) {
-				showPopUp("Authorize SocialSurvey", "Your authroization for payment is required.  Don't worry, you will not be charged until after your free trial ends on [DD/YY/YYYY].  You may cancel online anytime.");
-			} else {
-				// TODO Check if payment has been made by checking an entry is present in license detail..
-				console.log("Check if payment has been made by checking an entry is present in license detail..");
-				$location.path('/signupcomplete').replace();
+			if ($scope.validateCardDetails()) {
+				if (!$scope.authorize) {
+					showPopUp("Authorize SocialSurvey", "Your authroization for payment is required.  Don't worry, you will not be charged until after your free trial ends on " + formattedDate(trialEndDate) + ".  You may cancel online anytime.");
+				} else {
+					// TODO Check if payment has been made by checking an entry is present in license detail..
+					console.log("Check if payment has been made by checking an entry is present in license detail..");
+					// $location.path('/signupcomplete').replace();
+				}
+				$scope.setUpTokenizeBraintree();
 			}
 		} else {
-			$location.path('/signupcomplete').replace();
+			// $location.path('/signupcomplete').replace();
 		}
 	}
 
@@ -520,4 +716,13 @@ function showPopUp(header, message) {
 		$('#overlay-continue').unbind('click');
 	});
 	$('#overlay-main').show();
+}
+
+function formattedDate(date) {
+	var d = new Date(date || Date.now()), month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear();
+	if (month.length < 2)
+		month = '0' + month;
+	if (day.length < 2)
+		day = '0' + day;
+	return [ day, month, year ].join('/');
 }
