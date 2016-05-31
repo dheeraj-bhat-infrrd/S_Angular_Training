@@ -96,7 +96,7 @@ public class LoginController
     }
 
 
-    @RequestMapping ( value = "/newaccountsignup")
+    @RequestMapping ( value = "/accountsignup")
     public String initNewAccountSignUp( HttpServletResponse response, Model model )
     {
         LOG.info( "Method initNewAccountSignUp() called from LoginController" );
