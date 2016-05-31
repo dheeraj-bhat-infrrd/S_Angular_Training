@@ -24,5 +24,8 @@ public class ErrorCodes
     public static final String REMOTE_ADDR_INVALID = "remoteaddr.invalid";
     public static final String CAPTCHA_RESPONSE_INVALID = "captcharesponse.invalid";
 
+    // payment request variables
+    public static final String NONCE_INVALID = "nonce.invalid";
+
 
 }
