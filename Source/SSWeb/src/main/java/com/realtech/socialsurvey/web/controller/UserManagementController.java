@@ -1145,7 +1145,7 @@ public class UserManagementController
             }
 
             if ( user.getIsForcePassword() == 1 ) {
-                if ( !user.getRegistrationStage().equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
+                if ( !user.getRegistrationStage().equalsIgnoreCase( RegistrationStage.PAYMENT.getCode() ) ) {
                     redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
                     redirectAttributes.addFlashAttribute( "companyId", companyId );
                     return "redirect:/newaccountsignup.do";

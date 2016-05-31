@@ -1,13 +1,15 @@
 <script src="../resources/js/dropzone.js"></script>
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
-<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0px;">
-	<div class="reg-left-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
+<div class="main-reg-wrapper">
+	<div class="reg-left-container">
 		<div class="reg-ss-logo"></div>
-		<div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<img src="../resources/images/step-3.png" class="stretch" alt="" />
 		</div>
-		<div id="err-nw-wrapper" class="err-nw-wrapper reg-error">
-			<span class="err-new-close"></span> <span id="err-nw-txt"></span>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div id="err-nw-wrapper" class="err-nw-wrapper reg-error ">
+				<span class="err-new-close"></span> <span id="err-nw-txt"></span>
+			</div>
 		</div>
 		<div class="reg-payment-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<div class="reg-payment-container ">
@@ -45,34 +47,41 @@
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="individual||business">
 				<form id="paymentForm" ng-submit="processPayment()">
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 30px;">Name on Card</div>
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Name on Card</div>
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-							<input id="name-on-card" class="reg-details" type="text" ng-model="payment.nameOnCard" />
+							<input id="name-on-card" class="reg-details" type="text" ng-model="payment.cardHolderName" />
 						</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px">Card Number</div>
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-							<input id="card-number" class="reg-details" type="text" ng-model="payment.cardNumber" />
+							<!--  <div id="card-number" class="reg-details"></div>-->
+							<input id="card-number" class="reg-details" type="text" ng-model="payment.cardNumber" ng-change="onChangeCreditCardNumber()" />
 						</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px">Expiry</div>
 						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-							<input id="expiration-month" class="reg-details" type="text" ng-model="payment.expirationMonth" />
+							<!--<div id="expiration-month" class="reg-details"></div>-->
+							<!--  <input id="expiration-month" class="reg-details" type="text" ng-model="payment.expirationMonth" />-->
+							<select id="expiration-month" class="reg-details" ng-model="payment.expirationMonth" ng-options="month.id as month.value for month in expirationMonths"></select>
 						</div>
 						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-							<input id="expiration-year" class="reg-details" type="text" ng-model="payment.expirationYear" />
+							<!--<div id="expiration-year" class="reg-details"></div>
+							<!--<input id="expiration-year" class="reg-details" type="text" ng-model="payment.expirationYear" />-->
+							<select id="expiration-year" class="reg-details" ng-model="payment.expirationYear" ng-options="year.id as year.value for year in expirationYears"></select>
 						</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top:20px">CVV</div>
 						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top:20px">Zip Code</div>
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-							<input id="cvv" class="reg-details" type="text" ng-model="payment.cvv" />
+							<!--<div id="cvv" class="reg-details"></div>-->
+							<input id="cvv" class="reg-details" type="password" ng-model="payment.cvv" />
 						</div>
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+							<!--<div id="zip-code" class="reg-details"></div>-->
 							<input id="zip-code" class="reg-details" type="text" ng-model="payment.zipCode" />
 						</div>
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
@@ -81,7 +90,7 @@
 						<div class="reg-pswd-info col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 5px;">3 digits on back</div>
 						<div class="reg-pswd-info col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 5px;">For US cards only</div>
 					</div>
-					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px;">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 							<table>
 								<tr>
@@ -96,7 +105,7 @@
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
 							<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
 							<div style="width: 120px; margin: auto;">
-								<button type="submit" class="reg-next" ng-click="processPayment()" ng-class="{'regen':authorize}">Next</button>
+								<button type="submit" class="reg-next" ng-class="{'regen':authorize}">Next</button>
 							</div>
 						</div>
 					</div>
@@ -123,16 +132,16 @@
 			</div>
 		</div>
 	</div>
-	<div class="reg-right-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
-		<div class="reg-right-center col-lg-12 col-md-12 col-sm-12 col-xs-12">
-			<div ng-show="individual">
+	<div class="reg-right-container">
+		<div class="reg-right-center ">
+			<div ng-show="individual" class="payment-right-description">
 				<div class="reg-Individual">Individual</div>
 				<div class="reg-indiv-detail">Plan Details</div>
-				<div class="reg-right-description " style="width: 80%">
-					<div class="plan-discription">
-						Single user account: <span class="plan-discription-sub">for independent professionals.</span>
+				<div class="reg-right-description-payment " >
+					<div class="plan-discription" >
+						<span style="opacity:0.8!important;color:#fff;">Single user account: </span><span class="plan-discription-sub">for independent professionals.</span>
 					</div>
-					<div id="single-user">
+					<div id="single-user" class="reg-li">
 						<ul>
 							<li><span>Survey builder wizard with multiple question types and unlimited questions</span></li>
 							<li><span>Social media syndication of your featured reviews</span></li>
@@ -146,14 +155,14 @@
 					</div>
 				</div>
 			</div>
-			<div ng-show="business">
+			<div ng-show="business" class="payment-right-description">
 				<div class="reg-Individual">Business</div>
 				<div class="reg-indiv-detail">Plan Details</div>
-				<div class="reg-right-description " style="width: 80%">
+				<div class="reg-right-description-payment " >
 					<div class="plan-discription">
-						Small offices &amp; growing business: <span class="plan-discription-sub">with team management.</span>
+						<span style="opacity:0.8!important;color:#fff;">Small offices &amp; growing business: </span><span class="plan-discription-sub">with team management.</span>
 					</div>
-					<div id="business">
+					<div id="business" class="reg-li">
 						<ul>
 							<li><span class="bold-li">Business includes everything in Individual, and:</span></li>
 							<li><span>Point-of-sale transaction integrated survey automation with Verified Customer badge</span></li>
@@ -167,14 +176,14 @@
 					</div>
 				</div>
 			</div>
-			<div ng-show="enterprise">
+			<div ng-show="enterprise" class="payment-right-description">
 				<div class="reg-Individual">Enterprise</div>
 				<div class="reg-indiv-detail">Plan Details</div>
-				<div class="reg-right-description " style="width: 80%">
+				<div class="reg-right-description-payment " >
 					<div class="plan-discription">
-						Large organizations: <span class="plan-discription-sub">with enhanced customization</span>
+						<span style="opacity:0.8!important;color:#fff;">Large organizations: </span><span class="plan-discription-sub">with enhanced customization</span>
 					</div>
-					<div id="enterprise">
+					<div id="enterprise" class="reg-li">
 						<ul>
 							<li><span class="bold-li">Enterprise includes everything in Individual, Business, and:</span></li>
 							<li><span>Social media monitoring for keyword based compliance alerts</span></li>

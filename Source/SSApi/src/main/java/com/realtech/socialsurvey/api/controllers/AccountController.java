@@ -205,11 +205,25 @@ public class AccountController
         return new ResponseEntity<String>( company.getRegistrationStage(), HttpStatus.OK );
     }
 
+
     @RequestMapping ( value = "/payment/company/{companyId}/plan/{planId}", method = RequestMethod.POST)
     @ApiOperation( value = "Payment for company for a particular plan")
-    public ResponseEntity<?> payForPlan( @Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long companyId, @PathVariable int planId) throws NonFatalException{
-        LOGGER.info( "Payment initiated for company id "+companyId + " for plan id: "+ planId );
+    public ResponseEntity<?> payForPlan( @Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long companyId, @PathVariable int planId) throws NonFatalException
+    {
+        LOGGER.info( "Payment initiated for company id " + companyId + " for plan id: " + planId );
         accountService.payForPlan( companyId, planId, paymentRequest.getNonce(), paymentRequest.getCardHolderName() );
-        return new ResponseEntity<Void>( HttpStatus.OK);
+        return new ResponseEntity<Void>( HttpStatus.OK );
+    }
+
+    @RequestMapping ( value = "/company/generate/hierarchy/{companyId}", method = RequestMethod.POST)
+    @ApiOperation( value = "Generate default company heirarchy" )
+    public ResponseEntity<?> generateDefaultHierarchyForCompany( @PathVariable ( "companyId") String companyId )
+        throws InvalidInputException, SolrException
+    {
+        //Generate default company hierarchy for company
+        LOGGER.info( "AccountController.generateDefaultHierarchyForCompany started" );
+        accountService.generateDefaultHierarchy( Long.parseLong( companyId ) );
+        LOGGER.info( "AccountController.generateDefaultHierarchyForCompany completed successfully" );
+        return new ResponseEntity<Void>( HttpStatus.OK );
     }
 }

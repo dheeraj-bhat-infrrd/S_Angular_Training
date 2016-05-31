@@ -6,12 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.ActiveSubscriptionFoundException;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +25,6 @@ import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AccountsMaster;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.PaymentPlan;
-import com.realtech.socialsurvey.core.entities.Phone;
-import com.realtech.socialsurvey.core.entities.RegistrationStage;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -65,6 +56,7 @@ public class AccountServiceImpl implements AccountService
     public AccountServiceImpl( GenericDao<VerticalsMaster, Integer> industryDao,
         GenericDao<AccountsMaster, Integer> paymentPlanDao, CompanyDao companyDao,
         GenericDao<VerticalsMaster, Integer> verticalMastersDao, OrganizationManagementService organizationManagementService,
+
         OrganizationUnitSettingsDao organizationUnitSettingsDao, UserManagementService userManagementService, UserService userService, Payment payment )
     {
         this.industryDao = industryDao;
@@ -197,7 +189,7 @@ public class AccountServiceImpl implements AccountService
     public List<PaymentPlan> getPaymentPlans()
     {
         LOGGER.info( "AccountServiceImpl.getPaymentPlans started" );
-        List<PaymentPlan> paymentPlans = new ArrayList<PaymentPlan>();
+        List<PaymentPlan> paymentPlans = new ArrayList<>();
         List<AccountsMaster> plans = paymentPlanDao.findAll( AccountsMaster.class );
         for ( AccountsMaster plan : plans ) {
             if ( plan.getAccountsMasterId() == AccountType.INDIVIDUAL.getValue() ) {
@@ -210,6 +202,40 @@ public class AccountServiceImpl implements AccountService
         }
         LOGGER.info( "AccountServiceImpl.getPaymentPlans completed successfully" );
         return paymentPlans;
+    }
+
+
+    @Transactional
+    @Override
+    public void generateDefaultHierarchy( long companyId ) throws InvalidInputException, SolrException
+    {
+        LOGGER.info( "AccountServiceImpl.generateDefaultHierarchy started" );
+        Company company = companyDao.findById( Company.class, companyId );
+        if ( company == null ) {
+            throw new InvalidInputException( "Company with companyId : " + companyId + " does not exist" );
+        }
+        //Activate company admin
+        userManagementService.activateCompanyAdmin( companyId );
+        
+        //Get license details for the company
+        LicenseDetail companyLicenseDetail = company.getLicenseDetails().get( CommonConstants.INITIAL_INDEX );
+        if ( companyLicenseDetail == null ) {
+            throw new InvalidInputException( "LicenseDetails for companyId : " + companyId + " does not exist" );
+        }
+        //Get current accounts master
+        AccountsMaster accountsMaster = companyLicenseDetail.getAccountsMaster();
+        if ( accountsMaster == null ) {
+            throw new InvalidInputException( "AccountsMaster for companyId : " + companyId + " does not exist" );
+        }
+        //Add the account type for company
+        User companyAdmin = userManagementService.getCompanyAdmin( companyId );
+        organizationManagementService
+            .addAccountTypeForCompany( companyAdmin, String.valueOf( accountsMaster.getAccountsMasterId() ) );
+        //Update profile completion stage for company admin
+        userManagementService
+            .updateProfileCompletionStage( companyAdmin, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+                CommonConstants.DASHBOARD_STAGE );
+        LOGGER.info( "AccountServiceImpl.generateDefaultHierarchy finished" );
     }
 
 

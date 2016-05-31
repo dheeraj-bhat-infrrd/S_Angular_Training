@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.api;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
+import com.realtech.socialsurvey.web.entities.Payment;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
 
 import retrofit.client.Response;
@@ -69,4 +70,12 @@ public interface SSApiIntegration
 
     @PUT ( "/users/profile/profileimage/update/{userId}")
     Response updateUserProfileImage( @Path ( "userId") String userId, @Body String imageUrl );
+
+
+    @POST ( "/account/company/generate/hierarchy/{companyId}")
+    Response generateDefaultHierarchy( @Path ( "companyId") String companyId );
+
+
+    @POST ( "/account/payment/{companyId}/plan/{planId}")
+    Response makePayment( @Path ( "companyId") String companyId, @Path ( "planId") String planId, @Body Payment payment );
 }
