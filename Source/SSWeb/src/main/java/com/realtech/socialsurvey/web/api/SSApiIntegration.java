@@ -76,6 +76,6 @@ public interface SSApiIntegration
     Response generateDefaultHierarchy( @Path ( "companyId") String companyId );
 
 
-    @POST ( "/account/payment/{companyId}/plan/{planId}")
+    @POST ( "/account/payment/company/{companyId}/plan/{planId}")
     Response makePayment( @Path ( "companyId") String companyId, @Path ( "planId") String planId, @Body Payment payment );
 }
