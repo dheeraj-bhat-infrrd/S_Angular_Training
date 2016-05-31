@@ -12,6 +12,10 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.payment.exception.ActiveSubscriptionFoundException;
+import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,5 +46,8 @@ public interface AccountService
 
     public List<PaymentPlan> getPaymentPlans();
 
+    public void payForPlan(long companyId, int planId, String nonce, String cardHolderName) throws InvalidInputException,
+        PaymentException, SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException,
+        ActiveSubscriptionFoundException;
     public void generateDefaultHierarchy( long companyId ) throws InvalidInputException, SolrException;
 }

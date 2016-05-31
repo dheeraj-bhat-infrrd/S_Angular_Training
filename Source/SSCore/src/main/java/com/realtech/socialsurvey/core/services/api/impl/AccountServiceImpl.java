@@ -8,6 +8,12 @@ import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.ActiveSubscriptionFoundException;
+import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,15 +47,17 @@ public class AccountServiceImpl implements AccountService
     private GenericDao<VerticalsMaster, Integer> verticalMastersDao;
     private OrganizationManagementService organizationManagementService;
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-    private UserService userService;
     private UserManagementService userManagementService;
+    private UserService userService;
+    private Payment payment;
 
 
     @Autowired
     public AccountServiceImpl( GenericDao<VerticalsMaster, Integer> industryDao,
         GenericDao<AccountsMaster, Integer> paymentPlanDao, CompanyDao companyDao,
         GenericDao<VerticalsMaster, Integer> verticalMastersDao, OrganizationManagementService organizationManagementService,
-        OrganizationUnitSettingsDao organizationUnitSettingsDao, UserService userService, UserManagementService userManagementService )
+
+        OrganizationUnitSettingsDao organizationUnitSettingsDao, UserManagementService userManagementService, UserService userService, Payment payment )
     {
         this.industryDao = industryDao;
         this.paymentPlanDao = paymentPlanDao;
@@ -57,8 +65,9 @@ public class AccountServiceImpl implements AccountService
         this.verticalMastersDao = verticalMastersDao;
         this.organizationManagementService = organizationManagementService;
         this.organizationUnitSettingsDao = organizationUnitSettingsDao;
-        this.userService = userService;
         this.userManagementService = userManagementService;
+        this.userService = userService;
+        this.payment = payment;
     }
 
 
@@ -180,7 +189,7 @@ public class AccountServiceImpl implements AccountService
     public List<PaymentPlan> getPaymentPlans()
     {
         LOGGER.info( "AccountServiceImpl.getPaymentPlans started" );
-        List<PaymentPlan> paymentPlans = new ArrayList<PaymentPlan>();
+        List<PaymentPlan> paymentPlans = new ArrayList<>();
         List<AccountsMaster> plans = paymentPlanDao.findAll( AccountsMaster.class );
         for ( AccountsMaster plan : plans ) {
             if ( plan.getAccountsMasterId() == AccountType.INDIVIDUAL.getValue() ) {
@@ -397,5 +406,20 @@ public class AccountServiceImpl implements AccountService
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + company.getCompany() );
+    }
+
+    @Transactional
+    @Override
+    public void payForPlan(long companyId, int planId, String nonce, String cardHolderName) throws InvalidInputException,
+        PaymentException, SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException,
+        ActiveSubscriptionFoundException
+    {
+        LOGGER.info( "Paying for company id "+companyId+ " for plan "+planId );
+        Company company = companyDao.findById( Company.class, companyId );
+        // pass the company and nonce to make a payment. Get the subscription id and insert into license table.
+        String subscriptionId = payment.subscribeForCompany( company, nonce, planId, cardHolderName );
+        // insert into License Details table
+        User user = userManagementService.getAdminUserByCompanyId(companyId);
+        payment.insertIntoLicenseTable( planId, user, subscriptionId );
     }
 }
