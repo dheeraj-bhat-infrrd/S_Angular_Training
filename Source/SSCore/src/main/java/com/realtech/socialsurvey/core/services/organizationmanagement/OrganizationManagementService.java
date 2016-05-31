@@ -1372,4 +1372,13 @@ public interface OrganizationManagementService
 
 
     public String generateProfileNameForCompany( String companyName, long iden ) throws InvalidInputException;
+
+
+    /**
+     * Method to activate the company status to active
+     * @param company
+     * @return
+     * @throws InvalidInputException
+     */
+    public Company activateCompany( Company company ) throws InvalidInputException;
 }

@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.core.entities.PaymentPlan;
 import com.realtech.socialsurvey.core.entities.Phone;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -49,5 +50,6 @@ public interface AccountService
     public void payForPlan(long companyId, int planId, String nonce, String cardHolderName) throws InvalidInputException,
         PaymentException, SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException,
         ActiveSubscriptionFoundException;
-    public void generateDefaultHierarchy( long companyId ) throws InvalidInputException, SolrException;
+    public void generateDefaultHierarchy( long companyId )
+        throws InvalidInputException, SolrException, HierarchyAlreadyExistsException;
 }

@@ -11,7 +11,9 @@ import javax.annotation.Resource;
 
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.entities.integration.Agent;
 import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
+import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -4400,15 +4402,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
     }
 
+
     @Transactional
     @Override
-    public User activateCompanyAdmin( long companyId ) throws InvalidInputException
+    public User activateCompanyAdmin( User companyAdmin ) throws InvalidInputException, HierarchyAlreadyExistsException
     {
         LOG.info( "UserManagementService.activateCompanyAdmin started" );
-        User companyAdmin = getAdminUserByCompanyId( companyId );
-        if ( companyAdmin == null ) {
-            throw new InvalidInputException( "No company admin exists for companyId : " + companyId );
-        }
         //Update the USER table status
         companyAdmin.setStatus( CommonConstants.STATUS_ACTIVE );
         userDao.update( companyAdmin );
@@ -4416,6 +4415,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //Update the user's user profiles
         userProfileDao.activateAllUserProfilesForUser( companyAdmin );
 
+        //Activate agent in mongo
+        AgentSettings agentSettings = getUserSettings( companyAdmin.getUserId() );
+        organizationUnitSettingsDao
+            .updateParticularKeyAgentSettings( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE_MONGO,
+                agentSettings );
         LOG.info( "UserManagementService.activateCompanyAdmin finished" );
         return companyAdmin;
     }
