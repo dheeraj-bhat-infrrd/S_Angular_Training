@@ -1148,7 +1148,7 @@ public class UserManagementController
                 if ( !user.getRegistrationStage().equalsIgnoreCase( RegistrationStage.PAYMENT.getCode() ) ) {
                     redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
                     redirectAttributes.addFlashAttribute( "companyId", companyId );
-                    return "redirect:/newaccountsignup.do";
+                    return "redirect:/accountsignup.do";
                 }
             }
 
