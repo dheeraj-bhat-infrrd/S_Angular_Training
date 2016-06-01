@@ -116,11 +116,12 @@
 					<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">Name *</div>
 					<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">Email *</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<input class="reg-name" type="text" placeholder="Your Name" required ng-model="name" /> <input class="reg-name float-right" style="margin-left: 2%;" type="email" placeholder="email@example.com" required ng-model="email" />
+						<input class="reg-name" type="text" placeholder="Your Name" required ng-model="payment.name" />
+						<input class="reg-name float-right" style="margin-left: 2%;" type="email" placeholder="email@example.com" required ng-model="payment.email" />
 					</div>
 					<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Message *</div>
 					<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<textarea class="reg-details" style="height: 100px; padding: 10px;" placeholder="Lets us know how we can help." required ng-model="message"></textarea>
+						<textarea class="reg-details" style="height: 100px; padding: 10px;" placeholder="Lets us know how we can help." required ng-model="payment.message"></textarea>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
 						<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
