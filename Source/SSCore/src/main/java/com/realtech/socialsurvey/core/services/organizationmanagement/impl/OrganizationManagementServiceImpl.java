@@ -7637,6 +7637,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    @Transactional
+    @Override
+    public Company activateCompany( Company company ) throws InvalidInputException
+    {
+        LOG.info( "UserManagementService.activateCompany started" );
+        //Activate company in SQL
+        company.setStatus( CommonConstants.STATUS_ACTIVE );
+        companyDao.update( company );
+        //Activate company in MongoDB
+        OrganizationUnitSettings companySettings = getCompanySettings( company.getCompanyId() );
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "No company settings found for company : " + company.getCompanyId() );
+        }
+        organizationUnitSettingsDao
+            .updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE_MONGO,
+                companySettings, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        LOG.info( "UserManagementService.activateCompany finished" );
+        return company;
+    }
+
+
     private Map<Long, String> getUnprocessedProfileImages( String collection )
     {
         LOG.debug( "Getting unprocessed profile images for collection " + collection );

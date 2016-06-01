@@ -697,7 +697,12 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 			}
 		} else {
 			if (angular.isDefined($scope.selectedPlan)) {
-				PaymentService.makePayment($rootScope.companyId, $scope.selectedPlan.planId, $scope.nonce).then(function(response) {
+				var dataToSend = {
+					"name" : $scope.payment.name,
+					"email" : $scope.payment.email,
+					"message" : $scope.payment.message
+				};
+				PaymentService.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend).then(function(response) {
 					$location.path('/signupcomplete').replace();
 				}, function(error) {
 					showError($scope.getErrorMessage(error.data));
