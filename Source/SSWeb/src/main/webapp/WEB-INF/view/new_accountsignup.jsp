@@ -26,8 +26,11 @@
 <script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async defer></script>
 </head>
 <script type="text/javascript">
-	var userId = eval('(' + '${userId}' + ')');
-	var companyId = eval('(' + '${companyId}' + ')');
+	var userId = "${userId}" ;
+	var companyId =  "${companyId}" ;
+	var firstName = "${firstName}";
+	var lastName = "${lastName}";
+	var setPassword = "${setPassword}";
 </script>
 <body ng-app="SocialSurvey" ng-controller="newSignupController">
 	<div class="overlay-loader hide"></div>

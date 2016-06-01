@@ -50,7 +50,8 @@ app.config([ '$routeProvider', function($routeProvider) {
 		templateUrl : "../../resources/html/signupcomplete.html",
 		controller : "signupcompleteController"
 	}).when("/password", {
-		templateUrl : "../../resources/html/password.html"
+		templateUrl : "../../resources/html/password.html",
+		controller : "passwordController"
 	}).when("/linkedinloader", {
 		templateUrl : "../../resources/html/linkedinloader.html"
 	}).otherwise({

@@ -461,5 +461,31 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         return true;
     }
 
+
+    @Override
+    public User getActiveOrIncompleteUser( String emailId ) throws NoRecordsFetchedException
+    {
+        LOG.debug( "Method getActiveOrIncompleteUser() called to check if any user present with the Email id : " + emailId );
+        Criteria criteria = getSession().createCriteria( User.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.LOGIN_NAME, emailId ) );
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE ) );
+            criteria.add( criterion );
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
+        }
+        @SuppressWarnings ( "unchecked") List<User> users = criteria.list();
+        if ( users == null || users.isEmpty() ) {
+            LOG.debug( "No active users found with the emaild id " + emailId );
+            throw new NoRecordsFetchedException( "No active user found for the emailid" );
+        }
+        LOG.debug( "Method getActiveOrIncompleteUser() successfull, active user with the emailId " + emailId );
+        return users.get( CommonConstants.INITIAL_INDEX );
+    }
+
 }
 // JIRA SS-42 By RM-05 EOC

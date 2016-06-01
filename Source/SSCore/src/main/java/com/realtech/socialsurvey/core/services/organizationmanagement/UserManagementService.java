@@ -28,7 +28,6 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.vo.UserList;
-import org.springframework.transaction.annotation.Transactional;
 
 
 // JIRA SS-34 BY RM02 BOC
@@ -598,19 +597,24 @@ public interface UserManagementService
     public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
         throws InvalidInputException, SolrException;
 
+
     /**
      * Method to map CRM Data with AgentIds
      */
     public void crmDataAgentIdMApper();
 
-    public User getAdminUserByCompanyId(long companyId);
+
+    public User getAdminUserByCompanyId( long companyId );
 
 
     public ContactDetailsSettings fetchAgentContactDetailByEncryptedId( String userEncryptedId ) throws InvalidInputException;
 
 
     public String generateUserEncryptedId( long userId ) throws InvalidInputException;
+
+
     public void incompleteSurveyReminderSender();
+
 
     /**
      * Method to activate the company admin on payment completion
@@ -619,5 +623,8 @@ public interface UserManagementService
      * @throws InvalidInputException
      */
     public User activateCompanyAdmin( long companyId ) throws InvalidInputException;
+
+
+    public void inviteCorporateToRegister( User user ) throws InvalidInputException, UndeliveredEmailException;
 }
 // JIRA SS-34 BY RM02 BOC
