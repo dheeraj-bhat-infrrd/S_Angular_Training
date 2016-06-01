@@ -21,6 +21,7 @@ import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -614,10 +615,10 @@ public interface UserManagementService
 
     /**
      * Method to activate the company admin on payment completion
-     * @param companyId
+     * @param companyAdmin
      * @return
      * @throws InvalidInputException
      */
-    public User activateCompanyAdmin( long companyId ) throws InvalidInputException;
+    public User activateCompanyAdmin( User companyAdmin ) throws InvalidInputException, HierarchyAlreadyExistsException;
 }
 // JIRA SS-34 BY RM02 BOC

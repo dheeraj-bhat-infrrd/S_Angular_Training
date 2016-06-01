@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.ActiveSubscriptionFoundException;
@@ -194,10 +195,10 @@ public class AccountServiceImpl implements AccountService
         for ( AccountsMaster plan : plans ) {
             if ( plan.getAccountsMasterId() == AccountType.INDIVIDUAL.getValue() ) {
                 paymentPlans
-                    .add( getPaymentPlan( 1, plan.getAmount(), "$", plan.getAccountsMasterId(), "Individual", "", "" ) );
+                    .add( getPaymentPlan( plan.getAccountsMasterId(), plan.getAmount(), "$", 1, "Individual", "", "" ) );
             } else if ( plan.getAccountsMasterId() == AccountType.ENTERPRISE.getValue() ) {
-                paymentPlans.add( getPaymentPlan( 2, plan.getAmount(), "$", plan.getAccountsMasterId(), "Business", "", "" ) );
-                paymentPlans.add( getPaymentPlan( 3, 0, "$", plan.getAccountsMasterId(), "Enterprise", "", "" ) );
+                paymentPlans.add( getPaymentPlan( plan.getAccountsMasterId(), plan.getAmount(), "$", 2, "Business", "", "" ) );
+                paymentPlans.add( getPaymentPlan( plan.getAccountsMasterId(), 0, "$", 3, "Enterprise", "", "" ) );
             }
         }
         LOGGER.info( "AccountServiceImpl.getPaymentPlans completed successfully" );
@@ -207,16 +208,22 @@ public class AccountServiceImpl implements AccountService
 
     @Transactional
     @Override
-    public void generateDefaultHierarchy( long companyId ) throws InvalidInputException, SolrException
+    public void generateDefaultHierarchy( long companyId )
+        throws InvalidInputException, SolrException, HierarchyAlreadyExistsException
     {
         LOGGER.info( "AccountServiceImpl.generateDefaultHierarchy started" );
         Company company = companyDao.findById( Company.class, companyId );
         if ( company == null ) {
             throw new InvalidInputException( "Company with companyId : " + companyId + " does not exist" );
         }
-        //Activate company admin
-        userManagementService.activateCompanyAdmin( companyId );
-        
+        //Get the company admin
+        User companyAdmin = userManagementService.getAdminUserByCompanyId( companyId );
+        if ( companyAdmin == null ) {
+            throw new InvalidInputException( "No company admin exists for companyId : " + companyId );
+        }
+        if ( companyAdmin.getStatus() != CommonConstants.STATUS_INCOMPLETE ) {
+            throw new HierarchyAlreadyExistsException( "The hierarchy already exists for companyId: " + companyId );
+        }
         //Get license details for the company
         LicenseDetail companyLicenseDetail = company.getLicenseDetails().get( CommonConstants.INITIAL_INDEX );
         if ( companyLicenseDetail == null ) {
@@ -227,14 +234,18 @@ public class AccountServiceImpl implements AccountService
         if ( accountsMaster == null ) {
             throw new InvalidInputException( "AccountsMaster for companyId : " + companyId + " does not exist" );
         }
-        //Add the account type for company
-        User companyAdmin = userManagementService.getCompanyAdmin( companyId );
         organizationManagementService
             .addAccountTypeForCompany( companyAdmin, String.valueOf( accountsMaster.getAccountsMasterId() ) );
         //Update profile completion stage for company admin
         userManagementService
             .updateProfileCompletionStage( companyAdmin, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
                 CommonConstants.DASHBOARD_STAGE );
+
+        //Activate company
+        organizationManagementService.activateCompany( company );
+
+        //Activate company admin
+        userManagementService.activateCompanyAdmin( companyAdmin );
         LOGGER.info( "AccountServiceImpl.generateDefaultHierarchy finished" );
     }
 
