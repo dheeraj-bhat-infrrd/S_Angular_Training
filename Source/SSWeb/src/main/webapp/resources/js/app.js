@@ -46,7 +46,8 @@ app.config([ '$routeProvider', function($routeProvider) {
 	}).when("/password", {
 		templateUrl : "../../resources/html/password.html"
 	}).when("/linkedinloader", {
-		templateUrl : "../../resources/html/linkedinloader.html"
+		templateUrl : "../../resources/html/linkedinloader.html",
+		controller : "linkedloaderController"
 	}).otherwise({
 		redirect : '/accountsignup'
 	});

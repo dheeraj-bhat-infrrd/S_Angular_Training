@@ -9,32 +9,42 @@
 				<span class="err-new-close"></span> <span id="err-nw-txt"></span>
 			</div>
 		</div>
-		<form name="signInForm" id="signInForm" ng-submit="submitLogin()">
+		<form name="signInForm" id="signInForm" ng-submit="submitLogin()" novalidate>
 			<div style="margin-top: 20px;">
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 reg-create-account">Create an account</div>
 				<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">First Name *</div>
 				<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">Last Name *</div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<input class=" reg-name" type="text" placeholder="First Name" ng-model="accountRegistration.firstName" required oninvalid="this.setCustomValidity('Firstname is required.')" oninput="this.setCustomValidity('')" /> <input class=" reg-name float-right" ng-model="accountRegistration.lastName" style="margin-left: 2%;" type="text" placeholder="Last Name" required oninvalid="this.setCustomValidity('Lastname is required.')" oninput="this.setCustomValidity('')" />
+					<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding:0" ng-class="{ 'has-error-reg' : submitted && signInForm.firstName.$error.required}">
+						<input class=" reg-name form-control-reg" name="firstName" type="text" placeholder="First Name" ng-model="accountRegistration.firstName" required />
+						<p ng-show="submitted && signInForm.firstName.$error.required" class="help-block-reg">Firstname is required.</p>
+					</div>
+					<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding:0" ng-class="{ 'has-error-reg' : submitted && signInForm.lastName.$error.required}">
+						<input class=" reg-name  form-control-reg" name="lastName" ng-model="accountRegistration.lastName" style="margin-left: 2%;" type="text" placeholder="Last Name" required />
+						<p ng-show="submitted && signInForm.lastName.$error.required" class="help-block-reg">Lastname is required.</p>
+					</div>
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Company Name *</div>
-				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<input class="reg-details" type="text" placeholder="Company Name" required ng-model="accountRegistration.companyName" />
-				</div>
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0 15px" ng-class="{ 'has-error-reg' : submitted && signInForm.companyName.$error.required}">
+						<input class="reg-details form-control-reg" type="text" placeholder="Company Name" name="companyName" required ng-model="accountRegistration.companyName" />
+						<p ng-show="submitted && signInForm.companyName.$error.required" class="help-block-reg">Companyname is required.</p>
+					</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Phone</div>
 				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<input class="reg-details" type="tel" id="reg-phone" ng-model="accountRegistration.phone.number" />
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Email Address *</div>
-				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<input class="reg-details" type="email" placeholder="email@example.com" ng-pattern="emailFormat" required oninvalid="this.setCustomValidity('A valid email address is required.')" oninput="this.setCustomValidity('')" ng-model="accountRegistration.email" />
-				</div>
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0 15px" ng-class="{ 'has-error-reg' : submitted && signInForm.email.$invalid && signInForm.email.$error.required}">
+						<input class="reg-details form-control-reg" type="email" name="email" placeholder="email@example.com" ng-pattern="emailFormat" required  ng-model="accountRegistration.email" />
+						<p ng-show=" submitted && signInForm.email.$error.required" class="help-block-reg">A valid email address is required.</p>
+						<p ng-show="signInForm.email.$error.pattern" class="help-block-reg">A valid email address is required.</p>
+					</div>
 				<div class="reg-pswd-info col-lg-12 col-md-12 col-sm-12 col-xs-12">(Don't worry about setting a password right now, we'll email you a link to create one)</div>
 				<div class="clearfix reg-captcha-wrapper reg-item" style="width: 305px; margin: auto;">
 					<div vc-recaptcha key="model.key" on-create="setWidgetId(widgetId)" on-success="setResponse(response)" on-expire="cbExpiration()"></div>
 				</div>
 				<div style="width: 125; margin: 25px auto;">
-					<button class="reg-next" ng-init="activate=0" type="submit" ng-class="{'regen':activate == 1 && signInForm.$valid}">
+					<button class="reg-next" ng-init="activate=0" type="submit" ng-class="{'regen':activate == 1 && signInForm.$valid}"   ng-click="submitted=true">
 						Next <span style="font-size: 12px;"><i class="fa fa-arrow-right" aria-hidden="true"></i></span>
 					</button>
 				</div>

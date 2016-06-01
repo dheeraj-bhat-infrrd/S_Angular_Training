@@ -27,6 +27,8 @@
 <script type="text/javascript">
 	var userId = eval('(' + '${userId}' + ')');
 	var companyId = eval('(' + '${companyId}' + ')');
+	var isLinkedin = "${isLinkedin}";
+	var linkedinResponse = "${linkedinResponse}";
 </script>
 <body ng-app="SocialSurvey" ng-controller="newSignupController">
 	<div class="overlay-loader hide"></div>

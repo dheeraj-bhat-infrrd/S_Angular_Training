@@ -1,4 +1,5 @@
 package com.realtech.socialsurvey.web.controller;
+import com.realtech.socialsurvey.web.common.JspResolver;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -369,8 +371,7 @@ public class AccountController
 
     // TODO: To be moved from register account to more generic
     @RequestMapping ( value = "/registeraccount/connectlinkedin", method = RequestMethod.GET)
-    @ResponseBody
-    public String connectToLinkedIn( HttpServletRequest request ) throws InvalidInputException
+    public String connectToLinkedIn( HttpServletRequest request, Model model ) throws InvalidInputException
     {
         LOG.info( "Connecting to linkedin" );
         String response = null;
@@ -461,6 +462,9 @@ public class AccountController
                 throw new SSAPIException( "Could not fetch LinkedIn profile. Reason: " + ioe.getMessage() );
             }
         }
-        return response;
+        model.addAttribute("isLinkedin", true);
+        model.addAttribute("linkedinResponse", response);
+        
+        return JspResolver.NEW_ACCOUNT_SIGNUP;
     }
 }
