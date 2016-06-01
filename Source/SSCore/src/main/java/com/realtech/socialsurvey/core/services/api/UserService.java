@@ -36,4 +36,7 @@ public interface UserService
 
 
     public boolean isUserExist( String emailId ) throws InvalidInputException;
+
+
+    public void savePassword( long userId, String password ) throws InvalidInputException;
 }

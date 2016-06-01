@@ -192,4 +192,14 @@ public class UserController
         User user = userManagementService.getUserByUserId( Long.parseLong( userId ) );
         return new ResponseEntity<String>( user.getRegistrationStage(), HttpStatus.OK );
     }
+
+
+    @RequestMapping ( value = "/profile/password/update/{userId}", method = RequestMethod.PUT)
+    @ApiOperation ( value = "Save password")
+    public ResponseEntity<?> savePassword( @PathVariable ( "userId") String userId, @RequestBody String password )
+        throws InvalidInputException
+    {
+        userService.savePassword( Long.parseLong( userId ), password );
+        return new ResponseEntity<Void>( HttpStatus.OK );
+    }
 }

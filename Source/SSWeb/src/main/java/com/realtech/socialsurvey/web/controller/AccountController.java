@@ -28,9 +28,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +44,7 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -362,6 +365,39 @@ public class AccountController
             response = api.updateCompanyProfileStage( companyId, RegistrationStage.PAYMENT.getCode() );
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
+        return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/setregistrationpassword", method = RequestMethod.GET)
+    public String setRegistrationPassword( @RequestParam ( "q") String encryptedUrlParams, RedirectAttributes attributes )
+        throws InvalidInputException, JsonProcessingException
+    {
+        Map<String, String> urlParams = userManagementService.validateRegistrationUrl( encryptedUrlParams );
+        long userId = Long.parseLong( urlParams.get( CommonConstants.USER_ID ) );
+        User user = userManagementService.getUserByUserId( userId );
+        if ( user.getLoginPassword() == null ) {
+            attributes.addFlashAttribute( "userId", Long.parseLong( urlParams.get( CommonConstants.USER_ID ) ) );
+            attributes.addFlashAttribute( "companyId", Long.parseLong( urlParams.get( CommonConstants.COMPANY_ID ) ) );
+            attributes.addFlashAttribute( "firstName", urlParams.get( CommonConstants.FIRST_NAME ) );
+            attributes.addFlashAttribute( "lastName", urlParams.get( CommonConstants.LAST_NAME ) );
+            attributes.addFlashAttribute( "setPassword", true );
+        } else {
+            return "redirect:/login.do";
+        }
+        return "redirect:/accountsignup.do";
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/savePassword", method = RequestMethod.PUT)
+    @ResponseBody
+    public String savePassword( @QueryParam ( "userId") String userId, @RequestBody String password )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.savePassword( userId, password );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
     }
 

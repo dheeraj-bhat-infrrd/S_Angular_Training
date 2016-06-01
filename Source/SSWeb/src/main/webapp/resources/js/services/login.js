@@ -63,3 +63,9 @@ app.service('PaymentService', [ '$http', function($http) {
 		return $http.post('/registeraccount/makepayment.do?companyId=' + companyId + '&planId=' + planId, JSON.stringify(dataToSend));
 	}
 } ]);
+
+app.service('PasswordService', [ '$http', function($http) {
+	this.savePassword = function(userId, dataToSend) {
+		return $http.put('/registeraccount/savePassword.do?userId=' + userId, dataToSend);
+	}
+} ]);

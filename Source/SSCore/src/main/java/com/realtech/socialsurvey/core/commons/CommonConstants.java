@@ -79,6 +79,7 @@ public interface CommonConstants
     public static final String START_SURVEY = "rest/survey/start";
     public static final String SHOW_SURVEY_PAGE_FOR_URL = "rest/survey/showsurveypageforurl";
     public static final String SHOW_SURVEY_PAGE = "rest/survey/showsurveypage";
+    public static final String SET_REGISTRATION_PASSWORD = "/registeraccount/setregistrationpassword.do";
 
     /**
      * Status constants

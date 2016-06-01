@@ -78,4 +78,8 @@ public interface SSApiIntegration
 
     @POST ( "/account/payment/company/{companyId}/plan/{planId}")
     Response makePayment( @Path ( "companyId") String companyId, @Path ( "planId") String planId, @Body Payment payment );
+
+
+    @PUT ( "/users/profile/password/update/{userId}")
+    Response savePassword( @Path ( "userId") String userId, @Body String password );
 }
