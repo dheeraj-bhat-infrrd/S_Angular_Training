@@ -19,7 +19,7 @@ var digitRegEx = {
 	}
 };
 
-var app = angular.module('SocialSurvey', [ 'ngRoute', 'vcRecaptcha', 'ngDropdowns' ]).run(function($rootScope) {
+var app = angular.module('SocialSurvey', [ 'ngRoute', 'vcRecaptcha', 'ngDropdowns', 'ngCookies' ]).run(function($rootScope) {
 	$rootScope.userId;
 	$rootScope.comanyId;
 });
@@ -53,7 +53,8 @@ app.config([ '$routeProvider', function($routeProvider) {
 		templateUrl : "../../resources/html/password.html",
 		controller : "passwordController"
 	}).when("/linkedinloader", {
-		templateUrl : "../../resources/html/linkedinloader.html"
+		templateUrl : "../../resources/html/linkedinloader.html",
+		controller : "linkedloaderController"
 	}).otherwise({
 		redirect : '/accountsignup'
 	});

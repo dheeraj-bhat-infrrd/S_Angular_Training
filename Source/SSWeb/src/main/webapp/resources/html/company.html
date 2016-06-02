@@ -10,17 +10,30 @@
 				<span class="err-new-close"></span> <span id="err-nw-txt"></span>
 			</div>
 		</div>
-		<form ng-submit="saveCompanyProfile()" name="companyForm">
+		<form ng-submit="saveCompanyProfile()" name="companyForm" novalidate>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px;">
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 reg-create-account">Company Profile</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Company Name *</div>
-				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<!-- <div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<input class="reg-details" type="text" placeholder="Company Name" ng-model="companyProfile.companyName" name="companyName" required oninvalid="this.setCustomValidity('Company Name is required.')" oninput="this.setCustomValidity('')" />
-				</div>
+				</div> -->
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0 15px" ng-class="{ 'has-error-reg' : companysubmitted && companyForm.companyName.$error.required}">
+						<input class="reg-details form-control-reg" type="text" placeholder="Company Name" name="companyName" required ng-model="companyProfile.companyName" />
+						<p ng-show="companysubmitted && companyForm.companyName.$error.required" class="help-block-reg">Companyname is required.</p>
+					</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Industry *</div>
 				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div dropdown-select="ddSelectOptions" dropdown-model="companyProfile.industry" dropdown-item-label="verticalName"></div>
 				</div>
+				 
+				<!-- <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0 15px" ng-class="{ 'has-error-reg' : companysubmitted && companyForm.industry.$error.required}">
+						<div class="form-control-reg" dropdown-select="ddSelectOptions" dropdown-model="companyProfile.industry" dropdown-item-label="verticalName" name="industry" required></div>
+						<p ng-show="companysubmitted && companyForm.industry.$error.required" class="help-block-reg">Industry is required.</p>
+					</div> -->
+				
+				
+				
+				
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Logo</div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-bottom: 30px;">
 					<div id="logoDrop" class="dropzone" ng-init="loadDropzone()"></div>
@@ -29,7 +42,7 @@
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix">
 				<div class="reg-back" ng-click="backOnCompany()">&lt;&lt;Back</div>
 				<div style="width: 120px; margin: auto;">
-					<button class="reg-next" type="submit" ng-class="{'regen':companyForm.$valid}">
+					<button class="reg-next" type="submit" ng-class="{'regen':companyForm.$valid}" ng-click="companysubmitted=true">
 						Next <span style="font-size: 12px;"><i class="fa fa-arrow-right" aria-hidden="true"></i></span>
 					</button>
 				</div>
