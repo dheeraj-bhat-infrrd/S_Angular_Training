@@ -4453,6 +4453,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "UserManagementService.activateCompanyAdmin started" );
         //Update the USER table status
         companyAdmin.setStatus( CommonConstants.STATUS_ACTIVE );
+        companyAdmin.setIsAtleastOneUserprofileComplete( 1 );
         userDao.update( companyAdmin );
 
         //Update the user's user profiles

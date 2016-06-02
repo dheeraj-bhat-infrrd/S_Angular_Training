@@ -37,7 +37,6 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -59,8 +58,6 @@ public class LoginController
     private URLGenerator urlGenerator;
     @Autowired
     private SessionHelper sessionHelper;
-    @Autowired
-    private SolrSearchService solrSearchService;
     @Autowired
     private UserManagementService userManagementService;
     @Autowired
@@ -120,6 +117,13 @@ public class LoginController
         LOG.info( "Inside initLoginPage() of LoginController" );
 
         // Check for existing session
+        if ( model.asMap().get( "fromEmailLink" ) != null ) {
+            boolean fromEmailLink = (Boolean) model.asMap().get( "fromEmailLink" );
+            if ( fromEmailLink ) {
+                return JspResolver.LOGIN;
+            }
+        }
+
         if ( sessionHelper.isUserActiveSessionExists() ) {
             LOG.info( "Existing Active Session detected" );
 
@@ -213,10 +217,7 @@ public class LoginController
             user = sessionHelper.getCurrentUser();
 
             if ( user.getIsForcePassword() == 1 ) {
-                if ( user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.PAYMENT.getCode() ) ) {
-                    //TODO call service to create default hierarchy for the user
-                } else if ( !user.getCompany().getRegistrationStage()
-                    .equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
+                if ( !user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
                     redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
                     redirectAttributes.addFlashAttribute( "companyId", user.getCompany().getCompanyId() );
                     return "redirect:/accountsignup.do";
