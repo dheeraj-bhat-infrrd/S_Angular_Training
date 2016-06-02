@@ -2840,6 +2840,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setRetakeSurvey( false );
         surveyDetails.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
         surveyDetailsDao.insertSurveyDetails( surveyDetails );
+        surveyDetailsDao.updateSurveyAsClicked( surveyDetails.get_id() );
         return  surveyDetails;
     }
 
