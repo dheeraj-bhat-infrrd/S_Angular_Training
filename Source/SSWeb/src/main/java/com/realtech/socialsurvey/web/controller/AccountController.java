@@ -425,7 +425,7 @@ public class AccountController
 
     // TODO: To be moved from register account to more generic
     @RequestMapping ( value = "/registeraccount/connectlinkedin", method = RequestMethod.GET)
-    public String connectToLinkedIn( HttpServletRequest request, Model model ) throws InvalidInputException
+    public String connectToLinkedIn( HttpServletRequest request, RedirectAttributes attributes ) throws InvalidInputException
     {
         LOG.info( "Connecting to linkedin" );
         String response = null;
@@ -445,10 +445,10 @@ public class AccountController
         String errorCode = request.getParameter( "error" );
         if ( errorCode != null ) {
             LOG.error( "Error code : " + errorCode );
-            AuthError error = new AuthError();
-            error.setErrorCode( errorCode );
-            error.setReason( request.getParameter( "error_description" ) );
-            response = new Gson().toJson( error );
+//            AuthError error = new AuthError();
+//            error.setErrorCode( errorCode );
+//            error.setReason( request.getParameter( "error_description" ) );
+            response = errorCode;
         } else {
             try {
                 if ( sId != null && unit != null ) {
@@ -516,9 +516,9 @@ public class AccountController
                 throw new SSAPIException( "Could not fetch LinkedIn profile. Reason: " + ioe.getMessage() );
             }
         }
-        model.addAttribute("isLinkedin", true);
-        model.addAttribute("linkedinResponse", response);
+        attributes.addFlashAttribute("isLinkedin", true);
+        attributes.addFlashAttribute("linkedinResponse", response);
         
-        return JspResolver.NEW_ACCOUNT_SIGNUP;
+        return "redirect:/accountsignup.do";
     }
 }

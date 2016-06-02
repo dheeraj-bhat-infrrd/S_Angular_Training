@@ -26,16 +26,14 @@
 <script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async defer></script>
 </head>
 <script type="text/javascript">
-
-	var isLinkedin = "${isLinkedin}";
-	var linkedinResponse = "${linkedinResponse}";
-
-	var userId = "${userId}" ;
-	var companyId =  "${companyId}" ;
-	var firstName = "${firstName}";
-	var lastName = "${lastName}";
-	var setPassword = "${setPassword}";
-
+	var isLinkedin = '${isLinkedin}';
+	var linkedinResponse = '${linkedinResponse}';
+	console.log(linkedinResponse);
+	var userId = '${userId}' ;
+	var companyId =  '${companyId}' ;
+	var firstName = '${firstName}';
+	var lastName = '${lastName}';
+	var setPassword = '${setPassword}';
 </script>
 <body ng-app="SocialSurvey" ng-controller="newSignupController">
 	<div class="overlay-loader hide"></div>
@@ -48,6 +46,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular-route.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.0/angular-cookies.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/intlTelInput.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
