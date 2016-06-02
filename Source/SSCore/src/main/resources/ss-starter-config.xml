@@ -333,6 +333,19 @@
 		<property name="durability" value="true" />
 	</bean>
 
+	<!-- Setting bulk survey import job detail -->
+	<bean id="surveyimporterjobdetail"
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+				  value="com.realtech.socialsurvey.core.starter.BulkSurveyImporter" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -502,6 +515,14 @@
 		<property name="cronExpression" value="0 0 8 * * ?" />
 	</bean>
 
+	<!-- setting cron for bulk survey import -->
+	<bean id="surveyimportercron"
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="surveyimporterjobdetail" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="2000" />
+	</bean>
+
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
@@ -527,6 +548,7 @@
 				<!-- <ref bean="companiesbillingreportjobdetail" /> -->
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<ref bean="zillowreviewprocessandautopostjobdetail" />
+				<ref bean="surveyimporterjobdetail" />
 			</list>
 		</property>
 
@@ -554,6 +576,7 @@
 				<!-- <ref bean="companiesbillingreportcron" /> -->
 				<!-- <ref bean="hierarchysettingscron" /> -->
 				<ref bean="zillowreviewprocessandautopostcron" />
+				<ref bean="surveyimportercron" />
 			</list>
 		</property>
 		<property name="quartzProperties">

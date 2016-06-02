@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.starter;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -11,10 +10,12 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,9 +25,9 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class BulkSurveyImporter
+public class BulkSurveyImporter extends QuartzJobBean
 {
-    private static String fileName = "/home/ghanashyam/Downloads/Summit survey test.xlsx";
+    private static String fileName = "./surveyimport.xlsx";
     public static final Logger LOG = LoggerFactory.getLogger( BillingReportGenerator.class );
 
     private static final int USER_ID_INDEX = 2;
@@ -37,34 +38,22 @@ public class BulkSurveyImporter
     private static final int SCORE_INDEX = 8;
     private static final int COMMENT_INDEX = 9;
 
-
-    public static void main( String[] args ) throws NonFatalException
-    {
-        LOG.info( "Bulk Survey Importer started" );
-        ApplicationContext context = new ClassPathXmlApplicationContext( "ss-starter-config.xml" );
-        SurveyHandler surveyHandler = (SurveyHandler) context.getBean( "surveyHandler" );
-        List<SurveyImportVO> surveyImportVOs = getSurveyListFromCsv();
-        if ( surveyImportVOs != null && !surveyImportVOs.isEmpty() ) {
-            for ( SurveyImportVO surveyImportVO : surveyImportVOs ) {
-                surveyHandler.importSurveyVOToDBs( surveyImportVO );
-            }
-        }
-        LOG.info( "Bulk Survey Importer finished" );
-    }
-
+    private SurveyHandler surveyHandler;
 
     /**
      * Method to read the csv file and get a list of SurveyImportVO objects
      * @return
      * @throws InvalidInputException
      */
-    private static List<SurveyImportVO> getSurveyListFromCsv() throws InvalidInputException
+    private List<SurveyImportVO> getSurveyListFromCsv() throws InvalidInputException
     {
         LOG.info( "BulkSurveyImporter.getSurveyListFromCsv started" );
         InputStream fileStream = null;
         List<SurveyImportVO> surveyList = new ArrayList<>();
         try {
             fileStream = new FileInputStream( fileName );
+            if ( fileStream == null )
+                return null;
             XSSFWorkbook workBook = new XSSFWorkbook( fileStream );
             XSSFSheet regionSheet = workBook.getSheetAt( 0 );
             Iterator<Row> rows = regionSheet.rowIterator();
@@ -136,4 +125,30 @@ public class BulkSurveyImporter
         if ( survey.getScore() < 0.0 || survey.getScore() > 5.0 )
             throw new InvalidInputException( "Invalid survey score : " + survey.getScore() );
     }
+
+
+    @Override
+    protected void executeInternal( JobExecutionContext jobExecutionContext ) throws JobExecutionException
+    {
+        LOG.info( "Bulk Survey Importer started" );
+        initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
+        try {
+            List<SurveyImportVO> surveyImportVOs = getSurveyListFromCsv();
+            if ( surveyImportVOs != null && !surveyImportVOs.isEmpty() ) {
+                for ( SurveyImportVO surveyImportVO : surveyImportVOs ) {
+                    surveyHandler.importSurveyVOToDBs( surveyImportVO );
+                }
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "An error occurred while uploading the surveys. Reason: ", e );
+        }
+        LOG.info( "Bulk Survey Importer finished" );
+    }
+
+    private void initializeDependencies( JobDataMap jobMap )
+    {
+        surveyHandler = (SurveyHandler) jobMap.get( "surveyHandler" );
+    }
+
+
 }
