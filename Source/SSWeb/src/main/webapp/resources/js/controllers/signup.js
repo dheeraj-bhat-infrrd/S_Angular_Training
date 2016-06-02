@@ -1,12 +1,25 @@
-app.controller('newSignupController', [ '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
+app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
+	if (userId == undefined && companyId == undefined) {
+		var userId = $cookies.get("userId");
+		var companyId = $cookies.get("companyId");
+	}
+
 	$rootScope.userId = userId;
 	$rootScope.companyId = companyId;
+	$rootScope.redirect=false;
+	console.log($rootScope.userId);
+	console.log($rootScope.companyId);
 
-	if (setPassword == "true") {
+	if (isLinkedin == "true") {
+		$rootScope.redirect=true;
+		$rootScope.userId = $cookies.get("userId");
+		$rootScope.companyId = $cookies.get("companyId");
+		$location.path('/linkedin').replace();
+	} else if (setPassword == "true") {
 		$rootScope.firstName = firstName;
 		$rootScope.lastName = lastName;
 		$location.path('/password').replace();
-	} else if ($rootScope.userId != "" && $rootScope.companyId != "") {
+	} else if ($rootScope.userId != undefined && $rootScope.companyId != undefined && $rootScope.userId != "" && $rootScope.companyId != "") {
 		var userStageDsiplayOrder = 0;
 		var companyStageDsiplayOrder = 0;
 		var landingStage = '';
@@ -30,8 +43,6 @@ app.controller('newSignupController', [ '$scope', '$location', '$rootScope', 'Us
 			showError($scope.getErrorMessage(error.data));
 		});
 	} else if ($window.opener != null) {
-		ParentScope = $window.opener.ScopeToShare;
-		location.href = ParentScope.linkedinurl;
 		$location.path('/linkedinloader').replace();
 	} else {
 		$location.path('/accountsignup').replace();
@@ -58,12 +69,13 @@ app.controller('newSignupController', [ '$scope', '$location', '$rootScope', 'Us
 	}
 } ]);
 
-app.controller('accountSignupController', [ '$scope', '$location', 'vcRecaptchaService', 'LoginService', '$rootScope', function($scope, $location, vcRecaptchaService, LoginService, $rootScope) {
+app.controller('accountSignupController', ['$cookies', '$scope', '$location', 'vcRecaptchaService', 'LoginService', '$rootScope', function($cookies, $scope, $location, vcRecaptchaService, LoginService, $rootScope) {
 	$scope.activate = 0;
 	$scope.accountRegistration = {};
 	$scope.response = null;
 	$scope.widgetId = null;
-	$scope.emailFormat = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+	/* $scope.emailFormat = /^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/; */
+	$scope.emailFormat = /^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/;
 
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
@@ -100,6 +112,7 @@ app.controller('accountSignupController', [ '$scope', '$location', 'vcRecaptchaS
 	}
 
 	$scope.submitLogin = function() {
+
 		if (vcRecaptchaService.getResponse() == "") {
 			showError("Let's make sure you are a real person, please check the box beside I'm not a robot! ");
 			$scope.activate = 0;
@@ -110,12 +123,23 @@ app.controller('accountSignupController', [ '$scope', '$location', 'vcRecaptchaS
 			LoginService.signup($scope.accountRegistration).then(function(response) {
 				$rootScope.userId = response.data.userId;
 				$rootScope.companyId = response.data.companyId;
+				
+				var now = new Date(),
+			    // this will set the expiration to 12 months
+			    exp = new Date(now.getFullYear()+1, now.getMonth(), now.getDate());
+
+			
+				$cookies.put("userId", $rootScope.userId,{
+					 'expires': exp
+				});
+				$cookies.put("companyId", $rootScope.companyId);
 				hideOverlay();
 				$location.path('/linkedin').replace();
 			}, function(error) {
 				showError($scope.getErrorMessage(error.data));
 			});
 		}
+
 	};
 
 	$scope.setResponse = function(response) {
@@ -136,11 +160,22 @@ app.controller('accountSignupController', [ '$scope', '$location', 'vcRecaptchaS
 
 app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
 	$window.ScopeToShare = $scope;
+	if($rootScope.redirect){
+		if (linkedinResponse != null) {
+			if (linkedinResponse == "ok") {
+				showInfo("Successfully connected to LinkedIn");
+			} else if (linkedinResponse != null) {
+				showError($scope.getErrorMessage("Please try again,or to continue click on Next"));
+			}
+		}
+	}
+	
 
 	$scope.linkedin = function() {
 		LinkedinService.linkedin($rootScope.userId).then(function(response) {
 			$scope.linkedinurl = response.data;
-			window.open("/accountsignup.do", "Authorization Page", "width=800,height=600,scrollbars=yes");
+			location.href = $scope.linkedinurl;
+			/* window.open("/newaccountsignup.do", "Authorization Page", "width=800,height=600,scrollbars=yes"); */
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
@@ -153,7 +188,18 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 			showError($scope.getErrorMessage(error.data));
 		});
 	}
+
+	$scope.printm = function() {
+		console.log("linked response");
+	}
 } ]);
+/*
+ * app.controller('linkedloaderController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) { ParentScope = $window.opener.ScopeToShare; location.href = ParentScope.linkedinurl; $(window).on('unload', function(){ var parentWindow = null; if (window.opener != null && !window.opener.closed) { parentWindow = window.opener; } ParentScope.printm();
+ * 
+ * 
+ * 
+ * }); } ]);
+ */
 
 app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
 
@@ -235,7 +281,10 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	 */
 
 	$scope.saveProfile = function() {
-		$location.path('/profiledetail').replace();
+		if (!$scope.profileForm.$invalid) {
+			$location.path('/profiledetail').replace();
+		}
+
 		/* $('#reg-phone1').val($rootScope.userProfile.phone1.number); */
 	};
 
@@ -248,6 +297,7 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
+
 	};
 
 	$scope.backOnProfile = function() {
@@ -369,7 +419,9 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	$scope.ddSelectOptions = $rootScope.industries;
 
 	$scope.saveCompanyProfile = function() {
-		$location.path('/companydetail').replace();
+		if (!$scope.companyForm.$invalid) {
+			$location.path('/companydetail').replace();
+		}
 	};
 
 	$scope.saveCompanyProfileDetails = function() {
