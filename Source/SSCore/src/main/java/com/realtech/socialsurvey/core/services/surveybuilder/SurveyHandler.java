@@ -3,6 +3,8 @@ package com.realtech.socialsurvey.core.services.surveybuilder;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.entities.SurveyImportVO;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import org.apache.solr.client.solrj.SolrServerException;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
@@ -20,6 +22,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
+import org.springframework.transaction.annotation.Transactional;
 
 
 public interface SurveyHandler
@@ -275,6 +278,14 @@ public interface SurveyHandler
 
     public void deleteExistingZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
+
+    /**
+     * Method to import SurveyVO object into MySQL and mongo
+     * @param surveyImportVO
+     * @throws InvalidInputException
+     * @throws ProfileNotFoundException
+     */
+    public void importSurveyVOToDBs( SurveyImportVO surveyImportVO ) throws NonFatalException;
 
     public void updateZillowSummaryInExistingSurveyDetails( SurveyDetails surveyDetails );
 
