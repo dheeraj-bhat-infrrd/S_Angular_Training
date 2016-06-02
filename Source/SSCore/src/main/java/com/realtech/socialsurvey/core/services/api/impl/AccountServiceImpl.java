@@ -7,7 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.ActiveSubscriptionFoundException;
+import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,15 +48,17 @@ public class AccountServiceImpl implements AccountService
     private GenericDao<VerticalsMaster, Integer> verticalMastersDao;
     private OrganizationManagementService organizationManagementService;
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-    private UserService userService;
     private UserManagementService userManagementService;
+    private UserService userService;
+    private Payment payment;
 
 
     @Autowired
     public AccountServiceImpl( GenericDao<VerticalsMaster, Integer> industryDao,
         GenericDao<AccountsMaster, Integer> paymentPlanDao, CompanyDao companyDao,
         GenericDao<VerticalsMaster, Integer> verticalMastersDao, OrganizationManagementService organizationManagementService,
-        OrganizationUnitSettingsDao organizationUnitSettingsDao, UserService userService, UserManagementService userManagementService )
+
+        OrganizationUnitSettingsDao organizationUnitSettingsDao, UserManagementService userManagementService, UserService userService, Payment payment )
     {
         this.industryDao = industryDao;
         this.paymentPlanDao = paymentPlanDao;
@@ -57,8 +66,9 @@ public class AccountServiceImpl implements AccountService
         this.verticalMastersDao = verticalMastersDao;
         this.organizationManagementService = organizationManagementService;
         this.organizationUnitSettingsDao = organizationUnitSettingsDao;
-        this.userService = userService;
         this.userManagementService = userManagementService;
+        this.userService = userService;
+        this.payment = payment;
     }
 
 
@@ -180,15 +190,15 @@ public class AccountServiceImpl implements AccountService
     public List<PaymentPlan> getPaymentPlans()
     {
         LOGGER.info( "AccountServiceImpl.getPaymentPlans started" );
-        List<PaymentPlan> paymentPlans = new ArrayList<PaymentPlan>();
+        List<PaymentPlan> paymentPlans = new ArrayList<>();
         List<AccountsMaster> plans = paymentPlanDao.findAll( AccountsMaster.class );
         for ( AccountsMaster plan : plans ) {
             if ( plan.getAccountsMasterId() == AccountType.INDIVIDUAL.getValue() ) {
                 paymentPlans
-                    .add( getPaymentPlan( 1, plan.getAmount(), "$", plan.getAccountsMasterId(), "Individual", "", "" ) );
+                    .add( getPaymentPlan( plan.getAccountsMasterId(), plan.getAmount(), "$", 1, "Individual", "", "" ) );
             } else if ( plan.getAccountsMasterId() == AccountType.ENTERPRISE.getValue() ) {
-                paymentPlans.add( getPaymentPlan( 2, plan.getAmount(), "$", plan.getAccountsMasterId(), "Business", "", "" ) );
-                paymentPlans.add( getPaymentPlan( 3, 0, "$", plan.getAccountsMasterId(), "Enterprise", "", "" ) );
+                paymentPlans.add( getPaymentPlan( plan.getAccountsMasterId(), plan.getAmount(), "$", 2, "Business", "", "" ) );
+                paymentPlans.add( getPaymentPlan( plan.getAccountsMasterId(), 0, "$", 3, "Enterprise", "", "" ) );
             }
         }
         LOGGER.info( "AccountServiceImpl.getPaymentPlans completed successfully" );
@@ -198,16 +208,22 @@ public class AccountServiceImpl implements AccountService
 
     @Transactional
     @Override
-    public void generateDefaultHierarchy( long companyId ) throws InvalidInputException, SolrException
+    public void generateDefaultHierarchy( long companyId )
+        throws InvalidInputException, SolrException, HierarchyAlreadyExistsException
     {
         LOGGER.info( "AccountServiceImpl.generateDefaultHierarchy started" );
         Company company = companyDao.findById( Company.class, companyId );
         if ( company == null ) {
             throw new InvalidInputException( "Company with companyId : " + companyId + " does not exist" );
         }
-        //Activate company admin
-        userManagementService.activateCompanyAdmin( companyId );
-        
+        //Get the company admin
+        User companyAdmin = userManagementService.getAdminUserByCompanyId( companyId );
+        if ( companyAdmin == null ) {
+            throw new InvalidInputException( "No company admin exists for companyId : " + companyId );
+        }
+        if ( companyAdmin.getStatus() != CommonConstants.STATUS_INCOMPLETE ) {
+            throw new HierarchyAlreadyExistsException( "The hierarchy already exists for companyId: " + companyId );
+        }
         //Get license details for the company
         LicenseDetail companyLicenseDetail = company.getLicenseDetails().get( CommonConstants.INITIAL_INDEX );
         if ( companyLicenseDetail == null ) {
@@ -218,14 +234,18 @@ public class AccountServiceImpl implements AccountService
         if ( accountsMaster == null ) {
             throw new InvalidInputException( "AccountsMaster for companyId : " + companyId + " does not exist" );
         }
-        //Add the account type for company
-        User companyAdmin = userManagementService.getCompanyAdmin( companyId );
         organizationManagementService
             .addAccountTypeForCompany( companyAdmin, String.valueOf( accountsMaster.getAccountsMasterId() ) );
         //Update profile completion stage for company admin
         userManagementService
             .updateProfileCompletionStage( companyAdmin, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
                 CommonConstants.DASHBOARD_STAGE );
+
+        //Activate company
+        organizationManagementService.activateCompany( company );
+
+        //Activate company admin
+        userManagementService.activateCompanyAdmin( companyAdmin );
         LOGGER.info( "AccountServiceImpl.generateDefaultHierarchy finished" );
     }
 
@@ -397,5 +417,20 @@ public class AccountServiceImpl implements AccountService
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + company.getCompany() );
+    }
+
+    @Transactional
+    @Override
+    public void payForPlan(long companyId, int planId, String nonce, String cardHolderName) throws InvalidInputException,
+        PaymentException, SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException,
+        ActiveSubscriptionFoundException
+    {
+        LOGGER.info( "Paying for company id "+companyId+ " for plan "+planId );
+        Company company = companyDao.findById( Company.class, companyId );
+        // pass the company and nonce to make a payment. Get the subscription id and insert into license table.
+        String subscriptionId = payment.subscribeForCompany( company, nonce, planId, cardHolderName );
+        // insert into License Details table
+        User user = userManagementService.getAdminUserByCompanyId(companyId);
+        payment.insertIntoLicenseTable( planId, user, subscriptionId );
     }
 }

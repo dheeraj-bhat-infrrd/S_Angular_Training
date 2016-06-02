@@ -44,6 +44,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileMan
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 
 @Service
@@ -61,6 +62,8 @@ public class UserServiceImpl implements UserService
     private Utils utils;
     private ProfileManagementService profileManagementService;
     private GenericDao<UserEmailMapping, Long> userEmailMappingDao;
+    private EncryptionHelper encryptionHelper;
+
 
     @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
     private String salesLeadEmail;
@@ -71,7 +74,8 @@ public class UserServiceImpl implements UserService
         OrganizationUnitSettingsDao organizationUnitSettingsDao, UserManagementService userManagementService,
         SolrSearchService solrSearchService, UserDao userDao, UserProfileDao userProfileDao,
         GenericDao<ProfilesMaster, Integer> profilesMasterDao, EmailServices emailServices, Utils utils,
-        ProfileManagementService profileManagementService, GenericDao<UserEmailMapping, Long> userEmailMappingDao )
+        ProfileManagementService profileManagementService, GenericDao<UserEmailMapping, Long> userEmailMappingDao,
+        EncryptionHelper encryptionHelper )
     {
         this.organizationManagementService = organizationManagementService;
         this.organizationUnitSettingsDao = organizationUnitSettingsDao;
@@ -84,6 +88,7 @@ public class UserServiceImpl implements UserService
         this.utils = utils;
         this.profileManagementService = profileManagementService;
         this.userEmailMappingDao = userEmailMappingDao;
+        this.encryptionHelper = encryptionHelper;
     }
 
 
@@ -200,9 +205,9 @@ public class UserServiceImpl implements UserService
     public void sendRegistrationEmail( User user ) throws NonFatalException
     {
         LOGGER.info( "Method sendRegistrationEmail started for user: " + user.getUserId() );
+
         //Send registration email to user
-        userManagementService.inviteCorporateToRegister( user.getFirstName(), user.getLastName(), user.getEmailId(), false,
-            null );
+        userManagementService.inviteCorporateToRegister( user );
 
         // Send mail to sales lead
         Date today = new Date( System.currentTimeMillis() );
@@ -459,5 +464,18 @@ public class UserServiceImpl implements UserService
         }
         LOGGER.info( "Method to check if user exists finished for username : " + emailId );
         return true;
+    }
+
+
+    @Override
+    @Transactional
+    public void savePassword( long userId, String password ) throws InvalidInputException
+    {
+        LOGGER.info( "Method to save password called for userId : " + userId );
+        User user = userManagementService.getUserByUserId( userId );
+        String encryptedPassword = encryptionHelper.encryptSHA512( password );
+        user.setLoginPassword( encryptedPassword );
+        updateUserDetailsInMySql( userId, user );
+        LOGGER.info( "Method to save password finished for userId : " + userId );
     }
 }

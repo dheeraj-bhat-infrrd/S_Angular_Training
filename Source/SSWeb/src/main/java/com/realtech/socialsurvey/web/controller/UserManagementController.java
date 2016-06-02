@@ -1144,14 +1144,6 @@ public class UserManagementController
                 throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e );
             }
 
-            if ( user.getIsForcePassword() == 1 ) {
-                if ( !user.getRegistrationStage().equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
-                    redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
-                    redirectAttributes.addFlashAttribute( "companyId", companyId );
-                    return "redirect:/newaccountsignup.do";
-                }
-            }
-
             LOG.debug( "Adding newly registered user to principal session" );
             sessionHelper.loginOnRegistration( emailId, password );
             LOG.debug( "Successfully added registered user to principal session" );

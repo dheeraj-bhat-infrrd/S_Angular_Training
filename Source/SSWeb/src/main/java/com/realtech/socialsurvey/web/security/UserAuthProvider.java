@@ -37,7 +37,7 @@ public class UserAuthProvider extends DaoAuthenticationProvider {
 		try {
 			LOG.debug("Validating the form parameters");
 			validateLoginFormParameters(username, password);
-			user = authenticationService.getUserWithLoginName(username);
+			user = authenticationService.getActiveOrIncompleteUserWithLoginName(username);
 
 			LOG.debug("Check if company status is active");
 			if (user.getCompany().getStatus() == CommonConstants.STATUS_INACTIVE) {

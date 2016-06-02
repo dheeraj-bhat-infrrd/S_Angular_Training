@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -96,7 +97,7 @@ public class LoginController
     }
 
 
-    @RequestMapping ( value = "/newaccountsignup")
+    @RequestMapping ( value = "/accountsignup")
     public String initNewAccountSignUp( HttpServletResponse response, Model model )
     {
         LOG.info( "Method initNewAccountSignUp() called from LoginController" );
@@ -210,6 +211,18 @@ public class LoginController
             }
             HttpSession session = request.getSession( true );
             user = sessionHelper.getCurrentUser();
+
+            if ( user.getIsForcePassword() == 1 ) {
+                if ( user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.PAYMENT.getCode() ) ) {
+                    //TODO call service to create default hierarchy for the user
+                } else if ( !user.getCompany().getRegistrationStage()
+                    .equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
+                    redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
+                    redirectAttributes.addFlashAttribute( "companyId", user.getCompany().getCompanyId() );
+                    return "redirect:/accountsignup.do";
+                }
+            }
+
             // code to hide the overlay during registration
             if ( isDirectRegistration != null ) {
                 if ( isDirectRegistration.equals( "false" ) ) {

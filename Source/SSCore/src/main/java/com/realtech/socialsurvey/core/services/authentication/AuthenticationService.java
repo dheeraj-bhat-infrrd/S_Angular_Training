@@ -29,6 +29,8 @@ public interface AuthenticationService {
 	public User getUserWithLoginNameAndCompanyId(String loginName, long companyId) throws InvalidInputException;
 
 	public UserProfile getCompanyAdminProfileForUser(User user) throws InvalidInputException;
+	
+	public User getActiveOrIncompleteUserWithLoginName(String userId) throws NoRecordsFetchedException;
 
 }
 // JIRA : SS-21 by RM-06 : EOC

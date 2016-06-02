@@ -6,7 +6,8 @@ public enum RegistrationStage
     LINKEDIN_SETUP( "LIN", "LinkedIn setup", 2 ),
     USER_PROFESSIONAL_PROFILE( "UPP", "User professional profile", 3 ),
     USER_COMPANY_PROFILE( "UCP", "User company profile", 4 ),
-    COMPLETE( "COM", "Regsitration Completed", 5 );
+    PAYMENT( "PAY", "Regsitration payment Completed", 5 ),
+    COMPLETE( "COM", "Regsitration Completed", 6 );
 
     private String code;
     private String description;

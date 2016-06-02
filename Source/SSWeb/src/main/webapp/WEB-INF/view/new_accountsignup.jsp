@@ -21,14 +21,21 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/dropzone.css">
 <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/countrySelect.css">
+<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/payment.css">
 <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
 <script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async defer></script>
 </head>
 <script type="text/javascript">
-	var userId = eval('(' + '${userId}' + ')');
-	var companyId = eval('(' + '${companyId}' + ')');
+
 	var isLinkedin = "${isLinkedin}";
 	var linkedinResponse = "${linkedinResponse}";
+
+	var userId = "${userId}" ;
+	var companyId =  "${companyId}" ;
+	var firstName = "${firstName}";
+	var lastName = "${lastName}";
+	var setPassword = "${setPassword}";
+
 </script>
 <body ng-app="SocialSurvey" ng-controller="newSignupController">
 	<div class="overlay-loader hide"></div>
@@ -53,5 +60,6 @@
 <script src="${initParam.resourcesPath}/resources/js/angular-dropdowns.js"></script>
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/phoneFormat.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/card-validator/card-validator.min.js"></script>
 </body>
 </html>

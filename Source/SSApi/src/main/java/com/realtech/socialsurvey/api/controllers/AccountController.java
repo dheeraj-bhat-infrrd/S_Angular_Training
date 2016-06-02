@@ -4,7 +4,16 @@ import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.xml.ws.Response;
 
+import com.realtech.socialsurvey.api.models.request.PaymentRequest;
+import com.realtech.socialsurvey.api.validators.PaymentRequestValidator;
+import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.payment.exception.ActiveSubscriptionFoundException;
+import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +54,7 @@ public class AccountController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( AccountController.class );
     private AccountRegistrationValidator accountRegistrationValidator;
+    private PaymentRequestValidator paymentRequestValidator;
     private AccountService accountService;
     private CompanyProfileTransformer companyProfileTransformer;
     private CompanyProfileValidator companyProfileValidator;
@@ -52,11 +62,12 @@ public class AccountController
 
 
     @Autowired
-    public AccountController( AccountRegistrationValidator accountRegistrationValidator, AccountService accountService,
+    public AccountController( AccountRegistrationValidator accountRegistrationValidator, PaymentRequestValidator paymentRequestValidator, AccountService accountService,
         CompanyProfileTransformer companyProfileTransformer, CompanyProfileValidator companyProfileValidator,
         OrganizationManagementService organizationManagementService )
     {
         this.accountRegistrationValidator = accountRegistrationValidator;
+        this.paymentRequestValidator = paymentRequestValidator;
         this.accountService = accountService;
         this.companyProfileTransformer = companyProfileTransformer;
         this.companyProfileValidator = companyProfileValidator;
@@ -75,6 +86,11 @@ public class AccountController
     public void signUpCompanyProfileBinder( WebDataBinder binder )
     {
         binder.setValidator( companyProfileValidator );
+    }
+
+    @InitBinder ( "paymentRequestValidator" )
+    public void paymentRequestBinder( WebDataBinder binder) {
+        binder.setValidator( paymentRequestValidator );
     }
 
 
@@ -191,10 +207,23 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/generate/hierarchy/{companyId}", method = RequestMethod.POST)
-    @ApiOperation( value = "Generate default company heirarchy" )
-    public ResponseEntity<?> generateDefaultHierarchyForCompany( @PathVariable ( "companyId") String companyId )
-        throws InvalidInputException, SolrException
+    @RequestMapping ( value = "/payment/company/{companyId}/plan/{planId}", method = RequestMethod.POST)
+    @ApiOperation( value = "Payment for company for a particular plan")
+    public ResponseEntity<?> payForPlan(
+        @Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long companyId, @PathVariable int planId )
+        throws NonFatalException
+    {
+        LOGGER.info( "Payment initiated for company id " + companyId + " for plan id: " + planId );
+        accountService.payForPlan( companyId, planId, paymentRequest.getNonce(), paymentRequest.getCardHolderName() );
+        return new ResponseEntity<Void>( HttpStatus.OK );
+    }
+
+
+    @RequestMapping (value = "/company/generate/hierarchy/{companyId}", method = RequestMethod.POST)
+    @ApiOperation (value = "Generate default company heirarchy")
+    public ResponseEntity<?> generateDefaultHierarchyForCompany(
+        @PathVariable ("companyId") String companyId )
+        throws InvalidInputException, SolrException, HierarchyAlreadyExistsException
     {
         //Generate default company hierarchy for company
         LOGGER.info( "AccountController.generateDefaultHierarchyForCompany started" );

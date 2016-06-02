@@ -47,34 +47,41 @@
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="individual||business">
 				<form id="paymentForm" ng-submit="processPayment()">
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 30px;">Name on Card</div>
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Name on Card</div>
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-							<input id="name-on-card" class="reg-details" type="text" ng-model="payment.nameOnCard" />
+							<input id="name-on-card" class="reg-details" type="text" ng-model="payment.cardHolderName" />
 						</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px">Card Number</div>
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-							<input id="card-number" class="reg-details" type="text" ng-model="payment.cardNumber" />
+							<!--  <div id="card-number" class="reg-details"></div>-->
+							<input id="card-number" class="reg-details" type="text" ng-model="payment.cardNumber" ng-change="onChangeCreditCardNumber()" />
 						</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px">Expiry</div>
 						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-							<input id="expiration-month" class="reg-details" type="text" ng-model="payment.expirationMonth" />
+							<!--<div id="expiration-month" class="reg-details"></div>-->
+							<!--  <input id="expiration-month" class="reg-details" type="text" ng-model="payment.expirationMonth" />-->
+							<select id="expiration-month" class="reg-details" ng-model="payment.expirationMonth" ng-options="month.id as month.value for month in expirationMonths"></select>
 						</div>
 						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-							<input id="expiration-year" class="reg-details" type="text" ng-model="payment.expirationYear" />
+							<!--<div id="expiration-year" class="reg-details"></div>
+							<!--<input id="expiration-year" class="reg-details" type="text" ng-model="payment.expirationYear" />-->
+							<select id="expiration-year" class="reg-details" ng-model="payment.expirationYear" ng-options="year.id as year.value for year in expirationYears"></select>
 						</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top:20px">CVV</div>
 						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top:20px">Zip Code</div>
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-							<input id="cvv" class="reg-details" type="text" ng-model="payment.cvv" />
+							<!--<div id="cvv" class="reg-details"></div>-->
+							<input id="cvv" class="reg-details" type="password" ng-model="payment.cvv" />
 						</div>
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+							<!--<div id="zip-code" class="reg-details"></div>-->
 							<input id="zip-code" class="reg-details" type="text" ng-model="payment.zipCode" />
 						</div>
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
@@ -83,7 +90,7 @@
 						<div class="reg-pswd-info col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 5px;">3 digits on back</div>
 						<div class="reg-pswd-info col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 5px;">For US cards only</div>
 					</div>
-					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px;">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 							<table>
 								<tr>
@@ -98,7 +105,7 @@
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
 							<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
 							<div style="width: 120px; margin: auto;">
-								<button type="submit" class="reg-next" ng-click="processPayment()" ng-class="{'regen':authorize}">Next</button>
+								<button type="submit" class="reg-next" ng-class="{'regen':authorize}">Next</button>
 							</div>
 						</div>
 					</div>
@@ -109,11 +116,12 @@
 					<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">Name *</div>
 					<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">Email *</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<input class="reg-name" type="text" placeholder="Your Name" required ng-model="name" /> <input class="reg-name float-right" style="margin-left: 2%;" type="email" placeholder="email@example.com" required ng-model="email" />
+						<input class="reg-name" type="text" placeholder="Your Name" required ng-model="payment.name" />
+						<input class="reg-name float-right" style="margin-left: 2%;" type="email" placeholder="email@example.com" required ng-model="payment.email" />
 					</div>
 					<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Message *</div>
 					<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<textarea class="reg-details" style="height: 100px; padding: 10px;" placeholder="Lets us know how we can help." required ng-model="message"></textarea>
+						<textarea class="reg-details" style="height: 100px; padding: 10px;" placeholder="Lets us know how we can help." required ng-model="payment.message"></textarea>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
 						<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
