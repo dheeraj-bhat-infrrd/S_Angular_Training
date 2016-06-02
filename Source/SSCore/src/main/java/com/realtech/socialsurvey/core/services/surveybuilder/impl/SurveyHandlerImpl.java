@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.realtech.socialsurvey.core.entities.SurveyImportVO;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
@@ -188,6 +191,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private UrlService urlService;
+
+    @Autowired
+    private SocialManagementService socialManagementService;
 
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
@@ -2711,6 +2717,130 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.info( "Method to find user profile where user is agent, getUserProfileWhereAgentForUser ended" );
         return agentUserProfile;
+    }
+
+
+    @Transactional
+    @Override
+    public void importSurveyVOToDBs( SurveyImportVO surveyImportVO ) throws NonFatalException
+    {
+        LOG.info( "Method SurveyHandlerImpl.importSurveyVOToDBs started" );
+        User user = userManagementService.getUserByUserId( surveyImportVO.getUserId() );
+        if ( user == null )
+            throw new InvalidInputException( "User with userId : " + surveyImportVO.getUserId() + " was not found" );
+        AgentSettings settings = userManagementService.getUserSettings( user.getUserId() );
+        if ( settings == null )
+            throw new InvalidInputException( "AgentSettings empty for user: " + user.getUserId() );
+        //Resolve customerFirstName and customerLastName
+        surveyImportVO = resolveCustomerName( surveyImportVO );
+        SurveyPreInitiation surveyPreInitiation = importSurveyVOToSurveyPreInitiation( surveyImportVO, user );
+        SurveyDetails details = importSurveyVOToMongo( surveyImportVO, surveyPreInitiation, user );
+        String serverBaseUrl = getApplicationBaseUrl();
+        String agentProfileLink = serverBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + settings.getProfileUrl();
+        socialManagementService.postToSocialMedia( details.getAgentName(), agentProfileLink, details.getCustomerFirstName(),
+            details.getCustomerLastName(), details.getAgentId(), details.getScore(), details.get_id(), details.getReview(),
+            false, serverBaseUrl, true );
+        LOG.info( "Method SurveyHandlerImpl.importSurveyVOToDBs finished" );
+    }
+
+
+    SurveyImportVO resolveCustomerName( SurveyImportVO surveyImportVO ) throws InvalidInputException
+    {
+        String nameArray[] = null;
+        String individualName = surveyImportVO.getCustomerFirstName().trim();
+        if ( surveyImportVO.getCustomerLastName() != null && !surveyImportVO.getCustomerLastName().isEmpty() )
+            individualName += " " + surveyImportVO.getCustomerLastName().trim();
+        if ( individualName != null && !individualName.equalsIgnoreCase( "" ) ) {
+            nameArray = individualName.split( " " );
+        }
+
+        if ( nameArray == null ) {
+            throw new InvalidInputException( "Invalid name, please provide a valid name " );
+        }
+
+        surveyImportVO.setCustomerFirstName( nameArray[0] );
+        String lastName = "";
+        if ( nameArray.length > 1 ) {
+            for ( int i = 1; i <= nameArray.length - 1; i++ ) {
+                lastName += nameArray[i] + " ";
+            }
+        }
+        if ( lastName != null && !lastName.equalsIgnoreCase( "" ) ) {
+            lastName = lastName.trim();
+            surveyImportVO.setCustomerLastName( lastName );
+        } else {
+            surveyImportVO.setCustomerLastName( "" );
+        }
+        return surveyImportVO;
+    }
+
+
+    SurveyPreInitiation importSurveyVOToSurveyPreInitiation( SurveyImportVO surveyImportVO, User user )
+        throws InvalidInputException
+    {
+        LOG.info( "Method BulkSurveyImporter.importSurveyVOToSurveyPreInitiation started" );
+        SurveyPreInitiation survey = new SurveyPreInitiation();
+        survey.setSurveySource( CommonConstants.SURVEY_REQUEST_AGENT );
+        survey.setCompanyId( user.getCompany().getCompanyId() );
+        survey.setAgentId( user.getUserId() );
+        survey.setAgentEmailId( user.getEmailId() );
+        survey.setCustomerFirstName( surveyImportVO.getCustomerFirstName() );
+        survey.setCustomerLastName( surveyImportVO.getCustomerLastName() );
+        survey.setCustomerEmailId( surveyImportVO.getCustomerEmailAddress() );
+        Date date = surveyImportVO.getSurveyDate();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime( date );
+        Timestamp engagementTimestamp = new Timestamp( cal.getTimeInMillis() );
+        survey.setEngagementClosedTime( engagementTimestamp );
+        Timestamp currentTimestamp = new Timestamp( System.currentTimeMillis() );
+        survey.setLastReminderTime( currentTimestamp );
+        survey.setCreatedOn( currentTimestamp );
+        survey.setModifiedOn( currentTimestamp );
+        survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+        surveyPreInitiationDao.save( survey );
+        LOG.info( "Method BulkSurveyImporter.importSurveyVOToSurveyPreInitiation finished" );
+        return survey;
+    }
+
+    SurveyDetails importSurveyVOToMongo( SurveyImportVO surveyImportVO, SurveyPreInitiation surveyPreInitiation, User user )
+        throws InvalidInputException, ProfileNotFoundException
+    {
+        SurveyDetails surveyDetails = new SurveyDetails();
+        surveyDetails.setAgentId( user.getUserId() );
+        String agentName = user.getFirstName();
+        if ( user.getLastName() != null && !user.getLastName().isEmpty() )
+            agentName += " " + user.getLastName();
+        surveyDetails.setAgentName( agentName );
+        Map<String, Long> profile = userManagementService.getPrimaryUserProfileByAgentId( user.getUserId() );
+        surveyDetails.setBranchId( profile.get( CommonConstants.BRANCH_ID_COLUMN ) );
+        surveyDetails.setCustomerFirstName( surveyImportVO.getCustomerFirstName() );
+        String lastName = surveyImportVO.getCustomerLastName();
+        if ( lastName != null && !lastName.isEmpty() && !lastName.equalsIgnoreCase( "null" ) )
+            surveyDetails.setCustomerLastName( lastName );
+        surveyDetails.setCompanyId( user.getCompany().getCompanyId() );
+        surveyDetails.setCustomerEmail( surveyImportVO.getCustomerEmailAddress() );
+        surveyDetails.setRegionId( profile.get( CommonConstants.REGION_ID_COLUMN ) );
+        surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
+        surveyDetails.setReminderCount( 0 );
+        surveyDetails.setModifiedOn( new Date( System.currentTimeMillis() ) );
+        surveyDetails.setCreatedOn( new Date( System.currentTimeMillis() ) );
+        surveyDetails.setSurveyResponse( new ArrayList<SurveyResponse>() );
+        surveyDetails.setCustRelationWithAgent( null );
+        surveyDetails.setReview( surveyImportVO.getReview() );
+        surveyDetails.setScore( surveyImportVO.getScore() );
+        surveyDetails.setSurveyTransactionDate( surveyImportVO.getSurveyDate() );
+
+        surveyDetails.setUrl(
+            composeLink( user.getUserId(), surveyImportVO.getCustomerEmailAddress(), surveyImportVO.getCustomerFirstName(),
+                surveyImportVO.getCustomerLastName(), surveyPreInitiation.getSurveyPreIntitiationId(), false ) );
+        surveyDetails.setEditable( false );
+        surveyDetails.setSource( CommonConstants.SURVEY_REQUEST_AGENT );
+        surveyDetails.setShowSurveyOnUI( true );
+
+        surveyDetails.setRetakeSurvey( false );
+        surveyDetails.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
+        surveyDetailsDao.insertSurveyDetails( surveyDetails );
+        return  surveyDetails;
     }
 
 
