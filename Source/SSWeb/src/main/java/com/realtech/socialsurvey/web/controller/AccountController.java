@@ -362,9 +362,16 @@ public class AccountController
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.makePayment( companyId, planId, payment );
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         if ( response.getStatus() == HttpStatus.SC_OK ) {
             response = api.updateCompanyProfileStage( companyId, RegistrationStage.PAYMENT.getCode() );
+            if ( response.getStatus() == HttpStatus.SC_OK ) {
+                if ( Integer.parseInt( planId ) != 3 ) {
+                    response = api.generateDefaultHierarchy( companyId );
+                    if ( response.getStatus() == HttpStatus.SC_OK ) {
+                        response = api.updateCompanyProfileStage( companyId, RegistrationStage.COMPLETE.getCode() );
+                    }
+                }
+            }
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
         return responseString;
@@ -384,10 +391,11 @@ public class AccountController
             attributes.addFlashAttribute( "firstName", urlParams.get( CommonConstants.FIRST_NAME ) );
             attributes.addFlashAttribute( "lastName", urlParams.get( CommonConstants.LAST_NAME ) );
             attributes.addFlashAttribute( "setPassword", true );
+            return "redirect:/accountsignup.do";
         } else {
+            attributes.addFlashAttribute( "fromEmailLink", true );
             return "redirect:/login.do";
         }
-        return "redirect:/accountsignup.do";
     }
 
 
@@ -398,7 +406,6 @@ public class AccountController
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.savePassword( userId, password );
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
     }

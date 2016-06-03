@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
-import com.realtech.socialsurvey.core.entities.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -61,6 +60,50 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
 import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
+import com.realtech.socialsurvey.core.entities.CRMInfo;
+import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
+import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
+import com.realtech.socialsurvey.core.entities.DisabledAccount;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.Event;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
+import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.RegistrationStage;
+import com.realtech.socialsurvey.core.entities.RetriedTransaction;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.StateLookup;
+import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadStatus;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserApiKey;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
+import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -1581,14 +1624,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Record successfully deleted from the database!" );
     }
 
+
     @Override
-    public SocialMediaTokens getAgentSocialMediaTokens(long iden) throws InvalidInputException
+    public SocialMediaTokens getAgentSocialMediaTokens( long iden ) throws InvalidInputException
     {
         SocialMediaTokens tokens = null;
-        if(iden > 0l){
-            LOG.info( "Getting social media tokens for agent id: "+iden );
+        if ( iden > 0l ) {
+            LOG.info( "Getting social media tokens for agent id: " + iden );
             tokens = organizationUnitSettingsDao.fetchSocialMediaTokens( CommonConstants.AGENT_SETTINGS_COLLECTION, iden );
-        }else{
+        } else {
             LOG.error( "Invalid identified passed" );
             throw new InvalidInputException( "Invalid identified passed" );
         }
@@ -7644,15 +7688,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "UserManagementService.activateCompany started" );
         //Activate company in SQL
         company.setStatus( CommonConstants.STATUS_ACTIVE );
+        company.setIsRegistrationComplete( 1 );
+        company.setRegistrationStage( RegistrationStage.COMPLETE.getCode() );
+
         companyDao.update( company );
         //Activate company in MongoDB
         OrganizationUnitSettings companySettings = getCompanySettings( company.getCompanyId() );
         if ( companySettings == null ) {
             throw new InvalidInputException( "No company settings found for company : " + company.getCompanyId() );
         }
-        organizationUnitSettingsDao
-            .updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE_MONGO,
-                companySettings, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN,
+            CommonConstants.STATUS_ACTIVE_MONGO, companySettings, CommonConstants.COMPANY_SETTINGS_COLLECTION );
         LOG.info( "UserManagementService.activateCompany finished" );
         return company;
     }

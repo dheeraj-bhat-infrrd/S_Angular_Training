@@ -225,12 +225,14 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
  */
 
 app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
+
+	$scope.login = function() {
+		window.location = "/login.do";
+	}
+
 } ]);
 
 app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfileService', '$rootScope', function($scope, $http, $location, UserProfileService, $rootScope) {
-
-	// if(angular.isUndefined($rootScope.userId))
-	// $rootScope.userId = 1291;
 
 	$('#reg-phone1').intlTelInput({
 		utilsScript : "../resources/js/utils.js"
@@ -343,9 +345,6 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 } ]);
 
 app.controller('companyController', [ '$scope', '$location', 'CompanyProfileService', '$rootScope', function($scope, $location, CompanyProfileService, $rootScope) {
-
-	// if (angular.isUndefined($rootScope.companyId))
-	// $rootScope.companyId = 93;
 
 	$scope.usa = true;
 	$scope.canada = false;
@@ -737,6 +736,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	}
 
 	$scope.processPayment = function() {
+
 		if ($scope.individual) {
 			$scope.selectedPlan = $filter('filter')($scope.paymentPlans, function(plan) {
 				return plan.planName == "Individual";
@@ -768,7 +768,9 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 					"email" : $scope.payment.email,
 					"message" : $scope.payment.message
 				};
+				showOverlay();
 				PaymentService.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend).then(function(response) {
+					hideOverlay();
 					$location.path('/signupcomplete').replace();
 				}, function(error) {
 					showError($scope.getErrorMessage(error.data));
@@ -812,14 +814,17 @@ app.controller('passwordController', [ '$scope', '$location', '$rootScope', 'Pas
 	$scope.lastName = $rootScope.lastName;
 
 	$scope.savePassword = function() {
-		if ($scope.password == $scope.confirmPassword && $scope.password.length >= 6 && $scope.confirmPassword.length >= 6) {
+		if (($scope.password != undefined && $scope.password.length < 6) || ($scope.confirmPassword != undefined && $scope.confirmPassword.length < 6)) {
+			showError("Password and Confirm Password should be atleast 6 characters in length.");
+		} else if ($scope.password != $scope.confirmPassword) {
+			showError("Password and Confirm Password should exactly match.");
+		} else {
 			PasswordService.savePassword($rootScope.userId, $scope.password).then(function(response) {
-
+				showInfo("Password saved successfully.");
+				window.location = "/login.do";
 			}, function(error) {
 				showError($scope.getErrorMessage(error.data));
 			});
-		} else {
-			showError("Password and Confirm Password should exactly match.");
 		}
 	}
 } ]);
