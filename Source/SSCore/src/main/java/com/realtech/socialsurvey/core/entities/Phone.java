@@ -5,6 +5,19 @@ public class Phone
     private String countryCode;
     private String number;
     private String extension;
+    private String countryAbbr;
+
+
+    public String getCountryAbbr()
+    {
+        return countryAbbr;
+    }
+
+
+    public void setCountryAbbr( String countryAbbr )
+    {
+        this.countryAbbr = countryAbbr;
+    }
 
 
     public String getCountryCode()
