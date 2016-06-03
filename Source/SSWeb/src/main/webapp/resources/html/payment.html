@@ -45,45 +45,78 @@
 				</div>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="individual||business">
-				<form id="paymentForm" ng-submit="processPayment()">
+				<form name="paymentForm" id="paymentForm" ng-submit="processPayment()" novalidate>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Name on Card</div>
-						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Name on Card *</div>
+						<!-- <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 							<input id="name-on-card" class="reg-details" type="text" ng-model="payment.cardHolderName" />
-						</div>
+						</div> -->
+						<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.nameoncard.$error.required}">
+						<input class="reg-details form-control-reg" id="name-on-card" type="text" ng-model="payment.cardHolderName"  name="nameoncard" required  />
+						<p ng-show="paymentsubmitted && paymentForm.nameoncard.$error.required" class="help-block-reg">Name on card is required.</p>
+					</div>
+					
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px">Card Number</div>
-						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-							<!--  <div id="card-number" class="reg-details"></div>-->
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px">Card Number *</div>
+						<!-- <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 							<input id="card-number" class="reg-details" type="text" ng-model="payment.cardNumber" ng-change="onChangeCreditCardNumber()" />
-						</div>
+						</div> -->
+						
+						
+						<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.cardNumber.$error.required}">
+						<input class="reg-details form-control-reg" id="card-number" type="text" ng-model="payment.cardNumber" ng-change="onChangeCreditCardNumber()"  name="cardNumber" required  />
+						<p ng-show="paymentsubmitted && paymentForm.cardNumber.$error.required" class="help-block-reg">Card Number is required.</p>
+					</div>
+					
+					
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px">Expiry</div>
-						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-							<!--<div id="expiration-month" class="reg-details"></div>-->
-							<!--  <input id="expiration-month" class="reg-details" type="text" ng-model="payment.expirationMonth" />-->
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px">Expiry *</div>
+						<!-- <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 							<select id="expiration-month" class="reg-details" ng-model="payment.expirationMonth" ng-options="month.id as month.value for month in expirationMonths"></select>
-						</div>
-						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-							<!--<div id="expiration-year" class="reg-details"></div>
-							<!--<input id="expiration-year" class="reg-details" type="text" ng-model="payment.expirationYear" />-->
+						</div> -->
+						
+						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding:0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.month.$error.required}">
+						<select id="expiration-month" class="reg-details form-control-reg" ng-model="payment.expirationMonth" name="month" required ng-options="month.id as month.value for month in expirationMonths"></select>
+						<p ng-show="paymentsubmitted && paymentForm.month.$error.required" class="help-block-reg">Month is required.</p>
+					</div>
+						
+						
+						<!-- <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 							<select id="expiration-year" class="reg-details" ng-model="payment.expirationYear" ng-options="year.id as year.value for year in expirationYears"></select>
-						</div>
+						</div> -->
+						
+						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding:0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.year.$error.required}">
+						<select id="expiration-year" class="reg-details form-control-reg" ng-model="payment.expirationYear" name="year" required ng-options="year.id as year.value for year in expirationYears"></select>
+						<p ng-show="paymentsubmitted && paymentForm.year.$error.required" class="help-block-reg">Year is required.</p>
+					</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top:20px">CVV</div>
-						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top:20px">Zip Code</div>
-						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-							<!--<div id="cvv" class="reg-details"></div>-->
+						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top:20px">CVV *</div>
+						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top:20px">Zip Code *</div>
+						<!-- <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
 							<input id="cvv" class="reg-details" type="password" ng-model="payment.cvv" />
 						</div>
+						 -->
+						
+						
+						<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-3" style="padding:0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.cvv.$error.required}">
+						<input class="reg-details form-control-reg" id="cvv" type="password"  name="cvv" required ng-model="payment.cvv" />
+						<p ng-show="paymentsubmitted && paymentForm.cvv.$error.required" class="help-block-reg">CVV is required.</p>
+					</div>
+						
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
-						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-							<!--<div id="zip-code" class="reg-details"></div>-->
+						<!-- <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
 							<input id="zip-code" class="reg-details" type="text" ng-model="payment.zipCode" />
 						</div>
+						 -->
+						
+						<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-3" style="padding:0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.zipcode.$error.required}">
+						<input class="reg-details form-control-reg" id="zip-code" type="text" name="zipcode" required ng-model="payment.zipCode" />
+						<p ng-show="paymentsubmitted && paymentForm.zipcode.$error.required" class="help-block-reg">Zip Code is required.</p>
+					</div>
+					
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -105,28 +138,46 @@
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
 							<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
 							<div style="width: 120px; margin: auto;">
-								<button type="submit" class="reg-next" ng-class="{'regen':authorize}">Next</button>
+								<button type="submit" class="reg-next" ng-class="{'regen':authorize}"  ng-click="paymentsubmitted=true">Next</button>
 							</div>
 						</div>
 					</div>
 				</form>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="enterprise">
-				<form name="enterpriseForm" ng-submit="processPayment()">
+				<form name="enterpriseForm" ng-submit="processPayment()" novalidate>
+				
 					<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">Name *</div>
 					<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">Email *</div>
-					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<!-- <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<input class="reg-name" type="text" placeholder="Your Name" required ng-model="payment.name" />
 						<input class="reg-name float-right" style="margin-left: 2%;" type="email" placeholder="email@example.com" required ng-model="payment.email" />
+					</div> -->
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0" ng-class="{ 'has-error-reg' : entersubmitted && enterpriseForm.name.$error.required}">
+							<input class=" reg-name form-control-reg" name="name" type="text" placeholder="Your Name" ng-model="payment.name" required />
+							<p ng-show="entersubmitted && enterpriseForm.name.$error.required" class="help-block-reg">Name is required.</p>
+						</div>
+						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0" ng-class="{ 'has-error-reg' : entersubmitted && enterpriseForm.email.$error.required}">
+							<input class=" reg-name  form-control-reg" name="email" ng-model="payment.email" style="margin-left: 2%;" type="email" placeholder="email@example.com" required />
+							<p ng-show="entersubmitted && enterpriseForm.email.$error.required" class="help-block-reg">Email is required.</p>
+						</div>
 					</div>
 					<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Message *</div>
-					<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<!-- <div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<textarea class="reg-details" style="height: 100px; padding: 10px;" placeholder="Lets us know how we can help." required ng-model="payment.message"></textarea>
+					</div> -->
+					
+					<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0 15px" ng-class="{ 'has-error-reg' :  entersubmitted && enterpriseForm.message.$error.required}">
+						<textarea class="reg-details form-control-reg"  style="height: 100px; padding: 10px;" placeholder="Lets us know how we can help." name="message" required ng-model="payment.message" ></textarea>
+						<p ng-show=" entersubmitted && enterpriseForm.message.$error.required" class="help-block-reg">Address is required.</p>
 					</div>
+					
+					
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
 						<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
 						<div style="width: 120px; margin: auto;">
-							<button class="reg-next" type="submit" ng-class="{'regen':enterpriseForm.$valid}">Next</button>
+							<button class="reg-next" type="submit" ng-class="{'regen':enterpriseForm.$valid}"  ng-click="entersubmitted=true">Next</button>
 						</div>
 					</div>
 				</form>

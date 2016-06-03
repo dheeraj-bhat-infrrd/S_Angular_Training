@@ -731,12 +731,16 @@
             this.selectedFlagInner.parent().attr("title", title);
             if( codelength == 1){
             	 this.selectedFlagInner.parent().parent().parent().find('.reg-details').css('padding-left','75px');
+            	 this.selectedFlagInner.parent().parent().find('.dial-country-code').css('width','36px');
             }else if(codelength == 2){
             	this.selectedFlagInner.parent().parent().parent().find('.reg-details').css('padding-left','85px');
+            	this.selectedFlagInner.parent().parent().find('.dial-country-code').css('width','36px');
             }else if(codelength == 3){
             	this.selectedFlagInner.parent().parent().parent().find('.reg-details').css('padding-left','95px');
+            	this.selectedFlagInner.parent().parent().find('.dial-country-code').css('width','45px');
             }else{
             	this.selectedFlagInner.parent().parent().parent().find('.reg-details').css('padding-left','103px');
+            	this.selectedFlagInner.parent().parent().find('.dial-country-code').css('width','51px');
             }
             this.selectedFlagInner.parent().parent().find('.dial-country-code').html("+"+this.selectedCountryData.dialCode);
             if (this.options.separateDialCode) {

@@ -22,7 +22,11 @@ app.service('UserProfileService', [ '$http', function($http) {
 	}
 
 	this.logoupload = function(userId, formData) {
-		return $http.post('/registeraccount/uploadcompanylogo', JSON.stringify(formData));
+		return $http.post('/registeraccount/uploaduserprofilelogo', JSON.stringify(formData));
+	}
+
+	this.removelogo = function(userId) {
+	    return $http.delete('/registeraccount/removeuserprofilelogo.do?userId=' + userId);
 	}
 } ]);
 
@@ -42,6 +46,14 @@ app.service('CompanyProfileService', [ '$http', function($http) {
 	this.getCompanyStage = function(companyId) {
 		return $http.get('/registeraccount/getcompanystage.do?companyId=' + companyId);
 	}
+
+	this.logoupload = function(userId, formData) {
+	    return $http.post('/registeraccount/uploadcompanylogo', JSON.stringify(formData));
+	}
+
+    this.removelogo = function(companyId) {
+        return $http.delete('/registeraccount/removecompanylogo.do?companyId=' + companyId);
+    }
 } ]);
 
 app.service('LinkedinService', [ '$http', function($http) {

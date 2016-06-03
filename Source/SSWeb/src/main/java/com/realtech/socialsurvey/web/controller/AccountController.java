@@ -330,6 +330,18 @@ public class AccountController
     }
 
 
+    @RequestMapping ( value = "/registeraccount/removecompanylogo", method = RequestMethod.DELETE)
+    @ResponseBody
+    public String removeCompanyLogo( @QueryParam ( "companyId") String companyId )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.removeCompanyLogo( companyId );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
+    }
+
+
     @RequestMapping ( value = "/registeraccount/uploaduserprofilelogo", method = RequestMethod.POST)
     @ResponseBody
     public String uploadUserProfileLogo( @QueryParam ( "userId") String userId, MultipartHttpServletRequest request )
@@ -349,6 +361,18 @@ public class AccountController
             Response response = api.updateUserProfileImage( userId, profileImageUrl );
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
+        return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/removeuserprofilelogo", method = RequestMethod.DELETE)
+    @ResponseBody
+    public String removeUserProfileLogo( @QueryParam ( "userId") String userId )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.removeUserProfileImage( userId );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
     }
 
