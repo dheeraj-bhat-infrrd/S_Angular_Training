@@ -56,9 +56,10 @@
 <script src="${initParam.resourcesPath}/resources/js/app.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/controllers/signup.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/services/login.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/angular-dropdowns.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/angular-dropdowns.js"></script> 
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/phoneFormat.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/card-validator/card-validator.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/dropzone.js"></script>
 </body>
 </html>

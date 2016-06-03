@@ -6,12 +6,12 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 
 	$rootScope.userId = userId;
 	$rootScope.companyId = companyId;
-	$rootScope.redirect=false;
+	$rootScope.redirect = false;
 	console.log($rootScope.userId);
 	console.log($rootScope.companyId);
 
 	if (isLinkedin == "true") {
-		$rootScope.redirect=true;
+		$rootScope.redirect = true;
 		$rootScope.userId = $cookies.get("userId");
 		$rootScope.companyId = $cookies.get("companyId");
 		$location.path('/linkedin').replace();
@@ -67,9 +67,33 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		}
 		return errorMessage;
 	}
+
+	$scope.maskPhoneNumber = function(phoneId, iso2) {
+		if (iso2 == 'us') {
+			$('#' + phoneId).mask(phoneFormat, phoneRegEx);
+		} else {
+			$('#' + phoneId).mask(phoneFormatList[iso2.toUpperCase()], phoneRegEx);
+		}
+	}
+
+	$scope.getPhoneNumber = function(phoneId) {
+		var countryData = $('#' + phoneId).intlTelInput("getSelectedCountryData");
+		var number = $('#' + phoneId).intlTelInput("getNumber");
+		if (number.indexOf("+1") != -1) {
+			number = number.substring(2, number.length + 1);
+		} else {
+			number = number.substring(countryData.dialCode.length + 1, number.length + 1);
+		}
+		return {
+			"number" : number,
+			"countryCode" : "+" + countryData.dialCode,
+			"extension" : $('#' + phoneId).intlTelInput("getExtension"),
+			"countryAbbr" : countryData.iso2
+		};
+	}
 } ]);
 
-app.controller('accountSignupController', ['$cookies', '$scope', '$location', 'vcRecaptchaService', 'LoginService', '$rootScope', function($cookies, $scope, $location, vcRecaptchaService, LoginService, $rootScope) {
+app.controller('accountSignupController', [ '$cookies', '$scope', '$location', 'vcRecaptchaService', 'LoginService', '$rootScope', function($cookies, $scope, $location, vcRecaptchaService, LoginService, $rootScope) {
 	$scope.activate = 0;
 	$scope.accountRegistration = {};
 	$scope.response = null;
@@ -85,60 +109,64 @@ app.controller('accountSignupController', ['$cookies', '$scope', '$location', 'v
 	});
 	$('#reg-phone').mask(phoneFormat, phoneRegEx);
 	$("#reg-phone").on("countrychange", function(e, countryData) {
-		$scope.maskPhoneNumber("reg-phone", countryData);
+		$scope.maskPhoneNumber("reg-phone", countryData.iso2);
 	});
 
-	$scope.maskPhoneNumber = function(phoneId, countryData) {
-		if (countryData.iso2 == 'us') {
-			$('#' + phoneId).mask(phoneFormat, phoneRegEx);
-		} else {
-			$('#' + phoneId).mask(phoneFormatList[countryData.iso2.toUpperCase()], phoneRegEx);
-		}
-	}
-
-	$scope.getPhoneNumber = function(phoneId) {
-		var countryData = $('#' + phoneId).intlTelInput("getSelectedCountryData");
-		var number = $('#' + phoneId).intlTelInput("getNumber");
-		if (number.indexOf("+1") != -1) {
-			number = number.substring(2, number.length + 1);
-		} else {
-			number = number.substring(countryData.dialCode.length + 1, number.length + 1);
-		}
-		return {
-			"number" : number,
-			"countryCode" : "+" + countryData.dialCode,
-			"extension" : $('#' + phoneId).intlTelInput("getExtension")
-		};
-	}
-
 	$scope.submitLogin = function() {
-
-		if (vcRecaptchaService.getResponse() == "") {
-			showError("Let's make sure you are a real person, please check the box beside I'm not a robot! ");
-			$scope.activate = 0;
-		} else {
-			showOverlay();
-			$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-			$scope.accountRegistration.phone = $scope.getPhoneNumber("reg-phone");
-			LoginService.signup($scope.accountRegistration).then(function(response) {
-				$rootScope.userId = response.data.userId;
-				$rootScope.companyId = response.data.companyId;
+		
+			if (vcRecaptchaService.getResponse() == "") {
+				showError("Let's make sure you are a real person, please check the box beside I'm not a robot! ");
+				$scope.activate = 0;
 				
-				var now = new Date(),
-			    // this will set the expiration to 12 months
-			    exp = new Date(now.getFullYear()+1, now.getMonth(), now.getDate());
+				if ($scope.signInForm.$valid) {
+					showOverlay();
+					$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
+					$scope.accountRegistration.phone = $scope.getPhoneNumber("reg-phone");
+					LoginService.signup($scope.accountRegistration).then(function(response) {
+						$rootScope.userId = response.data.userId;
+						$rootScope.companyId = response.data.companyId;
 
+						var now = new Date(),
+						// this will set the expiration to 12 months
+						exp = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+
+						$cookies.put("userId", $rootScope.userId, {
+							'expires' : exp
+						});
+						$cookies.put("companyId", $rootScope.companyId);
+						hideOverlay();
+						$location.path('/linkedin').replace();
+					}, function(error) {
+						showError($scope.getErrorMessage(error.data));
+					});
+				}
+			}
+			else if (vcRecaptchaService.getResponse() != "") {
+				if ($scope.signInForm.$valid) {
+					showOverlay();
+					$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
+					$scope.accountRegistration.phone = $scope.getPhoneNumber("reg-phone");
+					LoginService.signup($scope.accountRegistration).then(function(response) {
+						$rootScope.userId = response.data.userId;
+						$rootScope.companyId = response.data.companyId;
+
+						var now = new Date(),
+						// this will set the expiration to 12 months
+						exp = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+
+						$cookies.put("userId", $rootScope.userId, {
+							'expires' : exp
+						});
+						$cookies.put("companyId", $rootScope.companyId);
+						hideOverlay();
+						$location.path('/linkedin').replace();
+					}, function(error) {
+						showError($scope.getErrorMessage(error.data));
+					});
+				}
+			};
 			
-				$cookies.put("userId", $rootScope.userId,{
-					 'expires': exp
-				});
-				$cookies.put("companyId", $rootScope.companyId);
-				hideOverlay();
-				$location.path('/linkedin').replace();
-			}, function(error) {
-				showError($scope.getErrorMessage(error.data));
-			});
-		}
+		
 
 	};
 
@@ -160,7 +188,7 @@ app.controller('accountSignupController', ['$cookies', '$scope', '$location', 'v
 
 app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
 	$window.ScopeToShare = $scope;
-	if($rootScope.redirect){
+	if ($rootScope.redirect) {
 		if (linkedinResponse != null) {
 			if (linkedinResponse == "ok") {
 				showInfo("Successfully connected to LinkedIn");
@@ -169,7 +197,6 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 			}
 		}
 	}
-	
 
 	$scope.linkedin = function() {
 		LinkedinService.linkedin($rootScope.userId).then(function(response) {
@@ -188,10 +215,6 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 			showError($scope.getErrorMessage(error.data));
 		});
 	}
-
-	$scope.printm = function() {
-		console.log("linked response");
-	}
 } ]);
 /*
  * app.controller('linkedloaderController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) { ParentScope = $window.opener.ScopeToShare; location.href = ParentScope.linkedinurl; $(window).on('unload', function(){ var parentWindow = null; if (window.opener != null && !window.opener.closed) { parentWindow = window.opener; } ParentScope.printm();
@@ -206,6 +229,7 @@ app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope'
 	$scope.login = function() {
 		window.location = "/login.do";
 	}
+
 } ]);
 
 app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfileService', '$rootScope', function($scope, $http, $location, UserProfileService, $rootScope) {
@@ -214,10 +238,16 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 		utilsScript : "../resources/js/utils.js"
 	});
 	$('#reg-phone1').mask(phoneFormat, phoneRegEx);
+	$("#reg-phone1").on("countrychange", function(e, countryData) {
+		$scope.maskPhoneNumber("reg-phone1", countryData.iso2);
+	});
 	$('#reg-phone2').intlTelInput({
 		utilsScript : "../resources/js/utils.js"
 	});
 	$('#reg-phone2').mask(phoneFormat, phoneRegEx);
+	$("#reg-phone2").on("countrychange", function(e, countryData) {
+		$scope.maskPhoneNumber("reg-phone2", countryData.iso2);
+	});
 
 	$scope.loadDropzone = function() {
 		if (!angular.isUndefined($rootScope.userProfile)) {
@@ -261,42 +291,47 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	if (angular.isUndefined($rootScope.userProfile) || $rootScope.userProfile == null || $rootScope.userProfile == {}) {
 		UserProfileService.getUserProfile($rootScope.userId).then(function(response) {
 			$rootScope.userProfile = response.data;
+			console.log($rootScope.userProfile.phone1);
+			/* $scope.setPhone("reg-phone1"); */
 			$scope.loadDropzone();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
 	}
 
-	$scope.setPhone1 = function() {
-		$rootScope.userProfile.phone1.number = $('#reg-phone1').val();
-		$rootScope.userProfile.phone1.countryCode = $('.dial-country-code').html();
+	$scope.setPhone = function(phoneId) {
+		var extension;
+		$('#' + phoneId).intlTelInput("setCountry", $rootScope.userProfile.phone1.countryAbbr);
+		console.log($rootScope.userProfile.phone1);
+		console.log($rootScope.userProfile.phone1.extension);
+		if( $rootScope.userProfile.phone1.extension == null||$rootScope.userProfile.phone1.extension == undefined||$rootScope.userProfile.phone1.extension == ""){
+			extension="";
+		}else{
+			extension="X"+" "+ $rootScope.userProfile.phone1.extension;
+		}
+		$('#' + phoneId).intlTelInput("setNumber", $rootScope.userProfile.phone1.number +" "+ extension);
+		/*$('#' + phoneId).intlTelInput("setExtension", $rootScope.userProfile.phone1.extension);*/
+		$scope.maskPhoneNumber(phoneId, $rootScope.userProfile.phone1.countryAbbr);
 	}
-
-	$scope.setPhone2 = function() {
-		$rootScope.userProfile.phone2.number = $('#reg-phone2').val();
-		$rootScope.userProfile.phone2.countryCode = $('.dial-country-code').html();
-	}
-	/*
-	 * $scope.getPhone1 = function(){ if($rootScope.phone!=""||$rootScope.phone!= undefined){ $scope.userProfile.phone1.number= $rootScope.phone; $('#reg-phone1').val($rootScope.userProfile.phone1.number); console.log($('#reg-phone1').val()); } }
-	 */
 
 	$scope.saveProfile = function() {
 		if (!$scope.profileForm.$invalid) {
 			$location.path('/profiledetail').replace();
 		}
-
-		/* $('#reg-phone1').val($rootScope.userProfile.phone1.number); */
 	};
 
 	$scope.saveProfileDetails = function() {
+		if($scope.detailsForm.$valid){
 		showOverlay();
-		// $rootScope.userProfile.phone1 = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+		$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
+		$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
 		UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response) {
 			hideOverlay();
 			$location.path('/company').replace();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
+		}
 
 	};
 

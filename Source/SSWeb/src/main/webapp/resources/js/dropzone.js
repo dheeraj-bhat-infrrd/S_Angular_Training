@@ -1777,6 +1777,8 @@
 	  $(this).find('.change-image').css('display','none');
 	  $(this).find('.dz-remove').css('display','none');
   });
- 
+ $(document).on('click','.change-image',function(e){
+	 return removeFile(file);
+ });
 
 }).call(this);
