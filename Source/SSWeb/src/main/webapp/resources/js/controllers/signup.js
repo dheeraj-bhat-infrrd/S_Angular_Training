@@ -251,7 +251,7 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 						}
 					});
 					this.on("removedfile", function(file) {
-
+                        UserProfileService.removelogo($rootScope.userId);
 					});
 				}
 			});
@@ -367,6 +367,9 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 							this.removeFile(this.files[0]);
 						}
 					});
+                    this.on("removedfile", function(file) {
+                        CompanyProfileService.removelogo($rootScope.companyId);
+                    });
 				}
 			});
 		}

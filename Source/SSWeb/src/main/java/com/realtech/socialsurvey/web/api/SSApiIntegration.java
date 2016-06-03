@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.web.entities.PersonalProfile;
 
 import retrofit.client.Response;
 import retrofit.http.Body;
+import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.PUT;
@@ -67,9 +68,15 @@ public interface SSApiIntegration
     @PUT ( "/account/company/profile/profileimage/update/{companyId}")
     Response updateCompanyLogo( @Path ( "companyId") String companyId, @Body String logoUrl );
 
+    @DELETE( "/account/company/profile/profileimage/remove/{companyId}" )
+    Response removeCompanyLogo( @Path( "companyId" ) String companyId );
+
 
     @PUT ( "/users/profile/profileimage/update/{userId}")
     Response updateUserProfileImage( @Path ( "userId") String userId, @Body String imageUrl );
+
+    @DELETE( "/users/profile/profileimage/remove/{userId}" )
+    Response removeUserProfileImage( @Path( "userId" ) String userId );
 
 
     @POST ( "/account/company/generate/hierarchy/{companyId}")
