@@ -1,40 +1,4 @@
 package com.realtech.socialsurvey.web.controller;
-import com.realtech.socialsurvey.web.common.JspResolver;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.QueryParam;
-
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,14 +24,44 @@ import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.api.exception.SSAPIException;
 import com.realtech.socialsurvey.web.common.TokenHandler;
-import com.realtech.socialsurvey.web.entities.AuthError;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
 import com.realtech.socialsurvey.web.ui.entities.AccountRegistration;
 import com.realtech.socialsurvey.web.util.RequestUtils;
-
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.QueryParam;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -331,6 +325,18 @@ public class AccountController
     }
 
 
+    @RequestMapping ( value = "/registeraccount/removecompanylogo", method = RequestMethod.DELETE)
+    @ResponseBody
+    public String removeCompanyLogo( @QueryParam( "companyId" ) String companyId )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.removeCompanyLogo( companyId );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
+    }
+
+
     @RequestMapping ( value = "/registeraccount/uploaduserprofilelogo", method = RequestMethod.POST)
     @ResponseBody
     public String uploadUserProfileLogo( @QueryParam ( "userId") String userId, MultipartHttpServletRequest request )
@@ -350,6 +356,18 @@ public class AccountController
             Response response = api.updateUserProfileImage( userId, profileImageUrl );
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
+        return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/removeuserprofilelogo", method = RequestMethod.DELETE)
+    @ResponseBody
+    public String removeUserProfileLogo( @QueryParam( "userId" ) String userId )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.removeUserProfileImage( userId );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
     }
 
