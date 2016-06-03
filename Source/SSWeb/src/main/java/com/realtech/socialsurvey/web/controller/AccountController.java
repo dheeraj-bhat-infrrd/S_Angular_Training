@@ -1,5 +1,4 @@
 package com.realtech.socialsurvey.web.controller;
-import com.realtech.socialsurvey.web.common.JspResolver;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +43,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
+import com.realtech.socialsurvey.core.entities.Plan;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
@@ -60,7 +60,6 @@ import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.api.exception.SSAPIException;
 import com.realtech.socialsurvey.web.common.TokenHandler;
-import com.realtech.socialsurvey.web.entities.AuthError;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
 import com.realtech.socialsurvey.web.ui.entities.AccountRegistration;
@@ -365,7 +364,7 @@ public class AccountController
         if ( response.getStatus() == HttpStatus.SC_OK ) {
             response = api.updateCompanyProfileStage( companyId, RegistrationStage.PAYMENT.getCode() );
             if ( response.getStatus() == HttpStatus.SC_OK ) {
-                if ( Integer.parseInt( planId ) != 3 ) {
+                if ( Integer.parseInt( planId ) < Plan.ENTERPRISE.getPlanId() ) {
                     response = api.generateDefaultHierarchy( companyId );
                     if ( response.getStatus() == HttpStatus.SC_OK ) {
                         response = api.updateCompanyProfileStage( companyId, RegistrationStage.COMPLETE.getCode() );
@@ -374,7 +373,18 @@ public class AccountController
             }
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
+        SecurityContextHolder.clearContext();
         return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/isregistrationpasswordset", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean isRegistrationPasswordSet( @QueryParam ( "userId") String userId )
+        throws InvalidInputException, JsonProcessingException
+    {
+        User user = userManagementService.getUserByUserId( Long.parseLong( userId ) );
+        return user.getLoginPassword() != null ? true : false;
     }
 
 
@@ -407,6 +417,7 @@ public class AccountController
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.savePassword( userId, password );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        SecurityContextHolder.clearContext();
         return responseString;
     }
 
@@ -452,9 +463,9 @@ public class AccountController
         String errorCode = request.getParameter( "error" );
         if ( errorCode != null ) {
             LOG.error( "Error code : " + errorCode );
-//            AuthError error = new AuthError();
-//            error.setErrorCode( errorCode );
-//            error.setReason( request.getParameter( "error_description" ) );
+            //            AuthError error = new AuthError();
+            //            error.setErrorCode( errorCode );
+            //            error.setReason( request.getParameter( "error_description" ) );
             response = errorCode;
         } else {
             try {
@@ -523,9 +534,9 @@ public class AccountController
                 throw new SSAPIException( "Could not fetch LinkedIn profile. Reason: " + ioe.getMessage() );
             }
         }
-        attributes.addFlashAttribute("isLinkedin", true);
-        attributes.addFlashAttribute("linkedinResponse", response);
-        
+        attributes.addFlashAttribute( "isLinkedin", true );
+        attributes.addFlashAttribute( "linkedinResponse", response );
+
         return "redirect:/accountsignup.do";
     }
 }

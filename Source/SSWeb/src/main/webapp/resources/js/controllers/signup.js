@@ -1,30 +1,32 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
-	if (userId == undefined && companyId == undefined) {
-		var userId = $cookies.get("userId");
-		var companyId = $cookies.get("companyId");
-	}
+	console.log(userId);
+	console.log(companyId);
 
-	$rootScope.userId = userId;
-	$rootScope.companyId = companyId;
-	$rootScope.redirect=false;
-	console.log($rootScope.userId);
-	console.log($rootScope.companyId);
+	$rootScope.redirect = false;
 
 	if (isLinkedin == "true") {
-		$rootScope.redirect=true;
+		$rootScope.redirect = true;
 		$rootScope.userId = $cookies.get("userId");
 		$rootScope.companyId = $cookies.get("companyId");
 		$location.path('/linkedin').replace();
 	} else if (setPassword == "true") {
 		$rootScope.firstName = firstName;
 		$rootScope.lastName = lastName;
+		$rootScope.userId = userId;
+		$rootScope.companyId = companyId;
 		$location.path('/password').replace();
-	} else if ($rootScope.userId != undefined && $rootScope.companyId != undefined && $rootScope.userId != "" && $rootScope.companyId != "") {
+	} else if (userId == "" && companyId == "") {
+		$rootScope.userId = userId;
+		$rootScope.companyId = companyId;
+		$location.path('/accountsignup').replace();
+	} else {
+		$rootScope.userId = userId;
+		$rootScope.companyId = companyId;
 		var userStageDsiplayOrder = 0;
 		var companyStageDsiplayOrder = 0;
 		var landingStage = '';
-		var registrationStages = JSON.parse('{"INIT":1, "LIN":2, "UPP":3, "CPP":4, "COM":5}');
-		var registrationStagesRoute = JSON.parse('{"1":"/accountsignup", "2":"/linkedin", "3":"/profile", "4":"/company", "5":"/payment"}');
+		var registrationStages = JSON.parse('{"INIT":1, "LIN":2, "UPP":3, "CPP":4, "PAY":5, "COM":6}');
+		var registrationStagesRoute = JSON.parse('{"1":"/accountsignup", "2":"/linkedin", "3":"/profile", "4":"/company", "5":"/payment", "6":"/signupcomplete"}');
 
 		UserProfileService.getUserStage($rootScope.userId).then(function(response) {
 			userStageDsiplayOrder = registrationStages[response.data];
@@ -42,10 +44,6 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
-	} else if ($window.opener != null) {
-		$location.path('/linkedinloader').replace();
-	} else {
-		$location.path('/accountsignup').replace();
 	}
 
 	$scope.getErrorMessage = function(data) {
@@ -69,7 +67,7 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 	}
 } ]);
 
-app.controller('accountSignupController', ['$cookies', '$scope', '$location', 'vcRecaptchaService', 'LoginService', '$rootScope', function($cookies, $scope, $location, vcRecaptchaService, LoginService, $rootScope) {
+app.controller('accountSignupController', [ '$cookies', '$scope', '$location', 'vcRecaptchaService', 'LoginService', '$rootScope', function($cookies, $scope, $location, vcRecaptchaService, LoginService, $rootScope) {
 	$scope.activate = 0;
 	$scope.accountRegistration = {};
 	$scope.response = null;
@@ -123,14 +121,13 @@ app.controller('accountSignupController', ['$cookies', '$scope', '$location', 'v
 			LoginService.signup($scope.accountRegistration).then(function(response) {
 				$rootScope.userId = response.data.userId;
 				$rootScope.companyId = response.data.companyId;
-				
-				var now = new Date(),
-			    // this will set the expiration to 12 months
-			    exp = new Date(now.getFullYear()+1, now.getMonth(), now.getDate());
 
-			
-				$cookies.put("userId", $rootScope.userId,{
-					 'expires': exp
+				var now = new Date(),
+				// this will set the expiration to 12 months
+				exp = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+
+				$cookies.put("userId", $rootScope.userId, {
+					'expires' : exp
 				});
 				$cookies.put("companyId", $rootScope.companyId);
 				hideOverlay();
@@ -160,22 +157,20 @@ app.controller('accountSignupController', ['$cookies', '$scope', '$location', 'v
 
 app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
 	$window.ScopeToShare = $scope;
-	if($rootScope.redirect){
+	if ($rootScope.redirect) {
 		if (linkedinResponse != null) {
 			if (linkedinResponse == "ok") {
 				showInfo("Successfully connected to LinkedIn");
 			} else if (linkedinResponse != null) {
-				showError($scope.getErrorMessage("Please try again,or to continue click on Next"));
+				showError($scope.getErrorMessage("Please try again or to continue, click on Next"));
 			}
 		}
 	}
-	
 
 	$scope.linkedin = function() {
 		LinkedinService.linkedin($rootScope.userId).then(function(response) {
 			$scope.linkedinurl = response.data;
 			location.href = $scope.linkedinurl;
-			/* window.open("/newaccountsignup.do", "Authorization Page", "width=800,height=600,scrollbars=yes"); */
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
@@ -193,13 +188,6 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 		console.log("linked response");
 	}
 } ]);
-/*
- * app.controller('linkedloaderController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) { ParentScope = $window.opener.ScopeToShare; location.href = ParentScope.linkedinurl; $(window).on('unload', function(){ var parentWindow = null; if (window.opener != null && !window.opener.closed) { parentWindow = window.opener; } ParentScope.printm();
- * 
- * 
- * 
- * }); } ]);
- */
 
 app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
 
@@ -444,7 +432,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	}
 } ]);
 
-app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '$rootScope', '$filter', function($scope, PaymentService, $location, $rootScope, $filter) {
+app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '$rootScope', '$filter', 'PasswordService', function($scope, PaymentService, $location, $rootScope, $filter, PasswordService) {
 
 	$scope.individual = true;
 	$scope.business = false;
@@ -612,11 +600,8 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 					"nonce" : nonce,
 					"cardHolderName" : $scope.payment.cardHolderName
 				};
-				PaymentService.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend).then(function(response) {
-					$location.path('/signupcomplete').replace();
-				}, function(error) {
-					showError($scope.getErrorMessage(error.data));
-				});
+				showOverlay();
+				$scope.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend);
 			}
 		});
 	}
@@ -734,14 +719,30 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 					"message" : $scope.payment.message
 				};
 				showOverlay();
-				PaymentService.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend).then(function(response) {
-					hideOverlay();
-					$location.path('/signupcomplete').replace();
-				}, function(error) {
-					showError($scope.getErrorMessage(error.data));
-				});
+				$scope.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend);
 			}
 		}
+	}
+
+	$scope.makePayment = function(companyId, planId, dataToSend) {
+		PaymentService.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend).then(function(response) {
+			hideOverlay();
+			PasswordService.isPasswordAlreadySet($rootScope.userId).then(function(response) {
+				$rootScope.signUpCompleteMessage = "Congratulations, you have completed the sign-up wizard and are ready to start using your new account.";
+				$rootScope.setPasswordMessage = "Be sure to check your email. We have sent a verification link to you that will need to be clicked to set your account password.";
+				if ($scope.selectedPlan.planId == 3) {
+					$rootScope.signUpCompleteMessage = "Congratulations, you have completed the sign-up wizard. Please wait till your account is approved and activated.";
+				}
+				if (response.data) {
+					$rootScope.setPasswordMessage = "";
+				}
+				$location.path('/signupcomplete').replace();
+			}, function(error) {
+				showError($scope.getErrorMessage(error.data));
+			});
+		}, function(error) {
+			showError($scope.getErrorMessage(error.data));
+		});
 	}
 
 	$scope.upGrade = function() {
@@ -755,6 +756,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 			$scope.enterprise = true;
 		}
 		$scope.authorize = true;
+		$scope.payment = {};
 	};
 
 	$scope.downGrade = function() {
@@ -771,6 +773,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 		$scope.email = null;
 		$scope.message = null;
 		$scope.authorize = true;
+		$scope.payment = {};
 	};
 } ]);
 

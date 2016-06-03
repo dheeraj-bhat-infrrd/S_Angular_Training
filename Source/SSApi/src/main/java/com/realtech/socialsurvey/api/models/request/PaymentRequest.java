@@ -1,14 +1,12 @@
 package com.realtech.socialsurvey.api.models.request;
 
-import java.io.Serializable;
-
-
-
-public class PaymentRequest implements Serializable
+public class PaymentRequest
 {
     private String nonce;
     private String cardHolderName;
     private String name;
+    private String email;
+    private String message;
 
 
     public String getName()
@@ -47,10 +45,6 @@ public class PaymentRequest implements Serializable
     }
 
 
-    private String email;
-    private String message;
-
-
     public String getNonce()
     {
         return nonce;
@@ -75,11 +69,9 @@ public class PaymentRequest implements Serializable
     }
 
 
-    @Override public String toString()
+    @Override
+    public String toString()
     {
-        return "PaymentRequest{" +
-            "nonce='" + nonce + '\'' +
-            ", cardHolderName='" + cardHolderName + '\'' +
-            '}';
+        return "PaymentRequest{" + "nonce='" + nonce + '\'' + ", cardHolderName='" + cardHolderName + '\'' + '}';
     }
 }

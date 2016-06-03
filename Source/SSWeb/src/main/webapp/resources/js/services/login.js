@@ -68,4 +68,8 @@ app.service('PasswordService', [ '$http', function($http) {
 	this.savePassword = function(userId, dataToSend) {
 		return $http.put('/registeraccount/savePassword.do?userId=' + userId, dataToSend);
 	}
+
+	this.isPasswordAlreadySet = function(userId) {
+		return $http.get('/registeraccount/isregistrationpasswordset.do?userId=' + userId);
+	}
 } ]);
