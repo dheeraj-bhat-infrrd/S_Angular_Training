@@ -98,32 +98,6 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 		};
 	}
 
-	if (vcRecaptchaService.getResponse() == "") {
-		showError("Let's make sure you are a real person, please check the box beside I'm not a robot! ");
-		$scope.activate = 0;
-	} else {
-		showOverlay();
-		$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-		$scope.accountRegistration.phone = $scope.getPhoneNumber("reg-phone");
-		LoginService.signup($scope.accountRegistration).then(function(response) {
-			$rootScope.userId = response.data.userId;
-			$rootScope.companyId = response.data.companyId;
-
-			var now = new Date(),
-			// this will set the expiration to 12 months
-			exp = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
-
-			$cookies.put("userId", $rootScope.userId, {
-				'expires' : exp
-			});
-			$cookies.put("companyId", $rootScope.companyId);
-			hideOverlay();
-			$location.path('/linkedin').replace();
-		}, function(error) {
-			showError($scope.getErrorMessage(error.data));
-		});
-	}
-
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
 	};
