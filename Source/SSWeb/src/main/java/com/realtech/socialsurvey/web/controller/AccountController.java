@@ -1,5 +1,40 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.QueryParam;
+
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -8,6 +43,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
+import com.realtech.socialsurvey.core.entities.Plan;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
@@ -28,40 +64,9 @@ import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
 import com.realtech.socialsurvey.web.ui.entities.AccountRegistration;
 import com.realtech.socialsurvey.web.util.RequestUtils;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.QueryParam;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -327,7 +332,7 @@ public class AccountController
 
     @RequestMapping ( value = "/registeraccount/removecompanylogo", method = RequestMethod.DELETE)
     @ResponseBody
-    public String removeCompanyLogo( @QueryParam( "companyId" ) String companyId )
+    public String removeCompanyLogo( @QueryParam ( "companyId") String companyId )
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
@@ -362,7 +367,7 @@ public class AccountController
 
     @RequestMapping ( value = "/registeraccount/removeuserprofilelogo", method = RequestMethod.DELETE)
     @ResponseBody
-    public String removeUserProfileLogo( @QueryParam( "userId" ) String userId )
+    public String removeUserProfileLogo( @QueryParam ( "userId") String userId )
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
@@ -383,7 +388,7 @@ public class AccountController
         if ( response.getStatus() == HttpStatus.SC_OK ) {
             response = api.updateCompanyProfileStage( companyId, RegistrationStage.PAYMENT.getCode() );
             if ( response.getStatus() == HttpStatus.SC_OK ) {
-                if ( Integer.parseInt( planId ) != 3 ) {
+                if ( Integer.parseInt( planId ) < Plan.ENTERPRISE.getPlanId() ) {
                     response = api.generateDefaultHierarchy( companyId );
                     if ( response.getStatus() == HttpStatus.SC_OK ) {
                         response = api.updateCompanyProfileStage( companyId, RegistrationStage.COMPLETE.getCode() );
@@ -392,7 +397,18 @@ public class AccountController
             }
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
+        SecurityContextHolder.clearContext();
         return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/isregistrationpasswordset", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean isRegistrationPasswordSet( @QueryParam ( "userId") String userId )
+        throws InvalidInputException, JsonProcessingException
+    {
+        User user = userManagementService.getUserByUserId( Long.parseLong( userId ) );
+        return user.getLoginPassword() != null ? true : false;
     }
 
 
@@ -425,6 +441,7 @@ public class AccountController
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.savePassword( userId, password );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        SecurityContextHolder.clearContext();
         return responseString;
     }
 
@@ -470,9 +487,9 @@ public class AccountController
         String errorCode = request.getParameter( "error" );
         if ( errorCode != null ) {
             LOG.error( "Error code : " + errorCode );
-//            AuthError error = new AuthError();
-//            error.setErrorCode( errorCode );
-//            error.setReason( request.getParameter( "error_description" ) );
+            //            AuthError error = new AuthError();
+            //            error.setErrorCode( errorCode );
+            //            error.setReason( request.getParameter( "error_description" ) );
             response = errorCode;
         } else {
             try {
@@ -541,9 +558,9 @@ public class AccountController
                 throw new SSAPIException( "Could not fetch LinkedIn profile. Reason: " + ioe.getMessage() );
             }
         }
-        attributes.addFlashAttribute("isLinkedin", true);
-        attributes.addFlashAttribute("linkedinResponse", response);
-        
+        attributes.addFlashAttribute( "isLinkedin", true );
+        attributes.addFlashAttribute( "linkedinResponse", response );
+
         return "redirect:/accountsignup.do";
     }
 }

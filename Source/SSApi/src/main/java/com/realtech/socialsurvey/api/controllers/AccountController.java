@@ -62,7 +62,8 @@ public class AccountController
 
 
     @Autowired
-    public AccountController( AccountRegistrationValidator accountRegistrationValidator, PaymentRequestValidator paymentRequestValidator, AccountService accountService,
+    public AccountController( AccountRegistrationValidator accountRegistrationValidator,
+        PaymentRequestValidator paymentRequestValidator, AccountService accountService,
         CompanyProfileTransformer companyProfileTransformer, CompanyProfileValidator companyProfileValidator,
         OrganizationManagementService organizationManagementService )
     {
@@ -88,8 +89,10 @@ public class AccountController
         binder.setValidator( companyProfileValidator );
     }
 
-    @InitBinder ( "paymentRequestValidator" )
-    public void paymentRequestBinder( WebDataBinder binder) {
+
+    @InitBinder ( "paymentRequestValidator")
+    public void paymentRequestBinder( WebDataBinder binder )
+    {
         binder.setValidator( paymentRequestValidator );
     }
 
@@ -208,21 +211,20 @@ public class AccountController
 
 
     @RequestMapping ( value = "/payment/company/{companyId}/plan/{planId}", method = RequestMethod.POST)
-    @ApiOperation( value = "Payment for company for a particular plan")
-    public ResponseEntity<?> payForPlan(
-        @Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long companyId, @PathVariable int planId )
-        throws NonFatalException
+    @ApiOperation ( value = "Payment for company for a particular plan")
+    public ResponseEntity<?> payForPlan( @Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long companyId,
+        @PathVariable int planId ) throws NonFatalException
     {
         LOGGER.info( "Payment initiated for company id " + companyId + " for plan id: " + planId );
-        accountService.payForPlan( companyId, planId, paymentRequest.getNonce(), paymentRequest.getCardHolderName() );
+        accountService.payForPlan( companyId, planId, paymentRequest.getNonce(), paymentRequest.getCardHolderName(),
+            paymentRequest.getName(), paymentRequest.getEmail(), paymentRequest.getMessage() );
         return new ResponseEntity<Void>( HttpStatus.OK );
     }
 
 
-    @RequestMapping (value = "/company/generate/hierarchy/{companyId}", method = RequestMethod.POST)
-    @ApiOperation (value = "Generate default company heirarchy")
-    public ResponseEntity<?> generateDefaultHierarchyForCompany(
-        @PathVariable ("companyId") String companyId )
+    @RequestMapping ( value = "/company/generate/hierarchy/{companyId}", method = RequestMethod.POST)
+    @ApiOperation ( value = "Generate default company heirarchy")
+    public ResponseEntity<?> generateDefaultHierarchyForCompany( @PathVariable ( "companyId") String companyId )
         throws InvalidInputException, SolrException, HierarchyAlreadyExistsException
     {
         //Generate default company hierarchy for company

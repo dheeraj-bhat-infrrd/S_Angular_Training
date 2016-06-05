@@ -217,7 +217,12 @@ public class LoginController
             user = sessionHelper.getCurrentUser();
 
             if ( user.getIsForcePassword() == 1 ) {
-                if ( !user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
+                if ( user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.PAYMENT.getCode() )
+                    && user.getCompany().getBillingMode().equalsIgnoreCase( CommonConstants.BILLING_MODE_INVOICE ) ) {
+                    throw new NonFatalException( "Please wait till your account is approved and activated.",
+                        "ACCOUNT_IN_PROGRESS" );
+                } else if ( !user.getCompany().getRegistrationStage()
+                    .equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
                     redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
                     redirectAttributes.addFlashAttribute( "companyId", user.getCompany().getCompanyId() );
                     return "redirect:/accountsignup.do";
