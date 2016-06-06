@@ -4448,7 +4448,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Transactional
     @Override
-    public User activateCompanyAdmin( User companyAdmin ) throws InvalidInputException, HierarchyAlreadyExistsException
+    public User activateCompanyAdmin( User companyAdmin )
+        throws InvalidInputException, HierarchyAlreadyExistsException, SolrException
     {
         LOG.info( "UserManagementService.activateCompanyAdmin started" );
         //Update the USER table status
@@ -4461,8 +4462,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //Activate agent in mongo
         AgentSettings agentSettings = getUserSettings( companyAdmin.getUserId() );
-        organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.STATUS_COLUMN,
-            CommonConstants.STATUS_ACTIVE_MONGO, agentSettings );
+        organizationUnitSettingsDao
+            .updateParticularKeyAgentSettings( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE_MONGO,
+                agentSettings );
+
+        //Activate agent in Solr
+        solrSearchService
+            .editUserInSolr( companyAdmin.getUserId(), CommonConstants.STATUS_COLUMN, String.valueOf( CommonConstants.STATUS_ACTIVE ) );
         LOG.info( "UserManagementService.activateCompanyAdmin finished" );
         return companyAdmin;
     }
