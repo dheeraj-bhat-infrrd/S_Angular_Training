@@ -4,16 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.xml.ws.Response;
 
-import com.realtech.socialsurvey.api.models.request.PaymentRequest;
-import com.realtech.socialsurvey.api.validators.PaymentRequestValidator;
-import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
-import com.realtech.socialsurvey.core.services.payment.exception.ActiveSubscriptionFoundException;
-import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
-import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.models.CompanyProfile;
 import com.realtech.socialsurvey.api.models.request.AccountRegistrationRequest;
+import com.realtech.socialsurvey.api.models.request.PaymentRequest;
 import com.realtech.socialsurvey.api.transformers.CompanyProfileTransformer;
 import com.realtech.socialsurvey.api.validators.AccountRegistrationValidator;
 import com.realtech.socialsurvey.api.validators.CompanyProfileValidator;
+import com.realtech.socialsurvey.api.validators.PaymentRequestValidator;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.PaymentPlan;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;

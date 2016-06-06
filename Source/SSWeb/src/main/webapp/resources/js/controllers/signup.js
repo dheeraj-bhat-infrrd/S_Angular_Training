@@ -65,14 +65,6 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		}
 		return errorMessage;
 	}
-} ]);
-
-app.controller('accountSignupController', [ '$cookies', '$scope', '$location', 'vcRecaptchaService', 'LoginService', '$rootScope', function($cookies, $scope, $location, vcRecaptchaService, LoginService, $rootScope) {
-	$scope.activate = 0;
-	$scope.accountRegistration = {};
-	$scope.response = null;
-	$scope.widgetId = null;
-	$scope.emailFormat = /^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/;
 
 	$scope.maskPhoneNumber = function(phoneId, iso2) {
 		if (iso2 == 'us') {
@@ -97,6 +89,28 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 			"countryAbbr" : countryData.iso2
 		};
 	}
+
+	$scope.setPhone = function(phoneId, phone) {
+		if (phone != null) {
+			var extension;
+			$('#' + phoneId).intlTelInput("setCountry", phone.countryAbbr);
+			if (phone.extension == null || phone.extension == undefined || phone.extension == "") {
+				extension = "";
+			} else {
+				extension = " x " + phone.extension;
+			}
+			$('#' + phoneId).intlTelInput("setNumber", phone.number + " " + extension);
+			$scope.maskPhoneNumber(phoneId, phone.countryAbbr);
+		}
+	}
+} ]);
+
+app.controller('accountSignupController', [ '$cookies', '$scope', '$location', 'vcRecaptchaService', 'LoginService', '$rootScope', function($cookies, $scope, $location, vcRecaptchaService, LoginService, $rootScope) {
+	$scope.activate = 0;
+	$scope.accountRegistration = {};
+	$scope.response = null;
+	$scope.widgetId = null;
+	$scope.emailFormat = /^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/;
 
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
@@ -145,14 +159,16 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 					$rootScope.userId = response.data.userId;
 					$rootScope.companyId = response.data.companyId;
 
-					var now = new Date(),
-					// this will set the expiration to 12 months
-					exp = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
-
+					// this will set the expiration to 30 minutes
+					var now = new Date(), exp = new Date();
+					exp.setMinutes(exp.getMinutes() + 30);
+					
 					$cookies.put("userId", $rootScope.userId, {
 						'expires' : exp
 					});
-					$cookies.put("companyId", $rootScope.companyId);
+					$cookies.put("companyId", $rootScope.companyId, {
+						'expires' : exp
+					});
 					hideOverlay();
 					$location.path('/linkedin').replace();
 				}, function(error) {
@@ -212,7 +228,7 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
 
 	$scope.login = function() {
-		window.location = "/login.do";
+		window.location = "/registeraccount/newloginas.do?userId=" + $rootScope.userId;
 	}
 
 } ]);
@@ -276,27 +292,12 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	if (angular.isUndefined($rootScope.userProfile) || $rootScope.userProfile == null || $rootScope.userProfile == {}) {
 		UserProfileService.getUserProfile($rootScope.userId).then(function(response) {
 			$rootScope.userProfile = response.data;
-			console.log($rootScope.userProfile.phone1);
-			/* $scope.setPhone("reg-phone1"); */
+			$scope.setPhone("reg-phone1", $rootScope.userProfile.phone1);
+			$scope.setPhone("reg-phone2", $rootScope.userProfile.phone2);
 			$scope.loadDropzone();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
-	}
-
-	$scope.setPhone = function(phoneId) {
-		var extension;
-		$('#' + phoneId).intlTelInput("setCountry", $rootScope.userProfile.phone1.countryAbbr);
-		console.log($rootScope.userProfile.phone1);
-		console.log($rootScope.userProfile.phone1.extension);
-		if ($rootScope.userProfile.phone1.extension == null || $rootScope.userProfile.phone1.extension == undefined || $rootScope.userProfile.phone1.extension == "") {
-			extension = "";
-		} else {
-			extension = "X" + " " + $rootScope.userProfile.phone1.extension;
-		}
-		$('#' + phoneId).intlTelInput("setNumber", $rootScope.userProfile.phone1.number + " " + extension);
-		/* $('#' + phoneId).intlTelInput("setExtension", $rootScope.userProfile.phone1.extension); */
-		$scope.maskPhoneNumber(phoneId, $rootScope.userProfile.phone1.countryAbbr);
 	}
 
 	$scope.saveProfile = function() {
@@ -338,6 +339,10 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 		utilsScript : "../resources/js/utils.js"
 	});
 	$('#reg-phone-office').mask(phoneFormat, phoneRegEx);
+	$('#reg-phone-office').on("countrychange", function(e, countryData) {
+		$scope.maskPhoneNumber("reg-phone-office", countryData.iso2);
+	});
+
 	$("#country").countrySelect();
 	$scope.selectCountry = function() {
 		var country_code = $('#country_code').val();
@@ -398,6 +403,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	if (angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}) {
 		CompanyProfileService.getCompanyProfile($rootScope.companyId).then(function(response) {
 			$rootScope.companyProfile = response.data;
+			$scope.setPhone("reg-phone-office", $rootScope.companyProfile.officePhone);
 			if ($rootScope.companyProfile.industry.verticalsMasterId < 0) {
 				$rootScope.companyProfile.industry = {};
 			}
@@ -823,7 +829,7 @@ app.controller('passwordController', [ '$scope', '$location', '$rootScope', 'Pas
 		} else {
 			PasswordService.savePassword($rootScope.userId, $scope.password).then(function(response) {
 				showInfo("Password saved successfully.");
-				window.location = "/login.do";
+				window.location = "/registeraccount/newloginas.do?userId=" + $rootScope.userId;
 			}, function(error) {
 				showError($scope.getErrorMessage(error.data));
 			});
