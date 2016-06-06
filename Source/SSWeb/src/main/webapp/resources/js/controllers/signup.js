@@ -77,17 +77,19 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 	$scope.getPhoneNumber = function(phoneId) {
 		var countryData = $('#' + phoneId).intlTelInput("getSelectedCountryData");
 		var number = $('#' + phoneId).intlTelInput("getNumber");
-		if (number.indexOf("+1") != -1) {
-			number = number.substring(2, number.length + 1);
-		} else {
-			number = number.substring(countryData.dialCode.length + 1, number.length + 1);
+		if (number != "") {
+			if (number.indexOf("+1") != -1) {
+				number = number.substring(2, number.length + 1);
+			} else {
+				number = number.substring(countryData.dialCode.length + 1, number.length + 1);
+			}
+			return {
+				"number" : number,
+				"countryCode" : "+" + countryData.dialCode,
+				"extension" : $('#' + phoneId).intlTelInput("getExtension"),
+				"countryAbbr" : countryData.iso2
+			};
 		}
-		return {
-			"number" : number,
-			"countryCode" : "+" + countryData.dialCode,
-			"extension" : $('#' + phoneId).intlTelInput("getExtension"),
-			"countryAbbr" : countryData.iso2
-		};
 	}
 
 	$scope.setPhone = function(phoneId, phone) {
@@ -162,7 +164,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 					// this will set the expiration to 30 minutes
 					var now = new Date(), exp = new Date();
 					exp.setMinutes(exp.getMinutes() + 30);
-					
+
 					$cookies.put("userId", $rootScope.userId, {
 						'expires' : exp
 					});
