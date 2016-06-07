@@ -54,6 +54,7 @@ import com.realtech.socialsurvey.core.services.payment.exception.CreditCardExcep
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 
 
 @Service
@@ -70,6 +71,7 @@ public class AccountServiceImpl implements AccountService
     private UserService userService;
     private Payment payment;
     private EmailServices emailServices;
+    private SurveyBuilder surveyBuilder;
 
     @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
     private String salesLeadEmail;
@@ -80,7 +82,7 @@ public class AccountServiceImpl implements AccountService
         GenericDao<AccountsMaster, Integer> paymentPlanDao, CompanyDao companyDao,
         GenericDao<VerticalsMaster, Integer> verticalMastersDao, OrganizationManagementService organizationManagementService,
         OrganizationUnitSettingsDao organizationUnitSettingsDao, UserManagementService userManagementService,
-        UserService userService, Payment payment, EmailServices emailServices )
+        UserService userService, Payment payment, EmailServices emailServices, SurveyBuilder surveyBuilder )
     {
         this.industryDao = industryDao;
         this.paymentPlanDao = paymentPlanDao;
@@ -92,6 +94,7 @@ public class AccountServiceImpl implements AccountService
         this.userService = userService;
         this.payment = payment;
         this.emailServices = emailServices;
+        this.surveyBuilder = surveyBuilder;
     }
 
 
@@ -238,6 +241,7 @@ public class AccountServiceImpl implements AccountService
         if ( company == null ) {
             throw new InvalidInputException( "Company with companyId : " + companyId + " does not exist" );
         }
+
         //Get the company admin
         User companyAdmin = userManagementService.getAdminUserByCompanyId( companyId );
         if ( companyAdmin == null ) {
@@ -246,11 +250,13 @@ public class AccountServiceImpl implements AccountService
         if ( companyAdmin.getStatus() != CommonConstants.STATUS_INCOMPLETE ) {
             throw new HierarchyAlreadyExistsException( "The hierarchy already exists for companyId: " + companyId );
         }
+
         //Get license details for the company
         LicenseDetail companyLicenseDetail = company.getLicenseDetails().get( CommonConstants.INITIAL_INDEX );
         if ( companyLicenseDetail == null ) {
             throw new InvalidInputException( "LicenseDetails for companyId : " + companyId + " does not exist" );
         }
+
         //Get current accounts master
         AccountsMaster accountsMaster = companyLicenseDetail.getAccountsMaster();
         if ( accountsMaster == null ) {
@@ -258,6 +264,12 @@ public class AccountServiceImpl implements AccountService
         }
         organizationManagementService.addAccountTypeForCompany( companyAdmin,
             String.valueOf( accountsMaster.getAccountsMasterId() ) );
+
+        //add default survey questions
+        if ( surveyBuilder.checkForExistingSurvey( companyAdmin ) == null ) {
+            surveyBuilder.addDefaultSurveyToCompany( companyAdmin );
+        }
+
         //Update profile completion stage for company admin
         userManagementService.updateProfileCompletionStage( companyAdmin,
             CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.DASHBOARD_STAGE );
@@ -267,6 +279,7 @@ public class AccountServiceImpl implements AccountService
 
         //Activate company admin
         userManagementService.activateCompanyAdmin( companyAdmin );
+
         LOGGER.info( "AccountServiceImpl.generateDefaultHierarchy finished" );
     }
 

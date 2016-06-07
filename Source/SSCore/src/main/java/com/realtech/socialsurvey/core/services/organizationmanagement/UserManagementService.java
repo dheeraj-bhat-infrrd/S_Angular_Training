@@ -620,6 +620,6 @@ public interface UserManagementService
     public void inviteCorporateToRegister( User user ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    public User activateCompanyAdmin( User companyAdmin ) throws InvalidInputException, HierarchyAlreadyExistsException;
+    public User activateCompanyAdmin( User companyAdmin ) throws InvalidInputException, HierarchyAlreadyExistsException, SolrException;
 }
 // JIRA SS-34 BY RM02 BOC
