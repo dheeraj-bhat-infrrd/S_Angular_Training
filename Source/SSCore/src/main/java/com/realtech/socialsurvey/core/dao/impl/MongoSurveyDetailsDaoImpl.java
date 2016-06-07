@@ -2780,4 +2780,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method getLatestCompletedSurveyDateForAgents ended." );
         return agentLastCompltedSurveyDate;
     }
+
+
+    @Override
+    public void updateModifiedDateForSurvey( String surveyId, Date date )
+    {
+        LOG.info( "Method updateModifiedDateForSurvey() started" );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
+        Update update = new Update();
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, date );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateModifiedDateForSurvey() finished" );
+    }
 }
