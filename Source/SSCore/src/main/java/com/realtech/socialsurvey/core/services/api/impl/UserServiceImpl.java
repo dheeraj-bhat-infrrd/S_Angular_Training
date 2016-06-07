@@ -123,6 +123,7 @@ public class UserServiceImpl implements UserService
         LOGGER.info( "Method deleteUserProfileImage started for userId: " + userId );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userId );
         agentSettings.setProfileImageUrl( null );
+        agentSettings.setProfileImageUrlThumbnail( null );
         agentSettings.setModifiedBy( String.valueOf( userId ) );
         agentSettings.setModifiedOn( System.currentTimeMillis() );
 
@@ -148,6 +149,7 @@ public class UserServiceImpl implements UserService
         LOGGER.info( "Method updateUserProfileImage started for userId: " + userId );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userId );
         agentSettings.setProfileImageUrl( imageUrl );
+        agentSettings.setProfileImageUrlThumbnail( imageUrl );
         agentSettings.setModifiedBy( String.valueOf( userId ) );
         agentSettings.setModifiedOn( System.currentTimeMillis() );
 
@@ -306,6 +308,10 @@ public class UserServiceImpl implements UserService
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, agentSettings.getProfileImageUrl(), agentSettings,
             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE_THUMBNAIL, agentSettings.getProfileImageUrlThumbnail(),
+            agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, agentSettings.getModifiedBy(), agentSettings,

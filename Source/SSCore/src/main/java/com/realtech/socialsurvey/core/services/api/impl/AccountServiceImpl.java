@@ -143,22 +143,54 @@ public class AccountServiceImpl implements AccountService
 
 
     @Override
-    public void updateCompanyProfile( long companyId, CompanyCompositeEntity companyProfile ) throws InvalidInputException
+    public void updateCompanyProfile( long companyId, long userId, CompanyCompositeEntity companyProfile )
+        throws InvalidInputException
     {
         LOGGER.info( "Method updateCompanyProfile started for company: " + companyId );
-        updateCompanyDetailsInMySql( companyId, companyProfile.getCompany() );
-        updateCompanyDetailsInMongo( companyId, companyProfile.getCompanySettings() );
+        updateCompanyDetailsInMySql( companyId, userId, companyProfile.getCompany() );
+        updateCompanyDetailsInMongo( companyId, userId, companyProfile.getCompanySettings() );
         LOGGER.info( "Method updateCompanyProfile finished for company: " + companyId );
     }
 
 
     @Override
-    public void deleteCompanyProfileImage( long companyId ) throws InvalidInputException
+    public void deleteCompanyProfileImage( long companyId, long userId ) throws InvalidInputException
     {
         LOGGER.info( "Method deleteCompanyProfileImage started for company: " + companyId );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
         unitSettings.setLogo( null );
+        unitSettings.setLogoThumbnail( null );
         unitSettings.setModifiedOn( System.currentTimeMillis() );
+        unitSettings.setModifiedBy( String.valueOf( userId ) );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
+            unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_LOGO_THUMBNAIL, unitSettings.getLogoThumbnail(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, unitSettings.getModifiedBy(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        LOGGER.info( "Method deleteCompanyProfileImage finished for company: " + companyId );
+    }
+
+
+    @Override
+    public void updateCompanyProfileImage( long companyId, long userId, String imageUrl ) throws InvalidInputException
+    {
+        LOGGER.info( "Method updateCompanyProfileImage started for company: " + companyId );
+        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
+        unitSettings.setLogo( imageUrl );
+        unitSettings.setLogoThumbnail( imageUrl );
+        unitSettings.setModifiedOn( System.currentTimeMillis() );
+        unitSettings.setModifiedBy( String.valueOf( userId ) );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -167,23 +199,8 @@ public class AccountServiceImpl implements AccountService
             MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
-        LOGGER.info( "Method deleteCompanyProfileImage finished for company: " + companyId );
-    }
-
-
-    @Override
-    public void updateCompanyProfileImage( long companyId, String imageUrl ) throws InvalidInputException
-    {
-        LOGGER.info( "Method updateCompanyProfileImage started for company: " + companyId );
-        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
-        unitSettings.setLogo( imageUrl );
-        unitSettings.setModifiedOn( System.currentTimeMillis() );
-
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
-            unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, unitSettings.getModifiedBy(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         LOGGER.info( "Method updateCompanyProfileImage finished for company: " + companyId );
@@ -284,7 +301,7 @@ public class AccountServiceImpl implements AccountService
     }
 
 
-    private void updateCompanyDetailsInMongo( long companyId, OrganizationUnitSettings unitSettings )
+    private void updateCompanyDetailsInMongo( long companyId, long userId, OrganizationUnitSettings unitSettings )
         throws InvalidInputException
     {
         LOGGER.info( "Method updateCompanyDetailsInMongo started for company: " + companyId );
@@ -304,6 +321,7 @@ public class AccountServiceImpl implements AccountService
         }
 
         unitSettings.setModifiedOn( System.currentTimeMillis() );
+        unitSettings.setModifiedBy( String.valueOf( userId ) );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, unitSettings.getContact_details(), unitSettings,
@@ -317,6 +335,18 @@ public class AccountServiceImpl implements AccountService
             unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_LOGO_THUMBNAIL, unitSettings.getLogoThumbnail(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, unitSettings.getProfileImageUrl(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE_THUMBNAIL, unitSettings.getProfileImageUrlThumbnail(),
+            unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, unitSettings.getProfileName(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
@@ -328,14 +358,19 @@ public class AccountServiceImpl implements AccountService
             MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, unitSettings.getModifiedBy(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method updateCompanyDetailsInMongo finished for company: " + companyId );
     }
 
 
-    private void updateCompanyDetailsInMySql( long companyId, Company companyProfile )
+    private void updateCompanyDetailsInMySql( long companyId, long userId, Company companyProfile )
     {
         LOGGER.info( "Method updateCompanyDetailsInMySql started for company: " + companyId );
         companyProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        companyProfile.setModifiedBy( String.valueOf( userId ) );
         companyDao.update( companyProfile );
         LOGGER.info( "Method updateCompanyDetailsInMySql finished for company: " + companyId );
     }
@@ -472,7 +507,7 @@ public class AccountServiceImpl implements AccountService
             payment.insertIntoLicenseTable( getPlanById( planId ).getLevel(), user,
                 CommonConstants.INVOICE_BILLED_DEFULAT_SUBSCRIPTION_ID );
             company.setBillingMode( CommonConstants.BILLING_MODE_INVOICE );
-            updateCompanyDetailsInMySql( companyId, company );
+            updateCompanyDetailsInMySql( companyId, user.getUserId(), company );
             String additionalEmailBody = "Please contact the below user to discuss plan details for Enterprise account. <br> Name: "
                 + name + "<br> Email: " + email + "<br> Message: " + message;
             sendMailToSalesLead( user, additionalEmailBody );

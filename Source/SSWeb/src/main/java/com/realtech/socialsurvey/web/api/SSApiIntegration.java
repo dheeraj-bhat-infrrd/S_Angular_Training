@@ -41,8 +41,9 @@ public interface SSApiIntegration
     Response getCompanyProfile( @Path ( "companyId") String companyId );
 
 
-    @PUT ( "/account/company/profile/update/{companyId}")
-    Response updateCompanyProfile( @Body CompanyProfile companyProfile, @Path ( "companyId") String companyId );
+    @PUT ( "/account/company/profile/update/{companyId}/{userId}")
+    Response updateCompanyProfile( @Body CompanyProfile companyProfile, @Path ( "companyId") String companyId,
+        @Path ( "userId") String userId );
 
 
     @PUT ( "/account/company/profile/stage/update/{companyId}/{stage}")
@@ -65,18 +66,20 @@ public interface SSApiIntegration
     Response getCompanyStage( @Path ( "companyId") String companyId );
 
 
-    @PUT ( "/account/company/profile/profileimage/update/{companyId}")
-    Response updateCompanyLogo( @Path ( "companyId") String companyId, @Body String logoUrl );
+    @PUT ( "/account/company/profile/profileimage/update/{companyId}/{userId}")
+    Response updateCompanyLogo( @Path ( "companyId") String companyId, @Path ( "userId") String userId, @Body String logoUrl );
 
-    @DELETE( "/account/company/profile/profileimage/remove/{companyId}" )
-    Response removeCompanyLogo( @Path( "companyId" ) String companyId );
+
+    @DELETE ( "/account/company/profile/profileimage/remove/{companyId}/{userId}")
+    Response removeCompanyLogo( @Path ( "companyId") String companyId, @Path ( "userId") String userId );
 
 
     @PUT ( "/users/profile/profileimage/update/{userId}")
     Response updateUserProfileImage( @Path ( "userId") String userId, @Body String imageUrl );
 
-    @DELETE( "/users/profile/profileimage/remove/{userId}" )
-    Response removeUserProfileImage( @Path( "userId" ) String userId );
+
+    @DELETE ( "/users/profile/profileimage/remove/{userId}")
+    Response removeUserProfileImage( @Path ( "userId") String userId );
 
 
     @POST ( "/account/company/generate/hierarchy/{companyId}")
