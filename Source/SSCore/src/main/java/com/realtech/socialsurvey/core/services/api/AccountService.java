@@ -30,13 +30,14 @@ public interface AccountService
     public CompanyCompositeEntity getCompanyProfileDetails( long companyId ) throws InvalidInputException;
 
 
-    public void updateCompanyProfile( long compId, CompanyCompositeEntity companyProfile ) throws InvalidInputException;
+    public void updateCompanyProfile( long compId, long userId, CompanyCompositeEntity companyProfile )
+        throws InvalidInputException;
 
 
-    public void deleteCompanyProfileImage( long companyId ) throws InvalidInputException;
+    public void deleteCompanyProfileImage( long companyId, long userId ) throws InvalidInputException;
 
 
-    public void updateCompanyProfileImage( long companyId, String imageUrl ) throws InvalidInputException;
+    public void updateCompanyProfileImage( long companyId, long userId, String imageUrl ) throws InvalidInputException;
 
 
     public void updateStage( long companyId, String stage );

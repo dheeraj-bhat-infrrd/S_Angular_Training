@@ -284,7 +284,11 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 						}
 					});
 					this.on("removedfile", function(file) {
-						UserProfileService.removelogo($rootScope.userId);
+						UserProfileService.removelogo($rootScope.userId).then(function(response) {
+							$rootScope.userProfile.profilePhotoUrl = null;
+						}, function(error) {
+							showError($scope.getErrorMessage(error.data));
+						});
 					});
 				}
 			});
@@ -366,7 +370,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	$scope.loadDropzone = function() {
 		if (!angular.isUndefined($rootScope.companyProfile)) {
 			$("div#logoDrop").dropzone({
-				url : "/registeraccount/uploadcompanylogo.do?companyId=" + $rootScope.companyId,
+				url : "/registeraccount/uploadcompanylogo.do?companyId=" + $rootScope.companyId + "&userId=" + $rootScope.userId,
 				success : function(file, response) {
 					$rootScope.companyProfile.companyLogo = response;
 				},
@@ -395,7 +399,11 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 						}
 					});
 					this.on("removedfile", function(file) {
-						CompanyProfileService.removelogo($rootScope.companyId);
+						CompanyProfileService.removelogo($rootScope.companyId, $rootScope.userId).then(function(response) {
+							$rootScope.companyProfile.companyLogo = null;
+						}, function(error) {
+							showError($scope.getErrorMessage(error.data));
+						});
 					});
 				}
 			});
@@ -457,7 +465,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 
 	$scope.saveCompanyProfileDetails = function() {
 		showOverlay();
-		CompanyProfileService.updateCompanyProfile($rootScope.companyId, 'CPP', $rootScope.companyProfile).then(function(response) {
+		CompanyProfileService.updateCompanyProfile($rootScope.companyId, $rootScope.userId, 'CPP', $rootScope.companyProfile).then(function(response) {
 			hideOverlay();
 			$location.path('/payment').replace();
 		}, function(error) {

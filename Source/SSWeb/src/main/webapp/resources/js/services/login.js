@@ -21,12 +21,8 @@ app.service('UserProfileService', [ '$http', function($http) {
 		return $http.put('/registeraccount/updateuserstage.do?userId=' + userId + '&stage=' + stage);
 	}
 
-	this.logoupload = function(userId, formData) {
-		return $http.post('/registeraccount/uploaduserprofilelogo', JSON.stringify(formData));
-	}
-
 	this.removelogo = function(userId) {
-	    return $http.delete('/registeraccount/removeuserprofilelogo.do?userId=' + userId);
+		return $http.delete('/registeraccount/removeuserprofilelogo.do?userId=' + userId);
 	}
 } ]);
 
@@ -35,8 +31,8 @@ app.service('CompanyProfileService', [ '$http', function($http) {
 		return $http.get('/registeraccount/getcompanyprofile.do?companyId=' + companyId);
 	}
 
-	this.updateCompanyProfile = function(companyId, stage, dataToSend) {
-		return $http.put('/registeraccount/updatecompanyprofile.do?companyId=' + companyId + '&stage=' + stage, JSON.stringify(dataToSend));
+	this.updateCompanyProfile = function(companyId, userId, stage, dataToSend) {
+		return $http.put('/registeraccount/updatecompanyprofile.do?companyId=' + companyId + '&userId=' + userId + '&stage=' + stage, JSON.stringify(dataToSend));
 	}
 
 	this.getVerticals = function() {
@@ -47,13 +43,9 @@ app.service('CompanyProfileService', [ '$http', function($http) {
 		return $http.get('/registeraccount/getcompanystage.do?companyId=' + companyId);
 	}
 
-	this.logoupload = function(userId, formData) {
-	    return $http.post('/registeraccount/uploadcompanylogo', JSON.stringify(formData));
+	this.removelogo = function(companyId, userId) {
+		return $http.delete('/registeraccount/removecompanylogo.do?companyId=' + companyId + '&userId=' + userId);
 	}
-
-    this.removelogo = function(companyId) {
-        return $http.delete('/registeraccount/removecompanylogo.do?companyId=' + companyId);
-    }
 } ]);
 
 app.service('LinkedinService', [ '$http', function($http) {

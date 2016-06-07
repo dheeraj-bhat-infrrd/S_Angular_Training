@@ -219,12 +219,12 @@ public class AccountController
 
     @RequestMapping ( value = "/registeraccount/updatecompanyprofile", method = RequestMethod.PUT)
     @ResponseBody
-    public String updateCompanyProfile( @QueryParam ( "companyId") String companyId, @QueryParam ( "stage") String stage,
-        @RequestBody CompanyProfile companyProfile )
+    public String updateCompanyProfile( @QueryParam ( "companyId") String companyId, @QueryParam ( "userId") String userId,
+        @QueryParam ( "stage") String stage, @RequestBody CompanyProfile companyProfile )
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Response response = api.updateCompanyProfile( companyProfile, companyId );
+        Response response = api.updateCompanyProfile( companyProfile, companyId, userId );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         if ( response.getStatus() == HttpStatus.SC_OK ) {
             response = api.updateCompanyProfileStage( companyId, stage );
@@ -318,8 +318,8 @@ public class AccountController
 
     @RequestMapping ( value = "/registeraccount/uploadcompanylogo", method = RequestMethod.POST)
     @ResponseBody
-    public String uploadCompanyLogo( @QueryParam ( "companyId") String companyId, MultipartHttpServletRequest request )
-        throws InvalidInputException
+    public String uploadCompanyLogo( @QueryParam ( "companyId") String companyId, @QueryParam ( "userId") String userId,
+        MultipartHttpServletRequest request ) throws InvalidInputException
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
@@ -330,7 +330,7 @@ public class AccountController
             String logoUrl = fileUploadService.uploadLogo( file, file.getOriginalFilename() );
             logoUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR
                 + logoUrl;
-            Response response = api.updateCompanyLogo( companyId, logoUrl );
+            Response response = api.updateCompanyLogo( companyId, userId, logoUrl );
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
         return responseString;
@@ -339,11 +339,11 @@ public class AccountController
 
     @RequestMapping ( value = "/registeraccount/removecompanylogo", method = RequestMethod.DELETE)
     @ResponseBody
-    public String removeCompanyLogo( @QueryParam ( "companyId") String companyId )
+    public String removeCompanyLogo( @QueryParam ( "companyId") String companyId, @QueryParam ( "userId") String userId )
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Response response = api.removeCompanyLogo( companyId );
+        Response response = api.removeCompanyLogo( companyId, userId );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
     }
