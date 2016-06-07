@@ -37,6 +37,7 @@ public class CompanyProfileTransformer implements Transformer<CompanyProfile, Co
                 }
                 contactDetails.setName( request.getCompanyName() );
                 contactDetails.setAddress( request.getAddress() );
+                contactDetails.setAddress1( request.getAddress() );
                 contactDetails.setCity( request.getCity() );
                 contactDetails.setState( request.getState() );
                 contactDetails.setZipcode( request.getZip() );
