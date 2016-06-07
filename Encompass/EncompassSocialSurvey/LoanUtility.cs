@@ -76,13 +76,15 @@ namespace EncompassSocialSurvey
         {
             DateFieldCriterion upperLimitCriteria = new DateFieldCriterion();
             upperLimitCriteria.FieldName = "Fields." + field;
-            upperLimitCriteria.Value = DateTime.Now;
+            upperLimitCriteria.Value = DateTime.Today;
             upperLimitCriteria.MatchType = OrdinalFieldMatchType.LessThanOrEquals;
+            upperLimitCriteria.Precision = DateFieldMatchPrecision.Day;
 
             DateFieldCriterion lowerLimitCriteria = new DateFieldCriterion();
             lowerLimitCriteria.FieldName = "Fields." + field;
             lowerLimitCriteria.Value = DateTime.Today.AddDays(-1 * noOfDays);
             lowerLimitCriteria.MatchType = OrdinalFieldMatchType.GreaterThanOrEquals;
+            lowerLimitCriteria.Precision = DateFieldMatchPrecision.Day;
             return upperLimitCriteria.And(lowerLimitCriteria);
         }
 
@@ -178,7 +180,8 @@ namespace EncompassSocialSurvey
                             Logger.Debug("Engagement cloed time " + fieldValues[8] + " is greater than current date so skipping the record");
                             continue;
                         }
-
+                        //Set loan number
+                        forLoanVM_Borrower.LoanNumber = runningLoan.LoanNumber;
                         // remove the flower bracket from GUID
                         forLoanVM_Borrower.SurveySourceId = id.Guid.ToString().Replace("{", "").Replace("}", "");
 
