@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.api.transformers;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.api.models.CompanyProfile;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -37,6 +38,7 @@ public class CompanyProfileTransformer implements Transformer<CompanyProfile, Co
                 }
                 contactDetails.setName( request.getCompanyName() );
                 contactDetails.setAddress( request.getAddress() );
+                contactDetails.setAddress1( request.getAddress() );
                 contactDetails.setCity( request.getCity() );
                 contactDetails.setState( request.getState() );
                 contactDetails.setZipcode( request.getZip() );
@@ -52,8 +54,15 @@ public class CompanyProfileTransformer implements Transformer<CompanyProfile, Co
 
                 unitSettings.setContact_details( contactDetails );
                 unitSettings.setLogo( request.getCompanyLogo() );
+                unitSettings.setLogoThumbnail( request.getCompanyLogo() );
                 unitSettings.setVertical( request.getIndustry().getVerticalName() );
                 companyProfile.setCompanySettings( unitSettings );
+            }
+
+            if ( objects[2] != null && objects[2] instanceof AgentSettings ) {
+                AgentSettings agentSettings = (AgentSettings) objects[2];
+                unitSettings.setProfileImageUrl( agentSettings.getProfileImageUrl() );
+                unitSettings.setProfileImageUrlThumbnail( agentSettings.getProfileImageUrlThumbnail() );
             }
         }
         return companyProfile;

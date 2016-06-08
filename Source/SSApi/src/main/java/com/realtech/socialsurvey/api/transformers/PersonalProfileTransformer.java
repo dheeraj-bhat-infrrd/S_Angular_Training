@@ -57,6 +57,7 @@ public class PersonalProfileTransformer implements Transformer<PersonalProfile, 
 
                 agentSettings.setContact_details( contactDetails );
                 agentSettings.setProfileImageUrl( request.getProfilePhotoUrl() );
+                agentSettings.setProfileImageUrlThumbnail( request.getProfilePhotoUrl() );
                 userProfile.setAgentSettings( agentSettings );
             }
         }

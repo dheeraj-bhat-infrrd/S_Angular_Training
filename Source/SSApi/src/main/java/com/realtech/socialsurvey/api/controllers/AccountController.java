@@ -4,16 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.xml.ws.Response;
 
-import com.realtech.socialsurvey.api.models.request.PaymentRequest;
-import com.realtech.socialsurvey.api.validators.PaymentRequestValidator;
-import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
-import com.realtech.socialsurvey.core.services.payment.exception.ActiveSubscriptionFoundException;
-import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
-import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,21 +20,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.models.CompanyProfile;
 import com.realtech.socialsurvey.api.models.request.AccountRegistrationRequest;
+import com.realtech.socialsurvey.api.models.request.PaymentRequest;
 import com.realtech.socialsurvey.api.transformers.CompanyProfileTransformer;
 import com.realtech.socialsurvey.api.validators.AccountRegistrationValidator;
 import com.realtech.socialsurvey.api.validators.CompanyProfileValidator;
+import com.realtech.socialsurvey.api.validators.PaymentRequestValidator;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.PaymentPlan;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.api.AccountService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -59,12 +55,14 @@ public class AccountController
     private CompanyProfileTransformer companyProfileTransformer;
     private CompanyProfileValidator companyProfileValidator;
     private OrganizationManagementService organizationManagementService;
+    private UserManagementService userManagementService;
 
 
     @Autowired
-    public AccountController( AccountRegistrationValidator accountRegistrationValidator, PaymentRequestValidator paymentRequestValidator, AccountService accountService,
+    public AccountController( AccountRegistrationValidator accountRegistrationValidator,
+        PaymentRequestValidator paymentRequestValidator, AccountService accountService,
         CompanyProfileTransformer companyProfileTransformer, CompanyProfileValidator companyProfileValidator,
-        OrganizationManagementService organizationManagementService )
+        OrganizationManagementService organizationManagementService, UserManagementService userManagementService )
     {
         this.accountRegistrationValidator = accountRegistrationValidator;
         this.paymentRequestValidator = paymentRequestValidator;
@@ -72,6 +70,7 @@ public class AccountController
         this.companyProfileTransformer = companyProfileTransformer;
         this.companyProfileValidator = companyProfileValidator;
         this.organizationManagementService = organizationManagementService;
+        this.userManagementService = userManagementService;
     }
 
 
@@ -88,8 +87,10 @@ public class AccountController
         binder.setValidator( companyProfileValidator );
     }
 
-    @InitBinder ( "paymentRequestValidator" )
-    public void paymentRequestBinder( WebDataBinder binder) {
+
+    @InitBinder ( "paymentRequestValidator")
+    public void paymentRequestBinder( WebDataBinder binder )
+    {
         binder.setValidator( paymentRequestValidator );
     }
 
@@ -124,42 +125,44 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/update/{companyId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/company/profile/update/{companyId}/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update company profile details")
     public ResponseEntity<?> updateCompanyProfile( @Valid @RequestBody CompanyProfile companyProfile,
-        @PathVariable ( "companyId") String companyId ) throws InvalidInputException
+        @PathVariable ( "companyId") String companyId, @PathVariable ( "userId") String userId ) throws InvalidInputException
     {
         LOGGER.info( "AccountController.updateCompanyProfile started" );
         long compId = Long.parseLong( companyId );
+        long userIdLong = Long.parseLong( userId );
+        AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userIdLong );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( compId );
         Company company = organizationManagementService.getCompanyById( compId );
         CompanyCompositeEntity companyProfileDetails = companyProfileTransformer
-            .transformApiRequestToDomainObject( companyProfile, company, unitSettings );
-        accountService.updateCompanyProfile( compId, companyProfileDetails );
+            .transformApiRequestToDomainObject( companyProfile, company, unitSettings, agentSettings );
+        accountService.updateCompanyProfile( compId, userIdLong, companyProfileDetails );
         LOGGER.info( "AccountController.updateCompanyProfile completed successfully" );
         return new ResponseEntity<Void>( HttpStatus.OK );
     }
 
 
-    @RequestMapping ( value = "/company/profile/profileimage/remove/{companyId}", method = RequestMethod.DELETE)
+    @RequestMapping ( value = "/company/profile/profileimage/remove/{companyId}/{userId}", method = RequestMethod.DELETE)
     @ApiOperation ( value = "Delete company profile image")
-    public ResponseEntity<?> deleteCompanyProfileImage( @PathVariable ( "companyId") String companyId )
-        throws InvalidInputException
+    public ResponseEntity<?> deleteCompanyProfileImage( @PathVariable ( "companyId") String companyId,
+        @PathVariable ( "userId") String userId ) throws InvalidInputException
     {
         LOGGER.info( "AccountController.deleteCompanyProfileImage started" );
-        accountService.deleteCompanyProfileImage( Long.parseLong( companyId ) );
+        accountService.deleteCompanyProfileImage( Long.parseLong( companyId ), Long.parseLong( userId ) );
         LOGGER.info( "AccountController.deleteCompanyProfileImage completed successfully" );
         return new ResponseEntity<Void>( HttpStatus.OK );
     }
 
 
-    @RequestMapping ( value = "/company/profile/profileimage/update/{companyId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/company/profile/profileimage/update/{companyId}/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update company profile image")
     public ResponseEntity<?> updateCompanyProfileImage( @PathVariable ( "companyId") String companyId,
-        @RequestBody String logoUrl ) throws InvalidInputException
+        @PathVariable ( "userId") String userId, @RequestBody String logoUrl ) throws InvalidInputException
     {
         LOGGER.info( "AccountController.updateCompanyProfileImage started" );
-        accountService.updateCompanyProfileImage( Long.parseLong( companyId ), logoUrl );
+        accountService.updateCompanyProfileImage( Long.parseLong( companyId ), Long.parseLong( userId ), logoUrl );
         LOGGER.info( "AccountController.updateCompanyProfileImage completed successfully" );
         return new ResponseEntity<String>( logoUrl, HttpStatus.OK );
     }
@@ -208,21 +211,20 @@ public class AccountController
 
 
     @RequestMapping ( value = "/payment/company/{companyId}/plan/{planId}", method = RequestMethod.POST)
-    @ApiOperation( value = "Payment for company for a particular plan")
-    public ResponseEntity<?> payForPlan(
-        @Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long companyId, @PathVariable int planId )
-        throws NonFatalException
+    @ApiOperation ( value = "Payment for company for a particular plan")
+    public ResponseEntity<?> payForPlan( @Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long companyId,
+        @PathVariable int planId ) throws NonFatalException
     {
         LOGGER.info( "Payment initiated for company id " + companyId + " for plan id: " + planId );
-        accountService.payForPlan( companyId, planId, paymentRequest.getNonce(), paymentRequest.getCardHolderName() );
+        accountService.payForPlan( companyId, planId, paymentRequest.getNonce(), paymentRequest.getCardHolderName(),
+            paymentRequest.getName(), paymentRequest.getEmail(), paymentRequest.getMessage() );
         return new ResponseEntity<Void>( HttpStatus.OK );
     }
 
 
-    @RequestMapping (value = "/company/generate/hierarchy/{companyId}", method = RequestMethod.POST)
-    @ApiOperation (value = "Generate default company heirarchy")
-    public ResponseEntity<?> generateDefaultHierarchyForCompany(
-        @PathVariable ("companyId") String companyId )
+    @RequestMapping ( value = "/company/generate/hierarchy/{companyId}", method = RequestMethod.POST)
+    @ApiOperation ( value = "Generate default company heirarchy")
+    public ResponseEntity<?> generateDefaultHierarchyForCompany( @PathVariable ( "companyId") String companyId )
         throws InvalidInputException, SolrException, HierarchyAlreadyExistsException
     {
         //Generate default company hierarchy for company

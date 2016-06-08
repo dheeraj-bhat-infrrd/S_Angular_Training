@@ -1175,5 +1175,6 @@ public interface CommonConstants
     public static final int CORRUPT_USER_TABID = 4;
 
     public static final String ACCOUNT_REGISTER = "ACCREG";
+    public static final int ENTERPRISE_PLAN_ID = 3;
 
 }

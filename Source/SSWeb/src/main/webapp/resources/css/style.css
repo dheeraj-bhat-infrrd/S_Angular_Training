@@ -787,7 +787,7 @@ font-size: 40px;
 .help-block-reg {
     display: block;
     margin-top: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
     color: #FFA940;
 }
 /* .reg-position{

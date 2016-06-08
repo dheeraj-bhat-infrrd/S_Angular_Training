@@ -21,8 +21,8 @@ app.service('UserProfileService', [ '$http', function($http) {
 		return $http.put('/registeraccount/updateuserstage.do?userId=' + userId + '&stage=' + stage);
 	}
 
-	this.logoupload = function(userId, formData) {
-		return $http.post('/registeraccount/uploadcompanylogo', JSON.stringify(formData));
+	this.removelogo = function(userId) {
+		return $http.delete('/registeraccount/removeuserprofilelogo.do?userId=' + userId);
 	}
 } ]);
 
@@ -31,8 +31,8 @@ app.service('CompanyProfileService', [ '$http', function($http) {
 		return $http.get('/registeraccount/getcompanyprofile.do?companyId=' + companyId);
 	}
 
-	this.updateCompanyProfile = function(companyId, stage, dataToSend) {
-		return $http.put('/registeraccount/updatecompanyprofile.do?companyId=' + companyId + '&stage=' + stage, JSON.stringify(dataToSend));
+	this.updateCompanyProfile = function(companyId, userId, stage, dataToSend) {
+		return $http.put('/registeraccount/updatecompanyprofile.do?companyId=' + companyId + '&userId=' + userId + '&stage=' + stage, JSON.stringify(dataToSend));
 	}
 
 	this.getVerticals = function() {
@@ -41,6 +41,10 @@ app.service('CompanyProfileService', [ '$http', function($http) {
 
 	this.getCompanyStage = function(companyId) {
 		return $http.get('/registeraccount/getcompanystage.do?companyId=' + companyId);
+	}
+
+	this.removelogo = function(companyId, userId) {
+		return $http.delete('/registeraccount/removecompanylogo.do?companyId=' + companyId + '&userId=' + userId);
 	}
 } ]);
 
@@ -67,5 +71,9 @@ app.service('PaymentService', [ '$http', function($http) {
 app.service('PasswordService', [ '$http', function($http) {
 	this.savePassword = function(userId, dataToSend) {
 		return $http.put('/registeraccount/savePassword.do?userId=' + userId, dataToSend);
+	}
+
+	this.isPasswordAlreadySet = function(userId) {
+		return $http.get('/registeraccount/isregistrationpasswordset.do?userId=' + userId);
 	}
 } ]);

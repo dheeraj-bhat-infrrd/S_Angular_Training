@@ -63,6 +63,7 @@
 
 		<!-- Registration urls -->
 		<intercept-url pattern="registeraccount/*.do" access="permitAll" />
+		<intercept-url pattern="/newlogin.do" access="permitAll" />
 
 		<!-- Restricted Services -->
 		<intercept-url pattern="/*.do" access="isAuthenticated()" />

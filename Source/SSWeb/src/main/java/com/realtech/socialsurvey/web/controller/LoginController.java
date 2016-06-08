@@ -117,13 +117,6 @@ public class LoginController
         LOG.info( "Inside initLoginPage() of LoginController" );
 
         // Check for existing session
-        if ( model.asMap().get( "fromEmailLink" ) != null ) {
-            boolean fromEmailLink = (Boolean) model.asMap().get( "fromEmailLink" );
-            if ( fromEmailLink ) {
-                return JspResolver.LOGIN;
-            }
-        }
-
         if ( sessionHelper.isUserActiveSessionExists() ) {
             LOG.info( "Existing Active Session detected" );
 
@@ -150,6 +143,13 @@ public class LoginController
                     break;
             }
         }
+        return JspResolver.LOGIN;
+    }
+
+
+    @RequestMapping ( value = "/newlogin")
+    public String newLogin()
+    {
         return JspResolver.LOGIN;
     }
 
@@ -216,12 +216,9 @@ public class LoginController
             HttpSession session = request.getSession( true );
             user = sessionHelper.getCurrentUser();
 
-            if ( user.getIsForcePassword() == 1 ) {
-                if ( !user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
-                    redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
-                    redirectAttributes.addFlashAttribute( "companyId", user.getCompany().getCompanyId() );
-                    return "redirect:/accountsignup.do";
-                }
+            if ( user.getIsForcePassword() == 1
+                && !user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
+                return "redirect:/registeraccount/newloginas.do?userId=" + user.getUserId();
             }
 
             // code to hide the overlay during registration

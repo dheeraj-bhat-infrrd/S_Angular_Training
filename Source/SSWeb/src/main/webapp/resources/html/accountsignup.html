@@ -51,7 +51,7 @@
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Email Address *</div>
 
 				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0 15px" ng-class="{ 'has-error-reg' : submitted && signInForm.email.$invalid && signInForm.email.$error.required}">
-						<input class="reg-details form-control-reg" type="email" name="email" placeholder="email@example.com" ng-pattern="emailFormat" required  ng-model="accountRegistration.email" />
+						<input class="reg-details form-control-reg" type="email" name="email" placeholder="email@example.com" required  ng-model="accountRegistration.email" />
 						<p ng-show=" submitted && signInForm.email.$error.required" class="help-block-reg">A valid email address is required.</p>
 						<p ng-show="signInForm.email.$error.pattern" class="help-block-reg">A valid email address is required.</p>
 					</div>

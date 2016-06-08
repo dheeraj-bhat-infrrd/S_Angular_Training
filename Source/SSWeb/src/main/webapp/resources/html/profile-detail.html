@@ -28,9 +28,11 @@
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0px;">
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 reg-quick-setup" style="float: none;">Professional Details</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Phone1 *</div>
-				 <!--  <div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<input class="reg-details" type="tel" id="reg-phone1" ng-init="setPhone('reg-phone1');" name="phone1"/>
-				</div>    -->
+
+				  <div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<input class="reg-details" type="tel" id="reg-phone1" ng-init="setPhone('reg-phone1', userProfile.phone1);" name="phone1"/>
+				</div>   
+
 				
 				 <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0 15px" ng-class="{ 'has-error-reg' : prodetailsubmitted && detailsForm.phone1.$error.required}">
 						<input class="reg-details form-control-reg" type="tel" id="reg-phone1" ng-init="setPhone('reg-phone1');" required name="phone1" ng-model="userProfile.phone1.number" />
@@ -39,7 +41,7 @@
 				
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Phone2</div>
 				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<input class="reg-details" type="tel" id="reg-phone2"/>
+					<input class="reg-details" type="tel" id="reg-phone2" ng-init="setPhone('reg-phone2', userProfile.phone2);" name="phone2"/>
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Website</div>
 				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">

@@ -1,5 +1,4 @@
 package com.realtech.socialsurvey.web.controller;
-import com.realtech.socialsurvey.web.common.JspResolver;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,9 +42,11 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
+import com.realtech.socialsurvey.core.entities.Plan;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -54,13 +54,14 @@ import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.api.SSApiIntegration;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.api.exception.SSAPIException;
+import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.common.TokenHandler;
-import com.realtech.socialsurvey.web.entities.AuthError;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
 import com.realtech.socialsurvey.web.ui.entities.AccountRegistration;
@@ -106,7 +107,12 @@ public class AccountController
     @Autowired
     private FileUploadService fileUploadService;
 
-    // LinkedIn
+    @Autowired
+    private MessageUtils messageUtils;
+
+    @Autowired
+    private SessionHelper sessionHelper;
+
     @Value ( "${LINKED_IN_API_KEY}")
     private String linkedInApiKey;
 
@@ -213,12 +219,12 @@ public class AccountController
 
     @RequestMapping ( value = "/registeraccount/updatecompanyprofile", method = RequestMethod.PUT)
     @ResponseBody
-    public String updateCompanyProfile( @QueryParam ( "companyId") String companyId, @QueryParam ( "stage") String stage,
-        @RequestBody CompanyProfile companyProfile )
+    public String updateCompanyProfile( @QueryParam ( "companyId") String companyId, @QueryParam ( "userId") String userId,
+        @QueryParam ( "stage") String stage, @RequestBody CompanyProfile companyProfile )
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Response response = api.updateCompanyProfile( companyProfile, companyId );
+        Response response = api.updateCompanyProfile( companyProfile, companyId, userId );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         if ( response.getStatus() == HttpStatus.SC_OK ) {
             response = api.updateCompanyProfileStage( companyId, stage );
@@ -312,8 +318,8 @@ public class AccountController
 
     @RequestMapping ( value = "/registeraccount/uploadcompanylogo", method = RequestMethod.POST)
     @ResponseBody
-    public String uploadCompanyLogo( @QueryParam ( "companyId") String companyId, MultipartHttpServletRequest request )
-        throws InvalidInputException
+    public String uploadCompanyLogo( @QueryParam ( "companyId") String companyId, @QueryParam ( "userId") String userId,
+        MultipartHttpServletRequest request ) throws InvalidInputException
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
@@ -324,9 +330,21 @@ public class AccountController
             String logoUrl = fileUploadService.uploadLogo( file, file.getOriginalFilename() );
             logoUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR
                 + logoUrl;
-            Response response = api.updateCompanyLogo( companyId, logoUrl );
+            Response response = api.updateCompanyLogo( companyId, userId, logoUrl );
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
+        return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/removecompanylogo", method = RequestMethod.DELETE)
+    @ResponseBody
+    public String removeCompanyLogo( @QueryParam ( "companyId") String companyId, @QueryParam ( "userId") String userId )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.removeCompanyLogo( companyId, userId );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
     }
 
@@ -354,6 +372,18 @@ public class AccountController
     }
 
 
+    @RequestMapping ( value = "/registeraccount/removeuserprofilelogo", method = RequestMethod.DELETE)
+    @ResponseBody
+    public String removeUserProfileLogo( @QueryParam ( "userId") String userId )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.removeUserProfileImage( userId );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
+    }
+
+
     @RequestMapping ( value = "/registeraccount/makepayment", method = RequestMethod.POST)
     @ResponseBody
     public String makePayment( @QueryParam ( "companyId") String companyId, @QueryParam ( "planId") String planId,
@@ -365,7 +395,7 @@ public class AccountController
         if ( response.getStatus() == HttpStatus.SC_OK ) {
             response = api.updateCompanyProfileStage( companyId, RegistrationStage.PAYMENT.getCode() );
             if ( response.getStatus() == HttpStatus.SC_OK ) {
-                if ( Integer.parseInt( planId ) != 3 ) {
+                if ( Integer.parseInt( planId ) < Plan.ENTERPRISE.getPlanId() ) {
                     response = api.generateDefaultHierarchy( companyId );
                     if ( response.getStatus() == HttpStatus.SC_OK ) {
                         response = api.updateCompanyProfileStage( companyId, RegistrationStage.COMPLETE.getCode() );
@@ -378,7 +408,17 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/registeraccount/setregistrationpassword", method = RequestMethod.GET)
+    @RequestMapping ( value = "/registeraccount/isregistrationpasswordset", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean isRegistrationPasswordSet( @QueryParam ( "userId") String userId )
+        throws InvalidInputException, JsonProcessingException
+    {
+        User user = userManagementService.getUserByUserId( Long.parseLong( userId ) );
+        return user.getLoginPassword() != null ? true : false;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/setregistrationpassword")
     public String setRegistrationPassword( @RequestParam ( "q") String encryptedUrlParams, RedirectAttributes attributes )
         throws InvalidInputException, JsonProcessingException
     {
@@ -393,8 +433,7 @@ public class AccountController
             attributes.addFlashAttribute( "setPassword", true );
             return "redirect:/accountsignup.do";
         } else {
-            attributes.addFlashAttribute( "fromEmailLink", true );
-            return "redirect:/login.do";
+            return "redirect:/newlogin.do";
         }
     }
 
@@ -408,6 +447,28 @@ public class AccountController
         Response response = api.savePassword( userId, password );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/newloginas")
+    public String newLoginAs( @QueryParam ( "userId") String userId, RedirectAttributes redirectAttributes,
+        HttpServletRequest request ) throws NumberFormatException, InvalidInputException
+    {
+        long userIdLong = Long.parseLong( userId );
+        User user = userManagementService.getUserByUserId( userIdLong );
+        if ( user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.PAYMENT.getCode() )
+            && user.getCompany().getBillingMode().equalsIgnoreCase( CommonConstants.BILLING_MODE_INVOICE ) ) {
+            redirectAttributes.addFlashAttribute( "message",
+                messageUtils.getDisplayMessage( "ACCOUNT_IN_PROGRESS", DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.LOGIN;
+        } else if ( !user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
+            redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
+            redirectAttributes.addFlashAttribute( "companyId", user.getCompany().getCompanyId() );
+            return "redirect:/accountsignup.do";
+        } else {
+            sessionHelper.loginOnRegistration( user.getLoginName(), CommonConstants.BYPASS_PWD );
+            return "redirect:/userlogin.do";
+        }
     }
 
 
@@ -452,9 +513,9 @@ public class AccountController
         String errorCode = request.getParameter( "error" );
         if ( errorCode != null ) {
             LOG.error( "Error code : " + errorCode );
-//            AuthError error = new AuthError();
-//            error.setErrorCode( errorCode );
-//            error.setReason( request.getParameter( "error_description" ) );
+            //            AuthError error = new AuthError();
+            //            error.setErrorCode( errorCode );
+            //            error.setReason( request.getParameter( "error_description" ) );
             response = errorCode;
         } else {
             try {
@@ -523,9 +584,9 @@ public class AccountController
                 throw new SSAPIException( "Could not fetch LinkedIn profile. Reason: " + ioe.getMessage() );
             }
         }
-        attributes.addFlashAttribute("isLinkedin", true);
-        attributes.addFlashAttribute("linkedinResponse", response);
-        
+        attributes.addFlashAttribute( "isLinkedin", true );
+        attributes.addFlashAttribute( "linkedinResponse", response );
+
         return "redirect:/accountsignup.do";
     }
 }

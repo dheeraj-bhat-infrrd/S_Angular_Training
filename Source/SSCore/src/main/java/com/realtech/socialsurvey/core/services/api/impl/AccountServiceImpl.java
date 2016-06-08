@@ -1,23 +1,19 @@
 package com.realtech.socialsurvey.core.services.api.impl;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.realtech.socialsurvey.core.entities.*;
-import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.payment.exception.ActiveSubscriptionFoundException;
-import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
-import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,16 +22,39 @@ import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.PaymentPlan;
+import com.realtech.socialsurvey.core.entities.Phone;
+import com.realtech.socialsurvey.core.entities.Plan;
+import com.realtech.socialsurvey.core.entities.RegistrationStage;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
+import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.api.AccountService;
 import com.realtech.socialsurvey.core.services.api.UserService;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.ActiveSubscriptionFoundException;
+import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 
 
 @Service
@@ -51,14 +70,19 @@ public class AccountServiceImpl implements AccountService
     private UserManagementService userManagementService;
     private UserService userService;
     private Payment payment;
+    private EmailServices emailServices;
+    private SurveyBuilder surveyBuilder;
+
+    @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
+    private String salesLeadEmail;
 
 
     @Autowired
     public AccountServiceImpl( GenericDao<VerticalsMaster, Integer> industryDao,
         GenericDao<AccountsMaster, Integer> paymentPlanDao, CompanyDao companyDao,
         GenericDao<VerticalsMaster, Integer> verticalMastersDao, OrganizationManagementService organizationManagementService,
-
-        OrganizationUnitSettingsDao organizationUnitSettingsDao, UserManagementService userManagementService, UserService userService, Payment payment )
+        OrganizationUnitSettingsDao organizationUnitSettingsDao, UserManagementService userManagementService,
+        UserService userService, Payment payment, EmailServices emailServices, SurveyBuilder surveyBuilder )
     {
         this.industryDao = industryDao;
         this.paymentPlanDao = paymentPlanDao;
@@ -69,6 +93,8 @@ public class AccountServiceImpl implements AccountService
         this.userManagementService = userManagementService;
         this.userService = userService;
         this.payment = payment;
+        this.emailServices = emailServices;
+        this.surveyBuilder = surveyBuilder;
     }
 
 
@@ -117,22 +143,54 @@ public class AccountServiceImpl implements AccountService
 
 
     @Override
-    public void updateCompanyProfile( long companyId, CompanyCompositeEntity companyProfile ) throws InvalidInputException
+    public void updateCompanyProfile( long companyId, long userId, CompanyCompositeEntity companyProfile )
+        throws InvalidInputException
     {
         LOGGER.info( "Method updateCompanyProfile started for company: " + companyId );
-        updateCompanyDetailsInMySql( companyId, companyProfile.getCompany() );
-        updateCompanyDetailsInMongo( companyId, companyProfile.getCompanySettings() );
+        updateCompanyDetailsInMySql( companyId, userId, companyProfile.getCompany() );
+        updateCompanyDetailsInMongo( companyId, userId, companyProfile.getCompanySettings() );
         LOGGER.info( "Method updateCompanyProfile finished for company: " + companyId );
     }
 
 
     @Override
-    public void deleteCompanyProfileImage( long companyId ) throws InvalidInputException
+    public void deleteCompanyProfileImage( long companyId, long userId ) throws InvalidInputException
     {
         LOGGER.info( "Method deleteCompanyProfileImage started for company: " + companyId );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
         unitSettings.setLogo( null );
+        unitSettings.setLogoThumbnail( null );
         unitSettings.setModifiedOn( System.currentTimeMillis() );
+        unitSettings.setModifiedBy( String.valueOf( userId ) );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
+            unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_LOGO_THUMBNAIL, unitSettings.getLogoThumbnail(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, unitSettings.getModifiedBy(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        LOGGER.info( "Method deleteCompanyProfileImage finished for company: " + companyId );
+    }
+
+
+    @Override
+    public void updateCompanyProfileImage( long companyId, long userId, String imageUrl ) throws InvalidInputException
+    {
+        LOGGER.info( "Method updateCompanyProfileImage started for company: " + companyId );
+        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
+        unitSettings.setLogo( imageUrl );
+        unitSettings.setLogoThumbnail( imageUrl );
+        unitSettings.setModifiedOn( System.currentTimeMillis() );
+        unitSettings.setModifiedBy( String.valueOf( userId ) );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -141,23 +199,8 @@ public class AccountServiceImpl implements AccountService
             MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
-        LOGGER.info( "Method deleteCompanyProfileImage finished for company: " + companyId );
-    }
-
-
-    @Override
-    public void updateCompanyProfileImage( long companyId, String imageUrl ) throws InvalidInputException
-    {
-        LOGGER.info( "Method updateCompanyProfileImage started for company: " + companyId );
-        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
-        unitSettings.setLogo( imageUrl );
-        unitSettings.setModifiedOn( System.currentTimeMillis() );
-
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
-            unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, unitSettings.getModifiedBy(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         LOGGER.info( "Method updateCompanyProfileImage finished for company: " + companyId );
@@ -194,11 +237,10 @@ public class AccountServiceImpl implements AccountService
         List<AccountsMaster> plans = paymentPlanDao.findAll( AccountsMaster.class );
         for ( AccountsMaster plan : plans ) {
             if ( plan.getAccountsMasterId() == AccountType.INDIVIDUAL.getValue() ) {
-                paymentPlans
-                    .add( getPaymentPlan( plan.getAccountsMasterId(), plan.getAmount(), "$", 1, "Individual", "", "" ) );
+                paymentPlans.add( getPaymentPlan( plan.getAmount(), Plan.INDIVIDUAL ) );
             } else if ( plan.getAccountsMasterId() == AccountType.ENTERPRISE.getValue() ) {
-                paymentPlans.add( getPaymentPlan( plan.getAccountsMasterId(), plan.getAmount(), "$", 2, "Business", "", "" ) );
-                paymentPlans.add( getPaymentPlan( plan.getAccountsMasterId(), 0, "$", 3, "Enterprise", "", "" ) );
+                paymentPlans.add( getPaymentPlan( plan.getAmount(), Plan.BUSINESS ) );
+                paymentPlans.add( getPaymentPlan( plan.getAmount(), Plan.ENTERPRISE ) );
             }
         }
         LOGGER.info( "AccountServiceImpl.getPaymentPlans completed successfully" );
@@ -216,6 +258,7 @@ public class AccountServiceImpl implements AccountService
         if ( company == null ) {
             throw new InvalidInputException( "Company with companyId : " + companyId + " does not exist" );
         }
+
         //Get the company admin
         User companyAdmin = userManagementService.getAdminUserByCompanyId( companyId );
         if ( companyAdmin == null ) {
@@ -224,33 +267,41 @@ public class AccountServiceImpl implements AccountService
         if ( companyAdmin.getStatus() != CommonConstants.STATUS_INCOMPLETE ) {
             throw new HierarchyAlreadyExistsException( "The hierarchy already exists for companyId: " + companyId );
         }
+
         //Get license details for the company
         LicenseDetail companyLicenseDetail = company.getLicenseDetails().get( CommonConstants.INITIAL_INDEX );
         if ( companyLicenseDetail == null ) {
             throw new InvalidInputException( "LicenseDetails for companyId : " + companyId + " does not exist" );
         }
+
         //Get current accounts master
         AccountsMaster accountsMaster = companyLicenseDetail.getAccountsMaster();
         if ( accountsMaster == null ) {
             throw new InvalidInputException( "AccountsMaster for companyId : " + companyId + " does not exist" );
         }
-        organizationManagementService
-            .addAccountTypeForCompany( companyAdmin, String.valueOf( accountsMaster.getAccountsMasterId() ) );
+        organizationManagementService.addAccountTypeForCompany( companyAdmin,
+            String.valueOf( accountsMaster.getAccountsMasterId() ) );
+
+        //add default survey questions
+        if ( surveyBuilder.checkForExistingSurvey( companyAdmin ) == null ) {
+            surveyBuilder.addDefaultSurveyToCompany( companyAdmin );
+        }
+
         //Update profile completion stage for company admin
-        userManagementService
-            .updateProfileCompletionStage( companyAdmin, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-                CommonConstants.DASHBOARD_STAGE );
+        userManagementService.updateProfileCompletionStage( companyAdmin,
+            CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.DASHBOARD_STAGE );
 
         //Activate company
         organizationManagementService.activateCompany( company );
 
         //Activate company admin
         userManagementService.activateCompanyAdmin( companyAdmin );
+
         LOGGER.info( "AccountServiceImpl.generateDefaultHierarchy finished" );
     }
 
 
-    private void updateCompanyDetailsInMongo( long companyId, OrganizationUnitSettings unitSettings )
+    private void updateCompanyDetailsInMongo( long companyId, long userId, OrganizationUnitSettings unitSettings )
         throws InvalidInputException
     {
         LOGGER.info( "Method updateCompanyDetailsInMongo started for company: " + companyId );
@@ -270,6 +321,7 @@ public class AccountServiceImpl implements AccountService
         }
 
         unitSettings.setModifiedOn( System.currentTimeMillis() );
+        unitSettings.setModifiedBy( String.valueOf( userId ) );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, unitSettings.getContact_details(), unitSettings,
@@ -283,6 +335,18 @@ public class AccountServiceImpl implements AccountService
             unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_LOGO_THUMBNAIL, unitSettings.getLogoThumbnail(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, unitSettings.getProfileImageUrl(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE_THUMBNAIL, unitSettings.getProfileImageUrlThumbnail(),
+            unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, unitSettings.getProfileName(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
@@ -294,30 +358,34 @@ public class AccountServiceImpl implements AccountService
             MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, unitSettings.getModifiedBy(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method updateCompanyDetailsInMongo finished for company: " + companyId );
     }
 
 
-    private void updateCompanyDetailsInMySql( long companyId, Company companyProfile )
+    private void updateCompanyDetailsInMySql( long companyId, long userId, Company companyProfile )
     {
         LOGGER.info( "Method updateCompanyDetailsInMySql started for company: " + companyId );
         companyProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        companyDao.merge( companyProfile );
+        companyProfile.setModifiedBy( String.valueOf( userId ) );
+        companyDao.update( companyProfile );
         LOGGER.info( "Method updateCompanyDetailsInMySql finished for company: " + companyId );
     }
 
 
-    private PaymentPlan getPaymentPlan( int level, double amount, String currency, int planId, String planName, String text,
-        String terms )
+    private PaymentPlan getPaymentPlan( double amount, Plan plan )
     {
         PaymentPlan paymentPlan = new PaymentPlan();
         paymentPlan.setAmount( amount );
-        paymentPlan.setLevel( level );
-        paymentPlan.setPlanCurrency( currency );
-        paymentPlan.setPlanId( planId );
-        paymentPlan.setPlanName( planName );
-        paymentPlan.setSupportingText( text );
-        paymentPlan.setTerms( terms );
+        paymentPlan.setLevel( plan.getAccountMasterId() );
+        paymentPlan.setPlanCurrency( plan.getPlanCurrency() );
+        paymentPlan.setPlanId( plan.getPlanId() );
+        paymentPlan.setPlanName( plan.getPlanName() );
+        paymentPlan.setSupportingText( plan.getSupportingText() );
+        paymentPlan.setTerms( plan.getTerms() );
         return paymentPlan;
     }
 
@@ -419,18 +487,76 @@ public class AccountServiceImpl implements AccountService
         LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + company.getCompany() );
     }
 
+
     @Transactional
     @Override
-    public void payForPlan(long companyId, int planId, String nonce, String cardHolderName) throws InvalidInputException,
-        PaymentException, SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException,
-        ActiveSubscriptionFoundException
+    public void payForPlan( long companyId, int planId, String nonce, String cardHolderName, String name, String email,
+        String message ) throws InvalidInputException, PaymentException, SubscriptionUnsuccessfulException,
+        NoRecordsFetchedException, CreditCardException, ActiveSubscriptionFoundException, UndeliveredEmailException
     {
-        LOGGER.info( "Paying for company id "+companyId+ " for plan "+planId );
+        LOGGER.info( "Paying for company id " + companyId + " for plan " + planId );
         Company company = companyDao.findById( Company.class, companyId );
-        // pass the company and nonce to make a payment. Get the subscription id and insert into license table.
-        String subscriptionId = payment.subscribeForCompany( company, nonce, planId, cardHolderName );
-        // insert into License Details table
-        User user = userManagementService.getAdminUserByCompanyId(companyId);
-        payment.insertIntoLicenseTable( planId, user, subscriptionId );
+        User user = userManagementService.getAdminUserByCompanyId( companyId );
+        if ( planId < Plan.ENTERPRISE.getPlanId() ) {
+            // pass the company and nonce to make a payment. Get the subscription id and insert into license table.
+            String subscriptionId = payment.subscribeForCompany( company, nonce, planId, cardHolderName );
+
+            // insert into License Details table
+            payment.insertIntoLicenseTable( getPlanById( planId ).getLevel(), user, subscriptionId );
+        } else {
+            payment.insertIntoLicenseTable( getPlanById( planId ).getLevel(), user,
+                CommonConstants.INVOICE_BILLED_DEFULAT_SUBSCRIPTION_ID );
+            company.setBillingMode( CommonConstants.BILLING_MODE_INVOICE );
+            updateCompanyDetailsInMySql( companyId, user.getUserId(), company );
+            String additionalEmailBody = "Please contact the below user to discuss plan details for Enterprise account. <br> Name: "
+                + name + "<br> Email: " + email + "<br> Message: " + message;
+            sendMailToSalesLead( user, additionalEmailBody );
+        }
+        sendMailToSalesLead( user, null );
+    }
+
+
+    private void sendMailToSalesLead( User user, String additionalEmailBody )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        // Send mail to sales lead
+        Date today = new Date( System.currentTimeMillis() );
+        SimpleDateFormat utcDateFormat = new SimpleDateFormat( CommonConstants.DATE_FORMAT_WITH_TZ );
+        utcDateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+
+        SimpleDateFormat pstDateFormat = new SimpleDateFormat( CommonConstants.DATE_FORMAT_WITH_TZ );
+        pstDateFormat.setTimeZone( TimeZone.getTimeZone( "PST" ) );
+
+        SimpleDateFormat estDateFormat = new SimpleDateFormat( CommonConstants.DATE_FORMAT_WITH_TZ );
+        estDateFormat.setTimeZone( TimeZone.getTimeZone( "EST" ) );
+        String details = "First Name : " + user.getFirstName() + "<br/>" + "Last Name : " + user.getLastName() + "<br/>"
+            + "Email Address : " + user.getEmailId() + "<br/>" + "Time : " + "<br/>" + utcDateFormat.format( today ) + "<br/>"
+            + estDateFormat.format( today ) + "<br/>" + pstDateFormat.format( today );
+        if ( additionalEmailBody != null ) {
+            details = details + "<br>" + additionalEmailBody;
+        }
+        try {
+            emailServices.sendCompanyRegistrationStageMail( user.getFirstName(), user.getLastName(),
+                Arrays.asList( salesLeadEmail ), CommonConstants.COMPANY_REGISTRATION_STAGE_COMPLETE, user.getEmailId(),
+                details, true );
+        } catch ( InvalidInputException e ) {
+            e.printStackTrace();
+        } catch ( UndeliveredEmailException e ) {
+            e.printStackTrace();
+        }
+        emailServices.sendCompanyRegistrationStageMail( user.getFirstName(), user.getLastName(),
+            Arrays.asList( salesLeadEmail ), CommonConstants.COMPANY_REGISTRATION_STAGE_STARTED, user.getEmailId(), details,
+            true );
+    }
+
+
+    private PaymentPlan getPlanById( int planId )
+    {
+        for ( PaymentPlan plan : getPaymentPlans() ) {
+            if ( plan.getPlanId() == planId ) {
+                return plan;
+            }
+        }
+        return null;
     }
 }
