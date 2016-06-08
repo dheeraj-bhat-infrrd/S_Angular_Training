@@ -126,59 +126,29 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 	});
 
 	$scope.submitLogin = function() {
-		if (vcRecaptchaService.getResponse() == "") {
-			showError("Let's make sure you are a real person, please check the box beside I'm not a robot! ");
-			$scope.activate = 0;
+		if ($scope.signInForm.$valid) {
+			showOverlay();
+			$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
+			$scope.accountRegistration.phone = $scope.getPhoneNumber("reg-phone");
+			LoginService.signup($scope.accountRegistration).then(function(response) {
+				$rootScope.userId = response.data.userId;
+				$rootScope.companyId = response.data.companyId;
+				// this will set the expiration to 1 day
+				var now = new Date(), exp = new Date();
+				exp.setDate(exp.getDate() + 1);
 
-			if ($scope.signInForm.$valid) {
-				showOverlay();
-				$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-				$scope.accountRegistration.phone = $scope.getPhoneNumber("reg-phone");
-				LoginService.signup($scope.accountRegistration).then(function(response) {
-					$rootScope.userId = response.data.userId;
-					$rootScope.companyId = response.data.companyId;
-
-					var now = new Date(),
-					// this will set the expiration to 12 months
-					exp = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
-
-					$cookies.put("userId", $rootScope.userId, {
-						'expires' : exp
-					});
-					$cookies.put("companyId", $rootScope.companyId);
-					hideOverlay();
-					$location.path('/linkedin').replace();
-				}, function(error) {
-					showError($scope.getErrorMessage(error.data));
+				$cookies.put("userId", $rootScope.userId, {
+					'expires' : exp
 				});
-			}
-		} else if (vcRecaptchaService.getResponse() != "") {
-			if ($scope.signInForm.$valid) {
-				showOverlay();
-				$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-				$scope.accountRegistration.phone = $scope.getPhoneNumber("reg-phone");
-				LoginService.signup($scope.accountRegistration).then(function(response) {
-					$rootScope.userId = response.data.userId;
-					$rootScope.companyId = response.data.companyId;
-
-					// this will set the expiration to 30 minutes
-					var now = new Date(), exp = new Date();
-					exp.setMinutes(exp.getMinutes() + 30);
-
-					$cookies.put("userId", $rootScope.userId, {
-						'expires' : exp
-					});
-					$cookies.put("companyId", $rootScope.companyId, {
-						'expires' : exp
-					});
-					hideOverlay();
-					$location.path('/linkedin').replace();
-				}, function(error) {
-					showError($scope.getErrorMessage(error.data));
+				$cookies.put("companyId", $rootScope.companyId, {
+					'expires' : exp
 				});
-			}
+				hideOverlay();
+				$location.path('/linkedin').replace();
+			}, function(error) {
+				showError($scope.getErrorMessage(error.data));
+			});
 		}
-		;
 	};
 
 	$scope.setResponse = function(response) {
