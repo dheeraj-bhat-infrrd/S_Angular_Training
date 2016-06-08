@@ -1,7 +1,4 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
-	console.log(userId);
-	console.log(companyId);
-
 	$rootScope.redirect = false;
 
 	if (isLinkedin == "true") {
@@ -428,7 +425,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	$scope.ddSelectOptions = $rootScope.industries;
 
 	$scope.saveCompanyProfile = function() {
-		if (!$scope.companyForm.$invalid) {
+		if (!$scope.companyForm.$invalid && $rootScope.companyProfile.industry.verticalsMasterId > 0) {
 			$location.path('/companydetail').replace();
 		}
 	};
