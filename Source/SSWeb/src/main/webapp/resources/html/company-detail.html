@@ -29,14 +29,14 @@
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Address *</div>
 				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px" ng-class="{ 'has-error-reg' : companydetailsubmitted && !companyProfile.address}">
-					<textarea class="reg-details form-control-reg" style="padding: 10px;" type="text" name="address" required ng-model="companyProfile.address"></textarea>
+					<textarea class="reg-details form-control-reg" id="textarea" style="padding: 10px;" type="text" name="address" required ng-model="companyProfile.address"></textarea>
 					<p ng-show="(companydetailsubmittedusa || companydetailsubmitted || companydetailsubmittedcanada) && !companyProfile.address" class="help-block-reg">Address is required.</p>
 				</div>
 				<div ng-show="usa">
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix">
-						<div class="reg-req-field" style="width: 44%; float: left; margin-left: 2%;">City *</div>
-						<div class="reg-req-field" style="width: 20%; float: left">State *</div>
-						<div class="reg-req-field" style="width: 30%; margin-left: 2%; float: left">ZIP *</div>
+						<div class="reg-req-field" style="width: 44%; float: left;">City *</div>
+						<div class="reg-req-field" style="width: 20%; float: left;margin-left: 3%;">State *</div>
+						<div class="reg-req-field" style="width: 30%; margin-left: 3%; float: left">ZIP *</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="form-group " style="padding: 0; width: 44%; float: left;" ng-class="{ 'has-error-reg' : companydetailsubmittedusa && !companyProfile.city}">
@@ -56,8 +56,8 @@
 				<div ng-show="canada">
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix">
 						<div class="reg-req-field" style="width: 44%; float: left">City*</div>
-						<div class="reg-req-field" style="width: 20%; float: left; margin-left: 2%;">Province *</div>
-						<div class="reg-req-field" style="width: 30%; margin-left: 2%; float: left">Postal Code *</div>
+						<div class="reg-req-field" style="width: 20%; float: left; margin-left: 3%;">Province *</div>
+						<div class="reg-req-field" style="width: 30%; margin-left: 3%; float: left">Postal Code *</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="form-group " style="padding: 0; width: 44%; float: left" ng-class="{ 'has-error-reg' : companydetailsubmittedcanada && !companyProfile.city}">

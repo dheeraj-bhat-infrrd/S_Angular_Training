@@ -363,14 +363,17 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 			$scope.canada = true;
 			$scope.others = false;
 			$scope.usa = false;
+			$('#textarea').css("height","40px");
 		} else if (country_code == "us") {
 			$scope.others = false;
 			$scope.canada = false;
 			$scope.usa = true;
+			$('#textarea').css("height","40px");
 		} else {
 			$scope.others = true;
 			$scope.canada = false;
 			$scope.usa = false;
+			$('#textarea').css("height","80px");
 		}
 	}
 
