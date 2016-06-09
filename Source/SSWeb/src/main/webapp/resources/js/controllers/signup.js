@@ -197,6 +197,7 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
 
 	$scope.login = function() {
+		showOverlay();
 		window.location = "/registeraccount/newloginas.do?userId=" + $rootScope.userId;
 	}
 
@@ -617,83 +618,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 					"nonce" : nonce,
 					"cardHolderName" : $scope.payment.cardHolderName
 				};
-				showOverlay();
 				$scope.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend);
-			}
-		});
-	}
-
-	$scope.setUpCustomBrainTree = function() {
-		braintree.setup($scope.clientToken, 'custom', {
-			id : "paymentForm",
-			hostedFields : {
-				number : {
-					selector : "#card-number",
-					placeholder : "e.g. 0000 0000 0000 0000"
-				},
-				cvv : {
-					selector : "#cvv",
-					placeholder : "e.g. 123 or 1234"
-				},
-				expirationMonth : {
-					selector : "#expiration-month",
-					placeholder : "e.g. 01"
-				},
-				expirationYear : {
-					selector : "#expiration-year",
-					placeholder : "e.g. 2020"
-				},
-				postalCode : {
-					selector : "#zip-code",
-					placeholder : "e.g. 12345 or 12345678"
-				},
-				styles : {
-					".invalid" : {
-						"color" : "red",
-					},
-				},
-				onFieldEvent : function(event) {
-					console.log(event);
-					if (event.type === "blur") {
-						if (event.target.fieldKey == "number") {
-							if (event.isEmpty || !event.isValid) {
-								showError($scope.getErrorMessage("A valid Credit or Debit Card number is required."));
-							}
-						} else if (event.target.fieldKey == "expirationMonth") {
-							if (event.isEmpty || !event.isValid) {
-								showError($scope.getErrorMessage("A 2 digit Credit or Debit Card expiry month is required."));
-							}
-						} else if (event.target.fieldKey == "expirationYear") {
-							if (event.isEmpty || !event.isValid) {
-								showError($scope.getErrorMessage("A 4 digit Credit or Debit Card expiry year is required."));
-							}
-						} else if (event.target.fieldKey == "cvv") {
-							if (event.isEmpty || !event.isValid) {
-								if (event.card != null) {
-									if (event.card.code.size == 3) {
-										showError($scope.getErrorMessage("The 3-digit CVV number which can be found after the account number on the back of your card is required."));
-									} else if (event.card.code.size == 4) {
-										showError($scope.getErrorMessage("The 4-digit CVV number which can be found just above the account number on the front of your card is required."));
-									}
-								} else {
-									showError($scope.getErrorMessage("A valid Credit or Debit Card number is required."));
-								}
-							}
-						} else if (event.target.fieldKey == "postalCode") {
-							if (event.isEmpty || !event.isValid) {
-								showError($scope.getErrorMessage("A 5 or 9 digit zip code is required."));
-							}
-						}
-					}
-				}
-			},
-			onPaymentMethodReceived : function(object) {
-				console.log(object.nonce);
-				console.log(object.type);
-				console.log(object.details);
-			},
-			onError : function(error) {
-				showError($scope.getErrorMessage(error.message));
 			}
 		});
 	}
@@ -703,7 +628,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	}
 
 	$scope.processPayment = function() {
-
+		showOverlay();
 		if ($scope.individual) {
 			$scope.selectedPlan = $filter('filter')($scope.paymentPlans, function(plan) {
 				return plan.planName == "Individual";
@@ -721,12 +646,13 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 		if ($scope.individual || $scope.business) {
 			if ($scope.validateCardDetails()) {
 				if (!$scope.authorize) {
+					hideOverlay();
 					showPopUp("Authorize SocialSurvey", "Your authroization for payment is required.  Don't worry, you will not be charged until after your free trial ends on " + formattedDate(trialEndDate) + ".  You may cancel online anytime.");
 				} else {
-					// TODO Check if payment has been made by checking an entry is present in license detail..
-					console.log("Check if payment has been made by checking an entry is present in license detail..");
 					$scope.setUpTokenizeBraintreeAndMakePayment();
 				}
+			}else{
+				hideOverlay();
 			}
 		} else {
 			if (angular.isDefined($scope.selectedPlan)) {
@@ -735,7 +661,6 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 					"email" : $scope.payment.email,
 					"message" : $scope.payment.message
 				};
-				showOverlay();
 				$scope.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend);
 			}
 		}
