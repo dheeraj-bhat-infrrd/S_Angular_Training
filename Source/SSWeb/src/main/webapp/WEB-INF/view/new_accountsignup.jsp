@@ -28,7 +28,6 @@
 <script type="text/javascript">
 	var isLinkedin = '${isLinkedin}';
 	var linkedinResponse = '${linkedinResponse}';
-	console.log(linkedinResponse);
 	var userId = '${userId}' ;
 	var companyId =  '${companyId}' ;
 	var firstName = '${firstName}';
