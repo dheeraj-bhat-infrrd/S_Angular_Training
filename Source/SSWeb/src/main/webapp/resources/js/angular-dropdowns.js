@@ -9,7 +9,8 @@
   dd.run(['$templateCache', function ($templateCache) {
     $templateCache.put('ngDropdowns/templates/dropdownSelect.html', [
       '<div ng-class="{\'disabled\': dropdownDisabled}" class="wrap-dd-select" tabindex="0">',
-      '<span class="selected">{{dropdownModel[labelField]}}</span>',
+      '<span class="selected" ng-show="!dropdownModel[labelField]">Select Industry</span>',
+      '<span class="selected" ng-show="dropdownModel[labelField]">{{dropdownModel[labelField]}}</span>',
       '<ul class="dropdown">',
       '<li ng-repeat="item in dropdownSelect"',
       ' class="dropdown-item"',
@@ -22,7 +23,7 @@
 
     $templateCache.put('ngDropdowns/templates/dropdownSelectItem.html', [
       '<li ng-class="{divider: (dropdownSelectItem.divider && !dropdownSelectItem[dropdownItemLabel]), \'divider-label\': (dropdownSelectItem.divider && dropdownSelectItem[dropdownItemLabel])}">',
-      '<a href="" class="dropdown-item"',
+      '<a href="" class="dropdown-item" ng-class="{\'priority\' : dropdownSelectItem.priorityOrder > 0, \'no-priority\' : dropdownSelectItem.priorityOrder == 0, }"',
       ' ng-if="!dropdownSelectItem.divider"',
       ' ng-href="{{dropdownSelectItem.href}}"',
       ' ng-click="selectItem()">',
