@@ -319,19 +319,29 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 
 	$("#country").countrySelect();
 	$scope.selectCountry = function() {
+		$scope.companyProfile.address = "";
+		$scope.companyProfile.city = "";
+		$scope.companyProfile.state = "";
+		$scope.companyProfile.zip = "";
+		$scope.companydetailsubmittedcanada = false;
+		$scope.companydetailsubmitted = false;
+		$scope.companydetailsubmittedusa = false;
 		var country_code = $('#country_code').val();
 		if (country_code == "ca") {
 			$scope.canada = true;
-			$scope.india = false;
+			$scope.others = false;
 			$scope.usa = false;
-		} else if (country_code == "in") {
-			$scope.india = true;
+			$('#textarea').css("height","40px");
+		} else if (country_code == "us") {
+			$scope.others = false;
 			$scope.canada = false;
-			$scope.usa = false;
-		} else {
 			$scope.usa = true;
-			$scope.india = false;
+			$('#textarea').css("height","40px");
+		} else {
+			$scope.others = true;
 			$scope.canada = false;
+			$scope.usa = false;
+			$('#textarea').css("height","80px");
 		}
 	}
 
@@ -432,13 +442,38 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	};
 
 	$scope.saveCompanyProfileDetails = function() {
-		showOverlay();
-		CompanyProfileService.updateCompanyProfile($rootScope.companyId, $rootScope.userId, 'CPP', $rootScope.companyProfile).then(function(response) {
-			hideOverlay();
-			$location.path('/payment').replace();
-		}, function(error) {
-			showError($scope.getErrorMessage(error.data));
-		});
+		if ($scope.canada) {
+			$scope.companydetailsubmittedcanada = true;
+			$scope.companydetailsubmitted = true;
+			$scope.companydetailsubmittedusa = false;
+		} else if ($scope.usa) {
+			$scope.companydetailsubmittedusa = true;
+			$scope.companydetailsubmitted = true;
+			$scope.companydetailsubmittedcanada = false;
+		} else {
+			$scope.companydetailsubmittedusa = false;
+			$scope.companydetailsubmittedcanada = false;
+			$scope.companydetailsubmitted = true;
+		}
+		if ($scope.validateCompanyDetailsForm()) {
+			showOverlay();
+			CompanyProfileService.updateCompanyProfile($rootScope.companyId, $rootScope.userId, 'CPP', $rootScope.companyProfile).then(function(response) {
+				hideOverlay();
+				$location.path('/payment').replace();
+			}, function(error) {
+				showError($scope.getErrorMessage(error.data));
+			});
+		}
+	};
+
+	$scope.validateCompanyDetailsForm = function() {
+		if ($scope.canada) {
+			return ($scope.companyProfile.address && $scope.companyProfile.city && $scope.companyProfile.state && $scope.companyProfile.zip);
+		} else if ($scope.usa) {
+			return ($scope.companyProfile.address && $scope.companyProfile.city && $scope.companyProfile.state && $scope.companyProfile.zip);
+		} else {
+			return ($scope.companyProfile.address);
+		}
 	};
 
 	$scope.backOnCompany = function() {
