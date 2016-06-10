@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.api.controllers;
 
 import javax.validation.Valid;
 
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,8 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.wordnik.swagger.annotations.ApiOperation;
 
+import java.io.IOException;
+
 
 @RestController
 @RequestMapping ( "/users")
@@ -48,6 +52,7 @@ public class UserController
     private PersonalProfileTransformer personalProfileTransformer;
     private UserService userService;
     private UserManagementService userManagementService;
+    private UrlValidationHelper urlValidationHelper;
 
     @Value ( "http://localhost:8082")
     private String authUrl;
@@ -62,7 +67,7 @@ public class UserController
     @Autowired
     public UserController( RestOperations restTemplate, LoginValidator loginValidator,
         PersonalProfileValidator personalProfileValidator, PersonalProfileTransformer personalProfileTransformer,
-        UserService userService, UserManagementService userManagementService )
+        UserService userService, UserManagementService userManagementService, UrlValidationHelper urlValidationHelper )
     {
         this.restTemplate = restTemplate;
         this.loginValidator = loginValidator;
@@ -70,6 +75,7 @@ public class UserController
         this.personalProfileTransformer = personalProfileTransformer;
         this.userService = userService;
         this.userManagementService = userManagementService;
+        this.urlValidationHelper = urlValidationHelper;
     }
 
 
@@ -200,6 +206,20 @@ public class UserController
         throws InvalidInputException
     {
         userService.savePassword( Long.parseLong( userId ), password );
+        return new ResponseEntity<Void>( HttpStatus.OK );
+    }
+
+    @RequestMapping ( value = "/profile/webaddress/validate", method = RequestMethod.POST)
+    @ApiOperation( value = "Validates the provided web address")
+    public ResponseEntity<?> validateWebAddress(@RequestBody String webAddress) throws InvalidInputException{
+        LOGGER.info( "Validating web address "+webAddress );
+        try {
+            urlValidationHelper.validateUrl( webAddress );
+        } catch ( IOException e ) {
+            LOGGER.error( "Error reaching "+webAddress, e );
+            throw new InvalidInputException( "Web address passed was invalid", DisplayMessageConstants.GENERAL_ERROR,
+                e );
+        }
         return new ResponseEntity<Void>( HttpStatus.OK );
     }
 }
