@@ -24,7 +24,7 @@
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px;">
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 reg-create-account">Company Details</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Country *</div>
-				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<input class="reg-details" type="text" id="country" ng-click="selectCountry()" ng-init="initCountry()">
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Address *</div>
@@ -44,7 +44,9 @@
 							<p ng-show="companydetailsubmittedusa && !companyProfile.city" class="help-block-reg">City is required.</p>
 						</div>
 						<div class="form-group " style="padding: 0; width: 20%; float: left; margin-left: 3%;" ng-class="{ 'has-error-reg' : companydetailsubmittedusa && !companyProfile.state}">
-							<input style="width: 100%" class=" reg-comp-add form-control-reg" name="state" ng-model="companyProfile.state" style="margin-left: 2%;" type="text" required />
+							<select style="width: 100%; margin-left: 2%;" class="reg-comp-add form-control-reg" name="state" ng-model="companyProfile.state" required ng-options="state.statecode as state.statecode for state in usStates">
+								<option value=''>State</option>
+							</select>
 							<p ng-show="companydetailsubmittedusa && !companyProfile.state" class="help-block-reg">State is required.</p>
 						</div>
 						<div class="form-group " style="padding: 0; width: 30%; float: left; margin-left: 3%;" ng-class="{ 'has-error-reg' : companydetailsubmittedusa && !companyProfile.zip}">

@@ -1,9 +1,6 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
 	$rootScope.redirect = false;
 
-	userId = 1423;
-	companyId = 224;
-
 	if (isLinkedin == "true") {
 		$rootScope.redirect = true;
 		$rootScope.userId = $cookies.get("userId");
@@ -398,13 +395,20 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	if (angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}) {
 		CompanyProfileService.getCompanyProfile($rootScope.companyId).then(function(response) {
 			$rootScope.companyProfile = response.data;
-			console.log($rootScope.companyProfile);
 			$scope.initCountry();
 			$scope.setPhone("reg-phone-office", $rootScope.companyProfile.officePhone);
 			if ($rootScope.companyProfile.industry.verticalsMasterId < 0) {
 				$rootScope.companyProfile.industry = {};
 			}
 			$scope.loadDropzone();
+		}, function(error) {
+			showError($scope.getErrorMessage(error.data));
+		});
+	}
+
+	if (angular.isUndefined($scope.usStates) || $scope.usStates == null || $scope.usStates == []) {
+		CompanyProfileService.getUsStates().then(function(response) {
+			$scope.usStates = response.data;
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
