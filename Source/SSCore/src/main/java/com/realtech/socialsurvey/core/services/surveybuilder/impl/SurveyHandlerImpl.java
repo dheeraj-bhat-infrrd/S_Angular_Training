@@ -2510,11 +2510,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String message = "";
             if ( bulkSurveyDetail != null ) {
                 LOG.debug( "processing survey for agent " + bulkSurveyDetail.getAgentFirstName() );
-                if ( bulkSurveyDetail.getAgentFirstName() == null || bulkSurveyDetail.getAgentFirstName().isEmpty() ) {
+                /*if ( bulkSurveyDetail.getAgentFirstName() == null || bulkSurveyDetail.getAgentFirstName().isEmpty() ) {
                     message = "Invalid Agent Name ";
                     status = CommonConstants.BULK_SURVEY_INVALID;
                     error = true;
-                } else if ( bulkSurveyDetail.getAgentEmailId() == null || bulkSurveyDetail.getAgentEmailId().isEmpty() ) {
+                } else */if ( bulkSurveyDetail.getAgentEmailId() == null || bulkSurveyDetail.getAgentEmailId().isEmpty() ) {
                     message = "Agent Email Address Not Found ";
                     status = CommonConstants.BULK_SURVEY_INVALID;
                     error = true;
