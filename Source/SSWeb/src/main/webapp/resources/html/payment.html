@@ -64,34 +64,39 @@
 						</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px">Card Number *</div>
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Card Number *</div>
 						<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.cardNumber.$error.required}">
 							<input class="reg-details form-control-reg" id="card-number" type="text" ng-model="payment.cardNumber" ng-change="onChangeCreditCardNumber()" name="cardNumber" required />
-							<p ng-show="paymentsubmitted && paymentForm.cardNumber.$error.required" class="help-block-reg">Card Number is required.</p>
+							<p ng-show="paymentsubmitted && paymentForm.cardNumber.$error.required" class="help-block-reg">A valid Credit or Debit Card number is required.</p>
 						</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px">Expiry *</div>
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Expiry *</div>
 						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.month.$error.required}">
-							<select id="expiration-month" class="reg-details form-control-reg" ng-model="payment.expirationMonth" name="month" required ng-options="month.id as month.value for month in expirationMonths"></select>
-							<p ng-show="paymentsubmitted && paymentForm.month.$error.required" class="help-block-reg">Month is required.</p>
+							<select id="expiration-month" class="reg-details form-control-reg" style="min-width: 0px" ng-model="payment.expirationMonth" name="month" required ng-options="month.id as month.value for month in expirationMonths"></select>
+							<p ng-show="paymentsubmitted && paymentForm.month.$error.required" class="help-block-reg">A valid Credit or Debit Card expiry month is required.</p>
+							<p ng-show="paymentsubmitted && !paymentForm.month.$error.required && !paymentForm.year.$error.required && payment.expirationMonth <= (today.getMonth()+1) && payment.expirationYear == today.getFullYear()" class="help-block-reg">Expiry date should be future date.</p>
 						</div>
 						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.year.$error.required}">
-							<select id="expiration-year" class="reg-details form-control-reg" ng-model="payment.expirationYear" name="year" required ng-options="year.id as year.value for year in expirationYears"></select>
-							<p ng-show="paymentsubmitted && paymentForm.year.$error.required" class="help-block-reg">Year is required.</p>
+							<select id="expiration-year" class="reg-details form-control-reg" style="min-width: 0px" ng-model="payment.expirationYear" name="year" required ng-options="year.id as year.value for year in expirationYears"></select>
+							<p ng-show="paymentsubmitted && paymentForm.year.$error.required" class="help-block-reg">A valid 4 digit Credit or Debit Card expiry year is required.</p>
+							<p ng-show="paymentsubmitted && !paymentForm.month.$error.required && !paymentForm.year.$error.required && payment.expirationMonth <= (today.getMonth()+1) && payment.expirationYear == today.getFullYear()" class="help-block-reg">Expiry date should be future date.</p>
 						</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 20px">CVV *</div>
-						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 20px">Zip Code *</div>
+						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6">CVV *</div>
+						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6">Zip Code *</div>
 						<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-3" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.cvv.$error.required}">
-							<input class="reg-details form-control-reg" id="cvv" type="password" name="cvv" required ng-model="payment.cvv" />
-							<p ng-show="paymentsubmitted && paymentForm.cvv.$error.required" class="help-block-reg">CVV is required.</p>
+							<input class="reg-details form-control-reg" id="cvv" style="min-width: 0px" type="password" name="cvv" required ng-model="payment.cvv" />
+							<p ng-show="paymentsubmitted && paymentForm.cvv.$error.required" class="help-block-reg">Valid 3-digit or 4-digit CVV number is required.</p>
+							<p ng-show="paymentsubmitted && !paymentForm.cvv.$error.required && cvvSize == 3 && payment.cvv.length < 3" class="help-block-reg">Valid 3-digit CVV number which can be found after the account number on the back of your card is required.</p>
+							<p ng-show="paymentsubmitted && !paymentForm.cvv.$error.required && cvvSize == 4 && payment.cvv.length < 4" class="help-block-reg">Valid 4-digit CVV number which can be found just above the account number on the front of your card is required.</p>
 						</div>
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
 						<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-3" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.zipcode.$error.required}">
-							<input class="reg-details form-control-reg" id="zip-code" type="text" name="zipcode" required ng-model="payment.zipCode" />
-							<p ng-show="paymentsubmitted && paymentForm.zipcode.$error.required" class="help-block-reg">Zip Code is required.</p>
+							<input class="reg-details form-control-reg" id="zip-code" style="min-width: 0px" type="text" name="zipcode" required ng-model="payment.zipCode" />
+							<p ng-show="paymentsubmitted && paymentForm.zipcode.$error.required" class="help-block-reg">A 5 or 9 digit zip code is required.</p>
+							<p ng-show="paymentsubmitted && !paymentForm.zipcode.$error.required && payment.zipCode.length != 5 && $scope.payment.zipCode.length != 10" class="help-block-reg">A 5 or 9 digit zip code is required.</p>
 						</div>
 						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
 					</div>
@@ -114,7 +119,7 @@
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
 							<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
 							<div style="width: 120px; margin: auto;">
-								<button type="submit" class="reg-next" ng-class="{'regen':authorize}" ng-click="paymentsubmitted=true">Next</button>
+								<button type="submit" class="reg-next" ng-class="{'regen':authorize && paymentForm.$valid && validateCardDetails()}" ng-click="paymentsubmitted=true">Next</button>
 							</div>
 						</div>
 					</div>
@@ -130,14 +135,14 @@
 							<p ng-show="entersubmitted && enterpriseForm.name.$error.required" class="help-block-reg">Name is required.</p>
 						</div>
 						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0" ng-class="{ 'has-error-reg' : entersubmitted && enterpriseForm.email.$error.required}">
-							<input class=" reg-name  form-control-reg" name="email" ng-model="payment.email" style="margin-left: 2%;" type="email" placeholder="email@example.com" required />
-							<p ng-show="entersubmitted && enterpriseForm.email.$error.required" class="help-block-reg">Email is required.</p>
+							<input class=" reg-name form-control-reg" name="email" ng-model="payment.email" style="margin-left: 2%;" type="email" placeholder="email@example.com" required />
+							<p ng-show="entersubmitted && enterpriseForm.email.$error.required" class="help-block-reg" style="margin-left: 2%;">Email is required.</p>
 						</div>
 					</div>
 					<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Message *</div>
 					<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px" ng-class="{ 'has-error-reg' :  entersubmitted && enterpriseForm.message.$error.required}">
 						<textarea class="reg-details form-control-reg" style="height: 100px; padding: 10px;" placeholder="Lets us know how we can help." name="message" required ng-model="payment.message"></textarea>
-						<p ng-show=" entersubmitted && enterpriseForm.message.$error.required" class="help-block-reg">Address is required.</p>
+						<p ng-show=" entersubmitted && enterpriseForm.message.$error.required" class="help-block-reg">Message is required.</p>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
 						<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
