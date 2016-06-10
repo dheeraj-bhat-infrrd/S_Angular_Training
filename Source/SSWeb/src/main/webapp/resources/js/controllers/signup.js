@@ -442,6 +442,14 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	};
 
 	$scope.saveCompanyProfileDetails = function() {
+		showOverlay();
+		$rootScope.userProfile.officePhone = $scope.getPhoneNumber("reg-phone-office");
+		CompanyProfileService.updateCompanyProfile($rootScope.companyId, $rootScope.userId, 'CPP', $rootScope.companyProfile).then(function(response) {
+			hideOverlay();
+			$location.path('/payment').replace();
+		}, function(error) {
+			showError($scope.getErrorMessage(error.data));
+		});
 		if ($scope.canada) {
 			$scope.companydetailsubmittedcanada = true;
 			$scope.companydetailsubmitted = true;
@@ -486,7 +494,6 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 } ]);
 
 app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '$rootScope', '$filter', 'PasswordService', function($scope, PaymentService, $location, $rootScope, $filter, PasswordService) {
-
 	$scope.individual = true;
 	$scope.business = false;
 	$scope.enterprise = false;
@@ -533,8 +540,8 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	$('#cvv').mask("ddd", digitRegEx);
 	$('#zip-code').mask("ddddd-dddd", digitRegEx);
 
-	var today = new Date();
-	var currentYear = today.getFullYear();
+	$scope.today = new Date();
+	var currentYear = $scope.today.getFullYear();
 	var validTillYear = currentYear + 19;
 	$scope.expirationYears = [ {} ];
 	for (var year = currentYear; year <= validTillYear; year++) {
@@ -543,6 +550,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 			"value" : year + ""
 		});
 	}
+	
 	var trialEndDate = new Date();
 	trialEndDate.setMonth(trialEndDate.getMonth() + 1);
 
@@ -580,58 +588,53 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	}
 
 	$scope.validateCardDetails = function() {
-		console.log($scope.payment);
 		var validCardDetails = true;
 		var numberValidation = cardValidator.number($scope.payment.cardNumber);
 		var expiryMonValidation = cardValidator.expirationMonth($scope.payment.expirationMonth);
 		var expiryYearValidation = cardValidator.expirationYear($scope.payment.expirationYear);
+		var postalCodeValidation = cardValidator.postalCode($scope.payment.zipCode);
 		var cvvValidation1 = cardValidator.cvv($scope.payment.cvv, 3);
 		var cvvValidation2 = cardValidator.cvv($scope.payment.cvv, 4);
-		var postalCodeValidation = cardValidator.postalCode($scope.payment.zipCode);
 
 		if (angular.isUndefined($scope.payment.cardHolderName) || $scope.payment.cardHolderName == "" || $scope.payment.cardHolderName == null) {
 			validCardDetails = false;
-			showError($scope.getErrorMessage("Name on Card is required."));
 		}
 
 		if (angular.isUndefined($scope.payment.cardNumber) || !numberValidation.isValid) {
 			validCardDetails = false;
-			showError($scope.getErrorMessage("A valid Credit or Debit Card number is required."));
 		}
 
-		if (angular.isUndefined($scope.payment.expirationMonth) || !expiryMonValidation.isValid || (expiryYearValidation.isCurrentYear && $scope.payment.expirationMonth < today.getMonth() + 1)) {
+		if (angular.isUndefined($scope.payment.expirationMonth) || !expiryMonValidation.isValid || (expiryYearValidation.isCurrentYear && $scope.payment.expirationMonth < $scope.today.getMonth() + 1)) {
 			validCardDetails = false;
-			showError($scope.getErrorMessage("A valid 2 digit Credit or Debit Card expiry month is required."));
 		}
 
 		if (angular.isUndefined($scope.payment.expirationYear) || !expiryYearValidation.isValid) {
 			validCardDetails = false;
-			showError($scope.getErrorMessage("A valid 4 digit Credit or Debit Card expiry year is required."));
 		}
 
 		if (numberValidation.card != null) {
 			if (numberValidation.card.code.size == 3) {
 				if (!cvvValidation1.isValid) {
 					validCardDetails = false;
-					showError($scope.getErrorMessage("Valid 3-digit CVV number which can be found after the account number on the back of your card is required."));
 				}
 			} else if (numberValidation.card.code.size == 4) {
 				if (!cvvValidation2.isValid) {
 					validCardDetails = false;
-					showError($scope.getErrorMessage("Valid 4-digit CVV number which can be found just above the account number on the front of your card is required."));
 				}
 			}
 		} else if (angular.isUndefined($scope.payment.cvv) || (!cvvValidation1.isValid && !cvvValidation2.isValid)) {
 			validCardDetails = false;
-			showError($scope.getErrorMessage("Valid 3-digit or 4-digit CVV number is required."));
 		}
 
 		if (angular.isUndefined($scope.payment.zipCode) || !postalCodeValidation.isValid || ($scope.payment.zipCode.length != 5 && $scope.payment.zipCode.length != 10)) {
 			validCardDetails = false;
-			showError($scope.getErrorMessage("A 5 or 9 digit zip code is required."));
 		}
 
 		return validCardDetails;
+	}
+
+	$scope.checkCvvValidations = function() {
+
 	}
 
 	$scope.setUpTokenizeBraintreeAndMakePayment = function() {
@@ -679,24 +682,29 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 		}
 
 		if ($scope.individual || $scope.business) {
-			if ($scope.validateCardDetails()) {
+			var numberValidation = cardValidator.number($scope.payment.cardNumber);
+			if (numberValidation.card != null)
+				$scope.cvvSize = numberValidation.card.code.size;
+			if ($scope.validateCardDetails() && $scope.paymentForm.$valid) {
 				if (!$scope.authorize) {
 					hideOverlay();
 					showPopUp("Authorize SocialSurvey", "Your authroization for payment is required.  Don't worry, you will not be charged until after your free trial ends on " + formattedDate(trialEndDate) + ".  You may cancel online anytime.");
 				} else {
 					$scope.setUpTokenizeBraintreeAndMakePayment();
 				}
-			}else{
+			} else {
 				hideOverlay();
 			}
 		} else {
-			if (angular.isDefined($scope.selectedPlan)) {
+			if ($scope.enterpriseForm.$valid && angular.isDefined($scope.selectedPlan)) {
 				var dataToSend = {
 					"name" : $scope.payment.name,
 					"email" : $scope.payment.email,
 					"message" : $scope.payment.message
 				};
 				$scope.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend);
+			} else {
+				hideOverlay();
 			}
 		}
 	}
@@ -734,6 +742,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 		}
 		$scope.authorize = true;
 		$scope.payment = {};
+		$scope.paymentsubmitted = false;
 	};
 
 	$scope.downGrade = function() {
@@ -746,11 +755,10 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 			$scope.business = true;
 			$scope.enterprise = false;
 		}
-		$scope.name = null;
-		$scope.email = null;
-		$scope.message = null;
 		$scope.authorize = true;
 		$scope.payment = {};
+		$scope.paymentsubmitted = false;
+		$scope.entersubmitted = false;
 	};
 } ]);
 

@@ -12,7 +12,6 @@
 				</div>
 				<div class="step">
 					<span><a>Payment</a></span>
-
 				</div>
 			</div>
 		</div>
@@ -36,7 +35,7 @@
 				<div ng-show="usa">
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix">
 						<div class="reg-req-field" style="width: 44%; float: left;">City *</div>
-						<div class="reg-req-field" style="width: 20%; float: left;margin-left: 3%;">State *</div>
+						<div class="reg-req-field" style="width: 20%; float: left; margin-left: 3%;">State *</div>
 						<div class="reg-req-field" style="width: 30%; margin-left: 3%; float: left">ZIP *</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -75,7 +74,6 @@
 						</div>
 					</div>
 				</div>
-
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Office Phone *</div>
 				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<input class="reg-details" type="tel" id="reg-phone-office" ng-init="setPhone('reg-phone-office', companyProfile.officePhone);" ng-model="companyProfile.officePhone" required oninvalid="this.setCustomValidity('Please Enter Office Phone')" oninput="this.setCustomValidity('')" />
@@ -85,7 +83,6 @@
 				<div class="reg-back" ng-click="backOnCompanyDetail()">&lt;&lt;Back</div>
 				<div style="width: 120px; margin: auto;">
 					<button class="reg-next" ng-class="{'regen':($scope.companyProfile.address && $scope.companyProfile.city && $scope.companyProfile.state && $scope.companyProfile.zip)||($scope.companyProfile.address && $scope.companyProfile.city && $scope.companyProfile.state && $scope.companyProfile.zip)||($scope.others && $scope.companyProfile.address)}" ng-click="saveCompanyProfileDetails()">
-
 						Next <span style="font-size: 12px;"><i class="fa fa-arrow-right" aria-hidden="true"></i></span>
 					</button>
 				</div>
