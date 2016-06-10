@@ -543,7 +543,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	$scope.today = new Date();
 	var currentYear = $scope.today.getFullYear();
 	var validTillYear = currentYear + 19;
-	$scope.expirationYears = [ {} ];
+	$scope.expirationYears = [];
 	for (var year = currentYear; year <= validTillYear; year++) {
 		$scope.expirationYears.push({
 			"id" : year + "",
