@@ -270,6 +270,18 @@ public class AccountController
     }
 
 
+    @RequestMapping ( value = "/registeraccount/getusstates", method = RequestMethod.GET)
+    @ResponseBody
+    public String getUsStates()
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.getUsStates();
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
+    }
+
+
     @RequestMapping ( value = "/registeraccount/updateuserstage", method = RequestMethod.PUT)
     @ResponseBody
     public String getUpdateUserStage( @QueryParam ( "userId") String userId, @QueryParam ( "stage") String stage )
@@ -337,7 +349,7 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/registeraccount/removecompanylogo", method = RequestMethod.DELETE)
+    @RequestMapping ( value = "/registeraccount/removecompanylogo", method = RequestMethod.PUT)
     @ResponseBody
     public String removeCompanyLogo( @QueryParam ( "companyId") String companyId, @QueryParam ( "userId") String userId )
     {
@@ -372,7 +384,7 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/registeraccount/removeuserprofilelogo", method = RequestMethod.DELETE)
+    @RequestMapping ( value = "/registeraccount/removeuserprofilelogo", method = RequestMethod.PUT)
     @ResponseBody
     public String removeUserProfileLogo( @QueryParam ( "userId") String userId )
     {

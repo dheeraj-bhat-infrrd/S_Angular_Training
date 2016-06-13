@@ -22,7 +22,7 @@ app.service('UserProfileService', [ '$http', function($http) {
 	}
 
 	this.removelogo = function(userId) {
-		return $http.delete('/registeraccount/removeuserprofilelogo.do?userId=' + userId);
+		return $http.put('/registeraccount/removeuserprofilelogo.do?userId=' + userId);
 	}
 } ]);
 
@@ -44,7 +44,11 @@ app.service('CompanyProfileService', [ '$http', function($http) {
 	}
 
 	this.removelogo = function(companyId, userId) {
-		return $http.delete('/registeraccount/removecompanylogo.do?companyId=' + companyId + '&userId=' + userId);
+		return $http.put('/registeraccount/removecompanylogo.do?companyId=' + companyId + '&userId=' + userId);
+	}
+
+	this.getUsStates = function() {
+		return $http.get('/registeraccount/getusstates.do');
 	}
 } ]);
 

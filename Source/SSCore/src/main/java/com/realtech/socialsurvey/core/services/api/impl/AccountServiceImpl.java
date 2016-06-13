@@ -33,6 +33,7 @@ import com.realtech.socialsurvey.core.entities.PaymentPlan;
 import com.realtech.socialsurvey.core.entities.Phone;
 import com.realtech.socialsurvey.core.entities.Plan;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
+import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -558,5 +559,13 @@ public class AccountServiceImpl implements AccountService
             }
         }
         return null;
+    }
+
+
+    @Override
+    public List<StateLookup> getUsStatesList()
+    {
+        List<StateLookup> lookups = organizationManagementService.getUsStateList();
+        return lookups;
     }
 }
