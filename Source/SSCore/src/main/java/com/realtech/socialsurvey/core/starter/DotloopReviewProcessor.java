@@ -512,6 +512,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
         String apiKeysStr = dotloopCrmInfo.getApi();
         List<String> apiKeyList = Arrays.asList(apiKeysStr.split("\\s*,\\s*"));
         for ( String apiKey : apiKeyList ) {
+            apiKey = apiKey.trim();
             LOG.debug( "Fetching reviews for api key: " + apiKey + " with id: " + unitSettings.getIden() );
             String authorizationHeader = CommonConstants.AUTHORIZATION_HEADER + apiKey;
             //re initialize the flag;
