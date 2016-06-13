@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -502,102 +503,104 @@ public class DotloopReviewProcessor extends QuartzJobBean
     /**
      * Fetches records from dot loop
      * 
-     * @param apiKey
+     * @param dotloopCrmInfo
      * @param unitSettings
      */
     public void fetchReviewfromDotloop( DotLoopCrmInfo dotloopCrmInfo, String collectionName,
         OrganizationUnitSettings unitSettings )
     {
-        String apiKey = dotloopCrmInfo.getApi();
-        LOG.debug( "Fetching reviews for api key: " + apiKey + " with id: " + unitSettings.getIden() );
-        String authorizationHeader = CommonConstants.AUTHORIZATION_HEADER + apiKey;
-        //re initialize the flag;
-        newLoopFound = false;
-        newRecordFound = false;
-        newRecordFoundCount=0;
-        // get list of profiles
-        List<DotLoopProfileEntity> profileList = getDotLoopProfiles( authorizationHeader, apiKey );
-        if ( profileList != null && !profileList.isEmpty() ) {
-            LOG.debug( "Got " + profileList.size() + " profiles." );
-            for ( DotLoopProfileEntity profile : profileList ) {
-            	
-                String profileId = String.valueOf( profile.getProfileId() );
-                try {
-                    if ( profile.isActive() && !isProfilePresentAsInactive( collectionName, unitSettings, profile ) ) {
-                        // check for loop ids with status closed (4)
-                        Response loopResponse = null;
-                        int batchNumber = 1;
-                        String loopResponseString = null;
-                        // List<LoopProfileMapping> dotloopProfileMappingList = null;
-                        List<LoopProfileMapping> loopEntities = null;
-                        boolean byPassRecords = false; // checks if the system has processed the
-                                                       // profile ever before.
-                        try {
+        String apiKeysStr = dotloopCrmInfo.getApi();
+        List<String> apiKeyList = Arrays.asList(apiKeysStr.split("\\s*,\\s*"));
+        for ( String apiKey : apiKeyList ) {
+            LOG.debug( "Fetching reviews for api key: " + apiKey + " with id: " + unitSettings.getIden() );
+            String authorizationHeader = CommonConstants.AUTHORIZATION_HEADER + apiKey;
+            //re initialize the flag;
+            newLoopFound = false;
+            newRecordFound = false;
+            newRecordFoundCount = 0;
+            // get list of profiles
+            List<DotLoopProfileEntity> profileList = getDotLoopProfiles( authorizationHeader, apiKey );
+            if ( profileList != null && !profileList.isEmpty() ) {
+                LOG.debug( "Got " + profileList.size() + " profiles." );
+                for ( DotLoopProfileEntity profile : profileList ) {
 
-                            if ( dotloopCrmInfo.isRecordsBeenFetched()
-                                && organizationManagementService.getLoopsCountByProfile( profileId, collectionName,
-                                    unitSettings.getIden() ) > 0 ) {
-                                LOG.info( "Records for profile id: " + profileId + " is already present" );
-                                byPassRecords = false;
-                            } else {
-                                LOG.info( "Proile id is not processed for profile id: " + profileId
-                                    + ". Bypassing all records. Just adding into tracker" );
-                                byPassRecords = true;
-                            }
-                            do {
-                                LOG.debug( "Gettig batch " + batchNumber + " for closed records for profile " + profileId );
-                                loopResponse = dotloopIntegrationApi.fetchClosedProfiles( authorizationHeader, profileId,
-                                    batchNumber );
-                                if ( loopResponse != null ) {
-                                    loopResponseString = new String( ( (TypedByteArray) loopResponse.getBody() ).getBytes() );
-                                    if ( loopResponseString == null || loopResponseString.equals( "[]" ) ) {
+                    String profileId = String.valueOf( profile.getProfileId() );
+                    try {
+                        if ( profile.isActive() ) {
+                            // check for loop ids with status closed (4)
+                            Response loopResponse = null;
+                            int batchNumber = 1;
+                            String loopResponseString = null;
+                            // List<LoopProfileMapping> dotloopProfileMappingList = null;
+                            List<LoopProfileMapping> loopEntities = null;
+                            boolean byPassRecords = false; // checks if the system has processed the
+                            // profile ever before.
+                            try {
+
+                                if ( dotloopCrmInfo.isRecordsBeenFetched() && organizationManagementService
+                                    .getLoopsCountByProfile( profileId, collectionName, unitSettings.getIden() ) > 0 ) {
+                                    LOG.info( "Records for profile id: " + profileId + " is already present" );
+                                    byPassRecords = false;
+                                } else {
+                                    LOG.info( "Proile id is not processed for profile id: " + profileId + ". Bypassing all records. Just adding into tracker" );
+                                    byPassRecords = true;
+                                }
+                                do {
+                                    LOG.debug( "Gettig batch " + batchNumber + " for closed records for profile " + profileId );
+                                    loopResponse = dotloopIntegrationApi
+                                        .fetchClosedProfiles( authorizationHeader, profileId, batchNumber );
+                                    if ( loopResponse != null ) {
+                                        loopResponseString = new String( ( (TypedByteArray) loopResponse.getBody() ).getBytes() );
+                                        if ( loopResponseString == null || loopResponseString.equals( "[]" ) ) {
+                                            // no more records
+                                            LOG.debug( "No more loops ids for profile: " + profileId );
+                                            break;
+                                        } else {
+                                            LOG.debug( "Processing batch: " + batchNumber + " for profile: " + profileId );
+                                            loopEntities = new Gson().fromJson( loopResponseString, new TypeToken<List<LoopProfileMapping>>()
+                                            {
+                                            }.getType() );
+                                            // process loop entites. If there are no records for the
+                                            // profile id in the tracker
+                                            processLoopEntites( collectionName, loopEntities, profileId, byPassRecords,
+                                                authorizationHeader, unitSettings.getIden() );
+                                        }
+                                    } else {
                                         // no more records
                                         LOG.debug( "No more loops ids for profile: " + profileId );
                                         break;
-                                    } else {
-                                        LOG.debug( "Processing batch: " + batchNumber + " for profile: " + profileId );
-                                        loopEntities = new Gson().fromJson( loopResponseString,
-                                            new TypeToken<List<LoopProfileMapping>>() {}.getType() );
-                                        // process loop entites. If there are no records for the
-                                        // profile id in the tracker
-                                        processLoopEntites( collectionName, loopEntities, profileId, byPassRecords,
-                                            authorizationHeader, unitSettings.getIden() );
                                     }
-                                } else {
-                                    // no more records
-                                    LOG.debug( "No more loops ids for profile: " + profileId );
-                                    break;
-                                }
-                                batchNumber++;
-                            } while ( true );
-                        } catch ( DotLoopAccessForbiddenException dafe ) {
-                            // insert into tracker table
-                            LOG.info( "Inactive profile. Inserting into Dot loop profile mapping." );
-                            insertCompanyDotloopProfile( collectionName, profile, unitSettings );
+                                    batchNumber++;
+                                } while ( true );
+                            } catch ( DotLoopAccessForbiddenException dafe ) {
+                                // insert into tracker table
+                                LOG.info( "Inactive profile. Inserting into Dot loop profile mapping." );
+                                insertCompanyDotloopProfile( collectionName, profile, unitSettings );
+                            }
                         }
+                    } catch ( JsonSyntaxException | InvalidInputException e ) {
+                        LOG.error( "Could not process " + profileId, e );
                     }
-                } catch ( JsonSyntaxException | InvalidInputException e ) {
-                    LOG.error( "Could not process " + profileId, e );
                 }
             }
-        }
-        
-        //send report to admin if no new record is fetched
-        if(!newLoopFound && !newRecordFound){
-            String subject = "No record fetched from Dotloop for " + collectionName + " id : " + unitSettings.getIden();
-            String body = "";
-            if(!newLoopFound)
-                body += "No new loop found for the entity <br/>";
-            if(!newRecordFound)
-                body += "No new record found for the entity <br/>";
-            try {
-                emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail, subject, body, null );
-            } catch ( InvalidInputException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch ( UndeliveredEmailException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+
+            //send report to admin if no new record is fetched
+            if ( !newLoopFound && !newRecordFound ) {
+                String subject = "No record fetched from Dotloop for " + collectionName + " id : " + unitSettings.getIden();
+                String body = "";
+                if ( !newLoopFound )
+                    body += "No new loop found for the entity <br/>";
+                if ( !newRecordFound )
+                    body += "No new record found for the entity <br/>";
+                try {
+                    emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail, subject, body, null );
+                } catch ( InvalidInputException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch ( UndeliveredEmailException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
         
