@@ -232,7 +232,7 @@
 					<span class="float-left ppl-share-icns icn-twit-rev" id ="twitt_${loop.index}" onclick="twitterDashboardFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}&url=${feedback.completeProfileUrl}"></span>
 					 <span
 						class="float-left ppl-share-icns icn-lin-rev" title="LinkedIn"
-						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}+ &source="></span>
+						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}&source="></span>
                        <span class="float-left" title="Google+">
                        <button 
                            class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"
