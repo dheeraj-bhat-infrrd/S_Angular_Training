@@ -26,9 +26,10 @@
         // add or remove input placeholder with an example number for the selected country
         autoPlaceholder: true,
         // modify the auto placeholder
-        customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
+        customPlaceholder:null,
+        /*customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
         	  return "eg. "+selectedCountryPlaceholder;
-        },
+        },*/
         // append menu to a specific element
         dropdownContainer: "",
         // don't display these countries

@@ -1,4 +1,5 @@
 var phoneFormat = '(ddd) ddd-dddd x yyyyy';
+var phoneNumberFormat=/[0-9()-. ]{25}/;
 var creditcardFormat = 'dddd dddd dddd dddd';
 var expiryDateFormat = 'dd/dd';
 var phoneRegEx = {
