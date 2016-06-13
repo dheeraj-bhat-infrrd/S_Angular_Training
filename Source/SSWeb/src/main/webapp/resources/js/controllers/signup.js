@@ -84,7 +84,8 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 				"number" : number,
 				"countryCode" : "+" + countryData.dialCode,
 				"extension" : $('#' + phoneId).intlTelInput("getExtension"),
-				"countryAbbr" : countryData.iso2
+				"countryAbbr" : countryData.iso2,
+				"formattedPhoneNumber" : $('#' + phoneId).val()
 			};
 		}
 	}
@@ -93,13 +94,7 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		if (phone != null) {
 			var extension;
 			$('#' + phoneId).intlTelInput("setCountry", phone.countryAbbr);
-			if (phone.extension == null || phone.extension == undefined || phone.extension == "") {
-				extension = "";
-			} else {
-				extension = " x " + phone.extension;
-			}
-			$('#' + phoneId).intlTelInput("setNumber", phone.number + " " + extension);
-			$scope.maskPhoneNumber(phoneId, phone.countryAbbr);
+			$('#' + phoneId).intlTelInput("setNumber", phone.formattedPhoneNumber);
 		}
 	}
 
