@@ -134,7 +134,10 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
 	};
-	$('#reg-phone').intlTelInput();
+	$('#reg-phone').intlTelInput({
+		utilsScript : "../resources/js/utils.js"		
+	 });
+	
 	$('#reg-phone').mask(phoneFormat, phoneRegEx);
 	$("#reg-phone").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone", countryData.iso2);
@@ -223,12 +226,16 @@ app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope'
 
 app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfileService', '$rootScope', function($scope, $http, $location, UserProfileService, $rootScope) {
 
-	$('#reg-phone1').intlTelInput();
+	$('#reg-phone1').intlTelInput({
+		utilsScript : "../resources/js/utils.js"		
+	 });
 	$('#reg-phone1').mask(phoneFormat, phoneRegEx);
 	$("#reg-phone1").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone1", countryData.iso2);
 	});
-	$('#reg-phone2').intlTelInput();
+	$('#reg-phone2').intlTelInput({
+		utilsScript : "../resources/js/utils.js"		
+	 });
 	$('#reg-phone2').mask(phoneFormat, phoneRegEx);
 	$("#reg-phone2").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone2", countryData.iso2);
@@ -323,7 +330,9 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	$scope.usa = true;
 	$scope.canada = false;
 	$scope.others = false;
-	$('#reg-phone-office').intlTelInput();
+	$('#reg-phone-office').intlTelInput({
+		utilsScript : "../resources/js/utils.js"		
+	 });
 	$('#reg-phone-office').mask(phoneFormat, phoneRegEx);
 	$('#reg-phone-office').on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone-office", countryData.iso2);
