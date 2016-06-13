@@ -1,6 +1,6 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
 	$rootScope.redirect = false;
-
+	$scope.emailFormat = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 	if (isLinkedin == "true") {
 		$rootScope.redirect = true;
 		$rootScope.userId = $cookies.get("userId");
@@ -63,30 +63,30 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		return errorMessage;
 	}
 	$scope.maskPhoneNumber = function(phoneId, iso2) {
-		
+
 		if (iso2 == 'us') {
 			$('#' + phoneId).mask(phoneFormat, phoneRegEx);
-			/*$('#'+phoneId).removeAttr("ng-pattern");*/
+			/* $('#'+phoneId).removeAttr("ng-pattern"); */
 		} else {
-			/*$('#' + phoneId).mask(phoneFormatList[iso2.toUpperCase()], phoneRegEx);*/
-			$('#'+phoneId).unmask(phoneFormat);
-			/*$('#'+phoneId).attr("ng-pattern","[0-9()-. ]{25}");*/
-			
-			$('#'+phoneId).keypress(function (e) {
-				 var count=$('#'+phoneId).val().length;
-				    if(count>24){
-				    	return false;
-				    }else{
-			    var regex = new RegExp("^[0-9-.() ]+$");
-			    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-			   
-			    if (regex.test(str)) {
-			        return true;
-			    }
-			    
-			    e.preventDefault();
-			    return false;
-				    }
+			/* $('#' + phoneId).mask(phoneFormatList[iso2.toUpperCase()], phoneRegEx); */
+			$('#' + phoneId).unmask(phoneFormat);
+			/* $('#'+phoneId).attr("ng-pattern","[0-9()-. ]{25}"); */
+
+			$('#' + phoneId).keypress(function(e) {
+				var count = $('#' + phoneId).val().length;
+				if (count > 24) {
+					return false;
+				} else {
+					var regex = new RegExp("^[0-9-.() ]+$");
+					var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+
+					if (regex.test(str)) {
+						return true;
+					}
+
+					e.preventDefault();
+					return false;
+				}
 			});
 		}
 	}
@@ -133,15 +133,14 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 	$scope.accountRegistration = {};
 	$scope.response = null;
 	$scope.widgetId = null;
-	$scope.emailFormat = /^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/;
 
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
 	};
 	$('#reg-phone').intlTelInput({
-		utilsScript : "../resources/js/utils.js"		
-	 });
-	
+		utilsScript : "../resources/js/utils.js"
+	});
+
 	$('#reg-phone').mask(phoneFormat, phoneRegEx);
 	$("#reg-phone").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone", countryData.iso2);
@@ -223,15 +222,15 @@ app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope'
 app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfileService', '$rootScope', function($scope, $http, $location, UserProfileService, $rootScope) {
 
 	$('#reg-phone1').intlTelInput({
-		utilsScript : "../resources/js/utils.js"		
-	 });
+		utilsScript : "../resources/js/utils.js"
+	});
 	$('#reg-phone1').mask(phoneFormat, phoneRegEx);
 	$("#reg-phone1").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone1", countryData.iso2);
 	});
 	$('#reg-phone2').intlTelInput({
-		utilsScript : "../resources/js/utils.js"		
-	 });
+		utilsScript : "../resources/js/utils.js"
+	});
 	$('#reg-phone2').mask(phoneFormat, phoneRegEx);
 	$("#reg-phone2").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone2", countryData.iso2);
@@ -352,8 +351,8 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	$scope.canada = false;
 	$scope.others = false;
 	$('#reg-phone-office').intlTelInput({
-		utilsScript : "../resources/js/utils.js"		
-	 });
+		utilsScript : "../resources/js/utils.js"
+	});
 	$('#reg-phone-office').mask(phoneFormat, phoneRegEx);
 	$('#reg-phone-office').on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone-office", countryData.iso2);
