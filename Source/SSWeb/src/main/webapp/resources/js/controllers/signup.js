@@ -322,14 +322,14 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 
 	$scope.usa = true;
 	$scope.canada = false;
-	$scope.india = false;
+	$scope.others = false;
 	$('#reg-phone-office').intlTelInput();
 	$('#reg-phone-office').mask(phoneFormat, phoneRegEx);
 	$('#reg-phone-office').on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone-office", countryData.iso2);
 	});
-
 	$("#country").countrySelect();
+
 	$scope.selectCountry = function() {
 		$scope.companyProfile.address = "";
 		$scope.companyProfile.city = "";
@@ -338,22 +338,26 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 		$scope.companydetailsubmittedcanada = false;
 		$scope.companydetailsubmitted = false;
 		$scope.companydetailsubmittedusa = false;
-		var country_code = $('#country_code').val();
+		var country_code = $("#country").countrySelect("getSelectedCountryData").iso2;
+		$scope.initFormByCountry(country_code);
+	}
+
+	$scope.initFormByCountry = function(country_code) {
 		if (country_code == "ca") {
 			$scope.canada = true;
 			$scope.others = false;
 			$scope.usa = false;
-			$('#textarea').css("height","40px");
+			$('#textarea').css("height", "40px");
 		} else if (country_code == "us") {
 			$scope.others = false;
 			$scope.canada = false;
 			$scope.usa = true;
-			$('#textarea').css("height","40px");
+			$('#textarea').css("height", "40px");
 		} else {
 			$scope.others = true;
 			$scope.canada = false;
 			$scope.usa = false;
-			$('#textarea').css("height","80px");
+			$('#textarea').css("height", "80px");
 		}
 	}
 
@@ -403,6 +407,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	if (angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}) {
 		CompanyProfileService.getCompanyProfile($rootScope.companyId).then(function(response) {
 			$rootScope.companyProfile = response.data;
+			$scope.initCountry();
 			$scope.setPhone("reg-phone-office", $rootScope.companyProfile.officePhone);
 			if ($rootScope.companyProfile.industry.verticalsMasterId < 0) {
 				$rootScope.companyProfile.industry = {};
@@ -411,6 +416,21 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
+	}
+
+	if (angular.isUndefined($scope.usStates) || $scope.usStates == null || $scope.usStates == []) {
+		CompanyProfileService.getUsStates().then(function(response) {
+			$scope.usStates = response.data;
+		}, function(error) {
+			showError($scope.getErrorMessage(error.data));
+		});
+	}
+
+	$scope.initCountry = function() {
+		if (angular.isDefined($rootScope.companyProfile) && $rootScope.companyProfile.location.country.code != null) {
+			$scope.initFormByCountry($rootScope.companyProfile.location.country.code);
+			$("#country").countrySelect("selectCountry", $rootScope.companyProfile.location.country.code);
+		}
 	}
 
 	if (angular.isUndefined($rootScope.industries) || $rootScope.industries == null || $rootScope.industries == {}) {
@@ -454,14 +474,10 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	};
 
 	$scope.saveCompanyProfileDetails = function() {
-		showOverlay();
-		$rootScope.userProfile.officePhone = $scope.getPhoneNumber("reg-phone-office");
-		CompanyProfileService.updateCompanyProfile($rootScope.companyId, $rootScope.userId, 'CPP', $rootScope.companyProfile).then(function(response) {
-			hideOverlay();
-			$location.path('/payment').replace();
-		}, function(error) {
-			showError($scope.getErrorMessage(error.data));
-		});
+		$rootScope.companyProfile.officePhone = $scope.getPhoneNumber("reg-phone-office");
+		var countryData = $("#country").countrySelect("getSelectedCountryData");
+		$rootScope.companyProfile.location.country.code = countryData.iso2;
+		$rootScope.companyProfile.location.name = countryData.name;
 		if ($scope.canada) {
 			$scope.companydetailsubmittedcanada = true;
 			$scope.companydetailsubmitted = true;
@@ -555,14 +571,14 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	$scope.today = new Date();
 	var currentYear = $scope.today.getFullYear();
 	var validTillYear = currentYear + 19;
-	$scope.expirationYears = [ {} ];
+	$scope.expirationYears = [];
 	for (var year = currentYear; year <= validTillYear; year++) {
 		$scope.expirationYears.push({
 			"id" : year + "",
 			"value" : year + ""
 		});
 	}
-	
+
 	var trialEndDate = new Date();
 	trialEndDate.setMonth(trialEndDate.getMonth() + 1);
 

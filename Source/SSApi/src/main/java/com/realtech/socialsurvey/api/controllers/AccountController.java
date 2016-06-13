@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.PaymentPlan;
+import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
@@ -144,7 +145,7 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/profileimage/remove/{companyId}/{userId}", method = RequestMethod.DELETE)
+    @RequestMapping ( value = "/company/profile/profileimage/remove/{companyId}/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Delete company profile image")
     public ResponseEntity<?> deleteCompanyProfileImage( @PathVariable ( "companyId") String companyId,
         @PathVariable ( "userId") String userId ) throws InvalidInputException
@@ -232,5 +233,16 @@ public class AccountController
         accountService.generateDefaultHierarchy( Long.parseLong( companyId ) );
         LOGGER.info( "AccountController.generateDefaultHierarchyForCompany completed successfully" );
         return new ResponseEntity<Void>( HttpStatus.OK );
+    }
+
+
+    @RequestMapping ( value = "/company/usstates", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get US states list")
+    public ResponseEntity<?> getUsStateList()
+    {
+        LOGGER.info( "AccountController.getUsStateList started" );
+        List<StateLookup> lookups = accountService.getUsStatesList();
+        LOGGER.info( "AccountController.getUsStateList completed successfully" );
+        return new ResponseEntity<List<StateLookup>>( lookups, HttpStatus.OK );
     }
 }

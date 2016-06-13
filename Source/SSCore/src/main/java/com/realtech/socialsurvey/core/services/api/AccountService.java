@@ -6,6 +6,7 @@ import java.util.Map;
 import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.PaymentPlan;
 import com.realtech.socialsurvey.core.entities.Phone;
+import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
@@ -56,4 +57,8 @@ public interface AccountService
 
     public void generateDefaultHierarchy( long companyId )
         throws InvalidInputException, SolrException, HierarchyAlreadyExistsException;
+
+
+    public List<StateLookup> getUsStatesList();
+
 }

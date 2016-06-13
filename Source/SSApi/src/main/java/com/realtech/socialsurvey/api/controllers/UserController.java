@@ -1,9 +1,9 @@
 package com.realtech.socialsurvey.api.controllers;
 
+import java.io.IOException;
+
 import javax.validation.Valid;
 
-import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +36,9 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.api.UserService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.wordnik.swagger.annotations.ApiOperation;
-
-import java.io.IOException;
 
 
 @RestController
@@ -168,7 +168,7 @@ public class UserController
     }
 
 
-    @RequestMapping ( value = "/profile/profileimage/remove/{userId}", method = RequestMethod.DELETE)
+    @RequestMapping ( value = "/profile/profileimage/remove/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Delete user profile image")
     public ResponseEntity<?> deleteUserProfileImage( @PathVariable ( "userId") String userId ) throws InvalidInputException
     {
@@ -209,16 +209,17 @@ public class UserController
         return new ResponseEntity<Void>( HttpStatus.OK );
     }
 
+
     @RequestMapping ( value = "/profile/webaddress/validate", method = RequestMethod.POST)
-    @ApiOperation( value = "Validates the provided web address")
-    public ResponseEntity<?> validateWebAddress(@RequestBody String webAddress) throws InvalidInputException{
-        LOGGER.info( "Validating web address "+webAddress );
+    @ApiOperation ( value = "Validates the provided web address")
+    public ResponseEntity<?> validateWebAddress( @RequestBody String webAddress ) throws InvalidInputException
+    {
+        LOGGER.info( "Validating web address " + webAddress );
         try {
             urlValidationHelper.validateUrl( webAddress );
         } catch ( IOException e ) {
-            LOGGER.error( "Error reaching "+webAddress, e );
-            throw new InvalidInputException( "Web address passed was invalid", DisplayMessageConstants.GENERAL_ERROR,
-                e );
+            LOGGER.error( "Error reaching " + webAddress, e );
+            throw new InvalidInputException( "Web address passed was invalid", DisplayMessageConstants.GENERAL_ERROR, e );
         }
         return new ResponseEntity<Void>( HttpStatus.OK );
     }

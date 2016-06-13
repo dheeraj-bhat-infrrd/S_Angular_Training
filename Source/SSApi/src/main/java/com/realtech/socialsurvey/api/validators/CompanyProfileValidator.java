@@ -31,10 +31,23 @@ public class CompanyProfileValidator implements Validator
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "industry", ErrorCodes.INDUSTRY_INVALID,
             "industry cannot be empty" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "location", ErrorCodes.COUNTRY_INVALID, "country cannot be empty" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "address", ErrorCodes.ADDRESS_INVALID, "address cannot be empty" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "city", ErrorCodes.CITY_INVALID, "city cannot be empty" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "state", ErrorCodes.STATE_INVALID, "state cannot be empty" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "zip", ErrorCodes.ZIP_INVALID, "zip cannot be empty" );
+        if ( request.getLocation().getCountry().getCode() == "us" ) {
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "address", ErrorCodes.ADDRESS_INVALID,
+                "address cannot be empty" );
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "city", ErrorCodes.CITY_INVALID, "city cannot be empty" );
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "state", ErrorCodes.STATE_INVALID, "state cannot be empty" );
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "zip", ErrorCodes.ZIP_INVALID, "zip cannot be empty" );
+        } else if ( request.getLocation().getCountry().getCode() == "ca" ) {
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "address", ErrorCodes.ADDRESS_INVALID,
+                "address cannot be empty" );
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "city", ErrorCodes.CITY_INVALID, "city cannot be empty" );
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "state", ErrorCodes.STATE_INVALID, "province cannot be empty" );
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "zip", ErrorCodes.ZIP_INVALID, "postalcode cannot be empty" );
+        } else {
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "address", ErrorCodes.ADDRESS_INVALID,
+                "address cannot be empty" );
+        }
+
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "officePhone", ErrorCodes.OFFICEPHONE_INVALID,
             "officePhone cannot be empty" );
 
