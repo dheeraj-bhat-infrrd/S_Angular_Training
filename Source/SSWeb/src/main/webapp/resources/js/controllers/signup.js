@@ -1,6 +1,9 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
 	$rootScope.redirect = false;
 
+	userId = 1426;
+	companyId = 226;
+
 	if (isLinkedin == "true") {
 		$rootScope.redirect = true;
 		$rootScope.userId = $cookies.get("userId");
@@ -219,6 +222,7 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	$("#reg-phone2").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone2", countryData.iso2);
 	});
+	$scope.isValidWebAddress = true;
 
 	$scope.loadDropzone = function() {
 		if (!angular.isUndefined($rootScope.userProfile)) {
@@ -281,19 +285,43 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	};
 
 	$scope.saveProfileDetails = function() {
-		if ($scope.detailsForm.$valid) {
-			showOverlay();
-			$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
-			$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
-			UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response) {
-				hideOverlay();
-				$location.path('/company').replace();
+		if ($rootScope.userProfile.website != "") {
+			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
+				$scope.isValidWebAddress = true;
+				if ($scope.detailsForm.$valid && $scope.isValidWebAddress) {
+					$scope.updateUserProfile();
+				}
 			}, function(error) {
-				showError($scope.getErrorMessage(error.data));
+				$scope.isValidWebAddress = false;
+			});
+		} else {
+			if ($scope.detailsForm.$valid) {
+				$scope.updateUserProfile();
+			}
+		}
+	};
+
+	$scope.updateUserProfile = function() {
+		showOverlay();
+		$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
+		$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
+		UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response) {
+			hideOverlay();
+			$location.path('/company').replace();
+		}, function(error) {
+			showError($scope.getErrorMessage(error.data));
+		});
+	}
+
+	$scope.validateWebAddress = function() {
+		if ($rootScope.userProfile.website != "") {
+			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
+				$scope.isValidWebAddress = true;
+			}, function(error) {
+				$scope.isValidWebAddress = false;
 			});
 		}
-
-	};
+	}
 
 	$scope.backOnProfile = function() {
 		$location.path('/linkedin').replace();

@@ -24,6 +24,10 @@ app.service('UserProfileService', [ '$http', function($http) {
 	this.removelogo = function(userId) {
 		return $http.put('/registeraccount/removeuserprofilelogo.do?userId=' + userId);
 	}
+
+	this.validateWebAddress = function(webAddress) {
+		return $http.post('/registeraccount/validatewebadress.do', webAddress);
+	}
 } ]);
 
 app.service('CompanyProfileService', [ '$http', function($http) {

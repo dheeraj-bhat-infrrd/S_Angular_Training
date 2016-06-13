@@ -95,4 +95,8 @@ public interface SSApiIntegration
 
     @GET ( "/account/company/usstates")
     Response getUsStates();
+
+
+    @POST ( "/users/profile/webaddress/validate")
+    Response validateWebAddress( @Body String webAddress );
 }

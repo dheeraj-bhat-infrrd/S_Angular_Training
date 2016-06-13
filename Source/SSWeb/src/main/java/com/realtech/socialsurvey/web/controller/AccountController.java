@@ -484,6 +484,18 @@ public class AccountController
     }
 
 
+    @RequestMapping ( value = "/registeraccount/validatewebadress", method = RequestMethod.POST)
+    @ResponseBody
+    public String validateWebAddress( @RequestBody String webAddress )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.validateWebAddress( webAddress );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
+    }
+
+
     // TODO: To be moved from register account to more generic
     @RequestMapping ( value = "/registeraccount/{organizationunit}/initlinkedinconnection", method = RequestMethod.POST)
     @ResponseBody
