@@ -1,9 +1,6 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
 	$rootScope.redirect = false;
 
-	userId = 1426;
-	companyId = 226;
-
 	if (isLinkedin == "true") {
 		$rootScope.redirect = true;
 		$rootScope.userId = $cookies.get("userId");
@@ -105,6 +102,15 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 			$scope.maskPhoneNumber(phoneId, phone.countryAbbr);
 		}
 	}
+
+	$scope.saveLinkedInStage = function() {
+		UserProfileService.updateUserStage($rootScope.userId, 'LIN').then(function(response) {
+			$rootScope.redirect = false;
+			$location.path('/profile').replace();
+		}, function(error) {
+			showError($scope.getErrorMessage(error.data));
+		});
+	}
 } ]);
 
 app.controller('accountSignupController', [ '$cookies', '$scope', '$location', 'vcRecaptchaService', 'LoginService', '$rootScope', function($cookies, $scope, $location, vcRecaptchaService, LoginService, $rootScope) {
@@ -172,9 +178,9 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 	if ($rootScope.redirect) {
 		if (linkedinResponse != null) {
 			if (linkedinResponse == "ok") {
-				showInfo("Successfully connected to LinkedIn");
+				$scope.saveLinkedInStage();
 			} else if (linkedinResponse != null) {
-				showError($scope.getErrorMessage("Please try again or to continue, click on Next"));
+				showError($scope.getErrorMessage("Please try again to connect to LinkedIn or to continue, click on Next"));
 			}
 		}
 	}
@@ -187,14 +193,6 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 			showError($scope.getErrorMessage(error.data));
 		});
 	};
-
-	$scope.saveLinkedInStage = function() {
-		UserProfileService.updateUserStage($rootScope.userId, 'LIN').then(function(response) {
-			$location.path('/profile').replace();
-		}, function(error) {
-			showError($scope.getErrorMessage(error.data));
-		});
-	}
 } ]);
 
 app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
@@ -285,7 +283,7 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	};
 
 	$scope.saveProfileDetails = function() {
-		if ($rootScope.userProfile.website != "") {
+		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
 			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
 				$scope.isValidWebAddress = true;
 				if ($scope.detailsForm.$valid && $scope.isValidWebAddress) {
@@ -314,7 +312,7 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	}
 
 	$scope.validateWebAddress = function() {
-		if ($rootScope.userProfile.website != "") {
+		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
 			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
 				$scope.isValidWebAddress = true;
 			}, function(error) {
