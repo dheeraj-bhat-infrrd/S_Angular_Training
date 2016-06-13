@@ -351,12 +351,15 @@ public class LoginController
                         // setting linkedin popup attribute
                         boolean showLinkedInPopup = false;
                         boolean showSendSurveyPopup = false;
+
                         for ( UserProfile profile : user.getUserProfiles() ) {
                             if ( profile.getProfilesMaster()
                                 .getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
                                 showLinkedInPopup = true;
-                                showSendSurveyPopup = true;
-                                break;
+                                if ( user.getIsForcePassword() == 1 && user.getLoginPassword() != null ) {
+                                    showSendSurveyPopup = true;
+                                    break;
+                                }
                             }
                         }
                         if ( user.getNumOfLogins() != 0 ) {

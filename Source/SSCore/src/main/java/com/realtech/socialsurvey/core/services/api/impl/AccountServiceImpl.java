@@ -23,6 +23,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -362,6 +363,10 @@ public class AccountServiceImpl implements AccountService
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, unitSettings.getModifiedBy(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_VERTICAL,
+            unitSettings.getVertical(), agentSettings );
 
         LOGGER.info( "Method updateCompanyDetailsInMongo finished for company: " + companyId );
     }
