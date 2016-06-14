@@ -10,34 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.realtech.socialsurvey.core.entities.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
-import com.realtech.socialsurvey.core.entities.BranchSettings;
-import com.realtech.socialsurvey.core.entities.CRMInfo;
-import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.DisabledAccount;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
-import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
-import com.realtech.socialsurvey.core.entities.MailContent;
-import com.realtech.socialsurvey.core.entities.MailContentSettings;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
-import com.realtech.socialsurvey.core.entities.StateLookup;
-import com.realtech.socialsurvey.core.entities.SurveySettings;
-import com.realtech.socialsurvey.core.entities.UploadValidation;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
-import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
-import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -874,6 +849,7 @@ public interface OrganizationManagementService
      */
     void deleteCompanyFromSolr( Company company ) throws InvalidInputException, SolrException;
 
+
     /**
      * @param company
      * @throws InvalidInputException
@@ -926,6 +902,7 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      */
     public void deactivateCompanyInMongo( Company company ) throws InvalidInputException;
+
 
     /**
      * @param user
@@ -1366,14 +1343,42 @@ public interface OrganizationManagementService
 
     public void forceDeleteDisabledAccount( long companyId, long userId );
 
+    /**
+     * Returns agent social media tokens
+     * @param iden
+     * @return
+     * @throws InvalidInputException
+     */
+    public SocialMediaTokens getAgentSocialMediaTokens(long iden) throws InvalidInputException;
+
 
     public List<AgentSettings> getAllAgentsFromMongo();
 
 
     void updateUserEncryptedIdOfSetting( AgentSettings agentSettings, String userEncryptedId );
+
+
     public void deactivatedAccountPurger();
+
 
     public void hierarchySettingsCorrector();
 
+
     public void imageProcessorStarter();
+
+
+    public void addOrganizationalDetails( User user, Company company, Map<String, String> organizationalDetails )
+        throws InvalidInputException;
+
+
+    public String generateProfileNameForCompany( String companyName, long iden ) throws InvalidInputException;
+
+
+    /**
+     * Method to activate the company status to active
+     * @param company
+     * @return
+     * @throws InvalidInputException
+     */
+    public Company activateCompany( Company company ) throws InvalidInputException;
 }

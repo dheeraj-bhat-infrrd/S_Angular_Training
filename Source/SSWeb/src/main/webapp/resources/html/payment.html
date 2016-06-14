@@ -1,0 +1,239 @@
+<script src="../resources/js/dropzone.js"></script>
+<script src="https://js.braintreegateway.com/v2/braintree.js"></script>
+<div class="main-reg-wrapper">
+	<div class="reg-left-container">
+		<div class="reg-ss-logo"></div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="arrow-steps clearfix">
+				<div class="step done">
+					<span> <a>Profile</a></span>
+				</div>
+				<div class="step done">
+					<span><a>Company</a></span>
+				</div>
+				<div class="step current">
+					<span><a>Payment</a></span>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div id="err-nw-wrapper" class="err-nw-wrapper reg-error ">
+				<span class="err-new-close"></span> <span id="err-nw-txt"></span>
+			</div>
+		</div>
+		<div class="reg-payment-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="reg-payment-container ">
+				<div class="clearfix" style="width: 370px; margin: auto;">
+					<button class="reg-upgrade float-left" style="width: 80px" ng-click="downGrade()" ng-show="business||enterprise">
+						<i class="fa fa-arrow-down" aria-hidden="true"></i>Downgrade
+					</button>
+					<div class="plan-card cursor_pointer float-left" ng-show="individual" style="background-color: #2BA875; margin-left: 90px;">
+						<h3 style="font-weight: 600 !important">Individual</h3>
+						<p>
+							<span class="price-info"> <span class="dollar">$</span>39 <span class="cents">95</span>
+							</span><br> <span class="price-info-sub">per month<br>single user
+							</span><br> 30-day trial <span class="pay-button"></span>
+						</p>
+					</div>
+					<div class="plan-card cursor_pointer float-left" ng-show="business" style="background-color: #4C84C7;">
+						<h3 style="font-weight: 600 !important">Business</h3>
+						<p>
+							<span class="price-info"> <span class="dollar">$</span>29 <span class="cents">95</span>
+							</span><br> <span class="price-info-sub">per month per user<br>minimun 5 users
+							</span><br> 30-day trial <span class=" pay-button"></span>
+						</p>
+					</div>
+					<div class="plan-card cursor_pointer float-left" ng-show="enterprise" style="background-color: #7E54B2;">
+						<h3 style="font-weight: 600 !important">Enterprise</h3>
+						<span class="call-us">Call for pricing</span> <span class="price-info-sub">per month per users <br>minimum 100 users
+						</span>
+						<div class="contact-number">1-888-701-4512</div>
+					</div>
+					<button class="reg-upgrade float-left" ng-click="upGrade()" ng-show="individual||business">
+						<i class="fa fa-arrow-up" aria-hidden="true"></i>Upgrade
+					</button>
+				</div>
+			</div>
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="individual||business">
+				<form name="paymentForm" id="paymentForm" ng-submit="processPayment()" novalidate>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Name on Card *</div>
+						<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.nameoncard.$error.required}">
+							<input class="reg-details form-control-reg" id="name-on-card" type="text" ng-model="payment.cardHolderName" name="nameoncard" required />
+							<p ng-show="paymentsubmitted && paymentForm.nameoncard.$error.required" class="help-block-reg">Name on card is required.</p>
+						</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Card Number *</div>
+						<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.cardNumber.$error.required}">
+							<input class="reg-details form-control-reg" id="card-number" type="text" ng-model="payment.cardNumber" ng-change="onChangeCreditCardNumber()" name="cardNumber" required />
+							<p ng-show="paymentsubmitted && paymentForm.cardNumber.$error.required" class="help-block-reg">A valid Credit or Debit Card number is required.</p>
+						</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Expiry *</div>
+						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.month.$error.required}">
+							<select id="expiration-month" class="reg-details form-control-reg" style="min-width: 0px" ng-model="payment.expirationMonth" name="month" required ng-options="month.id as month.value for month in expirationMonths">
+								<option value=''>Month</option>
+							</select>
+							<p ng-show="paymentsubmitted && paymentForm.month.$error.required" class="help-block-reg">A valid Credit or Debit Card expiry month is required.</p>
+							<p ng-show="paymentsubmitted && !paymentForm.month.$error.required && !paymentForm.year.$error.required && payment.expirationMonth <= (today.getMonth()+1) && payment.expirationYear == today.getFullYear()" class="help-block-reg">Expiry date should be future date.</p>
+						</div>
+						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.year.$error.required}">
+							<select id="expiration-year" class="reg-details form-control-reg" style="min-width: 0px" ng-model="payment.expirationYear" name="year" required ng-options="year.id as year.value for year in expirationYears">
+								<option value=''>Year</option>
+							</select>
+							<p ng-show="paymentsubmitted && paymentForm.year.$error.required" class="help-block-reg">A valid 4 digit Credit or Debit Card expiry year is required.</p>
+							<p ng-show="paymentsubmitted && !paymentForm.month.$error.required && !paymentForm.year.$error.required && payment.expirationMonth <= (today.getMonth()+1) && payment.expirationYear == today.getFullYear()" class="help-block-reg">Expiry date should be future date.</p>
+						</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6">CVV *</div>
+						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6">Zip Code *</div>
+						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.cvv.$error.required}">
+							<input class="reg-details form-control-reg" id="cvv" style="min-width: 0px" type="password" name="cvv" required ng-model="payment.cvv" />
+							<p ng-show="paymentsubmitted && paymentForm.cvv.$error.required" class="help-block-reg">Valid 3-digit or 4-digit CVV number is required.</p>
+							<p ng-show="paymentsubmitted && !paymentForm.cvv.$error.required && cvvSize == 3 && payment.cvv.length < 3" class="help-block-reg">Valid 3-digit CVV number which can be found after the account number on the back of your card is required.</p>
+							<p ng-show="paymentsubmitted && !paymentForm.cvv.$error.required && cvvSize == 4 && payment.cvv.length < 4" class="help-block-reg">Valid 4-digit CVV number which can be found just above the account number on the front of your card is required.</p>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
+						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.zipcode.$error.required}">
+							<input class="reg-details form-control-reg" id="zip-code" style="min-width: 0px" type="text" name="zipcode" required ng-model="payment.zipCode" />
+							<p ng-show="paymentsubmitted && (paymentForm.zipcode.$error.required || (payment.zipCode.length != 5 && payment.zipCode.length != 10))" class="help-block-reg">A 5 or 9 digit zip code is required.</p>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="reg-pswd-info col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 5px;">3 digits on back</div>
+						<div class="reg-pswd-info col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 5px;">For US cards only</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<table>
+								<tr>
+									<td style="vertical-align: top; padding-right: 10px;"><input type="checkbox" name="authorize" ng-model="authorize" ng-change="alertUser()" /></td>
+									<td style="font-size: 14px">At the end of my free 30 day trial period,I authorize SocialSurvey to debit my credit card for the monthly subscription fees, under the terms and conditions agreed to by me with SocialSurvey. <br> <br>For verification purpose, we will temporarily authorize your card for $1.00. Your card will not be charged for the first 30 days.
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
+							<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
+							<div style="width: 120px; margin: auto;">
+								<button type="submit" class="reg-next" ng-class="{'regen':authorize && paymentForm.$valid && validateCardDetails()}" ng-click="paymentsubmitted=true">Next</button>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="enterprise">
+				<form name="enterpriseForm" ng-submit="processPayment()" novalidate>
+					<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">Name *</div>
+					<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 30px;">Email *</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0" ng-class="{ 'has-error-reg' : entersubmitted && enterpriseForm.name.$error.required}">
+							<input class=" reg-name form-control-reg" name="name" type="text" placeholder="Your Name" ng-model="payment.name" required />
+							<p ng-show="entersubmitted && enterpriseForm.name.$error.required" class="help-block-reg">Name is required.</p>
+						</div>
+						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0" ng-class="{ 'has-error-reg' : entersubmitted && enterpriseForm.email.$error.required}">
+							<input class=" reg-name form-control-reg" name="email" ng-model="payment.email" style="margin-left: 2%;" type="email" placeholder="email@example.com" required ng-pattern="emailFormat" />
+							<p ng-show="entersubmitted && (enterpriseForm.email.$error.required || enterpriseForm.email.$error.pattern)" class="help-block-reg" style="margin-left: 2%;">A valid email is required.</p>
+						</div>
+					</div>
+					<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Message *</div>
+					<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px" ng-class="{ 'has-error-reg' :  entersubmitted && enterpriseForm.message.$error.required}">
+						<textarea class="reg-details form-control-reg" style="height: 100px; padding: 10px;" placeholder="Lets us know how we can help." name="message" required ng-model="payment.message"></textarea>
+						<p ng-show=" entersubmitted && enterpriseForm.message.$error.required" class="help-block-reg">Message is required.</p>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
+						<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
+						<div style="width: 120px; margin: auto;">
+							<button class="reg-next" type="submit" ng-class="{'regen':enterpriseForm.$valid}" ng-click="entersubmitted=true">Next</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="reg-right-container">
+		<div class="reg-right-center ">
+			<div ng-show="individual" class="payment-right-description">
+				<div class="reg-Individual">Individual</div>
+				<div class="reg-indiv-detail">Plan Details</div>
+				<div class="reg-right-description-payment ">
+					<div class="plan-discription">
+						<span style="opacity: 0.8 !important; color: #fff;">Single user account: </span><span class="plan-discription-sub">for independent professionals.</span>
+					</div>
+					<div id="single-user" class="reg-li">
+						<ul>
+							<li><span>Survey builder wizard with multiple question types and unlimited questions</span></li>
+							<li><span>Social media syndication of your featured reviews</span></li>
+							<li><span>Support for market specific review sites such as Zillow, Yelp, LendingTree and Realtor.com</span></li>
+							<li><span>Customizable email templates and workflows to maximize survey completion rate</span></li>
+							<li><span>Personal review page with search engine optimized star rating</span></li>
+							<li><span>SocialSurvey profile widget with star rating and featured reviews</span></li>
+							<li><span>Inclusion in our searchable directory of professionals</span></li>
+							<li><span>Customer support via ticket system</span></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div ng-show="business" class="payment-right-description">
+				<div class="reg-Individual">Business</div>
+				<div class="reg-indiv-detail">Plan Details</div>
+				<div class="reg-right-description-payment ">
+					<div class="plan-discription">
+						<span style="opacity: 0.8 !important; color: #fff;">Small offices &amp; growing business: </span><span class="plan-discription-sub">with team management.</span>
+					</div>
+					<div id="business" class="reg-li">
+						<ul>
+							<li><span class="bold-li">Business includes everything in Individual, and:</span></li>
+							<li><span>Point-of-sale transaction integrated survey automation with Verified Customer badge</span></li>
+							<li><span>Organizational units for managing complex hierarchies</span></li>
+							<li><span>User permission management</span></li>
+							<li><span>Custom user level score-cards, reports and workflows</span></li>
+							<li><span>Company level complaint resolution workflow</span></li>
+							<li><span>Support for compliance and licensing requirements</span></li>
+							<li id="enterprise-pln-tab"><span>Customer support via phone, email or ticket</span></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div ng-show="enterprise" class="payment-right-description">
+				<div class="reg-Individual">Enterprise</div>
+				<div class="reg-indiv-detail">Plan Details</div>
+				<div class="reg-right-description-payment ">
+					<div class="plan-discription">
+						<span style="opacity: 0.8 !important; color: #fff;">Large organizations: </span><span class="plan-discription-sub">with enhanced customization</span>
+					</div>
+					<div id="enterprise" class="reg-li">
+						<ul>
+							<li><span class="bold-li">Enterprise includes everything in Individual, Business, and:</span></li>
+							<li><span>Social media monitoring for keyword based compliance alerts</span></li>
+							<li><span>Dedicated Success Manager to ensure you reach your goals</span></li>
+							<li><span>SocialSurvey REST API service for CRM and custom integration</span></li>
+							<li><span>Early access to beta features</span></li>
+							<li><span>Private training webinars and tutorials</span></li>
+							<li><span>Priority support via phone, email or ticket</span></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="overlay-main" class="overlay-main hide">
+	<div id="overlay-pop-up" class="overlay-disable-wrapper">
+		<div id="overlay-header" class="ol-header"></div>
+		<div class="ol-content">
+			<div id="overlay-text" class="ol-txt"></div>
+			<div class="clearfix">
+				<div class="ol-btn-wrapper">
+					<div id="overlay-continue" class="ol-btn cursor-pointer" style="margin-left: 145px"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

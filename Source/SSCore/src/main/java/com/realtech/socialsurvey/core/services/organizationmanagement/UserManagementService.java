@@ -21,6 +21,7 @@ import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -597,18 +598,28 @@ public interface UserManagementService
     public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
         throws InvalidInputException, SolrException;
 
+
     /**
      * Method to map CRM Data with AgentIds
      */
     public void crmDataAgentIdMApper();
 
-    public User getAdminUserByCompanyId(long companyId);
+
+    public User getAdminUserByCompanyId( long companyId );
 
 
     public ContactDetailsSettings fetchAgentContactDetailByEncryptedId( String userEncryptedId ) throws InvalidInputException;
 
 
     public String generateUserEncryptedId( long userId ) throws InvalidInputException;
+
+
     public void incompleteSurveyReminderSender();
+
+
+    public void inviteCorporateToRegister( User user ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public User activateCompanyAdmin( User companyAdmin ) throws InvalidInputException, HierarchyAlreadyExistsException, SolrException;
 }
 // JIRA SS-34 BY RM02 BOC

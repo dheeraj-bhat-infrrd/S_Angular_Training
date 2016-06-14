@@ -296,6 +296,20 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         return mediaTokens;
     }
 
+    @Override
+    public SocialMediaTokens updateSocialMediaTokens( String collection, long iden,
+        SocialMediaTokens mediaTokens ) throws InvalidInputException
+    {
+        if ( mediaTokens == null ) {
+            throw new InvalidInputException( "Social Tokens passed can not be null" );
+        }
+        LOG.info( "Updating Social Tokens information" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden(
+            MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, mediaTokens, iden, collection );
+        LOG.info( "Social Tokens updated successfully" );
+        return mediaTokens;
+    }
+
 
     @Override
     public SocialMediaTokens updateAgentSocialMediaTokens( AgentSettings agentSettings, SocialMediaTokens mediaTokens )
@@ -479,7 +493,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         }
 
                         String profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                            + settings.getProfileUrl();
+                            + agentSettings.getProfileUrl();
                         message = StringEscapeUtils.escapeXml( message );
 
                         message = message.replace( "&amp;lmnlf;", "\\n" ).replace( "&amp;dash;", "\\u2014" );

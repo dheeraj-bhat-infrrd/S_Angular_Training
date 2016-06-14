@@ -8,8 +8,8 @@ import javax.persistence.Table;
 /**
  * Class with attributes that contain a file name and arguments to be replaced in that file
  */
-@Entity
-@Table(name = "FILE_CONTENT_REPLACEMENTS")
+//@Entity
+//@Table(name = "FILE_CONTENT_REPLACEMENTS")
 public class FileContentReplacements {
 
 	private String fileName;

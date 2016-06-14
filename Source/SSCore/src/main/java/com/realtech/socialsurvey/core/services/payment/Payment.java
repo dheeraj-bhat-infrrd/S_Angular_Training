@@ -17,15 +17,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.payment.exception.CardUpdateUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
-import com.realtech.socialsurvey.core.services.payment.exception.CustomerDeletionUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
-import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.*;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 /**
@@ -265,5 +257,22 @@ public interface Payment {
 
 
     ResourceCollection<Subscription> getActiveSubscriptionsListFromBrainTree() throws InvalidInputException;
+
+    /**
+     * Subscribes for the company for the first time
+     * @param company
+     * @param nonce
+     * @param accountsMasterId
+     * @param cardHolderName
+     * @return
+     * @throws InvalidInputException
+     * @throws PaymentException
+     * @throws SubscriptionUnsuccessfulException
+     * @throws NoRecordsFetchedException
+     * @throws CreditCardException
+     * @throws ActiveSubscriptionFoundException
+     */
+	String subscribeForCompany(Company company, String nonce, int accountsMasterId, String cardHolderName) throws InvalidInputException, PaymentException, SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException,
+		ActiveSubscriptionFoundException;
 		
 }

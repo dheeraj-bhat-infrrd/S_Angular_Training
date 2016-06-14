@@ -6,44 +6,7 @@
 		<artifactId>parent</artifactId>
 		<version>1.0</version>
 	</parent>
-
 	<artifactId>SSCore</artifactId>
-
-	<properties>
-
-		<!-- Generic properties -->
-		<java.version>1.7</java.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-		<!-- Spring -->
-		<spring-framework.version>4.1.4.RELEASE</spring-framework.version>
-		<spring.security>3.2.3.RELEASE</spring.security>
-
-		<!-- Hibernate / JPA -->
-		<hibernate.version>4.2.1.Final</hibernate.version>
-
-		<!-- Logging -->
-		<logback.version>1.0.13</logback.version>
-		<slf4j.version>1.7.5</slf4j.version>
-
-		<!-- Test -->
-		<junit.version>4.11</junit.version>
-
-		<!-- PowerMock -->
-		<powermock.version>1.5.6</powermock.version>
-
-		<!-- Quartz version -->
-		<quartz.version>2.2.1</quartz.version>
-
-		<!-- Google json -->
-		<gson.version>1.7.1</gson.version>
-
-		<dependency.path>/Users/nishit/work/lib</dependency.path>
-
-	</properties>
-
-
 
 	<dependencies>
 		<!-- Spring and Transactions -->
