@@ -1,6 +1,7 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
 	$rootScope.redirect = false;
 	$scope.emailFormat = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+	$scope.isValidPhone = false;
 	if (isLinkedin == "true") {
 		$rootScope.redirect = true;
 		$rootScope.userId = $cookies.get("userId");
@@ -66,12 +67,8 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 
 		if (iso2 == 'us') {
 			$('#' + phoneId).mask(phoneFormat, phoneRegEx);
-			/* $('#'+phoneId).removeAttr("ng-pattern"); */
 		} else {
-			/* $('#' + phoneId).mask(phoneFormatList[iso2.toUpperCase()], phoneRegEx); */
 			$('#' + phoneId).unmask(phoneFormat);
-			/* $('#'+phoneId).attr("ng-pattern","[0-9()-. ]{25}"); */
-
 			$('#' + phoneId).keypress(function(e) {
 				var count = $('#' + phoneId).val().length;
 				if (count > 24) {
@@ -79,11 +76,9 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 				} else {
 					var regex = new RegExp("^[0-9-.() ]+$");
 					var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-
 					if (regex.test(str)) {
 						return true;
 					}
-
 					e.preventDefault();
 					return false;
 				}
@@ -112,10 +107,22 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 
 	$scope.setPhone = function(phoneId, phone) {
 		if (phone != null) {
-			var extension;
 			$('#' + phoneId).intlTelInput("setCountry", phone.countryAbbr);
 			$('#' + phoneId).intlTelInput("setNumber", phone.formattedPhoneNumber);
 		}
+	}
+
+	$scope.validatePhone = function(phone) {
+		if (angular.isUndefined(phone) || phone == null || phone.formattedPhoneNumber == null || phone.formattedPhoneNumber == "") {
+			$scope.isValidPhone = false;
+		} else {
+			$scope.isValidPhone = true;
+		}
+	}
+
+	$scope.checkPhone = function(phoneId, phone) {
+		phone = $scope.getPhoneNumber(phoneId);
+		$scope.validatePhone(phone);
 	}
 
 	$scope.saveLinkedInStage = function() {
@@ -285,6 +292,7 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 			$rootScope.userProfile = response.data;
 			$scope.setPhone("reg-phone1", $rootScope.userProfile.phone1);
 			$scope.setPhone("reg-phone2", $rootScope.userProfile.phone2);
+			$scope.validatePhone($rootScope.userProfile.phone1);
 			$scope.loadDropzone();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
@@ -298,17 +306,20 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	};
 
 	$scope.saveProfileDetails = function() {
+		$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
+		$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
+		$scope.validatePhone($rootScope.userProfile.phone1);
 		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
 			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
 				$scope.isValidWebAddress = true;
-				if ($scope.detailsForm.$valid && $scope.isValidWebAddress) {
+				if ($scope.isValidWebAddress && $scope.isValidPhone) {
 					$scope.updateUserProfile();
 				}
 			}, function(error) {
 				$scope.isValidWebAddress = false;
 			});
 		} else {
-			if ($scope.detailsForm.$valid) {
+			if ($scope.isValidPhone) {
 				$scope.updateUserProfile();
 			}
 		}
@@ -316,8 +327,6 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 
 	$scope.updateUserProfile = function() {
 		showOverlay();
-		$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
-		$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
 		UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response) {
 			hideOverlay();
 			$location.path('/company').replace();
@@ -333,6 +342,8 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 			}, function(error) {
 				$scope.isValidWebAddress = false;
 			});
+		} else {
+			$scope.isValidWebAddress = true;
 		}
 	}
 
@@ -360,10 +371,19 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	$("#country").countrySelect();
 
 	$scope.selectCountry = function() {
-		$scope.companyProfile.address = "";
-		$scope.companyProfile.city = "";
-		$scope.companyProfile.state = "";
-		$scope.companyProfile.zip = "";
+		$rootScope.companyProfile.address = "";
+		$rootScope.companyProfile.city = "";
+		$rootScope.companyProfile.state = "";
+		$rootScope.companyProfile.zip = "";
+		$rootScope.companyProfile.officePhone = {
+			"number" : "",
+			"countryCode" : "",
+			"extension" : "",
+			"countryAbbr" : "us",
+			"formattedPhoneNumber" : ""
+		};
+		$scope.setPhone('reg-phone-office', $rootScope.companyProfile.officePhone);
+		$scope.isValidPhone = false;
 		$scope.companydetailsubmittedcanada = false;
 		$scope.companydetailsubmitted = false;
 		$scope.companydetailsubmittedusa = false;
@@ -438,6 +458,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 			$rootScope.companyProfile = response.data;
 			$scope.initCountry();
 			$scope.setPhone("reg-phone-office", $rootScope.companyProfile.officePhone);
+			$scope.validatePhone($rootScope.companyProfile.officePhone);
 			if ($rootScope.companyProfile.industry.verticalsMasterId < 0) {
 				$rootScope.companyProfile.industry = {};
 			}
@@ -532,12 +553,13 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	};
 
 	$scope.validateCompanyDetailsForm = function() {
+		$scope.validatePhone($rootScope.companyProfile.officePhone);
 		if ($scope.canada) {
-			return ($scope.companyProfile.address && $scope.companyProfile.city && $scope.companyProfile.state && $scope.companyProfile.zip);
+			return ($rootScope.companyProfile.address && $rootScope.companyProfile.city && $rootScope.companyProfile.state && $rootScope.companyProfile.zip && $scope.isValidPhone);
 		} else if ($scope.usa) {
-			return ($scope.companyProfile.address && $scope.companyProfile.city && $scope.companyProfile.state && $scope.companyProfile.zip);
+			return ($rootScope.companyProfile.address && $rootScope.companyProfile.city && $rootScope.companyProfile.state && $rootScope.companyProfile.zip && $scope.isValidPhone);
 		} else {
-			return ($scope.companyProfile.address);
+			return ($rootScope.companyProfile.address && $scope.isValidPhone);
 		}
 	};
 
