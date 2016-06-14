@@ -493,7 +493,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         }
 
                         String profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                            + settings.getProfileUrl();
+                            + agentSettings.getProfileUrl();
                         message = StringEscapeUtils.escapeXml( message );
 
                         message = message.replace( "&amp;lmnlf;", "\\n" ).replace( "&amp;dash;", "\\u2014" );
