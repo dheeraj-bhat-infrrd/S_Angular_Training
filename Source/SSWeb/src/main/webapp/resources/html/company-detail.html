@@ -78,13 +78,14 @@
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Office Phone *</div>
 				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<input class="reg-details" type="tel" id="reg-phone-office" ng-init="setPhone('reg-phone-office', companyProfile.officePhone);" ng-model="companyProfile.officePhone" required oninvalid="this.setCustomValidity('Please Enter Office Phone')" oninput="this.setCustomValidity('')" />
+					<input class="reg-details" type="text" id="reg-phone-office" ng-init="validatePhone(companyProfile.officePhone);setPhone('reg-phone-office', companyProfile.officePhone);" name="officePhone" ng-change="checkPhone('reg-phone-office', companyProfile.officePhone)" ng-model="officePhone" />
+					<p ng-show="(companydetailsubmittedusa || companydetailsubmitted || companydetailsubmittedcanada) && !isValidPhone" class="help-block-reg">Office phone number is required.</p>
 				</div>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 30px">
 				<div class="reg-back" ng-click="backOnCompanyDetail()">&lt;&lt;Back</div>
 				<div style="width: 120px; margin: auto;">
-					<button class="reg-next" ng-class="{'regen':($scope.companyProfile.address && $scope.companyProfile.city && $scope.companyProfile.state && $scope.companyProfile.zip)||($scope.companyProfile.address && $scope.companyProfile.city && $scope.companyProfile.state && $scope.companyProfile.zip)||($scope.others && $scope.companyProfile.address)}" ng-click="saveCompanyProfileDetails()">
+					<button class="reg-next" ng-class="{'regen':(companyProfile.address && companyProfile.city && companyProfile.state && companyProfile.zip && isValidPhone)||(others && companyProfile.address && isValidPhone)}" ng-click="saveCompanyProfileDetails()">
 						Next <span style="font-size: 12px;"><i class="fa fa-arrow-right" aria-hidden="true"></i></span>
 					</button>
 				</div>
