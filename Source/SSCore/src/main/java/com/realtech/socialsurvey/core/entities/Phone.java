@@ -6,6 +6,19 @@ public class Phone
     private String number;
     private String extension;
     private String countryAbbr;
+    private String formattedPhoneNumber;
+
+
+    public String getFormattedPhoneNumber()
+    {
+        return formattedPhoneNumber;
+    }
+
+
+    public void setFormattedPhoneNumber( String formattedPhoneNumber )
+    {
+        this.formattedPhoneNumber = formattedPhoneNumber;
+    }
 
 
     public String getCountryAbbr()

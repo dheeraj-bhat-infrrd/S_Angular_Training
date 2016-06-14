@@ -138,8 +138,8 @@
 							<p ng-show="entersubmitted && enterpriseForm.name.$error.required" class="help-block-reg">Name is required.</p>
 						</div>
 						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0" ng-class="{ 'has-error-reg' : entersubmitted && enterpriseForm.email.$error.required}">
-							<input class=" reg-name form-control-reg" name="email" ng-model="payment.email" style="margin-left: 2%;" type="email" placeholder="email@example.com" required />
-							<p ng-show="entersubmitted && enterpriseForm.email.$error.required" class="help-block-reg" style="margin-left: 2%;">Email is required.</p>
+							<input class=" reg-name form-control-reg" name="email" ng-model="payment.email" style="margin-left: 2%;" type="email" placeholder="email@example.com" required ng-pattern="emailFormat" />
+							<p ng-show="entersubmitted && (enterpriseForm.email.$error.required || enterpriseForm.email.$error.pattern)" class="help-block-reg" style="margin-left: 2%;">A valid email is required.</p>
 						</div>
 					</div>
 					<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Message *</div>

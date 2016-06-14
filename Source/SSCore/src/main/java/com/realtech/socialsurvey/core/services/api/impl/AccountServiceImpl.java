@@ -23,6 +23,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -363,6 +364,10 @@ public class AccountServiceImpl implements AccountService
             MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, unitSettings.getModifiedBy(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_VERTICAL,
+            unitSettings.getVertical(), agentSettings );
+
         LOGGER.info( "Method updateCompanyDetailsInMongo finished for company: " + companyId );
     }
 
@@ -498,6 +503,7 @@ public class AccountServiceImpl implements AccountService
         LOGGER.info( "Paying for company id " + companyId + " for plan " + planId );
         Company company = companyDao.findById( Company.class, companyId );
         User user = userManagementService.getAdminUserByCompanyId( companyId );
+        String additionalEmailBody = null;
         if ( planId < Plan.ENTERPRISE.getPlanId() ) {
             // pass the company and nonce to make a payment. Get the subscription id and insert into license table.
             String subscriptionId = payment.subscribeForCompany( company, nonce, planId, cardHolderName );
@@ -509,11 +515,26 @@ public class AccountServiceImpl implements AccountService
                 CommonConstants.INVOICE_BILLED_DEFULAT_SUBSCRIPTION_ID );
             company.setBillingMode( CommonConstants.BILLING_MODE_INVOICE );
             updateCompanyDetailsInMySql( companyId, user.getUserId(), company );
-            String additionalEmailBody = "Please contact the below user to discuss plan details for Enterprise account. <br> Name: "
+            additionalEmailBody = "Please contact the below user to discuss plan details for Enterprise account. <br> Name: "
                 + name + "<br> Email: " + email + "<br> Message: " + message;
-            sendMailToSalesLead( user, additionalEmailBody );
+            sendMailToUser( name, email );
         }
-        sendMailToSalesLead( user, null );
+        sendMailToSalesLead( user, additionalEmailBody );
+    }
+
+
+    private void sendMailToUser( String name, String email )
+    {
+        try {
+            Map<String, String> attachmentsDetails = null;
+            String subject = "";
+            String body = "";
+            emailServices.sendCustomMail( name, email, subject, body, attachmentsDetails );
+        } catch ( InvalidInputException e ) {
+            e.printStackTrace();
+        } catch ( UndeliveredEmailException e ) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -545,9 +566,6 @@ public class AccountServiceImpl implements AccountService
         } catch ( UndeliveredEmailException e ) {
             e.printStackTrace();
         }
-        emailServices.sendCompanyRegistrationStageMail( user.getFirstName(), user.getLastName(),
-            Arrays.asList( salesLeadEmail ), CommonConstants.COMPANY_REGISTRATION_STAGE_STARTED, user.getEmailId(), details,
-            true );
     }
 
 

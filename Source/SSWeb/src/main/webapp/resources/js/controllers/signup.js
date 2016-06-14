@@ -1,6 +1,6 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
 	$rootScope.redirect = false;
-
+	$scope.emailFormat = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 	if (isLinkedin == "true") {
 		$rootScope.redirect = true;
 		$rootScope.userId = $cookies.get("userId");
@@ -63,30 +63,30 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		return errorMessage;
 	}
 	$scope.maskPhoneNumber = function(phoneId, iso2) {
-		
+
 		if (iso2 == 'us') {
 			$('#' + phoneId).mask(phoneFormat, phoneRegEx);
-			/*$('#'+phoneId).removeAttr("ng-pattern");*/
+			/* $('#'+phoneId).removeAttr("ng-pattern"); */
 		} else {
-			/*$('#' + phoneId).mask(phoneFormatList[iso2.toUpperCase()], phoneRegEx);*/
-			$('#'+phoneId).unmask(phoneFormat);
-			/*$('#'+phoneId).attr("ng-pattern","[0-9()-. ]{25}");*/
-			
-			$('#'+phoneId).keypress(function (e) {
-				 var count=$('#'+phoneId).val().length;
-				    if(count>24){
-				    	return false;
-				    }else{
-			    var regex = new RegExp("^[0-9-.() ]+$");
-			    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-			   
-			    if (regex.test(str)) {
-			        return true;
-			    }
-			    
-			    e.preventDefault();
-			    return false;
-				    }
+			/* $('#' + phoneId).mask(phoneFormatList[iso2.toUpperCase()], phoneRegEx); */
+			$('#' + phoneId).unmask(phoneFormat);
+			/* $('#'+phoneId).attr("ng-pattern","[0-9()-. ]{25}"); */
+
+			$('#' + phoneId).keypress(function(e) {
+				var count = $('#' + phoneId).val().length;
+				if (count > 24) {
+					return false;
+				} else {
+					var regex = new RegExp("^[0-9-.() ]+$");
+					var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+
+					if (regex.test(str)) {
+						return true;
+					}
+
+					e.preventDefault();
+					return false;
+				}
 			});
 		}
 	}
@@ -104,7 +104,8 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 				"number" : number,
 				"countryCode" : "+" + countryData.dialCode,
 				"extension" : $('#' + phoneId).intlTelInput("getExtension"),
-				"countryAbbr" : countryData.iso2
+				"countryAbbr" : countryData.iso2,
+				"formattedPhoneNumber" : $('#' + phoneId).val()
 			};
 		}
 	}
@@ -113,14 +114,17 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		if (phone != null) {
 			var extension;
 			$('#' + phoneId).intlTelInput("setCountry", phone.countryAbbr);
-			if (phone.extension == null || phone.extension == undefined || phone.extension == "") {
-				extension = "";
-			} else {
-				extension = " x " + phone.extension;
-			}
-			$('#' + phoneId).intlTelInput("setNumber", phone.number + " " + extension);
-			$scope.maskPhoneNumber(phoneId, phone.countryAbbr);
+			$('#' + phoneId).intlTelInput("setNumber", phone.formattedPhoneNumber);
 		}
+	}
+
+	$scope.saveLinkedInStage = function() {
+		UserProfileService.updateUserStage($rootScope.userId, 'LIN').then(function(response) {
+			$rootScope.redirect = false;
+			$location.path('/profile').replace();
+		}, function(error) {
+			showError($scope.getErrorMessage(error.data));
+		});
 	}
 } ]);
 
@@ -129,15 +133,14 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 	$scope.accountRegistration = {};
 	$scope.response = null;
 	$scope.widgetId = null;
-	$scope.emailFormat = /^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/;
 
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
 	};
 	$('#reg-phone').intlTelInput({
-		utilsScript : "../resources/js/utils.js"		
-	 });
-	
+		utilsScript : "../resources/js/utils.js"
+	});
+
 	$('#reg-phone').mask(phoneFormat, phoneRegEx);
 	$("#reg-phone").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone", countryData.iso2);
@@ -190,9 +193,9 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 	if ($rootScope.redirect) {
 		if (linkedinResponse != null) {
 			if (linkedinResponse == "ok") {
-				showInfo("Successfully connected to LinkedIn");
+				$scope.saveLinkedInStage();
 			} else if (linkedinResponse != null) {
-				showError($scope.getErrorMessage("Please try again or to continue, click on Next"));
+				showError($scope.getErrorMessage("Please try again to connect to LinkedIn or to continue, click on Next"));
 			}
 		}
 	}
@@ -205,14 +208,6 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 			showError($scope.getErrorMessage(error.data));
 		});
 	};
-
-	$scope.saveLinkedInStage = function() {
-		UserProfileService.updateUserStage($rootScope.userId, 'LIN').then(function(response) {
-			$location.path('/profile').replace();
-		}, function(error) {
-			showError($scope.getErrorMessage(error.data));
-		});
-	}
 } ]);
 
 app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
@@ -227,19 +222,20 @@ app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope'
 app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfileService', '$rootScope', function($scope, $http, $location, UserProfileService, $rootScope) {
 
 	$('#reg-phone1').intlTelInput({
-		utilsScript : "../resources/js/utils.js"		
-	 });
+		utilsScript : "../resources/js/utils.js"
+	});
 	$('#reg-phone1').mask(phoneFormat, phoneRegEx);
 	$("#reg-phone1").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone1", countryData.iso2);
 	});
 	$('#reg-phone2').intlTelInput({
-		utilsScript : "../resources/js/utils.js"		
-	 });
+		utilsScript : "../resources/js/utils.js"
+	});
 	$('#reg-phone2').mask(phoneFormat, phoneRegEx);
 	$("#reg-phone2").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone2", countryData.iso2);
 	});
+	$scope.isValidWebAddress = true;
 
 	$scope.loadDropzone = function() {
 		if (!angular.isUndefined($rootScope.userProfile)) {
@@ -302,19 +298,43 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	};
 
 	$scope.saveProfileDetails = function() {
-		if ($scope.detailsForm.$valid) {
-			showOverlay();
-			$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
-			$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
-			UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response) {
-				hideOverlay();
-				$location.path('/company').replace();
+		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
+			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
+				$scope.isValidWebAddress = true;
+				if ($scope.detailsForm.$valid && $scope.isValidWebAddress) {
+					$scope.updateUserProfile();
+				}
 			}, function(error) {
-				showError($scope.getErrorMessage(error.data));
+				$scope.isValidWebAddress = false;
+			});
+		} else {
+			if ($scope.detailsForm.$valid) {
+				$scope.updateUserProfile();
+			}
+		}
+	};
+
+	$scope.updateUserProfile = function() {
+		showOverlay();
+		$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
+		$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
+		UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response) {
+			hideOverlay();
+			$location.path('/company').replace();
+		}, function(error) {
+			showError($scope.getErrorMessage(error.data));
+		});
+	}
+
+	$scope.validateWebAddress = function() {
+		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
+			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
+				$scope.isValidWebAddress = true;
+			}, function(error) {
+				$scope.isValidWebAddress = false;
 			});
 		}
-
-	};
+	}
 
 	$scope.backOnProfile = function() {
 		$location.path('/linkedin').replace();
@@ -331,8 +351,8 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	$scope.canada = false;
 	$scope.others = false;
 	$('#reg-phone-office').intlTelInput({
-		utilsScript : "../resources/js/utils.js"		
-	 });
+		utilsScript : "../resources/js/utils.js"
+	});
 	$('#reg-phone-office').mask(phoneFormat, phoneRegEx);
 	$('#reg-phone-office').on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone-office", countryData.iso2);
