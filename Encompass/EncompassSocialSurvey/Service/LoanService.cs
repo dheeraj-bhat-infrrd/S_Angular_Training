@@ -183,14 +183,14 @@ namespace EncompassSocialSurvey.Service
                 String filePath = EncompassSocialSurveyConfiguration.TempFolderPath + Path.DirectorySeparatorChar + fileName;
                 // Write header
                 var csv = new System.Text.StringBuilder();
-                var newLine = string.Format("{0},{1},{2},{3},{4},{5}", "Customer First Name", "Customer Last Name", "Customer Email Address", "Agent Email Address", "Loan Id", "Engagement Closed Time");
+                var newLine = string.Format("{0},{1},{2},{3},{4},{5},{6}", "Loan Number", "Customer First Name", "Customer Last Name", "Customer Email Address", "Agent Email Address", "Loan Id", "Engagement Closed Time");
                 csv.AppendLine(newLine);
                 if (null != loansVM)
                 {
                     foreach (var loanVM in loansVM)
                     {
                         newLine = null;
-                        newLine = string.Format("{0},{1},{2},{3},{4},{5}", loanVM.CustomerFirstName, loanVM.CustomerLastName, loanVM.CustomerEmailId, loanVM.AgentEmailId, loanVM.SurveySourceId, loanVM.EngagementClosedTime);
+                        newLine = string.Format("{0},{1},{2},{3},{4},{5},{6}", loanVM.LoanNumber, loanVM.CustomerFirstName, loanVM.CustomerLastName, loanVM.CustomerEmailId, loanVM.AgentEmailId, loanVM.SurveySourceId, loanVM.EngagementClosedTime);
                         csv.AppendLine(newLine);
                     }
                 }

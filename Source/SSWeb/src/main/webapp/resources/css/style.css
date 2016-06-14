@@ -349,3 +349,540 @@
     line-height: 26px;
     width: 100%;
 }
+/* ============== new registration style==============*/
+
+.reg-left-container{
+    position: relative;
+    min-height: 100%;
+    display: table-cell;
+    vertical-align: top;
+    overflow: hidden!important;
+    background-color: #fff;
+    color: #434245;
+    width: 50%;
+    min-width: 486px;
+    max-width: 624px;
+    float: left;
+    z-index: 1;
+    overflow-y: auto;
+    word-wrap: break-word;
+    height:100%;
+}
+.reg-ss-logo{
+	width:210px;
+	height:35px;
+	margin:20px 0 20 20px;
+	
+}
+.reg-right-container{
+	background-color:#326AAD;
+	height:100%;
+    width: 100%;
+    display: table-cell;
+    vertical-align: top;
+    overflow: hidden!important;
+    position:relative;
+}
+
+.reg-create-account{
+	font-size: 35px;
+    margin-top: 10px;
+}
+
+.reg-name{
+	width:98%;
+    height: 40px;
+    border-radius: 3px;
+    border: 1px solid #dcdcdc;
+    padding: 0 10px;
+    min-width: 170px;
+}
+.reg-comp-add{
+    height: 40px;
+    border-radius: 3px;
+    border: 1px solid #dcdcdc;
+    padding: 0 10px;
+}
+
+.reg-details{
+	width: 100%;
+    height: 40px;
+    border-radius: 3px;
+    border: 1px solid #dcdcdc;
+    padding: 0 10px;
+    min-width: 180px;
+}
+.reg-pswd-info{
+	font-size: 14px;
+    font-weight: 600 !important;
+    color: #B7B7B7;
+    margin: 10px 0 20px 0;
+}
+.reg-pln-btn{
+	background-color: #C4C4C4;
+    height: 50px;
+    line-height: 42px;
+    width: 120px;
+    text-align: center;
+    color: #fff;
+    border-radius: 5px;
+    margin: 5px 0;
+    font-size: 15px;
+    font-family: 'opensanssemibold';
+    cursor: pointer;
+}
+.reg-req-field{
+	font-size: 14px;
+    font-weight: 600 !important;
+    margin: 10px 0;
+}
+.reg-linkedin-border{
+	border: 1px solid #D7D7D7;
+    border-radius: 5px;
+}
+.reg-auth-linkedin-btn{
+	background-color: #38B278;
+    height: 40px;
+    line-height: 35px;
+    width: 300px;
+    text-align: center;
+    color: #fff;
+    border-radius: 5px;
+    margin: 5px 0;
+    font-size: 15px;
+    font-family: 'opensanssemibold';
+    cursor: pointer;
+}
+.reg-auth-linkedin-wrapper{
+	width: 100%;
+    padding: 15px;
+}
+.reg-linkedin-imp{
+	font-size: 18px;
+    font-weight: 800 !important;
+}
+.reg-linkedin-imp-info{
+	font-size: 16px;
+    margin: 10px 0;
+}
+.reg-or-line{border-bottom: 1px solid #C4C4C4;
+    width: 45%;
+    padding: 15px 0;
+}
+.reg-or{
+	padding: 20px 0;
+    width: 10%;
+    text-align: center;
+    color: #C4C4C4;
+}
+.reg-linkedin-manual{
+	text-align: center;
+    color: #C4C4C4;
+}
+.reg-quick-setup{
+    font-size: 30px;
+    margin-top: 40px;
+    float: none;
+    margin-bottom: 20px;
+    padding: 0;
+}
+.reg-next{
+    height: 45px;
+    line-height: 45px;
+    width: 115px;
+    text-align: center;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 15px;
+    font-family: 'opensanssemibold';
+    cursor: pointer;
+        border: none;
+    
+}
+.regen{
+	background-color: #326AAD !important;
+}
+
+.step-tab{
+	background:url('../images/step-1.png') no-repeat;
+	height:25px;
+}
+#background {
+    width: 100%; 
+    height: 100%; 
+    position: fixed; 
+    left: 0px; 
+    top: 0px; 
+    z-index: -1; /* Ensure div tag stays behind content; -999 might work, too. */
+}
+
+.stretch {
+    width:100%;
+}
+.reg-side-image{
+	background:url(../images/sidebar-survey.png)center no-repeat;
+	width: 280px;
+    height: 450px;
+    margin: auto;
+    margin-top: 35px;
+    background-size: contain;
+}
+.reg-right-description{
+	color:#fff;
+	font-size: 18px;
+    opacity: 0.6;
+    font-family: 'OpenSans';
+     margin: auto;
+    
+}
+.reg-line-1{
+	width: 333px;
+}
+.reg-line-3{
+	width: 388px;
+}
+.reg-line-4{
+	width: 221px;
+}
+.reg-side-linkedin-img{
+	background:url(../images/sidebar-import-profile.png)center no-repeat;
+	width: 270px;
+    height: 100px;
+    margin: auto;
+}
+.reg-side-welcome-img{
+	background:url(../images/sidebar-welcome.png)center no-repeat;
+	width: 303px;
+    height: 372px;
+    margin: auto;
+}
+.welcome-email{
+	background:url(../images/mail-icon.png)center no-repeat;
+	width: 50px;
+    height: 50px;
+    margin: auto;
+}
+.reg-import-linedin{
+	color: #fff;
+    font-size: 25px;
+    width: 225px;
+    margin: 0 auto 20px;
+    opacity: 0.6;
+}
+.reg-prof-img{
+	background:url(../images/sidebar-public-profile.png)center no-repeat;
+	width: 400px;
+    height: 270px;
+    margin: auto;
+    margin-top: 35px;
+    background-size: contain;
+}
+.prof-line-1{
+	width: 377px; 
+    
+}
+.prof-line-2{
+	width:367px;
+}
+.prof-line-3{
+	width:400px;
+}
+.reg-back{
+	color:#dcdcdc;
+	float:left;
+	cursor: pointer;
+}
+.reg-error{
+    height: 33px;
+    margin-top: 20px;
+}
+.reg-right-center{
+	position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+   
+}
+.reg-payment-wrapper{
+	
+}
+.reg-payment-container{
+	border: 1px solid #dcdcdc;
+    background-color: #dcdcdc;
+    border-radius: 5px;
+    width: 450px;
+    height: 300px;
+    margin: 30px auto;
+}
+.plan-card {
+   
+    position: relative;
+    border-radius: 10px;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 2px 1px rgba(0,0,0,.2);
+    padding: 20px 0 15px 0;
+    width: 200px;
+    margin: 0 10px;
+    height: 300px;
+
+}
+.price-info {
+    font-size: 8rem;
+    position: relative;
+    display: block;
+    font-weight: 900 !important;
+    margin-bottom: .5rem;
+    letter-spacing: -2px;
+    margin-left: -2.5rem;
+    font-family: 'Lato', 'Open Sans', Helvetica, Arial, sans-serif;
+    height:80px;
+}
+.price-info-sub {
+    display: block;
+    font-size: 13px;
+    line-height: 1.5rem;
+    padding: 5px 20px;
+    height: 30px;
+    opacity: .8;
+}
+.price-info .dollar {
+    position: relative;
+    top: -2.75rem;
+    font-weight: 400 !important;
+    font-size: 5rem;
+    letter-spacing: 0;
+}
+.price-info .cents {
+    position: absolute;
+    top: 4.25rem;
+    font-size: 1.75rem;
+    margin-left: 0.3rem !important;
+    letter-spacing: -1px;
+    font-weight: 700 !important;
+}
+.pay-button {
+    font-weight: 600 !important;
+}
+.reg-upgrade{
+	background-color: #326AAD;
+    height: 30px;
+    line-height: 30px;
+    width: 70px;
+    text-align: center;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 10px;
+    font-family: 'opensanssemibold';
+    cursor: pointer;
+    border: none;
+    margin-top:140px;
+}
+.plan-discription {
+    font-size: 18px;
+    font-weight: 600! important;
+    border-bottom: 1px solid;
+    padding: 20px 0 20px 10px;
+    color: #fff;
+}
+.plan-discription-sub {
+    font-weight: 400!important;
+    opacity: 0.6!important;
+    color: #fff;
+}
+.reg-Individual{
+font-size: 40px;
+    width: 180px;
+    margin: auto;
+    color: #fff;
+    opacity: .8;
+ }
+.reg-indiv-detail{
+    font-size: 25px;
+    width: 137px;
+    margin: auto;
+    color: #fff;
+    opacity: .6;
+} 
+.call-us{
+	font-size: 25px;
+    padding: 39px 0px;
+    display: block;
+}
+.contact-number{
+	padding: 20px 0;
+    font-size: 16px;
+    font-weight: 600 !important;
+}
+.reg-welcome{
+	border-top:1px solid #dcdcdc;
+	border-bottom:1px solid #dcdcdc;
+	    margin-top: 40px;
+}
+.reg-congrats{
+	    font-size: 18px;
+    font-weight: 600 !important;
+}
+.reg-check-mail{
+	width: 70%;
+    margin: 15px;
+    font-size: 18px;
+    font-weight: 600 !important;
+}
+.main-reg-wrapper{
+	display: table;
+    overflow: scroll;
+    position: absolute;
+    overflow: hidden;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+}
+.reg-li{
+	opacity: 0.6!important;
+    color: #fff;
+}
+.reg-li>ul>li{
+	padding:5px;
+}
+.payment-right-description{
+	width:70%;
+	margin:auto;
+}
+.reg-right-description-payment{
+	width:80%;
+	margin:auto;
+}
+.reg-password-header{
+	padding: 0 15px;
+    font-size: 16px;
+    color: #C4C4C4;
+    margin-bottom: 20px;
+}
+.reg-password-instruction{
+	padding: 0 15px;
+    font-size: 13px;
+    color: #C4C4C4;
+}
+.has-error-reg .form-control-reg {
+    border-color: #FFA940;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    background-color: #FFF1E1;
+}
+.has-error-reg .form-control-reg:focus {
+    border-color: #FFA940;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    background-color: #FFF1E1;
+}
+.form-control-reg:focus{
+	border-color: #66afe9;
+    outline: 0; 
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6); 
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6); 
+}
+.help-block-reg {
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 0px;
+    color: #FFA940;
+}
+/* .reg-position{
+	position: fixed;
+    margin-top: 640px;
+    margin-left: -299px;
+} */
+.arrow-steps .step {
+  font-size: 14px;
+  text-align: center;
+  color: #777;
+  cursor: default;
+  margin: 0 1px 0 0;
+  padding: 5px 0px;
+  width: 33%;
+  float: left;
+  position: relative;
+  background-color: #ddd;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.arrow-steps .step a {
+  color: #777;
+  text-decoration: none;
+}
+
+.arrow-steps .step:after,
+.arrow-steps .step:before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  right: -17px;
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-left: 17px solid #ddd;
+  z-index: 2;
+}
+
+.arrow-steps .step:before {
+  right: auto;
+  left: 0;
+  border-left: 17px solid #fff;
+  z-index: 0;
+}
+
+.arrow-steps .step:first-child:before {
+  border: none;
+}
+
+.arrow-steps .step:last-child:after {
+  border: none;
+}
+
+.arrow-steps .step span {
+  position: relative;
+}
+
+*.arrow-steps .step.done span:before {
+  opacity: 1;
+  position: absolute;
+  top: -2px;
+  left: -10px;
+  font-size: 11px;
+  line-height: 21px;
+}
+
+.arrow-steps .step.current {
+  color: #fff;
+  background-color: #5599e5;
+}
+
+.arrow-steps .step.current a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.arrow-steps .step.current:after {
+  border-left: 17px solid #5599e5;
+}
+
+.arrow-steps .step.done {
+  color: #fff;
+  background-color: #2f69aa;
+}
+
+.arrow-steps .step.done a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.arrow-steps .step.done:after {
+  border-left: 17px solid #2f69aa;
+}

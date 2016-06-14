@@ -69,7 +69,6 @@ public interface SurveyDetailsDao
 
     public long getCompletedSurveyCount( String columnName, long columnValue, int noOfDays );
 
-
     public long getClickedSurveyCount( String columnName, long columnValue, int noOfDays, boolean filterAbusive );
 
 
@@ -263,4 +262,6 @@ public interface SurveyDetailsDao
 
 
     void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
+
+    public void updateModifiedDateForSurvey( String surveyId, Date date );
 }

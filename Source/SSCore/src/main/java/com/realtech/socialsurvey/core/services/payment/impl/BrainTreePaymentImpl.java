@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.services.payment.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -57,15 +58,6 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.payment.exception.CardUpdateUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
-import com.realtech.socialsurvey.core.services.payment.exception.CustomerDeletionUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
-import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
@@ -121,6 +113,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
 
     @Value( "${MERCHANT_ACCOUNT}" )
     private String merchantAccount;
+
+    @Value( "${ALLOW_MULTIPLE_SUBSCRIPTION_FOR_SAME_CUSTOMER}" )
+    private String allowMultipleSubscription;
 
     private static final Logger LOG = LoggerFactory.getLogger( BrainTreePaymentImpl.class );
 
@@ -1947,6 +1942,53 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
         
         LOG.info( "Method getActiveSubscriptionsListFromBrainTree ended " );
         return collection;
+    }
+
+
+    @Override
+    public String subscribeForCompany(Company company, String nonce, int accountsMasterId, String cardHolderName) throws InvalidInputException, PaymentException, SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException, ActiveSubscriptionFoundException{
+        String subscriptionId = null;
+        if(company == null){
+            LOG.error( "Null company passed" );
+            throw new InvalidInputException( "Null company passed for subscription." );
+        }
+        if(nonce == null || nonce.isEmpty()){
+            LOG.error( "nonce passed is null" );
+            throw new InvalidInputException( "nonce passed is null for subscription." );
+        }
+        if(accountsMasterId <= 0){
+            LOG.error( "Invalid accounts master id passed." );
+            throw new InvalidInputException( "Invalid accounts master id passed." );
+        }
+        LOG.info( "Subscribing for company "+company.getCompanyId() + " for plan id "+ accountsMasterId );
+        String braintreePlanName = getBraintreePlanId( accountsMasterId );
+
+        // Check if the customer already exists in the vault.
+        Customer customer = containsCustomer( String.valueOf( company.getCompanyId() ) );
+
+        if ( customer != null ) {
+            LOG.debug( "Customer found in vault. Checking active subscription." );
+            // check if multiple subscription is allowed.
+            if(allowMultipleSubscription.equalsIgnoreCase( CommonConstants.NO_STRING )){
+                // check for active subscription
+                List<Subscription> subscriptions = customer.getCreditCards().get( 0 ).getSubscriptions();
+                for(Subscription subscription : subscriptions){
+                    if(subscription.getStatusHistory().get( 0 ).getStatus().equals( Subscription.Status.ACTIVE )){
+                        // Found active subscription. Throw exception.
+                        LOG.error( "Active subscription found for customer." );
+                        throw new ActiveSubscriptionFoundException( "Active subscriptipn found for customer." );
+                    }
+                }
+            }
+            subscriptionId = subscribeCustomer( String.valueOf( company.getCompanyId() ), braintreePlanName );
+        } else {
+            LOG.debug( "Customer does not exist in the vault.Adding customer to vault." );
+            // Add user with payment
+            addCustomerWithPayment( company, nonce );
+            LOG.info( "Customer Added. Making subscription." );
+            subscriptionId = subscribeCustomer( String.valueOf( company.getCompanyId() ), braintreePlanName );
+        }
+        return subscriptionId;
     }
 
 }
