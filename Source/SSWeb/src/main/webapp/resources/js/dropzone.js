@@ -147,7 +147,7 @@
       dictResponseError: "Server responded with {{statusCode}} code.",
       dictCancelUpload: "Cancel upload",
       dictCancelUploadConfirmation: "Are you sure you want to cancel this upload?",
-      dictRemoveFile: "X",
+      dictRemoveFile: "<img src=\"resources/images/ss-close-icon.png\">",
       dictRemoveFileConfirmation: null,
       dictMaxFilesExceeded: "You can not upload any more files.",
       accept: function(file, done) {
@@ -387,7 +387,8 @@
       canceledmultiple: noop,
       complete: function(file) {
         if (file._removeLink) {
-          file._removeLink.textContent = this.options.dictRemoveFile;
+        	file._removeLink = Dropzone.createElement("<a class=\"dz-remove\" href=\"javascript:undefined;\" data-dz-remove>" + this.options.dictRemoveFile + "</a>");
+            //file.previewElement.appendChild(file._removeLink);
         }
         if (file.previewElement) {
           return file.previewElement.classList.add("dz-complete");
