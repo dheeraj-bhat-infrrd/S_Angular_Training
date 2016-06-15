@@ -95,9 +95,10 @@ public class LoginController
 
 
     @RequestMapping ( value = "/accountsignup")
-    public String initNewAccountSignUp( HttpServletResponse response, Model model )
+    public String initNewAccountSignUp( @RequestParam ( value = "PlanId", required = false) String planId, Model model )
     {
         LOG.info( "Method initNewAccountSignUp() called from LoginController" );
+        model.addAttribute( "planId", planId );
         return JspResolver.NEW_ACCOUNT_SIGNUP;
     }
 

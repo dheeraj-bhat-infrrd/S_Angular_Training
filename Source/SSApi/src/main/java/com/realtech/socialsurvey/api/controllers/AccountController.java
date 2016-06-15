@@ -108,7 +108,8 @@ public class AccountController
         user.setLastName( accountRegistrationRequest.getLastName() );
         user.setEmailId( accountRegistrationRequest.getEmail() );
         Map<String, Long> ids = accountService.saveAccountRegistrationDetailsAndGetIdsInMap( user,
-            accountRegistrationRequest.getCompanyName(), accountRegistrationRequest.getPhone() );
+            accountRegistrationRequest.getCompanyName(), accountRegistrationRequest.getPhone(),
+            accountRegistrationRequest.getPlanId() );
         LOGGER.info( "AccountController.initAccountRegsitration completed successfully" );
         return new ResponseEntity<Map<String, Long>>( ids, HttpStatus.OK );
     }

@@ -32,7 +32,7 @@ public interface UserService
         throws InvalidInputException, SolrException, NoRecordsFetchedException;
 
 
-    public void sendRegistrationEmail( User user ) throws NonFatalException;
+    public void sendRegistrationEmail( User user, int planId ) throws NonFatalException;
 
 
     public boolean isUserExist( String emailId ) throws InvalidInputException;
