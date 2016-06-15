@@ -855,13 +855,8 @@ app.controller('passwordController', [ '$scope', '$location', '$rootScope', 'Pas
 	$scope.lastName = $rootScope.lastName;
 
 	$scope.savePassword = function() {
-		if (($scope.password != undefined && $scope.password.length < 6) || ($scope.confirmPassword != undefined && $scope.confirmPassword.length < 6)) {
-			showError("Password and Confirm Password should be atleast 6 characters in length.");
-		} else if ($scope.password != $scope.confirmPassword) {
-			showError("Password and Confirm Password should exactly match.");
-		} else {
+		if ($scope.passwordForm.$valid) {
 			PasswordService.savePassword($rootScope.userId, $scope.password).then(function(response) {
-				showInfo("Password saved successfully.");
 				window.location = "/registeraccount/newloginas.do?userId=" + $rootScope.userId + "&planId=" + planId;
 			}, function(error) {
 				showError($scope.getErrorMessage(error.data));
