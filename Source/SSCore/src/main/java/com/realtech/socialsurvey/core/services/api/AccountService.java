@@ -24,7 +24,8 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 public interface AccountService
 {
-    public Map<String, Long> saveAccountRegistrationDetailsAndGetIdsInMap( User user, String companyName, Phone phone )
+    public Map<String, Long> saveAccountRegistrationDetailsAndGetIdsInMap( User user, String companyName, Phone phone,
+        int planId )
         throws InvalidInputException, UserAlreadyExistsException, SolrException, NoRecordsFetchedException, NonFatalException;
 
 

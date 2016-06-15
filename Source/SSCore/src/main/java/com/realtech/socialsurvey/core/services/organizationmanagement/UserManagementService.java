@@ -617,9 +617,10 @@ public interface UserManagementService
     public void incompleteSurveyReminderSender();
 
 
-    public void inviteCorporateToRegister( User user ) throws InvalidInputException, UndeliveredEmailException;
+    public void inviteCorporateToRegister( User user, int planId ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    public User activateCompanyAdmin( User companyAdmin ) throws InvalidInputException, HierarchyAlreadyExistsException, SolrException;
+    public User activateCompanyAdmin( User companyAdmin )
+        throws InvalidInputException, HierarchyAlreadyExistsException, SolrException;
 }
 // JIRA SS-34 BY RM02 BOC

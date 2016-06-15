@@ -102,7 +102,8 @@ public class AccountServiceImpl implements AccountService
 
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public Map<String, Long> saveAccountRegistrationDetailsAndGetIdsInMap( User user, String companyName, Phone phone )
+    public Map<String, Long> saveAccountRegistrationDetailsAndGetIdsInMap( User user, String companyName, Phone phone,
+        int planId )
         throws InvalidInputException, UserAlreadyExistsException, SolrException, NoRecordsFetchedException, NonFatalException
     {
         LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO started for company: " + companyName );
@@ -122,7 +123,7 @@ public class AccountServiceImpl implements AccountService
             ids.put( "userId", user.getUserId() );
 
             // Send registration email to user, Send mail to sales lead, maybe to support
-            userService.sendRegistrationEmail( user );
+            userService.sendRegistrationEmail( user, planId );
         }
 
         LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO finished for company: " + companyName );

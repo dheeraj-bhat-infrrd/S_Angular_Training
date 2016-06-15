@@ -204,12 +204,12 @@ public class UserServiceImpl implements UserService
 
 
     @Override
-    public void sendRegistrationEmail( User user ) throws NonFatalException
+    public void sendRegistrationEmail( User user, int planId ) throws NonFatalException
     {
         LOGGER.info( "Method sendRegistrationEmail started for user: " + user.getUserId() );
 
         //Send registration email to user
-        userManagementService.inviteCorporateToRegister( user );
+        userManagementService.inviteCorporateToRegister( user, planId );
 
         // Send mail to sales lead
         Date today = new Date( System.currentTimeMillis() );

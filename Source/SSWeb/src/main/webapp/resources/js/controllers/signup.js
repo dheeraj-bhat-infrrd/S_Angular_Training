@@ -158,6 +158,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 			showOverlay();
 			$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
 			$scope.accountRegistration.phone = $scope.getPhoneNumber("reg-phone");
+			$scope.accountRegistration.planId = planId;
 			LoginService.signup($scope.accountRegistration).then(function(response) {
 				$rootScope.userId = response.data.userId;
 				$rootScope.companyId = response.data.companyId;
@@ -375,15 +376,6 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 		$rootScope.companyProfile.city = "";
 		$rootScope.companyProfile.state = "";
 		$rootScope.companyProfile.zip = "";
-		$rootScope.companyProfile.officePhone = {
-			"number" : "",
-			"countryCode" : "",
-			"extension" : "",
-			"countryAbbr" : "us",
-			"formattedPhoneNumber" : ""
-		};
-		$scope.setPhone('reg-phone-office', $rootScope.companyProfile.officePhone);
-		$scope.isValidPhone = false;
 		$scope.companydetailsubmittedcanada = false;
 		$scope.companydetailsubmitted = false;
 		$scope.companydetailsubmittedusa = false;
@@ -576,6 +568,21 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	$scope.individual = true;
 	$scope.business = false;
 	$scope.enterprise = false;
+
+	if (planId == 1) {
+		$scope.individual = true;
+		$scope.business = false;
+		$scope.enterprise = false;
+	} else if (planId == 2) {
+		$scope.individual = false;
+		$scope.business = true;
+		$scope.enterprise = false;
+	} else if (planId == 3) {
+		$scope.individual = false;
+		$scope.business = false;
+		$scope.enterprise = true;
+	}
+
 	$scope.authorize = true;
 	$scope.payment = {};
 	$scope.expirationMonths = [ {
@@ -853,7 +860,7 @@ app.controller('passwordController', [ '$scope', '$location', '$rootScope', 'Pas
 		} else {
 			PasswordService.savePassword($rootScope.userId, $scope.password).then(function(response) {
 				showInfo("Password saved successfully.");
-				window.location = "/registeraccount/newloginas.do?userId=" + $rootScope.userId;
+				window.location = "/registeraccount/newloginas.do?userId=" + $rootScope.userId + "&planId=" + planId;
 			}, function(error) {
 				showError($scope.getErrorMessage(error.data));
 			});

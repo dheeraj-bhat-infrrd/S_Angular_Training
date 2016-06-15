@@ -33,6 +33,7 @@
 	var firstName = '${firstName}';
 	var lastName = '${lastName}';
 	var setPassword = '${setPassword}';
+	var planId = '${planId}';
 </script>
 <body ng-app="SocialSurvey" ng-controller="newSignupController">
 	<div class="overlay-loader hide"></div>

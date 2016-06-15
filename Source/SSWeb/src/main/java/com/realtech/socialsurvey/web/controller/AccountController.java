@@ -170,6 +170,7 @@ public class AccountController
         accountRequest.setCompanyName( account.getCompanyName() );
         accountRequest.setEmail( account.getEmail() );
         accountRequest.setPhone( account.getPhone() );
+        accountRequest.setPlanId( account.getPlanId() );
         Response response = api.initateRegistration( accountRequest );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
@@ -443,7 +444,7 @@ public class AccountController
             attributes.addFlashAttribute( "firstName", urlParams.get( CommonConstants.FIRST_NAME ) );
             attributes.addFlashAttribute( "lastName", urlParams.get( CommonConstants.LAST_NAME ) );
             attributes.addFlashAttribute( "setPassword", true );
-            return "redirect:/accountsignup.do";
+            return "redirect:/accountsignup.do?PlanId=" + urlParams.get( CommonConstants.PLAN_ID );
         } else {
             return "redirect:/newlogin.do";
         }
@@ -463,8 +464,8 @@ public class AccountController
 
 
     @RequestMapping ( value = "/registeraccount/newloginas")
-    public String newLoginAs( @QueryParam ( "userId") String userId, RedirectAttributes redirectAttributes,
-        HttpServletRequest request ) throws NumberFormatException, InvalidInputException
+    public String newLoginAs( @QueryParam ( "userId") String userId, @QueryParam ( "planId") String planId,
+        RedirectAttributes redirectAttributes, HttpServletRequest request ) throws NumberFormatException, InvalidInputException
     {
         long userIdLong = Long.parseLong( userId );
         User user = userManagementService.getUserByUserId( userIdLong );
@@ -476,7 +477,7 @@ public class AccountController
         } else if ( !user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
             redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
             redirectAttributes.addFlashAttribute( "companyId", user.getCompany().getCompanyId() );
-            return "redirect:/accountsignup.do";
+            return "redirect:/accountsignup.do?PlanId=" + planId;
         } else {
             sessionHelper.loginOnRegistration( user.getLoginName(), CommonConstants.BYPASS_PWD );
             return "redirect:/userlogin.do";
