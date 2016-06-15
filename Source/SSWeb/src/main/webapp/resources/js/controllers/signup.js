@@ -651,8 +651,10 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 		if (numberValidation.card != null) {
 			if (numberValidation.card.code.size == 3) {
 				$('#cvv').mask("ddd", digitRegEx);
+				$('#cvv').attr("maxlength", 3);
 			} else if (numberValidation.card.code.size == 4) {
 				$('#cvv').mask("dddd", digitRegEx);
+				$('#cvv').attr("maxlength", 4);
 			}
 		}
 	}
