@@ -34,7 +34,7 @@
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Website</div>
 				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<input class="reg-details" type="text" placeholder="https://www.example.com" name="website" ng-model="userProfile.website" ng-blur="validateWebAddress()" />
+					<input class="reg-details" type="text" placeholder="https://www.example.com" name="website" ng-model="userProfile.website" ng-change="isValidWebAddress=true" />
 					<p ng-show="prodetailsubmitted && !isValidWebAddress" class="help-block-reg">A valid website is required.</p>
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Location</div>

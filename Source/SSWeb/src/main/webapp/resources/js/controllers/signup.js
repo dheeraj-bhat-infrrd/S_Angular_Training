@@ -1,4 +1,6 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
+	userId = 1477;
+	companyId = 276;
 	$rootScope.redirect = false;
 	$scope.emailFormat = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 	$scope.isValidPhone = false;
@@ -307,6 +309,7 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	};
 
 	$scope.saveProfileDetails = function() {
+		showOverlay();
 		$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
 		$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
 		$scope.validatePhone($rootScope.userProfile.phone1);
@@ -317,6 +320,7 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 					$scope.updateUserProfile();
 				}
 			}, function(error) {
+				hideOverlay();
 				$scope.isValidWebAddress = false;
 			});
 		} else {
@@ -327,25 +331,12 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	};
 
 	$scope.updateUserProfile = function() {
-		showOverlay();
 		UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response) {
 			hideOverlay();
 			$location.path('/company').replace();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
-	}
-
-	$scope.validateWebAddress = function() {
-		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
-			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
-				$scope.isValidWebAddress = true;
-			}, function(error) {
-				$scope.isValidWebAddress = false;
-			});
-		} else {
-			$scope.isValidWebAddress = true;
-		}
 	}
 
 	$scope.backOnProfile = function() {
