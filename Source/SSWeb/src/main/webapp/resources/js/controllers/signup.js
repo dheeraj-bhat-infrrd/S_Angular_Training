@@ -1,47 +1,70 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
+	$scope.putUserIdCompanyIdInCookie = function(userId, companyId) {
+		// this will set the expiration to 1 day
+		var now = new Date(), exp = new Date();
+		exp.setDate(exp.getDate() + 1);
+
+		$cookies.put("userId", userId, {
+			'expires' : exp
+		});
+		$cookies.put("companyId", companyId, {
+			'expires' : exp
+		});
+
+		$rootScope.userId = $cookies.get("userId");
+		$rootScope.companyId = $cookies.get("companyId");
+	}
+
+	$scope.clearCookie = function() {
+		$cookies.remove("userId");
+		$cookies.remove("companyId");
+	}
+
 	$rootScope.redirect = false;
 	$scope.emailFormat = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 	$scope.isValidPhone = false;
-	if (isLinkedin == "true") {
-		$rootScope.redirect = true;
+	if (userId != "" && companyId != "") {
+		$scope.putUserIdCompanyIdInCookie(userId, companyId);
+	} else {
 		$rootScope.userId = $cookies.get("userId");
 		$rootScope.companyId = $cookies.get("companyId");
+	}
+	if (newUser == "true") {
+		$scope.clearCookie();
+		$location.path('/accountsignup').replace();
+	} else if (isLinkedin == "true") {
+		$rootScope.redirect = true;
 		$location.path('/linkedin').replace();
 	} else if (setPassword == "true") {
 		$rootScope.firstName = firstName;
 		$rootScope.lastName = lastName;
-		$rootScope.userId = userId;
-		$rootScope.companyId = companyId;
 		$location.path('/password').replace();
-	} else if (userId == "" && companyId == "") {
-		$rootScope.userId = userId;
-		$rootScope.companyId = companyId;
-		$location.path('/accountsignup').replace();
 	} else {
-		$rootScope.userId = userId;
-		$rootScope.companyId = companyId;
 		var userStageDsiplayOrder = 0;
 		var companyStageDsiplayOrder = 0;
 		var landingStage = '';
 		var registrationStages = JSON.parse('{"INIT":1, "LIN":2, "UPP":3, "CPP":4, "PAY":5, "COM":6}');
 		var registrationStagesRoute = JSON.parse('{"1":"/accountsignup", "2":"/linkedin", "3":"/profile", "4":"/company", "5":"/payment", "6":"/signupcomplete"}');
-
-		UserProfileService.getUserStage($rootScope.userId).then(function(response) {
-			userStageDsiplayOrder = registrationStages[response.data];
-			CompanyProfileService.getCompanyStage($rootScope.companyId).then(function(response) {
-				companyStageDsiplayOrder = registrationStages[response.data];
-				if (userStageDsiplayOrder > companyStageDsiplayOrder) {
-					landingStage = registrationStagesRoute[userStageDsiplayOrder + 1];
-				} else {
-					landingStage = registrationStagesRoute[companyStageDsiplayOrder + 1];
-				}
-				$location.path(landingStage).replace();
+		if (angular.isDefined($rootScope.userId) && angular.isDefined($rootScope.companyId)) {
+			UserProfileService.getUserStage($rootScope.userId).then(function(response) {
+				userStageDsiplayOrder = registrationStages[response.data];
+				CompanyProfileService.getCompanyStage($rootScope.companyId).then(function(response) {
+					companyStageDsiplayOrder = registrationStages[response.data];
+					if (userStageDsiplayOrder > companyStageDsiplayOrder) {
+						landingStage = registrationStagesRoute[userStageDsiplayOrder + 1];
+					} else {
+						landingStage = registrationStagesRoute[companyStageDsiplayOrder + 1];
+					}
+					$location.path(landingStage).replace();
+				}, function(error) {
+					showError($scope.getErrorMessage(error.data));
+				});
 			}, function(error) {
 				showError($scope.getErrorMessage(error.data));
 			});
-		}, function(error) {
-			showError($scope.getErrorMessage(error.data));
-		});
+		} else {
+			$location.path('/accountsignup').replace();
+		}
 	}
 
 	$scope.getErrorMessage = function(data) {
@@ -140,6 +163,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 	$scope.accountRegistration = {};
 	$scope.response = null;
 	$scope.widgetId = null;
+	$scope.isEmailIdExist = false;
 
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
@@ -162,20 +186,16 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 			LoginService.signup($scope.accountRegistration).then(function(response) {
 				$rootScope.userId = response.data.userId;
 				$rootScope.companyId = response.data.companyId;
-				// this will set the expiration to 1 day
-				var now = new Date(), exp = new Date();
-				exp.setDate(exp.getDate() + 1);
-
-				$cookies.put("userId", $rootScope.userId, {
-					'expires' : exp
-				});
-				$cookies.put("companyId", $rootScope.companyId, {
-					'expires' : exp
-				});
+				$scope.putUserIdCompanyIdInCookie($rootScope.userId, $rootScope.companyId);
 				hideOverlay();
 				$location.path('/linkedin').replace();
 			}, function(error) {
-				showError($scope.getErrorMessage(error.data));
+				if (error.data.indexOf("already exists") > -1 && error.data.indexOf("User with Email") > -1) {
+					$scope.isEmailIdExist = true;
+					hideOverlay();
+				} else {
+					showError($scope.getErrorMessage(error.data));
+				}
 			});
 		}
 	};
@@ -219,6 +239,7 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 } ]);
 
 app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
+	$scope.clearCookie();
 
 	$scope.login = function() {
 		showOverlay();
@@ -307,45 +328,38 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	};
 
 	$scope.saveProfileDetails = function() {
+		showOverlay();
 		$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
 		$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
-		$scope.validatePhone($rootScope.userProfile.phone1);
 		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
 			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
 				$scope.isValidWebAddress = true;
+				$scope.isValidPhone = angular.isDefined($rootScope.userProfile.phone1);
 				if ($scope.isValidWebAddress && $scope.isValidPhone) {
 					$scope.updateUserProfile();
+				} else {
+					hideOverlay();
 				}
 			}, function(error) {
+				hideOverlay();
 				$scope.isValidWebAddress = false;
 			});
 		} else {
 			if ($scope.isValidPhone) {
 				$scope.updateUserProfile();
+			} else {
+				hideOverlay();
 			}
 		}
 	};
 
 	$scope.updateUserProfile = function() {
-		showOverlay();
 		UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response) {
 			hideOverlay();
 			$location.path('/company').replace();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
-	}
-
-	$scope.validateWebAddress = function() {
-		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
-			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
-				$scope.isValidWebAddress = true;
-			}, function(error) {
-				$scope.isValidWebAddress = false;
-			});
-		} else {
-			$scope.isValidWebAddress = true;
-		}
 	}
 
 	$scope.backOnProfile = function() {
@@ -688,7 +702,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 			validCardDetails = false;
 		}
 
-		if (angular.isUndefined($scope.payment.cardNumber) || !numberValidation.isValid) {
+		if (angular.isUndefined($scope.payment.cardNumber) || !numberValidation.isValid || ($scope.payment.cardNumber.indexOf('3') != 0 && $scope.payment.cardNumber.indexOf('4') != 0 && $scope.payment.cardNumber.indexOf('5') != 0 && $scope.payment.cardNumber.indexOf('6') != 0)) {
 			validCardDetails = false;
 		}
 
@@ -696,7 +710,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 			validCardDetails = false;
 		}
 
-		if (angular.isUndefined($scope.payment.expirationYear) || !expiryYearValidation.isValid) {
+		if (angular.isUndefined($scope.payment.expirationYear) || !expiryYearValidation.isValid || (expiryYearValidation.isCurrentYear && $scope.payment.expirationMonth < $scope.today.getMonth() + 1)) {
 			validCardDetails = false;
 		}
 
@@ -883,5 +897,5 @@ function formattedDate(date) {
 		month = '0' + month;
 	if (day.length < 2)
 		day = '0' + day;
-	return [ day, month, year ].join('/');
+	return [ month, day, year ].join('/');
 }

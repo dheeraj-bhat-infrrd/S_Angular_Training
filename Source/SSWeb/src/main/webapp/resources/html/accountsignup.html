@@ -44,9 +44,10 @@
 					<input class="reg-details" type="tel" id="reg-phone" ng-model="accountRegistration.phone.number" />
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Email Address *</div>
-				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px" ng-class="{ 'has-error-reg' : submitted && signInForm.email.$invalid && signInForm.email.$error.required}">
-					<input class="reg-details form-control-reg" type="email" name="email" placeholder="email@example.com" required ng-model="accountRegistration.email" ng-pattern="emailFormat" />
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px" ng-class="{ 'has-error-reg' : submitted && ((signInForm.email.$invalid && signInForm.email.$error.required) || isEmailIdExist)}">
+					<input class="reg-details form-control-reg" type="email" name="email" placeholder="email@example.com" required ng-model="accountRegistration.email" ng-pattern="emailFormat" ng-change="isEmailIdExist=false" />
 					<p ng-show="submitted && (signInForm.email.$error.required || signInForm.email.$error.pattern)" class="help-block-reg">A valid email address is required.</p>
+					<p ng-show="submitted && isEmailIdExist" class="help-block-reg">User with Email: {{accountRegistration.email}} already exists. Please check your email for instruction.</p>
 				</div>
 				<div class="reg-pswd-info col-lg-12 col-md-12 col-sm-12 col-xs-12">(Don't worry about setting a password right now, we'll email you a link to create one)</div>
 				<div class="clearfix reg-captcha-wrapper reg-item" style="width: 305px; margin: auto;">

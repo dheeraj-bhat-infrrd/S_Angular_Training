@@ -24,8 +24,8 @@
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px;">
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  reg-create-account">Professional Details</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Phone1 *</div>
-				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<input class="reg-details" type="text" id="reg-phone1" ng-init="validatePhone(userProfile.phone1);setPhone('reg-phone1', userProfile.phone1);" name="phone1" ng-change="checkPhone('reg-phone1', userProfile.phone1)" ng-model="phone" />
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-class="{'has-error-reg' : prodetailsubmitted && !isValidPhone}">
+					<input class="reg-details form-control-reg" type="text" id="reg-phone1" ng-init="validatePhone(userProfile.phone1);setPhone('reg-phone1', userProfile.phone1);" name="phone1" ng-change="isValidPhone=true" ng-model="phone" />
 					<p ng-show="prodetailsubmitted && !isValidPhone" class="help-block-reg">Phone number is required.</p>
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Phone2</div>
@@ -33,8 +33,8 @@
 					<input class="reg-details" type="tel" id="reg-phone2" ng-init="setPhone('reg-phone2', userProfile.phone2);" name="phone2" />
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Website</div>
-				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<input class="reg-details" type="text" placeholder="https://www.example.com" name="website" ng-model="userProfile.website" ng-blur="validateWebAddress()" />
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-class="{'has-error-reg' : prodetailsubmitted && !isValidWebAddress}">
+					<input class="reg-details form-control-reg" type="text" placeholder="https://www.example.com" name="website" ng-model="userProfile.website" ng-change="isValidWebAddress=true" />
 					<p ng-show="prodetailsubmitted && !isValidWebAddress" class="help-block-reg">A valid website is required.</p>
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Location</div>
