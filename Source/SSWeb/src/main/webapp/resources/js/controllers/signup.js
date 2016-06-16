@@ -1,49 +1,70 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
-	userId = 1477;
-	companyId = 276;
+	$scope.putUserIdCompanyIdInCookie = function(userId, companyId) {
+		// this will set the expiration to 1 day
+		var now = new Date(), exp = new Date();
+		exp.setDate(exp.getDate() + 1);
+
+		$cookies.put("userId", userId, {
+			'expires' : exp
+		});
+		$cookies.put("companyId", companyId, {
+			'expires' : exp
+		});
+
+		$rootScope.userId = $cookies.get("userId");
+		$rootScope.companyId = $cookies.get("companyId");
+	}
+
+	$scope.clearCookie = function() {
+		$cookies.remove("userId");
+		$cookies.remove("companyId");
+	}
+
 	$rootScope.redirect = false;
 	$scope.emailFormat = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 	$scope.isValidPhone = false;
-	if (isLinkedin == "true") {
-		$rootScope.redirect = true;
+	if (userId != "" && companyId != "") {
+		$scope.putUserIdCompanyIdInCookie(userId, companyId);
+	} else {
 		$rootScope.userId = $cookies.get("userId");
 		$rootScope.companyId = $cookies.get("companyId");
+	}
+	if (newUser == "true") {
+		$scope.clearCookie();
+		$location.path('/accountsignup').replace();
+	} else if (isLinkedin == "true") {
+		$rootScope.redirect = true;
 		$location.path('/linkedin').replace();
 	} else if (setPassword == "true") {
 		$rootScope.firstName = firstName;
 		$rootScope.lastName = lastName;
-		$rootScope.userId = userId;
-		$rootScope.companyId = companyId;
 		$location.path('/password').replace();
-	} else if (userId == "" && companyId == "") {
-		$rootScope.userId = userId;
-		$rootScope.companyId = companyId;
-		$location.path('/accountsignup').replace();
 	} else {
-		$rootScope.userId = userId;
-		$rootScope.companyId = companyId;
 		var userStageDsiplayOrder = 0;
 		var companyStageDsiplayOrder = 0;
 		var landingStage = '';
 		var registrationStages = JSON.parse('{"INIT":1, "LIN":2, "UPP":3, "CPP":4, "PAY":5, "COM":6}');
 		var registrationStagesRoute = JSON.parse('{"1":"/accountsignup", "2":"/linkedin", "3":"/profile", "4":"/company", "5":"/payment", "6":"/signupcomplete"}');
-
-		UserProfileService.getUserStage($rootScope.userId).then(function(response) {
-			userStageDsiplayOrder = registrationStages[response.data];
-			CompanyProfileService.getCompanyStage($rootScope.companyId).then(function(response) {
-				companyStageDsiplayOrder = registrationStages[response.data];
-				if (userStageDsiplayOrder > companyStageDsiplayOrder) {
-					landingStage = registrationStagesRoute[userStageDsiplayOrder + 1];
-				} else {
-					landingStage = registrationStagesRoute[companyStageDsiplayOrder + 1];
-				}
-				$location.path(landingStage).replace();
+		if (angular.isDefined($rootScope.userId) && angular.isDefined($rootScope.companyId)) {
+			UserProfileService.getUserStage($rootScope.userId).then(function(response) {
+				userStageDsiplayOrder = registrationStages[response.data];
+				CompanyProfileService.getCompanyStage($rootScope.companyId).then(function(response) {
+					companyStageDsiplayOrder = registrationStages[response.data];
+					if (userStageDsiplayOrder > companyStageDsiplayOrder) {
+						landingStage = registrationStagesRoute[userStageDsiplayOrder + 1];
+					} else {
+						landingStage = registrationStagesRoute[companyStageDsiplayOrder + 1];
+					}
+					$location.path(landingStage).replace();
+				}, function(error) {
+					showError($scope.getErrorMessage(error.data));
+				});
 			}, function(error) {
 				showError($scope.getErrorMessage(error.data));
 			});
-		}, function(error) {
-			showError($scope.getErrorMessage(error.data));
-		});
+		} else {
+			$location.path('/accountsignup').replace();
+		}
 	}
 
 	$scope.getErrorMessage = function(data) {
@@ -164,16 +185,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 			LoginService.signup($scope.accountRegistration).then(function(response) {
 				$rootScope.userId = response.data.userId;
 				$rootScope.companyId = response.data.companyId;
-				// this will set the expiration to 1 day
-				var now = new Date(), exp = new Date();
-				exp.setDate(exp.getDate() + 1);
-
-				$cookies.put("userId", $rootScope.userId, {
-					'expires' : exp
-				});
-				$cookies.put("companyId", $rootScope.companyId, {
-					'expires' : exp
-				});
+				$scope.putUserIdCompanyIdInCookie($rootScope.userId, $rootScope.companyId);
 				hideOverlay();
 				$location.path('/linkedin').replace();
 			}, function(error) {
@@ -221,7 +233,8 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 } ]);
 
 app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
-
+	$scope.clearCookie();
+	
 	$scope.login = function() {
 		showOverlay();
 		window.location = "/registeraccount/newloginas.do?userId=" + $rootScope.userId;

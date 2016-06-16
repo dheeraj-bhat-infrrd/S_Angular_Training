@@ -111,7 +111,8 @@ public class AccountServiceImpl implements AccountService
 
         // validate if the email address is not taken already.
         if ( userService.isUserExist( user.getEmailId() ) ) {
-            throw new UserAlreadyExistsException( "User with User ID : " + user.getEmailId() + " already exists" );
+            throw new UserAlreadyExistsException(
+                "User with Email: " + user.getEmailId() + " already exists. Please check your email for instruction." );
         } else {
             // Create a company with registration stage as 1. Insert into mongo with status 'I'
             Company company = addCompany( user, companyName, phone );

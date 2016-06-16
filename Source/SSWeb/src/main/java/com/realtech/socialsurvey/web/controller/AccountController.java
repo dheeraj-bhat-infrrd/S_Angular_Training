@@ -444,7 +444,7 @@ public class AccountController
             attributes.addFlashAttribute( "firstName", urlParams.get( CommonConstants.FIRST_NAME ) );
             attributes.addFlashAttribute( "lastName", urlParams.get( CommonConstants.LAST_NAME ) );
             attributes.addFlashAttribute( "setPassword", true );
-            return "redirect:/accountsignup.do?PlanId=" + urlParams.get( CommonConstants.PLAN_ID );
+            return "redirect:/accountsignupredirect.do?PlanId=" + urlParams.get( CommonConstants.PLAN_ID );
         } else {
             return "redirect:/newlogin.do";
         }
@@ -477,7 +477,7 @@ public class AccountController
         } else if ( !user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
             redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
             redirectAttributes.addFlashAttribute( "companyId", user.getCompany().getCompanyId() );
-            return "redirect:/accountsignup.do?PlanId=" + planId;
+            return "redirect:/accountsignupredirect.do?PlanId=" + planId;
         } else {
             sessionHelper.loginOnRegistration( user.getLoginName(), CommonConstants.BYPASS_PWD );
             return "redirect:/userlogin.do";
@@ -589,6 +589,11 @@ public class AccountController
                         AgentSettings agentSettings = userManagementService.getUserSettings( Long.parseLong( sId ) );
                         agentSettings = (AgentSettings) socialAsyncService.linkedInDataUpdate(
                             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, tokens );
+
+                        User user = userManagementService.getUserByUserId( Long.parseLong( sId ) );
+                        attributes.addFlashAttribute( "userId", user.getUserId() );
+                        attributes.addFlashAttribute( "companyId", user.getCompany().getCompanyId() );
+
                         response = "ok";
                     } else if ( unit.equalsIgnoreCase( BRANCH_UNIT ) ) {
                         //TODO: Handle branch LinkedIn Connection
@@ -612,6 +617,6 @@ public class AccountController
         attributes.addFlashAttribute( "isLinkedin", true );
         attributes.addFlashAttribute( "linkedinResponse", response );
 
-        return "redirect:/accountsignup.do";
+        return "redirect:/accountsignupredirect.do";
     }
 }
