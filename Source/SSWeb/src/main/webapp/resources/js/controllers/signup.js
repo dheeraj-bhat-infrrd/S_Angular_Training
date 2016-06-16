@@ -163,6 +163,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 	$scope.accountRegistration = {};
 	$scope.response = null;
 	$scope.widgetId = null;
+	$scope.isEmailIdExist = false;
 
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
@@ -189,7 +190,12 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 				hideOverlay();
 				$location.path('/linkedin').replace();
 			}, function(error) {
-				showError($scope.getErrorMessage(error.data));
+				if (error.data.indexOf("already exists") > -1 && error.data.indexOf("User with Email") > -1) {
+					$scope.isEmailIdExist = true;
+					hideOverlay();
+				} else {
+					showError($scope.getErrorMessage(error.data));
+				}
 			});
 		}
 	};
@@ -325,12 +331,14 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 		showOverlay();
 		$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
 		$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
-		$scope.validatePhone($rootScope.userProfile.phone1);
 		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
 			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
 				$scope.isValidWebAddress = true;
+				$scope.isValidPhone = angular.isDefined($rootScope.userProfile.phone1);
 				if ($scope.isValidWebAddress && $scope.isValidPhone) {
 					$scope.updateUserProfile();
+				} else {
+					hideOverlay();
 				}
 			}, function(error) {
 				hideOverlay();
@@ -339,6 +347,8 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 		} else {
 			if ($scope.isValidPhone) {
 				$scope.updateUserProfile();
+			} else {
+				hideOverlay();
 			}
 		}
 	};
@@ -692,7 +702,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 			validCardDetails = false;
 		}
 
-		if (angular.isUndefined($scope.payment.cardNumber) || !numberValidation.isValid) {
+		if (angular.isUndefined($scope.payment.cardNumber) || !numberValidation.isValid || ($scope.payment.cardNumber.indexOf('3') != 0 && $scope.payment.cardNumber.indexOf('4') != 0 && $scope.payment.cardNumber.indexOf('5') != 0 && $scope.payment.cardNumber.indexOf('6') != 0)) {
 			validCardDetails = false;
 		}
 
@@ -700,7 +710,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 			validCardDetails = false;
 		}
 
-		if (angular.isUndefined($scope.payment.expirationYear) || !expiryYearValidation.isValid) {
+		if (angular.isUndefined($scope.payment.expirationYear) || !expiryYearValidation.isValid || (expiryYearValidation.isCurrentYear && $scope.payment.expirationMonth < $scope.today.getMonth() + 1)) {
 			validCardDetails = false;
 		}
 
