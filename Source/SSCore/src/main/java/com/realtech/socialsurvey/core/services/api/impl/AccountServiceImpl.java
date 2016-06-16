@@ -519,24 +519,9 @@ public class AccountServiceImpl implements AccountService
             updateCompanyDetailsInMySql( companyId, user.getUserId(), company );
             additionalEmailBody = "Please contact the below user to discuss plan details for Enterprise account. <br> Name: "
                 + name + "<br> Email: " + email + "<br> Message: " + message;
-            sendMailToUser( name, email );
+			userManagementService.inviteCorporateToRegister( user, planId );
         }
         sendMailToSalesLead( user, additionalEmailBody );
-    }
-
-
-    private void sendMailToUser( String name, String email )
-    {
-        try {
-            Map<String, String> attachmentsDetails = null;
-            String subject = "";
-            String body = "";
-            emailServices.sendCustomMail( name, email, subject, body, attachmentsDetails );
-        } catch ( InvalidInputException e ) {
-            e.printStackTrace();
-        } catch ( UndeliveredEmailException e ) {
-            e.printStackTrace();
-        }
     }
 
 
