@@ -234,7 +234,7 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 
 app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
 	$scope.clearCookie();
-	
+
 	$scope.login = function() {
 		showOverlay();
 		window.location = "/registeraccount/newloginas.do?userId=" + $rootScope.userId;
@@ -887,5 +887,5 @@ function formattedDate(date) {
 		month = '0' + month;
 	if (day.length < 2)
 		day = '0' + day;
-	return [ day, month, year ].join('/');
+	return [ month, day, year ].join('/');
 }
