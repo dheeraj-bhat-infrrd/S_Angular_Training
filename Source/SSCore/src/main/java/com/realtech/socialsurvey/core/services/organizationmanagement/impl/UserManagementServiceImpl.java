@@ -4912,6 +4912,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         storeCompanyAdminInvitation( queryParam, user.getEmailId(), company );
 
         LOG.debug( "Calling email services to send registration invitation mail" );
-        emailServices.sendRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName() );
+        //emailServices.sendRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName() );
+        emailServices.sendNewRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName(), planId );
     }
 }
