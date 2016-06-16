@@ -149,6 +149,10 @@ public final class EmailTemplateConstants {
     public static final String COMPANY_REGISTRATION_STAGE_MAIL_BODY = "CompanyRegistrationStatusBody.html";
     public static final String CUSTOM_MAIL_SUBJECT = "customMailSubject.txt";
     public static final String CUSTOM_MAIL_BODY = "customMailBody.html";
+
+	public static final String NEW_REGISTRATION_MAIL_SUBJECT = "NewRegistrationMailSubject.txt";
+	public static final String NEW_REGISTRATION_MAIL_BODY = "NewRegistrationMailBody.html";
+	public static final String NEW_REGISTRATION_ENTERPRISE_MAIL_BODY = "NewRegistrationMailForEnterpriseBody.html";
     
     
 
