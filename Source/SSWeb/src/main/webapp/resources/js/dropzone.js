@@ -1770,16 +1770,21 @@
   };
 
   contentLoaded(window, Dropzone._autoDiscoverFunction);
-  $(document).on('mouseover','.dz-preview',function(e){
+
+ 
+}).call(this);
+
+$(document).on('mouseover','.dz-preview',function(e){
 	  $(this).find('.change-image').css('display','block');
 	  $(this).find('.dz-remove').css('display','block');
-  });
-  $(document).on('mouseleave','.dz-preview',function(e){
+});
+$(document).on('mouseleave','.dz-preview',function(e){
 	  $(this).find('.change-image').css('display','none');
 	  $(this).find('.dz-remove').css('display','none');
-  });
- $(document).on('click','.change-image',function(e){
-	 return removeFile(file);
- });
+});
 
-}).call(this);
+$(document).on('click','.change-image',function(e){
+		  e.stopPropagation();
+		  $("div#profileImg").trigger('click');
+		  $("div#logoDrop").trigger('click');
+	 });
