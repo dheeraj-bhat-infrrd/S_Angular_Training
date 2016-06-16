@@ -443,9 +443,9 @@ public class DotloopReviewProcessor extends QuartzJobBean
                     }
                 }
 
-                //Send surveys from selling agent to buyers
-                if ( buyersMap != null && buyersMap.size() > 0 && sellingAgentEmailIdList != null && !sellingAgentEmailIdList.isEmpty() ) {
-                    for ( String sellingAgentEmailId : sellingAgentEmailIdList ) {
+                //Send surveys from buying agent to buyers
+                if ( buyersMap != null && buyersMap.size() > 0 && buyingAgentEmailIdList != null && !buyingAgentEmailIdList.isEmpty() ) {
+                    for ( String buyingAgentEmailId : buyingAgentEmailIdList ) {
                         for ( String buyerEmailId : buyersMap.keySet() ) {
                             SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
                             surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName, organizationUnitId );
@@ -455,7 +455,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                             surveyPreInitiation.setCustomerFirstName( buyersMap.get( buyerEmailId ) );
                             surveyPreInitiation.setCustomerLastName( null );
                             surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
-                            surveyPreInitiation.setAgentEmailId( sellingAgentEmailId );
+                            surveyPreInitiation.setAgentEmailId( buyingAgentEmailId );
                             surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
                             surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
                             surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
@@ -476,10 +476,10 @@ public class DotloopReviewProcessor extends QuartzJobBean
                 }
                 
                 
-                //Send surveys from buying agents to sellers
-                if ( sellersMap != null && sellersMap.size() > 0 && buyingAgentEmailIdList != null && !buyingAgentEmailIdList
+                //Send surveys from selling agents to sellers
+                if ( sellersMap != null && sellersMap.size() > 0 && sellingAgentEmailIdList != null && !sellingAgentEmailIdList
                     .isEmpty() ) {
-                    for ( String buyingAgentEmailId : buyingAgentEmailIdList ) {
+                    for ( String sellingAgentEmailId : sellingAgentEmailIdList ) {
                         for ( String sellerEmailId : sellersMap.keySet() ) {
                             SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
                             surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName,
@@ -490,7 +490,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                             surveyPreInitiation.setCustomerFirstName( sellersMap.get( sellerEmailId ) );
                             surveyPreInitiation.setCustomerLastName( null );
                             surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
-                            surveyPreInitiation.setAgentEmailId( buyingAgentEmailId );
+                            surveyPreInitiation.setAgentEmailId( sellingAgentEmailId );
                             surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
                             surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
                             surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
