@@ -1,16 +1,16 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
-	$scope.putUserIdCompanyIdInCookie = function(userId, companyId) {
-		// this will set the expiration to 1 day
-		var now = new Date(), exp = new Date();
-		exp.setDate(exp.getDate() + 1);
 
+	// this will set the expiration to 1 day
+	var now = new Date(), exp = new Date();
+	exp.setDate(exp.getDate() + 1);
+
+	$scope.putUserIdCompanyIdInCookie = function(userId, companyId) {
 		$cookies.put("userId", userId, {
 			'expires' : exp
 		});
 		$cookies.put("companyId", companyId, {
 			'expires' : exp
 		});
-
 		$rootScope.userId = $cookies.get("userId");
 		$rootScope.companyId = $cookies.get("companyId");
 	}
@@ -22,6 +22,14 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 
 	$rootScope.redirect = false;
 	$scope.emailFormat = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+	if (planId != "") {
+		$cookies.put("planId", planId, {
+			'expires' : exp
+		});
+	} else {
+		planId = $cookies.get("planId");
+	}
 
 	if (userId != "" && companyId != "") {
 		$scope.putUserIdCompanyIdInCookie(userId, companyId);
@@ -86,9 +94,10 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		}
 		return errorMessage;
 	}
+
 	$scope.maskPhoneNumber = function(phoneId, iso2) {
 		if (iso2 == 'us') {
-			$('#' + phoneId).mask(phoneFormat, phoneRegEx);
+			$('#' + phoneId).mask(phoneFormatWithExtension, usPhoneRegEx);
 		} else {
 			$('#' + phoneId).unmask(phoneFormat);
 			$('#' + phoneId).keypress(function(e) {
@@ -158,7 +167,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 		utilsScript : "../resources/js/utils.js"
 	});
 
-	$('#reg-phone').mask(phoneFormat, phoneRegEx);
+	$('#reg-phone').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$("#reg-phone").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone", countryData.iso2);
 	});
@@ -224,8 +233,9 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 	};
 } ]);
 
-app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
+app.controller('signupcompleteController', [ '$cookies', '$scope', '$rootScope', function($cookies, $scope, $rootScope) {
 	$scope.clearCookie();
+	$cookies.remove("planId");
 
 	$scope.login = function() {
 		showOverlay();
@@ -239,14 +249,14 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	$('#reg-phone1').intlTelInput({
 		utilsScript : "../resources/js/utils.js"
 	});
-	$('#reg-phone1').mask(phoneFormat, phoneRegEx);
+	$('#reg-phone1').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$("#reg-phone1").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone1", countryData.iso2);
 	});
 	$('#reg-phone2').intlTelInput({
 		utilsScript : "../resources/js/utils.js"
 	});
-	$('#reg-phone2').mask(phoneFormat, phoneRegEx);
+	$('#reg-phone2').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$("#reg-phone2").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone2", countryData.iso2);
 	});
@@ -373,7 +383,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	$('#reg-phone-office').intlTelInput({
 		utilsScript : "../resources/js/utils.js"
 	});
-	$('#reg-phone-office').mask(phoneFormat, phoneRegEx);
+	$('#reg-phone-office').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$('#reg-phone-office').on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone-office", countryData.iso2);
 	});

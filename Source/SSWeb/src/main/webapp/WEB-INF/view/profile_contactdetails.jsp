@@ -249,7 +249,7 @@ $(document).ready(function() {
 	if(phoneFormatList[countryCode] && phoneFormatList[countryCode] != "") {
 		phoneFormat = phoneFormatList[countryCode];		
 	}
-	$('#phone-number-work').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
+	//$('#phone-number-work').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 	if($('#phone-number-work').val() == '('){
 		$('#phone-number-work').val('');
 	}

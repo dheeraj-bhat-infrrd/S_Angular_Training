@@ -25,7 +25,6 @@ import com.realtech.socialsurvey.api.transformers.CompanyProfileTransformer;
 import com.realtech.socialsurvey.api.validators.AccountRegistrationValidator;
 import com.realtech.socialsurvey.api.validators.CompanyProfileValidator;
 import com.realtech.socialsurvey.api.validators.PaymentRequestValidator;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -135,11 +134,10 @@ public class AccountController
         LOGGER.info( "AccountController.updateCompanyProfile started" );
         long compId = Long.parseLong( companyId );
         long userIdLong = Long.parseLong( userId );
-        AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userIdLong );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( compId );
         Company company = organizationManagementService.getCompanyById( compId );
         CompanyCompositeEntity companyProfileDetails = companyProfileTransformer
-            .transformApiRequestToDomainObject( companyProfile, company, unitSettings, agentSettings );
+            .transformApiRequestToDomainObject( companyProfile, company, unitSettings );
         accountService.updateCompanyProfile( compId, userIdLong, companyProfileDetails );
         LOGGER.info( "AccountController.updateCompanyProfile completed successfully" );
         return new ResponseEntity<Void>( HttpStatus.OK );

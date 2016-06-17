@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.PaymentPlan;
 import com.realtech.socialsurvey.core.entities.Phone;
@@ -38,6 +39,7 @@ import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -56,6 +58,8 @@ import com.realtech.socialsurvey.core.services.payment.exception.CreditCardExcep
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 
 
@@ -74,6 +78,8 @@ public class AccountServiceImpl implements AccountService
     private Payment payment;
     private EmailServices emailServices;
     private SurveyBuilder surveyBuilder;
+    private SettingsSetter settingsSetter;
+    private SettingsLocker settingsLocker;
 
     @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
     private String salesLeadEmail;
@@ -84,7 +90,8 @@ public class AccountServiceImpl implements AccountService
         GenericDao<AccountsMaster, Integer> paymentPlanDao, CompanyDao companyDao,
         GenericDao<VerticalsMaster, Integer> verticalMastersDao, OrganizationManagementService organizationManagementService,
         OrganizationUnitSettingsDao organizationUnitSettingsDao, UserManagementService userManagementService,
-        UserService userService, Payment payment, EmailServices emailServices, SurveyBuilder surveyBuilder )
+        UserService userService, Payment payment, EmailServices emailServices, SurveyBuilder surveyBuilder,
+        SettingsSetter settingsSetter, SettingsLocker settingsLocker )
     {
         this.industryDao = industryDao;
         this.paymentPlanDao = paymentPlanDao;
@@ -97,6 +104,8 @@ public class AccountServiceImpl implements AccountService
         this.payment = payment;
         this.emailServices = emailServices;
         this.surveyBuilder = surveyBuilder;
+        this.settingsSetter = settingsSetter;
+        this.settingsLocker = settingsLocker;
     }
 
 
@@ -151,8 +160,8 @@ public class AccountServiceImpl implements AccountService
         throws InvalidInputException
     {
         LOGGER.info( "Method updateCompanyProfile started for company: " + companyId );
+        updateCompanyDetailsInMongo( companyProfile.getCompany(), userId, companyProfile.getCompanySettings() );
         updateCompanyDetailsInMySql( companyId, userId, companyProfile.getCompany() );
-        updateCompanyDetailsInMongo( companyId, userId, companyProfile.getCompanySettings() );
         LOGGER.info( "Method updateCompanyProfile finished for company: " + companyId );
     }
 
@@ -305,21 +314,45 @@ public class AccountServiceImpl implements AccountService
     }
 
 
-    private void updateCompanyDetailsInMongo( long companyId, long userId, OrganizationUnitSettings unitSettings )
+    private void updateCompanyDetailsInMongo( Company company, long userId, OrganizationUnitSettings unitSettings )
         throws InvalidInputException
     {
-        LOGGER.info( "Method updateCompanyDetailsInMongo started for company: " + companyId );
+        LOGGER.info( "Method updateCompanyDetailsInMongo started for company: " + company.getCompanyId() );
 
-        if ( unitSettings != null && unitSettings.getContact_details() != null ) {
-            if ( unitSettings.getContact_details().getContact_numbers() != null
+        if ( unitSettings != null ) {
+            LockSettings lockSettings = new LockSettings();
+            if ( unitSettings.getLogo() != null ) {
+                try {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
+                    settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
+                } catch ( NonFatalException e ) {
+                    LOGGER.error( "Exception Caught " + e.getMessage() );
+                }
+                lockSettings.setLogoLocked( true );
+                unitSettings.setLockSettings( lockSettings );
+            }
+
+            if ( unitSettings.getContact_details() != null && unitSettings.getContact_details().getContact_numbers() != null
                 && unitSettings.getContact_details().getContact_numbers().getPhone1() != null ) {
                 unitSettings.getContact_details().getContact_numbers()
-                    .setWork( unitSettings.getContact_details().getContact_numbers().getPhone1().getCountryCode() + "-"
-                        + unitSettings.getContact_details().getContact_numbers().getPhone1().getNumber() + "x"
-                        + unitSettings.getContact_details().getContact_numbers().getPhone1().getExtension() );
+                    .setWork( unitSettings.getContact_details().getContact_numbers().getPhone1().getFormattedPhoneNumber() );
+                try {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.PHONE, true );
+                } catch ( NonFatalException e ) {
+                    LOGGER.error( "Exception Caught " + e.getMessage() );
+                }
             }
+
+            if ( unitSettings.getContact_details().getAddress() != null ) {
+                try {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ADDRESS, true );
+                } catch ( NonFatalException e ) {
+                    LOGGER.error( "Exception Caught " + e.getMessage() );
+                }
+            }
+
             String profileName = organizationManagementService
-                .generateProfileNameForCompany( unitSettings.getContact_details().getName(), companyId );
+                .generateProfileNameForCompany( unitSettings.getContact_details().getName(), company.getCompanyId() );
             unitSettings.setProfileName( profileName );
             unitSettings.setProfileUrl( CommonConstants.FILE_SEPARATOR + unitSettings.getProfileName() );
         }
@@ -343,12 +376,12 @@ public class AccountServiceImpl implements AccountService
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, unitSettings.getProfileImageUrl(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.KEY_LOGO_PROCESSED, unitSettings.isLogoImageProcessed(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE_THUMBNAIL, unitSettings.getProfileImageUrlThumbnail(),
-            unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            MongoOrganizationUnitSettingDaoImpl.KEY_LOCK_SETTINGS, unitSettings.getLockSettings(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, unitSettings.getProfileName(), unitSettings,
@@ -370,7 +403,7 @@ public class AccountServiceImpl implements AccountService
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_VERTICAL,
             unitSettings.getVertical(), agentSettings );
 
-        LOGGER.info( "Method updateCompanyDetailsInMongo finished for company: " + companyId );
+        LOGGER.info( "Method updateCompanyDetailsInMongo finished for company: " + company.getCompanyId() );
     }
 
 
@@ -519,7 +552,7 @@ public class AccountServiceImpl implements AccountService
             updateCompanyDetailsInMySql( companyId, user.getUserId(), company );
             additionalEmailBody = "Please contact the below user to discuss plan details for Enterprise account. <br> Name: "
                 + name + "<br> Email: " + email + "<br> Message: " + message;
-			userManagementService.inviteCorporateToRegister( user, planId );
+            userManagementService.inviteCorporateToRegister( user, planId );
         }
         sendMailToSalesLead( user, additionalEmailBody );
     }

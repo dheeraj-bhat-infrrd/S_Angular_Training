@@ -592,11 +592,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } catch ( NonFatalException e ) {
                 LOG.error( "Exception Caught " + e.getMessage() );
             }
-
-
             lockSettings.setLogoLocked( true );
-
-
         }
 
         companySettings.setLockSettings( lockSettings );
@@ -624,7 +620,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             contactNumberSettings.setWork( organizationalDetails.get( CommonConstants.COMPANY_CONTACT_NUMBER ) );
             try {
                 settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.PHONE, true );
-
             } catch ( NonFatalException e ) {
                 LOG.error( "Exception Caught " + e.getMessage() );
             }
@@ -708,44 +703,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         MailContentSettings mailContentSettings = new MailContentSettings();
-
-        //commented the code because it saves the mail templates in company settings. 
-        /*MailContent mailContent = new MailContent();
-        mailContent.setMail_subject( takeSurveyMailSubj );
-        mailContent.setMail_body( takeSurveyMail );
-        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) ) );
-        mailContentSettings.setTake_survey_mail( mailContent );
-        
-        mailContent = new MailContent();
-        mailContent.setMail_subject( takeSurveyByCustomerMailSubj );
-        mailContent.setMail_body( takeSurveyByCustomerMail );
-        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyCustomer.split( "," ) ) ) );
-        mailContentSettings.setTake_survey_mail_customer( mailContent );
-        
-        mailContent = new MailContent();
-        mailContent.setMail_subject( takeSurveyReminderMailSubj );
-        mailContent.setMail_body( takeSurveyReminderMail );
-        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
-        mailContentSettings.setTake_survey_reminder_mail( mailContent );
-        
-        mailContent = new MailContent();
-        mailContent.setMail_subject( surveyCompletionMailSubj );
-        mailContent.setMail_body( surveyCompletionMail );
-        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) ) );
-        mailContentSettings.setSurvey_completion_mail( mailContent );
-        
-        mailContent = new MailContent();
-        mailContent.setMail_subject( socialPostReminderMailSubj );
-        mailContent.setMail_body( socialPostReminderMail );
-        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) ) );
-        mailContentSettings.setSocial_post_reminder_mail( mailContent );
-        
-        mailContent = new MailContent();
-        mailContent.setMail_subject( incompleteSurveyReminderMailSubj );
-        mailContent.setMail_body( incompleteSurveyReminderMail );
-        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) ) );
-        mailContentSettings.setRestart_survey_mail( mailContent );*/
-
         companySettings.setMail_content( mailContentSettings );
 
         LOG.debug( "Inserting company settings." );
