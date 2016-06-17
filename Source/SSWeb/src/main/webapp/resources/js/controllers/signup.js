@@ -22,7 +22,7 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 
 	$rootScope.redirect = false;
 	$scope.emailFormat = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-	$scope.isValidPhone = false;
+
 	if (userId != "" && companyId != "") {
 		$scope.putUserIdCompanyIdInCookie(userId, companyId);
 	} else {
@@ -87,7 +87,6 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		return errorMessage;
 	}
 	$scope.maskPhoneNumber = function(phoneId, iso2) {
-
 		if (iso2 == 'us') {
 			$('#' + phoneId).mask(phoneFormat, phoneRegEx);
 		} else {
@@ -133,19 +132,6 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 			$('#' + phoneId).intlTelInput("setCountry", phone.countryAbbr);
 			$('#' + phoneId).intlTelInput("setNumber", phone.formattedPhoneNumber);
 		}
-	}
-
-	$scope.validatePhone = function(phone) {
-		if (angular.isUndefined(phone) || phone == null || phone.formattedPhoneNumber == null || phone.formattedPhoneNumber == "") {
-			$scope.isValidPhone = false;
-		} else {
-			$scope.isValidPhone = true;
-		}
-	}
-
-	$scope.checkPhone = function(phoneId, phone) {
-		phone = $scope.getPhoneNumber(phoneId);
-		$scope.validatePhone(phone);
 	}
 
 	$scope.saveLinkedInStage = function() {
@@ -266,6 +252,13 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	});
 	$scope.isValidWebAddress = true;
 
+	$scope.validatePhone1 = function() {
+		return angular.isDefined($rootScope.userProfile) && angular.isDefined($rootScope.userProfile.phone1) && $rootScope.userProfile.phone1 != null && $rootScope.userProfile.phone1.formattedPhoneNumber != null && $rootScope.userProfile.phone1.formattedPhoneNumber != "";
+
+	}
+
+	$scope.isValidPhone1 = $scope.validatePhone1();
+
 	$scope.loadDropzone = function() {
 		if (!angular.isUndefined($rootScope.userProfile)) {
 			$("div#profileImg").dropzone({
@@ -314,7 +307,7 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 			$rootScope.userProfile = response.data;
 			$scope.setPhone("reg-phone1", $rootScope.userProfile.phone1);
 			$scope.setPhone("reg-phone2", $rootScope.userProfile.phone2);
-			$scope.validatePhone($rootScope.userProfile.phone1);
+			$scope.isValidPhone1 = $scope.validatePhone1();
 			$scope.loadDropzone();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
@@ -334,8 +327,8 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
 			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
 				$scope.isValidWebAddress = true;
-				$scope.isValidPhone = angular.isDefined($rootScope.userProfile.phone1);
-				if ($scope.isValidWebAddress && $scope.isValidPhone) {
+				$scope.isValidPhone1 = $scope.validatePhone1();
+				if ($scope.isValidWebAddress && $scope.isValidPhone1) {
 					$scope.updateUserProfile();
 				} else {
 					hideOverlay();
@@ -345,7 +338,8 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 				$scope.isValidWebAddress = false;
 			});
 		} else {
-			if ($scope.isValidPhone) {
+			$scope.isValidPhone1 = $scope.validatePhone1();
+			if ($scope.isValidPhone1) {
 				$scope.updateUserProfile();
 			} else {
 				hideOverlay();
@@ -384,6 +378,12 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 		$scope.maskPhoneNumber("reg-phone-office", countryData.iso2);
 	});
 	$("#country").countrySelect();
+
+	$scope.validateOfficePhone = function() {
+		return angular.isDefined($rootScope.companyProfile) && angular.isDefined($rootScope.companyProfile.officePhone) && $rootScope.companyProfile.officePhone != null && $rootScope.companyProfile.officePhone.formattedPhoneNumber != null && $rootScope.companyProfile.officePhone.formattedPhoneNumber != "";
+	}
+
+	$scope.isValidOfficePhone = $scope.validateOfficePhone();
 
 	$scope.selectCountry = function() {
 		$rootScope.companyProfile.address = "";
@@ -464,7 +464,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 			$rootScope.companyProfile = response.data;
 			$scope.initCountry();
 			$scope.setPhone("reg-phone-office", $rootScope.companyProfile.officePhone);
-			$scope.validatePhone($rootScope.companyProfile.officePhone);
+			$scope.isValidOfficePhone = $scope.validateOfficePhone();
 			if ($rootScope.companyProfile.industry.verticalsMasterId < 0) {
 				$rootScope.companyProfile.industry = {};
 			}
@@ -559,13 +559,13 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	};
 
 	$scope.validateCompanyDetailsForm = function() {
-		$scope.validatePhone($rootScope.companyProfile.officePhone);
+		$scope.isValidOfficePhone = $scope.validateOfficePhone();
 		if ($scope.canada) {
-			return ($rootScope.companyProfile.address && $rootScope.companyProfile.city && $rootScope.companyProfile.state && $rootScope.companyProfile.zip && $scope.isValidPhone);
+			return ($rootScope.companyProfile.address && $rootScope.companyProfile.city && $rootScope.companyProfile.state && $rootScope.companyProfile.zip && $scope.isValidOfficePhone);
 		} else if ($scope.usa) {
-			return ($rootScope.companyProfile.address && $rootScope.companyProfile.city && $rootScope.companyProfile.state && $rootScope.companyProfile.zip && $scope.isValidPhone);
+			return ($rootScope.companyProfile.address && $rootScope.companyProfile.city && $rootScope.companyProfile.state && $rootScope.companyProfile.zip && $scope.isValidOfficePhone);
 		} else {
-			return ($rootScope.companyProfile.address && $scope.isValidPhone);
+			return ($rootScope.companyProfile.address && $scope.isValidOfficePhone);
 		}
 	};
 
