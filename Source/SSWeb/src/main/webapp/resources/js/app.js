@@ -1,8 +1,5 @@
-var phoneFormat = '(ddd) ddd-dddd x yyyyy';
-var phoneNumberFormat=/[0-9()-. ]{25}/;
-var creditcardFormat = 'dddd dddd dddd dddd';
-var expiryDateFormat = 'dd/dd';
-var phoneRegEx = {
+var phoneFormatWithExtension = '(ddd) ddd-dddd x yyyyy';
+var usPhoneRegEx = {
 	'translation' : {
 		d : {
 			pattern : /[0-9*]/

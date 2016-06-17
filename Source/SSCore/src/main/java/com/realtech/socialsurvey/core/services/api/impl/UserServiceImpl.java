@@ -272,16 +272,12 @@ public class UserServiceImpl implements UserService
                 agentSettings.getContact_details().getLastName() ) );
             if ( agentSettings.getContact_details().getContact_numbers() != null ) {
                 if ( agentSettings.getContact_details().getContact_numbers().getPhone1() != null ) {
-                    agentSettings.getContact_details().getContact_numbers()
-                        .setWork( agentSettings.getContact_details().getContact_numbers().getPhone1().getCountryCode() + "-"
-                            + agentSettings.getContact_details().getContact_numbers().getPhone1().getNumber() + "x"
-                            + agentSettings.getContact_details().getContact_numbers().getPhone1().getExtension() );
+                    agentSettings.getContact_details().getContact_numbers().setWork(
+                        agentSettings.getContact_details().getContact_numbers().getPhone1().getFormattedPhoneNumber() );
                 }
                 if ( agentSettings.getContact_details().getContact_numbers().getPhone2() != null ) {
-                    agentSettings.getContact_details().getContact_numbers()
-                        .setPersonal( agentSettings.getContact_details().getContact_numbers().getPhone2().getCountryCode() + "-"
-                            + agentSettings.getContact_details().getContact_numbers().getPhone2().getNumber() + "x"
-                            + agentSettings.getContact_details().getContact_numbers().getPhone2().getExtension() );
+                    agentSettings.getContact_details().getContact_numbers().setPersonal(
+                        agentSettings.getContact_details().getContact_numbers().getPhone2().getFormattedPhoneNumber() );
                 }
             }
 
@@ -366,9 +362,7 @@ public class UserServiceImpl implements UserService
             }
             agentSettings.getContact_details().getContact_numbers().setPhone1( phone );
             agentSettings.getContact_details().getContact_numbers()
-                .setWork( agentSettings.getContact_details().getContact_numbers().getPhone1().getCountryCode() + "-"
-                    + agentSettings.getContact_details().getContact_numbers().getPhone1().getNumber() + "x"
-                    + agentSettings.getContact_details().getContact_numbers().getPhone1().getExtension() );
+                .setWork( agentSettings.getContact_details().getContact_numbers().getPhone1().getFormattedPhoneNumber() );
         }
 
         agentSettings.setCreatedBy( String.valueOf( user.getUserId() ) );
