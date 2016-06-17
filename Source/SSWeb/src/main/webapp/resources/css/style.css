@@ -353,7 +353,7 @@
 
 .reg-left-container{
     position: relative;
-    min-height: 100%;
+    min-height: 750px;
     display: table-cell;
     vertical-align: top;
     overflow: hidden!important;
@@ -381,7 +381,7 @@
     display: table-cell;
     vertical-align: top;
     overflow: hidden!important;
-    position:relative;
+    position:fixed;
 }
 
 .reg-create-account{
@@ -600,8 +600,9 @@
 	position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: 0;
+    left: 55%;
     right: 0;
+    width:400px;
    
 }
 .reg-payment-wrapper{
@@ -745,16 +746,16 @@ font-size: 40px;
 .reg-li{
 	opacity: 0.6!important;
     color: #fff;
+    margin-top:20px;
 }
 .reg-li>ul>li{
-	padding:5px;
+	padding:10px;
 }
 .payment-right-description{
-	width:70%;
 	margin:auto;
 }
 .reg-right-description-payment{
-	width:80%;
+	width:100%;
 	margin:auto;
 }
 .reg-password-header{
@@ -790,11 +791,11 @@ font-size: 40px;
     margin-bottom: 0px;
     color: #FFA940;
 }
-/* .reg-position{
-	position: fixed;
-    margin-top: 640px;
-    margin-left: -299px;
-} */
+.payment-right-center{
+	width:400px !important;
+}
+
+/* progress bar */
 .arrow-steps .step {
   font-size: 14px;
   text-align: center;
