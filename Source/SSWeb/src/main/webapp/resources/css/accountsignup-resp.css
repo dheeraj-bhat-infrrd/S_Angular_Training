@@ -1,5 +1,5 @@
 /* ============== new registration style==============*/
-@media ( max-width :767px) {
+@media ( max-width :815px) {
 	.reg-right-container {
 		display: none;
 	}
@@ -46,28 +46,34 @@
 	width:100%;
 	margin:auto;
     }
-	
+
 }
 
  @media ( min-width : 1450px) {
-	/*.reg-side-image {
-		width: 350px;
-		height: 490px;
-	}
-	.reg-right-description {
-		font-size: 24px;
-	}
-	.reg-line-1 {
-		width: 444px;
-	}
-	.reg-line-3 {
-		width: 517px;
-	}
-	.reg-line-4 {
-		width: 295px;
-	}*/
+	
 	.reg-left-container{
 	      min-width: 624px
 	}
+	.payment-right-center{
+	width:450px !important;
+}
 	
 } 
+@media(min-width:993px)and (max-width:1650px){
+	 .reg-right-center {
+		left: 57%;
+	}
+}
+@media(max-width:900px){
+	.reg-right-description-payment {
+      width: 80%;
+	}
+	.reg-li{
+	 margin-top:0px;
+	}
+	.reg-li>ul>li{
+	 padding:5px;
+	}
+	
+	
+}
