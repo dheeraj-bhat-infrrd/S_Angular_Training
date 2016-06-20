@@ -9182,7 +9182,8 @@ $(document).on( 'click', '#send-help-mail-button', function() {
 
 
 //Disconnect social media
-function disconnectSocialMedia(socialMedia, isAutoLogin) {
+function disconnectSocialMedia(event,socialMedia, isAutoLogin) {
+	event.stopPropagation();
 	if(isAutoLogin) {
 		$('#overlay-toast').html('Insufficient permission to disconnect from ' + socialMedia);
 		showToast();
@@ -9191,8 +9192,48 @@ function disconnectSocialMedia(socialMedia, isAutoLogin) {
 	if($('div[data-social="'+socialMedia+'"]').text() == undefined || $('div[data-social="'+socialMedia+'"]').text() == ''){
 		return;
 	}
+	if (socialMedia=='linkedin'){
+		keepFeed();
+	}else{
+		$('#overlay-header').html("Social Feed");
+		$("#overlay-text").html("What would you like to do with your current news feed?");
+		$('#overlay-continue').html("Keep");
+		$('#overlay-cancel').html("Delete");
+		$('#overlay-continue').attr("onclick", "");
+		$('#overlay-main').show();
+		$('#overlay-continue').click(function() {
+			keepFeed();
+			overlayRevert();
+		});
+		$('#overlay-cancel').click(function(){
+			$('#overlay-continue').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			overlayRevert();
+			deleteFeed();
+		});
+	}
+	function deleteFeed(){
+		//delete feed function
+	}
 	
-	var payload = {
+	 function keepFeed(){
+		 var payload = {
+					"socialMedia" : socialMedia	
+				};
+				
+				callAjaxPostWithPayloadData("/disconnectsocialmedia.do", function(data) {
+					if(data == "success"){
+						$('div[data-social="'+socialMedia+'"]').html('');
+						$('div[data-social="'+socialMedia+'"]').parent().find('.social-media-disconnect').addClass('social-media-disconnect-disabled').removeAttr("onclick").removeAttr("title");
+						$('#overlay-toast').html('Successfully disconnected ' + socialMedia);
+						showToast();
+					} else {
+						$('#overlay-toast').html('Some error occurred while disconnecting ' + socialMedia);
+						showToast();
+					}
+				}, payload, true);
+	 }
+	/*var payload = {
 		"socialMedia" : socialMedia	
 	};
 	
@@ -9206,7 +9247,7 @@ function disconnectSocialMedia(socialMedia, isAutoLogin) {
 			$('#overlay-toast').html('Some error occurred while disconnecting ' + socialMedia);
 			showToast();
 		}
-	}, payload, true);	
+	}, payload, true);	*/
 }
 
 
