@@ -9214,11 +9214,17 @@ function disconnectSocialMedia(event,socialMedia, isAutoLogin) {
 	}
 	function deleteFeed(){
 		//delete feed function
+		processSocialMediaDisconnect(true);
 	}
 	
 	 function keepFeed(){
+		 processSocialMediaDisconnect(false);
+	 }
+	 
+	 function processSocialMediaDisconnect(removeFeed){
 		 var payload = {
-					"socialMedia" : socialMedia	
+					"socialMedia" : socialMedia,
+					"removeFeed" : removeFeed
 				};
 				
 				callAjaxPostWithPayloadData("/disconnectsocialmedia.do", function(data) {
