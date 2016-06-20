@@ -1,22 +1,5 @@
 package com.realtech.socialsurvey.core.starter;
 
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.stereotype.Component;
-
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -48,6 +31,23 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.stereotype.Component;
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -371,64 +371,145 @@ public class DotloopReviewProcessor extends QuartzJobBean
             if ( response != null ) {
                 responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
                 participants = new Gson().fromJson( responseString, new TypeToken<List<DotLoopParticipant>>() {}.getType() );
-                Map<String, String> customerMapping = null;
-                String agentEmailId = null;
+                //JIRA SS-493 begin
+                List<String> buyingAgentEmailIdList = null;
+                List<String> sellingAgentEmailIdList = null;
+                Map<String, String> buyersMap = null;
+                Map<String, String> sellersMap = null;
+
                 for ( DotLoopParticipant participant : participants ) {
-                    if ( participant.getRole() != null
-                        && ( participant.getRole().equalsIgnoreCase( BUYING_AGENT_ROLE )
-                            || participant.getRole().equalsIgnoreCase( SELLING_AGENT_ROLE ) || participant.getRole()
-                            .equalsIgnoreCase( LISTING_AGENT_ROLE ) ) && participant.getMemberOfMyTeam() != null
-                        && participant.getMemberOfMyTeam().equals( CommonConstants.YES_STRING ) ) {
+                    String agentEmailId = null;
+                    //If buying agent
+                    if ( participant.getRole() != null && participant.getRole().equalsIgnoreCase( BUYING_AGENT_ROLE )
+                        && participant.getMemberOfMyTeam() != null && participant.getMemberOfMyTeam()
+                        .equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
                         agentEmailId = participant.getEmail();
                         if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
-                            if(agentEmailId != null && !agentEmailId.isEmpty())
+                            if ( agentEmailId != null && !agentEmailId.isEmpty() ) {
                                 agentEmailId = utils.maskEmailAddress( agentEmailId );
+                                if ( buyingAgentEmailIdList == null )
+                                    buyingAgentEmailIdList = new ArrayList<>();
+                                buyingAgentEmailIdList.add( agentEmailId );
+                            }
                         }
                     }
-                    if ( participant.getRole() != null
-                        && ( participant.getRole().equalsIgnoreCase( BUYER_ROLE ) || participant.getRole().equalsIgnoreCase(
-                            SELLER_ROLE ) ) && participant.getMemberOfMyTeam().equalsIgnoreCase( CommonConstants.NO_STRING ) ) {
+
+                    //If selling agent
+                    if ( participant.getRole() != null && ( participant.getRole().equalsIgnoreCase( SELLING_AGENT_ROLE )
+                        || participant.getRole().equalsIgnoreCase( LISTING_AGENT_ROLE ) )
+                        && participant.getMemberOfMyTeam() != null && participant.getMemberOfMyTeam()
+                        .equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+                        agentEmailId = participant.getEmail();
+                        if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
+                            if ( agentEmailId != null && !agentEmailId.isEmpty() ) {
+                                agentEmailId = utils.maskEmailAddress( agentEmailId );
+                                if ( sellingAgentEmailIdList == null )
+                                    sellingAgentEmailIdList = new ArrayList<>();
+                                sellingAgentEmailIdList.add( agentEmailId );
+                            }
+                        }
+                    }
+
+                    //If buyer
+                    if ( participant.getRole() != null && participant.getRole().equalsIgnoreCase( BUYER_ROLE )
+                        && participant.getMemberOfMyTeam() != null && participant.getMemberOfMyTeam()
+                        .equalsIgnoreCase( CommonConstants.NO_STRING ) ) {
                         if ( participant.getEmail() != null && !participant.getEmail().isEmpty() ) {
-                            if ( customerMapping == null ) {
-                                customerMapping = new HashMap<>();
+                            if ( buyersMap == null ) {
+                                buyersMap = new HashMap<>();
                             }
                             String customerEmailId = participant.getEmail().trim();
                             if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
                                 customerEmailId = utils.maskEmailAddress( customerEmailId );
                             }
-                            customerMapping.put( customerEmailId, participant.getName() );
+                            buyersMap.put( customerEmailId, participant.getName() );
+                        }
+                    }
+
+                    //If seller
+                    if ( participant.getRole() != null && participant.getRole().equalsIgnoreCase( SELLER_ROLE )
+                        && participant.getMemberOfMyTeam() != null && participant.getMemberOfMyTeam()
+                        .equalsIgnoreCase( CommonConstants.NO_STRING ) ) {
+                        if ( participant.getEmail() != null && !participant.getEmail().isEmpty() ) {
+                            if ( sellersMap == null ) {
+                                sellersMap = new HashMap<>();
+                            }
+                            String customerEmailId = participant.getEmail().trim();
+                            if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
+                                customerEmailId = utils.maskEmailAddress( customerEmailId );
+                            }
+                            sellersMap.put( customerEmailId, participant.getName() );
                         }
                     }
                 }
-                if ( customerMapping != null && customerMapping.size() > 0 && agentEmailId != null && !agentEmailId.isEmpty() ) {
-                    SurveyPreInitiation surveyPreInitiation = null;
-                    for ( String customerMappingKey : customerMapping.keySet() ) {
-                        surveyPreInitiation = new SurveyPreInitiation();
-                        surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName, organizationUnitId );
-                        surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-                        surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-                        surveyPreInitiation.setCustomerEmailId( customerMappingKey );
-                        surveyPreInitiation.setCustomerFirstName( customerMapping.get( customerMappingKey ) );
-                        surveyPreInitiation.setCustomerLastName( null );
-                        surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
-                        surveyPreInitiation.setAgentEmailId( agentEmailId );
-                        surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
-                        surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
-                        surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
-                        // adding the loop view id in the source id for back tracking
-                        surveyPreInitiation.setSurveySourceId( String.valueOf( loop.getLoopViewId() ) );
-                        try {
-                            surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
-                            //update the flag
-                            newRecordFound = true;
-                            newRecordFoundCount++;
-                        } catch ( InvalidInputException e ) {
-                            LOG.error( "Unable to insert this record ", e );
+
+                //Send surveys from buying agent to buyers
+                if ( buyersMap != null && buyersMap.size() > 0 && buyingAgentEmailIdList != null && !buyingAgentEmailIdList.isEmpty() ) {
+                    for ( String buyingAgentEmailId : buyingAgentEmailIdList ) {
+                        for ( String buyerEmailId : buyersMap.keySet() ) {
+                            SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+                            surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName, organizationUnitId );
+                            surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+                            surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                            surveyPreInitiation.setCustomerEmailId( buyerEmailId );
+                            surveyPreInitiation.setCustomerFirstName( buyersMap.get( buyerEmailId ) );
+                            surveyPreInitiation.setCustomerLastName( null );
+                            surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
+                            surveyPreInitiation.setAgentEmailId( buyingAgentEmailId );
+                            surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
+                            surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+                            surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
+                            // adding the loop view id in the source id for back tracking
+                            surveyPreInitiation.setSurveySourceId( String.valueOf( loop.getLoopViewId() ) );
+                            try {
+                                surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
+                                //update the flag
+                                newRecordFound = true;
+                                newRecordFoundCount++;
+                            } catch ( InvalidInputException e ) {
+                                LOG.error( "Unable to insert this record ", e );
+                            }
                         }
                     }
                 } else {
                     LOG.warn( "Incomplete details from participants call for loop view id" );
                 }
+                
+                
+                //Send surveys from selling agents to sellers
+                if ( sellersMap != null && sellersMap.size() > 0 && sellingAgentEmailIdList != null && !sellingAgentEmailIdList
+                    .isEmpty() ) {
+                    for ( String sellingAgentEmailId : sellingAgentEmailIdList ) {
+                        for ( String sellerEmailId : sellersMap.keySet() ) {
+                            SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+                            surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName,
+                                organizationUnitId );
+                            surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+                            surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                            surveyPreInitiation.setCustomerEmailId( sellerEmailId );
+                            surveyPreInitiation.setCustomerFirstName( sellersMap.get( sellerEmailId ) );
+                            surveyPreInitiation.setCustomerLastName( null );
+                            surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
+                            surveyPreInitiation.setAgentEmailId( sellingAgentEmailId );
+                            surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
+                            surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+                            surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
+                            // adding the loop view id in the source id for back tracking
+                            surveyPreInitiation.setSurveySourceId( String.valueOf( loop.getLoopViewId() ) );
+                            try {
+                                surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
+                                //update the flag
+                                newRecordFound = true;
+                                newRecordFoundCount++;
+                            } catch ( InvalidInputException e ) {
+                                LOG.error( "Unable to insert this record ", e );
+                            }
+                        }
+                    }
+                } else {
+                    LOG.warn( "Incomplete details from participants call for loop view id" );
+                }
+                //JIRA SS-493 end
             } else {
                 LOG.info( "No response fetched for loop details " + loop.getLoopViewId() + " for profile id: "
                     + loop.getProfileId() );
@@ -502,102 +583,105 @@ public class DotloopReviewProcessor extends QuartzJobBean
     /**
      * Fetches records from dot loop
      * 
-     * @param apiKey
+     * @param dotloopCrmInfo
      * @param unitSettings
      */
     public void fetchReviewfromDotloop( DotLoopCrmInfo dotloopCrmInfo, String collectionName,
         OrganizationUnitSettings unitSettings )
     {
-        String apiKey = dotloopCrmInfo.getApi();
-        LOG.debug( "Fetching reviews for api key: " + apiKey + " with id: " + unitSettings.getIden() );
-        String authorizationHeader = CommonConstants.AUTHORIZATION_HEADER + apiKey;
-        //re initialize the flag;
-        newLoopFound = false;
-        newRecordFound = false;
-        newRecordFoundCount=0;
-        // get list of profiles
-        List<DotLoopProfileEntity> profileList = getDotLoopProfiles( authorizationHeader, apiKey );
-        if ( profileList != null && !profileList.isEmpty() ) {
-            LOG.debug( "Got " + profileList.size() + " profiles." );
-            for ( DotLoopProfileEntity profile : profileList ) {
-            	
-                String profileId = String.valueOf( profile.getProfileId() );
-                try {
-                    if ( profile.isActive() && !isProfilePresentAsInactive( collectionName, unitSettings, profile ) ) {
-                        // check for loop ids with status closed (4)
-                        Response loopResponse = null;
-                        int batchNumber = 1;
-                        String loopResponseString = null;
-                        // List<LoopProfileMapping> dotloopProfileMappingList = null;
-                        List<LoopProfileMapping> loopEntities = null;
-                        boolean byPassRecords = false; // checks if the system has processed the
-                                                       // profile ever before.
-                        try {
+        String apiKeysStr = dotloopCrmInfo.getApi();
+        List<String> apiKeyList = Arrays.asList(apiKeysStr.split("\\s*,\\s*"));
+        for ( String apiKey : apiKeyList ) {
+            apiKey = apiKey.trim();
+            LOG.debug( "Fetching reviews for api key: " + apiKey + " with id: " + unitSettings.getIden() );
+            String authorizationHeader = CommonConstants.AUTHORIZATION_HEADER + apiKey;
+            //re initialize the flag;
+            newLoopFound = false;
+            newRecordFound = false;
+            newRecordFoundCount = 0;
+            // get list of profiles
+            List<DotLoopProfileEntity> profileList = getDotLoopProfiles( authorizationHeader, apiKey );
+            if ( profileList != null && !profileList.isEmpty() ) {
+                LOG.debug( "Got " + profileList.size() + " profiles." );
+                for ( DotLoopProfileEntity profile : profileList ) {
 
-                            if ( dotloopCrmInfo.isRecordsBeenFetched()
-                                && organizationManagementService.getLoopsCountByProfile( profileId, collectionName,
-                                    unitSettings.getIden() ) > 0 ) {
-                                LOG.info( "Records for profile id: " + profileId + " is already present" );
-                                byPassRecords = false;
-                            } else {
-                                LOG.info( "Proile id is not processed for profile id: " + profileId
-                                    + ". Bypassing all records. Just adding into tracker" );
-                                byPassRecords = true;
-                            }
-                            do {
-                                LOG.debug( "Gettig batch " + batchNumber + " for closed records for profile " + profileId );
-                                loopResponse = dotloopIntegrationApi.fetchClosedProfiles( authorizationHeader, profileId,
-                                    batchNumber );
-                                if ( loopResponse != null ) {
-                                    loopResponseString = new String( ( (TypedByteArray) loopResponse.getBody() ).getBytes() );
-                                    if ( loopResponseString == null || loopResponseString.equals( "[]" ) ) {
+                    String profileId = String.valueOf( profile.getProfileId() );
+                    try {
+                        if ( profile.isActive() ) {
+                            // check for loop ids with status closed (4)
+                            Response loopResponse = null;
+                            int batchNumber = 1;
+                            String loopResponseString = null;
+                            // List<LoopProfileMapping> dotloopProfileMappingList = null;
+                            List<LoopProfileMapping> loopEntities = null;
+                            boolean byPassRecords = false; // checks if the system has processed the
+                            // profile ever before.
+                            try {
+
+                                if ( dotloopCrmInfo.isRecordsBeenFetched() && organizationManagementService
+                                    .getLoopsCountByProfile( profileId, collectionName, unitSettings.getIden() ) > 0 ) {
+                                    LOG.info( "Records for profile id: " + profileId + " is already present" );
+                                    byPassRecords = false;
+                                } else {
+                                    LOG.info( "Proile id is not processed for profile id: " + profileId + ". Bypassing all records. Just adding into tracker" );
+                                    byPassRecords = true;
+                                }
+                                do {
+                                    LOG.debug( "Gettig batch " + batchNumber + " for closed records for profile " + profileId );
+                                    loopResponse = dotloopIntegrationApi
+                                        .fetchClosedProfiles( authorizationHeader, profileId, batchNumber );
+                                    if ( loopResponse != null ) {
+                                        loopResponseString = new String( ( (TypedByteArray) loopResponse.getBody() ).getBytes() );
+                                        if ( loopResponseString == null || loopResponseString.equals( "[]" ) ) {
+                                            // no more records
+                                            LOG.debug( "No more loops ids for profile: " + profileId );
+                                            break;
+                                        } else {
+                                            LOG.debug( "Processing batch: " + batchNumber + " for profile: " + profileId );
+                                            loopEntities = new Gson().fromJson( loopResponseString, new TypeToken<List<LoopProfileMapping>>()
+                                            {
+                                            }.getType() );
+                                            // process loop entites. If there are no records for the
+                                            // profile id in the tracker
+                                            processLoopEntites( collectionName, loopEntities, profileId, byPassRecords,
+                                                authorizationHeader, unitSettings.getIden() );
+                                        }
+                                    } else {
                                         // no more records
                                         LOG.debug( "No more loops ids for profile: " + profileId );
                                         break;
-                                    } else {
-                                        LOG.debug( "Processing batch: " + batchNumber + " for profile: " + profileId );
-                                        loopEntities = new Gson().fromJson( loopResponseString,
-                                            new TypeToken<List<LoopProfileMapping>>() {}.getType() );
-                                        // process loop entites. If there are no records for the
-                                        // profile id in the tracker
-                                        processLoopEntites( collectionName, loopEntities, profileId, byPassRecords,
-                                            authorizationHeader, unitSettings.getIden() );
                                     }
-                                } else {
-                                    // no more records
-                                    LOG.debug( "No more loops ids for profile: " + profileId );
-                                    break;
-                                }
-                                batchNumber++;
-                            } while ( true );
-                        } catch ( DotLoopAccessForbiddenException dafe ) {
-                            // insert into tracker table
-                            LOG.info( "Inactive profile. Inserting into Dot loop profile mapping." );
-                            insertCompanyDotloopProfile( collectionName, profile, unitSettings );
+                                    batchNumber++;
+                                } while ( true );
+                            } catch ( DotLoopAccessForbiddenException dafe ) {
+                                // insert into tracker table
+                                LOG.info( "Inactive profile. Inserting into Dot loop profile mapping." );
+                                insertCompanyDotloopProfile( collectionName, profile, unitSettings );
+                            }
                         }
+                    } catch ( JsonSyntaxException | InvalidInputException e ) {
+                        LOG.error( "Could not process " + profileId, e );
                     }
-                } catch ( JsonSyntaxException | InvalidInputException e ) {
-                    LOG.error( "Could not process " + profileId, e );
                 }
             }
-        }
-        
-        //send report to admin if no new record is fetched
-        if(!newLoopFound && !newRecordFound){
-            String subject = "No record fetched from Dotloop for " + collectionName + " id : " + unitSettings.getIden();
-            String body = "";
-            if(!newLoopFound)
-                body += "No new loop found for the entity <br/>";
-            if(!newRecordFound)
-                body += "No new record found for the entity <br/>";
-            try {
-                emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail, subject, body, null );
-            } catch ( InvalidInputException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch ( UndeliveredEmailException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+
+            //send report to admin if no new record is fetched
+            if ( !newLoopFound && !newRecordFound ) {
+                String subject = "No record fetched from Dotloop for " + collectionName + " id : " + unitSettings.getIden();
+                String body = "";
+                if ( !newLoopFound )
+                    body += "No new loop found for the entity <br/>";
+                if ( !newRecordFound )
+                    body += "No new record found for the entity <br/>";
+                try {
+                    emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail, subject, body, null );
+                } catch ( InvalidInputException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch ( UndeliveredEmailException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
         
