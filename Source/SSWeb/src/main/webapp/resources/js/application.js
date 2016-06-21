@@ -8020,7 +8020,6 @@ function bindClickForIndividuals(elementClass) {
 
 //Bind scroll event for public posts on edit profile page
 function attachPostsScrollEvent() {
-	console.log("scroll function called");
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
@@ -11022,8 +11021,4 @@ $(document).on('click','.review-more-button',function(){
 	$(this).parent().find('.view-zillow-link').show();
 	$(this).hide();
 });
-/*$('.review-more-button').click(function(){
-	$(this).parent().find('.review-less-text').hide();
-	$(this).parent().find('.review-complete-txt').show();
-	$(this).hide();
-});*/
+
