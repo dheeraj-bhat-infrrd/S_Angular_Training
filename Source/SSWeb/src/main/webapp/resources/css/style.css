@@ -353,7 +353,7 @@
 
 .reg-left-container{
     position: relative;
-    min-height: 100%;
+    min-height: 750px;
     display: table-cell;
     vertical-align: top;
     overflow: hidden!important;
@@ -381,7 +381,7 @@
     display: table-cell;
     vertical-align: top;
     overflow: hidden!important;
-    position:relative;
+    position:fixed;
 }
 
 .reg-create-account{
@@ -395,7 +395,7 @@
     border-radius: 3px;
     border: 1px solid #dcdcdc;
     padding: 0 10px;
-    min-width: 170px;
+    min-width: 110px;
 }
 .reg-comp-add{
     height: 40px;
@@ -600,23 +600,25 @@
 	position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: 0;
+    left: 55%;
     right: 0;
+    width:400px;
    
 }
-.reg-payment-wrapper{
-	
-}
+
 .reg-payment-container{
 	border: 1px solid #dcdcdc;
     background-color: #dcdcdc;
     border-radius: 5px;
-    width: 450px;
     height: 300px;
     margin: 30px auto;
 }
+
+.reg-pay-wrap{
+	width: 380px; 
+	margin: auto;
+}
 .plan-card {
-   
     position: relative;
     border-radius: 10px;
     color: #fff;
@@ -626,8 +628,8 @@
     width: 200px;
     margin: 0 10px;
     height: 300px;
-
 }
+
 .price-info {
     font-size: 8rem;
     position: relative;
@@ -639,6 +641,7 @@
     font-family: 'Lato', 'Open Sans', Helvetica, Arial, sans-serif;
     height:80px;
 }
+
 .price-info-sub {
     display: block;
     font-size: 13px;
@@ -647,6 +650,7 @@
     height: 30px;
     opacity: .8;
 }
+
 .price-info .dollar {
     position: relative;
     top: -2.75rem;
@@ -662,6 +666,7 @@
     letter-spacing: -1px;
     font-weight: 700 !important;
 }
+
 .pay-button {
     font-weight: 600 !important;
 }
@@ -679,6 +684,7 @@
     border: none;
     margin-top:140px;
 }
+
 .plan-discription {
     font-size: 18px;
     font-weight: 600! important;
@@ -745,16 +751,16 @@ font-size: 40px;
 .reg-li{
 	opacity: 0.6!important;
     color: #fff;
+    margin-top:20px;
 }
 .reg-li>ul>li{
-	padding:5px;
+	padding:10px;
 }
 .payment-right-description{
-	width:70%;
 	margin:auto;
 }
 .reg-right-description-payment{
-	width:80%;
+	width:100%;
 	margin:auto;
 }
 .reg-password-header{
@@ -790,11 +796,11 @@ font-size: 40px;
     margin-bottom: 0px;
     color: #FFA940;
 }
-/* .reg-position{
-	position: fixed;
-    margin-top: 640px;
-    margin-left: -299px;
-} */
+.payment-right-center{
+	width:400px !important;
+}
+
+/* progress bar */
 .arrow-steps .step {
   font-size: 14px;
   text-align: center;
@@ -885,4 +891,10 @@ font-size: 40px;
 
 .arrow-steps .step.done:after {
   border-left: 17px solid #2f69aa;
+}
+.reg-dow{
+	width:80px;
+}
+.reg-agree{
+	font-size: 14px;
 }

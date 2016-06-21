@@ -42,6 +42,7 @@
 		<intercept-url pattern="/registrationpage.do" access="permitAll" />
 		<intercept-url pattern="/register.do" access="permitAll" />
 		<intercept-url pattern="/accountsignup.do" access="permitAll" />
+		<intercept-url pattern="/accountsignupredirect.do" access="permitAll" />
 		
 		<!-- Mail URL Resolver Services -->
 		<intercept-url pattern="/mail.do" access="permitAll" />

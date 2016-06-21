@@ -1,47 +1,78 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
-	$rootScope.redirect = false;
-	$scope.emailFormat = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-	$scope.isValidPhone = false;
-	if (isLinkedin == "true") {
-		$rootScope.redirect = true;
+
+	// this will set the expiration to 1 day
+	var now = new Date(), exp = new Date();
+	exp.setDate(exp.getDate() + 1);
+
+	$scope.putUserIdCompanyIdInCookie = function(userId, companyId) {
+		$cookies.put("userId", userId, {
+			'expires' : exp
+		});
+		$cookies.put("companyId", companyId, {
+			'expires' : exp
+		});
 		$rootScope.userId = $cookies.get("userId");
 		$rootScope.companyId = $cookies.get("companyId");
+	}
+
+	$scope.clearCookie = function() {
+		$cookies.remove("userId");
+		$cookies.remove("companyId");
+	}
+
+	$rootScope.redirect = false;
+	$scope.emailFormat = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+	if (planId != "") {
+		$cookies.put("planId", planId, {
+			'expires' : exp
+		});
+	} else {
+		planId = $cookies.get("planId");
+	}
+
+	if (userId != "" && companyId != "") {
+		$scope.putUserIdCompanyIdInCookie(userId, companyId);
+	} else {
+		$rootScope.userId = $cookies.get("userId");
+		$rootScope.companyId = $cookies.get("companyId");
+	}
+	if (newUser == "true") {
+		$scope.clearCookie();
+		$location.path('/accountsignup').replace();
+	} else if (isLinkedin == "true") {
+		$rootScope.redirect = true;
 		$location.path('/linkedin').replace();
 	} else if (setPassword == "true") {
 		$rootScope.firstName = firstName;
 		$rootScope.lastName = lastName;
-		$rootScope.userId = userId;
-		$rootScope.companyId = companyId;
 		$location.path('/password').replace();
-	} else if (userId == "" && companyId == "") {
-		$rootScope.userId = userId;
-		$rootScope.companyId = companyId;
-		$location.path('/accountsignup').replace();
 	} else {
-		$rootScope.userId = userId;
-		$rootScope.companyId = companyId;
 		var userStageDsiplayOrder = 0;
 		var companyStageDsiplayOrder = 0;
 		var landingStage = '';
 		var registrationStages = JSON.parse('{"INIT":1, "LIN":2, "UPP":3, "CPP":4, "PAY":5, "COM":6}');
 		var registrationStagesRoute = JSON.parse('{"1":"/accountsignup", "2":"/linkedin", "3":"/profile", "4":"/company", "5":"/payment", "6":"/signupcomplete"}');
-
-		UserProfileService.getUserStage($rootScope.userId).then(function(response) {
-			userStageDsiplayOrder = registrationStages[response.data];
-			CompanyProfileService.getCompanyStage($rootScope.companyId).then(function(response) {
-				companyStageDsiplayOrder = registrationStages[response.data];
-				if (userStageDsiplayOrder > companyStageDsiplayOrder) {
-					landingStage = registrationStagesRoute[userStageDsiplayOrder + 1];
-				} else {
-					landingStage = registrationStagesRoute[companyStageDsiplayOrder + 1];
-				}
-				$location.path(landingStage).replace();
+		if (angular.isDefined($rootScope.userId) && angular.isDefined($rootScope.companyId)) {
+			UserProfileService.getUserStage($rootScope.userId).then(function(response) {
+				userStageDsiplayOrder = registrationStages[response.data];
+				CompanyProfileService.getCompanyStage($rootScope.companyId).then(function(response) {
+					companyStageDsiplayOrder = registrationStages[response.data];
+					if (userStageDsiplayOrder > companyStageDsiplayOrder) {
+						landingStage = registrationStagesRoute[userStageDsiplayOrder + 1];
+					} else {
+						landingStage = registrationStagesRoute[companyStageDsiplayOrder + 1];
+					}
+					$location.path(landingStage).replace();
+				}, function(error) {
+					showError($scope.getErrorMessage(error.data));
+				});
 			}, function(error) {
 				showError($scope.getErrorMessage(error.data));
 			});
-		}, function(error) {
-			showError($scope.getErrorMessage(error.data));
-		});
+		} else {
+			$location.path('/accountsignup').replace();
+		}
 	}
 
 	$scope.getErrorMessage = function(data) {
@@ -63,10 +94,10 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		}
 		return errorMessage;
 	}
-	$scope.maskPhoneNumber = function(phoneId, iso2) {
 
+	$scope.maskPhoneNumber = function(phoneId, iso2) {
 		if (iso2 == 'us') {
-			$('#' + phoneId).mask(phoneFormat, phoneRegEx);
+			$('#' + phoneId).mask(phoneFormatWithExtension, usPhoneRegEx);
 		} else {
 			$('#' + phoneId).unmask(phoneFormat);
 			$('#' + phoneId).keypress(function(e) {
@@ -112,19 +143,6 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		}
 	}
 
-	$scope.validatePhone = function(phone) {
-		if (angular.isUndefined(phone) || phone == null || phone.formattedPhoneNumber == null || phone.formattedPhoneNumber == "") {
-			$scope.isValidPhone = false;
-		} else {
-			$scope.isValidPhone = true;
-		}
-	}
-
-	$scope.checkPhone = function(phoneId, phone) {
-		phone = $scope.getPhoneNumber(phoneId);
-		$scope.validatePhone(phone);
-	}
-
 	$scope.saveLinkedInStage = function() {
 		UserProfileService.updateUserStage($rootScope.userId, 'LIN').then(function(response) {
 			$rootScope.redirect = false;
@@ -140,6 +158,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 	$scope.accountRegistration = {};
 	$scope.response = null;
 	$scope.widgetId = null;
+	$scope.isEmailIdExist = false;
 
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
@@ -148,7 +167,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 		utilsScript : "../resources/js/utils.js"
 	});
 
-	$('#reg-phone').mask(phoneFormat, phoneRegEx);
+	$('#reg-phone').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$("#reg-phone").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone", countryData.iso2);
 	});
@@ -158,23 +177,20 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 			showOverlay();
 			$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
 			$scope.accountRegistration.phone = $scope.getPhoneNumber("reg-phone");
+			$scope.accountRegistration.planId = planId;
 			LoginService.signup($scope.accountRegistration).then(function(response) {
 				$rootScope.userId = response.data.userId;
 				$rootScope.companyId = response.data.companyId;
-				// this will set the expiration to 1 day
-				var now = new Date(), exp = new Date();
-				exp.setDate(exp.getDate() + 1);
-
-				$cookies.put("userId", $rootScope.userId, {
-					'expires' : exp
-				});
-				$cookies.put("companyId", $rootScope.companyId, {
-					'expires' : exp
-				});
+				$scope.putUserIdCompanyIdInCookie($rootScope.userId, $rootScope.companyId);
 				hideOverlay();
 				$location.path('/linkedin').replace();
 			}, function(error) {
-				showError($scope.getErrorMessage(error.data));
+				if (error.data.indexOf("already exists") > -1 && error.data.indexOf("User with Email") > -1) {
+					$scope.isEmailIdExist = true;
+					hideOverlay();
+				} else {
+					showError($scope.getErrorMessage(error.data));
+				}
 			});
 		}
 	};
@@ -217,7 +233,9 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 	};
 } ]);
 
-app.controller('signupcompleteController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
+app.controller('signupcompleteController', [ '$cookies', '$scope', '$rootScope', function($cookies, $scope, $rootScope) {
+	$scope.clearCookie();
+	$cookies.remove("planId");
 
 	$scope.login = function() {
 		showOverlay();
@@ -231,18 +249,25 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	$('#reg-phone1').intlTelInput({
 		utilsScript : "../resources/js/utils.js"
 	});
-	$('#reg-phone1').mask(phoneFormat, phoneRegEx);
+	$('#reg-phone1').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$("#reg-phone1").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone1", countryData.iso2);
 	});
 	$('#reg-phone2').intlTelInput({
 		utilsScript : "../resources/js/utils.js"
 	});
-	$('#reg-phone2').mask(phoneFormat, phoneRegEx);
+	$('#reg-phone2').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$("#reg-phone2").on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone2", countryData.iso2);
 	});
 	$scope.isValidWebAddress = true;
+
+	$scope.validatePhone1 = function() {
+		return angular.isDefined($rootScope.userProfile) && angular.isDefined($rootScope.userProfile.phone1) && $rootScope.userProfile.phone1 != null && $rootScope.userProfile.phone1.formattedPhoneNumber != null && $rootScope.userProfile.phone1.formattedPhoneNumber != "";
+
+	}
+
+	$scope.isValidPhone1 = $scope.validatePhone1();
 
 	$scope.loadDropzone = function() {
 		if (!angular.isUndefined($rootScope.userProfile)) {
@@ -292,7 +317,7 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 			$rootScope.userProfile = response.data;
 			$scope.setPhone("reg-phone1", $rootScope.userProfile.phone1);
 			$scope.setPhone("reg-phone2", $rootScope.userProfile.phone2);
-			$scope.validatePhone($rootScope.userProfile.phone1);
+			$scope.isValidPhone1 = $scope.validatePhone1();
 			$scope.loadDropzone();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
@@ -306,45 +331,39 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 	};
 
 	$scope.saveProfileDetails = function() {
+		showOverlay();
 		$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
 		$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
-		$scope.validatePhone($rootScope.userProfile.phone1);
 		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
 			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
 				$scope.isValidWebAddress = true;
-				if ($scope.isValidWebAddress && $scope.isValidPhone) {
+				$scope.isValidPhone1 = $scope.validatePhone1();
+				if ($scope.isValidWebAddress && $scope.isValidPhone1) {
 					$scope.updateUserProfile();
+				} else {
+					hideOverlay();
 				}
 			}, function(error) {
+				hideOverlay();
 				$scope.isValidWebAddress = false;
 			});
 		} else {
-			if ($scope.isValidPhone) {
+			$scope.isValidPhone1 = $scope.validatePhone1();
+			if ($scope.isValidPhone1) {
 				$scope.updateUserProfile();
+			} else {
+				hideOverlay();
 			}
 		}
 	};
 
 	$scope.updateUserProfile = function() {
-		showOverlay();
 		UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response) {
 			hideOverlay();
 			$location.path('/company').replace();
 		}, function(error) {
 			showError($scope.getErrorMessage(error.data));
 		});
-	}
-
-	$scope.validateWebAddress = function() {
-		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
-			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
-				$scope.isValidWebAddress = true;
-			}, function(error) {
-				$scope.isValidWebAddress = false;
-			});
-		} else {
-			$scope.isValidWebAddress = true;
-		}
 	}
 
 	$scope.backOnProfile = function() {
@@ -364,26 +383,23 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	$('#reg-phone-office').intlTelInput({
 		utilsScript : "../resources/js/utils.js"
 	});
-	$('#reg-phone-office').mask(phoneFormat, phoneRegEx);
+	$('#reg-phone-office').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$('#reg-phone-office').on("countrychange", function(e, countryData) {
 		$scope.maskPhoneNumber("reg-phone-office", countryData.iso2);
 	});
 	$("#country").countrySelect();
+
+	$scope.validateOfficePhone = function() {
+		return angular.isDefined($rootScope.companyProfile) && angular.isDefined($rootScope.companyProfile.officePhone) && $rootScope.companyProfile.officePhone != null && $rootScope.companyProfile.officePhone.formattedPhoneNumber != null && $rootScope.companyProfile.officePhone.formattedPhoneNumber != "";
+	}
+
+	$scope.isValidOfficePhone = $scope.validateOfficePhone();
 
 	$scope.selectCountry = function() {
 		$rootScope.companyProfile.address = "";
 		$rootScope.companyProfile.city = "";
 		$rootScope.companyProfile.state = "";
 		$rootScope.companyProfile.zip = "";
-		$rootScope.companyProfile.officePhone = {
-			"number" : "",
-			"countryCode" : "",
-			"extension" : "",
-			"countryAbbr" : "us",
-			"formattedPhoneNumber" : ""
-		};
-		$scope.setPhone('reg-phone-office', $rootScope.companyProfile.officePhone);
-		$scope.isValidPhone = false;
 		$scope.companydetailsubmittedcanada = false;
 		$scope.companydetailsubmitted = false;
 		$scope.companydetailsubmittedusa = false;
@@ -458,7 +474,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 			$rootScope.companyProfile = response.data;
 			$scope.initCountry();
 			$scope.setPhone("reg-phone-office", $rootScope.companyProfile.officePhone);
-			$scope.validatePhone($rootScope.companyProfile.officePhone);
+			$scope.isValidOfficePhone = $scope.validateOfficePhone();
 			if ($rootScope.companyProfile.industry.verticalsMasterId < 0) {
 				$rootScope.companyProfile.industry = {};
 			}
@@ -553,13 +569,13 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	};
 
 	$scope.validateCompanyDetailsForm = function() {
-		$scope.validatePhone($rootScope.companyProfile.officePhone);
+		$scope.isValidOfficePhone = $scope.validateOfficePhone();
 		if ($scope.canada) {
-			return ($rootScope.companyProfile.address && $rootScope.companyProfile.city && $rootScope.companyProfile.state && $rootScope.companyProfile.zip && $scope.isValidPhone);
+			return ($rootScope.companyProfile.address && $rootScope.companyProfile.city && $rootScope.companyProfile.state && $rootScope.companyProfile.zip && $scope.isValidOfficePhone);
 		} else if ($scope.usa) {
-			return ($rootScope.companyProfile.address && $rootScope.companyProfile.city && $rootScope.companyProfile.state && $rootScope.companyProfile.zip && $scope.isValidPhone);
+			return ($rootScope.companyProfile.address && $rootScope.companyProfile.city && $rootScope.companyProfile.state && $rootScope.companyProfile.zip && $scope.isValidOfficePhone);
 		} else {
-			return ($rootScope.companyProfile.address && $scope.isValidPhone);
+			return ($rootScope.companyProfile.address && $scope.isValidOfficePhone);
 		}
 	};
 
@@ -576,6 +592,21 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 	$scope.individual = true;
 	$scope.business = false;
 	$scope.enterprise = false;
+
+	if (planId == 1) {
+		$scope.individual = true;
+		$scope.business = false;
+		$scope.enterprise = false;
+	} else if (planId == 2) {
+		$scope.individual = false;
+		$scope.business = true;
+		$scope.enterprise = false;
+	} else if (planId == 3) {
+		$scope.individual = false;
+		$scope.business = false;
+		$scope.enterprise = true;
+	}
+
 	$scope.authorize = true;
 	$scope.payment = {};
 	$scope.expirationMonths = [ {
@@ -644,8 +675,10 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 		if (numberValidation.card != null) {
 			if (numberValidation.card.code.size == 3) {
 				$('#cvv').mask("ddd", digitRegEx);
+				$('#cvv').attr("maxlength", 3);
 			} else if (numberValidation.card.code.size == 4) {
 				$('#cvv').mask("dddd", digitRegEx);
+				$('#cvv').attr("maxlength", 4);
 			}
 		}
 	}
@@ -679,7 +712,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 			validCardDetails = false;
 		}
 
-		if (angular.isUndefined($scope.payment.cardNumber) || !numberValidation.isValid) {
+		if (angular.isUndefined($scope.payment.cardNumber) || !numberValidation.isValid || ($scope.payment.cardNumber.indexOf('3') != 0 && $scope.payment.cardNumber.indexOf('4') != 0 && $scope.payment.cardNumber.indexOf('5') != 0 && $scope.payment.cardNumber.indexOf('6') != 0)) {
 			validCardDetails = false;
 		}
 
@@ -687,7 +720,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 			validCardDetails = false;
 		}
 
-		if (angular.isUndefined($scope.payment.expirationYear) || !expiryYearValidation.isValid) {
+		if (angular.isUndefined($scope.payment.expirationYear) || !expiryYearValidation.isValid || (expiryYearValidation.isCurrentYear && $scope.payment.expirationMonth < $scope.today.getMonth() + 1)) {
 			validCardDetails = false;
 		}
 
@@ -846,14 +879,9 @@ app.controller('passwordController', [ '$scope', '$location', '$rootScope', 'Pas
 	$scope.lastName = $rootScope.lastName;
 
 	$scope.savePassword = function() {
-		if (($scope.password != undefined && $scope.password.length < 6) || ($scope.confirmPassword != undefined && $scope.confirmPassword.length < 6)) {
-			showError("Password and Confirm Password should be atleast 6 characters in length.");
-		} else if ($scope.password != $scope.confirmPassword) {
-			showError("Password and Confirm Password should exactly match.");
-		} else {
+		if ($scope.passwordForm.$valid) {
 			PasswordService.savePassword($rootScope.userId, $scope.password).then(function(response) {
-				showInfo("Password saved successfully.");
-				window.location = "/registeraccount/newloginas.do?userId=" + $rootScope.userId;
+				window.location = "/registeraccount/newloginas.do?userId=" + $rootScope.userId + "&planId=" + planId;
 			}, function(error) {
 				showError($scope.getErrorMessage(error.data));
 			});
@@ -879,5 +907,5 @@ function formattedDate(date) {
 		month = '0' + month;
 	if (day.length < 2)
 		day = '0' + day;
-	return [ day, month, year ].join('/');
+	return [ month, day, year ].join('/');
 }

@@ -783,7 +783,7 @@ $(document).on('click', '.hdr-log-btn', function() {
 	window.location = "/login.do";
 });
 $(document).on('click', '.hdr-reg-btn', function() {
-	window.location = "/signup.do";
+	window.location = "/accountsignupredirect.do?newUser=true";
 });
 $(document).on('click', '.hdr-logo', function() {
 	showOverlay();

@@ -4462,13 +4462,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //Activate agent in mongo
         AgentSettings agentSettings = getUserSettings( companyAdmin.getUserId() );
-        organizationUnitSettingsDao
-            .updateParticularKeyAgentSettings( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE_MONGO,
-                agentSettings );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.STATUS_COLUMN,
+            CommonConstants.STATUS_ACTIVE_MONGO, agentSettings );
 
         //Activate agent in Solr
-        solrSearchService
-            .editUserInSolr( companyAdmin.getUserId(), CommonConstants.STATUS_COLUMN, String.valueOf( CommonConstants.STATUS_ACTIVE ) );
+        solrSearchService.editUserInSolr( companyAdmin.getUserId(), CommonConstants.STATUS_COLUMN,
+            String.valueOf( CommonConstants.STATUS_ACTIVE ) );
         LOG.info( "UserManagementService.activateCompanyAdmin finished" );
         return companyAdmin;
     }
@@ -4895,13 +4894,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 
     @Override
-    public void inviteCorporateToRegister( User user ) throws InvalidInputException, UndeliveredEmailException
+    public void inviteCorporateToRegister( User user, int planId ) throws InvalidInputException, UndeliveredEmailException
     {
         Map<String, String> urlParams = new HashMap<String, String>();
         urlParams.put( CommonConstants.FIRST_NAME, user.getFirstName() );
         urlParams.put( CommonConstants.LAST_NAME, user.getLastName() );
         urlParams.put( CommonConstants.USER_ID, String.valueOf( user.getUserId() ) );
         urlParams.put( CommonConstants.COMPANY_ID, String.valueOf( user.getCompany().getCompanyId() ) );
+        urlParams.put( CommonConstants.PLAN_ID, String.valueOf( planId ) );
         urlParams.put( CommonConstants.CURRENT_TIMESTAMP, String.valueOf( System.currentTimeMillis() ) );
         urlParams.put( CommonConstants.UNIQUE_IDENTIFIER, generateUniqueIdentifier() );
 
@@ -4912,6 +4912,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         storeCompanyAdminInvitation( queryParam, user.getEmailId(), company );
 
         LOG.debug( "Calling email services to send registration invitation mail" );
-        emailServices.sendRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName() );
+        //emailServices.sendRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName() );
+        emailServices.sendNewRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName(), planId );
     }
 }

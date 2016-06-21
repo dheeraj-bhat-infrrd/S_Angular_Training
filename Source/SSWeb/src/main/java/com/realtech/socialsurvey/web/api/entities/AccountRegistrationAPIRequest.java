@@ -14,6 +14,19 @@ public class AccountRegistrationAPIRequest implements Serializable
     private String companyName;
     private String email;
     private Phone phone;
+    private int planId;
+
+
+    public int getPlanId()
+    {
+        return planId;
+    }
+
+
+    public void setPlanId( int planId )
+    {
+        this.planId = planId;
+    }
 
 
     public String getFirstName()

@@ -27,6 +27,7 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/intlTelInput.css">
 </head>
 <body>
 	<div id="overlay-linkedin-import" class="overlay-login overlay-main hide"></div>

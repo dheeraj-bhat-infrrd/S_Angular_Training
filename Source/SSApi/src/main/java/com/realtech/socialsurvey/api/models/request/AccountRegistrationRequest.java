@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.api.models.request;
 
 import com.realtech.socialsurvey.core.entities.Phone;
 
+
 public class AccountRegistrationRequest
 {
     private String firstName;
@@ -9,6 +10,19 @@ public class AccountRegistrationRequest
     private String companyName;
     private String email;
     private Phone phone;
+    private int planId;
+
+
+    public int getPlanId()
+    {
+        return planId;
+    }
+
+
+    public void setPlanId( int planId )
+    {
+        this.planId = planId;
+    }
 
 
     public String getFirstName()

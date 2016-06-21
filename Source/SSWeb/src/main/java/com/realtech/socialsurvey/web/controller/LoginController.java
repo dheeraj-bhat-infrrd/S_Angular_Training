@@ -94,8 +94,27 @@ public class LoginController
     }
 
 
+    @RequestMapping ( value = "/accountsignupredirect")
+    public String initNewAccountSignUp( @RequestParam ( value = "PlanId", required = false) String planId,
+        @RequestParam ( value = "newUser", required = false) String newUser, Model model, RedirectAttributes attributes )
+    {
+        LOG.info( "Method initNewAccountSignUp() called from LoginController" );
+        attributes.addFlashAttribute( "planId", planId );
+        attributes.addFlashAttribute( "newUser", newUser );
+        Map<String, Object> map = model.asMap();
+        attributes.addFlashAttribute( "isLinkedin", map.get( "isLinkedin" ) );
+        attributes.addFlashAttribute( "linkedinResponse", map.get( "linkedinResponse" ) );
+        attributes.addFlashAttribute( "userId", map.get( "userId" ) );
+        attributes.addFlashAttribute( "companyId", map.get( "companyId" ) );
+        attributes.addFlashAttribute( "firstName", map.get( "firstName" ) );
+        attributes.addFlashAttribute( "lastName", map.get( "lastName" ) );
+        attributes.addFlashAttribute( "setPassword", map.get( "setPassword" ) );
+        return "redirect:/accountsignup.do";
+    }
+
+
     @RequestMapping ( value = "/accountsignup")
-    public String initNewAccountSignUp( HttpServletResponse response, Model model )
+    public String initNewAccountSignUpRedirect( Model model )
     {
         LOG.info( "Method initNewAccountSignUp() called from LoginController" );
         return JspResolver.NEW_ACCOUNT_SIGNUP;

@@ -1177,4 +1177,6 @@ public interface CommonConstants
     public static final String ACCOUNT_REGISTER = "ACCREG";
     public static final int ENTERPRISE_PLAN_ID = 3;
 
+    public static final String PLAN_ID = "planId";
+
 }

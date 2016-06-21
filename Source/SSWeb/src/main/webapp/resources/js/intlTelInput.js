@@ -774,7 +774,7 @@
                 if (typeof this.options.customPlaceholder === "function") {
                     placeholder = this.options.customPlaceholder(placeholder, this.selectedCountryData);
                 }
-                this.telInput.attr("placeholder", placeholder);
+                /*this.telInput.attr("placeholder", placeholder);*/
             }
         },
         // called when the user selects a list item from the dropdown

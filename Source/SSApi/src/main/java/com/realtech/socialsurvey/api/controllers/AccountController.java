@@ -25,7 +25,6 @@ import com.realtech.socialsurvey.api.transformers.CompanyProfileTransformer;
 import com.realtech.socialsurvey.api.validators.AccountRegistrationValidator;
 import com.realtech.socialsurvey.api.validators.CompanyProfileValidator;
 import com.realtech.socialsurvey.api.validators.PaymentRequestValidator;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -108,7 +107,8 @@ public class AccountController
         user.setLastName( accountRegistrationRequest.getLastName() );
         user.setEmailId( accountRegistrationRequest.getEmail() );
         Map<String, Long> ids = accountService.saveAccountRegistrationDetailsAndGetIdsInMap( user,
-            accountRegistrationRequest.getCompanyName(), accountRegistrationRequest.getPhone() );
+            accountRegistrationRequest.getCompanyName(), accountRegistrationRequest.getPhone(),
+            accountRegistrationRequest.getPlanId() );
         LOGGER.info( "AccountController.initAccountRegsitration completed successfully" );
         return new ResponseEntity<Map<String, Long>>( ids, HttpStatus.OK );
     }
@@ -134,11 +134,10 @@ public class AccountController
         LOGGER.info( "AccountController.updateCompanyProfile started" );
         long compId = Long.parseLong( companyId );
         long userIdLong = Long.parseLong( userId );
-        AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userIdLong );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( compId );
         Company company = organizationManagementService.getCompanyById( compId );
         CompanyCompositeEntity companyProfileDetails = companyProfileTransformer
-            .transformApiRequestToDomainObject( companyProfile, company, unitSettings, agentSettings );
+            .transformApiRequestToDomainObject( companyProfile, company, unitSettings );
         accountService.updateCompanyProfile( compId, userIdLong, companyProfileDetails );
         LOGGER.info( "AccountController.updateCompanyProfile completed successfully" );
         return new ResponseEntity<Void>( HttpStatus.OK );

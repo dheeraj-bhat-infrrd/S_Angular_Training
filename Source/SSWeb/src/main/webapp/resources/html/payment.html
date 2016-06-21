@@ -1,7 +1,7 @@
 <script src="../resources/js/dropzone.js"></script>
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
 <div class="main-reg-wrapper">
-	<div class="reg-left-container">
+	<div class="reg-left-container" style="    height: 1110px !important;">
 		<div class="reg-ss-logo"></div>
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<div class="arrow-steps clearfix">
@@ -22,13 +22,13 @@
 			</div>
 		</div>
 		<div class="reg-payment-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12">
-			<div class="reg-payment-container ">
-				<div class="clearfix" style="width: 370px; margin: auto;">
-					<button class="reg-upgrade float-left" style="width: 80px" ng-click="downGrade()" ng-show="business||enterprise">
+			<div class="reg-payment-container col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="clearfix reg-pay-wrap" >
+					<button class="reg-upgrade float-left reg-dow"  ng-click="downGrade()" ng-show="business||enterprise">
 						<i class="fa fa-arrow-down" aria-hidden="true"></i>Downgrade
 					</button>
 					<div class="plan-card cursor_pointer float-left" ng-show="individual" style="background-color: #2BA875; margin-left: 90px;">
-						<h3 style="font-weight: 600 !important">Individual</h3>
+						<h3 class="reg-sm" style="font-weight: 600 !important">Individual</h3>
 						<p>
 							<span class="price-info"> <span class="dollar">$</span>39 <span class="cents">95</span>
 							</span><br> <span class="price-info-sub">per month<br>single user
@@ -36,7 +36,7 @@
 						</p>
 					</div>
 					<div class="plan-card cursor_pointer float-left" ng-show="business" style="background-color: #4C84C7;">
-						<h3 style="font-weight: 600 !important">Business</h3>
+						<h3 class="reg-sm" style="font-weight: 600 !important">Business</h3>
 						<p>
 							<span class="price-info"> <span class="dollar">$</span>29 <span class="cents">95</span>
 							</span><br> <span class="price-info-sub">per month per user<br>minimun 5 users
@@ -44,12 +44,12 @@
 						</p>
 					</div>
 					<div class="plan-card cursor_pointer float-left" ng-show="enterprise" style="background-color: #7E54B2;">
-						<h3 style="font-weight: 600 !important">Enterprise</h3>
+						<h3 class="reg-sm" style="font-weight: 600 !important">Enterprise</h3>
 						<span class="call-us">Call for pricing</span> <span class="price-info-sub">per month per users <br>minimum 100 users
 						</span>
 						<div class="contact-number">1-888-701-4512</div>
 					</div>
-					<button class="reg-upgrade float-left" ng-click="upGrade()" ng-show="individual||business">
+					<button class="reg-upgrade float-left" ng-click="upGrade()" ng-show="individual||business" >
 						<i class="fa fa-arrow-up" aria-hidden="true"></i>Upgrade
 					</button>
 				</div>
@@ -65,21 +65,21 @@
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Card Number *</div>
-						<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.cardNumber.$error.required}">
-							<input class="reg-details form-control-reg" id="card-number" type="text" ng-model="payment.cardNumber" ng-change="onChangeCreditCardNumber()" name="cardNumber" required />
-							<p ng-show="paymentsubmitted && paymentForm.cardNumber.$error.required" class="help-block-reg">A valid Credit or Debit Card number is required.</p>
+						<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && (paymentForm.cardNumber.$error.required || paymentForm.cardNumber.$error.pattern || (payment.cardNumber.indexOf('3') != 0 && payment.cardNumber.indexOf('4') != 0 && payment.cardNumber.indexOf('5') != 0 && payment.cardNumber.indexOf('6') != 0))}">
+							<input class="reg-details form-control-reg" id="card-number" type="text" ng-model="payment.cardNumber" ng-change="onChangeCreditCardNumber()" name="cardNumber" maxlength="19" required />
+							<p ng-show="paymentsubmitted && (paymentForm.cardNumber.$error.required || paymentForm.cardNumber.$error.pattern || (payment.cardNumber.indexOf('3') != 0 && payment.cardNumber.indexOf('4') != 0 && payment.cardNumber.indexOf('5') != 0 && payment.cardNumber.indexOf('6') != 0))" class="help-block-reg">A valid Credit or Debit Card number is required.</p>
 						</div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Expiry *</div>
-						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.month.$error.required}">
+						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && (paymentForm.month.$error.required || (!paymentForm.month.$error.required && !paymentForm.year.$error.required && payment.expirationMonth <= (today.getMonth()+1) && payment.expirationYear == today.getFullYear()))}">
 							<select id="expiration-month" class="reg-details form-control-reg" style="min-width: 0px" ng-model="payment.expirationMonth" name="month" required ng-options="month.id as month.value for month in expirationMonths">
 								<option value=''>Month</option>
 							</select>
 							<p ng-show="paymentsubmitted && paymentForm.month.$error.required" class="help-block-reg">A valid Credit or Debit Card expiry month is required.</p>
 							<p ng-show="paymentsubmitted && !paymentForm.month.$error.required && !paymentForm.year.$error.required && payment.expirationMonth <= (today.getMonth()+1) && payment.expirationYear == today.getFullYear()" class="help-block-reg">Expiry date should be future date.</p>
 						</div>
-						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.year.$error.required}">
+						<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && (paymentForm.year.$error.required || (!paymentForm.month.$error.required && !paymentForm.year.$error.required && payment.expirationMonth <= (today.getMonth()+1) && payment.expirationYear == today.getFullYear()))}">
 							<select id="expiration-year" class="reg-details form-control-reg" style="min-width: 0px" ng-model="payment.expirationYear" name="year" required ng-options="year.id as year.value for year in expirationYears">
 								<option value=''>Year</option>
 							</select>
@@ -90,18 +90,20 @@
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6">CVV *</div>
 						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6">Zip Code *</div>
-						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.cvv.$error.required}">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
+						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 5px 0 0" ng-class="{ 'has-error-reg' : paymentsubmitted && (paymentForm.cvv.$error.required || (cvvSize == 3 && payment.cvv.length < 3) || (cvvSize == 4 && payment.cvv.length < 4))}">
 							<input class="reg-details form-control-reg" id="cvv" style="min-width: 0px" type="password" name="cvv" required ng-model="payment.cvv" />
 							<p ng-show="paymentsubmitted && paymentForm.cvv.$error.required" class="help-block-reg">Valid 3-digit or 4-digit CVV number is required.</p>
 							<p ng-show="paymentsubmitted && !paymentForm.cvv.$error.required && cvvSize == 3 && payment.cvv.length < 3" class="help-block-reg">Valid 3-digit CVV number which can be found after the account number on the back of your card is required.</p>
 							<p ng-show="paymentsubmitted && !paymentForm.cvv.$error.required && cvvSize == 4 && payment.cvv.length < 4" class="help-block-reg">Valid 4-digit CVV number which can be found just above the account number on the front of your card is required.</p>
 						</div>
-						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
-						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && paymentForm.zipcode.$error.required}">
-							<input class="reg-details form-control-reg" id="zip-code" style="min-width: 0px" type="text" name="zipcode" required ng-model="payment.zipCode" />
+						<!-- <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div> -->
+						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && (paymentForm.zipcode.$error.required || (payment.zipCode.length != 5 && payment.zipCode.length != 10))}">
+							<input class="reg-details form-control-reg" id="zip-code" style="min-width: 0px" type="text" name="zipcode" required ng-model="payment.zipCode" maxlength="10" />
 							<p ng-show="paymentsubmitted && (paymentForm.zipcode.$error.required || (payment.zipCode.length != 5 && payment.zipCode.length != 10))" class="help-block-reg">A 5 or 9 digit zip code is required.</p>
 						</div>
-						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
+						</div>
+						<!-- <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div> -->
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="reg-pswd-info col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 5px;">3 digits on back</div>
@@ -112,20 +114,21 @@
 							<table>
 								<tr>
 									<td style="vertical-align: top; padding-right: 10px;"><input type="checkbox" name="authorize" ng-model="authorize" ng-change="alertUser()" /></td>
-									<td style="font-size: 14px">At the end of my free 30 day trial period,I authorize SocialSurvey to debit my credit card for the monthly subscription fees, under the terms and conditions agreed to by me with SocialSurvey. <br> <br>For verification purpose, we will temporarily authorize your card for $1.00. Your card will not be charged for the first 30 days.
+									<td class="reg-agree" >At the end of my free 30 day trial period,I authorize SocialSurvey to debit my credit card for the monthly subscription fees, under the terms and conditions agreed to by me with SocialSurvey. <br> <br>For verification purpose, we will temporarily authorize your card for $1.00. Your card will not be charged for the first 30 days.
 									</td>
 								</tr>
 							</table>
 						</div>
 					</div>
-					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 20px;">
 							<div class="reg-back" ng-click="back()">&lt;&lt;Back</div>
 							<div style="width: 120px; margin: auto;">
 								<button type="submit" class="reg-next" ng-class="{'regen':authorize && paymentForm.$valid && validateCardDetails()}" ng-click="paymentsubmitted=true">Next</button>
 							</div>
 						</div>
-					</div>
+					
+					
 				</form>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="enterprise">
@@ -158,7 +161,7 @@
 		</div>
 	</div>
 	<div class="reg-right-container">
-		<div class="reg-right-center ">
+		<div class="reg-right-center payment-right-center ">
 			<div ng-show="individual" class="payment-right-description">
 				<div class="reg-Individual">Individual</div>
 				<div class="reg-indiv-detail">Plan Details</div>
