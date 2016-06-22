@@ -52,6 +52,8 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -131,6 +133,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private UserManagementService userManagementService;
+
+	@Autowired
+	private SolrSearchService solrSearchService;
 
     @Autowired
     private BatchTrackerService batchTrackerService;
@@ -850,8 +855,17 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 throw new InvalidInputException( "Invalid entity type :" + entityType );
         }
 
+		//Remove from mongo
         socialPostDao.removeSocialPostsForEntityAndSource( entityType, entityId, source );
-        LOG.info( "Method to remove social posts finished for collectionName : " + collectionName + " entityId : " + entityId
+
+		//Remove from solr
+		try {
+			solrSearchService.removeSocialPostsFromSolr( entityType, entityId, source );
+		} catch ( SolrException e ) {
+			throw new InvalidInputException( "A Solr exception occurred while removing social posts. Reason : ", e );
+		}
+
+		LOG.info( "Method to remove social posts finished for collectionName : " + collectionName + " entityId : " + entityId
             + " source : " + source );
     }
 
