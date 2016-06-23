@@ -17,14 +17,19 @@
 			</div>
 		</div>
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 reg-quick-setup" style="float: none; font-size: 35px;">Sign-up Complete</div>
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 reg-quick-setup" style="float: none; font-size: 35px;">{{completeHeader}}</div>
 			<div class="reg-congrats">{{signUpCompleteMessage}}</div>
-			<div class="reg-welcome clearfix" ng-show="setPasswordMessage != ''">
+			<div class="reg-congrats" ng-show="!download" style="margin-top:20px">{{signUpCompleteMessageContact}}</div>
+			<div class="reg-welcome clearfix" ng-show="download">
+				<div class=" float-left" style="width: 15%; margin-top: 15px"></div>
+				<div class="float-left reg-check-mail">Download our <a href="/resources/SocialSurveyQuickStartGuide.pdf" target="_blank">Quick Start guide(pdf) </a>before you click the Get Started button</div>
+			</div>
+			<div class="reg-welcome clearfix" ng-show="download">
 				<div class="welcome-email float-left" style="width: 15%; margin-top: 15px"></div>
 				<div class="float-left reg-check-mail">{{setPasswordMessage}}</div>
 			</div>
 			<div style="width: 125; margin: 25px auto;">
-				<button class="reg-next regen" ng-click="login()">Get Started</button>
+				<button class="reg-next regen" ng-click="login()">{{welcomeButton}}</button>
 			</div>
 		</div>
 	</div>
