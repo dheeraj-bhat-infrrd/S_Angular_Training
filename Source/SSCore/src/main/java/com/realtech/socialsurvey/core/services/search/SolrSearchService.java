@@ -318,6 +318,8 @@ public interface SolrSearchService
     void addSocialPostsToSolr( List<SocialPost> socialPosts ) throws SolrException, InvalidInputException;
 
 
+    public void removeSocialPostsFromSolr( String entityType, long entityId, String source ) throws SolrException;
+
     Collection<SocialPost> getSocialPostsFromSolrDocuments( SolrDocumentList documentList ) throws InvalidInputException;
 
 

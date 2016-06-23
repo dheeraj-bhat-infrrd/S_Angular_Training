@@ -115,7 +115,7 @@ public class SocialManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testDisconnectSocialNetworkWithInvalidSocialMedia() throws NonFatalException
     {
-        socialManagementServiceImpl.disconnectSocialNetwork( TestConstants.TEST_STRING, null, TestConstants.TEST_STRING );
+        socialManagementServiceImpl.disconnectSocialNetwork( TestConstants.TEST_STRING, true, null, TestConstants.TEST_STRING );
     }
 
 
