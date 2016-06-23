@@ -457,7 +457,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     linkedInPost += "/shares?oauth2_access_token="
                         + settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
                     linkedInPost += "&format=json";
-                    try {
+					//SS-585 begin
+					String reviewId = Integer.toHexString( String.valueOf( System.currentTimeMillis() ).hashCode() ) + Integer
+						.toHexString( String.valueOf( settings.getIden() ).hashCode() );
+					linkedInPost += "&reviewid=" + reviewId;
+					//SS-585 end
+					try {
                         HttpClient client = HttpClientBuilder.create().build();
                         HttpPost post = new HttpPost( linkedInPost );
 
@@ -1234,7 +1239,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
-    void postToLinkedInForAHierarchy( OrganizationUnitSettings setting, Double rating, boolean isZillow,
+    void
+	postToLinkedInForAHierarchy( OrganizationUnitSettings setting, Double rating, boolean isZillow,
         String updatedLinkedInMessage, String linkedinMessage, String linkedinProfileUrl, String linkedinMessageFeedback,
         OrganizationUnitSettings companySettings, AgentSettings agentSettings, MediaPostDetails mediaPostDetails,
         EntityMediaPostResponseDetails mediaPostResponseDetails )
