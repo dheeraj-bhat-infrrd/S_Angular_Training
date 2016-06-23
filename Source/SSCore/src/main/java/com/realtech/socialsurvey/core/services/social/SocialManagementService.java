@@ -119,8 +119,8 @@ public interface SocialManagementService
         SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException;
 
 
-    public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, OrganizationUnitSettings unitSettings,
-        String collectionName ) throws InvalidInputException;
+    public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, boolean removeFeed,
+        OrganizationUnitSettings unitSettings, String collectionName ) throws InvalidInputException;
 
 
     public SocialMediaTokens checkOrAddZillowLastUpdated( SocialMediaTokens mediaTokens ) throws InvalidInputException;
