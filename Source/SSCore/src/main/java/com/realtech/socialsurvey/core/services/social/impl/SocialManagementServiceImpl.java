@@ -1454,8 +1454,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName );
             User agent = userManagementService.getUserByUserId( agentId );
 
-            if ( agent.getCompany() == null || agent.getCompany().getStatus() == CommonConstants.STATUS_INACTIVE )
-                return true;
+			if ( agent.getCompany() == null || agent.getCompany().getStatus() == CommonConstants.STATUS_INACTIVE
+				|| agent.getStatus() == CommonConstants.STATUS_INACTIVE )
+				return true;
 
             int accountMasterId = 0;
             try {
