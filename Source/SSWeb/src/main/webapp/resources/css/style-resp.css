@@ -1724,7 +1724,13 @@
 	 float:none;
 	 margin-left:55px;
 	}
-
+  .contact-phone{
+     height: 55px;
+     border: 0px;
+  }
+  .contact-phone-edit{
+    margin-top: 8px;
+  }
 
 }
 
