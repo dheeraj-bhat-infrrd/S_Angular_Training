@@ -275,6 +275,7 @@ $(document).ready(function() {
 	$('.dial-country-code').css('font-size','14px');
 	$('.dial-country-code').css('line-height','26px');
 	$('.reg-details').css('height','28px');
+	$('.intl-tel-input').css('float','left');
 	var countryCode = $('#sel-prof-country-code').val();
 	if(countryCode == undefined || countryCode == "") {
 		countryCode = "us";
