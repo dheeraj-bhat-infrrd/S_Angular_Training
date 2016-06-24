@@ -202,11 +202,11 @@
 				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
 			</c:when> --%>
 			<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid != 4}">
-				<input id="phone-number-work" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}"  readonly>
+				<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}"  readonly>
 				<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 			</c:when>
 			<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid == 4}">
-				<input id="phone-number-work" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}"  readonly>
+				<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}"  readonly>
 				<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
 			</c:when>
 			<c:when	test="${not parentLock.isWorkPhoneLocked && profilemasterid == 4}">
@@ -215,21 +215,21 @@
 				<!-- <input class="reg-details" type="tel" id="reg-phone-edit"  /> -->
 			</c:when>
 			<c:when	test="${not parentLock.isWorkPhoneLocked && lock.isWorkPhoneLocked && profilemasterid != 4}">
-				<input id="phone-number-work" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}"  >
+				<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}"  >
 				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 			</c:when>
 			<c:when	test="${not parentLock.isWorkPhoneLocked && not lock.isWorkPhoneLocked && profilemasterid != 4 && isContactNoSetByEntity}">
-				<input id="phone-number-work" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" >
+				<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" >
 				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
 			</c:when>
 			<c:when	test="${not parentLock.isWorkPhoneLocked && not lock.isWorkPhoneLocked && profilemasterid != 4 && not isContactNoSetByEntity}">
-				<input id="phone-number-work" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" >
+				<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" >
 				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
 			</c:when>
 		</c:choose>
 	</c:when>
 	<c:otherwise>
-		<input id="phone-number-work" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" >
+		<input id="phone-number-work" class="reg-details float-left  type="tel" prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" >
 				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
 	</c:otherwise>
 	</c:choose>
