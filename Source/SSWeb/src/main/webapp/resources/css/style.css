@@ -441,10 +441,10 @@
     border-radius: 5px;
 }
 .reg-auth-linkedin-btn{
-	background-color: #38B278;
+	background-color:#326AAD;
     height: 40px;
     line-height: 35px;
-    width: 300px;
+    width: 225px;
     text-align: center;
     color: #fff;
     border-radius: 5px;
@@ -452,6 +452,7 @@
     font-size: 15px;
     font-family: 'opensanssemibold';
     cursor: pointer;
+    margin:auto;
 }
 .reg-auth-linkedin-wrapper{
 	width: 100%;
@@ -529,26 +530,52 @@
 }
 .reg-right-description{
 	color:#fff;
-	font-size: 18px;
+	font-size: 19px;
     opacity: 0.6;
     font-family: 'OpenSans';
-     margin: auto;
+    margin: auto;
     
 }
-.reg-line-1{
-	width: 333px;
+.reg-right-description-profile{
+	color:#fff;
+	font-size: 22px;
+    opacity: 0.6;
+    font-family: 'OpenSans';
+    margin: auto;
+    
 }
-.reg-line-3{
-	width: 388px;
+.reg-right-description-linkedin{
+	color:#fff;
+	font-size: 25px;
+    opacity: 0.6;
+    font-family: 'OpenSans';
+    margin: auto;
+    
 }
-.reg-line-4{
-	width: 221px;
+.reg-right-description-pay{
+	color:#fff;
+	font-size: 14px;
+    opacity: 0.6;
+    font-family: 'OpenSans';
+    margin: auto;
+    
 }
+.reg-right-description-pay-header{
+	color:#fff;
+	font-size: 20px;
+    opacity: 0.8;
+    font-family: 'OpenSans';
+    margin: auto;
+    
+}
+
+
 .reg-side-linkedin-img{
 	background:url(../images/sidebar-import-profile.png)center no-repeat;
 	width: 270px;
     height: 100px;
-    margin: auto;
+    margin: 25px auto;
+    background-size: contain;
 }
 .reg-side-welcome-img{
 	background:url(../images/sidebar-welcome.png)center no-repeat;
@@ -565,24 +592,32 @@
 .reg-import-linedin{
 	color: #fff;
     font-size: 25px;
-    width: 225px;
+    width: 270px;
     margin: 0 auto 20px;
     opacity: 0.6;
 }
 .reg-prof-img{
 	background:url(../images/sidebar-public-profile.png)center no-repeat;
-	width: 400px;
-    height: 270px;
+	width: 500px;
+    height: 302px;
     margin: auto;
     margin-top: 35px;
     background-size: contain;
 }
-.prof-line-1{
-	width: 377px; 
+.reg-prof-img-detail{
+	background:url(../images/sidebar-professional-details.png)center no-repeat;
+	width: 500px;
+    height: 302px;
+    margin: auto;
+    margin-top: 35px;
+    background-size: contain;
+}
+.prof-line{
+	text-align:center;
     
 }
 .prof-line-2{
-	width:367px;
+	width:305px;
 }
 .prof-line-3{
 	width:400px;
@@ -600,9 +635,18 @@
 	position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: 55%;
+    left: 58%;
     right: 0;
     width:400px;
+   
+}
+.reg-right-center-profile{
+	position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 55%;
+    right: 0;
+    width:500px;
    
 }
 
@@ -689,8 +733,9 @@
     font-size: 18px;
     font-weight: 600! important;
     border-bottom: 1px solid;
-    padding: 20px 0 20px 10px;
+    padding: 10px 0 10px 10px;
     color: #fff;
+    opacity:.8;
 }
 .plan-discription-sub {
     font-weight: 400!important;
@@ -751,10 +796,10 @@ font-size: 40px;
 .reg-li{
 	opacity: 0.6!important;
     color: #fff;
-    margin-top:20px;
+    margin-top:10px;
 }
 .reg-li>ul>li{
-	padding:10px;
+	padding:2px;
 }
 .payment-right-description{
 	margin:auto;
@@ -898,3 +943,16 @@ font-size: 40px;
 .reg-agree{
 	font-size: 14px;
 }
+
+.reg-1-pg {
+    margin-top: 15px;
+    width: 362px;
+    margin-left: 2px;
+}
+.reg-company-deatil-ul{
+    margin-left:43px;
+}
+.reg-bold{
+	font-weight:600 !important;
+}
+    

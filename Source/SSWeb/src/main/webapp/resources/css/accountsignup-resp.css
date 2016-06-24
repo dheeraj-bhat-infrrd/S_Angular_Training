@@ -74,40 +74,72 @@
 	.reg-side-image {
 		width: 180px;
 		height: 322px;
-		margin-top;20px;
+		margin-top:20px;
 	}
 	.reg-right-description {
+		font-size: 14px;
+	}
+	.reg-right-description-profile {
+		font-size: 14px;
+	}
+	.reg-right-description-linkedin {
+		font-size: 25px;
+	}
+	.reg-right-description-pay {
 		font-size: 13px;
 	}
-	.reg-line-1 {
-		width: 241px;
+	.reg-right-description-pay-header {
+		font-size: 15px;
 	}
-	.reg-line-3 {
-		width: 280px;
-	}
-	.reg-line-4 {
-		width: 160px;
-	}
-	.prof-line-1 {
-    width: 273px;
-	}
-	.prof-line-2 {
-    width: 264px;
-    }
-   .prof-line-3 {
-    width: 289px;
-    }
-    .reg-prof-img {
+	
+    /* .reg-prof-img , .reg-prof-img-detail{
     width: 260px;
     height: 200px;
     margin-top: 20px;
-    }
+    } */
     .payment-right-description{
 	width:100%;
 	margin:auto;
     }
+    .reg-1-pg{
+     width: 263px;
+     margin-left: 7px;
+    }
+    .reg-right-center{
+      left: 60%;
+      width: 310px;
+    }
+    .reg-right-center-profile{
+      left: 60%;
+      width: 310px;
+    }
+    
+    .reg-side-linkedin-img {
+     width: 215px;
+     height: 75px;
+    
+    }
+    .reg-prof-img, .reg-prof-img-detail {
+    width: 305px;
+    height: 200px;
+    margin-top: 20px;
+}
+    
 
 }
+@media ( max-width :1175px)and (min-width:991px) {
+  .reg-prof-img, .reg-prof-img-detail {
+    width: 260px;
+    height: 200px;
+    margin-top: 20px;
+}
+.reg-right-center-profile {
+	    width: 445px;
+	}
+	
+}
+
+
 @media ( max-width :815px) {
 	.reg-right-container {
 		display: none;
@@ -126,13 +158,59 @@
 	}
 	.payment-right-center{
 	width:450px !important;
-}
-	
-} 
+  }
+   .reg-right-center{
+      width: 599px;
+    }
+    .reg-right-center-profile{
+      width: 599px;
+    }
+    .reg-right-description{
+      font-size: 29px;
+    }
+    .reg-right-description-profile{
+      font-size: 29px;
+    }
+    .reg-right-description-linkedin{
+      font-size: 35px;
+    }
+     .reg-right-description-pay{
+      font-size: 22px;
+    }
+    .reg-right-description-pay-header{
+      font-size: 24px;
+    }
+    .reg-1-pg {
+    /* width: 376px; */
+        width: 563px; 
+    margin-left: -21px;
+   }
+    
+  .reg-company-deatil-ul{
+    margin-left:40px;
+    }
+    .reg-side-linkedin-img{
+      width: 340px;
+      height: 116px;
+    }
+    .reg-prof-img{
+      width: 570px;
+      height: 340px;
+    } 
+    .reg-right-center-profile{
+    left: 51%;
+    } 
+    .reg-right-center{
+     left:51%;
+    }
+ }
 @media(min-width:993px)and (max-width:1650px){
 	 .reg-right-center {
 		left: 57%;
 	}
+	
+   
+}
 }
 @media(max-width:900px){
 	.reg-right-description-payment {
@@ -142,7 +220,7 @@
 	 margin-top:0px;
 	}
 	.reg-li>ul>li{
-	 padding:5px;
+	 padding:2px;
 	}
 	
 	
