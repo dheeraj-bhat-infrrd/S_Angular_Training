@@ -6443,6 +6443,7 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 			|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
 		$(this).removeClass('prof-name-edit');
 	}
+	
 });
 
 /*$(document).on('click', '.fb-shr', function() {
@@ -6624,6 +6625,39 @@ function callBackShowContactDetails(data) {
 	$('#contant-info-container').html(data);
 	adjustImage();
 }
+var phoneFormatWithExtension = '(ddd) ddd-dddd x yyyyy';
+var usPhoneRegEx = {
+		'translation' : {
+			d : {
+				pattern : /[0-9*]/
+			},
+			y : {
+				pattern : /[0-9*]/
+			}
+		}
+	};
+function maskPhoneNumber (phoneId, iso2) {
+	if (iso2 == 'us') {
+		$('#phone-number-work').mask(phoneFormatWithExtension, usPhoneRegEx);
+	} else {
+		$('#phone-number-work').unmask(phoneFormat);
+		$('#phone-number-work').keypress(function(e) {
+			var count = $('#phone-number-work').val().length;
+			if (count > 24) {
+				return false;
+			} else {
+				var regex = new RegExp("^[0-9-.() ]+$");
+				var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+				if (regex.test(str)) {
+					return true;
+				}
+				e.preventDefault();
+				return false;
+			}
+		});
+	}
+}
+var countryPhone=/^[0-9-.() ]+$/;
 
 // Phone numbers in contact details
 $(document).on(
@@ -6634,7 +6668,7 @@ $(document).on(
 					|| $(this).is('[readonly]')) {
 				return;
 			}
-			if (!phoneRegex.test(this.value) && !ausPhoneRegex.test(this.value) ) {
+			if (!countryPhone.test(this.value) ) {
 				$('#overlay-toast').html("Please add a valid phone number");
 				showToast();
 				return;
@@ -6649,7 +6683,7 @@ $(document).on(
 								var phoneNumber = {};
 								phoneNumber.key = $(this).attr(
 										"data-phone-number");
-								phoneNumber.value = this.value;
+								phoneNumber.value = getPhoneNumber();
 								phoneNumbers.push(phoneNumber);
 							}
 						});
@@ -7612,7 +7646,24 @@ function isValidUrl(url){
 		return false;
 	}
 }
-
+function getPhoneNumber() {
+	var countryData = $('#phone-number-work').intlTelInput("getSelectedCountryData");
+	var number = $('#phone-number-work').intlTelInput("getNumber");
+	if (number != "") {
+		if (number.indexOf("+1") != -1) {
+			number = number.substring(2, number.length + 1);
+		} else {
+			number = number.substring(countryData.dialCode.length + 1, number.length + 1);
+		}
+		return {
+			"number" : number,
+			"countryCode" : "+" + countryData.dialCode,
+			"extension" : $('#phone-number-work').intlTelInput("getExtension"),
+			"countryAbbr" : countryData.iso2,
+			"formattedPhoneNumber" : $('#phone-number-work').val()
+		};
+	}
+}
 // Adjust image
 function adjustImage() {
 	var windW = window.innerWidth;
@@ -8020,7 +8071,6 @@ function bindClickForIndividuals(elementClass) {
 
 //Bind scroll event for public posts on edit profile page
 function attachPostsScrollEvent() {
-	console.log("scroll function called");
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
@@ -11022,8 +11072,4 @@ $(document).on('click','.review-more-button',function(){
 	$(this).parent().find('.view-zillow-link').show();
 	$(this).hide();
 });
-/*$('.review-more-button').click(function(){
-	$(this).parent().find('.review-less-text').hide();
-	$(this).parent().find('.review-complete-txt').show();
-	$(this).hide();
-});*/
+

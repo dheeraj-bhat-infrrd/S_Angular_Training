@@ -171,13 +171,13 @@
 	</div>
 </div>--%>
 
-<div class="lp-con-row lp-row clearfix">
-	<div class="float-left lp-con-icn icn-phone"></div>
-	<div class="float-left lp-edit-wrapper clearfix float-left">
+<div class="lp-con-row lp-row clearfix contact-phone">
+	<div class="float-left lp-con-icn icn-phone"></div> 
+	<div class="float-left lp-edit-wrapper clearfix float-left contact-phone-edit" >
 	<c:choose>
 	<c:when test="${not empty contactNumbers && not empty contactNumbers.work }">
 		<c:choose>
-			<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid != 4}">
+			<%-- <c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid != 4}">
 				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>' readonly>
 				<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 			</c:when>
@@ -186,8 +186,8 @@
 				<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
 			</c:when>
 			<c:when	test="${not parentLock.isWorkPhoneLocked && profilemasterid == 4}">
-				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
-				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
+				 <input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
+				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div> 
 			</c:when>
 			<c:when	test="${not parentLock.isWorkPhoneLocked && lock.isWorkPhoneLocked && profilemasterid != 4}">
 				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
@@ -200,11 +200,36 @@
 			<c:when	test="${not parentLock.isWorkPhoneLocked && not lock.isWorkPhoneLocked && profilemasterid != 4 && not isContactNoSetByEntity}">
 				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
 				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
+			</c:when> --%>
+			<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid != 4}">
+				<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}"  readonly>
+				<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+			</c:when>
+			<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid == 4}">
+				<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}"  readonly>
+				<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
+			</c:when>
+			<c:when	test="${not parentLock.isWorkPhoneLocked && profilemasterid == 4}">
+				 <input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" title="${contactNumbers.work}">
+				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div> 
+				<!-- <input class="reg-details" type="tel" id="reg-phone-edit"  /> -->
+			</c:when>
+			<c:when	test="${not parentLock.isWorkPhoneLocked && lock.isWorkPhoneLocked && profilemasterid != 4}">
+				<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}"  >
+				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+			</c:when>
+			<c:when	test="${not parentLock.isWorkPhoneLocked && not lock.isWorkPhoneLocked && profilemasterid != 4 && isContactNoSetByEntity}">
+				<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" >
+				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
+			</c:when>
+			<c:when	test="${not parentLock.isWorkPhoneLocked && not lock.isWorkPhoneLocked && profilemasterid != 4 && not isContactNoSetByEntity}">
+				<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" >
+				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
 			</c:when>
 		</c:choose>
 	</c:when>
 	<c:otherwise>
-		<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
+		<input id="phone-number-work" class="reg-details float-left  type="tel" prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" >
 				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
 	</c:otherwise>
 	</c:choose>
@@ -239,19 +264,34 @@
 		</c:choose>
 	</div>
 </div> --%>
+
 <script>
 var phoneFormat = '(ddd) ddd-dddd';
 $(document).ready(function() {
+	$('#phone-number-work').intlTelInput({
+		utilsScript : "../resources/js/utils.js"
+	});
+	
+	$('.dial-country-code').css('font-size','14px');
+	$('.dial-country-code').css('line-height','26px');
+	$('.reg-details').css('height','28px');
+	$('.intl-tel-input').css('float','left');
 	var countryCode = $('#sel-prof-country-code').val();
 	if(countryCode == undefined || countryCode == "") {
-		countryCode = "US";
+		countryCode = "us";
+		
 	}
-	if(phoneFormatList[countryCode] && phoneFormatList[countryCode] != "") {
+	var countryData = $('#phone-number-work').intlTelInput("getSelectedCountryData");
+	$("#phone-number-work").on("countrychange", function(e, countryData) {
+		maskPhoneNumber("#phone-number-work", countryData.iso2);
+	});
+	$('#phone-number-work').intlTelInput("setCountry", countryCode);
+	
+	/* if(phoneFormatList[countryCode] && phoneFormatList[countryCode] != "") {
 		phoneFormat = phoneFormatList[countryCode];		
-	}
-	//$('#phone-number-work').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
+	} */
 	if($('#phone-number-work').val() == '('){
 		$('#phone-number-work').val('');
-	}
+	} 
 });
 </script>
