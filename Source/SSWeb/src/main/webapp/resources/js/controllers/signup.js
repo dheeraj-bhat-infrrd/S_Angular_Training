@@ -121,11 +121,7 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		var countryData = $('#' + phoneId).intlTelInput("getSelectedCountryData");
 		var number = $('#' + phoneId).intlTelInput("getNumber");
 		if (number != "") {
-			if (number.indexOf("+1") != -1) {
-				number = number.substring(2, number.length + 1);
-			} else {
 				number = number.substring(countryData.dialCode.length + 1, number.length + 1);
-			}
 			return {
 				"number" : number,
 				"countryCode" : "+" + countryData.dialCode,
