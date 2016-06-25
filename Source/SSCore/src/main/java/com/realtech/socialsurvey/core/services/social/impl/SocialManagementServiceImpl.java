@@ -52,6 +52,8 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -131,6 +133,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private UserManagementService userManagementService;
+
+	@Autowired
+	private SolrSearchService solrSearchService;
 
     @Autowired
     private BatchTrackerService batchTrackerService;
@@ -452,7 +457,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     linkedInPost += "/shares?oauth2_access_token="
                         + settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
                     linkedInPost += "&format=json";
-                    try {
+					//SS-585 begin
+					String reviewId = Integer.toHexString( String.valueOf( System.currentTimeMillis() ).hashCode() ) + Integer
+						.toHexString( String.valueOf( settings.getIden() ).hashCode() );
+					linkedInPost += "&reviewid=" + reviewId;
+					//SS-585 end
+					try {
                         HttpClient client = HttpClientBuilder.create().build();
                         HttpPost post = new HttpPost( linkedInPost );
 
@@ -730,8 +740,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     @Override
-    public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, OrganizationUnitSettings unitSettings,
-        String collectionName ) throws InvalidInputException
+    public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, boolean removeFeed,
+        OrganizationUnitSettings unitSettings, String collectionName ) throws InvalidInputException
     {
         LOG.debug( "Method disconnectSocialNetwork() called" );
 
@@ -743,24 +753,30 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 profileStage.setOrder( ProfileStages.FACEBOOK_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.FACEBOOK_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN;
-                //Remove from SOCIAL_POST
-                removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
+				if ( removeFeed ) {
+					//Remove from SOCIAL_POST
+					removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
+				}
                 break;
 
             case CommonConstants.TWITTER_SOCIAL_SITE:
                 profileStage.setOrder( ProfileStages.TWITTER_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.TWITTER_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_TWITTER_SOCIAL_MEDIA_TOKEN;
-                //Remove from SOCIAL_POST
-                removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
+				if ( removeFeed ) {
+					//Remove from SOCIAL_POST
+					removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
+				}
                 break;
 
             case CommonConstants.GOOGLE_SOCIAL_SITE:
                 profileStage.setOrder( ProfileStages.GOOGLE_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.GOOGLE_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_SOCIAL_MEDIA_TOKEN;
-                //Remove from SOCIAL_POST
-                removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
+				if ( removeFeed ) {
+					//Remove from SOCIAL_POST
+					removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
+				}
                 break;
 
             case CommonConstants.LINKEDIN_SOCIAL_SITE:
@@ -844,8 +860,17 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 throw new InvalidInputException( "Invalid entity type :" + entityType );
         }
 
+		//Remove from mongo
         socialPostDao.removeSocialPostsForEntityAndSource( entityType, entityId, source );
-        LOG.info( "Method to remove social posts finished for collectionName : " + collectionName + " entityId : " + entityId
+
+		//Remove from solr
+		try {
+			solrSearchService.removeSocialPostsFromSolr( entityType, entityId, source );
+		} catch ( SolrException e ) {
+			throw new InvalidInputException( "A Solr exception occurred while removing social posts. Reason : ", e );
+		}
+
+		LOG.info( "Method to remove social posts finished for collectionName : " + collectionName + " entityId : " + entityId
             + " source : " + source );
     }
 
@@ -1214,7 +1239,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
-    void postToLinkedInForAHierarchy( OrganizationUnitSettings setting, Double rating, boolean isZillow,
+    void
+	postToLinkedInForAHierarchy( OrganizationUnitSettings setting, Double rating, boolean isZillow,
         String updatedLinkedInMessage, String linkedinMessage, String linkedinProfileUrl, String linkedinMessageFeedback,
         OrganizationUnitSettings companySettings, AgentSettings agentSettings, MediaPostDetails mediaPostDetails,
         EntityMediaPostResponseDetails mediaPostResponseDetails )
@@ -1428,8 +1454,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName );
             User agent = userManagementService.getUserByUserId( agentId );
 
-            if ( agent.getCompany() == null || agent.getCompany().getStatus() == CommonConstants.STATUS_INACTIVE )
-                return true;
+			if ( agent.getCompany() == null || agent.getCompany().getStatus() == CommonConstants.STATUS_INACTIVE
+				|| agent.getStatus() == CommonConstants.STATUS_INACTIVE )
+				return true;
 
             int accountMasterId = 0;
             try {
@@ -1822,7 +1849,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.FACEBOOK_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.FACEBOOK;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1833,7 +1860,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.TWITTER_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.TWITTER;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1844,7 +1871,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.GOOGLE_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.GOOGLE_PLUS;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1855,7 +1882,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.LINKEDIN_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.LINKED_IN;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1866,7 +1893,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.ZILLOW_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.ZILLOW;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1877,7 +1904,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.YELP_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.YELP;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1888,7 +1915,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.REALTOR_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.REALTOR;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1899,7 +1926,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.LENDINGTREE_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.LENDING_TREE;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history

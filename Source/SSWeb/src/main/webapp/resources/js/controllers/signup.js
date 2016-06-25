@@ -806,10 +806,17 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 		PaymentService.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend).then(function(response) {
 			hideOverlay();
 			PasswordService.isPasswordAlreadySet($rootScope.userId).then(function(response) {
-				$rootScope.signUpCompleteMessage = "Congratulations, you have completed the sign-up wizard and are ready to start using your new account.";
+				$rootScope.completeHeader="Sign-up Complete";
+				$rootScope.welcomeButton="Get Started";
+				$rootScope.download=true;
+				$rootScope.signUpCompleteMessage = "Congratulations for starting your FREE trial. We want you to get the most value from this tool. There are still a few tasks to complete before sending survey requests to customers.";
 				$rootScope.setPasswordMessage = "Be sure to check your email. We have sent a verification link to you that will need to be clicked to set your account password.";
 				if ($scope.selectedPlan.planId == 3) {
-					$rootScope.signUpCompleteMessage = "Congratulations, you have completed the sign-up wizard. Please wait till your account is approved and activated.";
+					$rootScope.signUpCompleteMessage = "Thankyou for your interest in an Enterprise account. A member of our team will contact you within 1 business day.";
+					$rootScope.completeHeader="Request Sent";
+					$rootScope.welcomeButton="Close";
+					$rootScope.signUpCompleteMessageContact="You may also contact us at 1-888-701-4512 or getstarted@socialsurvey.com";
+					$rootScope.download=false;
 				}
 				if (response.data) {
 					$rootScope.setPasswordMessage = "";

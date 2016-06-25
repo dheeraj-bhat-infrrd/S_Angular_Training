@@ -1,41 +1,5 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import com.realtech.socialsurvey.web.common.TokenHandler;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.solr.common.SolrDocumentList;
-import org.scribe.model.OAuthRequest;
-import org.scribe.model.Response;
-import org.scribe.model.Verb;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -52,7 +16,6 @@ import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
 import com.realtech.socialsurvey.core.entities.FacebookPage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
-import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
@@ -91,18 +54,51 @@ import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.common.TokenHandler;
 import com.realtech.socialsurvey.web.util.RequestUtils;
-
 import facebook4j.Account;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
 import facebook4j.ResponseList;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.solr.common.SolrDocumentList;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Response;
+import org.scribe.model.Verb;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import retrofit.mime.TypedByteArray;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -2183,6 +2179,12 @@ public class SocialManagementController
     public String disconnectSocialMedia( HttpServletRequest request )
     {
         String socialMedia = request.getParameter( "socialMedia" );
+        String removeFeedStr = request.getParameter( "removeFeed" );
+        boolean removeFeed = false;
+        if ( removeFeedStr != null && !removeFeedStr.isEmpty() )
+        {
+            removeFeed = Boolean.parseBoolean( removeFeedStr );
+        }
         HttpSession session = request.getSession();
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
             .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
@@ -2234,7 +2236,7 @@ public class SocialManagementController
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getCompanySettings( entityId );
                 mediaTokens = unitSettings.getSocialMediaTokens();
-                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                 userSettings.setCompanySettings( unitSettings );
                 //update SETTINGS_SET_STATUS to unset in COMPANY table
@@ -2253,7 +2255,7 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
                 mediaTokens = unitSettings.getSocialMediaTokens();
-                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
                 userSettings.getRegionSettings().put( entityId, unitSettings );
                 //update SETTINGS_SET_STATUS to unset in REGION table
@@ -2271,7 +2273,7 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 mediaTokens = unitSettings.getSocialMediaTokens();
-                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
                 userSettings.getBranchSettings().put( entityId, unitSettings );
                 //update SETTINGS_SET_STATUS to unset in BRANCH table
@@ -2290,7 +2292,7 @@ public class SocialManagementController
             if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 unitSettings = userManagementService.getUserSettings( entityId );
                 mediaTokens = unitSettings.getSocialMediaTokens();
-                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 userSettings.setAgentSettings( (AgentSettings) unitSettings );
             }
