@@ -19,8 +19,8 @@ var surveyFetchedSoFarInc;
 var accountType;
 var graphData;
 
-//colName and colValue contains profile level of logged in user and value for
-//colName is present in colValue.
+// colName and colValue contains profile level of logged in user and value for
+// colName is present in colValue.
 var colName;
 var colValue;
 var searchColumn;
@@ -29,8 +29,7 @@ var lastColValueForCount;
 var lastColNameForGraph;
 var lastColValueForGraph;
 
-
-//Variables for processing Edit profile
+// Variables for processing Edit profile
 var startIndex = 0;
 var numOfRows = 3;
 var minScore = 0;
@@ -49,11 +48,11 @@ var delay = (function() {
 	};
 })();
 
-//User management
+// User management
 var usersStartIndex = 0;
 var numOfRows = 10;
 
-//User management
+// User management
 var userStartIndex = 0;
 var userBatchSize = 10;
 var doStopAjaxRequestForUsersList = false;
@@ -61,13 +60,13 @@ var listOfBranchesForAdmin;
 var isUserManagementAuthorized = true;
 var isAddUser = true;
 
-//Variables for editprofile page
+// Variables for editprofile page
 var editProfileForYelp = false;
 var editProfileForLicense = false;
 var editProfileForHobbies = false;
 var editProfileForAchievements = false;
 
-//Variables for survey question page
+// Variables for survey question page
 var qno = 0;
 var questions;
 var questionDetails;
@@ -78,7 +77,7 @@ var customerEmail;
 var surveyId;
 var mood;
 var stage;
-var isSmileTypeQuestion=true;
+var isSmileTypeQuestion = true;
 var swearWords = [];
 var isAbusive;
 var autoPost;
@@ -103,10 +102,10 @@ var agentProfileLink;
 var agentFullProfileLink;
 var companyLogo;
 
-//Verticals master
+// Verticals master
 var verticalsMasterList;
 
-//Variables for social monitor
+// Variables for social monitor
 var autocompleteData;
 var companyIdForSocialMonitor;
 var smScrollTop = 0;
@@ -129,7 +128,7 @@ var existingCall;
  * @param url
  */
 function showMainContent(url) {
-	
+
 	closeMoblieScreenMenu();
 	saveState(url);
 	callAjaxGET(url, showMainContentCallBack, true);
@@ -146,7 +145,7 @@ function showMainContentCallBack(data) {
 	hideOverlay();
 }
 
-$(window).resize(function(){
+$(window).resize(function() {
 	if ($(window).width() > 767) {
 		if ($('#header-slider-wrapper').hasClass('rt-panel-slide')) {
 			closeMoblieScreenMenu();
@@ -159,7 +158,7 @@ function closeMoblieScreenMenu() {
 	enableBodyScroll();
 }
 
-//Function to logout
+// Function to logout
 function userLogout() {
 	window.location.href = 'j_spring_security_logout';
 }
@@ -174,8 +173,7 @@ var historyCallback = false;
 var refreshSupport = true;
 
 function getRandomID() {
-	return (Math.floor(Math.random() * 10000) + Math
-			.floor(Math.random() * 10000));
+	return (Math.floor(Math.random() * 10000) + Math.floor(Math.random() * 10000));
 }
 
 function saveState(url) {
@@ -191,118 +189,99 @@ function saveState(url) {
 
 function retrieveState() {
 	if (!refreshSupport) {
-		//refresh not supported
+		// refresh not supported
 		return;
 	}
 	var newLocation = window.location.hash.substring(1);
 	if (newLocation) {
-		showMainContent("/"+newLocation+".do");
+		showMainContent("/" + newLocation + ".do");
 	}
 }
-/*End of functions for history support*/
-
+/* End of functions for history support */
 
 /*
  * Click event to close survey popup
  */
-$(document).on('click',  function(e){
-	if($('#overlay-send-survey').is(':visible')){
+$(document).on('click', function(e) {
+	if ($('#overlay-send-survey').is(':visible')) {
 		$('#overlay-send-survey').hide();
 		enableBodyScroll();
 	}
-	if($('#report-abuse-overlay' ).is(':visible')){
+	if ($('#report-abuse-overlay').is(':visible')) {
 		$('#report-abuse-overlay').hide();
 		enableBodyScroll();
 	}
-	if($('#overlay-main' ).is(':visible')){
+	if ($('#overlay-main').is(':visible')) {
 		$('#overlay-main').hide();
 		enableBodyScroll();
 	}
-	if($('.overlay-payment' ).is(':visible')){
+	if ($('.overlay-payment').is(':visible')) {
 		$('.overlay-payment').hide();
 		enableBodyScroll();
 	}
-	if($('#overlay-incomplete-survey' ).is(':visible')){
+	if ($('#overlay-incomplete-survey').is(':visible')) {
 		$('#overlay-incomplete-survey').hide();
 		enableBodyScroll();
 	}
-	if($('#email-map-pop-up' ).is(':visible')){
+	if ($('#email-map-pop-up').is(':visible')) {
 		$('#email-map-pop-up').hide();
 		enableBodyScroll();
 	}
-	
-		
+
 });
 
-$(document).on('keyup',  function(e){
-	if (e.keyCode == 27){
-		if($('#overlay-send-survey').is(':visible')){
+$(document).on('keyup', function(e) {
+	if (e.keyCode == 27) {
+		if ($('#overlay-send-survey').is(':visible')) {
 			$('#overlay-send-survey').hide();
 			enableBodyScroll();
 		}
-		if($('#report-abuse-overlay' ).is(':visible')){
+		if ($('#report-abuse-overlay').is(':visible')) {
 			$('#report-abuse-overlay').hide();
 			enableBodyScroll();
 		}
-		if($('#overlay-main' ).is(':visible')){
+		if ($('#overlay-main').is(':visible')) {
 			$('#overlay-main').hide();
 			enableBodyScroll();
 		}
-		if($('.overlay-payment' ).is(':visible')){
+		if ($('.overlay-payment').is(':visible')) {
 			$('.overlay-payment').hide();
 			enableBodyScroll();
 		}
-		if($('#overlay-incomplete-survey' ).is(':visible')){
+		if ($('#overlay-incomplete-survey').is(':visible')) {
 			$('#overlay-incomplete-survey').hide();
 			enableBodyScroll();
 		}
-		if($('#email-map-pop-up' ).is(':visible')){
+		if ($('#email-map-pop-up').is(':visible')) {
 			$('#email-map-pop-up').hide();
 			enableBodyScroll();
 		}
-		
-		
+
 	}
 });
 
-/**if($('#report-abuse-overlay' ).is(':visible')){
-			$('#report-abuse-overlay').hide();
-			enableBodyScroll();
-		}
-		if($('#overlay-main' ).is(':visible')){
-			$('#overlay-main').hide();
-			enableBodyScroll();
-		}
-		if($('#report-abuse-overlay' ).is(':visible')){
-			$('#report-abuse-overlay').hide();
-			enableBodyScroll();
-		}
-		if($('#overlay-main' ).is(':visible')){
-			$('#overlay-main').hide();
-			enableBodyScroll();
-		}
-*/
-$(document).on('click', '#email-overlay', function(e){
+/**
+ * if($('#report-abuse-overlay' ).is(':visible')){ $('#report-abuse-overlay').hide(); enableBodyScroll(); } if($('#overlay-main' ).is(':visible')){ $('#overlay-main').hide(); enableBodyScroll(); } if($('#report-abuse-overlay' ).is(':visible')){ $('#report-abuse-overlay').hide(); enableBodyScroll(); } if($('#overlay-main' ).is(':visible')){ $('#overlay-main').hide(); enableBodyScroll(); }
+ */
+$(document).on('click', '#email-overlay', function(e) {
 	e.stopPropagation();
 });
-$(document).on('click', '#payment-data-container', function(e){
+$(document).on('click', '#payment-data-container', function(e) {
 	e.stopPropagation();
 });
-$(document).on('click', '#welcome-popup-invite', function(e){
+$(document).on('click', '#welcome-popup-invite', function(e) {
 	e.stopPropagation();
 });
-$(document).on('click', '#overlay-pop-up', function(e){
+$(document).on('click', '#overlay-pop-up', function(e) {
 	e.stopPropagation();
 });
 
-$(document).on('click', '#report-abuse-pop-up', function(e){
+$(document).on('click', '#report-abuse-pop-up', function(e) {
 	e.stopPropagation();
 });
-$(document).on('click', '#incomplete-survey-popup', function(e){
+$(document).on('click', '#incomplete-survey-popup', function(e) {
 	e.stopPropagation();
 });
-
-
 
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
@@ -327,45 +306,26 @@ $(document).on('click', '.hr-dd-item', function(e) {
 $(document).on('click', '.restart-survey-mail-txt', function(e) {
 	e.stopPropagation();
 	confirmRetakeSurveyReminderMail(this);
-	
-	
-	/*var firstName = $(this).parent().parent().parent().parent().attr('data-firstname');
-	var lastName = $(this).parent().parent().parent().parent().attr('data-lastname');
-	var agentName = $(this).parent().parent().parent().parent().attr('data-agentname');
-	var customerEmail = $(this).parent().parent().parent().parent().attr('data-customeremail');
-	var agentId = $(this).parent().parent().parent().parent().attr('data-agentid');
-	var payload = {
-			"customerEmail" : customerEmail,
-			"agentId" : agentId,
-			"firstName" : firstName,
-			"lastName" : lastName,
-			"agentName" : agentName
-	};
-	callAjaxGetWithPayloadData('./restartsurvey.do', '', payload, true);
-	$('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.');
-	showToast();*/
+
+	/*
+	 * var firstName = $(this).parent().parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().parent().attr('data-agentname'); var customerEmail = $(this).parent().parent().parent().parent().attr('data-customeremail'); var agentId = $(this).parent().parent().parent().parent().attr('data-agentid'); var payload = { "customerEmail" : customerEmail, "agentId" : agentId, "firstName" : firstName, "lastName" : lastName, "agentName" : agentName }; callAjaxGetWithPayloadData('./restartsurvey.do', '', payload, true); $('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.'); showToast();
+	 */
 });
 
-
 function confirmRetakeSurveyReminderMail(element) {
-	
-	
-		$('#overlay-header').html("Retake survey");
-		$('#overlay-text').html("This action will erase all the previous data of this survey and survey will be reset.");
-		$('#overlay-continue').html("Yes");
-		$('#overlay-cancel').html("No");
-		$('#overlay-continue').off();
-		$('#overlay-continue').click(function(){
-			retakeSurveyReminderMail(element);
-		});
-		
-		$('#overlay-main').show();
-		disableBodyScroll();
-	}
 
-	
+	$('#overlay-header').html("Retake survey");
+	$('#overlay-text').html("This action will erase all the previous data of this survey and survey will be reset.");
+	$('#overlay-continue').html("Yes");
+	$('#overlay-cancel').html("No");
+	$('#overlay-continue').off();
+	$('#overlay-continue').click(function() {
+		retakeSurveyReminderMail(element);
+	});
 
-
+	$('#overlay-main').show();
+	disableBodyScroll();
+}
 
 function retakeSurveyReminderMail(element) {
 	var firstName = $(element).parent().parent().parent().parent().attr('data-firstname');
@@ -374,18 +334,18 @@ function retakeSurveyReminderMail(element) {
 	var customerEmail = $(element).parent().parent().parent().parent().attr('data-customeremail');
 	var agentId = $(element).parent().parent().parent().parent().attr('data-agentid');
 	var surveyId = $(element).parent().parent().parent().parent().attr('survey-mongo-id');
-	
+
 	var payload = {
-			"customerEmail" : customerEmail,
-			"agentId" : agentId,
-			"firstName" : firstName,
-			"lastName" : lastName,
-			"agentName" : agentName,
-			"surveyId" : surveyId
+		"customerEmail" : customerEmail,
+		"agentId" : agentId,
+		"firstName" : firstName,
+		"lastName" : lastName,
+		"agentName" : agentName,
+		"surveyId" : surveyId
 	};
-	
+
 	callAjaxGetWithPayloadData('./restartsurvey.do', function() {
-		$('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.');
+		$('#overlay-toast').html('Mail sent to ' + firstName + ' ' + ' to retake the survey for you.');
 		showToast();
 		$('#overlay-cancel').click();
 		$(element).parent().parent().parent().parent().remove();
@@ -393,30 +353,9 @@ function retakeSurveyReminderMail(element) {
 	}, payload, true);
 }
 
-/*$(document).on('click', '.report-abuse-txt', function(e) {
-	disableBodyScroll();
-	e.stopPropagation();
-	var reviewElement = $(this).parent().parent().parent().parent();
-	var payload = {
-		"customerEmail" : reviewElement.attr('data-customeremail'),
-		"agentId" : reviewElement.attr('data-agentid'),
-		"firstName" : reviewElement.attr('data-cust-first-name'),
-		"lastName" : reviewElement.attr('data-cust-last-name'),
-		"agentName" : reviewElement.attr('data-agent-name'),
-		"review" : reviewElement.attr('data-review'),
-		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
-	};
-	$("#report-abuse-txtbox").val('');
-	
-	// Unbind click events for button
-	$('.rpa-cancel-btn').off('click');
-	$('.rpa-report-btn').off('click');
-	//disableBodyScroll();
-	$('#report-abuse-overlay').show();
-	$('.rpa-cancel-btn').on('click', function() {
-		$('#report-abuse-overlay').hide();
-		enableBodyScroll();
-	}); */
+/*
+ * $(document).on('click', '.report-abuse-txt', function(e) { disableBodyScroll(); e.stopPropagation(); var reviewElement = $(this).parent().parent().parent().parent(); var payload = { "customerEmail" : reviewElement.attr('data-customeremail'), "agentId" : reviewElement.attr('data-agentid'), "firstName" : reviewElement.attr('data-cust-first-name'), "lastName" : reviewElement.attr('data-cust-last-name'), "agentName" : reviewElement.attr('data-agent-name'), "review" : reviewElement.attr('data-review'), "surveyMongoId" : reviewElement.attr('survey-mongo-id') }; $("#report-abuse-txtbox").val(''); // Unbind click events for button $('.rpa-cancel-btn').off('click'); $('.rpa-report-btn').off('click'); //disableBodyScroll(); $('#report-abuse-overlay').show(); $('.rpa-cancel-btn').on('click', function() { $('#report-abuse-overlay').hide(); enableBodyScroll(); });
+ */
 $(document).on('click', '.report-abuse-txt', function(e) {
 	disableBodyScroll();
 	e.stopPropagation();
@@ -430,22 +369,21 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 		"review" : reviewElement.attr('data-review'),
 		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
 	};
-	var r=reviewElement.attr('data-firstname');
+	var r = reviewElement.attr('data-firstname');
 	$("#report-abuse-txtbox").val('');
 	console.log(r);
 	// Unbind click events for button
 	$('.rpa-cancel-btn').off('click');
 	$('.rpa-report-btn').off('click');
-	//disableBodyScroll();
+	// disableBodyScroll();
 	$('#report-abuse-overlay').show();
 	$('.rpa-cancel-btn').on('click', function() {
 		$('#report-abuse-overlay').hide();
 		enableBodyScroll();
-	}); 
-	
-	
+	});
+
 	$('.rpa-report-btn').on('click', function() {
-		
+
 		var reportText = $("#report-abuse-txtbox").val();
 		if (validateReportAbuseUserForm(reportText)) {
 			showOverlay();
@@ -455,10 +393,8 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 	});
 });
 
-
-
 function validateReportAbuseUserForm(reportText) {
-	//check if report text is empty
+	// check if report text is empty
 	if (reportText == undefined || reportText == "") {
 		$('#overlay-toast').html('Please enter why you want to report the review!');
 		showToast();
@@ -470,7 +406,7 @@ function validateReportAbuseUserForm(reportText) {
 function confirmUserReportAbuse(payload) {
 	callAjaxGetWithPayloadData('./reportabuse.do', function(status) {
 		$('#report-abuse-overlay').hide();
-		
+
 		if (status == 'success') {
 			$('#overlay-toast').html('Reported Successfully!');
 		} else {
@@ -509,10 +445,10 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	});
 	lastColNameForCount = newProfileName;
 	lastColValueForCount = newProfileValue;
-	
+
 	colName = newProfileName;
 	colValue = newProfileValue;
-	
+
 	if (newProfileName == "companyId") {
 		showCompanyAdminFlow(newProfileName, newProfileValue);
 	} else if (newProfileName == "regionId") {
@@ -522,51 +458,48 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	} else if (newProfileName == "agentId") {
 		showAgentFlow(newProfileName, newProfileValue);
 	}
-	
+
 	// initializing datepickers
 	bindDatePickerforSurveyDownload();
 	bindDatePickerforIndividualSurveyDownload();
-	
+
 	getIncompleteSurveyCount(colName, colValue);
-	/*if(is_dashboard_loaded === undefined){ //file never entered. the global var was not set.
-		window.is_dashboard_loaded = 1;
-		fetchReviewsOnDashboard(false);
-	}else{
-		return;
-	}*/
+	/*
+	 * if(is_dashboard_loaded === undefined){ //file never entered. the global var was not set. window.is_dashboard_loaded = 1; fetchReviewsOnDashboard(false); }else{ return; }
+	 */
 	fetchReviewsOnDashboard(false);
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-sel-item');
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-grph-sel-item');
 }
 
 function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
-	//Bind keyup on search for region, branch, individual for dashboard
-	$('#'+elementId).on('keyup', function(e) {
+	// Bind keyup on search for region, branch, individual for dashboard
+	$('#' + elementId).on('keyup', function(e) {
 		var value = $(this).val();
 		var prevVal = $(this).attr('data-prev-val');
-		
-		if(value != prevVal){
-			if ( value === undefined || value == null || value.length <= 0 ) {
+
+		if (value != prevVal) {
+			if (value === undefined || value == null || value.length <= 0) {
 				$('#dsh-srch-res').removeClass('dsh-sb-dd');
 				$('#dsh-srch-res').hide();
 				$('#dsh-srch-res').empty();
 				return;
 			}
 			$(this).attr('data-prev-val', value);
-			searchBranchRegionOrAgent(value, $(this).attr('data-search-target'));			
+			searchBranchRegionOrAgent(value, $(this).attr('data-search-target'));
 		}
-		//Detect arrow key down
-		else if(e.which == 40) {
-			if($(this).next().is(':visible')) {
+		// Detect arrow key down
+		else if (e.which == 40) {
+			if ($(this).next().is(':visible')) {
 				var parentElement = $(this).next();
 				var selectedElement = parentElement.find('.dsh-res-hover');
-				if(selectedElement && selectedElement.length > 0 && selectedElement.next('.dsh-res-display') && selectedElement.next('.dsh-res-display').length > 0) {
+				if (selectedElement && selectedElement.length > 0 && selectedElement.next('.dsh-res-display') && selectedElement.next('.dsh-res-display').length > 0) {
 					selectedElement.removeClass('dsh-res-hover');
 					selectedElement.next('.dsh-res-display').addClass('dsh-res-hover');
-					
+
 					var updatedSelectedElement = parentElement.find('.dsh-res-hover');
-					//check if the top of current selected element is over the parents top
-					if((updatedSelectedElement.offset().top - parentElement.offset().top + updatedSelectedElement[0].clientHeight) > parentElement[0].clientHeight) {
+					// check if the top of current selected element is over the parents top
+					if ((updatedSelectedElement.offset().top - parentElement.offset().top + updatedSelectedElement[0].clientHeight) > parentElement[0].clientHeight) {
 						var scrollTopPos = parentElement[0].scrollTop + updatedSelectedElement[0].clientHeight;
 						parentElement[0].scrollTop = scrollTopPos;
 					}
@@ -577,18 +510,18 @@ function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
 				}
 			}
 		}
-		//Detect arrow key up
-		else if(e.which == 38) {
-			if($(this).next().is(':visible')) {
+		// Detect arrow key up
+		else if (e.which == 38) {
+			if ($(this).next().is(':visible')) {
 				var parentElement = $(this).next();
 				var selectedElement = parentElement.find('.dsh-res-hover');
-				if(selectedElement && selectedElement.length > 0 && selectedElement.prev('.dsh-res-display') && selectedElement.prev('.dsh-res-display').length > 0) {
+				if (selectedElement && selectedElement.length > 0 && selectedElement.prev('.dsh-res-display') && selectedElement.prev('.dsh-res-display').length > 0) {
 					selectedElement.removeClass('dsh-res-hover');
 					selectedElement.prev('.dsh-res-display').addClass('dsh-res-hover');
-					
+
 					var updatedSelectedElement = parentElement.find('.dsh-res-hover');
-					//check if the top of current selected element is over the parents top
-					if((updatedSelectedElement.offset().top - parentElement.offset().top) < 0) {
+					// check if the top of current selected element is over the parents top
+					if ((updatedSelectedElement.offset().top - parentElement.offset().top) < 0) {
 						var scrollTopPos = parentElement[0].scrollTop - updatedSelectedElement[0].clientHeight;
 						parentElement[0].scrollTop = scrollTopPos;
 					}
@@ -599,22 +532,22 @@ function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
 				}
 			}
 		}
-		
-		//Detect enter key
-		else if(e.which == 13) {
-			if($(this).next().is(':visible')) {
+
+		// Detect enter key
+		else if (e.which == 13) {
+			if ($(this).next().is(':visible')) {
 				var selectedElement = $(this).next().find('.dsh-res-hover');
-				if(selectedElement && selectedElement.length > 0) {
+				if (selectedElement && selectedElement.length > 0) {
 					selectedElement.click();
 				}
 			}
 		}
 	});
-	
-	$('#'+elementId).on('blur', function(e) {
-		if($(this).next().is(':visible')) {
+
+	$('#' + elementId).on('blur', function(e) {
+		if ($(this).next().is(':visible')) {
 			var selectedElement = $(this).next().find('.dsh-res-hover');
-			if(selectedElement && selectedElement.length > 0) {
+			if (selectedElement && selectedElement.length > 0) {
 				selectedElement.click();
 			} else {
 				$(this).next().children('.dsh-res-display').first().click();
@@ -623,27 +556,27 @@ function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
 	});
 }
 function bindAutosuggestForCompanySearch(elementId) {
-	//Bind keyup on search for company for dashboard
-	$('#'+elementId).on('keyup', function(e) {
+	// Bind keyup on search for company for dashboard
+	$('#' + elementId).on('keyup', function(e) {
 		var value = $(this).val();
 		var prevVal = $(this).attr('data-prev-val');
-		
-		if(value != prevVal){
+
+		if (value != prevVal) {
 			$(this).attr('data-prev-val', value);
-			searchCompany(value, $(this).attr('data-search-target'));			
+			searchCompany(value, $(this).attr('data-search-target'));
 		}
-		//Detect arrow key down
-		else if(e.which == 40) {
-			if($(this).next().is(':visible')) {
+		// Detect arrow key down
+		else if (e.which == 40) {
+			if ($(this).next().is(':visible')) {
 				var parentElement = $(this).next();
 				var selectedElement = parentElement.find('.dsh-res-hover');
-				if(selectedElement && selectedElement.length > 0 && selectedElement.next('.dsh-res-display') && selectedElement.next('.dsh-res-display').length > 0) {
+				if (selectedElement && selectedElement.length > 0 && selectedElement.next('.dsh-res-display') && selectedElement.next('.dsh-res-display').length > 0) {
 					selectedElement.removeClass('dsh-res-hover');
 					selectedElement.next('.dsh-res-display').addClass('dsh-res-hover');
-					
+
 					var updatedSelectedElement = parentElement.find('.dsh-res-hover');
-					//check if the top of current selected element is over the parents top
-					if((updatedSelectedElement.offset().top - parentElement.offset().top + updatedSelectedElement[0].clientHeight) > parentElement[0].clientHeight) {
+					// check if the top of current selected element is over the parents top
+					if ((updatedSelectedElement.offset().top - parentElement.offset().top + updatedSelectedElement[0].clientHeight) > parentElement[0].clientHeight) {
 						var scrollTopPos = parentElement[0].scrollTop + updatedSelectedElement[0].clientHeight;
 						parentElement[0].scrollTop = scrollTopPos;
 					}
@@ -654,18 +587,18 @@ function bindAutosuggestForCompanySearch(elementId) {
 				}
 			}
 		}
-		//Detect arrow key up
-		else if(e.which == 38) {
-			if($(this).next().is(':visible')) {
+		// Detect arrow key up
+		else if (e.which == 38) {
+			if ($(this).next().is(':visible')) {
 				var parentElement = $(this).next();
 				var selectedElement = parentElement.find('.dsh-res-hover');
-				if(selectedElement && selectedElement.length > 0 && selectedElement.prev('.dsh-res-display') && selectedElement.prev('.dsh-res-display').length > 0) {
+				if (selectedElement && selectedElement.length > 0 && selectedElement.prev('.dsh-res-display') && selectedElement.prev('.dsh-res-display').length > 0) {
 					selectedElement.removeClass('dsh-res-hover');
 					selectedElement.prev('.dsh-res-display').addClass('dsh-res-hover');
-					
+
 					var updatedSelectedElement = parentElement.find('.dsh-res-hover');
-					//check if the top of current selected element is over the parents top
-					if((updatedSelectedElement.offset().top - parentElement.offset().top) < 0) {
+					// check if the top of current selected element is over the parents top
+					if ((updatedSelectedElement.offset().top - parentElement.offset().top) < 0) {
 						var scrollTopPos = parentElement[0].scrollTop - updatedSelectedElement[0].clientHeight;
 						parentElement[0].scrollTop = scrollTopPos;
 					}
@@ -676,22 +609,22 @@ function bindAutosuggestForCompanySearch(elementId) {
 				}
 			}
 		}
-		
-		//Detect enter key
-		else if(e.which == 13) {
-			if($(this).next().is(':visible')) {
+
+		// Detect enter key
+		else if (e.which == 13) {
+			if ($(this).next().is(':visible')) {
 				var selectedElement = $(this).next().find('.dsh-res-hover');
-				if(selectedElement && selectedElement.length > 0) {
+				if (selectedElement && selectedElement.length > 0) {
 					selectedElement.click();
 				}
 			}
 		}
 	});
-	
-	$('#'+elementId).on('blur', function(e) {
-		if($(this).next().is(':visible')) {
+
+	$('#' + elementId).on('blur', function(e) {
+		if ($(this).next().is(':visible')) {
 			var selectedElement = $(this).next().find('.dsh-res-hover');
-			if(selectedElement && selectedElement.length > 0) {
+			if (selectedElement && selectedElement.length > 0) {
 				selectedElement.click();
 			} else {
 				$(this).next().children('.dsh-res-display').first().click();
@@ -706,10 +639,10 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
-	//get profile data for all the records , noOfDays = -1
+	// get profile data for all the records , noOfDays = -1
 	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons(newProfileValue);
-	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
+	if ((accountType != "INDIVIDUAL") && (accountType != "FREE"))
 		populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
@@ -721,10 +654,10 @@ function showRegionAdminFlow(newProfileName, newProfileValue) {
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
-	//get profile data for all the records , noOfDays = -1
+	// get profile data for all the records , noOfDays = -1
 	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons(newProfileValue);
-	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
+	if ((accountType != "INDIVIDUAL") && (accountType != "FREE"))
 		populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
@@ -736,22 +669,22 @@ function showBranchAdminFlow(newProfileName, newProfileValue) {
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
-	//get profile data for all the records , noOfDays = -1
+	// get profile data for all the records , noOfDays = -1
 	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons(newProfileValue);
-	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
+	if ((accountType != "INDIVIDUAL") && (accountType != "FREE"))
 		populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 }
 
 function showAgentFlow(newProfileName, newProfileValue) {
-	
+
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
-	//get profile data for all the records , noOfDays = -1
+	// get profile data for all the records , noOfDays = -1
 	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons(newProfileValue);
 	showSurveyStatistics(newProfileName, newProfileValue);
@@ -774,80 +707,87 @@ function showProfileDetails(columnName, columnValue, numberOfDays) {
 }
 
 function updateDashboardProfileEvents() {
-    // Social Posts
-    $('#dg-img-3').find('svg').remove();
-    var socialPosts = $('#socl-post').text();
-    var circle1 = new ProgressBar.Circle('#dg-img-3', {
-        color: '#7AB400',
-        fill: "rgba(249,249,251, 1)",
-        duration: 1500,
-        strokeWidth: 4,
-        easing: 'easeInOut'
-    });
-    if ((parseFloat(socialPosts) / maxSocialPosts) > 1) circle1.animate(1);
-    else circle1.animate(parseFloat(socialPosts) / maxSocialPosts);
-    // Survey Count
-    $('#dg-img-2').find('svg').remove();
-    var surveyCount = $("#srv-snt-cnt").text();
-    var circle2 = new ProgressBar.Circle('#dg-img-2', {
-        color: '#E97F30',
-        fill: "rgba(249,249,251, 1)",
-        duration: 1500,
-        strokeWidth: 4,
-        easing: 'easeInOut'
-    });
-    if ((parseInt(surveyCount) / maxSurveySent) > 1) circle2.animate(1);
-    else circle2.animate(parseInt(surveyCount) / maxSurveySent);
-    // Social Score
-    $('#dg-img-1').find('svg').remove();
-    var socialScore = $("#srv-scr").text();
-    var circle3 = new ProgressBar.Circle('#dg-img-1', {
-        color: '#5CC7EF',
-        fill: "rgba(249,249,251, 1)",
-        duration: 1500,
-        strokeWidth: 4,
-        easing: 'easeInOut'
-    });
-    if ((parseFloat(socialScore) / 5) > 1) circle3.animate(1);
-    else circle3.animate(parseFloat(socialScore) / 5);
-    // Profile completion
-    $('#dg-img-4').find('svg').remove();
-    var circle4 = new ProgressBar.Circle('#dg-img-4', {
-        color: '#7AB400',
-        fill: "rgba(249,249,251, 1)",
-        duration: 1500,
-        strokeWidth: 4,
-        easing: 'easeInOut'
-    });
-    var profileCompleted = parseInt($('#pro-cmplt-stars').attr("data-profilecompleteness"));
-    if ((profileCompleted / 100) > 1) circle4.animate(1);
-    else circle4.animate(profileCompleted / 100);
-    
-    //update dashboard button events 
-    $('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
-    	e.stopPropagation();
+	// Social Posts
+	$('#dg-img-3').find('svg').remove();
+	var socialPosts = $('#socl-post').text();
+	var circle1 = new ProgressBar.Circle('#dg-img-3', {
+		color : '#7AB400',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
+	});
+	if ((parseFloat(socialPosts) / maxSocialPosts) > 1)
+		circle1.animate(1);
+	else
+		circle1.animate(parseFloat(socialPosts) / maxSocialPosts);
+	// Survey Count
+	$('#dg-img-2').find('svg').remove();
+	var surveyCount = $("#srv-snt-cnt").text();
+	var circle2 = new ProgressBar.Circle('#dg-img-2', {
+		color : '#E97F30',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
+	});
+	if ((parseInt(surveyCount) / maxSurveySent) > 1)
+		circle2.animate(1);
+	else
+		circle2.animate(parseInt(surveyCount) / maxSurveySent);
+	// Social Score
+	$('#dg-img-1').find('svg').remove();
+	var socialScore = $("#srv-scr").text();
+	var circle3 = new ProgressBar.Circle('#dg-img-1', {
+		color : '#5CC7EF',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
+	});
+	if ((parseFloat(socialScore) / 5) > 1)
+		circle3.animate(1);
+	else
+		circle3.animate(parseFloat(socialScore) / 5);
+	// Profile completion
+	$('#dg-img-4').find('svg').remove();
+	var circle4 = new ProgressBar.Circle('#dg-img-4', {
+		color : '#7AB400',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
+	});
+	var profileCompleted = parseInt($('#pro-cmplt-stars').attr("data-profilecompleteness"));
+	if ((profileCompleted / 100) > 1)
+		circle4.animate(1);
+	else
+		circle4.animate(profileCompleted / 100);
+
+	// update dashboard button events
+	$('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
+		e.stopPropagation();
 		if (colName == 'agentId') {
 			sendSurveyInvitation('#dsh-btn1');
 		} else if (accountType == "INDIVIDUAL") {
 			sendSurveyInvitation('#dsh-btn1');
 		} else {
-			sendSurveyInvitationAdmin(colName, colValue,'#dsh-btn1');
+			sendSurveyInvitationAdmin(colName, colValue, '#dsh-btn1');
 		}
 	});
-	$('#pro-cmplt-stars').on('click', '#dsh-btn2', function(e){
-		e.stopPropagation();		
+	$('#pro-cmplt-stars').on('click', '#dsh-btn2', function(e) {
+		e.stopPropagation();
 		var buttonId = 'dsh-btn2';
 		var task = $('#dsh-btn2').data('social');
 		dashboardButtonAction(buttonId, task, colName, colValue);
 	});
-	$('#pro-cmplt-stars').on('click', '#dsh-btn3', function(e){
+	$('#pro-cmplt-stars').on('click', '#dsh-btn3', function(e) {
 		e.stopPropagation();
 		var buttonId = 'dsh-btn3';
 		var task = $('#dsh-btn3').data('social');
 		dashboardButtonAction(buttonId, task, colName, colValue);
 	});
 }
-
 
 function bindSelectButtons(newProfileValue) {
 	$("#selection-list").unbind('change');
@@ -858,54 +798,53 @@ function bindSelectButtons(newProfileValue) {
 	$("#selection-list").change(function() {
 		$('#dsh-sel-item').val('');
 		$('.dsh-res-display').hide();
-		
+
 		if ($("#selection-list").val() == 'companyId') {
 			$('#dsh-srch-survey-div').hide();
 			showSurveyStatistics('companyId', newProfileValue);
-		} else if($("#selection-list").val() == 'regionId'){
+		} else if ($("#selection-list").val() == 'regionId') {
 			$('#dsh-srch-survey-div').hide();
 			showSurveyStatistics('regionId', newProfileValue);
-		}else if($("#selection-list").val() == 'branchId'){
+		} else if ($("#selection-list").val() == 'branchId') {
 			$('#dsh-srch-survey-div').hide();
 			showSurveyStatistics('branchId', newProfileValue);
-		}
-		else{
+		} else {
 			$('#dsh-srch-survey-div').show();
 		}
 	});
 	$("#graph-sel-list").change(function() {
 		$('#dsh-grph-sel-item').val('');
 		$('.dsh-res-display').hide();
-		
+
 		if ($("#graph-sel-list").val() == 'companyId') {
 			$('#dsh-grph-srch-survey-div').hide();
 			showSurveyStatisticsGraphically('companyId', newProfileValue);
-		} else if($("#graph-sel-list").val() == 'regionId'){
+		} else if ($("#graph-sel-list").val() == 'regionId') {
 			$('#dsh-grph-srch-survey-div').hide();
 			showSurveyStatisticsGraphically('regionId', newProfileValue);
-		}else if($("#graph-sel-list").val() == 'branchId'){
+		} else if ($("#graph-sel-list").val() == 'branchId') {
 			$('#dsh-grph-srch-survey-div').hide();
 			showSurveyStatisticsGraphically('branchId', newProfileValue);
-		}else {
+		} else {
 			$('#dsh-grph-srch-survey-div').show();
 		}
 	});
-	
+
 	$("#dsh-grph-format").change(function() {
 		var columnName = colName;
 		var columnValue = colValue;
-		if($('#dsh-grph-srch-survey-div').is(':visible')){
-			if($('#dsh-grph-sel-item').val()==''){
+		if ($('#dsh-grph-srch-survey-div').is(':visible')) {
+			if ($('#dsh-grph-sel-item').val() == '') {
 				$('#dsh-grph-sel-item').addClass("empty-field");
-				if($('#graph-sel-list').val()=="regionName"){
-				$('#overlay-toast').html("Please choose a valid Region Name");
-				}else if($('#graph-sel-list').val()=="branchName"){
+				if ($('#graph-sel-list').val() == "regionName") {
+					$('#overlay-toast').html("Please choose a valid Region Name");
+				} else if ($('#graph-sel-list').val() == "branchName") {
 					$('#overlay-toast').html("Please choose a valid Office Name");
 				}
 				showToast();
 				return;
 			}
-			
+
 			columnName = lastColNameForGraph;
 			columnValue = lastColValueForGraph;
 		}
@@ -914,22 +853,22 @@ function bindSelectButtons(newProfileValue) {
 	$("#survey-count-days").change(function() {
 		var columnName = colName;
 		var columnValue = colValue;
-		
-		if($('#dsh-srch-survey-div').is(':visible')){
-			if($('#dsh-sel-item').val()==''){
+
+		if ($('#dsh-srch-survey-div').is(':visible')) {
+			if ($('#dsh-sel-item').val() == '') {
 				$('#dsh-sel-item').addClass("empty-field");
-				if($('#selection-list').val()=="regionName"){
+				if ($('#selection-list').val() == "regionName") {
 					$('#overlay-toast').html("Please choose a valid Region Name");
-					}else if($('#selection-list').val()=="branchName"){
-						$('#overlay-toast').html("Please choose a valid Office Name");
-					}
-					showToast();
+				} else if ($('#selection-list').val() == "branchName") {
+					$('#overlay-toast').html("Please choose a valid Office Name");
+				}
+				showToast();
 				return;
 			}
-		
+
 			columnName = lastColNameForCount;
 			columnValue = lastColValueForCount;
-			
+
 		}
 		showSurveyStatistics(columnName, columnValue);
 	});
@@ -938,34 +877,34 @@ function bindSelectButtons(newProfileValue) {
 function populateSurveyStatisticsList(columnName) {
 	$("#region-div").show();
 	$("#graph-sel-div").show();
-	
+
 	var options = "";
 	if ((columnName == "companyId") && (accountType == "ENTERPRISE" || accountType == "COMPANY")) {
 		options += "<option value=companyId>Company</option>";
 	}
 	if ((columnName == "companyId") && (accountType == "ENTERPRISE")) {
 		options += "<option value=regionName>Region</option>";
-	}else if((columnName == "regionId") && (accountType == "ENTERPRISE")){
+	} else if ((columnName == "regionId") && (accountType == "ENTERPRISE")) {
 		options += "<option value=regionId>Region</option>";
 	}
 	if (accountType == "ENTERPRISE" || accountType == "COMPANY") {
 		if (columnName == "companyId" || columnName == "regionId") {
 			options += "<option value=branchName>Office</option>";
-		}else if(columnName == "branchId"){
+		} else if (columnName == "branchId") {
 			options += "<option value=branchId>Office</option>";
 		}
 	}
 	if (columnName == "companyId" || columnName == "regionId" || columnName == "branchId") {
 		options += "<option value=displayName>Individual</option>";
 	}
-	
+
 	$("#selection-list").html(options);
 	$("#graph-sel-list").html(options);
-	
+
 	if (columnName == "companyId") {
 		$('#dsh-srch-survey-div').hide();
 		$('#dsh-grph-srch-survey-div').hide();
-	}else if(columnName == "regionId"||columnName == "branchId"){
+	} else if (columnName == "regionId" || columnName == "branchId") {
 		$('#dsh-srch-survey-div').hide();
 		$('#dsh-grph-srch-survey-div').hide();
 	}
@@ -990,92 +929,91 @@ function showSurveyCount(columnName, columnValue, numberOfDays) {
 	}, payload, true);
 }
 
-
 var isIncompleteSurveyAjaxRequestRunning = false;
 var doStopIncompleteSurveyPostAjaxRequest = false;
 
 function fetchIncompleteSurvey(isNextBatch) {
-	
-	if(!isNextBatch && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
+
+	if (!isNextBatch && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
 		showLoaderOnPagination($('#dsh-inc-srvey'));
-		
-		//paint the posts
+
+		// paint the posts
 		setTimeout(function() {
 			displayIncompleteSurveysOnDashboard();
 		}, 500);
 		return;
 	}
-	
-	if(isIncompleteSurveyAjaxRequestRunning) return; //Return if request is running
-	
+
+	if (isIncompleteSurveyAjaxRequestRunning)
+		return; // Return if request is running
+
 	var payload = {
 		"columnName" : colName,
 		"columnValue" : colValue,
 		"startIndex" : startIndexInc,
 		"batchSize" : batchSizeInc
 	};
-	
+
 	var totalIncReviews = parseInt($('#dsh-inc-srvey').attr("data-total"));
-	if(totalIncReviews == 0) {
+	if (totalIncReviews == 0) {
 		$("#incomplete-survey-header").html("No incomplete surveys found");
 		return;
 	}
-	
-	//Show loader icon if not next batch
-	if(!isNextBatch) {
+
+	// Show loader icon if not next batch
+	if (!isNextBatch) {
 		showLoaderOnPagination($('#dsh-inc-srvey'));
 	}
-	
+
 	isIncompleteSurveyAjaxRequestRunning = true;
 	callAjaxGetWithPayloadData("./fetchdashboardincompletesurvey.do", function(data) {
-		
+
 		isIncompleteSurveyAjaxRequestRunning = false;
 		startIndexInc += batchSizeInc;
-		
+
 		var tempDiv = $("<div>");
 		tempDiv.html(data);
-		
-		if(tempDiv.children('div.dsh-icn-sur-item').length < batchSizeInc) {
+
+		if (tempDiv.children('div.dsh-icn-sur-item').length < batchSizeInc) {
 			doStopIncompleteSurveyPostAjaxRequest = true;
 		}
-		
+
 		if (startIndexInc == 0) {
 			$('#dsh-inc-srvey').html(data);
 			$("#dsh-inc-dwnld").show();
-		}
-		else {
+		} else {
 			$('#dsh-inc-srvey').append(data);
 		}
-		
+
 		$('.dsh-inc-sur-date[data-modified="false"]').each(function(index, currentElement) {
 			var dateStr = $(this).attr('data-value');
-			$(this).html(getDateStrToUTC(dateStr)).attr("data-modified","true");
+			$(this).html(getDateStrToUTC(dateStr)).attr("data-modified", "true");
 		});
-		
-		if(isNextBatch) {
-			//Fetch the next batch
-			if(!doStopIncompleteSurveyPostAjaxRequest && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length <= batchSizeInc) {
+
+		if (isNextBatch) {
+			// Fetch the next batch
+			if (!doStopIncompleteSurveyPostAjaxRequest && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length <= batchSizeInc) {
 				fetchIncompleteSurvey(true);
 			}
-		} else if($('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
-				fetchIncompleteSurvey(false);
-		} 
+		} else if ($('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
+			fetchIncompleteSurvey(false);
+		}
 	}, payload, true);
-	
+
 }
 
 function displayIncompleteSurveysOnDashboard() {
 	hideLoaderOnPagination($('#dsh-inc-srvey'));
 	$('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').each(function(index, currentElement) {
-		if(index >= batchSizeInc) {
+		if (index >= batchSizeInc) {
 			return false;
 		}
 		$(this).removeClass("hide");
 	});
 	$('#dsh-inc-srvey').perfectScrollbar();
-	
-	//Fetch the next batch
-	if(!doStopIncompleteSurveyPostAjaxRequest && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length <= batchSizeInc) {
+
+	// Fetch the next batch
+	if (!doStopIncompleteSurveyPostAjaxRequest && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length <= batchSizeInc) {
 		fetchIncompleteSurvey(true);
 	}
 }
@@ -1083,72 +1021,73 @@ function displayIncompleteSurveysOnDashboard() {
 $(document).on('click', '.dash-lp-rt-img', function() {
 	var surveyPreInitiationId = $(this).data("surveypreinitiationid");
 	var customerName = $(this).data("custname");
-	sendSurveyReminderMail(surveyPreInitiationId, customerName,'.dash-lp-rt-img');
+	sendSurveyReminderMail(surveyPreInitiationId, customerName, '.dash-lp-rt-img');
 });
 
 var isDashboardReviewRequestRunning = false;
 var doStopPaginationDashboard = false;
- 
-var isAjaxInProgress=false;
+
+var isAjaxInProgress = false;
 function fetchReviewsOnDashboard(isNextBatch) {
-	if (isAjaxInProgress==true){
+	if (isAjaxInProgress == true) {
 		return;
 	}
-	if(isDashboardReviewRequestRunning) return; //Return if ajax request is still running
-	
+	if (isDashboardReviewRequestRunning)
+		return; // Return if ajax request is still running
+
 	var payload = {
 		"columnName" : colName,
 		"columnValue" : colValue,
 		"startIndex" : startIndexCmp,
 		"batchSize" : batchSizeCmp
 	};
-	
+
 	isDashboardReviewRequestRunning = true;
-	if(!isNextBatch) {
+	if (!isNextBatch) {
 		showLoaderOnPagination($('#review-details'));
 	}
-	isAjaxInProgress=true;
+	isAjaxInProgress = true;
 	callAjaxGetWithPayloadData("./fetchdashboardreviews.do", function(data) {
-		isAjaxInProgress=false;
+		isAjaxInProgress = false;
 		var tempDiv = $('<div>').html(data);
 		var reviewsCount = tempDiv.children('div.dsh-review-cont').length;
 		var ssReviewsPresent = true;
-		//check if no reviews found
-		if(startIndexCmp == 0) {
+		// check if no reviews found
+		if (startIndexCmp == 0) {
 			var name = $('#review-desc').attr('data-profile-name');
 			if (reviewsCount == 0) {
 				$("#review-desc").html("No reviews found for " + name);
 				$("#review-details").html('');
-//				return;
+				// return;
 				ssReviewsPresent = false;
 			} else {
 				$("#review-desc").html("What people say about " + name);
 			}
 		}
-		
-		if(reviewsCount < batchSizeCmp) {
+
+		if (reviewsCount < batchSizeCmp) {
 			doStopPaginationDashboard = true;
 		}
-		
-		if(ssReviewsPresent){
+
+		if (ssReviewsPresent) {
 			if (startIndexCmp == 0)
 				$('#review-details').html(data);
 			else
 				$('#review-details').append(data);
-		
-			//Update events
+
+			// Update events
 			updateEventOnDashboardPageForReviews();
 		}
 		startIndexCmp += batchSizeCmp;
-		
-		if(!isNextBatch) {
+
+		if (!isNextBatch) {
 			displayReviewOnDashboard();
 		}
 		isDashboardReviewRequestRunning = false;
-		if($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
+		if ($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
 			fetchReviewsOnDashboard(true);
-		} else if($('div.dsh-review-cont.hide').length < (2 * batchSizeCmp)) {
-			fetchZillowReviewsBasedOnProfile(colName, colValue,isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp, name);
+		} else if ($('div.dsh-review-cont.hide').length < (2 * batchSizeCmp)) {
+			fetchZillowReviewsBasedOnProfile(colName, colValue, isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp, name);
 		}
 	}, payload, true);
 }
@@ -1157,34 +1096,35 @@ var isDashboardReviewScrollRunning = false;
 
 function dashbaordReviewScroll() {
 	if ((window.innerHeight + window.pageYOffset) >= ($('#review-details').offset().top + $('#review-details').height() - 200) && (!doStopPaginationDashboard || $('div.dsh-review-cont.hide').length > 0)) {
-		if(isDashboardReviewScrollRunning) return; //return if the scroll is running
-		if($('div.dsh-review-cont.hide').length > 0){
+		if (isDashboardReviewScrollRunning)
+			return; // return if the scroll is running
+		if ($('div.dsh-review-cont.hide').length > 0) {
 			showLoaderOnPagination($('#review-details'));
 			isDashboardReviewScrollRunning = true;
 			setTimeout(displayReviewOnDashboard, 500);
-		} else{
+		} else {
 			fetchReviewsOnDashboard(false);
 		}
-	}	
+	}
 }
 
 function displayReviewOnDashboard() {
-	
+
 	isDashboardReviewScrollRunning = false;
 	$('.dsh-review-cont').removeClass("ppl-review-item-last").addClass("ppl-review-item");
-	
+
 	hideLoaderOnPagination($('#review-details'));
 	var nextBatchReviews = $('div.dsh-review-cont.hide').length;
 	$('div.dsh-review-cont.hide').each(function(index, currentElement) {
 		$(this).removeClass("hide");
-		if(index >= batchSizeCmp - 1 || index >= nextBatchReviews - 1 ) {
+		if (index >= batchSizeCmp - 1 || index >= nextBatchReviews - 1) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
 			return false;
 		}
 	});
-	
-	//Get the next batch
-	if($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
+
+	// Get the next batch
+	if ($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
 		fetchReviewsOnDashboard(true);
 	}
 }
@@ -1192,25 +1132,25 @@ function displayReviewOnDashboard() {
 function updateEventOnDashboardPageForReviews() {
 	$('.ppl-head-2[data-modified="false"]').each(function(index, currentElement) {
 		var dateSplit = $(this).attr('data-modifiedon').split('-');
-		var month=dateSplit[0];
-		var day=dateSplit[1];
-		var year=dateSplit[2];
-		var reviewDay=month+" "+day+","+year;
+		var month = dateSplit[0];
+		var day = dateSplit[1];
+		var year = dateSplit[2];
+		var reviewDay = month + " " + day + "," + year;
 		$(this).html(reviewDay).attr("data-modified", "true");
 	});
 	$('.completedOn[data-modified="false"]').each(function(index, currentElement) {
 		var dateSplit = $(this).attr('data-modifiedon').split('-');
-		var month=dateSplit[0];
-		var year=dateSplit[1];
-		var reviewDay=month+" "+year;
+		var month = dateSplit[0];
+		var year = dateSplit[1];
+		var reviewDay = month + " " + year;
 		$(this).html(reviewDay).attr("data-modified", "true");
 	});
-	
+
 	$('.review-ratings[data-modified="false"]').each(function() {
 		changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
 		$(this).attr("data-modified", "true");
 	});
-	
+
 	$('.ppl-share-icns').unbind('click');
 	$('.ppl-share-icns').bind('click', function() {
 		var link = $(this).attr('data-link');
@@ -1228,9 +1168,9 @@ function showSurveyStatisticsGraphically(columnName, columnValue) {
 	showDashOverlay('#low-dash');
 	showSurveyGraph(columnName, columnValue, numberOfDays);
 }
-var isSurveydetailsforgraph=false;
+var isSurveydetailsforgraph = false;
 function showSurveyGraph(columnName, columnValue, numberOfDays) {
-	if(isSurveydetailsforgraph==true){
+	if (isSurveydetailsforgraph == true) {
 		return;
 	}
 	var payload = {
@@ -1238,7 +1178,7 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 		"columnValue" : columnValue,
 		"numberOfDays" : numberOfDays
 	};
-	isSurveydetailsforgraph=true;
+	isSurveydetailsforgraph = true;
 	$.ajax({
 		url : "./surveydetailsforgraph.do",
 		type : "GET",
@@ -1246,14 +1186,14 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 		cache : false,
 		data : payload,
 		success : function(data) {
-			isSurveydetailsforgraph=false;
+			isSurveydetailsforgraph = false;
 			$('#dsh-grph-sel-item').removeClass("empty-field");
 			graphData = data;
 			paintSurveyGraph();
 			hideDashOverlay('#low-dash');
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -1273,10 +1213,10 @@ function paintSurveyGraph() {
 	var completedSurveys = [];
 
 	var element = document.getElementById("dsh-grph-format");
-	if(element == null){
+	if (element == null) {
 		return;
 	}
-	
+
 	var format = element.options[element.selectedIndex].value;
 	var type = '';
 	if (format == '30') {
@@ -1288,32 +1228,29 @@ function paintSurveyGraph() {
 	} else if (format == '365') {
 		type = 'Month';
 	}
-	
+
 	var keys = getKeysFromGraphFormat(format);
-	
-	
+
 	for (var i = 0; i < keys.length; i++) {
-		if(format == '365') {
-			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);	
+		if (format == '365') {
+			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
 		} else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
 		}
-		if(graphData != undefined) {
-			if(graphData.clicked != undefined)
+		if (graphData != undefined) {
+			if (graphData.clicked != undefined)
 				clickedSurveys[i] = graphData.clicked[keys[i]] || 0;
-			if(graphData.sent != undefined)
+			if (graphData.sent != undefined)
 				sentSurveys[i] = graphData.sent[keys[i]] || 0;
-			if(graphData.complete != undefined)
+			if (graphData.complete != undefined)
 				completedSurveys[i] = graphData.complete[keys[i]] || 0;
-			if(graphData.socialposts != undefined)
+			if (graphData.socialposts != undefined)
 				socialPosts[i] = graphData.socialposts[keys[i]] || 0;
 		}
 	}
 	var internalData = [];
 	var nestedInternalData = [];
-	nestedInternalData.push(type, 'No. of surveys sent',
-			'No. of surveys clicked', 'No. of surveys completed',
-			'No. of social posts');
+	nestedInternalData.push(type, 'No. of surveys sent', 'No. of surveys clicked', 'No. of surveys completed', 'No. of social posts');
 	internalData.push(nestedInternalData);
 	for (var itr = 0; itr < allTimeslots.length; itr++) {
 		nestedInternalData = [];
@@ -1321,31 +1258,31 @@ function paintSurveyGraph() {
 		var clickedSurvey;
 		var completedSurvey;
 		var socialPost;
-		
+
 		if (isNaN(parseInt(sentSurveys[itr]))) {
 			sentSurvey = 0;
 		} else {
 			sentSurvey = parseInt(sentSurveys[itr]);
 		}
-		
+
 		if (isNaN(parseInt(clickedSurveys[itr]))) {
 			clickedSurvey = 0;
 		} else {
 			clickedSurvey = parseInt(clickedSurveys[itr]);
 		}
-		
+
 		if (isNaN(parseInt(completedSurveys[itr]))) {
 			completedSurvey = 0;
 		} else {
 			completedSurvey = parseInt(completedSurveys[itr]);
 		}
-		
+
 		if (isNaN(parseInt(socialPosts[itr]))) {
 			socialPost = 0;
 		} else {
 			socialPost = parseInt(socialPosts[itr]);
 		}
-		
+
 		nestedInternalData.push(allTimeslots[itr], sentSurvey, clickedSurvey, completedSurvey, socialPost);
 		internalData.push(nestedInternalData);
 	}
@@ -1356,29 +1293,23 @@ function paintSurveyGraph() {
 			width : '90%',
 			height : '80%'
 		},
-		colors : [ 'rgb(28,242,0)', 'rgb(0,174,239)', 'rgb(255,242,0)',
-				'rgb(255,202,145)' ],
+		colors : [ 'rgb(28,242,0)', 'rgb(0,174,239)', 'rgb(255,242,0)', 'rgb(255,202,145)' ],
 		legend : {
 			position : 'none'
 		}
 	};
-	
 
 	removeAllPreviousGraphToolTip();
-	
+
 	var chart = new google.visualization.LineChart(document.getElementById('util-gph-item'));
 	chart.draw(data, options);
 }
 
-
-//Function to remove all previous tool tips popped up from charts
+// Function to remove all previous tool tips popped up from charts
 function removeAllPreviousGraphToolTip() {
-	$('.footer-main-wrapper').nextAll("div").filter(
-			function() {
-				return $(this).css("display") == "none"
-						&& $(this).css("position") == "absolute"
-							&& $(this).children().css("font-family") == "Arial";
-			}).remove();
+	$('.footer-main-wrapper').nextAll("div").filter(function() {
+		return $(this).css("display") == "none" && $(this).css("position") == "absolute" && $(this).children().css("font-family") == "Arial";
+	}).remove();
 }
 
 function convertYearWeekKeyToDate(key) {
@@ -1389,8 +1320,8 @@ function convertYearWeekKeyToDate(key) {
 
 function convertYearMonthKeyToDate(key) {
 	var year = parseInt(key.substr(0, 4));
-	var monthStr = key.substr(4 , key.length);
-	var monthInt = parseInt(monthStr , "10"); //add base value
+	var monthStr = key.substr(4, key.length);
+	var monthInt = parseInt(monthStr, "10"); // add base value
 	var monthNumber = monthInt - 1;
 	return Date.today().set({
 		day : 1,
@@ -1402,67 +1333,76 @@ function convertYearMonthKeyToDate(key) {
 function getKeysFromGraphFormat(format) {
 	var firstDate;
 	var keys = [];
-	if(format == '365') {
-		firstDate = Date.today().add({months:-11});
-		var key = firstDate.getFullYear().toString() + (firstDate.getMonth()+1).toString();
+	if (format == '365') {
+		firstDate = Date.today().add({
+			months : -11
+		});
+		var key = firstDate.getFullYear().toString() + (firstDate.getMonth() + 1).toString();
 		keys.push(key);
-		for (var i=1; i<12; i++){
-			var date = Date.today().add({months:-11}).addMonths(i);
-			var month = date.getMonth()+1;
-			if(month < 10) {
-				keys.push(date.getFullYear().toString() + ("0" + (date.getMonth()+1).toString()));	
+		for (var i = 1; i < 12; i++) {
+			var date = Date.today().add({
+				months : -11
+			}).addMonths(i);
+			var month = date.getMonth() + 1;
+			if (month < 10) {
+				keys.push(date.getFullYear().toString() + ("0" + (date.getMonth() + 1).toString()));
 			} else {
-				keys.push(date.getFullYear().toString() + (date.getMonth()+1).toString());
+				keys.push(date.getFullYear().toString() + (date.getMonth() + 1).toString());
 			}
-			
+
 		}
-		
+
 	} else {
-		firstDate = Date.today().add({days:-parseInt(format)});
+		firstDate = Date.today().add({
+			days : -parseInt(format)
+		});
 		var count = parseInt(parseInt(format) / 7);
-		if(parseInt(format) % 7 != 0) {
+		if (parseInt(format) % 7 != 0) {
 			count += 1;
 		}
-		/*var key = firstDate.getFullYear().toString() + (firstDate.getWeek()).toString();
-		keys.push(key);*/
-		for (var i=1; i<=count; i++){
-			var date = firstDate.add({days:7});
+		/*
+		 * var key = firstDate.getFullYear().toString() + (firstDate.getWeek()).toString(); keys.push(key);
+		 */
+		for (var i = 1; i <= count; i++) {
+			var date = firstDate.add({
+				days : 7
+			});
 			var week = date.getWeek();
-			if(week < 10 ) {
+			if (week < 10) {
 				week = "0" + week.toString();
 				keys.push(date.getFullYear().toString() + week);
-			} else if(week > 52) {
-				if(date.getMonth() == 11) {
-					keys.push((date.getFullYear() + 1).toString() + '00');	
+			} else if (week > 52) {
+				if (date.getMonth() == 11) {
+					keys.push((date.getFullYear() + 1).toString() + '00');
 				} else {
 					keys.push(date.getFullYear().toString() + '00');
 				}
-				
+
 			} else {
-				keys.push(date.getFullYear().toString() + week.toString());	
+				keys.push(date.getFullYear().toString() + week.toString());
 			}
-			
+
 		}
 	}
 	return keys;
 }
 
-//Detect mousedown event to close to autocomplete list on outside click
+// Detect mousedown event to close to autocomplete list on outside click
 $(document).mousedown(function(event) {
-	if($('.dsh-res-display').is(':visible') && !$(event.target).hasClass('dsh-res-display')) {
+	if ($('.dsh-res-display').is(':visible') && !$(event.target).hasClass('dsh-res-display')) {
 		$('.dsh-res-display').parent().hide();
 	}
 });
 
-//Being called from dashboard.jsp on key up event.
+// Being called from dashboard.jsp on key up event.
 function searchBranchRegionOrAgent(searchKeyword, flow) {
 	var e;
-	if(flow == 'icons') {
+	if (flow == 'icons') {
 		e = document.getElementById("selection-list");
-	} else if (flow == 'graph'){
-		e = document.getElementById("graph-sel-list");		
+	} else if (flow == 'graph') {
+		e = document.getElementById("graph-sel-list");
 	} else if (flow == 'reports') {
-		e = document.getElementById("report-sel");	
+		e = document.getElementById("report-sel");
 	} else {
 		return false;
 	}
@@ -1473,36 +1413,36 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 		"searchColumn" : searchColumn,
 		"searchKey" : searchKeyword
 	};
-	if(existingCall != undefined && existingCall != null){
+	if (existingCall != undefined && existingCall != null) {
 		existingCall.abort();
 	}
 	existingCall = callAjaxGetWithPayloadData("./findregionbranchorindividual.do", function(data) {
-		if (flow == 'icons'){
+		if (flow == 'icons') {
 			$('#dsh-srch-res').addClass('dsh-sb-dd');
 			$('#dsh-srch-res').html(data).show().perfectScrollbar();
 			$('#dsh-srch-res').perfectScrollbar('update');
-			if($('#dsh-srch-res').children('div.dsh-res-display').length <= 0) {
+			if ($('#dsh-srch-res').children('div.dsh-res-display').length <= 0) {
 				$('#dsh-srch-res').removeClass('dsh-sb-dd');
 				$('#dsh-srch-res').hide();
 			}
-		} else if (flow == 'graph'){
+		} else if (flow == 'graph') {
 			$('#dsh-grph-srch-res').addClass('dsh-sb-dd');
 			$('#dsh-grph-srch-res').html(data).show().perfectScrollbar();
 			$('#dsh-grph-srch-res').perfectScrollbar('update');
-			if($('#dsh-grph-srch-res').children('div.dsh-res-display').length <= 0) {
+			if ($('#dsh-grph-srch-res').children('div.dsh-res-display').length <= 0) {
 				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
 				$('#dsh-grph-srch-res').hide();
 			}
-		} else if (flow == 'reports'){
+		} else if (flow == 'reports') {
 			$('#dsh-srch-report').addClass('dsh-sb-dd');
 			$('#dsh-srch-report').html(data).show().perfectScrollbar();
 			$('#dsh-srch-report').perfectScrollbar('update');
-			if($('#dsh-srch-report').children('div.dsh-res-display').length <= 0) {
+			if ($('#dsh-srch-report').children('div.dsh-res-display').length <= 0) {
 				$('#dsh-srch-report').removeClass('dsh-sb-dd');
 				$('#dsh-srch-report').hide();
 			}
 		}
-		
+
 		$('.dsh-res-display').off('click');
 		$('.dsh-res-display').click(function(event) {
 			event.stopPropagation();
@@ -1516,26 +1456,24 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 			} else if (searchColumn == "company") {
 				columnName = "companyId";
 			}
-			
-			if (flow == 'icons'){
-			    $('#dsh-srch-res').removeClass('dsh-sb-dd');
-				$('#dsh-sel-item').val($(this).html()).attr('data-prev-val',"");
+
+			if (flow == 'icons') {
+				$('#dsh-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-sel-item').val($(this).html()).attr('data-prev-val', "");
 				lastColNameForCount = columnName;
 				lastColValueForCount = value;
 				showSurveyStatistics(columnName, value);
-			}
-			else if (flow == 'graph') {
+			} else if (flow == 'graph') {
 				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
-				$('#dsh-grph-sel-item').val($(this).html()).attr('data-prev-val',"");
+				$('#dsh-grph-sel-item').val($(this).html()).attr('data-prev-val', "");
 				lastColNameForGraph = columnName;
 				lastColValueForGraph = value;
 				showSurveyStatisticsGraphically(columnName, value);
-			}
-			else if (flow == 'reports'){
+			} else if (flow == 'reports') {
 				$('#dsh-srch-report').removeClass('dsh-sb-dd');
-				$('#admin-report-dwn').val($(this).html()).attr('data-prev-val',"");
-				$('#report-sel').attr('data-iden',columnName);
-				$('#report-sel').attr('data-idenVal',value);
+				$('#admin-report-dwn').val($(this).html()).attr('data-prev-val', "");
+				$('#report-sel').attr('data-iden', columnName);
+				$('#report-sel').attr('data-idenVal', value);
 				if (searchColumn == "displayName") {
 					$('#dsh-ind-rep-bnt').show();
 					$('#dsh-admin-rep-bnt').hide();
@@ -1547,65 +1485,63 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 			$('.dsh-res-display').hide();
 		});
 		$('.dsh-res-display').off('mouseover');
-		$('.dsh-res-display').on('mouseover',function(){
+		$('.dsh-res-display').on('mouseover', function() {
 			$('.dsh-res-display').removeClass('dsh-res-hover');
 			$(this).addClass('dsh-res-hover');
 		});
 		$('.dsh-res-display').off('mouseout');
-		$('.dsh-res-display').on('mouseout',function(){
+		$('.dsh-res-display').on('mouseout', function() {
 			$(this).removeClass('dsh-res-hover');
 		});
 	}, payload, true);
 }
 function searchCompany(searchKeyword, flow) {
-	/*var e;*/
-	
-	 /*if (flow == 'reports') {
-		e = document.getElementById("report-sel");	
-	} else {
-		return false;
-	}*/
+	/* var e; */
+
+	/*
+	 * if (flow == 'reports') { e = document.getElementById("report-sel"); } else { return false; }
+	 */
 	searchColumn = "company";
 	var payload = {
 		"columnName" : colName,
 		"columnValue" : colValue,
-		"searchColumn" :searchColumn ,
+		"searchColumn" : searchColumn,
 		"searchKey" : searchKeyword
 	};
-	
+
 	callAjaxGetWithPayloadData("./findregionbranchorindividual.do", function(data) {
-		 if (flow == 'reports'){
+		if (flow == 'reports') {
 			$('#admin-srch-report').addClass('dsh-sb-dd');
 			$('#admin-srch-report').html(data).show().perfectScrollbar();
 			$('#admin-srch-report').perfectScrollbar('update');
-			if($('#admin-srch-report').children('div.dsh-res-display').length <= 0) {
+			if ($('#admin-srch-report').children('div.dsh-res-display').length <= 0) {
 				$('#admin-srch-report').removeClass('dsh-sb-dd');
 				$('#admin-srch-report').hide();
 			}
-		} else if (flow == 'hierarchy'){
-			//TODO: Replace this stuff
+		} else if (flow == 'hierarchy') {
+			// TODO: Replace this stuff
 			$('#hierarchy-srch-report').addClass('dsh-sb-dd');
 			$('#hierarchy-srch-report').html(data).show().perfectScrollbar();
 			$('#hierarchy-srch-report').perfectScrollbar('update');
-			if($('#hierarchy-srch-report').children('div.dsh-res-display').length <= 0) {
+			if ($('#hierarchy-srch-report').children('div.dsh-res-display').length <= 0) {
 				$('#hierarchy-srch-report').removeClass('dsh-sb-dd');
 				$('#hierarchy-srch-report').hide();
 			}
 		}
-		
+
 		$('.dsh-res-display').off('click');
 		$('.dsh-res-display').click(function(event) {
 			event.stopPropagation();
 			var value = $(this).data('attr');
-			 if (searchColumn == "company") {
+			if (searchColumn == "company") {
 				columnName = "companyId";
 			}
-			
-			 if (flow == 'reports'){
+
+			if (flow == 'reports') {
 				$('#dsh-srch-report').removeClass('dsh-sb-dd');
-				$('#admin-report-down').val($(this).html()).attr('data-prev-val',"");
-				$('#admin-report-down').attr('data-iden',columnName);
-				$('#admin-report-down').attr('data-idenVal',value);
+				$('#admin-report-down').val($(this).html()).attr('data-prev-val', "");
+				$('#admin-report-down').attr('data-iden', columnName);
+				$('#admin-report-down').attr('data-idenVal', value);
 				if (searchColumn == "displayName") {
 					$('#dsh-ind-rep-bnt').show();
 					$('#dsh-admin-rep-bnt').hide();
@@ -1613,12 +1549,12 @@ function searchCompany(searchKeyword, flow) {
 					$('#dsh-admin-rep-bnt').show();
 					$('#dsh-ind-rep-bnt').hide();
 				}
-			} else if (flow == 'hierarchy'){
-				//TODO: Replace this stuff
+			} else if (flow == 'hierarchy') {
+				// TODO: Replace this stuff
 				$('#dsh-srch-report').removeClass('dsh-sb-dd');
-				$('#hierarchy-report-down').val($(this).html()).attr('data-prev-val',"");
-				$('#hierarchy-report-down').attr('data-iden',columnName);
-				$('#hierarchy-report-down').attr('data-idenVal',value);
+				$('#hierarchy-report-down').val($(this).html()).attr('data-prev-val', "");
+				$('#hierarchy-report-down').attr('data-iden', columnName);
+				$('#hierarchy-report-down').attr('data-idenVal', value);
 				if (searchColumn == "displayName") {
 					$('#dsh-ind-rep-bnt').show();
 					$('#dsh-admin-rep-bnt').hide();
@@ -1630,77 +1566,75 @@ function searchCompany(searchKeyword, flow) {
 			$('.dsh-res-display').hide();
 		});
 		$('.dsh-res-display').off('mouseover');
-		$('.dsh-res-display').on('mouseover',function(){
+		$('.dsh-res-display').on('mouseover', function() {
 			$('.dsh-res-display').removeClass('dsh-res-hover');
 			$(this).addClass('dsh-res-hover');
 		});
 		$('.dsh-res-display').off('mouseout');
-		$('.dsh-res-display').on('mouseout',function(){
+		$('.dsh-res-display').on('mouseout', function() {
 			$(this).removeClass('dsh-res-hover');
 		});
 	}, payload, true);
 }
-$(document).on('click','#admin-bill-rep-bnt',function(e){
-	var email=$('#admin-mail-id').val();
+$(document).on('click', '#admin-bill-rep-bnt', function(e) {
+	var email = $('#admin-mail-id').val();
 	var idenVal = $('#admin-report-down').attr('data-idenVal');
 	var selectedProf = $('#admin-report-down').attr('data-iden');
-	
-	if(email!= undefined && email!="" ){
-		if (emailRegex.test(email) == false){
+
+	if (email != undefined && email != "") {
+		if (emailRegex.test(email) == false) {
 			showErrorMobileAndWeb('Please enter a valid email address');
 		}
 	}
-	if(idenVal == undefined || idenVal == "") {
+	if (idenVal == undefined || idenVal == "") {
 		showErrorMobileAndWeb('Please select a company');
 		return;
 	}
-	var payload={
-			"mailid":email,
-			"companyId":idenVal
+	var payload = {
+		"mailid" : email,
+		"companyId" : idenVal
 	}
-	callAjaxGetWithPayloadData("./downloadcompanyuserreport.do",function(data){
-		if(data=="success"){
+	callAjaxGetWithPayloadData("./downloadcompanyuserreport.do", function(data) {
+		if (data == "success") {
 			$('#overlay-toast').html('The User List Report will be mailed to you shortly');
 			showToast();
 		}
-	},payload,true);
-	
+	}, payload, true);
+
 });
 
-$(document).on('click','#admin-hierarchy-rep-bnt',function(e){
-	var email=$('#hierarchy-mail-id').val();
+$(document).on('click', '#admin-hierarchy-rep-bnt', function(e) {
+	var email = $('#hierarchy-mail-id').val();
 	var idenVal = $('#hierarchy-report-down').attr('data-idenVal');
 	var selectedProf = $('#hierarchy-report-down').attr('data-iden');
-	
-	if(email!= undefined && email!="" ){
-		if (emailRegex.test(email) == false){
+
+	if (email != undefined && email != "") {
+		if (emailRegex.test(email) == false) {
 			showErrorMobileAndWeb('Please enter a valid email address');
 		}
 	}
-	if(idenVal == undefined || idenVal == "") {
+	if (idenVal == undefined || idenVal == "") {
 		showErrorMobileAndWeb('Please select a company');
 		return;
 	}
-	var payload={
-			"mailid":email,
-			"companyId":idenVal
+	var payload = {
+		"mailid" : email,
+		"companyId" : idenVal
 	}
-	callAjaxGetWithPayloadData("./downloadcompanyhierarchyreport.do",function(data){
-		if(data=="success"){
+	callAjaxGetWithPayloadData("./downloadcompanyhierarchyreport.do", function(data) {
+		if (data == "success") {
 			$('#overlay-toast').html('The Comapny Hierarchy Report will be mailed to you shortly');
 			showToast();
 		}
-	},payload,true);
-	
+	}, payload, true);
+
 });
 
-
-
-function sendSurveyReminderMail(surveyPreInitiationId, customerName,disableEle) {
-	if ( $(disableEle).data('requestRunning') ) {
+function sendSurveyReminderMail(surveyPreInitiationId, customerName, disableEle) {
+	if ($(disableEle).data('requestRunning')) {
 		return;
-    }
-	
+	}
+
 	disable(disableEle);
 	var success = false;
 	var payload = {
@@ -1724,7 +1658,7 @@ function sendSurveyReminderMail(surveyPreInitiationId, customerName,disableEle) 
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -1741,26 +1675,26 @@ function showDisplayPic() {
 		cache : false,
 		dataType : "JSON",
 		success : function(data) {
-			
+
 		},
 		complete : function(data) {
-			if (data.errCode == undefined){
+			if (data.errCode == undefined) {
 				var imageUrl = data.responseJSON;
 				if (imageUrl != undefined && imageUrl != "undefined" && imageUrl.trim() != "") {
 					$("#dsh-prsn-img").removeClass('dsh-pers-default-img');
 					$("#dsh-prsn-img").removeClass('dsh-office-default-img');
 					$("#dsh-prsn-img").removeClass('dsh-region-default-img');
 					$("#dsh-prsn-img").removeClass('dsh-comp-default-img');
-					
+
 					$("#dsh-prsn-img").css("background", "url(" + imageUrl + ") no-repeat center");
 					$("#dsh-prsn-img").css("background-size", "cover");
-					$("#dsh-prsn-img").attr("data-img",imageUrl);
+					$("#dsh-prsn-img").attr("data-img", imageUrl);
 				}
 				return data.responseJSON;
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -1783,33 +1717,32 @@ function updateCurrentProfile(entityType, entityValue, callbackFunction) {
 	callAjaxGET(url, callbackFunction, true);
 }
 
-function showSurveyRequestPage(){
+function showSurveyRequestPage() {
 	callAjaxGET('./redirecttosurveyrequestpage.do', function(data) {
 		$('#srv-req-pop').removeClass('hide');
 		$('#srv-req-pop').addClass('survey-request-popup-container');
 		$('#srv-req-pop').show();
 		$('#srv-req-pop').find('.survey-request-popup').html(data);
-		
-	},true);
+
+	}, true);
 }
 
-$(document).on('click','#dashboard-sel',function(e){
+$(document).on('click', '#dashboard-sel', function(e) {
 	e.stopPropagation();
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 });
 
-$(document).on('click','.da-dd-item',function(e){
+$(document).on('click', '.da-dd-item', function(e) {
 	showOverlay();
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
-	
+
 	attrName = $(this).attr('data-column-type');
 	attrVal = $(this).attr('data-column-value');
-	
+
 	// update selected profile in session
-	
-	updateCurrentProfile($(this).attr('data-column-type'), $(this)
-			.attr('data-column-value'), function() {
+
+	updateCurrentProfile($(this).attr('data-column-type'), $(this).attr('data-column-value'), function() {
 		showDashOverlay('#logo-dash');
 		showDashOverlay('#latest-post-ep');
 		showDashOverlay('#review-ep');
@@ -1821,23 +1754,23 @@ $(document).on('click','.da-dd-item',function(e){
 	});
 });
 
-$(document).click(function(e){
+$(document).click(function(e) {
 	e.stopPropagation();
 	if ($('#da-dd-wrapper-profiles').css('display') == "block") {
 		$('#da-dd-wrapper-profiles').toggle();
 	}
-	
+
 	if ($('#srch-crtria-list').css('display') == "block") {
 		$('#srch-crtria-list').toggle();
 	}
-	
-	/*if($('.v-tbl-icn-wraper').is(':visible')) {
-		$('.v-tbl-icn-wraper').hide();
-	}*/
+
+	/*
+	 * if($('.v-tbl-icn-wraper').is(':visible')) { $('.v-tbl-icn-wraper').hide(); }
+	 */
 });
 
-//Populate Existing Survey Questions 
-function commonActiveSurveyCallback(response){
+// Populate Existing Survey Questions
+function commonActiveSurveyCallback(response) {
 	showInfo(response);
 	loadActiveSurveyQuestions();
 	$('.err-nw-wrapper').delay(2000).fadeOut();
@@ -1852,13 +1785,13 @@ function loadActiveSurveyQuestions() {
 	}, true);
 }
 
-function resizeAdjBuildSurvey(){
+function resizeAdjBuildSurvey() {
 	var winW = window.innerWidth;
 	if (winW < 768) {
 		var txtW = winW - 118;
 		$('.srv-tbl-txt').width(txtW);
+	} else {
 	}
-	else {}
 }
 
 function bindEditSurveyEvents() {
@@ -1872,7 +1805,7 @@ function bindEditSurveyEvents() {
 			} else {
 				$(this).find('.srv-tbl-btns').hide();
 			}
-		} 
+		}
 	});
 	$('.bd-srv-tbl-row').off('touchStart');
 	$('.bd-srv-tbl-row').on('touchStart', function() {
@@ -1885,8 +1818,8 @@ function bindEditSurveyEvents() {
 			$(this).find('.srv-tbl-btns').show();
 		}
 	});
-	$( '.bd-srv-tbl-row').off('mouseout');
-	$( '.bd-srv-tbl-row').on('mouseout', function() {
+	$('.bd-srv-tbl-row').off('mouseout');
+	$('.bd-srv-tbl-row').on('mouseout', function() {
 		if (getWindowWidth() > 768) {
 			$(this).removeClass('bd-srv-tbl-row-hover');
 			$(this).find('.srv-tbl-btns').hide();
@@ -1903,7 +1836,7 @@ function bindEditSurveyEvents() {
 	$('.srv-tbl-edit').off('click');
 	$('.srv-tbl-edit').on('click', function(e) {
 		e.stopPropagation();
-		if($(this).parent().parent().next().hasClass('sb-edit-q-wrapper')) {
+		if ($(this).parent().parent().next().hasClass('sb-edit-q-wrapper')) {
 			return;
 		}
 		var questionId = $(this).parent().parent().data('questionid');
@@ -1918,30 +1851,30 @@ function bindEditSurveyEvents() {
 	});
 	// Remove Question from survey
 	$('.srv-tbl-rem').off('click');
-	$('.srv-tbl-rem').on('click', function(e){
+	$('.srv-tbl-rem').on('click', function(e) {
 		e.stopPropagation();
 		var questionId = $(this).parent().parent().data('questionid');
 		var url = "./removequestionfromsurvey.do?questionId=" + questionId;
-		
+
 		createPopupConfirm("Delete Question", "Do you want to delete the question ?", "Delete", "Cancel");
-		$('#overlay-continue').click(function(){
+		$('#overlay-continue').click(function() {
 			overlayRevert();
 			$('#overlay-continue').unbind('click');
 
 			callAjaxPOST(url, commonActiveSurveyCallback, true);
 		});
-		$('#overlay-cancel').click(function(){
+		$('#overlay-cancel').click(function() {
 			$('#overlay-continue').unbind('click');
 			$('#overlay-cancel').unbind('click');
 			overlayRevert();
-			
-			//loadActiveSurveyQuestions();
+
+			// loadActiveSurveyQuestions();
 		});
 	});
 
 	// Reorder Question in survey
 	$('.srv-tbl-move-up').off('click');
-	$('.srv-tbl-move-up').on('click', function(e){
+	$('.srv-tbl-move-up').on('click', function(e) {
 		e.stopPropagation();
 		var formData = new FormData();
 		formData.append("questionId", $(this).parent().parent().data('questionid'));
@@ -1950,7 +1883,7 @@ function bindEditSurveyEvents() {
 		callAjaxPOSTWithTextData("./reorderQuestion.do", commonActiveSurveyCallback, true, formData);
 	});
 	$('.srv-tbl-move-dn').off('click');
-	$('.srv-tbl-move-dn').on('click', function(e){
+	$('.srv-tbl-move-dn').on('click', function(e) {
 		e.stopPropagation();
 		var formData = new FormData();
 		formData.append("questionId", $(this).parent().parent().data('questionid'));
@@ -1958,8 +1891,8 @@ function bindEditSurveyEvents() {
 
 		callAjaxPOSTWithTextData("./reorderQuestion.do", commonActiveSurveyCallback, true, formData);
 	});
-	
-	//Save the changes
+
+	// Save the changes
 	$('.bd-q-btn-done').off('click');
 	$('.bd-q-btn-done').on('click', function(e) {
 		e.stopPropagation();
@@ -1970,8 +1903,7 @@ function bindEditSurveyEvents() {
 			if ($('#bs-question-' + count).attr('data-status') == 'edited') {
 				editedStatus = true;
 				break;
-			}
-			else {
+			} else {
 				editedStatus = false;
 			}
 			count++;
@@ -1983,17 +1915,16 @@ function bindEditSurveyEvents() {
 			}, 2000);
 			return;
 		}
-		
+
 		createPopupConfirm("Unsaved changes detected", "Do you want to save your changes ?", "Save", "Cancel");
 
 		$('#overlay-continue').off('click');
-		$('#overlay-continue').on('click', function(){
+		$('#overlay-continue').on('click', function() {
 			var count = 1;
 			while (count <= lastQuestion) {
 				// submit for adding question
-				if (count > 0 && $('#bs-question-' + count).attr('data-state') == 'new'
-					&& $('#bs-question-' + count).attr('data-status') == 'edited') {
-					
+				if (count > 0 && $('#bs-question-' + count).attr('data-state') == 'new' && $('#bs-question-' + count).attr('data-status') == 'edited') {
+
 					if ($('#sb-question-txt-' + count).val() == '' || $('#sb-question-type-' + count).val() == '') {
 						$("#overlay-toast").html('Please finish adding the Question');
 						showToast();
@@ -2002,10 +1933,10 @@ function bindEditSurveyEvents() {
 						$('#bs-question-' + count).attr('data-state', 'editable');
 						$('#bs-question-' + count).attr('data-status', 'new');
 						callAjaxFormSubmit(url, function(data) {
-							var map =  $.parseJSON(data);
+							var map = $.parseJSON(data);
 							$("#overlay-toast").html(map.message);
 							showToast();
-							
+
 							if (map.status == "success") {
 								$('#bs-question-' + count).attr('data-quesref', map.questionId);
 								revertQuestionOverlay();
@@ -2013,13 +1944,12 @@ function bindEditSurveyEvents() {
 								$('#bs-question-' + count).attr('data-state', 'new');
 								$('#bs-question-' + count).attr('data-status', 'edited');
 							}
-						}, 'bs-question-' + count,'#overlay-continue');
+						}, 'bs-question-' + count, '#overlay-continue');
 					}
 				}
 				// submit for modifying question
-				else if (count > 0 && $('#bs-question-' + count).attr('data-state') == 'editable'
-					&& $('#bs-question-' + count).attr('data-status') == 'edited') {
-					
+				else if (count > 0 && $('#bs-question-' + count).attr('data-state') == 'editable' && $('#bs-question-' + count).attr('data-status') == 'edited') {
+
 					if ($('#sb-question-txt-' + count).val() == '' || $('#sb-question-type-' + count).val() == '') {
 						$("#overlay-toast").html('Please finish editing the Question');
 						showToast();
@@ -2027,22 +1957,22 @@ function bindEditSurveyEvents() {
 						var questionId = $('#bs-question-' + count).attr('data-quesref');
 						var url = "./updatequestionfromsurvey.do?order=" + count + "&questionId=" + questionId;
 						callAjaxFormSubmit(url, function(data) {
-							var map =  $.parseJSON(data);
+							var map = $.parseJSON(data);
 							$("#overlay-toast").html(map.message);
 							showToast();
-							
+
 							if (map.status == "success") {
 								revertQuestionOverlay();
 								$('#bs-question-' + count).attr('data-status', 'new');
 							} else {
 								$('#bs-question-' + count).attr('data-status', 'edited');
 							}
-						}, 'bs-question-' + count,'#overlay-continue');
+						}, 'bs-question-' + count, '#overlay-continue');
 					}
 				}
-				count ++;
+				count++;
 			}
-			
+
 			$('#overlay-continue').unbind('click');
 			$('#overlay-cancel').unbind('click');
 			overlayRevert();
@@ -2050,11 +1980,11 @@ function bindEditSurveyEvents() {
 				loadActiveSurveyQuestions();
 			}, 2000);
 		});
-		$('#overlay-cancel').click(function(){
+		$('#overlay-cancel').click(function() {
 			$('#overlay-continue').unbind('click');
 			$('#overlay-cancel').unbind('click');
 			overlayRevert();
-			
+
 			revertQuestionOverlay();
 			loadActiveSurveyQuestions();
 		});
@@ -2066,13 +1996,13 @@ function revertQuestionOverlay() {
 	callAjaxGET(url, function(data) {
 		$('#bd-quest-wrapper').html(data);
 	}, true);
-	
+
 	$('#bd-srv-pu').hide();
 	$(document).removeClass('body-no-scroll');
 	currentQues = 1;
 }
 
-//Clear the current edited question
+// Clear the current edited question
 $(document).on('click', '.bd-q-pu-close', function() {
 	$(this).parent().parent().remove();
 });
@@ -2093,19 +2023,19 @@ $(document).on('click', '.bd-q-btn-done-edit', function() {
 		var url = "./updatequestionfromsurvey.do?order=" + questionId + "&questionId=" + questionId;
 		showProgress('#bs-question-edit-' + questionId);
 		callAjaxFormSubmit(url, function(data) {
-			var map =  $.parseJSON(data);
-			
+			var map = $.parseJSON(data);
+
 			if (map.status == "success") {
 				showInfo(map.message);
 				$('.bd-srv-tbl-row-' + questionId).next().remove();
-				
+
 				delay(function() {
 					loadActiveSurveyQuestions();
 				}, 500);
 			} else {
 				showStatus('#bs-question-edit-' + questionId, 'Retry Saving');
 			}
-		}, 'bs-question-edit-' + questionId,'.bd-q-btn-done-edit');
+		}, 'bs-question-edit-' + questionId, '.bd-q-btn-done-edit');
 	}
 });
 
@@ -2122,9 +2052,9 @@ $(document).on('click', '.bd-tab-mcq', function() {
 	$(this).addClass('bd-ans-tab-sel');
 	$(this).parent().parent().parent().find('.bd-ans-type-item').hide();
 	$(this).parent().parent().parent().find('.bd-ans-type-mcq').show();
-	
+
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum + '"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
@@ -2136,7 +2066,7 @@ $(document).on('click', '.bd-tab-com', function() {
 	$(this).parent().parent().parent().find('.bd-ans-type-com').show();
 
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum + '"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
@@ -2146,7 +2076,7 @@ $(document).on('click', '.bd-ans-img-wrapper', function() {
 	$(this).find('.bd-ans-img').removeClass('bd-img-sel');
 
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum + '"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
@@ -2163,11 +2093,10 @@ $(document).on('click', '.bd-com-chk', function() {
 var currentQues = 1;
 $(document).on("focus", '.bd-q-pu-txt', function() {
 	var quesOrder = $(this).closest('form').data('quesnum') - 1;
-	
+
 	// submit for adding new question
-	if (quesOrder > 0 && $('#bs-question-' + quesOrder).attr('data-state') == 'new'
-			&& $('#bs-question-' + quesOrder).attr('data-status') == 'edited') {
-		
+	if (quesOrder > 0 && $('#bs-question-' + quesOrder).attr('data-state') == 'new' && $('#bs-question-' + quesOrder).attr('data-status') == 'edited') {
+
 		if ($('#sb-question-txt-' + quesOrder).val() == '' || $('#sb-question-type-' + quesOrder).val() == '') {
 			$("#overlay-toast").html('Please finish adding the Question');
 			showToast('error');
@@ -2177,10 +2106,10 @@ $(document).on("focus", '.bd-q-pu-txt', function() {
 			$('#bs-question-' + quesOrder).attr('data-state', 'editable');
 			$('#bs-question-' + quesOrder).attr('data-status', 'new');
 			callAjaxFormSubmit(url, function(data) {
-				var map =  $.parseJSON(data);
+				var map = $.parseJSON(data);
 				$("#overlay-toast").html(map.message);
 				showToast();
-				
+
 				if (map.status == "success") {
 					$('#bs-question-' + quesOrder).attr('data-quesref', map.questionId);
 					showStatus('#bs-question-' + quesOrder, 'Saved');
@@ -2189,13 +2118,12 @@ $(document).on("focus", '.bd-q-pu-txt', function() {
 					$('#bs-question-' + quesOrder).attr('data-status', 'edited');
 					showStatus('#bs-question-' + quesOrder, 'Retry Saving');
 				}
-			}, 'bs-question-' + quesOrder,'');
+			}, 'bs-question-' + quesOrder, '');
 		}
 	}
 	// submit for modifying question
-	else if (quesOrder > 0 && $('#bs-question-' + quesOrder).attr('data-state') == 'editable'
-		&& $('#bs-question-' + quesOrder).attr('data-status') == 'edited') {
-		
+	else if (quesOrder > 0 && $('#bs-question-' + quesOrder).attr('data-state') == 'editable' && $('#bs-question-' + quesOrder).attr('data-status') == 'edited') {
+
 		if ($('#sb-question-txt-' + quesOrder).val() == '' || $('#sb-question-type-' + quesOrder).val() == '') {
 			$("#overlay-toast").html('Please finish editing the Question');
 			showToast();
@@ -2204,10 +2132,10 @@ $(document).on("focus", '.bd-q-pu-txt', function() {
 			var url = "./updatequestionfromsurvey.do?order=" + quesOrder + "&questionId=" + questionId;
 			showProgress('#bs-question-' + quesOrder);
 			callAjaxFormSubmit(url, function(data) {
-				var map =  $.parseJSON(data);
+				var map = $.parseJSON(data);
 				$("#overlay-toast").html(map.message);
 				showToast();
-				
+
 				if (map.status == "success") {
 					showStatus('#bs-question-' + quesOrder, 'Saved');
 					$('#bs-question-' + quesOrder).attr('data-status', 'new');
@@ -2215,25 +2143,25 @@ $(document).on("focus", '.bd-q-pu-txt', function() {
 					showStatus('#bs-question-' + quesOrder, 'Retry Saving');
 					$('#bs-question-' + quesOrder).attr('data-status', 'edited');
 				}
-			}, 'bs-question-' + quesOrder,'');
+			}, 'bs-question-' + quesOrder, '');
 		}
 	}
 });
 
 $(document).on("input", '.bd-q-pu-txt', function() {
 	var quesPresent = $(this).closest('form').data('quesnum');
-	
+
 	// Setting status
 	showStatus('#bs-question-' + quesPresent, 'Edited');
 	$('#bs-question-' + quesPresent).attr('data-status', 'edited');
-	
+
 	// populating next question
 	if ($(this).val().trim().length > 0) {
 		$(this).parent().next('.bs-ans-wrapper').show();
 
 		if ($(this).data('nextquest') == false) {
-			currentQues ++;
-			
+			currentQues++;
+
 			var url = "./populatenewform.do?order=" + currentQues;
 			$('#sb-question-txt-' + quesPresent).data('nextquest', 'true');
 			callAjaxGET(url, function(data) {
@@ -2242,22 +2170,22 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 			}, true);
 		}
 	}
-	
-	/*if ($(this).data('qno') != '1') {
-		$(this).next('.bd-q-pu-close').show();
-	}*/
+
+	/*
+	 * if ($(this).data('qno') != '1') { $(this).next('.bd-q-pu-close').show(); }
+	 */
 });
 
-$(document).on('input', '.bd-mcq-txt', function(){
+$(document).on('input', '.bd-mcq-txt', function() {
 	// changing status to edited
 	var name = $(this).attr('name');
 	var addMcqTextOption = name.substring(name.lastIndexOf("-") + 1, name.lastIndexOf("["));
-	
+
 	showStatus('#bs-question-' + addMcqTextOption, 'Edited');
 	$('#bs-question-' + addMcqTextOption).attr('data-status', 'edited');
 });
 
-$(document).on('blur', '.bd-mcq-txt', function(){
+$(document).on('blur', '.bd-mcq-txt', function() {
 	if ($(this).parent().is(':last-child')) {
 		var name = $(this).attr('name');
 		var addMcqTextOption = name.substring(name.lastIndexOf("-") + 1, name.lastIndexOf("["));
@@ -2265,14 +2193,10 @@ $(document).on('blur', '.bd-mcq-txt', function(){
 		// changing status to edited
 		showStatus('#bs-question-' + addMcqTextOption, 'Edited');
 		$('#bs-question-' + addMcqTextOption).attr('data-status', 'edited');
-		
-		var htmlData = '<div class="bd-mcq-row clearfix">'
-				+ '<div class="float-left bd-mcq-lbl">Option</div>'
-				+ '<input name="sb-answers-' + addMcqTextOption + '[]" class="float-left bd-mcq-txt">'
-				+ '<div class="float-left bd-mcq-close"></div>'
-			+ '</div>';
+
+		var htmlData = '<div class="bd-mcq-row clearfix">' + '<div class="float-left bd-mcq-lbl">Option</div>' + '<input name="sb-answers-' + addMcqTextOption + '[]" class="float-left bd-mcq-txt">' + '<div class="float-left bd-mcq-close"></div>' + '</div>';
 		$(this).parent().after(htmlData);
-		
+
 		// enable remove button
 		if ($(this).parent().parent().children().length > 2) {
 			$('.bd-mcq-close').removeClass('hide');
@@ -2280,7 +2204,7 @@ $(document).on('blur', '.bd-mcq-txt', function(){
 	}
 });
 
-$(document).on('click', '.bd-mcq-close', function(){
+$(document).on('click', '.bd-mcq-close', function() {
 	var parentDiv = $(this).parent().parent();
 	$(this).parent().remove();
 
@@ -2288,7 +2212,7 @@ $(document).on('click', '.bd-mcq-close', function(){
 	if (parentDiv.children().length <= 3) {
 		$('.bd-mcq-close').addClass('hide');
 	}
-	
+
 	// changing status to edited
 	var name = $(this).attr('name');
 	var addMcqTextOption = name.substring(name.lastIndexOf("-") + 1, name.lastIndexOf("["));
@@ -2306,13 +2230,9 @@ function createPopupConfirm(header, text, ok, cancel) {
 
 	$('#overlay-main').show();
 }
-/*function overlayRevert() {
-	$('#overlay-main').hide();
-	$("#overlay-header").html('');
-	$("#overlay-text").html('');
-	$('#overlay-continue').html('');
-	$('#overlay-cancel').html('');
-}*/
+/*
+ * function overlayRevert() { $('#overlay-main').hide(); $("#overlay-header").html(''); $("#overlay-text").html(''); $('#overlay-continue').html(''); $('#overlay-cancel').html(''); }
+ */
 
 // Progress Bar
 function hideProgress(formId) {
@@ -2332,19 +2252,19 @@ function showStatus(formId, text) {
 
 /**
  * function to display success/failure message to user after an action
+ * 
  * @param data
  */
 function displayMessage(data) {
 	$("#temp-message").html(data);
 	var displayMessageDiv = $("#temp-message #display-msg-div");
-	if($(displayMessageDiv).hasClass("success-message")) {
+	if ($(displayMessageDiv).hasClass("success-message")) {
 		showInfoMobileAndWeb($(displayMessageDiv).html());
-	}
-	else if($(displayMessageDiv).hasClass("error-message")) {
+	} else if ($(displayMessageDiv).hasClass("error-message")) {
 		showErrorMobileAndWeb($(displayMessageDiv).html());
-	}	
+	}
 	var invalidMessage = $('#invalid-display-msg-div').text();
-	if(invalidMessage != undefined && invalidMessage != ""){
+	if (invalidMessage != undefined && invalidMessage != "") {
 		$('#overlay-toast').html(invalidMessage);
 		showToast();
 	}
@@ -2353,6 +2273,7 @@ function displayMessage(data) {
 
 /**
  * function to display success and failure message to user after adding region and branch action
+ * 
  * @param data
  */
 function displayMessageForRegionAndBranchAddition(data) {
@@ -2360,20 +2281,19 @@ function displayMessageForRegionAndBranchAddition(data) {
 	var displayMessageDiv = $("#temp-message #display-msg-div");
 	var invalidEmailAddressDiv = $("#display-invalid-email-addr-msg-div");
 	var alreadyExistEmailAddressDiv = $("#display-already-exist-email-addr-msg-div");
-	if($(displayMessageDiv).hasClass("success-message")) {
+	if ($(displayMessageDiv).hasClass("success-message")) {
 		showInfoSuccessMobileAndWeb($(displayMessageDiv).html());
-	}
-	else if($(displayMessageDiv).hasClass("error-message")) {
+	} else if ($(displayMessageDiv).hasClass("error-message")) {
 		showErrorSuccessMobileAndWeb($(displayMessageDiv).html());
 	}
-	if($(invalidEmailAddressDiv).hasClass("error-message")) {
+	if ($(invalidEmailAddressDiv).hasClass("error-message")) {
 		showErrorInvalidMobileAndWeb($(invalidEmailAddressDiv).html());
 	}
-	if($(alreadyExistEmailAddressDiv).hasClass("error-message")) {
+	if ($(alreadyExistEmailAddressDiv).hasClass("error-message")) {
 		showErrorMobileAndWeb($(alreadyExistEmailAddressDiv).html());
 	}
 	var invalidMessage = $('#invalid-display-msg-div').text();
-	if(invalidMessage != undefined && invalidMessage != ""){
+	if (invalidMessage != undefined && invalidMessage != "") {
 		$('#overlay-toast').html(invalidMessage);
 		showToast();
 	}
@@ -2383,10 +2303,10 @@ function displayMessageForRegionAndBranchAddition(data) {
 /**
  * checks whether is authorized to build hierarchy and displays message to the user
  */
-function checkUserAuthorization(){
+function checkUserAuthorization() {
 	var data = $("#server-message").html();
 	var isUserAuthorized = $("#is-user-authorized").val();
-	if(isUserAuthorized == "false") {
+	if (isUserAuthorized == "false") {
 		displayMessage(data);
 	}
 }
@@ -2399,36 +2319,37 @@ function fetchCompleteHierarchy() {
 	fetchCompanyHierarchy("companyProfileName", profileName);
 }
 /**
- * Method to change the arrow in tabs according to the form displayed 
+ * Method to change the arrow in tabs according to the form displayed
+ * 
  * @param spanId
  */
 function changeTabArrow(spanId) {
 	$('.bd-hdr-span').removeClass('bd-hdr-active');
-    $('.bd-hdr-span').removeClass('bd-hdr-active-arr');
-    $("#"+spanId).addClass('bd-hdr-active');
-    $("#"+spanId).addClass('bd-hdr-active-arr');
+	$('.bd-hdr-span').removeClass('bd-hdr-active-arr');
+	$("#" + spanId).addClass('bd-hdr-active');
+	$("#" + spanId).addClass('bd-hdr-active-arr');
 }
 
 /**
- * function to get the edit form based on tab value 
+ * function to get the edit form based on tab value
  */
 function getEditSectionFormByTab(tabValue) {
-	switch(tabValue){
-    case 'region': 
-    	getRegionEditPage();
-        break;
-    case 'office': 
-        getOfficeEditPage();
-        break;
-    case 'individual': 
-    	getIndividualEditPage();
-        break;
-    case 'csv': 
-    	getCsvUploadPage();
-        break;
-    default: 
-    	getRegionEditPage();
-        break;
+	switch (tabValue) {
+	case 'region':
+		getRegionEditPage();
+		break;
+	case 'office':
+		getOfficeEditPage();
+		break;
+	case 'individual':
+		getIndividualEditPage();
+		break;
+	case 'csv':
+		getCsvUploadPage();
+		break;
+	default:
+		getRegionEditPage();
+		break;
 	}
 }
 
@@ -2438,36 +2359,34 @@ function getEditSectionFormByTab(tabValue) {
 function getEditSection() {
 	var accountType = $("#account-type").val();
 	var highestRole = $("#highest-role").val();
-	switch(accountType){
-    case 'Enterprise':
-    	if(highestRole == 1 || highestRole == 2 || highestRole == 3) {
-    		getIndividualEditPage();
-    	}
-    	else {
-    		showErrorMobileAndWeb("Sorry you are not authorized to build hierarchy");
-    	}
-        break;
-    case 'Company': 
-    	if(highestRole == 1 || highestRole == 2 || highestRole == 3) {
-    		getIndividualEditPage();
-    	}
-    	else {
-    		showErrorMobileAndWeb("Sorry you are not authorized to build hierarchy");
-    	}
-        break;
-    case 'Team': 
-    	getIndividualEditPage();
-        break;
-    default: 
-    	showErrorMobileAndWeb("Sorry you are not authorized to build hierarchy");
-        break;
+	switch (accountType) {
+	case 'Enterprise':
+		if (highestRole == 1 || highestRole == 2 || highestRole == 3) {
+			getIndividualEditPage();
+		} else {
+			showErrorMobileAndWeb("Sorry you are not authorized to build hierarchy");
+		}
+		break;
+	case 'Company':
+		if (highestRole == 1 || highestRole == 2 || highestRole == 3) {
+			getIndividualEditPage();
+		} else {
+			showErrorMobileAndWeb("Sorry you are not authorized to build hierarchy");
+		}
+		break;
+	case 'Team':
+		getIndividualEditPage();
+		break;
+	default:
+		showErrorMobileAndWeb("Sorry you are not authorized to build hierarchy");
+		break;
 	}
 }
 
 /**
  * function to get the region edit page
  */
-function getRegionEditPage(){
+function getRegionEditPage() {
 	var url = "./getregioneditpage.do";
 	callAjaxGET(url, paintEditSection, true);
 	changeTabArrow("hr-region-tab");
@@ -2476,7 +2395,7 @@ function getRegionEditPage(){
 /**
  * function to get the office edit page
  */
-function getOfficeEditPage(){
+function getOfficeEditPage() {
 	var url = "./getofficeeditpage.do";
 	callAjaxGET(url, paintEditSection, true);
 	changeTabArrow("hr-office-tab");
@@ -2484,7 +2403,7 @@ function getOfficeEditPage(){
 /**
  * function to get the individual edit page
  */
-function getIndividualEditPage(){
+function getIndividualEditPage() {
 	var url = "./getindividualeditpage.do";
 	callAjaxGET(url, paintEditSection, true);
 	changeTabArrow("hr-individual-tab");
@@ -2496,9 +2415,9 @@ function paintEditSection(data) {
 	/**
 	 * allow hierarchy management only if the user is authorized
 	 */
-	if(isUserAuthorized == "false") {
-		$("#bd-edit-form-section :input").prop("disabled",true);
-		$("#bd-edit-form-section").click(function(){
+	if (isUserAuthorized == "false") {
+		$("#bd-edit-form-section :input").prop("disabled", true);
+		$("#bd-edit-form-section").click(function() {
 			return false;
 		});
 		return false;
@@ -2508,148 +2427,136 @@ function paintEditSection(data) {
 	 */
 	var assignToOption = $("#assign-to-txt").attr('data-assignto');
 	showSelectorsByAssignToOption(assignToOption);
-	
+
 	bindUserSelector();
-	
-	$("#btn-region-save").click(function(e){
-		if(validateRegionForm()){
-			addRegion("edit-region-form",'#btn-region-save');
+
+	$("#btn-region-save").click(function(e) {
+		if (validateRegionForm()) {
+			addRegion("edit-region-form", '#btn-region-save');
 		}
 	});
-	
+
 	$('#region-name-txt').blur(function() {
-		if(validateRegionName(this.id)){
+		if (validateRegionName(this.id)) {
 			hideError();
 		}
 	});
 
 	bindAdminCheckBoxClick();
-	
+
 	bindSingleMultipleSelection();
 	bindAssignToSelectorClick();
-	
+
 	bindRegionSelectorEvents();
-	
-	$("#btn-office-save").click(function(e){
-		if(validateOfficeForm()){
-			addOffice("edit-office-form",'#btn-office-save');
+
+	$("#btn-office-save").click(function(e) {
+		if (validateOfficeForm()) {
+			addOffice("edit-office-form", '#btn-office-save');
 		}
 	});
-	
+
 	$('#office-name-txt').blur(function() {
-		if(validateOfficeName(this.id)){
+		if (validateOfficeName(this.id)) {
 			hideError();
 		}
 	});
-	
+
 	bindOfficeSelectorEvents();
-	
-	$("#btn-individual-save").click(function(e){
-		if(validateIndividualForm()){
-			addIndividual("edit-individual-form",'#btn-individual-save');
+
+	$("#btn-individual-save").click(function(e) {
+		if (validateIndividualForm()) {
+			addIndividual("edit-individual-form", '#btn-individual-save');
 		}
 	});
 }
 
 function bindSingleMultipleSelection() {
 	$('.bd-cust-rad-img').click(function(e) {
-        $('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
-        $(this).toggleClass('bd-cust-rad-img-checked');
-        if($(this).data('type') == "single"){
-            $('#bd-single').show();
-            $('#bd-multiple').hide();
-            showAdminPrivilegesChk();
-        }else if($(this).data('type') == "multiple"){
-            $('#bd-single').hide();
-            $('#bd-multiple').show();
-            $('#selected-userid-hidden').val("");
-            hideAdminPrivilegesChk();
-        }
-        $('#user-selection-info').attr('data-user-selection-type',$(this).data('type'));
-    });
+		$('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
+		$(this).toggleClass('bd-cust-rad-img-checked');
+		if ($(this).data('type') == "single") {
+			$('#bd-single').show();
+			$('#bd-multiple').hide();
+			showAdminPrivilegesChk();
+		} else if ($(this).data('type') == "multiple") {
+			$('#bd-single').hide();
+			$('#bd-multiple').show();
+			$('#selected-userid-hidden').val("");
+			hideAdminPrivilegesChk();
+		}
+		$('#user-selection-info').attr('data-user-selection-type', $(this).data('type'));
+	});
 }
 
 function bindUserSelector() {
-	/*$("#selected-user-txt").click(function() {
-		getUsersList("", -1 , -1 );
-	});*/
-	/*$("#selected-user-txt").keydown(function(e) {
-		bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid");
-	});*/
-	/*$("#selected-user-txt").keyup(function(e) {
-		if(e.which != 38 && e.which != 40 && e.which != 13) {
-			var text = $(this).val();
-			usersStartIndex = 0;	
-			if (text.length > 0) {
-				delay(function() {
-					getUsersList(text, -1 , -1);
-				}, 500);
-			}
-			else {
-				delay(function() {
-					getUsersList("", -1 , -1);
-				}, 500);
-			}
-		}
-	});*/
-	
-	//using autocomplete instead of normal search
+	/*
+	 * $("#selected-user-txt").click(function() { getUsersList("", -1 , -1 ); });
+	 */
+	/*
+	 * $("#selected-user-txt").keydown(function(e) { bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid"); });
+	 */
+	/*
+	 * $("#selected-user-txt").keyup(function(e) { if(e.which != 38 && e.which != 40 && e.which != 13) { var text = $(this).val(); usersStartIndex = 0; if (text.length > 0) { delay(function() { getUsersList(text, -1 , -1); }, 500); } else { delay(function() { getUsersList("", -1 , -1); }, 500); } } });
+	 */
+
+	// using autocomplete instead of normal search
 	attachAutocompleteUserListDropdown();
-	
+
 }
 
 /**
  * binds the click and keyup of region selector
  */
-function bindRegionSelectorEvents(){
+function bindRegionSelectorEvents() {
 	callAjaxGET("/fetchregions.do", function(data) {
 		var regionList = [];
-		if(data != undefined && data != "")
+		if (data != undefined && data != "")
 			regionList = $.parseJSON(data);
 		var searchData = [];
-		for(var i=0, j=0; i<regionList.length; i++) {
-			if(regionList[i].isDefaultBySystem == 0) {
+		for (var i = 0, j = 0; i < regionList.length; i++) {
+			if (regionList[i].isDefaultBySystem == 0) {
 				searchData[j] = {};
 				searchData[j].label = regionList[i].regionName;
 				searchData[j].regionId = regionList[i].regionId;
-				j++;				
+				j++;
 			}
 		}
 		$("#selected-region-txt").autocomplete({
 			source : searchData,
-			minLength: 0,
+			minLength : 0,
 			delay : 0,
 			autoFocus : true,
-			select: function(event, ui) {
+			select : function(event, ui) {
 				$("#selected-region-txt").val(ui.item.label);
 				$('#selected-region-id-hidden').val(ui.item.regionId);
 				return false;
 			},
-			close: function(event, ui) {},
-			create: function(event, ui) {
-		        $('.ui-helper-hidden-accessible').remove();
+			close : function(event, ui) {
+			},
+			create : function(event, ui) {
+				$('.ui-helper-hidden-accessible').remove();
 			}
 		}).autocomplete("instance")._renderItem = function(ul, item) {
 			return $("<li>").append(item.label).appendTo(ul);
-	  	};
-	  	$("#selected-region-txt").off('focus');
-		$("#selected-region-txt").focus(function(){            
-            $(this).autocomplete('search');
-        });
+		};
+		$("#selected-region-txt").off('focus');
+		$("#selected-region-txt").focus(function() {
+			$(this).autocomplete('search');
+		});
 	}, true);
 }
 
 /**
  * binds the click and keyup of office selector
  */
-function bindOfficeSelectorEvents(){
+function bindOfficeSelectorEvents() {
 	callAjaxGET("/fetchbranches.do", function(data) {
 		var branchList = [];
-		if(data != undefined && data != "")
-		branchList = $.parseJSON(data);
+		if (data != undefined && data != "")
+			branchList = $.parseJSON(data);
 		var searchData = [];
-		for(var i=0,j=0; i<branchList.length; i++) {
-			if(branchList[i].isDefaultBySystem == 0) {
+		for (var i = 0, j = 0; i < branchList.length; i++) {
+			if (branchList[i].isDefaultBySystem == 0) {
 				searchData[j] = {};
 				searchData[j].label = branchList[i].branchName;
 				searchData[j].branchId = branchList[i].branchId;
@@ -2659,44 +2566,45 @@ function bindOfficeSelectorEvents(){
 		}
 		$("#selected-office-txt").autocomplete({
 			source : searchData,
-			minLength: 0,
+			minLength : 0,
 			delay : 0,
 			autoFocus : true,
-			select: function(event, ui) {
+			select : function(event, ui) {
 				$("#selected-office-txt").val(ui.item.label);
 				$('#selected-office-id-hidden').val(ui.item.branchId);
 				$('#selected-region-id-hidden').val(ui.item.regionId);
 				return false;
 			},
-			close: function(event, ui) {},
-			create: function(event, ui) {
-		        $('.ui-helper-hidden-accessible').remove();
+			close : function(event, ui) {
+			},
+			create : function(event, ui) {
+				$('.ui-helper-hidden-accessible').remove();
 			}
 		}).autocomplete("instance")._renderItem = function(ul, item) {
 			return $("<li>").append(item.label).appendTo(ul);
-	  	};
-	  	$("#selected-office-txt").off('focus');
-		$("#selected-office-txt").focus(function(){            
-            $(this).autocomplete('search');
-        });
+		};
+		$("#selected-office-txt").off('focus');
+		$("#selected-office-txt").focus(function() {
+			$(this).autocomplete('search');
+		});
 	}, true);
 }
 
 /**
  * binds the click of assign to selector
  */
-function bindAssignToSelectorClick(){
+function bindAssignToSelectorClick() {
 	$('#assign-to-selector').click(function(e) {
 		e.stopPropagation();
 		$("#assign-to-droplist").slideToggle(200);
 	});
-	
+
 	$('.hm-assignto-options').click(function(e) {
 		e.stopPropagation();
 		var assignToOption = $(this).attr('data-assign-to-option');
 		$("#assign-to-txt").val($(this).html());
-		$("#assign-to-txt").attr("data-assignto",assignToOption);
-		
+		$("#assign-to-txt").attr("data-assignto", assignToOption);
+
 		showSelectorsByAssignToOption(assignToOption);
 		$("#assign-to-droplist").slideToggle(200);
 	});
@@ -2705,94 +2613,93 @@ function bindAssignToSelectorClick(){
 /**
  * binds the check and uncheck of admin privileges checkbox
  */
-function bindAdminCheckBoxClick(){
+function bindAdminCheckBoxClick() {
 	$('.bd-check-img').unbind('click');
-	$('.bd-check-img').click(function(){
-		/* $(this).toggleClass('bd-check-img-checked');*/
+	$('.bd-check-img').click(function() {
+		/* $(this).toggleClass('bd-check-img-checked'); */
 		/**
-		 * If class is "bd-check-img-checked", check box is unchecked ,
-		 * hence setting the hidden value as false
+		 * If class is "bd-check-img-checked", check box is unchecked , hence setting the hidden value as false
 		 */
-		 if($(this).hasClass('bd-check-img-checked') ){
+		if ($(this).hasClass('bd-check-img-checked')) {
 			$(this).removeClass('bd-check-img-checked');
 			$(this).next("#is-admin-chk").val("true");
 			$(this).next("#is-ignore").val("true");
-		 }
-		 else {
+		} else {
 			$(this).addClass('bd-check-img-checked');
 			$(this).next("#is-admin-chk").val("false");
 			$(this).next("#is-ignore").val("false");
-		 }
-		 if($('#is-ignore').val()=="true"){
-			if($('#match-user-email').val()!=""){
+		}
+		if ($('#is-ignore').val() == "true") {
+			if ($('#match-user-email').val() != "") {
 				$('#match-user-email').val('');
-				$('#match-user-email').attr('agent-id' , 0);
-			$('#match-user-email').attr("disabled",true);
+				$('#match-user-email').attr('agent-id', 0);
+				$('#match-user-email').attr("disabled", true);
 			}
-		}else if($('#is-ignore').val()=="false"){
-			
+		} else if ($('#is-ignore').val() == "false") {
+
 			$('#match-user-email').removeAttr("disabled");
 		}
-		 
+
 	});
 }
 
 /**
  * Method to show/hide the other selectors based on the assign to option selected
+ * 
  * @param assignToOption
  */
 function showSelectorsByAssignToOption(assignToOption) {
-	switch(assignToOption) {
+	switch (assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
-		if($("#assign-to-selector").data("profile") == "individual")
+		if ($("#assign-to-selector").data("profile") == "individual")
 			hideAdminPrivilegesChk();
 		break;
 	case 'region':
-		$("#selected-region-txt").prop("disabled",false);
+		$("#selected-region-txt").prop("disabled", false);
 		disableOfficeSelector();
 		$("#bd-region-selector").show();
 		showAdminPrivilegesChk();
 		break;
 	case 'office':
-		$("#selected-office-txt").prop("disabled",false);
+		$("#selected-office-txt").prop("disabled", false);
 		$("#bd-office-selector").show();
 		showAdminPrivilegesChk();
 		disableRegionSelector();
 		break;
 	default:
-		$("#selected-region-txt").prop("disabled",false);
-		$("#selected-office-txt").prop("disabled",false);
+		$("#selected-region-txt").prop("disabled", false);
+		$("#selected-office-txt").prop("disabled", false);
 	}
 }
 
-function showAdminPrivilegesChk(){
+function showAdminPrivilegesChk() {
 	$("#admin-privilege-div").show();
-	if(!$('.bd-check-img').hasClass('bd-check-img-checked') ){
+	if (!$('.bd-check-img').hasClass('bd-check-img-checked')) {
 		$('.bd-check-img').next("#is-admin-chk").val("true");
 		$('.bd-check-img').removeClass('bd-check-img-checked');
 	}
 }
 
-function hideAdminPrivilegesChk(){
+function hideAdminPrivilegesChk() {
 	$("#admin-privilege-div").hide();
 	$('.bd-check-img').next("#is-admin-chk").val("false");
 	$('.bd-check-img').addClass('bd-check-img-checked');
 }
 
-function disableRegionSelector(){
-	$("#selected-region-txt").prop("disabled",true);
+function disableRegionSelector() {
+	$("#selected-region-txt").prop("disabled", true);
 	$("#selected-region-txt").val("");
 	$('#selected-region-id-hidden').val("");
 	$("#bd-region-selector").hide();
 }
 
-function disableOfficeSelector(){
-	$("#selected-office-txt").prop("disabled",true);
+function disableOfficeSelector() {
+	$("#selected-office-txt").prop("disabled", true);
 	$("#selected-office-txt").val("");
 	$('#selected-office-id-hidden').val("");
-	//$('#selected-region-id-hidden').val("");
+	// $('#selected-region-id-hidden').val("");
 	$("#bd-office-selector").hide();
 }
 
@@ -2804,34 +2711,34 @@ var isRegionValid;
 /**
  * Function to validate Region name
  */
-function validateRegionName(elementId){
-	if ($('#'+elementId).val() != "") {
-		if (companyNameRegEx.test($('#'+elementId).val()) == true) {
+function validateRegionName(elementId) {
+	if ($('#' + elementId).val() != "") {
+		if (companyNameRegEx.test($('#' + elementId).val()) == true) {
 			return true;
-		}else {
+		} else {
 			showErrorMobileAndWeb('Please enter a valid region name.');
 			return false;
 		}
-	}else{
+	} else {
 		showErrorMobileAndWeb('Please enter region name.');
 		return false;
 	}
 }
 
 function validateUserEmailTextArea(elementId) {
-	var emailIds = $('#'+elementId).val();
+	var emailIds = $('#' + elementId).val();
 	if (emailIds != "") {
 		var emailIdsArray = emailIds.split(/[,;\n]/);
-		for(var i = 0; i < emailIdsArray.length; i++) {
+		for (var i = 0; i < emailIdsArray.length; i++) {
 			var emailId = emailIdsArray[i].trim();
-			if(emailId == ""){
+			if (emailId == "") {
 				continue;
 			}
-			if(emailId.indexOf(">") > -1){
-				emailId = emailId.substring(emailId.indexOf("<")+1,emailId.length-1);
+			if (emailId.indexOf(">") > -1) {
+				emailId = emailId.substring(emailId.indexOf("<") + 1, emailId.length - 1);
 			}
 
-			if(emailRegex.test(emailId) == false){
+			if (emailRegex.test(emailId) == false) {
 				showErrorMobileAndWeb('Please enter valid email addresses');
 				return false;
 			}
@@ -2840,23 +2747,22 @@ function validateUserEmailTextArea(elementId) {
 	}
 }
 
-function validateUserSelection(elementId,hiddenElementId) {
-	if ($('#'+elementId).val() != "") {
-		var emailId = $('#'+elementId).val();
-		if(emailId.indexOf('"') > -1){
+function validateUserSelection(elementId, hiddenElementId) {
+	if ($('#' + elementId).val() != "") {
+		var emailId = $('#' + elementId).val();
+		if (emailId.indexOf('"') > -1) {
 			emailId = emailId.split('"').join("");
 		}
-		if(emailId.indexOf("<") > -1){
-			emailId = emailId.substring(emailId.indexOf("<")+1,emailId.indexOf(">"));
+		if (emailId.indexOf("<") > -1) {
+			emailId = emailId.substring(emailId.indexOf("<") + 1, emailId.indexOf(">"));
 		}
-		if($("#"+hiddenElementId).val() != ""){
+		if ($("#" + hiddenElementId).val() != "") {
 			return true;
 		}
-		
+
 		else if (emailRegex.test(emailId) == true) {
 			return true;
-		}
-		else {
+		} else {
 			showErrorMobileAndWeb('Please select a valid user');
 			return false;
 		}
@@ -2870,39 +2776,34 @@ function validateUserSelection(elementId,hiddenElementId) {
 function validateRegionForm() {
 	isRegionValid = true;
 	var isFocussed = false;
-	
-	
-	if(!validateRegionName('region-name-txt')){
+
+	if (!validateRegionName('region-name-txt')) {
 		isRegionValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#region-name-txt').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 		return isRegionValid;
 	}
-	
-	
+
 	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
-	if(userSelectionType =="single"){
-	
-			if(!isFocussed){
-				$('#selected-user-txt').focus();
-				isFocussed=true;
-			}
-	
+	if (userSelectionType == "single") {
+
+		if (!isFocussed) {
+			$('#selected-user-txt').focus();
+			isFocussed = true;
+		}
+
+	} else {
+
+		if (!isFocussed) {
+			$('#selected-user-txt-area').focus();
+			isFocussed = true;
+		}
+
 	}
-	else {
-		
-			if(!isFocussed){
-				$('#selected-user-txt-area').focus();
-				isFocussed=true;
-			}
-		
-		
-	}
-	
-	
-	if(isRegionValid){
+
+	if (isRegionValid) {
 		hideError();
 	}
 	return isRegionValid;
@@ -2918,12 +2819,12 @@ function resetInputFields(elementId) {
 /**
  * js function for adding a region
  */
-function addRegion(formId,disableEle) {
+function addRegion(formId, disableEle) {
 	var url = "./addregion.do";
 	showOverlay();
 	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
 	$('input[name="userSelectionType"]').val(selectedType);
-	callAjaxFormSubmit(url, addRegionCallBack, formId,disableEle);
+	callAjaxFormSubmit(url, addRegionCallBack, formId, disableEle);
 }
 
 /**
@@ -2943,48 +2844,49 @@ function addRegionCallBack(data) {
 
 /**
  * Method to fetch list of already existing users
+ * 
  * @param searchKey
  * @param start
  * @param rows
  */
-function getUsersList(searchKey,start,rows) {
-	var url="./finduserbyemail.do?startIndex="+start+"&batchSize="+rows+"&searchKey="+searchKey;
-	//encode the url so it can accept the special characters also
+function getUsersList(searchKey, start, rows) {
+	var url = "./finduserbyemail.do?startIndex=" + start + "&batchSize=" + rows + "&searchKey=" + searchKey;
+	// encode the url so it can accept the special characters also
 	callAjaxGET(encodeURI(url), paintUsersList, true);
 }
 
 /**
  * Callback for getUsersList, populates the drop down with users list obtained
+ * 
  * @param data
  */
 function paintUsersList(data) {
 	var usersList = $.parseJSON(data);
 	var htmlData = "";
-	if(usersList != null) {
+	if (usersList != null) {
 		var len = usersList.length;
-		if(len > 0) {
+		if (len > 0) {
 			$('#selected-userid-hidden').val("");
-			$.each(usersList,function(i,user) {
+			$.each(usersList, function(i, user) {
 				var displayName = user.firstName;
-				if(user.lastName != undefined) {
-					displayName = displayName +" "+ user.lastName;
+				if (user.lastName != undefined) {
+					displayName = displayName + " " + user.lastName;
 				}
-				htmlData = htmlData +'<div class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-user-options" data-userid="'+user.userId+'">'+displayName+'</div>';
+				htmlData = htmlData + '<div class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-user-options" data-userid="' + user.userId + '">' + displayName + '</div>';
 			});
 		}
 	}
-	
-	if(htmlData != "") {
+
+	if (htmlData != "") {
 		$("#users-droplist").html(htmlData).slideDown(200);
-	}
-	else{	
+	} else {
 		$("#users-droplist").slideUp(200);
-		
+
 	}
-	
+
 	$('#users-droplist').perfectScrollbar();
 	$('#users-droplist').perfectScrollbar('update');
-	
+
 	// bind the click event of selector
 	$(".hm-user-options").click(function() {
 		$('#selected-user-txt').val($(this).html());
@@ -2998,15 +2900,15 @@ var isOfficeValid;
 /**
  * Function to validate office name
  */
-function validateOfficeName(elementId){
-	if ($('#'+elementId).val() != "") {
-		if (companyNameRegEx.test($('#'+elementId).val()) == true) {
+function validateOfficeName(elementId) {
+	if ($('#' + elementId).val() != "") {
+		if (companyNameRegEx.test($('#' + elementId).val()) == true) {
 			return true;
-		}else {
+		} else {
 			showErrorMobileAndWeb('Please enter a valid office name.');
 			return false;
 		}
-	}else{
+	} else {
 		showErrorMobileAndWeb('Please enter office name.');
 		return false;
 	}
@@ -3019,17 +2921,17 @@ function validateOfficeName(elementId){
  * @param textElementId
  * @returns {Boolean}
  */
-function validateRegionSelector(hiddenElementId,textElementId) {
+function validateRegionSelector(hiddenElementId, textElementId) {
 	var assignToType = $("#assign-to-txt").attr("data-assignto");
-	if(assignToType == 'region'){
-		if ($('#'+hiddenElementId).val() == "" || $('#'+textElementId).val() == "") {
+	if (assignToType == 'region') {
+		if ($('#' + hiddenElementId).val() == "" || $('#' + textElementId).val() == "") {
 			showErrorMobileAndWeb('Please select a region');
 			return false;
 		}
 		return true;
 	}
 	return true;
-	
+
 }
 
 /**
@@ -3038,50 +2940,49 @@ function validateRegionSelector(hiddenElementId,textElementId) {
 function validateOfficeForm() {
 	isOfficeValid = true;
 	var isFocussed = false;
-	
-	if(!validateOfficeName('office-name-txt')){
+
+	if (!validateOfficeName('office-name-txt')) {
 		isOfficeValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#office-name-txt').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 		return isOfficeValid;
 	}
-	
-	if(!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
+
+	if (!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
 		isOfficeValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#selected-region-txt').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 		return isOfficeValid;
 	}
-	if(!validateAddress1('office-address-txt')){
+	if (!validateAddress1('office-address-txt')) {
 		isOfficeValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#office-address-txt').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 		return isOfficeValid;
 	}
-	
+
 	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
-	if(userSelectionType =="single"){
-			if(!isFocussed){
-				$('#selected-user-txt').focus();
-				isFocussed=true;
-			}
+	if (userSelectionType == "single") {
+		if (!isFocussed) {
+			$('#selected-user-txt').focus();
+			isFocussed = true;
+		}
+	} else {
+
+		if (!isFocussed) {
+			$('#selected-user-txt-area').focus();
+			isFocussed = true;
+		}
+
 	}
-	else {
-		
-			if(!isFocussed){
-				$('#selected-user-txt-area').focus();
-				isFocussed=true;
-			}
-				
-	}
-	
-	if(isOfficeValid){
+
+	if (isOfficeValid) {
 		hideError();
 	}
 	return isOfficeValid;
@@ -3090,12 +2991,12 @@ function validateOfficeForm() {
 /**
  * js function for adding a branch
  */
-function addOffice(formId,disableEle) {
+function addOffice(formId, disableEle) {
 	var url = "./addbranch.do";
 	showOverlay();
 	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
 	$('input[name="userSelectionType"]').val(selectedType);
-	callAjaxFormSubmit(url, addOfficeCallBack, formId,disableEle);
+	callAjaxFormSubmit(url, addOfficeCallBack, formId, disableEle);
 }
 
 /**
@@ -3119,25 +3020,26 @@ function addOfficeCallBack(data) {
  * @param regionPattern
  */
 function populateRegionsSelector(regionPattern) {
-	var url = "./searchregions.do?regionPattern="+regionPattern+"&start=0&rows=-1";
+	var url = "./searchregions.do?regionPattern=" + regionPattern + "&start=0&rows=-1";
 	callAjaxGET(url, populateRegionsSelectorCallBack, true);
 }
 
 /**
  * callback method for fetching regions from solr for populating region selector
+ * 
  * @param data
  */
 function populateRegionsSelectorCallBack(data) {
 	var searchResult = $.parseJSON(data);
-	if(searchResult != null) {
+	if (searchResult != null) {
 		var len = searchResult.length;
 		var htmlData = "";
-		if(len > 0) {
-			$.each(searchResult,function(i,region) {
-					htmlData = htmlData +'<div data-regionId="'+region.regionId+'" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-region-option">'+region.regionName+'</div>';
+		if (len > 0) {
+			$.each(searchResult, function(i, region) {
+				htmlData = htmlData + '<div data-regionId="' + region.regionId + '" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-region-option">' + region.regionName + '</div>';
 			});
 		}
-		if(htmlData != ""){
+		if (htmlData != "") {
 			$("#regions-droplist").html(htmlData).slideDown(200);
 			// bind the click event of selector
 			$('.hm-region-option').click(function(e) {
@@ -3145,20 +3047,19 @@ function populateRegionsSelectorCallBack(data) {
 				$('#selected-region-txt').val($(this).html());
 				$('#selected-region-id-hidden').val($(this).data('regionid'));
 				$('#regions-droplist').slideToggle(200);
-			});	
-			
-			//bind the hover event
+			});
+
+			// bind the hover event
 			$(".hm-dd-hover").hover(function() {
 				$(".hm-region-option").removeClass("hm-dd-item-keys-selected");
 			});
-			$("#selected-region-txt").keydown(function(e){
+			$("#selected-region-txt").keydown(function(e) {
 				bindArrowKeysWithSelector(e, "selected-region-txt", "regions-droplist", populateRegionsSelector, "selected-region-id-hidden", "data-regionid");
-			});			
+			});
+		} else {
+			$("#regions-droplist").html(htmlData).slideUp(200);
 		}
-		else {
-			$("#regions-droplist").html(htmlData).slideUp(200);	
-		}
-	}	
+	}
 }
 
 var isIndividualValid;
@@ -3170,10 +3071,10 @@ var isIndividualValid;
  * @param textElementId
  * @returns {Boolean}
  */
-function validateOfficeSelector(hiddenElementId,textElementId) {
+function validateOfficeSelector(hiddenElementId, textElementId) {
 	var assignToType = $("#assign-to-txt").attr("data-assignto");
-	if(assignToType == 'office'){
-		if ($('#'+hiddenElementId).val() == "" || $('#'+textElementId).val() == "") {
+	if (assignToType == 'office') {
+		if ($('#' + hiddenElementId).val() == "" || $('#' + textElementId).val() == "") {
 			showErrorMobileAndWeb('Please select an office');
 			return false;
 		}
@@ -3184,11 +3085,12 @@ function validateOfficeSelector(hiddenElementId,textElementId) {
 
 /**
  * function to validate user selection in case of individual addition
+ * 
  * @param elementId
  * @returns {Boolean}
  */
 function validateIndividualSelection(elementId) {
-	if ($('#'+elementId).val() == "") {
+	if ($('#' + elementId).val() == "") {
 		showErrorMobileAndWeb('Please select a user or enter atleast one email address');
 		return false;
 	}
@@ -3197,70 +3099,70 @@ function validateIndividualSelection(elementId) {
 
 /**
  * function to validate the individual form
+ * 
  * @returns {Boolean}
  */
 function validateIndividualForm() {
 	isIndividualValid = true;
 	var isFocussed = false;
-	
-	if(!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
+
+	if (!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
 		isIndividualValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#selected-region-txt').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 	}
-	
-	if(!validateOfficeSelector('selected-office-txt', 'selected-office-id-hidden')) {
+
+	if (!validateOfficeSelector('selected-office-txt', 'selected-office-id-hidden')) {
 		isIndividualValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#selected-office-txt').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 	}
-	
+
 	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
-	if(userSelectionType =="single"){
-		if(!validateIndividualSelection('selected-user-txt')) {
+	if (userSelectionType == "single") {
+		if (!validateIndividualSelection('selected-user-txt')) {
 			isIndividualValid = false;
-			if(!isFocussed){
+			if (!isFocussed) {
 				$('#selected-user-txt').focus();
-				isFocussed=true;
+				isFocussed = true;
 			}
 		}
-			if(!isFocussed){
-				$('#selected-user-txt').focus();
-				isFocussed=true;
-			}
-	}
-	else {
-		if(!validateIndividualSelection('selected-user-txt-area')) {
+		if (!isFocussed) {
+			$('#selected-user-txt').focus();
+			isFocussed = true;
+		}
+	} else {
+		if (!validateIndividualSelection('selected-user-txt-area')) {
 			isIndividualValid = false;
-			if(!isFocussed){
+			if (!isFocussed) {
 				$('#selected-user-txt-area').focus();
-				isFocussed=true;
+				isFocussed = true;
 			}
 		}
-		
-			if(!isFocussed){
-				$('#selected-user-txt-area').focus();
-				isFocussed=true;
-			}
-				
+
+		if (!isFocussed) {
+			$('#selected-user-txt-area').focus();
+			isFocussed = true;
+		}
+
 	}
-	
-	if(isIndividualValid){
+
+	if (isIndividualValid) {
 		hideError();
 	}
 	return isIndividualValid;
 }
 
-function addIndividual(formId,disableEle) {
+function addIndividual(formId, disableEle) {
 	var url = "./addindividual.do";
 	showOverlay();
 	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
 	$('input[name="userSelectionType"]').val(selectedType);
-	callAjaxFormSubmit(url, addIndividualCallBack, formId,disableEle);
+	callAjaxFormSubmit(url, addIndividualCallBack, formId, disableEle);
 }
 
 function addIndividualCallBack(data) {
@@ -3276,27 +3178,28 @@ function addIndividualCallBack(data) {
  * @param officePattern
  */
 function populateOfficesSelector(officePattern) {
-	var url = "./searchbranches.do?branchPattern="+officePattern+"&start=0&rows=-1";
+	var url = "./searchbranches.do?branchPattern=" + officePattern + "&start=0&rows=-1";
 	callAjaxGET(url, populateOfficesSelectorCallBack, true);
 }
 
 /**
  * callback method for fetching offices(branches) from solr for populating office selector
+ * 
  * @param data
  */
 function populateOfficesSelectorCallBack(data) {
 	var searchResult = $.parseJSON(data);
-	if(searchResult != null) {
+	if (searchResult != null) {
 		var len = searchResult.length;
 		var htmlData = "";
-		if(len > 0) {
-			$.each(searchResult,function(i,branch) {
-					htmlData = htmlData +'<div data-regionid="'+branch.regionId+'" data-officeid="'+branch.branchId+'" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-office-option">'+branch.branchName+'</div>';
+		if (len > 0) {
+			$.each(searchResult, function(i, branch) {
+				htmlData = htmlData + '<div data-regionid="' + branch.regionId + '" data-officeid="' + branch.branchId + '" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-office-option">' + branch.branchName + '</div>';
 			});
 		}
-		if(htmlData != ""){
-			$("#offices-droplist").html(htmlData).slideDown(200);	
-			
+		if (htmlData != "") {
+			$("#offices-droplist").html(htmlData).slideDown(200);
+
 			// bind the click event of selector
 			$('.hm-office-option').click(function(e) {
 				e.stopPropagation();
@@ -3304,58 +3207,55 @@ function populateOfficesSelectorCallBack(data) {
 				$('#selected-region-id-hidden').val($(this).data('regionid'));
 				$('#selected-office-id-hidden').val($(this).data('officeid'));
 				$('#offices-droplist').slideToggle(200);
-			});	
-			
-			//bind the hover event
+			});
+
+			// bind the hover event
 			$(".hm-dd-hover").hover(function() {
 				$(".hm-office-option").removeClass("hm-dd-item-keys-selected");
 			});
+		} else {
+			$("#offices-droplist").html(htmlData).slideUp(200);
 		}
-		else {
-			$("#offices-droplist").html(htmlData).slideUp(200);	
-		}
-	}	
+	}
 }
 
-function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hiddenFieldId,attrName) {
-	if(e.which == 40) {
-		var text = $("#"+textBoxId).val();
-		if(text == undefined) {
+function bindArrowKeysWithSelector(e, textBoxId, dropListId, populatorFunction, hiddenFieldId, attrName) {
+	if (e.which == 40) {
+		var text = $("#" + textBoxId).val();
+		if (text == undefined) {
 			text = "";
 		}
-		if (!($("#"+dropListId).css("display") =="block")){
+		if (!($("#" + dropListId).css("display") == "block")) {
 			delay(function() {
 				populatorFunction(text);
 			}, 500);
-		}else {
-			var current = $("#"+dropListId).find(".hm-dd-item-keys-selected");
-			if(current.length > 0) {
+		} else {
+			var current = $("#" + dropListId).find(".hm-dd-item-keys-selected");
+			if (current.length > 0) {
 				$(current).removeClass("hm-dd-item-keys-selected");
 				$(current).next().addClass("hm-dd-item-keys-selected");
+			} else {
+				$("#" + dropListId + " :first-child").addClass("hm-dd-item-keys-selected");
 			}
-			else {
-				$("#"+dropListId +" :first-child").addClass("hm-dd-item-keys-selected");
-			}
-			$("#"+dropListId).show();
+			$("#" + dropListId).show();
 		}
-		
-	}	
-	else if(e.which == 38){
-		var current = $("#"+dropListId).find(".hm-dd-item-keys-selected");
-		if(current.length > 0) {
+
+	} else if (e.which == 38) {
+		var current = $("#" + dropListId).find(".hm-dd-item-keys-selected");
+		if (current.length > 0) {
 			$(current).removeClass("hm-dd-item-keys-selected");
 			$(current).prev().addClass("hm-dd-item-keys-selected");
-		}else {
-			$('#'+dropListId).slideUp(200);
+		} else {
+			$('#' + dropListId).slideUp(200);
 		}
-	}else if(e.which == 13) {
-		var selectedItem = $("#"+dropListId).find(".hm-dd-item-keys-selected");
-		if(selectedItem.length == 0) {
-			selectedItem = $("#"+dropListId+" :first-child");
+	} else if (e.which == 13) {
+		var selectedItem = $("#" + dropListId).find(".hm-dd-item-keys-selected");
+		if (selectedItem.length == 0) {
+			selectedItem = $("#" + dropListId + " :first-child");
 		}
-		$('#'+textBoxId).val($(selectedItem).html());
-		$('#'+hiddenFieldId).val($(selectedItem).attr(attrName));
-		$('#'+dropListId).slideToggle(200);	
+		$('#' + textBoxId).val($(selectedItem).html());
+		$('#' + hiddenFieldId).val($(selectedItem).attr(attrName));
+		$('#' + dropListId).slideToggle(200);
 	}
 }
 
@@ -3370,15 +3270,15 @@ function viewHierarchyCallBack(data) {
 }
 
 function fetchHierarchyViewBranches(regionId) {
-	var url = "./fetchhierarchyviewbranches.do?regionId="+regionId;
+	var url = "./fetchhierarchyviewbranches.do?regionId=" + regionId;
 	callAjaxGET(url, function(data) {
-		paintHierarchyViewBranches(data,regionId);
+		paintHierarchyViewBranches(data, regionId);
 	}, true);
 }
 
-function paintHierarchyViewBranches(data,regionId) {
-	$("#td-region-edit-"+regionId).parent(".tr-region-edit").after(data);
-	$("#tr-region-"+regionId).slideDown(200);
+function paintHierarchyViewBranches(data, regionId) {
+	$("#td-region-edit-" + regionId).parent(".tr-region-edit").after(data);
+	$("#tr-region-" + regionId).slideDown(200);
 	$(".tr-region-edit").slideUp(200);
 	bindUserEditClicks();
 	bindBranchListClicks();
@@ -3386,37 +3286,35 @@ function paintHierarchyViewBranches(data,regionId) {
 	bindAppUserLoginEvent();
 }
 
-function bindBranchListClicks(){
+function bindBranchListClicks() {
 	$(".branch-edit-icn").unbind('click');
-	$(".branch-edit-icn").click(function(e){
+	$(".branch-edit-icn").click(function(e) {
 		e.stopPropagation();
 		$('.v-hr-tbl-icn-wraper').hide();
 		var branchId = $(this).attr("data-branchid");
-		if($(this).attr('clicked') == "false"){
+		if ($(this).attr('clicked') == "false") {
 			showBranchEdit(branchId);
-			$(this).attr('clicked','true');
-		}
-		else {
+			$(this).attr('clicked', 'true');
+		} else {
 			hideBranchEdit(branchId);
-			$(this).attr('clicked','false');
-		}		
+			$(this).attr('clicked', 'false');
+		}
 	});
 	$(".branch-row").unbind('click');
-	$(".branch-row").click(function(e){
-		//e.stopPropagation();
+	$(".branch-row").click(function(e) {
+		// e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
 		var regionId = $(this).attr("data-regionid");
-		if($(this).attr('clicked') == "false"){
-			fetchUsersForBranch(branchId,regionId);
-			 $(this).attr('clicked','true');
-		}
-		else {
-			$('.user-row-'+branchId).html("").hide(); 
-            $(this).attr('clicked','false');
+		if ($(this).attr('clicked') == "false") {
+			fetchUsersForBranch(branchId, regionId);
+			$(this).attr('clicked', 'true');
+		} else {
+			$('.user-row-' + branchId).html("").hide();
+			$(this).attr('clicked', 'false');
 		}
 	});
 	$(".branch-del-icn").unbind('click');
-	$(".branch-del-icn").click(function(e){
+	$(".branch-del-icn").click(function(e) {
 		e.stopPropagation();
 		$('.v-hr-tbl-icn-wraper').hide();
 		var branchId = $(this).attr("data-branchid");
@@ -3430,44 +3328,42 @@ function fetchHierarchyViewList() {
 		$("#hierarchy-list-header").siblings().remove();
 		$("#hierarchy-list-header").after(data);
 		bindRegionListClicks();
-	    /*$('.v-tbl-icn').click(function(e){
-	        e.stopPropagation();
-	    });*/
-	    bindBranchListClicks();
-	    bindUserEditClicks();
-	    bindHierarchyEvents();
-	    bindAppUserLoginEvent();
+		/*
+		 * $('.v-tbl-icn').click(function(e){ e.stopPropagation(); });
+		 */
+		bindBranchListClicks();
+		bindUserEditClicks();
+		bindHierarchyEvents();
+		bindAppUserLoginEvent();
 	}, true);
 }
 
 function bindRegionListClicks() {
-	$(".region-row").click(function(e){
+	$(".region-row").click(function(e) {
 		var regionId = $(this).attr("data-regionid");
-		if($(this).attr('clicked') == "false"){
+		if ($(this).attr('clicked') == "false") {
 			fetchHierarchyViewBranches(regionId);
-			 $(this).attr('clicked','true');
-		}
-		else {
-			$("tr[class*='sel-r"+regionId+"']").html("").hide();
-            $(this).attr('clicked','false');
-   
+			$(this).attr('clicked', 'true');
+		} else {
+			$("tr[class*='sel-r" + regionId + "']").html("").hide();
+			$(this).attr('clicked', 'false');
+
 		}
 	});
-	$(".region-edit-icn").click(function(e){
+	$(".region-edit-icn").click(function(e) {
 		e.stopPropagation();
 		$('.v-hr-tbl-icn-wraper').hide();
 		var regionId = $(this).attr("data-regionid");
-		if($(this).attr('clicked') == "false"){
+		if ($(this).attr('clicked') == "false") {
 			showRegionEdit(regionId);
-			$(this).attr('clicked','true');
-		}
-		else {
+			$(this).attr('clicked', 'true');
+		} else {
 			hideRegionEdit(regionId);
-			$(this).attr('clicked','false');
-		}		
+			$(this).attr('clicked', 'false');
+		}
 	});
 	$(".region-del-icn").unbind('click');
-	$(".region-del-icn").click(function(e){
+	$(".region-del-icn").click(function(e) {
 		e.stopPropagation();
 		$('.v-hr-tbl-icn-wraper').hide();
 		var regionId = $(this).attr("data-regionid");
@@ -3480,7 +3376,7 @@ function bindHierarchyEvents() {
 	$('.v-tbn-icn-dropdown').on('click', function(e) {
 		e.stopPropagation();
 		var element = $(this);
-		if(element.next('.v-hr-tbl-icn-wraper').is(':visible')) {
+		if (element.next('.v-hr-tbl-icn-wraper').is(':visible')) {
 			$(this).next('.v-hr-tbl-icn-wraper').hide();
 		} else {
 			$('.v-hr-tbl-icn-wraper').hide();
@@ -3503,22 +3399,22 @@ function bindHierarchyEvents() {
 
 		var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
 		var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-	    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
-	    reinviteUser(firstName, lastName, emailId,'.v-icn-femail');
+		var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
+		reinviteUser(firstName, lastName, emailId, '.v-icn-femail');
 	});
 }
 
 function showRegionEdit(regionId) {
-	var url = "./getregioneditpage.do?regionId="+regionId;
-	callAjaxGET(url, function(data){
+	var url = "./getregioneditpage.do?regionId=" + regionId;
+	callAjaxGET(url, function(data) {
 		showRegionEditCallBack(data, regionId);
 	}, true);
 }
-function showRegionEditCallBack(data,regionId) {
+function showRegionEditCallBack(data, regionId) {
 	$(".td-region-edit").html("").hide();
 	$(".tr-region-edit").hide();
-	$("#td-region-edit-"+regionId).parent(".tr-region-edit").slideDown(200);
-	$("#td-region-edit-"+regionId).html(data).slideDown(200);
+	$("#td-region-edit-" + regionId).parent(".tr-region-edit").slideDown(200);
+	$("#td-region-edit-" + regionId).html(data).slideDown(200);
 	bindSingleMultipleSelection();
 	bindAdminCheckBoxClick();
 	bindUserSelector();
@@ -3527,57 +3423,57 @@ function showRegionEditCallBack(data,regionId) {
 	bindAssignToSelectorClick();
 	$("#btn-region-update").click(function(e) {
 		var regionId = $(this).attr("data-regionid");
-		if(validateRegionForm()){
-			updateRegion("edit-region-form",regionId);
+		if (validateRegionForm()) {
+			updateRegion("edit-region-form", regionId);
 		}
 	});
-	
+
 }
 
 function hideRegionEdit(regionId) {
 	$(".td-region-edit").html("").hide();
-	$("#td-region-edit-"+regionId).hide();
+	$("#td-region-edit-" + regionId).hide();
 	$(".tr-region-edit").hide();
 }
 
 function showBranchEdit(branchId) {
-	var url = "./getofficeeditpage.do?branchId="+branchId;
-	callAjaxGET(url, function(data){
+	var url = "./getofficeeditpage.do?branchId=" + branchId;
+	callAjaxGET(url, function(data) {
 		$('.td-branch-edit').parent().hide();
 		$('.td-branch-edit').html('');
 		showBranchEditCallBack(data, branchId);
 	}, true);
 }
 
-function showBranchEditCallBack(data,branchId) {
-	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").slideDown(200);
-	$("#td-branch-edit-"+branchId).html(data).slideDown(200);
+function showBranchEditCallBack(data, branchId) {
+	$("#td-branch-edit-" + branchId).parent(".tr-branch-edit").slideDown(200);
+	$("#td-branch-edit-" + branchId).html(data).slideDown(200);
 	bindSingleMultipleSelection();
 	bindUserSelector();
 	bindRegionSelectorEvents();
 	var assignToOption = $("#assign-to-txt").attr('data-assignto');
 	showSelectorsByAssignToOption(assignToOption);
 	bindAssignToSelectorClick();
-	$("#btn-office-update").click(function(e){
+	$("#btn-office-update").click(function(e) {
 		updateBranch("edit-office-form", branchId);
 	});
 }
 
 function hideBranchEdit(branchId) {
-	$("#td-branch-edit-"+branchId).slideUp(200);
-	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").hide();
+	$("#td-branch-edit-" + branchId).slideUp(200);
+	$("#td-branch-edit-" + branchId).parent(".tr-branch-edit").hide();
 }
 
-function fetchUsersForBranch(branchId,regionId) {
-	var url="./fetchbranchusers.do?branchId="+branchId+"&regionId="+regionId;
+function fetchUsersForBranch(branchId, regionId) {
+	var url = "./fetchbranchusers.do?branchId=" + branchId + "&regionId=" + regionId;
 	callAjaxGET(url, function(data) {
-		paintUsersFromBranch(data,branchId);
+		paintUsersFromBranch(data, branchId);
 	}, true);
 }
 
-function paintUsersFromBranch(data,branchId,regionId) {
-	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").after(data);
-	$("#tr-branch-"+branchId).slideDown(200);
+function paintUsersFromBranch(data, branchId, regionId) {
+	$("#td-branch-edit-" + branchId).parent(".tr-branch-edit").after(data);
+	$("#tr-branch-" + branchId).slideDown(200);
 	$(".tr-branch-edit").slideUp(200);
 	bindUserEditClicks();
 	bindHierarchyEvents();
@@ -3586,27 +3482,27 @@ function paintUsersFromBranch(data,branchId,regionId) {
 
 function bindUserEditClicks() {
 	$(".user-edit-icn").unbind('click');
-	$('.user-edit-icn').click(function(e){
+	$('.user-edit-icn').click(function(e) {
 		e.stopPropagation();
 		$('.v-hr-tbl-icn-wraper').hide();
-		if($(this).attr('clicked') == "false") {
+		if ($(this).attr('clicked') == "false") {
 			// make an ajax call and fetch the details of the user
 			var userId = $(this).attr('data-userid');
 			$(".user-assignment-edit-div").html("");
 			$(".user-edit-row").slideUp();
 			var elementToAppendTo = $(this).closest('tr').next('tr.user-edit-row').find('td.td-user-edit');
-			getUserAssignments(userId,elementToAppendTo);
+			getUserAssignments(userId, elementToAppendTo);
 			$(this).parent().parent().parent().next('.user-edit-row').slideDown(200);
-			$(this).attr('clicked','true');
-	    }else {
+			$(this).attr('clicked', 'true');
+		} else {
 			$(this).parent().parent().parent().next('.user-edit-row').slideUp(200);
 			$(".user-assignment-edit-div").html("");
 			$(".user-edit-row").slideUp();
-			$(this).attr('clicked','false');
-	    }
+			$(this).attr('clicked', 'false');
+		}
 	});
 	$(".user-del-icn").unbind('click');
-	$(".user-del-icn").click(function(e){
+	$(".user-del-icn").click(function(e) {
 		e.stopPropagation();
 		var userId = $(this).attr("data-userid");
 		$('.v-hr-tbl-icn-wraper').hide();
@@ -3614,43 +3510,43 @@ function bindUserEditClicks() {
 	});
 }
 
-function updateRegion(formId,regionId) {
+function updateRegion(formId, regionId) {
 	var url = "./updateregion.do";
 	showOverlay();
 	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
 	$('input[name="userSelectionType"]').val(selectedType);
-	callAjaxFormSubmit(url, function(data){
+	callAjaxFormSubmit(url, function(data) {
 		updateRegionCallBack(data, regionId);
 	}, formId);
 }
 
-function updateRegionCallBack(data,regionId) {
+function updateRegionCallBack(data, regionId) {
 	hideOverlay();
 	displayMessage(data);
 	hideRegionEdit(regionId);
 	fetchHierarchyViewList();
 }
 
-function updateBranch(formId,branchId) {
-	if(validateBranchForm()) {
+function updateBranch(formId, branchId) {
+	if (validateBranchForm()) {
 		var url = "./updatebranch.do";
 		var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
 		$('input[name="userSelectionType"]').val(selectedType);
-		callAjaxFormSubmit(url, function(data){
-			updateBranchCallBack(data,branchId);
+		callAjaxFormSubmit(url, function(data) {
+			updateBranchCallBack(data, branchId);
 		}, formId);
 	}
 }
 
 function validateBranchForm() {
-	//check for region dropdown open
-	if($('#selected-region-txt').is(':visible')) {
-		if($('#selected-region-txt').val() == undefined || $('#selected-region-txt').val().trim() == "") {
+	// check for region dropdown open
+	if ($('#selected-region-txt').is(':visible')) {
+		if ($('#selected-region-txt').val() == undefined || $('#selected-region-txt').val().trim() == "") {
 			$('#selected-region-txt').focus();
 			showErrorMobileAndWeb("Please enter region name");
 			return false;
 		}
-		if($('#selected-region-id-hidden').val() == undefined || isNaN(parseInt($('#selected-region-id-hidden').val()))) {
+		if ($('#selected-region-id-hidden').val() == undefined || isNaN(parseInt($('#selected-region-id-hidden').val()))) {
 			$('#selected-region-txt').focus();
 			showErrorMobileAndWeb("Please enter region name");
 			return false;
@@ -3659,7 +3555,7 @@ function validateBranchForm() {
 	return true;
 }
 
-function updateBranchCallBack(data,branchId) {
+function updateBranchCallBack(data, branchId) {
 	hideOverlay();
 	displayMessage(data);
 	hideBranchEdit(branchId);
@@ -3685,10 +3581,10 @@ function deleteRegionCheckCallBack(response, regionId) {
 	var successMsg = $("#overlay-text").find('.success-message').text().trim();
 	if (success == successMsg) {
 		createPopupConfirm("Remove Region");
-		
-		$('#overlay-continue').click(function(){
+
+		$('#overlay-continue').click(function() {
 			if ($('#overlay-continue').attr("disabled") != "disabled") {
-				if(regionId != null) {
+				if (regionId != null) {
 					overlayRevert();
 					deleteRegion(regionId);
 					regionId = null;
@@ -3701,7 +3597,6 @@ function deleteRegionCheckCallBack(response, regionId) {
 		regionId = null;
 	}
 }
-
 
 /**
  * Branch Delete popup overlay
@@ -3721,10 +3616,10 @@ function deleteBranchCheckCallBack(response, branchId) {
 	var successMsg = $("#overlay-text").find('.success-message').text().trim();
 	if (success == successMsg) {
 		createPopupConfirm("Remove Office");
-		
-		$('#overlay-continue').click(function(){
+
+		$('#overlay-continue').click(function() {
 			if ($('#overlay-continue').attr("disabled") != "disabled") {
-				if(branchId != null) {
+				if (branchId != null) {
 					overlayRevert();
 					deleteBranch(branchId);
 					branchId = null;
@@ -3738,8 +3633,8 @@ function deleteBranchCheckCallBack(response, branchId) {
 	}
 }
 
-//Pop-up Overlay modifications
-$('#overlay-cancel').click(function(){
+// Pop-up Overlay modifications
+$('#overlay-cancel').click(function() {
 	$('#overlay-continue').unbind('click');
 	overlayRevert();
 	branchId = null;
@@ -3763,19 +3658,12 @@ function createPopupInfo(header) {
 	$('#overlay-continue').addClass("btn-disabled");
 	$('#overlay-continue').html('Continue');
 	$('#overlay-cancel').html('Cancel');
-	
-   	$('#overlay-main').show();
+
+	$('#overlay-main').show();
 }
-/*function overlayRevert() {
-	$('#overlay-main').hide();
-	if ($('#overlay-continue').attr("disabled") == "disabled") {
-		$('#overlay-continue').removeAttr("disabled");
-	}
-	$("#overlay-header").html('');
-	$("#overlay-text").html('');
-	$('#overlay-continue').html('');
-	$('#overlay-cancel').html('');
-}*/
+/*
+ * function overlayRevert() { $('#overlay-main').hide(); if ($('#overlay-continue').attr("disabled") == "disabled") { $('#overlay-continue').removeAttr("disabled"); } $("#overlay-header").html(''); $("#overlay-text").html(''); $('#overlay-continue').html(''); $('#overlay-cancel').html(''); }
+ */
 
 /**
  * Function to delete a region
@@ -3784,8 +3672,8 @@ function createPopupInfo(header) {
  */
 function deleteRegion(regionId) {
 	var url = "./deactivateregion.do?regionId=" + regionId;
-	callAjaxPOST(url, function(data){
-		deleteRegionCallBack(data,regionId);
+	callAjaxPOST(url, function(data) {
+		deleteRegionCallBack(data, regionId);
 	}, true);
 }
 
@@ -3794,10 +3682,10 @@ function deleteRegion(regionId) {
  * 
  * @param data
  */
-function deleteRegionCallBack(data,regionId) {
+function deleteRegionCallBack(data, regionId) {
 	displayMessage(data);
-	$("#tr-region-"+regionId).hide();
-	$("#tr-region-"+regionId).next(".tr-region-edit").hide();
+	$("#tr-region-" + regionId).hide();
+	$("#tr-region-" + regionId).next(".tr-region-edit").hide();
 }
 
 /**
@@ -3807,8 +3695,8 @@ function deleteRegionCallBack(data,regionId) {
  */
 function deleteBranch(branchId) {
 	var url = "./deactivatebranch.do?branchId=" + branchId;
-	callAjaxPOST(url, function(data){
-		deleteBranchCallBack(data,branchId);
+	callAjaxPOST(url, function(data) {
+		deleteBranchCallBack(data, branchId);
 	}, true);
 }
 
@@ -3817,26 +3705,25 @@ function deleteBranch(branchId) {
  * 
  * @param data
  */
-function deleteBranchCallBack(data,branchId) {
+function deleteBranchCallBack(data, branchId) {
 	displayMessage(data);
-	$("#tr-branch-row-"+branchId).hide();
-	$("#tr-branch-row-"+branchId).next(".tr-branch-edit").hide();
+	$("#tr-branch-row-" + branchId).hide();
+	$("#tr-branch-row-" + branchId).next(".tr-branch-edit").hide();
 }
 
-function resendVerificationMail(){
+function resendVerificationMail() {
 	$.ajax({
 		url : "./sendverificationmail.do",
 		type : "GET",
 		cache : false,
 		dataType : "text",
 		success : function(data) {
-			if (data.errCode == undefined){
+			if (data.errCode == undefined) {
 				$('#overlay-toast').html(data);
 				showToast();
 				hideError();
 				hideInfo();
-			}
-			else {
+			} else {
 				$('#overlay-toast').html(data);
 				showToast();
 				hideError();
@@ -3844,7 +3731,7 @@ function resendVerificationMail(){
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -3866,138 +3753,136 @@ function saveEncompassDetails(formid) {
 }
 
 function saveEncompassDetailsCallBack(response) {
-	
+
 	var map = $.parseJSON(response);
 	if (map.status == true) {
-		saveEncompassDetails("encompass-form");	
+		saveEncompassDetails("encompass-form");
 	} else {
 		showError(map.message);
 	}
-	/*$("#overlay-toast").html(response);
-	showToast();*/
-	
+	/*
+	 * $("#overlay-toast").html(response); showToast();
+	 */
+
 }
-function testConnectionSaveCallBack(response){
+function testConnectionSaveCallBack(response) {
 	var map = $.parseJSON(response);
 	if (map.status == true) {
-		//If state = prod/ state = dryrun, don't make any changes
-		//else state = dryrun
+		// If state = prod/ state = dryrun, don't make any changes
+		// else state = dryrun
 		var state = $("#encompass-state").val();
 		if (state != 'dryrun' && state != 'prod') {
 			$("#encompass-state").val('dryrun');
 			showEncompassButtons();
 		}
-		showInfo(map.message);	
+		showInfo(map.message);
 	} else {
 		showError(map.message);
 	}
 };
 
-
 function testEncompassConnectionCallBack(response) {
-	var map =  $.parseJSON(response);
+	var map = $.parseJSON(response);
 	if (map.status == true) {
 		showInfo(map.message);
 	} else {
 		showError(map.message);
 	}
-	
+
 }
 
 var isEncompassValid;
 function validateEncompassInput(elementId) {
 	isEncompassValid = true;
 	var isFocussed = false;
-	
-	if(!validateEncompassUserName('encompass-username')){
+
+	if (!validateEncompassUserName('encompass-username')) {
 		isEncompassValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#encompass-username').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 	}
-	if(!validateEncompassPassword('encompass-password')){
+	if (!validateEncompassPassword('encompass-password')) {
 		isEncompassValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#encompass-password').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 	}
 	if (!validateURL('encompass-url')) {
 		isEncompassValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#encompass-url').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 	}
-	
-	
+
 	return isEncompassValid;
 }
-//Check for encompass input fields for testConnection (except fieldid)
+// Check for encompass input fields for testConnection (except fieldid)
 function validateEncompassTestInput(elementId) {
 	isEncompassValid = true;
 	var isFocussed = false;
-	
-	if(!validateEncompassUserName('encompass-username')){
+
+	if (!validateEncompassUserName('encompass-username')) {
 		isEncompassValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#encompass-username').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 	}
-	if(!validateEncompassPassword('encompass-password')){
+	if (!validateEncompassPassword('encompass-password')) {
 		isEncompassValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#encompass-password').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 	}
 	if (!validateURL('encompass-url')) {
 		isEncompassValid = false;
-		if(!isFocussed){
+		if (!isFocussed) {
 			$('#encompass-url').focus();
-			isFocussed=true;
+			isFocussed = true;
 		}
 	}
-	
+
 	return isEncompassValid;
 }
 
-
-//validate dotloop form
+// validate dotloop form
 function validateDotloopInput() {
-	
-	if(!validateDotloopKey('encompass-apikey')){
+
+	if (!validateDotloopKey('encompass-apikey')) {
 		$('#encompass-username').focus();
 		return false;
 	}
 	return true;
 }
 
-//app settings event binding
+// app settings event binding
 
-$('body').on('click',function(){
+$('body').on('click', function() {
 	$('.crm-settings-dropdown-cont').slideUp(200);
 });
-$('body').on('click','.crm-settings-dropdown',function(e){
+$('body').on('click', '.crm-settings-dropdown', function(e) {
 	e.stopPropagation();
 	$('.crm-settings-dropdown-cont').slideToggle(200);
 });
-$('body').on('click','.crm-settings-dropdown-item',function(e){
+$('body').on('click', '.crm-settings-dropdown-item', function(e) {
 	var crmType = $(this).attr('data-crm-type');
 	$('#crm-settings-dropdown-sel-text').text(crmType);
 	$('.crm-setting-cont').hide();
-	$('.crm-setting-cont[data-crm-type="'+crmType+'"]').show();
+	$('.crm-setting-cont[data-crm-type="' + crmType + '"]').show();
 });
 
-$('body').on('blur', '#encompass-username',function() {
+$('body').on('blur', '#encompass-username', function() {
 	validateEncompassUserName(this.id);
 });
-$('body').on('blur', '#encompass-password',function() {
+$('body').on('blur', '#encompass-password', function() {
 	validateEncompassPassword(this.id);
 });
-$('body').on('blur', '#encompass-url',function() {
+$('body').on('blur', '#encompass-url', function() {
 	validateURL(this.id);
 });
 
@@ -4007,71 +3892,70 @@ $('#dotloop-apikey').blur(function() {
 $('body').on('click', '#dotloop-save', function() {
 	if (validateDotloopInput()) {
 		showOverlay();
-		saveDotloopDetails("dotloop-form",'#dotloop-save');
+		saveDotloopDetails("dotloop-form", '#dotloop-save');
 	}
 });
 $('body').on('click', '#dotloop-testconnection', function() {
 	if (validateDotloopInput()) {
-		testDotloopConnection("dotloop-form",'#dotloop-testconnection');
+		testDotloopConnection("dotloop-form", '#dotloop-testconnection');
 	}
 });
 
-//Dotloop function
-function saveDotloopDetails(formid,disableEle) {
+// Dotloop function
+function saveDotloopDetails(formid, disableEle) {
 	if (validateDotloopInput()) {
 		var url = "./savedotloopdetails.do";
 		callAjaxFormSubmit(url, function(response) {
 			hideOverlay();
 			$("#overlay-toast").html(response);
 			showToast();
-		}, formid,disableEle);
+		}, formid, disableEle);
 	}
 }
 
-function testDotloopConnection(formid,disableEle) {
+function testDotloopConnection(formid, disableEle) {
 	if (validateDotloopInput(formid)) {
 		var url = "./testdotloopconnection.do";
 		callAjaxFormSubmit(url, function(response) {
 			$("#overlay-toast").html(response);
 			showToast();
-		}, formid,disableEle);
+		}, formid, disableEle);
 	}
 }
 
-//Function to validate the api key
-function validateDotloopKey(elementId){
-	if($(window).width()<768){
-		if ($('#'+elementId).val() != "") {
-			$('#'+elementId).next('.hm-item-err-2').hide();
+// Function to validate the api key
+function validateDotloopKey(elementId) {
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).val() != "") {
+			$('#' + elementId).next('.hm-item-err-2').hide();
 			return true;
 		} else {
 			$('#overlay-toast').html('Please enter valid api key');
 			showToast();
 			return false;
 		}
-	}else{
-    	if ($('#'+elementId).val() != "") {
-			$('#'+elementId).next('.hm-item-err-2').hide();
+	} else {
+		if ($('#' + elementId).val() != "") {
+			$('#' + elementId).next('.hm-item-err-2').hide();
 			return true;
 		} else {
-			$('#'+elementId).next('.hm-item-err-2').html('Please enter valid api key');
-			$('#'+elementId).next('.hm-item-err-2').show();
+			$('#' + elementId).next('.hm-item-err-2').html('Please enter valid api key');
+			$('#' + elementId).next('.hm-item-err-2').show();
 			return false;
 		}
 	}
 }
 
 // Mail content
-function updateMailContent(formid,disableEle){
+function updateMailContent(formid, disableEle) {
 	var url = "./savesurveyparticipationmail.do";
-	callAjaxFormSubmit(url, updateMailContentCallBack, formid,disableEle);
+	callAjaxFormSubmit(url, updateMailContentCallBack, formid, disableEle);
 }
 
-function updateMailContentCallBack(response){
+function updateMailContentCallBack(response) {
 	$("#overlay-toast").html(response);
 	showToast();
 }
-
 
 // Mail Reminder
 function autoAppendReminderDropdown(reminderId, reminderDefault) {
@@ -4083,18 +3967,17 @@ function updateReminderSettings(formid) {
 	callAjaxFormSubmit(url, updateReminderSettingsCallBack, formid);
 }
 
-function updateReminderSettingsCallBack(response){
+function updateReminderSettingsCallBack(response) {
 	$("#overlay-toast").html(response);
 	showToast();
 }
-
 
 // Ratings Settings
 function autoAppendRatingDropdown(ratingId, classes) {
 	autoAppendDropdown(ratingId, classes, 5, 0.5);
 }
 
-//Ratings Settings
+// Ratings Settings
 function autoAppendRatingDropdownComplaint(ratingId, classes, maxPoint, minPoint, diff) {
 	var value = diff;
 	while (maxPoint >= minPoint) {
@@ -4115,12 +3998,12 @@ function updatePostScoreCallBack(response) {
 
 // Other settings
 function autoSetCheckboxStatus(on, off, status) {
-	if($(status).val() == 'true') {
-	$(on).show();
-        $(off).hide();
-	} else if($(status).val() == 'false') {
-        $(on).hide();
-	$(off).show();
+	if ($(status).val() == 'true') {
+		$(on).show();
+		$(off).hide();
+	} else if ($(status).val() == 'false') {
+		$(on).hide();
+		$(off).show();
 	}
 }
 
@@ -4134,7 +4017,6 @@ function updateOtherSettingsCallBack(response) {
 	showToast();
 }
 
-
 // Generic functions
 function autoAppendDropdown(elementId, classes, maxVal, minVal) {
 	var value = 0;
@@ -4145,17 +4027,17 @@ function autoAppendDropdown(elementId, classes, maxVal, minVal) {
 }
 
 function autoSetReminderIntervalStatus() {
-	if($('#reminder-needed-hidden').val() == 'true') {
+	if ($('#reminder-needed-hidden').val() == 'true') {
 		$('#reminder-interval').attr("disabled", true);
-	} else if($('#reminder-needed-hidden').val() == 'false') {
+	} else if ($('#reminder-needed-hidden').val() == 'false') {
 		$('#reminder-interval').removeAttr("disabled");
 	}
 }
 
-function overlayAccount(){
+function overlayAccount() {
 	$('#othercategory').val('other-account');
 
-	$('#overlay-continue').click(function(){
+	$('#overlay-continue').click(function() {
 		$('#st-settings-account-off').toggle();
 		$('#st-settings-account-on').toggle();
 
@@ -4164,22 +4046,22 @@ function overlayAccount(){
 		$('#othercategory').val('');
 		$('#overlay-continue').unbind('click');
 	});
-	$('#overlay-cancel').click(function(){
+	$('#overlay-cancel').click(function() {
 		$('#overlay-continue').unbind('click');
 		overlayRevert();
 		$('#othercategory').val('');
 	});
 }
 
-function overlayDeleteAccount(){
+function overlayDeleteAccount() {
 	$('#othercategory').val('other-account');
 
-	$('#overlay-continue').click(function(){
+	$('#overlay-continue').click(function() {
 		overlayRevert();
 		confirmDeleteAccount();
 		$('#overlay-continue').unbind('click');
 	});
-	$('#overlay-cancel').click(function(){
+	$('#overlay-cancel').click(function() {
 		overlayRevert();
 	});
 }
@@ -4196,52 +4078,44 @@ function createPopupConfirm(header, body) {
 
 	$('#overlay-main').show();
 }
-/*function overlayRevert() {
-	$('#overlay-main').hide();
-	if ($('#overlay-continue').attr("disabled") == "disabled") {
-		$('#overlay-continue').removeAttr("disabled");
-	}
-	$("#overlay-header").html('');
-	$("#overlay-text").html('');
-	$('#overlay-continue').html('');
-	$('#overlay-cancel').html('');
-}*/
+/*
+ * function overlayRevert() { $('#overlay-main').hide(); if ($('#overlay-continue').attr("disabled") == "disabled") { $('#overlay-continue').removeAttr("disabled"); } $("#overlay-header").html(''); $("#overlay-text").html(''); $('#overlay-continue').html(''); $('#overlay-cancel').html(''); }
+ */
 
 function showPaymentOptions() {
 	disableBodyScroll();
 	var url = "./paymentchange.do";
-    showOverlay();
-    callAjaxGET(url,displayPopup,true);
+	showOverlay();
+	callAjaxGET(url, displayPopup, true);
 }
 
-function displayPopup(data){
+function displayPopup(data) {
 	$("#temp-div").html(data);
-	
+
 	var displayMessageDiv = $("#display-msg-div");
-	if($(displayMessageDiv).hasClass("message")) {
+	if ($(displayMessageDiv).hasClass("message")) {
 		hideOverlay();
 		$('#st-settings-payment-off').show();
-   		$('#st-settings-payment-on').hide();
+		$('#st-settings-payment-on').hide();
 		enableBodyScroll();
 		$("#overlay-toast").html($(displayMessageDiv).html());
 		showToast();
-	}	
-	else{
+	} else {
 		$('.overlay-payment').html(data);
-    	hideOverlay();
-    	$('.overlay-payment').show();
-    }
+		hideOverlay();
+		$('.overlay-payment').show();
+	}
 	$("#temp-div").html("");
 }
 
-function updateAutoPostSetting(isautopostenabled,disableEle){
-	
-	if ( $(disableEle).data('requestRunning') ) {
+function updateAutoPostSetting(isautopostenabled, disableEle) {
+
+	if ($(disableEle).data('requestRunning')) {
 		return;
-    }
-	
+	}
+
 	disable(disableEle);
-	
+
 	var payload = {
 		"autopost" : isautopostenabled
 	};
@@ -4261,23 +4135,22 @@ function updateAutoPostSetting(isautopostenabled,disableEle){
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			$('#overlay-toast').html(
-					"Oops! Something went wrong. Please try again later.");
+			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
 		}
 	});
 }
 
-function resetTextForMoodFlow(mood, resetId){
+function resetTextForMoodFlow(mood, resetId) {
 	var payload = {
 		"mood" : mood
 	};
 	callAjaxGetWithPayloadData("./resettextforflow.do", function(data) {
 		hideOverlay();
-		var map =  $.parseJSON(data);
+		var map = $.parseJSON(data);
 
 		if (map.success == 1 && map.message) {
 			$('#' + resetId).val(map.message);
@@ -4289,7 +4162,7 @@ function resetTextForMoodFlow(mood, resetId){
 	}, payload, true);
 }
 
-function saveTextForMoodFlow(content, mood){
+function saveTextForMoodFlow(content, mood) {
 	var payload = {
 		"text" : content,
 		"mood" : mood
@@ -4304,7 +4177,7 @@ function saveTextForMoodFlow(content, mood){
 	}, payload, true);
 }
 
-function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete){
+function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete) {
 	$('#happy-text').html(happyText);
 	$('#neutral-text').html(neutralText);
 	$('#sad-text').html(sadText);
@@ -4314,7 +4187,7 @@ function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, ne
 	$('#sad-text-complete').html(sadTextComplete);
 }
 
-//User management
+// User management
 $(document).on('click', '.um-user-row', function() {
 	if (!isUserManagementAuthorized)
 		return false;
@@ -4361,7 +4234,7 @@ $(document).on('click', '#um-add-user', function() {
 	if (!isUserManagementAuthorized) {
 		return false;
 	}
-	
+
 	var userId;
 	if (isAddUser) {
 		// TODO Add code to create a new user.
@@ -4369,12 +4242,12 @@ $(document).on('click', '#um-add-user', function() {
 			return false;
 		}
 		inviteUser();
-		isAddUser=false;
+		isAddUser = false;
 		userId = $('#mh-userId').val();
 	} else {
 		userId = $('#um-user-details-container').attr("data-id");
 	}
-	
+
 	if (!validateUserInviteDetails()) {
 		return false;
 	}
@@ -4390,12 +4263,11 @@ $(document).on('click', '#um-clear-user-form', function() {
 	if (!isUserManagementAuthorized) {
 		return false;
 	}
-	isAddUser=true;
+	isAddUser = true;
 	paintUserDetailsForm("");
-	/*if (!validateUserInviteDetails()) {
-		return false;
-	}
-	inviteUser();*/
+	/*
+	 * if (!validateUserInviteDetails()) { return false; } inviteUser();
+	 */
 });
 
 /*
@@ -4431,7 +4303,7 @@ function assignUserToBranch(userId, branchId) {
 			hideOverlay();
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -4466,19 +4338,17 @@ function unassignUserFromBranch(userId, branchId) {
 			hideOverlay();
 			if (success) {
 				$('#branch-to-unassign-' + branchId).remove();
-				
+
 				// check if there are any assigned branches left
 				if ($('#um-assigned-branch-container > div').length <= 0) {
-					$('#um-assignto').parent().parent().find(
-							'.um-item-row-icon').removeClass('icn-tick')
-							.addClass('icn-save');
+					$('#um-assignto').parent().parent().find('.um-item-row-icon').removeClass('icn-tick').addClass('icn-save');
 				}
 			} else {
 				createPopupInfo("Error!", "Branch deletion unsuccessful");
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -4516,8 +4386,7 @@ function inviteUser() {
 			} else {
 				var userId = $('#mh-existing-userId').val();
 				if (userId == undefined || userId == "") {
-					createPopupInfo("Limit Exceeded",
-							"Maximum limit of users exceeded.");
+					createPopupInfo("Limit Exceeded", "Maximum limit of users exceeded.");
 				} else {
 					paintUserDetailsForm(userId);
 					return;
@@ -4528,7 +4397,7 @@ function inviteUser() {
 			hideOverlay();
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -4551,14 +4420,13 @@ $(document).on('click', '#overlay-cancel', function() {
 	$('#overlay-main').hide();
 });
 
-
 function confirmDeleteUser(userId, adminId) {
 	if (userId == adminId) {
 		$('#overlay-continue').hide();
 		createPopupInfo("Access Denied", "Can not delete the admin account !!!");
 		return;
 	}
-	
+
 	$('#overlay-main').show();
 	$('#overlay-continue').show();
 	$('#overlay-continue').html("Delete");
@@ -4584,28 +4452,27 @@ function confirmDeleteUserProfile(profileId) {
 function deleteUser(userId) {
 	$('#overlay-continue').removeAttr("onclick");
 	$('#overlay-main').hide();
-	
+
 	var payload = {
 		"userIdToRemove" : userId
 	};
 	showOverlay();
-	callAjaxPostWithPayloadData("./removeexistinguser.do",  function(data) {
-		var map =  $.parseJSON(data);
+	callAjaxPostWithPayloadData("./removeexistinguser.do", function(data) {
+		var map = $.parseJSON(data);
 		if (map.status == "success") {
 			showInfo(map.message);
 		} else {
 			showError(map.message);
 		}
-		
+
 		// hide the row of the user deleted
 		$('#user-row-' + userId).next('.v-tbl-row').remove();
 		$('#user-row-' + userId).next('.u-tbl-row').remove();
 		$('#user-row-' + userId).remove();
-	}, payload,true);
+	}, payload, true);
 }
 
-
-//Function to delete user profile
+// Function to delete user profile
 function deleteUserProfile(profileId) {
 	showOverlay();
 	var payload = {
@@ -4613,19 +4480,19 @@ function deleteUserProfile(profileId) {
 	};
 	callAjaxPostWithPayloadData("./deleteuserprofile.do", function(data) {
 		if (data == "success") {
-			
-			//close the popup
+
+			// close the popup
 			$('#overlay-cancel').click();
 			// remove the tab from UI
 			$('#v-edt-tbl-row-' + profileId).remove();
-		}else{
-			//close the popup
+		} else {
+			// close the popup
 			$('#overlay-cancel').click();
 			$('#overlay-toast').html(data);
 			showToast();
 		}
 	}, payload, true);
-} 
+}
 /*
  * Paint the user details form in the user management page
  */
@@ -4647,7 +4514,7 @@ function paintUserDetailsForm(userId) {
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -4731,7 +4598,7 @@ function activateOrDeactivateUser(isActive, userId) {
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -4828,7 +4695,7 @@ function bindUMEvents() {
 	$('.v-tbn-icn-dropdown').off('click');
 	$('.v-tbn-icn-dropdown').on('click', function(e) {
 		e.stopPropagation();
-		if(!$(this).next('.v-um-tbl-icn-wraper').is(':visible')) {
+		if (!$(this).next('.v-um-tbl-icn-wraper').is(':visible')) {
 			$('.v-um-tbl-icn-wraper').hide();
 			$(this).next('.v-um-tbl-icn-wraper').show();
 		} else {
@@ -4844,9 +4711,9 @@ function bindUMEvents() {
 		$('.v-um-tbl-icn-wraper').hide();
 		var $parentRowElemt = $(this).closest('.user-row');
 		var firstName = $parentRowElemt.find('.fetch-name').attr('data-first-name');
-	    var lastName = $parentRowElemt.find('.fetch-name').attr('data-last-name');
-	    var emailId = $parentRowElemt.find('.fetch-email').text();
-	    reinviteUser(firstName, lastName, emailId,'.v-icn-fmail');
+		var lastName = $parentRowElemt.find('.fetch-name').attr('data-last-name');
+		var emailId = $parentRowElemt.find('.fetch-email').text();
+		reinviteUser(firstName, lastName, emailId, '.v-icn-fmail');
 	});
 }
 
@@ -4882,7 +4749,7 @@ function searchBranchesForUser(branchPattern) {
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -4894,7 +4761,7 @@ function searchBranchesForUserCallBack(jsonData) {
 	var branchListContainer = $('<div>').attr({
 		"class" : "um-branch-list"
 	});
-	
+
 	$('#um-assignto').parent().find('.um-branch-list').remove();
 	var searchResult = jsonData;
 	if (searchResult != null) {
@@ -4917,90 +4784,90 @@ function searchBranchesForUserCallBack(jsonData) {
  * Function fetch assignments for user
  */
 function getUserAssignments(userId, element) {
-	var url = "./finduserassignments.do?userId=" + userId; 
-	callAjaxGET(url, function(data){
-		
-		if(element == undefined){
-			$('#user-details-and-assignments-' + userId).html(data);			
+	var url = "./finduserassignments.do?userId=" + userId;
+	callAjaxGET(url, function(data) {
+
+		if (element == undefined) {
+			$('#user-details-and-assignments-' + userId).html(data);
 		} else {
 			element.html(data);
 		}
-		
+
 		var assignToOption = $("#assign-to-txt").attr('data-assignto');
 		showSelectorsByAssignToOption(assignToOption);
-		
+
 		/**
 		 * bind the click and keyup events
-		 */		
+		 */
 		bindAssignToSelectorClick();
 		bindOfficeSelectorEvents();
 		bindRegionSelectorEvents();
 		bindAdminCheckBoxClick();
-		
-		// de-activate user profile
-        $('.tbl-switch-on').click(function(){
-            var profileId = $(this).parent().data('profile-id');
-            updateUserProfile(profileId, 0);
-        });
 
-        // activate user profile
-        $('.tbl-switch-off').click(function(){
-            var profileId = $(this).parent().data('profile-id');
-            updateUserProfile(profileId, 1);
-        });
-		
-		/*setTimeout(function() {
-			$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
-		}, 1000);*/
+		// de-activate user profile
+		$('.tbl-switch-on').click(function() {
+			var profileId = $(this).parent().data('profile-id');
+			updateUserProfile(profileId, 0);
+		});
+
+		// activate user profile
+		$('.tbl-switch-off').click(function() {
+			var profileId = $(this).parent().data('profile-id');
+			updateUserProfile(profileId, 1);
+		});
+
+		/*
+		 * setTimeout(function() { $('#profile-tbl-wrapper-' + userId).perfectScrollbar(); }, 1000);
+		 */
 
 		$(document).on('click', 'body', function() {
-            $('.dd-droplist').slideUp(200);
-        });
-	} , true);
+			$('.dd-droplist').slideUp(200);
+		});
+	}, true);
 }
 
-$(document).on('click','#user-edit-btn',function(e){
-	
+$(document).on('click', '#user-edit-btn', function(e) {
+
 	$('#user-edit-btn-row').hide();
 	$('form input[data-editable="true"]').removeAttr("readonly");
 	$('#btn-save-user-assignment').show();
-	
+
 	$("#user-edit-save").off('click');
-	$("#user-edit-save").on('click',function(e){
-		if(validateUserDetailsUserManagement()){
+	$("#user-edit-save").on('click', function(e) {
+		if (validateUserDetailsUserManagement()) {
 			saveUserDetailsByAdmin();
-			
+
 			// refreshing right section after assignment
 			setTimeout(function() {
 				getUserAssignments($('#selected-userid-hidden').val());
 			}, 2000);
 		}
 	});
-	$('#user-edit-cancel').on('click',function(){
+	$('#user-edit-cancel').on('click', function() {
 		setTimeout(function() {
 			getUserAssignments($('#selected-userid-hidden').val());
 		}, 1000);
 	});
 });
 
-$(document).on('click','#user-assign-btn',function(e){
-	
+$(document).on('click', '#user-assign-btn', function(e) {
+
 	$('#user-edit-btn-row').hide();
 	$('#user-assignment-cont').show();
 	$('#btn-save-user-assignment').show();
-	
+
 	$("#user-edit-save").off('click');
-	$("#user-edit-save").on('click',function(e){
-		if(validateIndividualForm()){
-			saveUserAssignment("user-assignment-form",'#user-edit-save');
-			
+	$("#user-edit-save").on('click', function(e) {
+		if (validateIndividualForm()) {
+			saveUserAssignment("user-assignment-form", '#user-edit-save');
+
 			// refreshing right section after assignment
 			setTimeout(function() {
 				getUserAssignments($('#selected-userid-hidden').val());
 			}, 2000);
 		}
 	});
-	$('#user-edit-cancel').on('click',function(){
+	$('#user-edit-cancel').on('click', function() {
 		setTimeout(function() {
 			getUserAssignments($('#selected-userid-hidden').val());
 		}, 1000);
@@ -5008,15 +4875,15 @@ $(document).on('click','#user-assign-btn',function(e){
 });
 
 function validateUserDetailsUserManagement() {
-	
+
 	var isUserDetailsFormValid = true;
-	
-	
+
 	return isUserDetailsFormValid;
 }
 
 /**
  * Method to update user details edited by admin
+ * 
  * @param formId
  */
 function saveUserDetailsByAdmin() {
@@ -5026,46 +4893,48 @@ function saveUserDetailsByAdmin() {
 	var lastName = $('#um-user-last-name').val();
 	var emailID = $('#selected-user-txt').val();
 	var name = firstName;
-	if(lastName && lastName != ""){
+	if (lastName && lastName != "") {
 		name += " " + lastName;
 	}
 	var payload = {
-			"userId" : userId,
-			"name" : name,
-			"firstName" : firstName,
-			"lastName" : lastName,
-			"emailId" : emailID
+		"userId" : userId,
+		"name" : name,
+		"firstName" : firstName,
+		"lastName" : lastName,
+		"emailId" : emailID
 	};
-	
+
 	showOverlay();
 	callAjaxPostWithPayloadData(url, function(data) {
 		hideOverlay();
 
-		//view hierarchy page
-		$('.v-tbl-row[data-userid="'+userId+'"]').find('.v-tbl-name').text(name);
-		$('.v-tbl-row[data-userid="'+userId+'"]').find('.v-tbl-add').text(emailID);
-		
-		//user management page
-		$('td[data-user-id="'+userId+'"]').text(name).attr("data-first-name",firstName).attr("data-last-name",lastName);
-		$('td[data-user-id="'+userId+'"]').parent().find('.v-tbl-email').text(emailID);
-		
+		// view hierarchy page
+		$('.v-tbl-row[data-userid="' + userId + '"]').find('.v-tbl-name').text(name);
+		$('.v-tbl-row[data-userid="' + userId + '"]').find('.v-tbl-add').text(emailID);
+
+		// user management page
+		$('td[data-user-id="' + userId + '"]').text(name).attr("data-first-name", firstName).attr("data-last-name", lastName);
+		$('td[data-user-id="' + userId + '"]').parent().find('.v-tbl-email').text(emailID);
+
 		$('#overlay-toast').html(data);
 		showToast();
-	}, payload, true,'#user-edit-save');
+	}, payload, true, '#user-edit-save');
 }
 
 /**
  * Method to save the assignment of user with branch/region or company
+ * 
  * @param formId
  */
-function saveUserAssignment(formId,disableEle) {
+function saveUserAssignment(formId, disableEle) {
 	var url = "./addindividual.do";
 	showOverlay();
-	callAjaxFormSubmit(url, saveUserAssignmentCallBack, formId,disableEle);
+	callAjaxFormSubmit(url, saveUserAssignmentCallBack, formId, disableEle);
 }
 
 /**
  * callback for saveUserAssignment
+ * 
  * @param data
  */
 function saveUserAssignmentCallBack(data) {
@@ -5079,44 +4948,44 @@ $(document).on('click', '.v-icn-rem-userprofile', function(e) {
 	if ($(this).hasClass('v-tbl-icn-disabled')) {
 		return;
 	}
-	
+
 	var profileId = $(this).parent().data('profile-id');
-    confirmDeleteUserProfile(profileId);
+	confirmDeleteUserProfile(profileId);
 });
 
-//remove user
+// remove user
 $(document).on('click', '.v-icn-rem-user', function() {
-		if ($(this).hasClass('v-tbl-icn-disabled')) {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
 		return;
 	}
 
 	var userId = $(this).closest('.user-row').find('.fetch-name').attr('data-user-id');
-    var adminId = '${user.userId}';
-    confirmDeleteUser(userId, adminId);
+	var adminId = '${user.userId}';
+	confirmDeleteUser(userId, adminId);
 });
 
 /**
  * Method to send invite link
  */
-function reinviteUser(firstName, lastName, emailId,disableEle) {
+function reinviteUser(firstName, lastName, emailId, disableEle) {
 	var payload = {
 		"firstName" : firstName,
 		"lastName" : lastName,
 		"emailId" : emailId
 	};
-	var url="./reinviteuser.do";
+	var url = "./reinviteuser.do";
 	showOverlay();
-	callAjaxGetWithPayloadData(url, reinviteUserCallBack, payload, true,disableEle);
+	callAjaxGetWithPayloadData(url, reinviteUserCallBack, payload, true, disableEle);
 }
 
-function reinviteUserCallBack(data){
-	var map =  $.parseJSON(data);
+function reinviteUserCallBack(data) {
+	var map = $.parseJSON(data);
 	if (map.status == "success") {
 		showInfo(map.message);
 	} else {
 		showError(map.message);
 	}
- }
+}
 
 function updateUserProfile(profileId, profileStatus) {
 	showOverlay();
@@ -5126,33 +4995,32 @@ function updateUserProfile(profileId, profileStatus) {
 	};
 	callAjaxPostWithPayloadData("./updateuserprofile.do", function(data) {
 		hideOverlay();
-		
-		var map =  $.parseJSON(data);
+
+		var map = $.parseJSON(data);
 		if (map.status == "success") {
 			showInfo(map.message);
 			if (profileStatus == 1) {
 				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-off');
 				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-on');
 				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'Active');
-				
+
 				// de-activate user profile
 				$('.tbl-switch-on').unbind('click');
-		        $('.tbl-switch-on').click(function(){
-		            var profileId = $(this).parent().data('profile-id');
-		            updateUserProfile(profileId, 0);
-		        });
-			}
-			else if (profileStatus == 0) {
+				$('.tbl-switch-on').click(function() {
+					var profileId = $(this).parent().data('profile-id');
+					updateUserProfile(profileId, 0);
+				});
+			} else if (profileStatus == 0) {
 				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-on');
 				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-off');
 				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'InActive');
 
 				// activate user profile
 				$('.tbl-switch-off').unbind('click');
-		        $('.tbl-switch-off').click(function(){
-		            var profileId = $(this).parent().data('profile-id');
-		            updateUserProfile(profileId, 1);
-		        });
+				$('.tbl-switch-off').click(function() {
+					var profileId = $(this).parent().data('profile-id');
+					updateUserProfile(profileId, 1);
+				});
 			}
 		} else {
 			showError(map.message);
@@ -5160,54 +5028,54 @@ function updateUserProfile(profileId, profileStatus) {
 	}, payload, false);
 }
 
-function bindEditUserClick(){
-	$('.edit-user').click(function(e){
+function bindEditUserClick() {
+	$('.edit-user').click(function(e) {
 		e.stopPropagation();
 		$('.v-um-tbl-icn-wraper').hide();
 		if ($(this).hasClass('v-tbl-icn-disabled')) {
 			return;
 		}
-		
-		// de-activate user profile
-        $('.tbl-switch-on').click(function(){
-            var profileId = $(this).parent().data('profile-id');
-            updateUserProfile(profileId, 0);
-        });
 
-        // activate user profile
-        $('.tbl-switch-off').click(function(){
-            var profileId = $(this).parent().data('profile-id');
-            updateUserProfile(profileId, 1);
-        });
+		// de-activate user profile
+		$('.tbl-switch-on').click(function() {
+			var profileId = $(this).parent().data('profile-id');
+			updateUserProfile(profileId, 0);
+		});
+
+		// activate user profile
+		$('.tbl-switch-off').click(function() {
+			var profileId = $(this).parent().data('profile-id');
+			updateUserProfile(profileId, 1);
+		});
 
 		if ($(this).closest('.user-row').hasClass('u-tbl-row-sel')) {
-	        $(this).closest('.user-row').removeClass('u-tbl-row-sel');
-	        $(this).closest('.user-row').next('.user-assignment-edit-row').slideUp(200);
-	    } else {
-	        // make an ajax call and fetch the details of the user
-	        var userId = $(this).closest('.user-row').find('.fetch-name').attr('data-user-id');
+			$(this).closest('.user-row').removeClass('u-tbl-row-sel');
+			$(this).closest('.user-row').next('.user-assignment-edit-row').slideUp(200);
+		} else {
+			// make an ajax call and fetch the details of the user
+			var userId = $(this).closest('.user-row').find('.fetch-name').attr('data-user-id');
 			$(".user-assignment-edit-div").html("");
 			$(".user-row").removeClass('u-tbl-row-sel');
 			$(".user-assignment-edit-row").slideUp();
 
 			getUserAssignments(userId);
 
-	        $(this).closest('.user-row').next('.user-assignment-edit-row').slideDown(200);
-	        $(this).closest('.user-row').addClass('u-tbl-row-sel');
-	        
+			$(this).closest('.user-row').next('.user-assignment-edit-row').slideDown(200);
+			$(this).closest('.user-row').addClass('u-tbl-row-sel');
+
 			setTimeout(function() {
 				$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
 			}, 1000);
-	    }
+		}
 	});
 }
 
-$(document).on('click', '#page-previous.paginate-button', function(){
+$(document).on('click', '#page-previous.paginate-button', function() {
 	var newIndex = userStartIndex - userBatchSize;
 	var searchKey = $('#search-users-key').val();
 	if (newIndex < $('#users-count').val()) {
-		if(searchKey == undefined || searchKey == "") {
-			paintUserListInUserManagement(newIndex);			
+		if (searchKey == undefined || searchKey == "") {
+			paintUserListInUserManagement(newIndex);
 		} else {
 			userStartIndex = newIndex;
 			searchUsersByNameEmailLoginId(searchKey);
@@ -5215,12 +5083,12 @@ $(document).on('click', '#page-previous.paginate-button', function(){
 	}
 });
 
-$(document).on('click', '#page-next.paginate-button', function(){
+$(document).on('click', '#page-next.paginate-button', function() {
 	var newIndex = userStartIndex + userBatchSize;
 	var searchKey = $('#search-users-key').val();
 	if (newIndex < $('#users-count').val()) {
-		if(searchKey == undefined || searchKey == "") {
-			paintUserListInUserManagement(newIndex);			
+		if (searchKey == undefined || searchKey == "") {
+			paintUserListInUserManagement(newIndex);
 		} else {
 			userStartIndex = newIndex;
 			searchUsersByNameEmailLoginId(searchKey);
@@ -5231,39 +5099,38 @@ function updatePaginateButtons() {
 	var numFound = $('#u-tbl-header').attr('data-num-found');
 	if (numFound > userBatchSize) {
 		$('#paginate-buttons').show();
-		
+
 		// next button
 		if (userStartIndex <= 0) {
 			$('#page-previous').removeClass('paginate-button');
 		} else {
 			$('#page-previous').addClass('paginate-button');
 		}
-		
+
 		// previous button
 		if (userStartIndex + userBatchSize >= $('#users-count').val()) {
 			$('#page-next').removeClass('paginate-button');
 		} else {
 			$('#page-next').addClass('paginate-button');
 		}
-	}
-	else {
+	} else {
 		$('#paginate-buttons').hide();
 	}
 }
 
-//Edit profile dropdown
-//Profile View as
-$('body').on('click','#profile-sel',function(e) {
+// Edit profile dropdown
+// Profile View as
+$('body').on('click', '#profile-sel', function(e) {
 	e.stopPropagation();
 	$('#pe-dd-wrapper-profiles').slideToggle(200);
 });
-$('body').on('click','.pe-dd-item',function(e) {
+$('body').on('click', '.pe-dd-item', function(e) {
 	$('#profile-sel').html($(this).html());
 	$('#pe-dd-wrapper-profiles').slideToggle(200);
 
 	var entityId = $(this).attr('data-column-value');
 	var entityType = $(this).attr('data-column-type');
-	
+
 	showMainContent("./showprofilepage.do?entityId=" + entityId + "&entityType=" + entityType);
 });
 
@@ -5273,20 +5140,20 @@ $('body').click(function() {
 	}
 });
 
-//Settings page dropdown
-//Settings View as
-$('body').on('click','#setting-sel',function(e){
+// Settings page dropdown
+// Settings View as
+$('body').on('click', '#setting-sel', function(e) {
 	e.stopPropagation();
 	$('#se-dd-wrapper-profiles').slideToggle(200);
 });
 
-$('body').on('click','.se-dd-item',function(e) {
+$('body').on('click', '.se-dd-item', function(e) {
 	$('#setting-sel').html($(this).html());
 	$('#se-dd-wrapper-profiles').slideToggle(200);
-	
+
 	var entityId = $(this).attr('data-column-value');
 	var entityType = $(this).attr('data-column-type');
-	
+
 	showMainContent("./showcompanysettings.do?entityId=" + entityId + "&entityType=" + entityType);
 });
 
@@ -5296,9 +5163,9 @@ $('body').click(function() {
 	}
 });
 
-//Linked In Import
-function authenticate(event,socialNetwork) {
-	openAuthPage(event,socialNetwork);
+// Linked In Import
+function authenticate(event, socialNetwork) {
+	openAuthPage(event, socialNetwork);
 	payload = {
 		'socialNetwork' : socialNetwork
 	};
@@ -5311,7 +5178,7 @@ function authenticateZillow(event) {
 // update yelp profile url
 function showYelpInput() {
 	$('#yelp-profile-url-display').addClass('hide');
-	
+
 	$('#yelp-profile-url').removeClass('hide');
 	$('#yelp-profile-url').focus();
 }
@@ -5325,7 +5192,7 @@ $(document).on('blur', '#yelp-profile-url', function() {
 		$('#yelp-profile-url').addClass('hide');
 		return;
 	}
-	
+
 	var payload = {
 		"yelplink" : yelpLink
 	};
@@ -5333,13 +5200,13 @@ $(document).on('blur', '#yelp-profile-url', function() {
 		callAjaxPostWithPayloadData("./updateyelplink.do", function(data) {
 			$('#yelp-profile-url-display').html(yelpLink);
 			$('#yelp-profile-url-display').removeClass('hide');
-	        
+
 			$('#yelp-profile-url').addClass('hide');
-			
+
 			$('#message-header').html(data);
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
-		}, payload,true);
+		}, payload, true);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -5351,40 +5218,37 @@ function showLinkedInProfileUrl(data) {
 	if (data == undefined || data == null) {
 		return;
 	}
-	
+
 	$('#wl-import-btn').remove();
 	$('#wl-import-btn-msg').removeClass('hide');
 	$('#wc-connect-link').html('LinkedIn Profile <u><a href=' + data + ' target="_blank">' + data + '</a></u>');
 }
 
 function loadSocialMediaUrlInSettingsPage() {
-	callAjaxGET('/getsocialmediatokenonsettingspage.do', function(data){
+	callAjaxGET('/getsocialmediatokenonsettingspage.do', function(data) {
 		$('#social-media-token-cont').html(data);
 	}, false);
 }
 
 function loadSocialMediaUrlInPopup() {
-	callAjaxGET('/fetchsociallinksinpopup.do', function(data){
+	callAjaxGET('/fetchsociallinksinpopup.do', function(data) {
 		$('#wc-step3-body-cont').html(data);
 	}, false);
 }
 
-function showProfileLink(source, profileUrl){
-	if(source=='facebook'){
+function showProfileLink(source, profileUrl) {
+	if (source == 'facebook') {
 		$('#fb-profile-url').html(profileUrl);
-	}
-	else if(source=='twitter'){
+	} else if (source == 'twitter') {
 		$('#twitter-profile-url').html(profileUrl);
-	}
-	else if(source=='linkedin'){
+	} else if (source == 'linkedin') {
 		$('#linkedin-profile-url').html(profileUrl);
-	}
-	else if(source=='google'){
+	} else if (source == 'google') {
 		$('#ggl-profile-url').html(profileUrl);
 	}
 }
 
-$(document).on('click', '.ctnt-review-btn', function(){
+$(document).on('click', '.ctnt-review-btn', function() {
 	initSurveyReview($(this).attr('user'));
 });
 
@@ -5418,12 +5282,12 @@ function initSurveyWithUrl(q) {
 				lastName = data.responseJSON.customerLastName;
 				surveyId = data.responseJSON.surveyId;
 				paintSurveyPage(data);
-                var message = $("#pst-srvy-div .bd-check-txt").html();
-                $("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
+				var message = $("#pst-srvy-div .bd-check-txt").html();
+				$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -5432,11 +5296,11 @@ function initSurveyWithUrl(q) {
 	});
 }
 
-function showPageNotFoundError(){
+function showPageNotFoundError() {
 	window.location = getLocationOrigin() + surveyUrl + "notfound";
 }
 
-function loadAgentPic(agentId){
+function loadAgentPic(agentId) {
 	var imageUrl;
 	var success = false;
 	var payload = {
@@ -5453,16 +5317,16 @@ function loadAgentPic(agentId){
 				success = true;
 		},
 		complete : function(data) {
-			
+
 			if (success) {
 				imageUrl = data.responseText;
-				if(imageUrl.trim()!='' && imageUrl!=null) {
-					$("#agnt-img").html("<img class='hr-ind-img' src='"+imageUrl+"'/>");
+				if (imageUrl.trim() != '' && imageUrl != null) {
+					$("#agnt-img").html("<img class='hr-ind-img' src='" + imageUrl + "'/>");
 				}
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -5492,15 +5356,15 @@ function paintSurveyPage(jsonData) {
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
 	fb_app_id = jsonData.responseJSON.fbAppId;
 	google_plus_app_id = jsonData.responseJSON.googlePlusAppId;
-	
-	//If social token availiable populate the links
-//	if (googleEnabled) {
-//		var googleElement = document.getElementById('ggl-btn');
-//		//shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
-//		shareOnGooglePlus(agentId, getLocationOrigin() + "/rest/survey/", googleElement);
-//	} else {
-//		$('#ggl-btn').remove();
-//	}
+
+	// If social token availiable populate the links
+	// if (googleEnabled) {
+	// var googleElement = document.getElementById('ggl-btn');
+	// //shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
+	// shareOnGooglePlus(agentId, getLocationOrigin() + "/rest/survey/", googleElement);
+	// } else {
+	// $('#ggl-btn').remove();
+	// }
 	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink);
 
 	if (yelpEnabled) {
@@ -5508,36 +5372,34 @@ function paintSurveyPage(jsonData) {
 	} else {
 		$('#ylp-btn').remove();
 	}
-	
+
 	if (zillowEnabled) {
 		$('#zillow-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.zillowLink));
 	} else {
 		$('#zillow-btn').remove();
 	}
-	
+
 	if (lendingtreeEnabled) {
 		$('#lt-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.lendingtreeLink));
 	} else {
 		$('#lt-btn').remove();
 	}
-	
+
 	if (realtorEnabled) {
-		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink)+"#reviews-section");
+		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink) + "#reviews-section");
 	} else {
 		$('#realtor-btn').remove();
 	}
-	
+
 	companyLogo = jsonData.responseJSON.companyLogo;
-	
+
 	if (stage != undefined)
 		qno = stage;
 	paintSurveyPageFromJson();
 }
 
 /*
- * It gets the questions from array of questions and finds out the current
- * question based upon current index for question number. It also checks over
- * various conditions of the question and renders the page accordingly.
+ * It gets the questions from array of questions and finds out the current question based upon current index for question number. It also checks over various conditions of the question and renders the page accordingly.
  */
 function paintSurveyPageFromJson() {
 	$("div[data-ques-type]").hide();
@@ -5545,19 +5407,15 @@ function paintSurveyPageFromJson() {
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#content-head').html('Survey');
-		$('#content').html(
-				"OOPS! It looks like you have already taken a survey for " + agentName + "."
-				+"<br/><br/>"
-				+"Are you trying to amend a prior response? If so click the link below and we will email you the access required<br/><br/>")
-				.append("<div>Link to resend original Survey Responses so they can be amended</div>");
-		
+		$('#content').html("OOPS! It looks like you have already taken a survey for " + agentName + "." + "<br/><br/>" + "Are you trying to amend a prior response? If so click the link below and we will email you the access required<br/><br/>").append("<div>Link to resend original Survey Responses so they can be amended</div>");
+
 		var linkToResendSurvey = $('<div>').attr({
 			"id" : "changeSurvey",
 			"class" : "change-survey-btn"
 		}).html("Retake survey");
-		
+
 		$('#content').append(linkToResendSurvey);
-		
+
 		$(document).on('click', '#changeSurvey', function() {
 			retakeSurveyRequest();
 		});
@@ -5565,7 +5423,7 @@ function paintSurveyPageFromJson() {
 	}
 	questionDetails = questions[qno];
 	var question = questionDetails.question;
-	
+
 	question = question.replace(/\[name\]/gi, agentName);
 	var questionType = questionDetails.questionType;
 	var isRatingQuestion = questionDetails.isRatingQuestion;
@@ -5579,7 +5437,7 @@ function paintSurveyPageFromJson() {
 		$("div[data-ques-type='stars']").show();
 		$("#ques-text").html(question);
 		$("#sq-stars").show();
-		if(questionDetails.customerResponse!=undefined && !isNaN(parseInt(questionDetails.customerResponse))){
+		if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
 			increaseOpacityOfStars(parseInt(questionDetails.customerResponse));
 			$("#next-star").removeClass("btn-com-disabled");
 		}
@@ -5587,7 +5445,7 @@ function paintSurveyPageFromJson() {
 		$("div[data-ques-type='smiley']").show();
 		$("#ques-text-smiley").html(question);
 		$("#sq-smiles").show();
-		if(questionDetails.customerResponse!=undefined && !isNaN(parseInt(questionDetails.customerResponse))){
+		if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
 			increaseOpacityOfStars(parseInt(questionDetails.customerResponse));
 			$("#next-smile").removeClass("btn-com-disabled");
 		}
@@ -5611,18 +5469,17 @@ function paintSurveyPageFromJson() {
 		$("div[data-ques-type='smiley-text-final']").show();
 		$("#ques-text-textarea").html(question);
 		$("#text-area").show();
-		
+
 		var val = questionDetails.customerResponse;
 		if (val != undefined) {
 			$("#text-area").val(val);
-		}
-		else {
+		} else {
 			$("#text-area").val('');
 		}
-		
+
 		$('#text-box-disclaimer').show();
 		$("#smiles-final").hide();
-		if(questionDetails.customerResponse!=undefined)
+		if (questionDetails.customerResponse != undefined)
 			$("#text-area").html(questionDetails.customerResponse);
 	} else if (questionType == "sb-master") {
 		$("div[data-ques-type='smiley-text-final']").show();
@@ -5640,16 +5497,15 @@ function paintSurveyPageFromJson() {
 		$("#skip-ques-mcq").hide();
 	}
 	$(".sq-main-txt").html("Survey for " + agentName);
-	
+
 	if (companyLogo != undefined && companyLogo != "") {
 		var companylogoHtml = '<div class="float-left user-info-seperator"></div>';
-		companylogoHtml += '<div class="float-left user-info-logo" style="background: url('
-			+ companyLogo + ') no-repeat center; background-size: contain"></div>';
+		companylogoHtml += '<div class="float-left user-info-logo" style="background: url(' + companyLogo + ') no-repeat center; background-size: contain"></div>';
 		$('#header-user-info').html(companylogoHtml);
 	}
 }
 
-function togglePrevAndNext(){
+function togglePrevAndNext() {
 	if (qno == 0) {
 		$("#prev-star").addClass("btn-com-disabled");
 		$("#prev-smile").addClass("btn-com-disabled");
@@ -5665,23 +5521,22 @@ function togglePrevAndNext(){
 	}
 }
 
-function retakeSurveyRequest(){
+function retakeSurveyRequest() {
 	var payload = {
-			"customerEmail" : customerEmail,
-			"agentId" : agentId,
-			"firstName" : firstName,
-			"lastName" : lastName,
-			"agentName" : agentName,
-			"surveyId" : surveyId
+		"customerEmail" : customerEmail,
+		"agentId" : agentId,
+		"firstName" : firstName,
+		"lastName" : lastName,
+		"agentName" : agentName,
+		"surveyId" : surveyId
 	};
 	callAjaxGetWithPayloadData(getLocationOrigin() + surveyUrl + 'restartsurvey', '', payload, true);
-	$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for '+agentName);
+	$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for ' + agentName);
 	showToast();
 }
 
 /*
- * This method is used to store the answer provided by the customer for a
- * specific question.
+ * This method is used to store the answer provided by the customer for a specific question.
  */
 function storeCustomerAnswer(customerResponse) {
 	var success = false;
@@ -5705,7 +5560,7 @@ function storeCustomerAnswer(customerResponse) {
 		},
 		complete : function(data) {
 			if (success) {
-				if(swearWords.length <= 0) {
+				if (swearWords.length <= 0) {
 					var parsed = data.responseJSON;
 					for ( var x in parsed) {
 						swearWords.push(parsed[x]);
@@ -5714,7 +5569,7 @@ function storeCustomerAnswer(customerResponse) {
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -5722,9 +5577,9 @@ function storeCustomerAnswer(customerResponse) {
 	});
 }
 
-function updateCustomerResponse(feedback, agreedToShare , isAbusive, isIsoEncoded) {
+function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded) {
 	var success = false;
-	
+
 	var payload = {
 		"mood" : mood,
 		"feedback" : feedback,
@@ -5753,7 +5608,7 @@ function updateCustomerResponse(feedback, agreedToShare , isAbusive, isIsoEncode
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -5777,21 +5632,20 @@ function showFeedbackPage(mood) {
 		$("#ques-text-textarea").html(question);
 		var currResponse = 0;
 		var counter = 0;
-		for(var i=0;i<questions.length;i++){
+		for (var i = 0; i < questions.length; i++) {
 			var currQuestion = questions[i];
-			if((currQuestion.questionType=='sb-range-smiles')||(currQuestion.questionType=='sb-range-scale')
-					||(currQuestion.questionType=='sb-range-star')){
-				if(!isNaN(parseInt(currQuestion.customerResponse))){
+			if ((currQuestion.questionType == 'sb-range-smiles') || (currQuestion.questionType == 'sb-range-scale') || (currQuestion.questionType == 'sb-range-star')) {
+				if (!isNaN(parseInt(currQuestion.customerResponse))) {
 					counter++;
 					currResponse += parseInt(currQuestion.customerResponse);
 				}
 			}
 		}
-		rating = currResponse/(counter);
+		rating = currResponse / (counter);
 		rating = parseFloat(rating).toFixed(3);
-		if((rating >= autoPostScore)){
+		if ((rating >= autoPostScore)) {
 			$("#pst-srvy-div").show();
-			if( (Boolean(autoPost) == false)){
+			if ((Boolean(autoPost) == false)) {
 				$('#shr-pst-cb').val('false');
 				$('#shr-post-chk-box').addClass('bd-check-img-checked');
 			} else {
@@ -5802,13 +5656,13 @@ function showFeedbackPage(mood) {
 		break;
 	case "OK":
 		question = neutralText;
-		$('#shr-pst-cb').val('false');//Update the agree to share checkbox false if mood is ok
+		$('#shr-pst-cb').val('false');// Update the agree to share checkbox false if mood is ok
 		$('#shr-post-chk-box').addClass('bd-check-img-checked');
 		$("#ques-text-textarea").html(question);
 		break;
 	case "Unpleasant":
 		question = sadText;
-		$('#shr-pst-cb').val('false');//Update the agree to share checkbox false if mood is unpleasant
+		$('#shr-pst-cb').val('false');// Update the agree to share checkbox false if mood is unpleasant
 		$('#shr-post-chk-box').addClass('bd-check-img-checked');
 		$("#ques-text-textarea").html(question);
 		break;
@@ -5823,33 +5677,15 @@ function paintMcqAnswer(answer) {
 	var divToPopulate;
 	customerResponse = questionDetails.customerResponse;
 	if (answer == customerResponse) {
-		divToPopulate = "<div data-answer='" + answer
-				+ "' class='sq-mcq-item clearfix'>"
-				+ "<div class='sq-mcq-chk-wrapper float-left'>"
-				+ "<div class='float-left sq-mcq-chk st-mcq-chk-on'>"
-				+ "</div>"
-				+ "<div class='float-left sq-mcq-chk st-mcq-chk-off hide'>"
-				+ "</div>" + "</div>"
-				+ "<div class='sq-mcq-ans-wrapper float-left'>" + answer
-				+ "</div></div>";
+		divToPopulate = "<div data-answer='" + answer + "' class='sq-mcq-item clearfix'>" + "<div class='sq-mcq-chk-wrapper float-left'>" + "<div class='float-left sq-mcq-chk st-mcq-chk-on'>" + "</div>" + "<div class='float-left sq-mcq-chk st-mcq-chk-off hide'>" + "</div>" + "</div>" + "<div class='sq-mcq-ans-wrapper float-left'>" + answer + "</div></div>";
 	} else {
-		divToPopulate = "<div data-answer='" + answer
-				+ "' class='sq-mcq-item clearfix'>"
-				+ "<div class='sq-mcq-chk-wrapper float-left'>"
-				+ "<div class='float-left sq-mcq-chk st-mcq-chk-on hide'>"
-				+ "</div>"
-				+ "<div class='float-left sq-mcq-chk st-mcq-chk-off'>"
-				+ "</div>" + "</div>"
-				+ "<div class='sq-mcq-ans-wrapper float-left'>" + answer
-				+ "</div></div>";
+		divToPopulate = "<div data-answer='" + answer + "' class='sq-mcq-item clearfix'>" + "<div class='sq-mcq-chk-wrapper float-left'>" + "<div class='float-left sq-mcq-chk st-mcq-chk-on hide'>" + "</div>" + "<div class='float-left sq-mcq-chk st-mcq-chk-off'>" + "</div>" + "</div>" + "<div class='sq-mcq-ans-wrapper float-left'>" + answer + "</div></div>";
 	}
 	return divToPopulate;
 }
 
 function paintListOptions(agentName) {
-	var divToPopulate = "<option value='select'>--Select an Option--"
-			+ "<option value='transacted'>Transacted with " + agentName
-			+ "<option value='enquired'>Enquired with " + agentName;
+	var divToPopulate = "<option value='select'>--Select an Option--" + "<option value='transacted'>Transacted with " + agentName + "<option value='enquired'>Enquired with " + agentName;
 	return divToPopulate;
 }
 
@@ -5885,19 +5721,19 @@ function paintRangeScale() {
 	}
 }
 
-function showMasterQuestionPage(){
+function showMasterQuestionPage() {
 	if (isSmileTypeQuestion) {
 		showFeedbackPage(mood);
 	} else {
-		//if ($('#pst-srvy-div').is(':visible'))
-		//	autoPost = $('#post-survey').is(":checked");
+		// if ($('#pst-srvy-div').is(':visible'))
+		// autoPost = $('#post-survey').is(":checked");
 		var feedback = $("#text-area").val();
 		if (feedback == null || feedback == "") {
 			$('#overlay-toast').html('Please enter feedback to continue');
 			showToast();
 			return;
 		}
-		
+
 		var isAbusive = false;
 		var feedbackArr = feedback.split(" ");
 		for (var i = 0; i < feedbackArr.length; i++) {
@@ -5905,58 +5741,58 @@ function showMasterQuestionPage(){
 				isAbusive = true;
 			}
 		}
-		
+
 		var onlyPostToSocialSurvey = true;
 		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
-			if(isAbusive == false){
+			if (isAbusive == false) {
 				onlyPostToSocialSurvey = false;
 			}
 		}
-		if(mood == 'Great' && isAbusive == false) {
+		if (mood == 'Great' && isAbusive == false) {
 			$('#social-post-links').show();
-			
+
 		}
-		
-		//Check character encoding
+
+		// Check character encoding
 		var isIsoEncoded = false;
-		try{
+		try {
 			feedback = decodeURIComponent(escape(feedback));
-		} catch(err){
+		} catch (err) {
 			isIsoEncoded = true;
 		}
-		
-		//call method to post the review and update the review count
-		postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey, isIsoEncoded);
-		
-		updateCustomerResponse(feedback, $('#shr-pst-cb').val() , isAbusive, isIsoEncoded);
+
+		// call method to post the review and update the review count
+		postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded);
+
+		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
 		var fmt_rating = Number(rating).toFixed(1);
-		$('#linkedin-btn').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&source=");
-        var twitterFeedback = feedback;
-        if(twitterFeedback.length > 109) {
-            twitterFeedback = twitterFeedback.substring(0, 70);
-            twitterFeedback = twitterFeedback + "...";
-        } else {
-            twitterFeedback = feedback;
-        }
-		$('#twitter-btn').attr("href","https://twitter.com/intent/tweet?text="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ twitterFeedback + "&url='"+agentFullProfileLink+"'");
-		$('#fb-btn').attr("href","https://www.facebook.com/dialog/feed?app_id="+fb_app_id+"&link="+agentFullProfileLink+"&description="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&redirect_uri=https://www.facebook.com");
+		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
+		var twitterFeedback = feedback;
+		if (twitterFeedback.length > 109) {
+			twitterFeedback = twitterFeedback.substring(0, 70);
+			twitterFeedback = twitterFeedback + "...";
+		} else {
+			twitterFeedback = feedback;
+		}
+		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink + "'");
+		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/feed?app_id=" + fb_app_id + "&link=" + agentFullProfileLink + "&description=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&redirect_uri=https://www.facebook.com");
 
 		$('#content-head').html('Survey Completed');
-			if (mood == 'Great')
-				$('#content').html(happyTextComplete);
-			else if(mood == 'OK')
-				$('#content').html(neutralTextComplete);
-			else
-				$('#content').html(sadTextComplete);
-	//	$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
+		if (mood == 'Great')
+			$('#content').html(happyTextComplete);
+		else if (mood == 'OK')
+			$('#content').html(neutralTextComplete);
+		else
+			$('#content').html(sadTextComplete);
+		// $('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
 	}
 	return;
 }
 
-function postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey, isIsoEncoded){
+function postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded) {
 	var success = false;
 	var payload = {
 		"agentId" : agentId,
@@ -5979,15 +5815,15 @@ function postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey, isIsoE
 		dataType : "TEXT",
 		data : payload,
 		success : function(data) {
-				success = true;
+			success = true;
 		},
 		complete : function(data) {
 			if (success) {
-				
+
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -5997,7 +5833,7 @@ function postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey, isIsoE
 	});
 }
 
-function updateSharedOn(socialSite, agentId, customerEmail){
+function updateSharedOn(socialSite, agentId, customerEmail) {
 	var success = false;
 	var payload = {
 		"agentId" : agentId,
@@ -6011,15 +5847,15 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 		dataType : "TEXT",
 		data : payload,
 		success : function(data) {
-				success = true;
+			success = true;
 		},
 		complete : function(data) {
 			if (success) {
-				
+
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -6029,7 +5865,7 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 	});
 }
 
-function reduceOpacityOfStars(){
+function reduceOpacityOfStars() {
 	$('#sq-stars').find('.sq-star').each(function(index) {
 		if (index < 5) {
 			$(this).removeClass('sq-full-star-click');
@@ -6038,17 +5874,16 @@ function reduceOpacityOfStars(){
 	});
 }
 
-function reduceOpacityOfSmiles(){
-	$('#sq-smiles').find('.sq-smile').each(
-		function(index) {
-			if (index < 5) {
-				$(this).removeClass('sq-full-smile-click');
-				$(this).addClass('opacity-red');
-			}
+function reduceOpacityOfSmiles() {
+	$('#sq-smiles').find('.sq-smile').each(function(index) {
+		if (index < 5) {
+			$(this).removeClass('sq-full-smile-click');
+			$(this).addClass('opacity-red');
+		}
 	});
 }
 
-function increaseOpacityOfStars(value){
+function increaseOpacityOfStars(value) {
 	$('#sq-stars').find('.sq-star').each(function(index) {
 		if (index < value) {
 			$(this).addClass('sq-full-star-click');
@@ -6057,17 +5892,16 @@ function increaseOpacityOfStars(value){
 	});
 }
 
-function increaseOpacityOfSmiles(value){
-	$('#sq-smiles').find('.sq-smile').each(
-		function(index) {
-			if (index < value) {
-				$(this).addClass('sq-full-smile-click');
-				$(this).removeClass('opacity-red');
-			}
+function increaseOpacityOfSmiles(value) {
+	$('#sq-smiles').find('.sq-smile').each(function(index) {
+		if (index < value) {
+			$(this).addClass('sq-full-smile-click');
+			$(this).removeClass('opacity-red');
+		}
 	});
 }
 
-function clearForm(){
+function clearForm() {
 	$('#firstName').val('');
 	$('#lastName').val('');
 	$('#email').val('');
@@ -6085,9 +5919,8 @@ $('.sq-star').click(function() {
 		if (index < starVal) {
 			$(this).removeClass('opacity-red');
 			$(this).addClass('sq-full-star-click');
-		}
-		else{
-			if(!$(this).hasClass('opacity-red'))
+		} else {
+			if (!$(this).hasClass('opacity-red'))
 				$(this).addClass('opacity-red');
 		}
 	});
@@ -6118,95 +5951,84 @@ $('.sq-star').hover(function() {
 });
 
 // Code to be executed on click of next for all types of questions.
-$('.sq-np-item-next')
-		.click(
-				function() {
+$('.sq-np-item-next').click(function() {
 
-					if (questionDetails.questionType == "sb-sel-mcq"
-							&& customerResponse != undefined) {
-						storeCustomerAnswer(customerResponse);
-					} else if (questionDetails.questionType == "sb-sel-desc") {
-						customerResponse = $("#text-area").val();
-						if (customerResponse == undefined) {
-							customerResponse = "";
-						}
-						storeCustomerAnswer(customerResponse);
-					} else if (questionDetails.questionType == "sb-range-star") {
-						reduceOpacityOfStars();
-						if ($('#next-star').hasClass("btn-com-disabled")) {
-							$('#overlay-toast')
-									.html(
-											'Please answer the question. You can not skip a rating question.');
-							showToast();
-							return;
-						}
-					} else if (questionDetails.questionType == "sb-range-smiles") {
-						reduceOpacityOfSmiles();
-						if ($('#next-smile').hasClass("btn-com-disabled")) {
-							$('#overlay-toast')
-									.html(
-											'Please answer the question. You can not skip a rating question.');
-							showToast();
-							return;
-						}
-					} else if (questionDetails.questionType == "sb-range-scale") {
-						if ($('#next-scale').hasClass("btn-com-disabled")) {
-							$('#overlay-toast')
-									.html(
-											'Please answer the question. You can not skip a rating question.');
-							showToast();
-							return;
-						}
-					} else if (questionDetails.questionType == "sb-master") {
-						if ($('#next-textarea-smiley').hasClass("btn-com-disabled")) {
-							$('#overlay-toast').html('Please answer this question.');
-							showToast();
-						} else {
-							showMasterQuestionPage();
-						}
-						return;
-					}
-					$(".sq-star").removeClass('sq-full-star');
-					$(".sq-smile").removeClass('sq-full-smile');
-					qno++;
-					paintSurveyPageFromJson();
+	if (questionDetails.questionType == "sb-sel-mcq" && customerResponse != undefined) {
+		storeCustomerAnswer(customerResponse);
+	} else if (questionDetails.questionType == "sb-sel-desc") {
+		customerResponse = $("#text-area").val();
+		if (customerResponse == undefined) {
+			customerResponse = "";
+		}
+		storeCustomerAnswer(customerResponse);
+	} else if (questionDetails.questionType == "sb-range-star") {
+		reduceOpacityOfStars();
+		if ($('#next-star').hasClass("btn-com-disabled")) {
+			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+			showToast();
+			return;
+		}
+	} else if (questionDetails.questionType == "sb-range-smiles") {
+		reduceOpacityOfSmiles();
+		if ($('#next-smile').hasClass("btn-com-disabled")) {
+			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+			showToast();
+			return;
+		}
+	} else if (questionDetails.questionType == "sb-range-scale") {
+		if ($('#next-scale').hasClass("btn-com-disabled")) {
+			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+			showToast();
+			return;
+		}
+	} else if (questionDetails.questionType == "sb-master") {
+		if ($('#next-textarea-smiley').hasClass("btn-com-disabled")) {
+			$('#overlay-toast').html('Please answer this question.');
+			showToast();
+		} else {
+			showMasterQuestionPage();
+		}
+		return;
+	}
+	$(".sq-star").removeClass('sq-full-star');
+	$(".sq-smile").removeClass('sq-full-smile');
+	qno++;
+	paintSurveyPageFromJson();
 
-					if (questionDetails.questionType == "sb-range-star") {
-						var starVal = parseInt(questionDetails.customerResponse);
-						if (!isNaN(starVal)) {
-							$("#next-star").removeClass("btn-com-disabled");
-							$('#sq-stars').find('.sq-star').each(
-									function(index) {
-										if (index < starVal) {
-											$(this).addClass('sq-full-star-click');
-											$(this).removeClass('opacity-red');
-										}
-									});
-						}
-					}
-					if (questionDetails.questionType == "sb-range-smiles") {
-						var smileVal = parseInt(questionDetails.customerResponse);
-						if (!isNaN(smileVal)) {
-							$("#next-smile").removeClass("btn-com-disabled");
-							$('#sq-smiles').find('.sq-smile').each(
-									function(index) {
-										if (index < smileVal) {
-											$(this).addClass('sq-full-smile-click');
-											$(this).removeClass('opacity-red');
-										}
-									});
-						}
-					}
-					if (questionDetails.questionType == "sb-range-scale") {
-						$("#next-scale").removeClass("btn-com-disabled");
-						paintRangeScale();
-					}
-					if (questionDetails.questionType == "sb-sel-mcq") {
-						if(questionDetails.customerResponse==undefined || questionDetails.customerResponse=="")
-							customerResponse = "";
-					}
+	if (questionDetails.questionType == "sb-range-star") {
+		var starVal = parseInt(questionDetails.customerResponse);
+		if (!isNaN(starVal)) {
+			$("#next-star").removeClass("btn-com-disabled");
+			$('#sq-stars').find('.sq-star').each(function(index) {
+				if (index < starVal) {
+					$(this).addClass('sq-full-star-click');
+					$(this).removeClass('opacity-red');
+				}
+			});
+		}
+	}
+	if (questionDetails.questionType == "sb-range-smiles") {
+		var smileVal = parseInt(questionDetails.customerResponse);
+		if (!isNaN(smileVal)) {
+			$("#next-smile").removeClass("btn-com-disabled");
+			$('#sq-smiles').find('.sq-smile').each(function(index) {
+				if (index < smileVal) {
+					$(this).addClass('sq-full-smile-click');
+					$(this).removeClass('opacity-red');
+				}
+			});
+		}
+	}
+	if (questionDetails.questionType == "sb-range-scale") {
+		$("#next-scale").removeClass("btn-com-disabled");
+		paintRangeScale();
+	}
+	if (questionDetails.questionType == "sb-sel-mcq") {
+		if (questionDetails.customerResponse == undefined || questionDetails.customerResponse == "")
+			customerResponse = "";
+	}
 
-				});
+});
 
 // Code to be executed on click of previous for star and smile questions.
 $('.sq-np-item-prev').click(function() {
@@ -6267,9 +6089,8 @@ $('.sq-smile').click(function() {
 		if (index < smileVal) {
 			$(this).removeClass('opacity-red');
 			$(this).addClass('sq-full-smile-click');
-		}
-		else{
-			if(!$(this).hasClass('opacity-red'))
+		} else {
+			if (!$(this).hasClass('opacity-red'))
 				$(this).addClass('opacity-red');
 		}
 	});
@@ -6327,23 +6148,11 @@ $('#sq-sad-smile').click(function() {
 	$(this).removeClass('opacity-red');
 });
 
-/*$('input[type="range"]').rangeslider({
-	polyfill : false,
-
-	// Default CSS classes
-	rangeClass : 'rangeslider',
-	fillClass : 'rangeslider__fill',
-	handleClass : 'rangeslider__handle',
-
-	onSlide : function(position, value) {
-		$('#range-slider-value').html(value);
-	},
-	// Callback function
-	onSlideEnd : function(position, value) {
-		$('#range-slider-value').html(value);
-		storeCustomerAnswer(value);
-	},
-});*/
+/*
+ * $('input[type="range"]').rangeslider({ polyfill : false, // Default CSS classes rangeClass : 'rangeslider', fillClass : 'rangeslider__fill', handleClass : 'rangeslider__handle',
+ * 
+ * onSlide : function(position, value) { $('#range-slider-value').html(value); }, // Callback function onSlideEnd : function(position, value) { $('#range-slider-value').html(value); storeCustomerAnswer(value); }, });
+ */
 
 $('.sq-pts-red').click(function() {
 	$('.sq-pts-item-hover').removeClass('showHoverTab');
@@ -6389,20 +6198,19 @@ $('#ggl-btn').click(function(e) {
 	updateSharedOn("google", agentId, customerEmail);
 });
 
-$('#shr-post-chk-box').click(function(){
-	if($('#shr-post-chk-box').hasClass('bd-check-img-checked')){
+$('#shr-post-chk-box').click(function() {
+	if ($('#shr-post-chk-box').hasClass('bd-check-img-checked')) {
 		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
 		$('#shr-pst-cb').val('true');
 		autoPost = true;
-	}
-	else{
+	} else {
 		$('#shr-post-chk-box').addClass('bd-check-img-checked');
 		$('#shr-pst-cb').val('false');
 		autoPost = false;
 	}
 });
 
-//Edit profile functions
+// Edit profile functions
 $(document).ajaxStop(function() {
 	adjustImage();
 });
@@ -6410,11 +6218,10 @@ $(document).ajaxStop(function() {
 // Toggle text editor
 $(document).on('focus', '.prof-edditable', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#'+lockId).length == 0){
+	if ($('#' + lockId).length == 0) {
 		$(this).addClass('prof-name-edit');
 	}
-	if ($('#' + lockId).attr('data-control') == 'user'
-			|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) ) {
+	if ($('#' + lockId).attr('data-control') == 'user' || ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
 		$(this).addClass('prof-name-edit');
 		$('#prof-all-lock').val('modified');
 	}
@@ -6422,16 +6229,14 @@ $(document).on('focus', '.prof-edditable', function() {
 
 $(document).on('blur', '.prof-edditable', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if ($('#' + lockId).attr('data-control') == 'user'
-			|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
+	if ($('#' + lockId).attr('data-control') == 'user' || ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
 		$(this).removeClass('prof-name-edit');
 	}
 });
 
 $(document).on('focus', '.prof-edditable-sin', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if ($('#' + lockId).attr('data-control') == 'user'
-			|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
+	if ($('#' + lockId).attr('data-control') == 'user' || ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
 		$(this).addClass('prof-name-edit');
 		$('#prof-all-lock').val('modified');
 	}
@@ -6439,39 +6244,19 @@ $(document).on('focus', '.prof-edditable-sin', function() {
 
 $(document).on('blur', '.prof-edditable-sin', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if ($('#' + lockId).attr('data-control') == 'user'
-			|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
+	if ($('#' + lockId).attr('data-control') == 'user' || ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
 		$(this).removeClass('prof-name-edit');
 	}
-	
+
 });
 
-/*$(document).on('click', '.fb-shr', function() {
-	var firstName = $(this).parent().parent().parent().attr('data-firstname');
-	var lastName = $(this).parent().parent().parent().attr('data-lastname');
-	var agentName = $(this).parent().parent().parent().attr('data-agentname');
-	var review = $(this).parent().parent().parent().attr('data-review');
-	var score = $(this).parent().parent().parent().attr('data-score');
-	shareOnFacebook(firstName, lastName, agentName, review, score);
-});
-
-$(document).on('click', '.twt-shr', function() {
-	var firstName = $(this).parent().parent().parent().attr('data-firstname');
-	var lastName = $(this).parent().parent().parent().attr('data-lastname');
-	var agentName = $(this).parent().parent().parent().attr('data-agentname');
-	var review = $(this).parent().parent().parent().attr('data-review');
-	var score = $(this).parent().parent().parent().attr('data-score');
-	shareOnTwitter(firstName, lastName, agentName, review, score);
-});
-
-$(document).on('click', '.lnkdn-shr', function() {
-	var firstName = $(this).parent().parent().parent().attr('data-firstname');
-	var lastName = $(this).parent().parent().parent().attr('data-lastname');
-	var agentName = $(this).parent().parent().parent().attr('data-agentname');
-	var review = $(this).parent().parent().parent().attr('data-review');
-	var score = $(this).parent().parent().parent().attr('data-score');
-	shareOnLinkedin(firstName, lastName, agentName, review, score);
-});*/
+/*
+ * $(document).on('click', '.fb-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnFacebook(firstName, lastName, agentName, review, score); });
+ * 
+ * $(document).on('click', '.twt-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnTwitter(firstName, lastName, agentName, review, score); });
+ * 
+ * $(document).on('click', '.lnkdn-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnLinkedin(firstName, lastName, agentName, review, score); });
+ */
 
 // On hover for lock icons
 $(document).on('mouseover', '#prof-logo-container', function(e) {
@@ -6545,17 +6330,16 @@ function updateLockSettings(id, state) {
 					$('#' + id).removeClass('lp-edit-locks-locked');
 					$('#' + id).removeClass('prof-img-lock-locked');
 					$('#' + id).attr('data-state', 'unlocked');
-				}
-				else if (state == true) {
+				} else if (state == true) {
 					$('#' + id).addClass('lp-edit-locks-locked');
 					$('#' + id).addClass('prof-img-lock-locked');
 					$('#' + id).attr('data-state', 'locked');
 				}
 			}
-			
+
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
-		}, payload,true);
+		}, payload, true);
 	}, 0);
 }
 
@@ -6583,8 +6367,7 @@ $(document).on('blur', '#intro-body-text-edit', function() {
 
 		var aboutMe = $('#intro-body-text-edit').val().trim();
 		if (aboutMe == undefined || aboutMe == "") {
-			$('#overlay-toast')
-					.html("Please add a few words about you");
+			$('#overlay-toast').html("Please add a few words about you");
 			showToast();
 			return;
 		}
@@ -6592,8 +6375,7 @@ $(document).on('blur', '#intro-body-text-edit', function() {
 			var payload = {
 				"aboutMe" : aboutMe
 			};
-			callAjaxPostWithPayloadData("./addorupdateaboutme.do",
-					callBackOnEditAdboutMeDetails, payload,true);
+			callAjaxPostWithPayloadData("./addorupdateaboutme.do", callBackOnEditAdboutMeDetails, payload, true);
 		}, 0);
 	}
 });
@@ -6627,16 +6409,16 @@ function callBackShowContactDetails(data) {
 }
 var phoneFormatWithExtension = '(ddd) ddd-dddd x yyyyy';
 var usPhoneRegEx = {
-		'translation' : {
-			d : {
-				pattern : /[0-9*]/
-			},
-			y : {
-				pattern : /[0-9*]/
-			}
+	'translation' : {
+		d : {
+			pattern : /[0-9*]/
+		},
+		y : {
+			pattern : /[0-9*]/
 		}
-	};
-function maskPhoneNumber (phoneId, iso2) {
+	}
+};
+function maskPhoneNumber(phoneId, iso2) {
 	if (iso2 == 'us') {
 		$('#phone-number-work').mask(phoneFormatWithExtension, usPhoneRegEx);
 	} else {
@@ -6657,108 +6439,98 @@ function maskPhoneNumber (phoneId, iso2) {
 		});
 	}
 }
-var countryPhone=/^[0-9-.() ]+$/;
+var countryPhone = /^[0-9-.()x ]+$/;
 
 // Phone numbers in contact details
-$(document).on(
-		'blur',
-		'#contant-info-container input[data-phone-number]',
-		function() {
-			if ($('#prof-all-lock').val() != 'modified' || !$(this).val()
-					|| $(this).is('[readonly]')) {
-				return;
-			}
-			if (!countryPhone.test(this.value) ) {
-				$('#overlay-toast').html("Please add a valid phone number");
-				showToast();
-				return;
-			}
+$(document).on('blur', '#contant-info-container input[data-phone-number]', function() {
+	if ($('#prof-all-lock').val() != 'modified' || !$(this).val() || $(this).is('[readonly]')) {
+		return;
+	}
+	if (!countryPhone.test(this.value)) {
+		$('#overlay-toast').html("Please add a valid phone number");
+		showToast();
+		return;
+	}
 
-			delay(function() {
-				var phoneNumbers = [];
-				$('#contant-info-container input[data-phone-number]').each(
-						function() {
-							if (this.value != "" && (phoneRegex.test(this.value) || ausPhoneRegex.test(this.value))
-									&& !$(this).is('[readonly]')) {
-								var phoneNumber = {};
-								phoneNumber.key = $(this).attr(
-										"data-phone-number");
-								phoneNumber.value = getPhoneNumber();
-								phoneNumbers.push(phoneNumber);
-							}
-						});
-				phoneNumbers = JSON.stringify(phoneNumbers);
-				var payload = {
-					"phoneNumbers" : phoneNumbers
-				};
-				callAjaxPostWithPayloadData("./updatephonenumbers.do",
-						callBackOnUpdatePhoneNumbers, payload,true);
-			}, 0);
+	delay(function() {
+		var phoneNumbers = [];
+		$('#contant-info-container input[data-phone-number]').each(function() {
+			if (this.value != "" && (countryPhone.test(this.value)) && !$(this).is('[readonly]')) {
+				var phoneNumber = {};
+				phoneNumber.key = $(this).attr("data-phone-number");
+				if (phoneNumber.key == 'work') {
+					phoneNumber.value = JSON.stringify(getPhoneNumber('phone-number-work'));
+				} else if (phoneNumber.key == 'personal') {
+					phoneNumber.value = JSON.stringify(getPhoneNumber('phone-number-personal'));
+				} else {
+					phoneNumber.value = this.value;
+				}
+				phoneNumbers.push(phoneNumber);
+			}
 		});
+		phoneNumbers = JSON.stringify(phoneNumbers);
+		var payload = {
+			"phoneNumbers" : phoneNumbers
+		};
+		callAjaxPostWithPayloadData("./updatephonenumbers.do", callBackOnUpdatePhoneNumbers, payload, true);
+	}, 0);
+});
 
 function callBackOnUpdatePhoneNumbers(data) {
 	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
-	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails,true);
+	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails, true);
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
 
 // Function to update web addresses in contact details
-$(document).on(
-		'blur',
-		'#contant-info-container input[data-web-address]',
-		function() {
-			if ($('#prof-all-lock').val() != 'modified' || !$(this).val()
-					|| $(this).is('[readonly]')) {
-				return;
-			}
-			if (!isValidUrl($(this).val().trim())) {
-				$('#overlay-toast').html("Please add a valid web address");
-				showToast();
-				return;
-			}
+$(document).on('blur', '#contant-info-container input[data-web-address]', function() {
+	if ($('#prof-all-lock').val() != 'modified' || !$(this).val() || $(this).is('[readonly]')) {
+		return;
+	}
+	if (!isValidUrl($(this).val().trim())) {
+		$('#overlay-toast').html("Please add a valid web address");
+		showToast();
+		return;
+	}
 
-			delay(function() {
-				var webAddresses = [];
-				var i = 0;
-				var webAddressValid = true;
-				$('#contant-info-container input[data-web-address]').each(
-						function() {
-							var link = $.trim(this.value);
-							if (link != "") {
-								if (isValidUrl(link)
-										&& !$(this).is('[readonly]')) {
-									var webAddress = {};
-									webAddress.key = $(this).attr(
-											"data-web-address");
-									webAddress.value = link;
-									webAddresses[i++] = webAddress;
-								} else {
-									return;
-									$(this).focus();
-									webAddressValid = false;
-								}
-							}
-						});
-				if (!webAddressValid) {
-					alert("Invalid web address");
-					return false;
+	delay(function() {
+		var webAddresses = [];
+		var i = 0;
+		var webAddressValid = true;
+		$('#contant-info-container input[data-web-address]').each(function() {
+			var link = $.trim(this.value);
+			if (link != "") {
+				if (isValidUrl(link) && !$(this).is('[readonly]')) {
+					var webAddress = {};
+					webAddress.key = $(this).attr("data-web-address");
+					webAddress.value = link;
+					webAddresses[i++] = webAddress;
+				} else {
+					return;
+					$(this).focus();
+					webAddressValid = false;
 				}
-				webAddresses = JSON.stringify(webAddresses);
-				var payload = {
-					"webAddresses" : webAddresses
-				};
-				callAjaxPostWithPayloadData("./updatewebaddresses.do",
-						callBackOnUpdateWebAddresses, payload,true);
-			}, 0);
+			}
 		});
+		if (!webAddressValid) {
+			alert("Invalid web address");
+			return false;
+		}
+		webAddresses = JSON.stringify(webAddresses);
+		var payload = {
+			"webAddresses" : webAddresses
+		};
+		callAjaxPostWithPayloadData("./updatewebaddresses.do", callBackOnUpdateWebAddresses, payload, true);
+	}, 0);
+});
 
 function callBackOnUpdateWebAddresses(data) {
 	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
-	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails,true);
+	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails, true);
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
@@ -6771,54 +6543,53 @@ function callBackShowAddressDetails(data) {
 }
 
 function showEditAddressPopup() {
-	callAjaxGET("./fetchaddressdetailsedit.do", callBackEditAddressDetails,true);
+	callAjaxGET("./fetchaddressdetailsedit.do", callBackEditAddressDetails, true);
 }
 
 function callBackEditAddressDetails(data) {
-	
+
 	var header = "Edit Address Detail";
 	createEditAddressPopup(header, data);
 
-	//update events
+	// update events
 	updateEventsEditAddress();
-	
+
 	$('#overlay-continue').click(function() {
 		var isFocussed = false;
 		var profName = $('#prof-name').val();
 		var profAddress1 = $('#prof-address1').val();
-		
-		//var profAddress2 = $('#prof-address2').val();
+
+		// var profAddress2 = $('#prof-address2').val();
 		var country = $('#prof-country').val();
 		var zipCode = $('#prof-zipcode').val();
-		if(!validateAddress1('prof-address1',true)){
-			
-			if(!isFocussed){
+		if (!validateAddress1('prof-address1', true)) {
+
+			if (!isFocussed) {
 				$('#prof-address1').focus();
-				isFocussed=true;
-			}
-			return; 
-		}
-		if(!validateCountryProfile(country)){
-			
-			if(!isFocussed){
-				$('#prof-country').focus();
-				isFocussed=true;
+				isFocussed = true;
 			}
 			return;
 		}
-		if(!validateCountryZipcode('prof-zipcode',true)){
-			
-			if(!isFocussed){
-				$('#prof-zipcode').focus();
-				isFocussed=true;
+		if (!validateCountryProfile(country)) {
+
+			if (!isFocussed) {
+				$('#prof-country').focus();
+				isFocussed = true;
 			}
-			return; 
+			return;
 		}
-		
-		
+		if (!validateCountryZipcode('prof-zipcode', true)) {
+
+			if (!isFocussed) {
+				$('#prof-zipcode').focus();
+				isFocussed = true;
+			}
+			return;
+		}
+
 		delay(function() {
 			payload = $('#prof-edit-address-form').serialize();
-			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload,true);
+			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload, true);
 		}, 0);
 
 		$('#overlay-continue').unbind('click');
@@ -6829,29 +6600,27 @@ function callBackEditAddressDetails(data) {
 	$('body').scrollTop('0');
 }
 
-//Function to update events on edit profile page
+// Function to update events on edit profile page
 function updateEventsEditAddress() {
-    var countryCode = $('#prof-country-code').val();
-    if (countryCode == "US") {
-        showStateCityRow('prof-address-state-city-row', 'prof-state',
-            'prof-city');
-        selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
-    	selectedCountryRegEx = new RegExp(selectedCountryRegEx);
-    } else {
-        hideStateCityRow('prof-address-state-city-row', 'prof-state');
-    }
+	var countryCode = $('#prof-country-code').val();
+	if (countryCode == "US") {
+		showStateCityRow('prof-address-state-city-row', 'prof-state', 'prof-city');
+		selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+	} else {
+		hideStateCityRow('prof-address-state-city-row', 'prof-state');
+	}
 
-    attachAutocompleteCountry('prof-country', 'prof-country-code',
-        'prof-state', 'prof-address-state-city-row', 'prof-city');
+	attachAutocompleteCountry('prof-country', 'prof-country-code', 'prof-state', 'prof-address-state-city-row', 'prof-city');
 }
 
 function callBackUpdateAddressDetails(data) {
-	$('body').css('overflow','auto');
+	$('body').css('overflow', 'auto');
 	$('#prof-message-header').html(data);
-	callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails,true);
-	callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails,true);
-	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails,true);
-	
+	callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails, true);
+	callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails, true);
+	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails, true);
+
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 
@@ -6860,7 +6629,7 @@ function callBackUpdateAddressDetails(data) {
 
 $('#overlay-cancel').click(function() {
 	$('#overlay-continue').unbind('click');
-	$('body').css('overflow','auto');
+	$('body').css('overflow', 'auto');
 	overlayRevert();
 	$('#prof-image').val('');
 });
@@ -6896,8 +6665,8 @@ function callBackShowBasicDetails(response) {
 
 $(document).on('blur', '#prof-basic-container input', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if ($('#'+lockId).length > 0) {
-		//if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
+	if ($('#' + lockId).length > 0) {
+		// if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
 		if ($('#prof-all-lock').val() != 'modified') {
 			return;
 		}
@@ -6906,7 +6675,7 @@ $(document).on('blur', '#prof-basic-container input', function() {
 			return;
 		}
 	}
-	
+
 	delay(function() {
 		var profName = $('#prof-name').val().trim();
 		var profTitle = $('#prof-title').val().trim();
@@ -6914,14 +6683,14 @@ $(document).on('blur', '#prof-basic-container input', function() {
 			"profName" : profName,
 			"profTitle" : profTitle
 		};
-		if($('#prof-vertical').val()){
+		if ($('#prof-vertical').val()) {
 			payload["profVertical"] = $('#prof-vertical').val().trim();
 		}
-		if($('#prof-location').val()){
+		if ($('#prof-location').val()) {
 			payload["profLocation"] = $('#prof-location').val().trim();
 		}
-		
-		callAjaxPostWithPayloadData("./updatebasicprofile.do", callBackUpdateBasicDetails, payload,true);
+
+		callAjaxPostWithPayloadData("./updatebasicprofile.do", callBackUpdateBasicDetails, payload, true);
 	}, 0);
 });
 
@@ -6939,8 +6708,8 @@ function callBackShowProfileLogo(data) {
 	if (logoImageUrl == undefined || logoImageUrl == "none") {
 		return;
 	}
-	
-	//update logo if it is company admin or it does not have logo
+
+	// update logo if it is company admin or it does not have logo
 	if ($('#header-user-info').find('.user-info-logo').length <= 0 || colName == "companyId") {
 		var userInfoDivider = $('<div>').attr({
 			"class" : "float-left user-info-seperator"
@@ -6953,14 +6722,14 @@ function callBackShowProfileLogo(data) {
 		});
 		$('#header-user-info').find('.user-info-logo').remove();
 		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
-	} 
+	}
 	adjustImage();
 	hideOverlay();
 }
 
 $(document).on('change', '#prof-logo', function() {
 
-	if(!logoValidate('#prof-logo')){
+	if (!logoValidate('#prof-logo')) {
 		console.log("inside log");
 		return false;
 	}
@@ -6969,9 +6738,9 @@ $(document).on('change', '#prof-logo', function() {
 	formData.append("logo", $(this).prop("files")[0]);
 	formData.append("logoFileName", $(this).prop("files")[0].name);
 	delay(function() {
-				callAjaxPOSTWithTextData("./updatelogo.do", function(data) {
+		callAjaxPOSTWithTextData("./updatelogo.do", function(data) {
 			$('#prof-message-header').html(data);
-					callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo,true);
+			callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo, true);
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
 		}, false, formData);
@@ -6983,41 +6752,36 @@ function callBackOnProfileImageUpload(data) {
 
 	if ($('#overlay-linkedin-import').is(":visible")) {
 		$('#message-header').html(data);
-		callAjaxGET("./fetchuploadedprofileimage.do",
-				function(profileImageUrl) {
-					if (profilemasterid == 4) {
-						$("#wc-photo-upload").removeClass('dsh-pers-default-img');
-					} else if (profilemasterid == 3) {
-						$("#wc-photo-upload").removeClass('dsh-office-default-img');
-					} else if (profilemasterid == 2) {
-						$("#wc-photo-upload").removeClass('dsh-region-default-img');
-					} else if (profilemasterid == 1) {
-						$("#wc-photo-upload").removeClass('dsh-comp-default-img');
-					}
+		callAjaxGET("./fetchuploadedprofileimage.do", function(profileImageUrl) {
+			if (profilemasterid == 4) {
+				$("#wc-photo-upload").removeClass('dsh-pers-default-img');
+			} else if (profilemasterid == 3) {
+				$("#wc-photo-upload").removeClass('dsh-office-default-img');
+			} else if (profilemasterid == 2) {
+				$("#wc-photo-upload").removeClass('dsh-region-default-img');
+			} else if (profilemasterid == 1) {
+				$("#wc-photo-upload").removeClass('dsh-comp-default-img');
+			}
 
-					$('#wc-photo-upload').css("background",
-							"url(" + profileImageUrl + ") no-repeat center");
-					$('#wc-photo-upload').css("background-size", "contain");
-					hideOverlay();
-				},true);
+			$('#wc-photo-upload').css("background", "url(" + profileImageUrl + ") no-repeat center");
+			$('#wc-photo-upload').css("background-size", "contain");
+			hideOverlay();
+		}, true);
 
 		$('#overlay-toast').html($('#display-msg-div').text().trim());
 		showToast();
 	} else {
 		$('#prof-message-header').html(data);
 
-		callAjaxGET("./fetchprofileimage.do",
-				function(data) {
-					$('#prof-img-container').html(data);
-					var profileImageUrl = $('#prof-image-edit').css(
-							"background-image");
-					if (profileImageUrl == undefined
-							|| profileImageUrl == "none") {
-						return;
-					}
-					adjustImage();
-					hideOverlay();
-				},true);
+		callAjaxGET("./fetchprofileimage.do", function(data) {
+			$('#prof-img-container').html(data);
+			var profileImageUrl = $('#prof-image-edit').css("background-image");
+			if (profileImageUrl == undefined || profileImageUrl == "none") {
+				return;
+			}
+			adjustImage();
+			hideOverlay();
+		}, true);
 
 		$('#overlay-toast').html($('#display-msg-div').text().trim());
 		showToast();
@@ -7063,8 +6827,8 @@ $(document).on('click', '.lp-ach-item-img', function(e) {
 		updateExpertise();
 	} else if (type == 'hobby') {
 		updateHobbies();
-	}  
-			
+	}
+
 });
 
 // Function to update association/membership list
@@ -7126,8 +6890,7 @@ function updateAssociations() {
 	var payload = {
 		"associationList" : associationList
 	};
-	callAjaxPostWithPayloadData("./updateassociations.do",
-			callBackUpdateAssociations, payload,true);
+	callAjaxPostWithPayloadData("./updateassociations.do", callBackUpdateAssociations, payload, true);
 }
 
 function callBackUpdateAssociations(data) {
@@ -7136,8 +6899,7 @@ function callBackUpdateAssociations(data) {
 	showToast();
 
 	if (!$('#association-container').find('input').length) {
-		$('#association-container').append(
-				'<span>No association added yet</span>');
+		$('#association-container').append('<span>No association added yet</span>');
 	}
 }
 
@@ -7200,8 +6962,7 @@ function updateAchievements() {
 	var payload = {
 		"achievementList" : achievementList
 	};
-	callAjaxPostWithPayloadData("./updateachievements.do",
-			callBackUpdateAchievements, payload,true);
+	callAjaxPostWithPayloadData("./updateachievements.do", callBackUpdateAchievements, payload, true);
 }
 
 function callBackUpdateAchievements(data) {
@@ -7210,8 +6971,7 @@ function callBackUpdateAchievements(data) {
 	showToast();
 
 	if (!$('#achievement-container').find('input').length) {
-		$('#achievement-container').append(
-				'<span>No achievement added yet</span>');
+		$('#achievement-container').append('<span>No achievement added yet</span>');
 	}
 }
 
@@ -7237,8 +6997,7 @@ function addAuthorisedIn() {
 	});
 
 	$('#authorised-in-container').children().last().append(newAuthorisation);
-	$('#authorised-in-container').children().last().append(
-			newAuthorizationButton);
+	$('#authorised-in-container').children().last().append(newAuthorizationButton);
 	newAuthorisation.focus();
 	newAuthorizationButton.addClass('float-right');
 }
@@ -7274,8 +7033,7 @@ function updateLicenseAuthorizations() {
 	var payload = {
 		"licenceList" : licenceList
 	};
-	callAjaxPostWithPayloadData("./updatelicenses.do",
-			callBackUpdateLicenseAuthorizations, payload,true);
+	callAjaxPostWithPayloadData("./updatelicenses.do", callBackUpdateLicenseAuthorizations, payload, true);
 }
 
 function callBackUpdateLicenseAuthorizations(data) {
@@ -7284,14 +7042,13 @@ function callBackUpdateLicenseAuthorizations(data) {
 	showToast();
 
 	if (!$('#authorised-in-container').find('input').length) {
-		$('#authorised-in-container').append(
-				'<span>No license added yet</span>');
+		$('#authorised-in-container').append('<span>No license added yet</span>');
 	}
 }
 
-//TODO:Postions
+// TODO:Postions
 
-//Function to update Expertise
+// Function to update Expertise
 function addExpertise() {
 	if ($('#expertise-container > div').length <= 0) {
 		$('#expertise-container').empty();
@@ -7313,8 +7070,7 @@ function addExpertise() {
 	});
 
 	$('#expertise-container').children().last().append(newExpertise);
-	$('#expertise-container').children().last().append(
-			newExpertiseButton);
+	$('#expertise-container').children().last().append(newExpertiseButton);
 	newExpertise.focus();
 	newExpertiseButton.addClass('float-right');
 }
@@ -7350,8 +7106,7 @@ function updateExpertise() {
 	var payload = {
 		"expertiseList" : expertiseList
 	};
-	callAjaxPostWithPayloadData("./updateexpertise.do",
-			callBackUpdateExpertise, payload,true);
+	callAjaxPostWithPayloadData("./updateexpertise.do", callBackUpdateExpertise, payload, true);
 }
 
 function callBackUpdateExpertise(data) {
@@ -7360,12 +7115,11 @@ function callBackUpdateExpertise(data) {
 	showToast();
 
 	if (!$('#expertise-container').find('input').length) {
-		$('#expertise-container').append(
-				'<span>No license added yet</span>');
+		$('#expertise-container').append('<span>No license added yet</span>');
 	}
 }
 
-//Function to update Hobbies
+// Function to update Hobbies
 function addHobby() {
 	if ($('#hobbies-container > div').length <= 0) {
 		$('#hobbies-container').empty();
@@ -7387,8 +7141,7 @@ function addHobby() {
 	});
 
 	$('#hobbies-container').children().last().append(newExpertise);
-	$('#hobbies-container').children().last().append(
-			newExpertiseButton);
+	$('#hobbies-container').children().last().append(newExpertiseButton);
 	newExpertise.focus();
 	newExpertiseButton.addClass('float-right');
 }
@@ -7424,8 +7177,7 @@ function updateHobbies() {
 	var payload = {
 		"hobbiesList" : hobbies
 	};
-	callAjaxPostWithPayloadData("./updatehobbies.do",
-			callBackUpdateHobbies, payload,true);
+	callAjaxPostWithPayloadData("./updatehobbies.do", callBackUpdateHobbies, payload, true);
 }
 
 function callBackUpdateHobbies(data) {
@@ -7434,107 +7186,37 @@ function callBackUpdateHobbies(data) {
 	showToast();
 
 	if (!$('#expertise-container').find('input').length) {
-		$('#expertise-container').append(
-				'<span>No license added yet</span>');
+		$('#expertise-container').append('<span>No license added yet</span>');
 	}
 }
 
-
 // Update Social links - facebook
-/*$('body').on('click', '#prof-edit-social-link .icn-fb', function() {
-	$('#social-token-text').show();
-	var link = $(this).attr('data-link');
-	$('#social-token-text').attr({
-		"placeholder" : "Add facebook link",
-		"onblur" : "updateFacebookLink(this.value);$('#social-token-text').hide();"
-	});
-	$('#social-token-text').val(link);
-});
-
-function updateFacebookLink(link) {
-	var payload = {
-		"fblink" : link	
-	};
-	if (isValidUrl(link)) {
-        callAjaxPostWithPayloadData("./updatefacebooklink.do", callBackUpdateSocialLink, payload);
-        $('#icn-fb').attr("data-link", link);
-	} else {
-		$('#overlay-toast').html("Enter a valid url");
-		showToast();
-	}
-}*/
+/*
+ * $('body').on('click', '#prof-edit-social-link .icn-fb', function() { $('#social-token-text').show(); var link = $(this).attr('data-link'); $('#social-token-text').attr({ "placeholder" : "Add facebook link", "onblur" : "updateFacebookLink(this.value);$('#social-token-text').hide();" }); $('#social-token-text').val(link); });
+ * 
+ * function updateFacebookLink(link) { var payload = { "fblink" : link }; if (isValidUrl(link)) { callAjaxPostWithPayloadData("./updatefacebooklink.do", callBackUpdateSocialLink, payload); $('#icn-fb').attr("data-link", link); } else { $('#overlay-toast').html("Enter a valid url"); showToast(); } }
+ */
 
 // Update Social links - twitter
-/*$('body').on('click', '#prof-edit-social-link .icn-twit', function() {
-	$('#social-token-text').show();
-	var link = $(this).attr("data-link");
-	$('#social-token-text').attr({
-		"placeholder" : "Add Twitter link",
-		"onblur" : "updateTwitterLink(this.value);$('#social-token-text').hide();"
-	});
-	$('#social-token-text').val(link);
-});
-
-function updateTwitterLink(link) {
-	var payload = {
-		"twitterlink" : link	
-	};
-	if (isValidUrl(link)) {
-        callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateSocialLink, payload);
-        $('#icn-twit').attr("data-link", link);
-	} else {
-		$('#overlay-toast').html("Enter a valid url");
-		showToast();
-	}
-}*/
+/*
+ * $('body').on('click', '#prof-edit-social-link .icn-twit', function() { $('#social-token-text').show(); var link = $(this).attr("data-link"); $('#social-token-text').attr({ "placeholder" : "Add Twitter link", "onblur" : "updateTwitterLink(this.value);$('#social-token-text').hide();" }); $('#social-token-text').val(link); });
+ * 
+ * function updateTwitterLink(link) { var payload = { "twitterlink" : link }; if (isValidUrl(link)) { callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateSocialLink, payload); $('#icn-twit').attr("data-link", link); } else { $('#overlay-toast').html("Enter a valid url"); showToast(); } }
+ */
 
 // Update Social links - linkedin
-/*$('body').on('click', '#prof-edit-social-link .icn-lin', function() {
-	$('#social-token-text').show();
-	var link = $(this).attr("data-link");
-	$('#social-token-text').attr({
-		"placeholder" : "Add LinkedIn link",
-		"onblur" : "updateLinkedInLink(this.value);$('#social-token-text').hide();"
-	});
-	$('#social-token-text').val(link);
-});
-
-function updateLinkedInLink(link) {
-	var payload = {
-		"linkedinlink" : link	
-	};
-	if (isValidUrl(link)) {
-		callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateSocialLink, payload);
-        $('#icn-lin').attr("data-link", link);
-	} else {
-		$('#overlay-toast').html("Enter a valid url");
-		showToast();
-	}
-}*/
+/*
+ * $('body').on('click', '#prof-edit-social-link .icn-lin', function() { $('#social-token-text').show(); var link = $(this).attr("data-link"); $('#social-token-text').attr({ "placeholder" : "Add LinkedIn link", "onblur" : "updateLinkedInLink(this.value);$('#social-token-text').hide();" }); $('#social-token-text').val(link); });
+ * 
+ * function updateLinkedInLink(link) { var payload = { "linkedinlink" : link }; if (isValidUrl(link)) { callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateSocialLink, payload); $('#icn-lin').attr("data-link", link); } else { $('#overlay-toast').html("Enter a valid url"); showToast(); } }
+ */
 
 // Update Social links - google plus
-/*$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
-	$('#social-token-text').show();
-	var link = $(this).attr("data-link");
-	$('#social-token-text').attr({
-		"placeholder" : "Add Google link",
-		"onblur" : "updateGoogleLink(this.value);$('#social-token-text').hide();"
-	});
-	$('#social-token-text').val(link);
-});
-
-function updateGoogleLink(link) {
-	var payload = {
-		"gpluslink" : link	
-	};
-	if (isValidUrl(link)) {
-        callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload);
-        $('#icn-gplus').attr("data-link", link);
-	} else {
-		$('#overlay-toast').html("Enter a valid url");
-		showToast();
-	}
-}*/
+/*
+ * $('body').on('click', '#prof-edit-social-link .icn-gplus', function() { $('#social-token-text').show(); var link = $(this).attr("data-link"); $('#social-token-text').attr({ "placeholder" : "Add Google link", "onblur" : "updateGoogleLink(this.value);$('#social-token-text').hide();" }); $('#social-token-text').val(link); });
+ * 
+ * function updateGoogleLink(link) { var payload = { "gpluslink" : link }; if (isValidUrl(link)) { callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload); $('#icn-gplus').attr("data-link", link); } else { $('#overlay-toast').html("Enter a valid url"); showToast(); } }
+ */
 
 // Update Social links - yelp
 $('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
@@ -7552,7 +7234,7 @@ function updateYelpLink(link) {
 		"yelplink" : link
 	};
 	if (isValidUrl(link)) {
-		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload,true);
+		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("yelp", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
@@ -7561,28 +7243,13 @@ function updateYelpLink(link) {
 }
 
 // Update Social links - zillow
-/*$('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
-	$('#social-token-text').show();
-	var link = $(this).attr("data-link");
-	$('#social-token-text').attr({
-		"placeholder" : "Add Zillow link",
-		"onblur" : "updateZillowLink(this.value);$('#social-token-text').hide();"
-	});
-	$('#social-token-text').val(link);
-});*/
+/*
+ * $('body').on('click', '#prof-edit-social-link .icn-zillow', function() { $('#social-token-text').show(); var link = $(this).attr("data-link"); $('#social-token-text').attr({ "placeholder" : "Add Zillow link", "onblur" : "updateZillowLink(this.value);$('#social-token-text').hide();" }); $('#social-token-text').val(link); });
+ */
 
-/*function updateZillowLink(link) {
-	var payload = {
-		"zillowlink" : link
-	};
-	if (isValidUrl(link)) {
-		callAjaxPostWithPayloadData("./updatezillowlink.do", callBackUpdateSocialLink, payload);
-        $('#icn-zillow').attr("data-link", link);
-	} else {
-		$('#overlay-toast').html("Enter a valid url");
-		showToast();
-	}
-}*/
+/*
+ * function updateZillowLink(link) { var payload = { "zillowlink" : link }; if (isValidUrl(link)) { callAjaxPostWithPayloadData("./updatezillowlink.do", callBackUpdateSocialLink, payload); $('#icn-zillow').attr("data-link", link); } else { $('#overlay-toast').html("Enter a valid url"); showToast(); } }
+ */
 
 // Update Social links - lendingTree
 $('body').on('click', '#prof-edit-social-link .icn-lendingtree', function() {
@@ -7600,7 +7267,7 @@ function updateLendingTreeLink(link) {
 		"lendingTreeLink" : link
 	};
 	if (isValidUrl(link)) {
-		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload,true);
+		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("lendingtree", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
@@ -7623,7 +7290,7 @@ function updateRealtorLink(link) {
 		"realtorLink" : link
 	};
 	if (isValidUrl(link)) {
-		callAjaxPostWithPayloadData("./updateRealtorlink.do", callBackUpdateSocialLink, payload,true);
+		callAjaxPostWithPayloadData("./updateRealtorlink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("realtor", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
@@ -7638,32 +7305,15 @@ function callBackUpdateSocialLink(data) {
 	$('#social-token-text').val('');
 }
 
-function isValidUrl(url){
+function isValidUrl(url) {
 	var myVariable = url;
-	if(webAddressRegEx.test(myVariable)) {
+	if (webAddressRegEx.test(myVariable)) {
 		return true;
 	} else {
 		return false;
 	}
 }
-function getPhoneNumber() {
-	var countryData = $('#phone-number-work').intlTelInput("getSelectedCountryData");
-	var number = $('#phone-number-work').intlTelInput("getNumber");
-	if (number != "") {
-		if (number.indexOf("+1") != -1) {
-			number = number.substring(2, number.length + 1);
-		} else {
-			number = number.substring(countryData.dialCode.length + 1, number.length + 1);
-		}
-		return {
-			"number" : number,
-			"countryCode" : "+" + countryData.dialCode,
-			"extension" : $('#phone-number-work').intlTelInput("getExtension"),
-			"countryAbbr" : countryData.iso2,
-			"formattedPhoneNumber" : $('#phone-number-work').val()
-		};
-	}
-}
+
 // Adjust image
 function adjustImage() {
 	var windW = window.innerWidth;
@@ -7679,32 +7329,20 @@ function adjustImage() {
 	} else {
 		$('.prof-name-container,#prof-image').height(200);
 		var rowW = $('.lp-con-row').width() - 50 - 50; // left image-50;
-														// right-locks-50
+		// right-locks-50
 		$('.lp-con-row-item').width(rowW + 'px');
 		$('.footer-main-wrapper').show();
-		//show all the containers
-        $('#reviews-container, #prof-company-intro, #prof-agent-container').show();
-        $('#recent-post-container, #ppl-post-cont, #contact-wrapper, #intro-about-me').show();
+		// show all the containers
+		$('#reviews-container, #prof-company-intro, #prof-agent-container').show();
+		$('#recent-post-container, #ppl-post-cont, #contact-wrapper, #intro-about-me').show();
 	}
 }
 
 // Function to show map on the screen
 /*
- * function initializeGoogleMap() { var mapCanvas =
- * document.getElementById('map-canvas'); var geocoder = new
- * google.maps.Geocoder(); var address = "Raremile technologies,HSR
- * layout,bangalore, 560102"; var latitude = 45; var longitude = -73;
- * geocoder.geocode({ 'address' : address }, function(results, status) { if
- * (status == google.maps.GeocoderStatus.OK) { latitude =
- * results[0].geometry.location.lat(); longitude =
- * results[0].geometry.location.lng(); var mapOptions = { center: new
- * google.maps.LatLng(latitude, longitude), zoom: 15, mapTypeId:
- * google.maps.MapTypeId.ROADMAP };
+ * function initializeGoogleMap() { var mapCanvas = document.getElementById('map-canvas'); var geocoder = new google.maps.Geocoder(); var address = "Raremile technologies,HSR layout,bangalore, 560102"; var latitude = 45; var longitude = -73; geocoder.geocode({ 'address' : address }, function(results, status) { if (status == google.maps.GeocoderStatus.OK) { latitude = results[0].geometry.location.lat(); longitude = results[0].geometry.location.lng(); var mapOptions = { center: new google.maps.LatLng(latitude, longitude), zoom: 15, mapTypeId: google.maps.MapTypeId.ROADMAP };
  * 
- * map = new google.maps.Map(mapCanvas, mapOptions);
- * map.setCenter(results[0].geometry.location); marker = new
- * google.maps.Marker({ position: results[0].geometry.location, map: map, title:
- * "RM" }); } }); }
+ * map = new google.maps.Map(mapCanvas, mapOptions); map.setCenter(results[0].geometry.location); marker = new google.maps.Marker({ position: results[0].geometry.location, map: map, title: "RM" }); } }); }
  */
 
 // Data population for Admin
@@ -7788,17 +7426,15 @@ function paintHierarchy(data) {
 	 * Click on region
 	 */
 	$('.comp-region').unbind('click');
-	$('.comp-region').click(
-			function(e) {
-				if ($(this).attr("data-openstatus") == "closed") {
-					fetchRegionHierarchyOnClick($(this).attr('data-regionid'));
-					$(this).attr("data-openstatus", "open");
-				} else {
-					$('#comp-region-branches-' + $(this).attr('data-regionid'))
-							.slideUp(200);
-					$(this).attr("data-openstatus", "closed");
-				}
-			});
+	$('.comp-region').click(function(e) {
+		if ($(this).attr("data-openstatus") == "closed") {
+			fetchRegionHierarchyOnClick($(this).attr('data-regionid'));
+			$(this).attr("data-openstatus", "open");
+		} else {
+			$('#comp-region-branches-' + $(this).attr('data-regionid')).slideUp(200);
+			$(this).attr("data-openstatus", "closed");
+		}
+	});
 	// Click on branch
 	bindClickBranchForIndividuals("comp-region-branch");
 	bindClickBranchForIndividuals("comp-branch");
@@ -7819,20 +7455,16 @@ function fetchRegionHierarchyOnClick(regionId) {
 
 function bindClickBranchForIndividuals(bindingClass) {
 	$("." + bindingClass).unbind('click');
-	$("." + bindingClass).click(
-			function(e) {
-				e.stopPropagation();
-				if ($(this).attr("data-openstatus") == "closed") {
-					fetchBranchHierarchyOnClick($(this).attr('data-branchid'));
-					$(this).attr("data-openstatus", "open");
-				} else {
-					$(
-							'#comp-branch-individuals-'
-									+ $(this).attr('data-branchid')).slideUp(
-							200);
-					$(this).attr("data-openstatus", "closed");
-				}
-			});
+	$("." + bindingClass).click(function(e) {
+		e.stopPropagation();
+		if ($(this).attr("data-openstatus") == "closed") {
+			fetchBranchHierarchyOnClick($(this).attr('data-branchid'));
+			$(this).attr("data-openstatus", "open");
+		} else {
+			$('#comp-branch-individuals-' + $(this).attr('data-branchid')).slideUp(200);
+			$(this).attr("data-openstatus", "closed");
+		}
+	});
 }
 
 // Branch hierarchy on click
@@ -7846,15 +7478,13 @@ function fetchBranchHierarchyOnClick(branchId) {
 }
 
 function paintProfImage(imgDivClass) {
-	$("." + imgDivClass).each(
-			function() {
-				var imageUrl = $(this).attr('data-imageurl');
-				if (imageUrl != undefined && imageUrl.trim() != "") {
-					$(this).css("background",
-							"url(" + imageUrl + ") no-repeat center");
-					$(this).css("background-size", "100%");
-				}
-			});
+	$("." + imgDivClass).each(function() {
+		var imageUrl = $(this).attr('data-imageurl');
+		if (imageUrl != undefined && imageUrl.trim() != "") {
+			$(this).css("background", "url(" + imageUrl + ") no-repeat center");
+			$(this).css("background-size", "100%");
+		}
+	});
 }
 
 var doStopReviewsPaginationEditProfile = false;
@@ -7863,40 +7493,39 @@ var isReviewsLoadingEditProfile = false;
 
 function fetchReviewsEditProfileScroll() {
 
-	//check if the current page is edit profile
-	if(location.hash != "#showprofilepage")  {
+	// check if the current page is edit profile
+	if (location.hash != "#showprofilepage") {
 		return;
 	}
-	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() - 200)
-			&& ( !doStopReviewsPaginationEditProfile || $('div.dsh-review-cont.hide').length > 0 ) ) {
-		if(isReviewsLoadingEditProfile) return; //return if the scroll is running
-		if($('div.dsh-review-cont.hide').length > 0){
+	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() - 200) && (!doStopReviewsPaginationEditProfile || $('div.dsh-review-cont.hide').length > 0)) {
+		if (isReviewsLoadingEditProfile)
+			return; // return if the scroll is running
+		if ($('div.dsh-review-cont.hide').length > 0) {
 			showLoaderOnPagination($('#prof-review-item'));
 			isReviewsLoadingEditProfile = true;
 			setTimeout(displayReviewOnEditProfile, 500);
-		} else{
+		} else {
 			fetchReviewsOnEditProfile(attrName, attrVal, false);
 		}
 	}
 }
 
 function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
-	
-	if(isReviewsRequestRunningEditProfile) return; //Return if ajax request is still running
-	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore="
-			+ minScore + "&startIndex=" + startIndex + "&numOfRows="
-			+ numOfRows;
-	
+
+	if (isReviewsRequestRunningEditProfile)
+		return; // Return if ajax request is still running
+	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore=" + minScore + "&startIndex=" + startIndex + "&numOfRows=" + numOfRows;
+
 	isReviewsRequestRunningEditProfile = true;
-	if(!isNextBatch) {
+	if (!isNextBatch) {
 		showLoaderOnPagination($('#prof-review-item'));
 	}
 	callAjaxGET(url, function(data) {
-		//Check if list revcieved is empty 
+		// Check if list revcieved is empty
 		var tempDiv = $("<div>").html(data);
-		
+
 		var countOfReviewsFetched = tempDiv.children('.dsh-review-cont').length;
-		
+
 		if (countOfReviewsFetched <= 0) {
 			if (startIndex == 0) {
 				$("#prof-review-item").html("<span>No Reviews Found</span>");
@@ -7905,30 +7534,30 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 			// Populate the reviews
 			$("#prof-review-item").append(data);
 		}
-		
-		if(countOfReviewsFetched < numOfRows) {
+
+		if (countOfReviewsFetched < numOfRows) {
 			doStopReviewsPaginationEditProfile = true;
 		}
-		
-		//Update events
+
+		// Update events
 		updateEventOnDashboardPageForReviews();
 		startIndex = startIndex + numOfRows;
-		
-		if(!isNextBatch) {
+
+		if (!isNextBatch) {
 			displayReviewOnEditProfile();
 		}
 		isReviewsRequestRunningEditProfile = false;
-		if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
+		if ($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 			fetchReviewsOnEditProfile(attrName, attrVal, true);
-		} else if($('div.dsh-review-cont.hide').length < (2 * numOfRows)) {
-			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning, false, countOfReviewsFetched, numOfRows, "");
+		} else if ($('div.dsh-review-cont.hide').length < (2 * numOfRows)) {
+			fetchZillowReviewsBasedOnProfile(attrName, attrVal, isZillowReviewsCallRunning, false, countOfReviewsFetched, numOfRows, "");
 		}
 	}, true);
 }
 
-function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard, start, batchSize, name){
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard, start, batchSize, name) {
 	if (currentProfileIden == undefined || currentProfileIden == "" || isZillowReviewsCallRunning) {
-		return; //Return if profile id is undefined
+		return; // Return if profile id is undefined
 	}
 	var url = "/rest/profile/";
 	if (profileLevel == 'companyId') {
@@ -7946,34 +7575,34 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	}
 	url += currentProfileIden + "/zillowreviews";
 	isZillowReviewsCallRunning = true;
-	
+
 	callAjaxGET(url, function(data) {
 		isZillowReviewsCallRunning = false;
-	    if (data != undefined && data != "") {
-	        var responseJson = $.parseJSON(data);
-	        if (responseJson != undefined) {
-	            var result = $.parseJSON(responseJson.entity);
-	            zillowCallBreak = result.zillowCallBreak;
-	            if (!zillowCallBreak) {
-	                stopFetchReviewPagination = true; //Stop pagination as zillow reviews are fetch one shot
-	                if (result != undefined && result.length > 0) {
+		if (data != undefined && data != "") {
+			var responseJson = $.parseJSON(data);
+			if (responseJson != undefined) {
+				var result = $.parseJSON(responseJson.entity);
+				zillowCallBreak = result.zillowCallBreak;
+				if (!zillowCallBreak) {
+					stopFetchReviewPagination = true; // Stop pagination as zillow reviews are fetch one shot
+					if (result != undefined && result.length > 0) {
 						// build zillow reviews html here
-	                	var lastIndex = start - batchSize;
+						var lastIndex = start - batchSize;
 						// remove the No Reviews Found
 						if (isFromDashBoard && lastIndex <= 0) {
 							$("#review-desc").html("What people say about " + name);
 						} else if (!isFromDashBoard && start <= 0) {
 							$("#prof-review-item").html("");
 						}
-						paintReviews(result,isFromDashBoard);
-	                }
-	            }
-	        }
-	    }
+						paintReviews(result, isFromDashBoard);
+					}
+				}
+			}
+		}
 	}, true);
 }
 
-//Display the review on edit profile
+// Display the review on edit profile
 function displayReviewOnEditProfile() {
 	isReviewsLoadingEditProfile = false;
 	$('.dsh-review-cont').removeClass("ppl-review-item-last").addClass("ppl-review-item");
@@ -7981,22 +7610,20 @@ function displayReviewOnEditProfile() {
 	var total = $('div.dsh-review-cont.hide').length;
 	$('div.dsh-review-cont.hide').each(function(index, currentElement) {
 		$(this).removeClass("hide");
-		if(index >= numOfRows - 1 || index >= total - 1) {
+		if (index >= numOfRows - 1 || index >= total - 1) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
 			return false;
 		}
 	});
-	
-	if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
+
+	if ($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 		fetchReviewsOnEditProfile(attrName, attrVal, true);
 	}
 }
 
-
 // fetch review count
 function fetchReviewCount(attrName, attrVal, minScore) {
-	var url = "./fetchreviewcount.do?" + attrName + "=" + attrVal
-			+ "&minScore=" + minScore;
+	var url = "./fetchreviewcount.do?" + attrName + "=" + attrVal + "&minScore=" + minScore;
 	callAjaxGET(url, paintReviewCount, true);
 }
 
@@ -8004,8 +7631,8 @@ function paintReviewCount(reviewCount) {
 	if (reviewCount != undefined) {
 		if (reviewCount > 0) {
 			$("#prof-company-review-count").click(function() {
-				if(window.innerWidth < 768){
-					$('.icn-star-smile').click();					
+				if (window.innerWidth < 768) {
+					$('.icn-star-smile').click();
 				}
 				$(window).scrollTop($('#reviews-container').offset().top);
 			});
@@ -8023,19 +7650,18 @@ function fetchAvgRating(attrName, attrVal) {
 
 function paintAvgRating(avgRating) {
 	if (avgRating != undefined) {
-		changeRatingPattern(avgRating, $("#rating-avg-comp"),true);
+		changeRatingPattern(avgRating, $("#rating-avg-comp"), true);
 	}
 }
 
 // Edit EmailIds
 $(document).on('blur', '#contant-info-container input[data-email]', function() {
-	if (!$(this).val() || !emailRegex.test(this.value)
-			|| ($(this).val() == $('#' + $(this).attr("id") + '-old').val())) {
+	if (!$(this).val() || !emailRegex.test(this.value) || ($(this).val() == $('#' + $(this).attr("id") + '-old').val())) {
 		$('#overlay-toast').html("Please enter valid email address");
 		showToast();
 		return;
 	}
-	
+
 	delay(function() {
 		var mailIds = [];
 		$('#contant-info-container input[data-email]').each(function() {
@@ -8050,13 +7676,13 @@ $(document).on('blur', '#contant-info-container input[data-email]', function() {
 		var payload = {
 			"mailIds" : mailIds
 		};
-		callAjaxPostWithPayloadData("./updateemailids.do", callBackOnUpdateMailIds, payload,true);
+		callAjaxPostWithPayloadData("./updateemailids.do", callBackOnUpdateMailIds, payload, true);
 	}, 0);
 });
 
 function callBackOnUpdateMailIds(data) {
 	$('#prof-message-header').html(data);
-	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails,true);
+	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails, true);
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
@@ -8069,41 +7695,40 @@ function bindClickForIndividuals(elementClass) {
 	});
 }
 
-//Bind scroll event for public posts on edit profile page
+// Bind scroll event for public posts on edit profile page
 function attachPostsScrollEvent() {
 	$('#prof-posts').off('scroll');
-	$('#prof-posts').on('scroll',function(){
+	$('#prof-posts').on('scroll', function() {
 		var scrollContainer = this;
-		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) 
-				- (scrollContainer.clientHeight / 0.75))) {
-				if (!doStopPostPaginationEditProfile || publicPostsBatch.length > 0) {
-					fetchPublicPostEditProfile(false);
-				}
-					
+		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) - (scrollContainer.clientHeight / 0.75))) {
+			if (!doStopPostPaginationEditProfile || publicPostsBatch.length > 0) {
+				fetchPublicPostEditProfile(false);
+			}
+
 		}
 	});
 }
 
-var doStopPostPaginationEditProfile = false; 
+var doStopPostPaginationEditProfile = false;
 var isAjaxRequestRunningEditProfile = false;
 var isLoaderRunningEditProfile = false;
 var publicPostsBatch = [];
 
 /**
  * Method to fetch public posts on edit profile page
+ * 
  * @param isNextBatch
  */
 function fetchPublicPostEditProfile(isNextBatch) {
 
-	
-	if(proPostStartIndex == 0) {
+	if (proPostStartIndex == 0) {
 		doStopPostPaginationEditProfile = false;
 		publicPostsBatch = [];
 		$('#prof-posts').html('');
-		$('#last-post').attr('hidden','true');
+		$('#last-post').attr('hidden', 'true');
 	}
-	
-	//Show from existing batch if the data is present
+
+	// Show from existing batch if the data is present
 	if (!isNextBatch && publicPostsBatch.length > 0) {
 		$('#last-post').removeAttr('hidden');
 		var posts = publicPostsBatch.slice(0, proPostBatchSize);
@@ -8112,70 +7737,70 @@ function fetchPublicPostEditProfile(isNextBatch) {
 		} else {
 			publicPostsBatch = [];
 		}
-		
-		if(isLoaderRunningEditProfile) {
+
+		if (isLoaderRunningEditProfile) {
 			hideLoaderOnPagination($('#prof-posts'));
 		}
 		showLoaderOnPagination($('#prof-posts'));
 		isLoaderRunningEditProfile = true;
-		//paint the posts
+		// paint the posts
 		setTimeout(function() {
 			paintPosts(posts);
 			isLoaderRunningEditProfile = false;
-			//Fetch the next batch
-			if(!doStopPostPaginationEditProfile && publicPostsBatch.length <= proPostBatchSize) {
+			// Fetch the next batch
+			if (!doStopPostPaginationEditProfile && publicPostsBatch.length <= proPostBatchSize) {
 				fetchPublicPostEditProfile(true);
 			}
 		}, 500);
-		
+
 		return;
-	} 
-	
+	}
+
 	if (!isNextBatch) {
 		showLoaderOnPagination($('#prof-posts'));
 	}
-	
-	if(isAjaxRequestRunningEditProfile) return; //Return if ajax request running to fetch the social posts
-	
+
+	if (isAjaxRequestRunningEditProfile)
+		return; // Return if ajax request running to fetch the social posts
+
 	var payload = {
 		"batchSize" : proPostBatchSize,
 		"startIndex" : proPostStartIndex
 	};
-	
+
 	isAjaxRequestRunningEditProfile = true;
 	callAjaxGetWithPayloadData("./postsforuser.do", function(data) {
-		
+
 		isAjaxRequestRunningEditProfile = false;
 		if (data.errCode == undefined) {
-			if(data != "") {
-				
-				
+			if (data != "") {
+
 				var posts = JSON.parse(data);
-				if(posts.length <= 0 && proPostStartIndex == 0) {
+				if (posts.length <= 0 && proPostStartIndex == 0) {
 					doStopPostPaginationEditProfile = true;
 					hideLoaderOnPagination($('#prof-posts'));
 					return;
 				}
-				if(posts.length < proPostBatchSize) {
+				if (posts.length < proPostBatchSize) {
 					doStopPostPaginationEditProfile = true;
 				}
-				
-				//update start index
-				proPostStartIndex += proPostBatchSize;	
-				
-				//update the batch
+
+				// update start index
+				proPostStartIndex += proPostBatchSize;
+
+				// update the batch
 				publicPostsBatch = publicPostsBatch.concat(posts);
-				
-				if(isNextBatch) {
-					//Fetch the next batch
-					if(!doStopPostPaginationEditProfile && publicPostsBatch.length <= proPostBatchSize) {
+
+				if (isNextBatch) {
+					// Fetch the next batch
+					if (!doStopPostPaginationEditProfile && publicPostsBatch.length <= proPostBatchSize) {
 						fetchPublicPostEditProfile(true);
 					}
 				} else {
-					if(posts && posts.length > 0)
+					if (posts && posts.length > 0)
 						fetchPublicPostEditProfile(false);
 				}
-					
+
 			}
 		}
 	}, payload, true);
@@ -8188,80 +7813,66 @@ function paintPosts(posts) {
 	$('#prof-posts').children('.tweet-panel-item').removeClass('bord-bot-none');
 	$.each(posts, function(i, post) {
 		var iconClass = "";
-		var href="javascript:void(0)";
-		if(post.source == "google"){
+		var href = "javascript:void(0)";
+		if (post.source == "google") {
 			iconClass = "icn-gplus";
-		}
-		else if(post.source == "SocialSurvey")
+		} else if (post.source == "SocialSurvey")
 			iconClass = "icn-ss";
-		else if(post.source == "facebook"){
+		else if (post.source == "facebook") {
 			iconClass = "icn-fb";
-			href="http://www.facebook.com/"+post.postId;
-		}
-		else if(post.source == "twitter"){
+			href = "http://www.facebook.com/" + post.postId;
+		} else if (post.source == "twitter") {
 			iconClass = "icn-twit";
 			var res = post.postText.split("http");
-			href="http"+res[1];
-		}
-		else if(post.source == "linkedin"){
+			href = "http" + res[1];
+		} else if (post.source == "linkedin") {
 			iconClass = "icn-lin";
 		}
-		if(typeof post.postUrl!=  "undefined" ){
-			 href= post.postUrl;
+		if (typeof post.postUrl != "undefined") {
+			href = post.postUrl;
 		}
-		var hrefComplet='<a href='+href+' target="_blank">';
-		
+		var hrefComplet = '<a href=' + href + ' target="_blank">';
+
 		elementClass = "tweet-panel-item bord-bot-dc clearfix";
-		
-		if(i >= postsLength - 1) {
+
+		if (i >= postsLength - 1) {
 			elementClass += " bord-bot-none";
 		}
-		
-		divToPopulate += '<div class="'+elementClass+'">'		
-				+ hrefComplet
-				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
-				+"</a>"
-				+ '<div class="tweet-txt float-left">'
-				+ '<div class="tweet-text-main">' + linkify(escapeHtml(post.postText)) + '</div>'
-				+ '<div class="tweet-text-link"><em>' + post.postedBy
-				+ '</em></div>' + '<div class="tweet-text-time"><em>'
-				+ convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
-				+ '</div>';
-		
-		if(post.source == "SocialSurvey"){
-			var divToDeleteSurvey = '<div class="dlt-survey-wrapper hide"><div surveymongoid=' + post._id + ' class="post-dlt-icon reg-err-pu-close float-left">'
-								+ '</div></div>';
+
+		divToPopulate += '<div class="' + elementClass + '">' + hrefComplet + '<div class="tweet-icn ' + iconClass + ' float-left"></div>' + "</a>" + '<div class="tweet-txt float-left">' + '<div class="tweet-text-main">' + linkify(escapeHtml(post.postText)) + '</div>' + '<div class="tweet-text-link"><em>' + post.postedBy + '</em></div>' + '<div class="tweet-text-time"><em>' + convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>' + '</div>';
+
+		if (post.source == "SocialSurvey") {
+			var divToDeleteSurvey = '<div class="dlt-survey-wrapper hide"><div surveymongoid=' + post._id + ' class="post-dlt-icon reg-err-pu-close float-left">' + '</div></div>';
 			divToPopulate += divToDeleteSurvey;
 		}
-		
+
 		divToPopulate += '</div>';
 	});
-	
-	//Hide the loader icon
+
+	// Hide the loader icon
 	hideLoaderOnPagination($('#prof-posts'));
 
-	if ($('#prof-posts').children('.tweet-panel-item').length == 0){
+	if ($('#prof-posts').children('.tweet-panel-item').length == 0) {
 		$('#prof-posts').html(divToPopulate);
 		$('#prof-posts').perfectScrollbar({
 			suppressScrollX : true
 		});
 		$('#prof-posts').perfectScrollbar('update');
-	}
-	else{
+	} else {
 		$('#prof-posts').append(divToPopulate);
 		$('#prof-posts').perfectScrollbar('update');
 	}
 }
 
-function showDashboardButtons(columnName, columnValue){
-	var payload={
+function showDashboardButtons(columnName, columnValue) {
+	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue
 	};
 	callAjaxGetWithPayloadData('./dashboardbuttonsorder.do', paintDashboardButtons, payload, true);
 }
 
-function paintDashboardButtons(data){
+function paintDashboardButtons(data) {
 	data = $.parseJSON(data);
 	var stages = data.stages;
 	var max = 2;
@@ -8275,9 +7886,9 @@ function paintDashboardButtons(data){
 			var contentToDisplay = '';
 			if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
 				contentToDisplay = 'Connect to Facebook';
-			}else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
+			} else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
 				contentToDisplay = 'Connect to Zillow';
-			}else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
+			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
 				contentToDisplay = 'Connect to Google+';
 			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
 				contentToDisplay = 'Connect to Twitter';
@@ -8306,59 +7917,51 @@ function paintDashboardButtons(data){
 	}
 }
 
-function dashboardButtonAction(buttonId, task, columnName, columnValue){
-	if(task=='FACEBOOK_PRF'){
+function dashboardButtonAction(buttonId, task, columnName, columnValue) {
+	if (task == 'FACEBOOK_PRF') {
 		openAuthPageDashboard('facebook', columnName, columnValue);
-	}
-	else if(task=='GOOGLE_PRF'){
+	} else if (task == 'GOOGLE_PRF') {
 		openAuthPageDashboard('google', columnName, columnValue);
-	}
-	else if(task=='ZILLOW_PRF'){
+	} else if (task == 'ZILLOW_PRF') {
 		openAuthPageDashboardZillow('#dsh-btn3');
-	}
-	else if(task=='YELP_PRF'){
+	} else if (task == 'YELP_PRF') {
 		showMainContent('./showprofilepage.do');
 		editProfileForYelp = true;
-	}
-	else if(task=='LINKEDIN_PRF'){
+	} else if (task == 'LINKEDIN_PRF') {
 		openAuthPageDashboard('linkedin', columnName, columnValue);
-	}
-	else if(task=='TWITTER_PRF'){
+	} else if (task == 'TWITTER_PRF') {
 		openAuthPageDashboard('twitter', columnName, columnValue);
-	}
-	else if(task=='LICENSE_PRF'){
+	} else if (task == 'LICENSE_PRF') {
 		showMainContent('./showprofilepage.do');
 		editProfileForLicense = true;
-	}
-	else if(task=='HOBBIES_PRF'){
+	} else if (task == 'HOBBIES_PRF') {
 		showMainContent('./showprofilepage.do');
 		editProfileForHobbies = true;
-	}
-	else if(task=='ACHIEVEMENTS_PRF'){
+	} else if (task == 'ACHIEVEMENTS_PRF') {
 		showMainContent('./showprofilepage.do');
 		editProfileForAchievements = true;
 	}
 }
 
-//Update Disclaimer details
+// Update Disclaimer details
 $(document).on('blur', '#disclaimer-text', function() {
-	
+
 	var disclaimer = $('#disclaimer-text').val().trim();
 	if (disclaimer == undefined || disclaimer == "") {
 		$('#overlay-toast').html("Please add disclaimer");
 		showToast();
 		return;
 	}
-	
+
 	if ($('#disclaimer-default').val() != disclaimer) {
 		var payload = {
 			"disclaimer" : disclaimer
 		};
-		
+
 		callAjaxPostWithPayloadData("./updatedisclaimer.do", function(data) {
 			$('#prof-message-header').html(data);
 			if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-				if(disclaimer != undefined){
+				if (disclaimer != undefined) {
 					$('#disclaimer-default').val(disclaimer.trim());
 					$('#disclaimer-text').val(disclaimer.trim());
 				}
@@ -8366,37 +7969,33 @@ $(document).on('blur', '#disclaimer-text', function() {
 
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
-		}, payload,true);
+		}, payload, true);
 	}
 });
 
-//Dashboard admin reports
-$(document).on('change','#download-survey-reports',function(){
-//	var selectedValue =
+// Dashboard admin reports
+$(document).on('change', '#download-survey-reports', function() {
+	// var selectedValue =
 });
 
-$(document).on('click','#dsh-dwnld-report-btn',function(){
+$(document).on('click', '#dsh-dwnld-report-btn', function() {
 	var selectedValue = $('#download-survey-reports').val();
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
-	
+
 	var key = parseInt(selectedValue);
 	switch (key) {
 	case 1:
-		window.location.href = "/downloadagentrankingreport.do?columnName=" + colName + "&columnValue=" + colValue
-			+ "&startDate=" + startDate + "&endDate=" + endDate;
+		window.location.href = "/downloadagentrankingreport.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	case 2:
-		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue
-			+ "&startDate=" + startDate + "&endDate=" + endDate;
+		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	case 3:
-		window.location.href = "/downloaddashboardsocialmonitor.do?columnName=" + colName + "&columnValue=" + colValue
-			+ "&startDate=" + startDate + "&endDate=" + endDate;
+		window.location.href = "/downloaddashboardsocialmonitor.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	case 4:
-		window.location.href = "/downloaddashboardincompletesurvey.do?columnName=" + colName + "&columnValue=" + colValue
-			+ "&startDate=" + startDate + "&endDate=" + endDate;
+		window.location.href = "/downloaddashboardincompletesurvey.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	case 5:
 		window.location.href = "/downloaduseradoptionreport.do?columnName=" + colName + "&columnValue=" + colValue;
@@ -8409,21 +8008,21 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 	}
 });
 
-//function to switch to admin 
+// function to switch to admin
 function userSwitchToAdmin() {
-	callAjaxGET("/switchtoadmin.do", function(data){
-		if(data == "success") {
-			//window.location = window.location.origin + '/userlogin.do';
+	callAjaxGET("/switchtoadmin.do", function(data) {
+		if (data == "success") {
+			// window.location = window.location.origin + '/userlogin.do';
 			window.location = getLocationOrigin() + '/userlogin.do';
 		}
 	}, true);
 }
 
-//function to switch to company admin 
+// function to switch to company admin
 function userSwitchToCompAdmin() {
-	callAjaxGET("/switchtocompanyadmin.do", function(data){
-		if(data == "success") {
-			//window.location = window.location.origin + '/userlogin.do';
+	callAjaxGET("/switchtocompanyadmin.do", function(data) {
+		if (data == "success") {
+			// window.location = window.location.origin + '/userlogin.do';
 			window.location = getLocationOrigin() + '/userlogin.do';
 		}
 	}, true);
@@ -8432,48 +8031,51 @@ function userSwitchToCompAdmin() {
 function bindAppUserLoginEvent() {
 	$('.user-login-icn').off('click');
 	$('.user-login-icn').on('click', function(e) {
-		$( '.user-login-icn').unbind( "click" );
+		$('.user-login-icn').unbind("click");
 		e.stopImmediatePropagation();
 		var payload = {
 			"colName" : "userId",
 			"colValue" : $(this).attr('data-iden')
 		};
 		callAjaxGETWithTextData("/logincompanyadminas.do", function(data) {
-			
+
 			window.location = getLocationOrigin() + '/userlogin.do';
-		}, true, payload,'.user-login-icn');
+		}, true, payload, '.user-login-icn');
 	});
 }
 
 function initializeVerticalAutcomplete() {
 	$('#prof-vertical').autocomplete({
-		minLength: 1,
-		source: verticalsMasterList,
+		minLength : 1,
+		source : verticalsMasterList,
 		delay : 0,
 		autoFocus : true,
-		close: function(event, ui) {},
-		select: function(event, ui) {},
-		create: function(event, ui) {
-	        $('.ui-helper-hidden-accessible').remove();
+		close : function(event, ui) {
+		},
+		select : function(event, ui) {
+		},
+		create : function(event, ui) {
+			$('.ui-helper-hidden-accessible').remove();
 		}
 	});
-	$("#prof-vertical").keydown(function(e){
-  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
-  	    
-   	   e.keyCode = $.ui.keyCode.DOWN;
-   	   $(this).trigger(e);
+	$("#prof-vertical").keydown(function(e) {
+		if (e.keyCode != $.ui.keyCode.TAB)
+			return;
 
-   	   e.keyCode = $.ui.keyCode.ENTER;
-   	   $(this).trigger(e);
-   	});
+		e.keyCode = $.ui.keyCode.DOWN;
+		$(this).trigger(e);
+
+		e.keyCode = $.ui.keyCode.ENTER;
+		$(this).trigger(e);
+	});
 	$("#prof-vertical").focus(function() {
 		$(this).trigger('keydown');
-		$(this).autocomplete("search");	
+		$(this).autocomplete("search");
 	});
 }
-var isfetchreview=false;
-function getIncompleteSurveyCount(colName, colValue){
-	if(isfetchreview==true){
+var isfetchreview = false;
+function getIncompleteSurveyCount(colName, colValue) {
+	if (isfetchreview == true) {
 		return;
 	}
 	startIndexInc = 0;
@@ -8481,22 +8083,22 @@ function getIncompleteSurveyCount(colName, colValue){
 		"columnName" : colName,
 		"columnValue" : colValue
 	};
-	isfetchreview=true;
+	isfetchreview = true;
 	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(data) {
-		isfetchreview=false;
+		isfetchreview = false;
 		$('#icn-sur-popup-cont').attr("data-total", data);
 		$('#dsh-inc-srvey').attr("data-total", data);
 		var totalCount = parseInt(data);
-		var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch")); 
+		var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
 		var numPages = 0;
-		if(parseInt( totalCount % batchSize) == 0) {
-			numPages = parseInt( totalCount / batchSize);
-		}else {
-			numPages = parseInt(parseInt( totalCount / batchSize) + 1);
+		if (parseInt(totalCount % batchSize) == 0) {
+			numPages = parseInt(totalCount / batchSize);
+		} else {
+			numPages = parseInt(parseInt(totalCount / batchSize) + 1);
 		}
 		$('#paginate-total-pages').html(numPages);
-		
-		//Show dashboard incomplete reviews
+
+		// Show dashboard incomplete reviews
 		doStopIncompleteSurveyPostAjaxRequest = false;
 		$('#dsh-inc-srvey').html('');
 		fetchIncompleteSurvey(false);
@@ -8504,67 +8106,66 @@ function getIncompleteSurveyCount(colName, colValue){
 			suppressScrollX : true
 		});
 		$('#dsh-inc-srvey').perfectScrollbar('update');
-		
+
 	}, payload, true);
 }
 
-$(document).on('click', '#sur-next.paginate-button',function(){
+$(document).on('click', '#sur-next.paginate-button', function() {
 	var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
 	var incompleteSurveyBatchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
 	incompleteSurveyStartIndex = incompleteSurveyStartIndex + incompleteSurveyBatchSize;
 	$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
-	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);	
+	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
 });
 
-$(document).on('click', '#sur-previous.paginate-button',function(){
+$(document).on('click', '#sur-previous.paginate-button', function() {
 	var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
 	var incompleteSurveyBatchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
-	if(incompleteSurveyStartIndex % incompleteSurveyBatchSize == 0) {
-		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize)  - 1;
+	if (incompleteSurveyStartIndex % incompleteSurveyBatchSize == 0) {
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize) - 1;
 	} else {
-		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize);	
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize);
 	}
-	incompleteSurveyStartIndex = incompleteSurveyStartIndex * incompleteSurveyBatchSize ;
+	incompleteSurveyStartIndex = incompleteSurveyStartIndex * incompleteSurveyBatchSize;
 	$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
 	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
 });
 
-
 $(document).on('keypress', '#sel-page', function(e) {
-	//if the letter is not digit then don't type anything
+	// if the letter is not digit then don't type anything
 	if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
 		return false;
 	}
 	var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
 	var total = parseInt($('#icn-sur-popup-cont').attr("data-total"));
 	var prevPageNoVal = parseInt($('#sel-page').val());
-	if(prevPageNoVal == NaN) {
+	if (prevPageNoVal == NaN) {
 		prevPageNoVal = 0;
 	}
 	var pageNo = prevPageNoVal + String.fromCharCode(e.which);
 	pageNo = parseInt(pageNo);
-	var incompleteSurveyStartIndex = parseInt(pageNo-1) * batchSize;
-	if(incompleteSurveyStartIndex >= total || incompleteSurveyStartIndex <= 0) {
+	var incompleteSurveyStartIndex = parseInt(pageNo - 1) * batchSize;
+	if (incompleteSurveyStartIndex >= total || incompleteSurveyStartIndex <= 0) {
 		return false;
 	}
 });
 
-function paginateIncompleteSurvey(){
+function paginateIncompleteSurvey() {
 	$('#sel-page').blur();
 	var pageNo = parseInt($('#sel-page').val());
-	if(pageNo == NaN || pageNo <= 0) {
+	if (pageNo == NaN || pageNo <= 0) {
 		return false;
 	}
 	var incompleteSurveyStartIndex = 0;
 	var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
-	incompleteSurveyStartIndex = parseInt(pageNo-1) * batchSize;
-	
+	incompleteSurveyStartIndex = parseInt(pageNo - 1) * batchSize;
+
 	$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
 	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
 }
 
 $(document).on('keyup', '#sel-page', function(e) {
-	if(e.which == 13) {
+	if (e.which == 13) {
 		paginateIncompleteSurvey();
 	}
 });
@@ -8579,10 +8180,10 @@ function showIncompleteSurveyListPopup(event) {
 	event.stopPropagation();
 	$('#icn-sur-popup-cont').attr("data-start", 0);
 	$("#overlay-incomplete-survey").show();
-	paintIncompleteSurveyListPopupResults(0);		
+	paintIncompleteSurveyListPopupResults(0);
 }
 
-function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex){
+function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex) {
 	var incompleteSurveyBatchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
 	$('#sel-page').val((incompleteSurveystartIndex / incompleteSurveyBatchSize) + 1);
 	var payload = {
@@ -8594,14 +8195,14 @@ function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex){
 	callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
 		disableBodyScroll();
 		$('#icn-sur-popup-cont').html(data);
-		if(parseInt(incompleteSurveystartIndex) > 0 ) {
+		if (parseInt(incompleteSurveystartIndex) > 0) {
 			$('#sur-previous').addClass('paginate-button');
 		} else {
 			$('#sur-previous').removeClass('paginate-button');
 		}
 		incompleteSurveystartIndex = parseInt(incompleteSurveystartIndex) + parseInt($('#icn-sur-popup-cont').children('.dash-lp-item').size());
 		var totalSurveysCount = parseInt($('#icn-sur-popup-cont').attr("data-total"));
-		if(incompleteSurveystartIndex < totalSurveysCount ) {
+		if (incompleteSurveystartIndex < totalSurveysCount) {
 			$('#sur-next').addClass('paginate-button');
 		} else {
 			$('#sur-next').removeClass('paginate-button');
@@ -8617,7 +8218,7 @@ function hideIncompleteSurveyListPopup() {
 	$('#icn-sur-popup-cont').data('selected-survey', new Array());
 }
 
-$(document).on('click','#del-mult-sur-icn.mult-sur-icn-active',function(){
+$(document).on('click', '#del-mult-sur-icn.mult-sur-icn-active', function() {
 	var selectedSurveys = $('#icn-sur-popup-cont').data('selected-survey');
 	removeMultipleIncompleteSurveyRequest(selectedSurveys);
 });
@@ -8631,42 +8232,42 @@ function removeIncompleteSurveyRequest(incompleteSurveyId) {
 function removeMultipleIncompleteSurveyRequest(incompleteSurveyIds) {
 	callAjaxPOSTWithTextData("/deletemultipleincompletesurveyrequest.do?surveySetToDelete=" + incompleteSurveyIds, function(data) {
 		if (data == "success") {
-			
-			//unselect all the options after deleting
-			$('#icn-sur-popup-cont').data('selected-survey',[]);
-			
+
+			// unselect all the options after deleting
+			$('#icn-sur-popup-cont').data('selected-survey', []);
+
 			var totalIncSurveys = $('#icn-sur-popup-cont').attr('data-total');
 			totalIncSurveys = totalIncSurveys - incompleteSurveyIds.length;
 			$('#icn-sur-popup-cont').attr('data-total', totalIncSurveys);
 			var batchSize = parseInt($('#icn-sur-popup-cont').attr('data-batch'));
 			var newTotalPages = 0;
-			if(totalIncSurveys % batchSize == 0) {
-				newTotalPages =  totalIncSurveys / batchSize;
+			if (totalIncSurveys % batchSize == 0) {
+				newTotalPages = totalIncSurveys / batchSize;
 			} else {
-				newTotalPages =  parseInt(totalIncSurveys / batchSize) + 1;
+				newTotalPages = parseInt(totalIncSurveys / batchSize) + 1;
 			}
 			$('#paginate-total-pages').html(newTotalPages);
-			for (var i=0; i < incompleteSurveyIds.length; i++) {
-				$('div[data-iden="sur-pre-'+incompleteSurveyIds[i]+'"]').remove();
+			for (var i = 0; i < incompleteSurveyIds.length; i++) {
+				$('div[data-iden="sur-pre-' + incompleteSurveyIds[i] + '"]').remove();
 			}
-			
+
 			$('#overlay-toast').html('Survey reminder request deleted successfully');
 			showToast();
-			
-			//update the page
+
+			// update the page
 			var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
 			paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
-			
-			//Update the incomplete survey on dashboard
+
+			// Update the incomplete survey on dashboard
 			getIncompleteSurveyCount(colName, colValue);
-			
+
 			$('#del-mult-sur-icn').removeClass('mult-sur-icn-active');
 			$('#resend-mult-sur-icn').removeClass('mult-sur-icn-active');
 		}
 	}, true, {});
 }
 
-$(document).on('click','#resend-mult-sur-icn.mult-sur-icn-active',function(){
+$(document).on('click', '#resend-mult-sur-icn.mult-sur-icn-active', function() {
 	var selectedSurveys = $('#icn-sur-popup-cont').data('selected-survey');
 	resendMultipleIncompleteSurveyRequests(selectedSurveys);
 });
@@ -8674,23 +8275,23 @@ $(document).on('click','#resend-mult-sur-icn.mult-sur-icn-active',function(){
 function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
 	callAjaxPOSTWithTextData("/resendmultipleincompletesurveyrequest.do?surveysSelected=" + incompleteSurveyIds, function(data) {
 		if (data == "success") {
-			//unselect all the options after deleting
-			$('#icn-sur-popup-cont').data('selected-survey',[]);
-			
+			// unselect all the options after deleting
+			$('#icn-sur-popup-cont').data('selected-survey', []);
+
 			$('#overlay-toast').html('Survey reminder request resent successfully');
 			showToast();
 			$('#del-mult-sur-icn').removeClass('mult-sur-icn-active');
 			$('#resend-mult-sur-icn').removeClass('mult-sur-icn-active');
 			$('#icn-sur-popup-cont').data('selected-survey', []);
 			$('.sur-icn-checkbox').addClass('sb-q-chk-yes').removeClass('sb-q-chk-no');
-			
-			//Update the incomplete survey on dashboard
+
+			// Update the incomplete survey on dashboard
 			startIndexInc = 0;
 			doStopIncompleteSurveyPostAjaxRequest = false;
 			fetchIncompleteSurvey(false);
 			$('#dsh-inc-srvey').perfectScrollbar('update');
-			
-			//update the page
+
+			// update the page
 			var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
 			paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
 		}
@@ -8703,40 +8304,38 @@ function bindDatePickerforSurveyDownload() {
 	var fromEndDate = new Date();
 	var toEndDate = new Date();
 	$("#dsh-start-date").datepicker({
-		orientation: "auto",
-		format: 'mm/dd/yyyy',
-		endDate: fromEndDate,
-		todayHighlight: true,
-		clearBtn: true,
-		autoclose: true
-	})
-	.on('changeDate', function(selected){
-		if(selected.date == undefined) {
-			startDate = null; //reset start date
+		orientation : "auto",
+		format : 'mm/dd/yyyy',
+		endDate : fromEndDate,
+		todayHighlight : true,
+		clearBtn : true,
+		autoclose : true
+	}).on('changeDate', function(selected) {
+		if (selected.date == undefined) {
+			startDate = null; // reset start date
 		} else {
 			startDate = new Date(selected.date.valueOf());
-	        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));			
+			startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
 		}
-        $('#dsh-end-date').datepicker('setStartDate', startDate);
-    });
-	
+		$('#dsh-end-date').datepicker('setStartDate', startDate);
+	});
+
 	$("#dsh-end-date").datepicker({
-		orientation: "auto",
-		format: 'mm/dd/yyyy',
-		endDate: toEndDate,
-		todayHighlight: true,
-		clearBtn: true,
-		autoclose: true
-	})
-	.on('changeDate', function(selected){
-		if(selected.date == undefined) {
-			fromEndDate = null; //reset end date
+		orientation : "auto",
+		format : 'mm/dd/yyyy',
+		endDate : toEndDate,
+		todayHighlight : true,
+		clearBtn : true,
+		autoclose : true
+	}).on('changeDate', function(selected) {
+		if (selected.date == undefined) {
+			fromEndDate = null; // reset end date
 		} else {
 			fromEndDate = new Date(selected.date.valueOf());
-	        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));			
+			fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
 		}
-        $('#dsh-start-date').datepicker('setEndDate', fromEndDate);
-    });
+		$('#dsh-start-date').datepicker('setEndDate', fromEndDate);
+	});
 }
 
 function bindDatePickerforIndividualSurveyDownload() {
@@ -8745,59 +8344,48 @@ function bindDatePickerforIndividualSurveyDownload() {
 	var fromEndDate = new Date();
 	var toEndDate = new Date();
 	$("#indv-dsh-start-date").datepicker({
-		orientation: "auto",
-		format: 'mm/dd/yyyy',
-		endDate: fromEndDate,
-		todayHighlight: true,
-		clearBtn: true,
-		autoclose: true
-	})
-	.on('changeDate', function(selected){
-        startDate = new Date(selected.date.valueOf());
-        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
-        $('#indv-dsh-end-date').datepicker('setStartDate', startDate);
-    });
-	
+		orientation : "auto",
+		format : 'mm/dd/yyyy',
+		endDate : fromEndDate,
+		todayHighlight : true,
+		clearBtn : true,
+		autoclose : true
+	}).on('changeDate', function(selected) {
+		startDate = new Date(selected.date.valueOf());
+		startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		$('#indv-dsh-end-date').datepicker('setStartDate', startDate);
+	});
+
 	$("#indv-dsh-end-date").datepicker({
-		orientation: "auto",
-		format: 'mm/dd/yyyy',
-		endDate: toEndDate,
-		todayHighlight: true,
-		clearBtn: true,
-		autoclose: true
-	})
-	.on('changeDate', function(selected){
-        fromEndDate = new Date(selected.date.valueOf());
-        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
-        $('#indv-dsh-start-date').datepicker('setEndDate', fromEndDate);
-    });
+		orientation : "auto",
+		format : 'mm/dd/yyyy',
+		endDate : toEndDate,
+		todayHighlight : true,
+		clearBtn : true,
+		autoclose : true
+	}).on('changeDate', function(selected) {
+		fromEndDate = new Date(selected.date.valueOf());
+		fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+		$('#indv-dsh-start-date').datepicker('setEndDate', fromEndDate);
+	});
 }
 
 function editPositions(disableEle) {
 	callAjaxGET("/geteditpositions.do", function(data) {
 		createEditPositionsPopup("Edit positions", data);
-		
+
 		addDatePcikerForPositions();
 		$('.pos-edit-icn').click(function() {
-			$(this).parent().find('input').prop('readonly',false);
+			$(this).parent().find('input').prop('readonly', false);
 		});
 		$('.add-pos-link').click(function() {
-			var htmlToAppned = "<div class='pos-cont margin-top-10 text-left'>" + 
-					"<div class='checkbox-input-cont'>" +
-					"<div class='checkbox-input checkbox-iscurrent' data-checked='false'></div>" +
-					"Current Employer</div>" +
-					"<input name='companyName' class='pos-input' placeholder='Company Name'>" +
-					"<input name='title' class='pos-input' placeholder='Job Title'>" +
-					"<input name='startTime' class='pos-input'placeholder='Start Date'>" +
-					"<input name='endTime' class='pos-input' placeholder='End Date'>" +
-					"<div class='pos-remove-icn'></div>" +
-					"</div>";
+			var htmlToAppned = "<div class='pos-cont margin-top-10 text-left'>" + "<div class='checkbox-input-cont'>" + "<div class='checkbox-input checkbox-iscurrent' data-checked='false'></div>" + "Current Employer</div>" + "<input name='companyName' class='pos-input' placeholder='Company Name'>" + "<input name='title' class='pos-input' placeholder='Job Title'>" + "<input name='startTime' class='pos-input'placeholder='Start Date'>" + "<input name='endTime' class='pos-input' placeholder='End Date'>" + "<div class='pos-remove-icn'></div>" + "</div>";
 			$(this).before(htmlToAppned);
-			//$(this).remove();
+			// $(this).remove();
 			addDatePcikerForPositions();
 		});
-	}, true,disableEle);
-	
+	}, true, disableEle);
+
 }
 /**
  * Method to call warning popup controller method.
@@ -8805,19 +8393,17 @@ function editPositions(disableEle) {
 function editProfileUrl(disableEle) {
 	callAjaxGET("/showurleditwarning.do", function(data) {
 		createEditProfileUrlPopup("Warning", data);
-	}, true,disableEle);
-	
+	}, true, disableEle);
+
 }
 // Get all the required elements and show popup
 
-function generateWidget(clickedAttr , iden, profileLevel) {
+function generateWidget(clickedAttr, iden, profileLevel) {
 	$('.v-hr-tbl-icn-wraper').hide();
-	if($(clickedAttr).hasClass('v-tbl-icn-disabled')){
+	if ($(clickedAttr).hasClass('v-tbl-icn-disabled')) {
 		return;
-	}
-	else{
-	callAjaxGET("./showwidgetpage.do?profileLevel=" + profileLevel + "&iden="
-			+ iden, callBackShowWidget,true);
+	} else {
+		callAjaxGET("./showwidgetpage.do?profileLevel=" + profileLevel + "&iden=" + iden, callBackShowWidget, true);
 	}
 }
 
@@ -8832,7 +8418,7 @@ function callBackShowWidget(data) {
 
 	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
 	disableBodyScroll();
-	//$('body').css('overflow', 'hidden');
+	// $('body').css('overflow', 'hidden');
 	$('body').scrollTop('0');
 }
 
@@ -8884,58 +8470,54 @@ function createEditProfileUrlPopup(header, body) {
 	$('#overlay-continue').html("Continue");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-continue').off();
-	$('#overlay-continue').click(function(){
+	$('#overlay-continue').click(function() {
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
 		updateProfileUrl();
 		overlayRevert();
 	});
-	
+
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
-function createEditProfileUrlPopup2( body) {
-	
+function createEditProfileUrlPopup2(body) {
+
 	$('#overlay-text').html(body);
 	$('#overlay-continue').html("Submit");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-continue').off();
-	$('#overlay-continue').click(function(){
+	$('#overlay-continue').click(function() {
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
 		saveProfileUrl();
 		overlayRevert();
 	});
-	
+
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
-function createZillowProfileUrlPopup(body){
+function createZillowProfileUrlPopup(body) {
 	$('#overlay-text').html(body);
 	$('#overlay-continue').html("Submit");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-continue').off();
-	$('#overlay-continue').click(function(){
+	$('#overlay-continue').click(function() {
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
 		saveZillowEmailAddress();
 		overlayRevert();
 	});
-	
+
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
-/*function saveZillowEmailAddress1(){
-	console.info("before zillosaveinfo is called");
-	callAjaxGET("/zillowSaveInfo.do", function(data) {
-		createZillowProfileUrlPopupPath( data);
-	}, true);
-}
-*/
-function createZillowProfileUrlPopupPath(body){
+/*
+ * function saveZillowEmailAddress1(){ console.info("before zillosaveinfo is called"); callAjaxGET("/zillowSaveInfo.do", function(data) { createZillowProfileUrlPopupPath( data); }, true); }
+ */
+function createZillowProfileUrlPopupPath(body) {
 	$('#overlay-text').html(body);
 	$('#overlay-continue').html("ok");
-	$('#overlay-continue').click(function(){
+	$('#overlay-continue').click(function() {
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
 		saveZillowEmailAddress();
@@ -8943,70 +8525,67 @@ function createZillowProfileUrlPopupPath(body){
 	});
 }
 
-
-/*function updateProfileUrl(){
-	window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
-}*/
+/*
+ * function updateProfileUrl(){ window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes"); }
+ */
 
 function updateProfileUrl() {
 	callAjaxGET("/editprofileurl.do", function(data) {
-		createEditProfileUrlPopup2( data);
+		createEditProfileUrlPopup2(data);
 	}, true);
-	
+
 }
 
-
-
-$(document).on('click', '.checkbox-iscurrent', function(e){
+$(document).on('click', '.checkbox-iscurrent', function(e) {
 	var isCurrent = $(this).attr('data-checked');
-	if(isCurrent == "true") {
-		$(this).attr('data-checked',"false");
+	if (isCurrent == "true") {
+		$(this).attr('data-checked', "false");
 		$(this).parent().parent().find('input[name="endTime"]').show();
 	} else {
-		$(this).attr('data-checked',"true");
+		$(this).attr('data-checked', "true");
 		$(this).parent().parent().find('input[name="endTime"]').hide();
 	}
 });
 
-$(document).on('click', '.pos-remove-icn', function(e){
+$(document).on('click', '.pos-remove-icn', function(e) {
 	$(this).parent().remove();
 	updatePositions();
 });
 
 function addDatePcikerForPositions() {
-	
+
 	var startDate;
 	var fromEndDate = new Date();
 	var toEndDate = new Date();
-	
+
 	$('input[name="endTime"]').datepicker({
-		orientation: "auto",
-		format: "mm-yyyy",
-	    startView: "months", 
-	    minViewMode: "months",
-	    endDate : toEndDate,
-	    todayHighlight: true,
-		clearBtn: true,
-		autoclose: true
-	}).on('changeDate', function(selected){
-        fromEndDate = new Date(selected.date.valueOf());
-        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
-        $(this).parent().find('input[name="startTime"]').datepicker('setEndDate', fromEndDate);
-    });
+		orientation : "auto",
+		format : "mm-yyyy",
+		startView : "months",
+		minViewMode : "months",
+		endDate : toEndDate,
+		todayHighlight : true,
+		clearBtn : true,
+		autoclose : true
+	}).on('changeDate', function(selected) {
+		fromEndDate = new Date(selected.date.valueOf());
+		fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+		$(this).parent().find('input[name="startTime"]').datepicker('setEndDate', fromEndDate);
+	});
 	$('input[name="startTime"]').datepicker({
-		orientation: "auto",
-		format: "mm-yyyy",
-	    startView: "months", 
-	    minViewMode: "months",
-	    endDate : toEndDate,
-	    todayHighlight: true,
-		clearBtn: true,
-		autoclose: true
-	}).on('changeDate', function(selected){
-        startDate = new Date(selected.date.valueOf());
-        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
-        $(this).parent().find('input[name="endTime"]').datepicker('setStartDate', startDate);
-    });
+		orientation : "auto",
+		format : "mm-yyyy",
+		startView : "months",
+		minViewMode : "months",
+		endDate : toEndDate,
+		todayHighlight : true,
+		clearBtn : true,
+		autoclose : true
+	}).on('changeDate', function(selected) {
+		startDate = new Date(selected.date.valueOf());
+		startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		$(this).parent().find('input[name="endTime"]').datepicker('setStartDate', startDate);
+	});
 }
 
 function createEditPositionsPopup(header, body) {
@@ -9015,15 +8594,13 @@ function createEditPositionsPopup(header, body) {
 	$('#overlay-continue').html("Save");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-continue').off();
-	$('#overlay-continue').click(function(){
+	$('#overlay-continue').click(function() {
 		updatePositions();
 	});
-	
+
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
-
-
 
 function updatePositions() {
 	var positions = [];
@@ -9036,30 +8613,30 @@ function updatePositions() {
 		var endTime = $(this).find('input[name="endTime"]').val();
 		var startMonth, startYear, endMonth, endYear;
 		var isCurrent = false;
-		
+
 		var isCurrentString = $(this).find('.checkbox-input-cont').find('.checkbox-iscurrent').attr("data-checked");
-		
-		if(isCurrentString == "true") {
+
+		if (isCurrentString == "true") {
 			isCurrent = true;
 		}
-		
-		if(companyName == undefined || companyName == '') {
+
+		if (companyName == undefined || companyName == '') {
 			$(this).find('input[name="companyName"]').focus();
 			$('#overlay-toast').html("Please enter company name");
 			showToast();
 			isFormValid = false;
 			return false;
 		}
-		
-		if(title == undefined || title == '') {
+
+		if (title == undefined || title == '') {
 			$(this).find('input[name="title"]').focus();
 			$('#overlay-toast').html("Please enter title");
 			showToast();
 			isFormValid = false;
 			return false;
 		}
-		
-		if(startTime == undefined || startTime == '') {
+
+		if (startTime == undefined || startTime == '') {
 			$(this).find('input[name="startTime"]').focus();
 			$('#overlay-toast').html("Please enter start time");
 			showToast();
@@ -9067,22 +8644,22 @@ function updatePositions() {
 			return false;
 		} else {
 			var startDateSplit = startTime.split("-");
-			if(startDateSplit.length < 2) {
+			if (startDateSplit.length < 2) {
 				$('#overlay-toast').html("Please enter valid start time");
 				showToast();
 			}
 			startMonth = parseInt(startDateSplit[0]);
 			startYear = parseInt(startDateSplit[1]);
 		}
-		
+
 		position["name"] = companyName;
 		position["title"] = title;
 		position["startTime"] = startTime;
 		position["startMonth"] = startMonth;
 		position["startYear"] = startYear;
-		
-		if(!isCurrent) {
-			if(endTime == undefined || endTime == ''){
+
+		if (!isCurrent) {
+			if (endTime == undefined || endTime == '') {
 				$(this).find('input[name="endTime"]').focus();
 				$('#overlay-toast').html("Please enter end time");
 				showToast();
@@ -9090,7 +8667,7 @@ function updatePositions() {
 				return false;
 			} else {
 				var endDateSplit = endTime.split("-");
-				if(endDateSplit.length < 2) {
+				if (endDateSplit.length < 2) {
 					$('#overlay-toast').html("Please enter valid end time");
 					showToast();
 					isFormValid = false;
@@ -9102,28 +8679,28 @@ function updatePositions() {
 				position["endMonth"] = endMonth;
 				position["endYear"] = endYear;
 			}
-		} 
-		
+		}
+
 		position["isCurrent"] = isCurrent;
-		
+
 		positions.push(position);
 	});
-	
+
 	if (!isFormValid) {
 		return;
 	}
-	
-	if(positions.length > 0) {
+
+	if (positions.length > 0) {
 		positions = JSON.stringify(positions);
 	} else {
 		$('#overlay-toast').html("No positions added.");
 		showToast();
 	}
-	
-	callAjaxPOSTWithTextData("/updatepositions.do?positions="+positions, function(data) {
-		if(data == "success") {
+
+	callAjaxPOSTWithTextData("/updatepositions.do?positions=" + positions, function(data) {
+		if (data == "success") {
 			$('#overlay-toast').html("Positions updated successfully");
-			showToast();			
+			showToast();
 			updatePositionInLeftSection(positions);
 			$('#overlay-cancel').click();
 		}
@@ -9131,58 +8708,57 @@ function updatePositions() {
 	}, true, {});
 }
 
-
 function updatePositionInLeftSection(positions) {
 	var contentToAppend = "";
 	var positionsArray = [];
-	if(positions != undefined && positions != "")
+	if (positions != undefined && positions != "")
 		positionsArray = JSON.parse(positions);
-	if(positionsArray.length > 0) {
-		for(var index in positionsArray) {
+	if (positionsArray.length > 0) {
+		for ( var index in positionsArray) {
 			var position = positionsArray[index];
 			contentToAppend += '<div class="postions-content">';
-			contentToAppend += '<div class="lp-pos-row-1 lp-row clearfix">'+position.name+'</div>';
-			contentToAppend += '<div class="lp-pos-row-2 lp-row clearfix">'+position.title+'</div>';
-			if(position.isCurrent) {
-				contentToAppend += '<div class="lp-pos-row-3 lp-row clearfix">'+position.startTime + ' - Current' +'</div>';
+			contentToAppend += '<div class="lp-pos-row-1 lp-row clearfix">' + position.name + '</div>';
+			contentToAppend += '<div class="lp-pos-row-2 lp-row clearfix">' + position.title + '</div>';
+			if (position.isCurrent) {
+				contentToAppend += '<div class="lp-pos-row-3 lp-row clearfix">' + position.startTime + ' - Current' + '</div>';
 			} else {
-				contentToAppend += '<div class="lp-pos-row-3 lp-row clearfix">'+position.startTime + ' - ' + position.endTime +'</div>';
+				contentToAppend += '<div class="lp-pos-row-3 lp-row clearfix">' + position.startTime + ' - ' + position.endTime + '</div>';
 			}
 		}
 	} else {
 		contentToAppend = "No positions added yet";
 	}
-	
+
 	$('#positions-container').html(contentToAppend);
 }
 
-$(document).on('click','#hdr-config-settings-dropdown', function(e) {
+$(document).on('click', '#hdr-config-settings-dropdown', function(e) {
 	$('#hdr-link-item-dropdown').toggle();
 });
 
-$(document).on('mouseover','#hdr-link-item-config', function(e) {
+$(document).on('mouseover', '#hdr-link-item-config', function(e) {
 	$('#hdr-link-item-dropdown').show();
 });
 
-$(document).on('mouseout','#hdr-link-item-config', function(e) {
+$(document).on('mouseout', '#hdr-link-item-config', function(e) {
 	$('#hdr-link-item-dropdown').hide();
 });
 
-$(document).on('click','.hdr-link-item-dropdown-item',function(e) {
+$(document).on('click', '.hdr-link-item-dropdown-item', function(e) {
 	$('#hdr-link-item-dropdown').hide();
 	showOverlay();
 });
 
-//Help page onclick function
-$(document).on( 'click', '#send-help-mail-button', function() {
+// Help page onclick function
+$(document).on('click', '#send-help-mail-button', function() {
 	var subject = "";
 	var message = "";
 	var emailId = "";
-	
+
 	if ($("#email-id").val() != undefined) {
 		emailId = $("#email-id").val().trim();
 	}
-	
+
 	if ($("#subject-id").val() != undefined) {
 		subject = $("#subject-id").val().trim();
 	}
@@ -9190,19 +8766,19 @@ $(document).on( 'click', '#send-help-mail-button', function() {
 	if ($("#user-message").val() != undefined) {
 		message = $("#user-message").val().trim();
 	}
-	
+
 	if ((emailId == "") || (emailId == undefined)) {
 		$('#overlay-toast').html('Please enter a valid email address');
 		showToast();
 		return;
 	}
-	
-	if (emailRegex.test(emailId) != true){
+
+	if (emailRegex.test(emailId) != true) {
 		$('#overlay-toast').html('Please enter a valid email address');
 		showToast();
 		return;
 	}
-	
+
 	if (subject == "" || subject == undefined) {
 		$('#overlay-toast').html('Please enter the subject');
 		showToast();
@@ -9221,82 +8797,73 @@ $(document).on( 'click', '#send-help-mail-button', function() {
 		"emailId" : emailId
 	};
 
-	callAjaxPostWithPayloadData("./sendhelpmailtoadmin.do",
-		function(data) {
-			$('#overlay-toast').html('Message sent successfully!');
-			$("#subject-id").val("");
-			$("#user-message").val("");
-			showToast();
-	}, payload,true,'#send-help-mail-button');
+	callAjaxPostWithPayloadData("./sendhelpmailtoadmin.do", function(data) {
+		$('#overlay-toast').html('Message sent successfully!');
+		$("#subject-id").val("");
+		$("#user-message").val("");
+		showToast();
+	}, payload, true, '#send-help-mail-button');
 });
 
-
-//Disconnect social media
+// Disconnect social media
 function disconnectSocialMedia(socialMedia, isAutoLogin) {
-	if(isAutoLogin) {
+	if (isAutoLogin) {
 		$('#overlay-toast').html('Insufficient permission to disconnect from ' + socialMedia);
 		showToast();
 		return;
 	}
-	if($('div[data-social="'+socialMedia+'"]').text() == undefined || $('div[data-social="'+socialMedia+'"]').text() == ''){
+	if ($('div[data-social="' + socialMedia + '"]').text() == undefined || $('div[data-social="' + socialMedia + '"]').text() == '') {
 		return;
 	}
-	
+
 	var payload = {
-		"socialMedia" : socialMedia	
+		"socialMedia" : socialMedia
 	};
-	
+
 	callAjaxPostWithPayloadData("/disconnectsocialmedia.do", function(data) {
-		if(data == "success"){
-			$('div[data-social="'+socialMedia+'"]').html('');
-			$('div[data-social="'+socialMedia+'"]').parent().find('.social-media-disconnect').addClass('social-media-disconnect-disabled').removeAttr("onclick").removeAttr("title");
+		if (data == "success") {
+			$('div[data-social="' + socialMedia + '"]').html('');
+			$('div[data-social="' + socialMedia + '"]').parent().find('.social-media-disconnect').addClass('social-media-disconnect-disabled').removeAttr("onclick").removeAttr("title");
 			$('#overlay-toast').html('Successfully disconnected ' + socialMedia);
 			showToast();
 		} else {
 			$('#overlay-toast').html('Some error occurred while disconnecting ' + socialMedia);
 			showToast();
 		}
-	}, payload, true);	
+	}, payload, true);
 }
 
-
-function showProfileLinkInEditProfilePage(source, profileUrl){
-	$('.social-item-icon[data-source="' + source + '"').attr('data-link',
-			profileUrl).removeClass('icn-social-add');
+function showProfileLinkInEditProfilePage(source, profileUrl) {
+	$('.social-item-icon[data-source="' + source + '"').attr('data-link', profileUrl).removeClass('icn-social-add');
 }
 
-function showSurveysUnderResolution(startIndexCmp, batchSizeCmp){
+function showSurveysUnderResolution(startIndexCmp, batchSizeCmp) {
 	var payload = {
-			"startIndex" : startIndexCmp,
-			"batchSize" : batchSizeCmp
-		};
-		callAjaxGetWithPayloadData("./fetchsurveysunderresolution.do", function(data) {
-			if (startIndexCmp == 0)
-				$('#sur-under-res-list').html(data);
-			else
-				$('#sur-under-res-list').append(data);
-			
-			startIndexCmp += batchSizeCmp;
-		}, payload, true);
+		"startIndex" : startIndexCmp,
+		"batchSize" : batchSizeCmp
+	};
+	callAjaxGetWithPayloadData("./fetchsurveysunderresolution.do", function(data) {
+		if (startIndexCmp == 0)
+			$('#sur-under-res-list').html(data);
+		else
+			$('#sur-under-res-list').append(data);
+
+		startIndexCmp += batchSizeCmp;
+	}, payload, true);
 }
 
 // Send Survey Agent
 $(document).on('input', '#wc-review-table-inner[data-role="agent"] input', function() {
 	var parentDiv = $(this).parent().parent();
 	if (parentDiv.is(':last-child')) {
-		var htmlData = '<div class="wc-review-tr clearfix">'
-			+ '<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname"></div>'
-			+ '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname"></div>'
-			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>'
-			+ '<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
-		+ '</div>';
+		var htmlData = '<div class="wc-review-tr clearfix">' + '<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname"></div>' + '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname"></div>' + '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>' + '<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
 		parentDiv.after(htmlData);
-		
+
 		// enable remove button
 		if ($('#wc-review-table-inner').children().length > 2) {
 			$('.wc-review-rmv-icn').show();
 		}
-		
+
 		// setting up perfect scrollbar
 		setTimeout(function() {
 			$('#wc-review-table').perfectScrollbar();
@@ -9305,37 +8872,31 @@ $(document).on('input', '#wc-review-table-inner[data-role="agent"] input', funct
 	}
 });
 
-//Send Survey Admin
+// Send Survey Admin
 $(document).on('input', '#wc-review-table-inner[data-role="admin"] input', function() {
 	var parentDiv = $(this).parent().parent();
 	if (parentDiv.is(':last-child')) {
-		var htmlData = '<div class="wc-review-tr clearfix">'
-			+ '<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>'
-			+ '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>'
-			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>'
-			+ '<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>'
-			+ '<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
-		+ '</div>';
+		var htmlData = '<div class="wc-review-tr clearfix">' + '<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>' + '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>' + '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>' + '<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>' + '<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
 		parentDiv.after(htmlData);
-		
+
 		// enable remove button
 		if ($('#wc-review-table-inner').children().length > 2) {
 			$('.wc-review-rmv-icn').show();
 		}
-		
+
 		// setting up perfect scrollbar
 		setTimeout(function() {
 			$('#wc-review-table').perfectScrollbar();
 			$('#wc-review-table').perfectScrollbar('update');
 		}, 1000);
-		
+
 		attachAutocompleteAgentSurveyInviteDropdown();
 	}
 });
 
 $(document).on('click', '.wc-review-rmv-icn', function() {
 	var parentDiv = $('#wc-review-table-inner');
-	
+
 	// disable remove button
 	if (parentDiv.children().length <= 3) {
 		$('.wc-review-rmv-icn').hide();
@@ -9355,7 +8916,7 @@ $(document).on('click', '#wc-send-survey', function() {
 	var columnName = undefined;
 	var firstname = "";
 	var lastname = "";
-	var idx=0;
+	var idx = 0;
 	var exit = false;
 	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
@@ -9366,23 +8927,23 @@ $(document).on('click', '#wc-send-survey', function() {
 
 				if (idx == 0) {
 					columnName = $(this).find('input.wc-review-agentname').first().attr('column-name');
-					idx ++;
+					idx++;
 				}
-			}else{
+			} else {
 				agentEmailId = $("#wc-review-table-inner").attr('user-email-id');
 			}
-			
+
 			firstname = $(this).find('input.wc-review-fname').first().val();
 			lastname = $(this).find('input.wc-review-lname').first().val();
-			
+
 			var emailId = $(this).find('input.wc-review-email').first().val();
-			
-			if(firstname == "" && emailId != ""){
+
+			if (firstname == "" && emailId != "") {
 				$('#overlay-toast').html('Please enter Firstname for all the customer');
 				showToast();
 				exit = true;
 				return false;
-			} else if (agentId != undefined && firstname == ""){
+			} else if (agentId != undefined && firstname == "") {
 				$('#overlay-toast').html('Please enter Firstname for all the customer');
 				showToast();
 				exit = true;
@@ -9396,27 +8957,27 @@ $(document).on('click', '#wc-send-survey', function() {
 				receiver.agentEmailId = agentEmailId;
 				if (dataName == 'agent-name') {
 					receiver.agentId = agentId;
-					if(agentId == undefined){
+					if (agentId == undefined) {
 						$('#overlay-toast').html('Please enter Agent name for all survey requests');
 						showToast();
 						exit = true;
-						return false;					
-					} else if(agentId.trim() == ""){
+						return false;
+					} else if (agentId.trim() == "") {
 						$('#overlay-toast').html('Please select valid agents for all survey requests');
 						showToast();
 						exit = true;
-						return false;					
+						return false;
 					}
 				}
-				//check if agent mail id is not same as recipient mail id
-				if(emailId == agentEmailId ){
+				// check if agent mail id is not same as recipient mail id
+				if (emailId == agentEmailId) {
 					$('#overlay-toast').html("You can't a send survey request to the agent initiating the survey");
 					showToast();
 					exit = true;
 					return false;
 				}
 				receiversList.push(receiver);
-			} else if(firstname != ""){
+			} else if (firstname != "") {
 				$('#overlay-toast').html('Please enter valid email for ' + firstname);
 				showToast();
 				exit = true;
@@ -9424,24 +8985,24 @@ $(document).on('click', '#wc-send-survey', function() {
 			}
 		}
 	});
-	
-	if(exit) {
+
+	if (exit) {
 		return false;
 	}
-	//Check if recievers list empty
-	if(receiversList.length == 0){
+	// Check if recievers list empty
+	if (receiversList.length == 0) {
 		$('#overlay-toast').html('Add customers to send survey request!');
 		showToast();
 		exit = false;
 		return false;
 	}
-	
-	//check if there is no duplicate entries
+
+	// check if there is no duplicate entries
 	var receiversListLength = receiversList.length;
-	
-	for (var i = 0; i < receiversListLength; i++){
-		for (var j = i+1; j < receiversListLength; j++){
-			if( receiversList[i].emailId == receiversList[j].emailId && receiversList[i].agentEmailId == receiversList[j].agentEmailId ){
+
+	for (var i = 0; i < receiversListLength; i++) {
+		for (var j = i + 1; j < receiversListLength; j++) {
+			if (receiversList[i].emailId == receiversList[j].emailId && receiversList[i].agentEmailId == receiversList[j].agentEmailId) {
 				$('#overlay-toast').html("Can't enter same email address multiple times for same user");
 				showToast();
 				exit = true;
@@ -9450,11 +9011,11 @@ $(document).on('click', '#wc-send-survey', function() {
 		}
 	}
 
-	if(exit){
+	if (exit) {
 		exit = false;
 		return false;
 	}
-	
+
 	receiversList = JSON.stringify(receiversList);
 	var payload = {
 		"receiversList" : receiversList,
@@ -9470,20 +9031,20 @@ $(document).on('click', '#wc-send-survey', function() {
 
 	$(this).closest('.overlay-login').hide();
 	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
-		
-		//Update the incomplete survey on dashboard
+
+		// Update the incomplete survey on dashboard
 		getIncompleteSurveyCount(colName, colValue);
-		if(data == "error"){
+		if (data == "error") {
 			$('#overlay-toast').html('Error while sending survey request!');
-		}else if(data == "Success"){
+		} else if (data == "Success") {
 			$('#overlay-toast').html('Survey request sent successfully!');
-		}else{
+		} else {
 			$('#overlay-toast').html(data);
 		}
-		
+
 		showToast();
 		enableBodyScroll();
-	}, payload,true);
+	}, payload, true);
 });
 
 $(document).on('click', '#wc-skip-send-survey', function() {
@@ -9499,14 +9060,14 @@ function sendSurveyInvitation(disableEle) {
 			$('#overlay-send-survey').removeClass("hide");
 			$('#overlay-send-survey').show();
 		}
-	}, true,disableEle);
+	}, true, disableEle);
 }
 
-function sendSurveyInvitationAdmin(columnName, columnValue,disableEle) {
+function sendSurveyInvitationAdmin(columnName, columnValue, disableEle) {
 	disableBodyScroll();
 	var payload = {
-			"columnName" : columnName,
-			"columnValue" : columnValue
+		"columnName" : columnName,
+		"columnValue" : columnValue
 	};
 	callAjaxGetWithPayloadData("./sendsurveyinvitationadmin.do", function(data) {
 		$('#overlay-send-survey').html(data);
@@ -9517,7 +9078,7 @@ function sendSurveyInvitationAdmin(columnName, columnValue,disableEle) {
 		$('#wc-review-table').perfectScrollbar();
 		$('#wc-review-table').perfectScrollbar('update');
 		attachAutocompleteAgentSurveyInviteDropdown();
-	}, payload, true,disableEle);
+	}, payload, true, disableEle);
 }
 
 function linkedInDataImport() {
@@ -9532,23 +9093,22 @@ function linkedInDataImport() {
 	}, true);
 }
 
-function revertMailContent(mailcategory,disableEle) {
-    showOverlay();
+function revertMailContent(mailcategory, disableEle) {
+	showOverlay();
 	var payload = {
 		"mailcategory" : mailcategory
 	};
-	callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function (data) {
+	callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function(data) {
 		showMainContent('./showemailsettings.do');
 		hideOverlay();
 		$('#overlay-main').hide();
 		$("#overlay-toast").html(data);
 		showToast();
-	}, payload, true,disableEle);
+	}, payload, true, disableEle);
 }
 
-
-//settings page event binding
-$('body').on('click','.st-dd-item-auto-post',function() {
+// settings page event binding
+$('body').on('click', '.st-dd-item-auto-post', function() {
 	$('#rating-auto-post').val($(this).html());
 	$('#st-dd-wrapper-auto-post').slideToggle(200);
 
@@ -9560,33 +9120,33 @@ $('body').on('click','.st-dd-item-auto-post',function() {
 	updatePostScore("rating-settings-form");
 });
 
-$('body').on('click','.st-dd-item-min-post',function() {
+$('body').on('click', '.st-dd-item-min-post', function() {
 	var pageHash = window.location.hash;
-	if(pageHash.toLowerCase() == "#showcomplaintressettings") {
+	if (pageHash.toLowerCase() == "#showcomplaintressettings") {
 		$('#comp-rating-post').val($(this).html());
 		$('#st-dd-wrapper-min-post').slideToggle(200);
 		return;
 	}
-	
+
 	$('#rating-min-post').val($(this).html());
 	$('#st-dd-wrapper-min-post').slideToggle(200);
-	
+
 	$('#ratingcategory').val('rating-min-post');
-	
+
 	var rating = $('#rating-min-post').val();
 	var ratingParent = $('#rating-min-post-parent');
 	changeRatingPattern(rating, ratingParent);
-	
+
 	updatePostScore("rating-settings-form");
 });
 
 $('body').on('click', '#st-settings-location-on', function() {
 	$('#othercategory').val('other-location');
 	$('#other-location').val('false');
-	
+
 	$('#st-settings-location-off').show();
 	$(this).hide();
-	
+
 	updateOtherSettings("other-settings-form");
 });
 $('body').on('click', '#st-settings-location-off', function() {
@@ -9595,10 +9155,9 @@ $('body').on('click', '#st-settings-location-off', function() {
 
 	$('#st-settings-location-on').show();
 	$(this).hide();
-	
+
 	updateOtherSettings("other-settings-form");
 });
-
 
 $('body').on('click', '#st-settings-payment-on', function() {
 	$('#st-settings-payment-off').show();
@@ -9613,8 +9172,7 @@ $('body').on('click', '#st-settings-payment-off', function() {
 $('body').on('click', '#st-delete-account', function(e) {
 	e.stopPropagation();
 	$('#other-account').val('true');
-	createPopupConfirm("Delete Account",
-		"This action cannot be undone.<br/>All user setting will be permanently deleted and your subscription will terminate permanently immediately.");
+	createPopupConfirm("Delete Account", "This action cannot be undone.<br/>All user setting will be permanently deleted and your subscription will terminate permanently immediately.");
 	overlayDeleteAccount();
 });
 
@@ -9651,44 +9209,39 @@ $('body').on('blur', '#sad-text-complete', function() {
 	saveTextForMoodFlow($("#sad-text-complete").val(), "sadComplete");
 });
 
-$('body').on('click','.reset-icon', function() {
+$('body').on('click', '.reset-icon', function() {
 	var resetId = $(this).prev().attr('id');
 	var resetTag = "";
-	
+
 	if (resetId == 'happy-text') {
 		resetTag = 'happy';
-	}
-	else if (resetId == 'neutral-text') {
+	} else if (resetId == 'neutral-text') {
 		resetTag = 'neutral';
-	}
-	else if (resetId == 'sad-text') {
+	} else if (resetId == 'sad-text') {
 		resetTag = 'sad';
-	}
-	else if (resetId == 'happy-text-complete') {
+	} else if (resetId == 'happy-text-complete') {
 		resetTag = 'happyComplete';
-	}
-	else if (resetId == 'neutral-text-complete') {
+	} else if (resetId == 'neutral-text-complete') {
 		resetTag = 'neutralComplete';
-	}
-	else if (resetId == 'sad-text-complete') {
+	} else if (resetId == 'sad-text-complete') {
 		resetTag = 'sadComplete';
 	}
-	
-    showOverlay();
+
+	showOverlay();
 	resetTextForMoodFlow(resetTag, resetId);
 });
 
 $('body').on('click', '#atpst-chk-box', function() {
 	if ($('#atpst-chk-box').hasClass('bd-check-img-checked')) {
 		$('#atpst-chk-box').removeClass('bd-check-img-checked');
-		updateAutoPostSetting(true,'#atpst-chk-box');
+		updateAutoPostSetting(true, '#atpst-chk-box');
 	} else {
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
-		updateAutoPostSetting(false,'#atpst-chk-box');
+		updateAutoPostSetting(false, '#atpst-chk-box');
 	}
 });
 
-//Dashboard fb and twitter share
+// Dashboard fb and twitter share
 function getDashboardImageandCaption(loop) {
 	var name = "";
 	var designation = "";
@@ -9715,8 +9268,7 @@ function getDashboardImageandCaption(loop) {
 
 	}
 
-	pictureandCaptionLink = "&picture=" + imgId + "&caption=" + name + ","
-			+ designation + "," + company;
+	pictureandCaptionLink = "&picture=" + imgId + "&caption=" + name + "," + designation + "," + company;
 	fblink = fblink.concat(pictureandCaptionLink);
 	if (document.getElementById('fb_' + loop) != null)
 		document.getElementById('fb_' + loop).setAttribute('data-link', fblink);
@@ -9725,8 +9277,7 @@ function getDashboardImageandCaption(loop) {
 function twitterDashboardFn(loop, twitterElement) {
 	var twitText = "";
 	var twitLink = $("#twitt_" + loop).data('link');
-	var String = twitLink.substring(twitLink.indexOf("=") + 1, twitLink
-			.lastIndexOf("&"));
+	var String = twitLink.substring(twitLink.indexOf("=") + 1, twitLink.lastIndexOf("&"));
 	var twitId = 'twttxt_' + loop;
 	if ($("#" + twitId) != undefined) {
 		twitText = $("#" + twitId).val();
@@ -9744,19 +9295,16 @@ function twitterDashboardFn(loop, twitterElement) {
 
 		twitLink = twitLink.replace(String, finalString);
 		if (document.getElementById('twitt_' + loop) != undefined)
-			document.getElementById('twitt_' + loop).setAttribute('data-link',
-					twitLink);
+			document.getElementById('twitt_' + loop).setAttribute('data-link', twitLink);
 	}
 
 }
 
-
-//Edit profile fb and twitter share functions
+// Edit profile fb and twitter share functions
 function twitterProfileFn(loop, twitterElement) {
 
 	var twitLink = $("#twitt_" + loop).data('link');
-	var String = twitLink.substring(twitLink.indexOf("=") + 1, twitLink
-			.lastIndexOf("&"));
+	var String = twitLink.substring(twitLink.indexOf("=") + 1, twitLink.lastIndexOf("&"));
 	var twitId = 'twttxt_' + loop;
 	var twitText = $("#" + twitId).val();
 	var length = twitText.length;
@@ -9770,8 +9318,7 @@ function twitterProfileFn(loop, twitterElement) {
 
 		if (document.getElementById('twitt_' + loop) != null) {
 
-			document.getElementById('twitt_' + loop).setAttribute('data-link',
-					twitLink);
+			document.getElementById('twitt_' + loop).setAttribute('data-link', twitLink);
 		}
 
 	}
@@ -9785,8 +9332,7 @@ function getImageandCaptionProfile(loop) {
 	var title = "";
 	var vertical = "";
 	var imgid = "";
-	if (document.getElementById("prof-image-edit") != null
-			&& document.getElementById("prof-image-edit").getAttribute("src") != null) {
+	if (document.getElementById("prof-image-edit") != null && document.getElementById("prof-image-edit").getAttribute("src") != null) {
 
 		imgid = document.getElementById("prof-image-edit").getAttribute("src");
 	}
@@ -9801,8 +9347,7 @@ function getImageandCaptionProfile(loop) {
 
 		vertical = $("#prof-vertical").val();
 	}
-	pictureandCaptionLink = "&picture=" + imgid + "&caption=" + name + ","
-			+ title + "," + vertical;
+	pictureandCaptionLink = "&picture=" + imgid + "&caption=" + name + "," + title + "," + vertical;
 
 	fblink = fblink.concat(pictureandCaptionLink);
 	if (document.getElementById('fb_' + loop) != null) {
@@ -9811,13 +9356,12 @@ function getImageandCaptionProfile(loop) {
 
 }
 
-
 var isSocialMonitorPostAjaxRequestRunning = false;
 var doStopSocialMonitorPostAjaxRequest = false;
 var isSocialMonitorPostLoaderRunning = false;
 var socialMonitorPostBatch = [];
 
-function postsSearch(){
+function postsSearch() {
 	proPostStartIndex = 0;
 	$('#prof-posts').html("");
 	socialMonitorPostBatch = [];
@@ -9826,110 +9370,112 @@ function postsSearch(){
 }
 
 function fetchSearchedPostsSolr(isNextBatch) {
-	
-	if(!isNextBatch && socialMonitorPostBatch.length > 0) {
+
+	if (!isNextBatch && socialMonitorPostBatch.length > 0) {
 		var posts = socialMonitorPostBatch.slice(0, proPostBatchSize);
 		if (socialMonitorPostBatch.length > proPostBatchSize) {
 			socialMonitorPostBatch = socialMonitorPostBatch.slice(proPostBatchSize);
 		} else {
 			socialMonitorPostBatch = [];
 		}
-		
-		//paint the posts
+
+		// paint the posts
 		showLoaderOnPagination($('#prof-posts'));
 		isSocialMonitorPostLoaderRunning = true;
 		setTimeout(function() {
 			isSocialMonitorPostLoaderRunning = false;
 			paintPostsSolr(posts);
 		}, 500);
-		
-		//Fetch the next batch
-		if(!doStopSocialMonitorPostAjaxRequest && socialMonitorPostBatch.length <= proPostBatchSize) {
+
+		// Fetch the next batch
+		if (!doStopSocialMonitorPostAjaxRequest && socialMonitorPostBatch.length <= proPostBatchSize) {
 			fetchSearchedPostsSolr(true);
 		}
 		return;
 	}
-	
-	if(!isNextBatch) {
+
+	if (!isNextBatch) {
 		showLoaderOnPagination($('#prof-posts'));
 	}
-	
-	if(isSocialMonitorPostAjaxRequestRunning) return;//Return if posts fetch is still working
-	
+
+	if (isSocialMonitorPostAjaxRequestRunning)
+		return;// Return if posts fetch is still working
+
 	var entityType = $("#select-hierarchy-level").val();
 	var entityId;
 	entityId = $("#selected-entity-id-hidden").val();
-	if(entityType == undefined || entityType == "companyId"){
+	if (entityType == undefined || entityType == "companyId") {
 		entityType = "companyId";
 		entityId = companyIdForSocialMonitor;
-	} else if(entityId == undefined || entityId <= 0 ){
+	} else if (entityId == undefined || entityId <= 0) {
 		$('#overlay-toast').html("Please select a valid " + $("#select-hierarchy-level").find(':selected').data('entity'));
 		showToast();
 		return;
 	}
 	var searchQuery = $("#post-search-query").val();
-	
+
 	var payload = {
-			"entityType" : entityType,
-			"entityId" : entityId,
-			"batchSize" : proPostBatchSize,
-			"startIndex" : proPostStartIndex,
-			"searchQuery" : searchQuery
-		};
-	
+		"entityType" : entityType,
+		"entityId" : entityId,
+		"batchSize" : proPostBatchSize,
+		"startIndex" : proPostStartIndex,
+		"searchQuery" : searchQuery
+	};
+
 	isSocialMonitorPostAjaxRequestRunning = true;
 	callAjaxGetWithPayloadData("./searchSocialPosts.do", function(response, e) {
 		isSocialMonitorPostAjaxRequestRunning = false;
 		var data = $.parseJSON(response);
-		var posts = data.socialMonitorPosts; 
+		var posts = data.socialMonitorPosts;
 		var profilePics = data.profileImageUrlDataList;
-		
-		//check if posts are empty
-		if(proPostStartIndex == 0 && posts.length <= 0) {
+
+		// check if posts are empty
+		if (proPostStartIndex == 0 && posts.length <= 0) {
 			doStopSocialMonitorPostAjaxRequest = true;
 			hideLoaderOnPagination($('#prof-posts'));
 			return;
-		} else if(posts.length < proPostBatchSize) {
+		} else if (posts.length < proPostBatchSize) {
 			doStopSocialMonitorPostAjaxRequest = true;
 		}
 		proPostStartIndex += proPostBatchSize;
-		
-		//Process images
-		for(var i=0; i< posts.length; i++) {
+
+		// Process images
+		for (var i = 0; i < posts.length; i++) {
 			var post = posts[i];
 			var profileImg = "";
-			$.each(profilePics,  function(i, pic){
-				if(pic.profileImageUrl != ""){
-					//post by region
-					if(post.regionId > 0 && pic.entityType == "regionId" && pic.entityId == post.regionId){
+			$.each(profilePics, function(i, pic) {
+				if (pic.profileImageUrl != "") {
+					// post by region
+					if (post.regionId > 0 && pic.entityType == "regionId" && pic.entityId == post.regionId) {
 						profileImg = pic.profileImageUrl;
-						//post by branch
-					} else if(post.branchId > 0 && pic.entityType == "branchId" && pic.entityId == post.branchId){
+						// post by branch
+					} else if (post.branchId > 0 && pic.entityType == "branchId" && pic.entityId == post.branchId) {
 						profileImg = pic.profileImageUrl;
-						//post by agent
-					} else if(post.agentId > 0 && pic.entityType == "userId" && pic.entityId == post.agentId){
+						// post by agent
+					} else if (post.agentId > 0 && pic.entityType == "userId" && pic.entityId == post.agentId) {
 						profileImg = pic.profileImageUrl;
-						//post by company
-					} else if(post.companyId > 0 && post.regionId <=0 && post.branchId <= 0 && post.agentId <= 0 && pic.entityType == "companyId" && pic.entityId == post.companyId){
+						// post by company
+					} else if (post.companyId > 0 && post.regionId <= 0 && post.branchId <= 0 && post.agentId <= 0 && pic.entityType == "companyId" && pic.entityId == post.companyId) {
 						profileImg = pic.profileImageUrl;
 					}
 				}
 			});
 			post["profileImage"] = profileImg;
-		};
-		
-		//update the batch
+		}
+		;
+
+		// update the batch
 		socialMonitorPostBatch = socialMonitorPostBatch.concat(posts);
-		
-		if(isNextBatch) {
-			//Fetch the next batch
-			if(!doStopSocialMonitorPostAjaxRequest && socialMonitorPostBatch.length <= proPostBatchSize) {
+
+		if (isNextBatch) {
+			// Fetch the next batch
+			if (!doStopSocialMonitorPostAjaxRequest && socialMonitorPostBatch.length <= proPostBatchSize) {
 				fetchSearchedPostsSolr(true);
 			}
-		} else if(posts && posts.length > 0) {
-				fetchSearchedPostsSolr(false);
+		} else if (posts && posts.length > 0) {
+			fetchSearchedPostsSolr(false);
 		}
-		
+
 	}, payload, true);
 }
 
@@ -9939,34 +9485,31 @@ function paintPostsSolr(posts, entityType, entityId) {
 		var profImgClass = "sm-default-img";
 		var profImgStyle = "";
 		var iconClass = "";
-		var href="javascript:void(0)";
-		if(post.source == "google"){
+		var href = "javascript:void(0)";
+		if (post.source == "google") {
 			iconClass = "icn-gplus";
-		}
-		else if(post.source == "SocialSurvey")
+		} else if (post.source == "SocialSurvey")
 			iconClass = "icn-ss";
-		else if(post.source == "facebook"){
+		else if (post.source == "facebook") {
 			iconClass = "icn-fb";
-			href="http://www.facebook.com/"+post.postId;
-		}
-		else if(post.source == "twitter"){
+			href = "http://www.facebook.com/" + post.postId;
+		} else if (post.source == "twitter") {
 			iconClass = "icn-twit";
 			var res = post.postText.split("http");
-			href="http"+res[1];
-		}
-		else if(post.source == "linkedin"){
+			href = "http" + res[1];
+		} else if (post.source == "linkedin") {
 			iconClass = "icn-lin";
 		}
-		if(typeof post.postUrl!=  "undefined" ){
-			 href= post.postUrl;
+		if (typeof post.postUrl != "undefined") {
+			href = post.postUrl;
 		}
 		var profileImg = post.profileImage;
-		if(profileImg != ""){
+		if (profileImg != "") {
 			profImgClass = "sm-custom-img";
 			profImgStyle = 'style="background:url(' + profileImg + ') no-repeat center; background-size: 50px;"';
 		}
-		
-		var hrefComplet='<a href='+href+' target="_blank">';
+
+		var hrefComplet = '<a href=' + href + ' target="_blank">';
 		divToPopulate += '<div class="tweet-panel-item bord-bot-dc sm-tweet-item clearfix">';
 		var profName = "";
 		if (post.companyName != undefined && post.companyName != "") {
@@ -9982,70 +9525,60 @@ function paintPostsSolr(posts, entityType, entityId) {
 			profName = post.agentName;
 		}
 		divToPopulate += '<div class="float-left ' + profImgClass + '" ' + profImgStyle + ' ></div>';
-		divToPopulate += '<div class="sm-prof-name">' + profName + '</div>'
-				+ '<div class="sm-post-row float-left">'
-				+ hrefComplet
-				+ '<div class="tweet-icn-sm ' + iconClass + ' float-left"></div>'
-				+"</a>"
-				+ '<div class="tweet-txt float-left">'
-				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
-				+ '<div class="tweet-text-time"><em>'
-				+ convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>';
+		divToPopulate += '<div class="sm-prof-name">' + profName + '</div>' + '<div class="sm-post-row float-left">' + hrefComplet + '<div class="tweet-icn-sm ' + iconClass + ' float-left"></div>' + "</a>" + '<div class="tweet-txt float-left">' + '<div class="tweet-text-main">' + linkify(post.postText) + '</div>' + '<div class="tweet-text-time"><em>' + convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>';
 		divToPopulate += '</div>';
-		
+
 		divToPopulate += '</div>';
 		divToPopulate += '</div>';
-		
-		
+
 	});
-	
+
 	hideLoaderOnPagination($('#prof-posts'));
-	
-	if ($('#prof-posts').children('.tweet-panel-item').length == 0){
+
+	if ($('#prof-posts').children('.tweet-panel-item').length == 0) {
 		$('#prof-posts').html(divToPopulate);
 		$('#prof-posts').perfectScrollbar({
 			suppressScrollX : true
 		});
 		$('#prof-posts').perfectScrollbar('update');
-	}
-	else{
+	} else {
 		$('#prof-posts').append(divToPopulate);
 		$('#prof-posts').perfectScrollbar('update');
 	}
 }
 
-function setColDetails(currentProfileName, currentProfileValue, parentCompanyId){
+function setColDetails(currentProfileName, currentProfileValue, parentCompanyId) {
 	colName = currentProfileName;
 	colValue = currentProfileValue;
 	companyIdForSocialMonitor = parentCompanyId;
 }
 
-//complaint registration event binding
-$(document).on('click','#comp-reg-form-submit',function(){
-	if(validateComplaintRegistraionForm()) {
+// complaint registration event binding
+$(document).on('click', '#comp-reg-form-submit', function() {
+	if (validateComplaintRegistraionForm()) {
 		var formData = $('#comp-reg-form').serialize();
-		callAjaxPostWithPayloadData("/updatecomplaintressettings.do", function(data){
+		callAjaxPostWithPayloadData("/updatecomplaintressettings.do", function(data) {
 			$('#overlay-toast').html(data);
 			showToast();
-		}, formData,  true ,'#comp-reg-form-submit');
+		}, formData, true, '#comp-reg-form-submit');
 	}
 });
 
-$(document).on('click touchstart','#compl-checkbox', function() {
-	if($(this).hasClass('bd-check-img-checked')) {
-		if(validateMultipleEmailIds('comp-mailId')) {
+$(document).on('click touchstart', '#compl-checkbox', function() {
+	if ($(this).hasClass('bd-check-img-checked')) {
+		if (validateMultipleEmailIds('comp-mailId')) {
 			$(this).removeClass('bd-check-img-checked');
-			$('input[name="enabled"]').prop( "checked" , true);
+			$('input[name="enabled"]').prop("checked", true);
 			$('input[name="enabled"]').val("enable");
 		}
 	} else {
-			$(this).addClass('bd-check-img-checked');
-			$('input[name="enabled"]').prop( "checked" , false);
-			$('input[name="enabled"]').val("");
+		$(this).addClass('bd-check-img-checked');
+		$('input[name="enabled"]').prop("checked", false);
+		$('input[name="enabled"]').val("");
 	}
 });
 
-//function to remove social post
+// function to remove social post
 function removeUserPost(surveyMongoId) {
 
 	$('#overlay-continue').removeAttr("onclick");
@@ -10053,7 +9586,7 @@ function removeUserPost(surveyMongoId) {
 	var payload = {
 		"statusmongoid" : surveyMongoId
 	};
-	
+
 	callAjaxPostWithPayloadData("./deletestatus.do", function(data) {
 		if (data.errCode == undefined) {
 			$('#overlay-toast').html(data.responseText);
@@ -10067,7 +9600,7 @@ function removeUserPost(surveyMongoId) {
 	}, payload, true);
 }
 
-//Edit profile events
+// Edit profile events
 $(document).on('click', '#prof-post-btn', function() {
 	var textContent = $('#status-body-text-edit').val().trim();
 	if (textContent == undefined || textContent == "") {
@@ -10075,26 +9608,23 @@ $(document).on('click', '#prof-post-btn', function() {
 		showToast();
 		return;
 	}
-	
+
 	$('#status-body-text-edit').val('');
 	var payload = {
 		"text" : textContent
 	};
-	
 
 	callAjaxPostWithPayloadData("./savestatus.do", function(data) {
 		if (data.errCode == undefined) {
 			proPostStartIndex = 0;
 			fetchPublicPostEditProfile(false);
 		}
-	}, payload, true,'#prof-post-btn');
+	}, payload, true, '#prof-post-btn');
 });
 
-/*$(document).on('click', '.ppl-share-wrapper .icn-remove', function() {
-	$(this).hide();
-	$(this).parent().find('.ppl-share-social').hide();
-	$(this).parent().find('.icn-plus-open').show();
-});*/
+/*
+ * $(document).on('click', '.ppl-share-wrapper .icn-remove', function() { $(this).hide(); $(this).parent().find('.ppl-share-social').hide(); $(this).parent().find('.icn-plus-open').show(); });
+ */
 
 $(document).on('click touchstart', '.icn-person', function() {
 	$('.mob-icn').removeClass('mob-icn-active');
@@ -10136,27 +9666,26 @@ $(document).on('click touchstart', '.inc-more', function() {
 	$('#ppl-post-cont').hide();
 });
 
-$(document).on('mouseover', '#prof-basic-container', function(e){
+$(document).on('mouseover', '#prof-basic-container', function(e) {
 	$('#prof-basic-container .prof-edit-field-icn').show();
 	$('#prof-basic-container .prof-edditable').addClass('prof-name-edit');
 });
-$(document).on('mouseleave', '#prof-basic-container', function(e){
-	if(!$('#prof-basic-container input').is(':focus')){
+$(document).on('mouseleave', '#prof-basic-container', function(e) {
+	if (!$('#prof-basic-container input').is(':focus')) {
 		$('#prof-basic-container .prof-edit-field-icn').hide();
-		$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');			
+		$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');
 	}
 });
 
-$(document).on('mouseover', '#prof-posts .tweet-panel-item' , function(e){
+$(document).on('mouseover', '#prof-posts .tweet-panel-item', function(e) {
 	$(this).find('.dlt-survey-wrapper').removeClass('hide');
 });
 
-$(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e){
+$(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e) {
 	$(this).find('.dlt-survey-wrapper').addClass('hide');
 });
 
-
-$(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
+$(document).on('click', '#prof-posts .post-dlt-icon', function(e) {
 	e.stopPropagation();
 	var surveyMongoId = $(this).attr('surveymongoid');
 	$('#overlay-main').show();
@@ -10169,27 +9698,25 @@ $(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
 
 });
 
-/*$(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() {
-	$(this).hide();
-	$(this).parent().find('.ppl-share-social,.icn-remove').show();
-});
-*/
-function getRelevantEntities(){
-	//Remove pre-existing options
+/*
+ * $(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() { $(this).hide(); $(this).parent().find('.ppl-share-social,.icn-remove').show(); });
+ */
+function getRelevantEntities() {
+	// Remove pre-existing options
 	$('#select-entity-id').val("");
 	$("#selected-entity-id-hidden").val("");
 	$("#entity-selection-panel").show();
-	//Get the entity type
+	// Get the entity type
 	var entityType = $("#select-hierarchy-level").val();
-	//If branch
-	if (entityType == "branchId" ) {
+	// If branch
+	if (entityType == "branchId") {
 		callAjaxGET("/fetchbranches.do", function(data) {
 			var branchList = [];
-			if(data != undefined && data != "")
-			branchList = $.parseJSON(data);
+			if (data != undefined && data != "")
+				branchList = $.parseJSON(data);
 			var searchData = [];
-			for(var i=0,j=0; i<branchList.length; i++) {
-				if(branchList[i].isDefaultBySystem == 0) {
+			for (var i = 0, j = 0; i < branchList.length; i++) {
+				if (branchList[i].isDefaultBySystem == 0) {
 					searchData[j] = {};
 					searchData[j].label = branchList[i].branchName;
 					searchData[j].branchId = branchList[i].branchId;
@@ -10198,110 +9725,113 @@ function getRelevantEntities(){
 			}
 			$("#select-entity-id").autocomplete({
 				source : searchData,
-				minLength: 0,
+				minLength : 0,
 				delay : 0,
 				autoFocus : true,
-				select: function(event, ui) {
+				select : function(event, ui) {
 					$("#select-entity-id").val(ui.item.label);
 					$('#selected-entity-id-hidden').val(ui.item.branchId);
 					postsSearch();
 					return false;
 				},
-				close: function(event, ui) {},
-				create: function(event, ui) {
-			        $('.ui-helper-hidden-accessible').remove();
+				close : function(event, ui) {
+				},
+				create : function(event, ui) {
+					$('.ui-helper-hidden-accessible').remove();
 				}
 			}).autocomplete("instance")._renderItem = function(ul, item) {
 				$(ul).addClass("social-monitor-autocomplete");
 				return $('<li>').append(item.label).appendTo(ul);
-		  	};
-		  	$("#select-entity-id").off('focus');
-			$("#select-entity-id").focus(function(){            
-	            $(this).autocomplete('search');
-	        });
-			
-		},true);
+			};
+			$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function() {
+				$(this).autocomplete('search');
+			});
+
+		}, true);
 	} else if (entityType == "regionId") {
 		callAjaxGET("/fetchregions.do", function(data) {
 			var regionList = [];
-			if(data != undefined && data != "")
+			if (data != undefined && data != "")
 				regionList = $.parseJSON(data);
 			autocompleteData = data;
 			var searchData = [];
-			for(var i=0, j=0; i<regionList.length; i++) {
-				if(regionList[i].isDefaultBySystem == 0) {
+			for (var i = 0, j = 0; i < regionList.length; i++) {
+				if (regionList[i].isDefaultBySystem == 0) {
 					searchData[j] = {};
 					searchData[j].label = regionList[i].regionName;
 					searchData[j].regionId = regionList[i].regionId;
-					j++;				
+					j++;
 				}
 			}
 			$("#select-entity-id").autocomplete({
 				source : searchData,
-				minLength: 0,
+				minLength : 0,
 				delay : 0,
 				autoFocus : true,
-				select: function(event, ui) {
+				select : function(event, ui) {
 					$("#select-entity-id").val(ui.item.label);
 					$('#selected-entity-id-hidden').val(ui.item.regionId);
 					postsSearch();
 					return false;
 				},
-				close: function(event, ui) {},
-				create: function(event, ui) {
-			        $('.ui-helper-hidden-accessible').remove();
+				close : function(event, ui) {
+				},
+				create : function(event, ui) {
+					$('.ui-helper-hidden-accessible').remove();
 				}
 			}).autocomplete("instance")._renderItem = function(ul, item) {
 				$(ul).addClass("social-monitor-autocomplete");
 				return $("<li>").append(item.label).appendTo(ul);
-		  	};
-		  	$("#select-entity-id").off('focus');
-			$("#select-entity-id").focus(function(){            
-	            $(this).autocomplete('search');
-	        }); 
-			
+			};
+			$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function() {
+				$(this).autocomplete('search');
+			});
+
 		}, true);
 	} else if (entityType == "userId") {
 		callAjaxGET("/fetchusers.do", function(data) {
 			var userList = [];
-			if(data != undefined && data != "")
+			if (data != undefined && data != "")
 				userList = $.parseJSON(data);
 			autocompleteData = data;
 			var searchData = [];
-			for(var i=0, j=0; i<userList.length; i++) {
-				if(userList[i].isOwner == 0) {
+			for (var i = 0, j = 0; i < userList.length; i++) {
+				if (userList[i].isOwner == 0) {
 					searchData[j] = {};
 					searchData[j].label = userList[i].firstName;
-					if(userList[i].lastName != undefined)
+					if (userList[i].lastName != undefined)
 						searchData[j].label += " " + userList[i].lastName;
 					searchData[j].userId = userList[i].userId;
-					j++;				
+					j++;
 				}
 			}
 			$("#select-entity-id").autocomplete({
 				source : searchData,
-				minLength: 0,
+				minLength : 0,
 				delay : 0,
 				autoFocus : true,
-				select: function(event, ui) {
+				select : function(event, ui) {
 					$("#select-entity-id").val(ui.item.label);
 					$('#selected-entity-id-hidden').val(ui.item.userId);
 					postsSearch();
 					return false;
 				},
-				close: function(event, ui) {},
-				create: function(event, ui) {
-			        $('.ui-helper-hidden-accessible').remove();
+				close : function(event, ui) {
+				},
+				create : function(event, ui) {
+					$('.ui-helper-hidden-accessible').remove();
 				}
 			}).autocomplete("instance")._renderItem = function(ul, item) {
 				$(ul).addClass("social-monitor-autocomplete");
 				return $("<li>").append(item.label).appendTo(ul);
-		  	};
-		  	$("#select-entity-id").off('focus');
-			$("#select-entity-id").focus(function(){            
-	            $(this).autocomplete('search');
-	        }); 
-			
+			};
+			$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function() {
+				$(this).autocomplete('search');
+			});
+
 		}, true);
 	} else if (entityType == "companyId") {
 		$("#entity-selection-panel").hide();
@@ -10310,36 +9840,36 @@ function getRelevantEntities(){
 }
 
 $(document).on("keyup", "#post-search-query", function(e) {
-    if(e.which == 13) {
-    	postsSearch();
-    }
+	if (e.which == 13) {
+		postsSearch();
+	}
 });
 
-//send survey popup admin events
-function attachAutocompleteAgentSurveyInviteDropdown(){
+// send survey popup admin events
+function attachAutocompleteAgentSurveyInviteDropdown() {
 	$('.wc-review-agentname[data-name="agent-name"]').autocomplete({
 		source : function(request, response) {
-			if((request.term).trim().length==0){
+			if ((request.term).trim().length == 0) {
 				return;
 			}
 			callAjaxGetWithPayloadData("/fetchagentsforadmin.do", function(data) {
-					var responseData = JSON.parse(data);
-					response($.map(responseData, function(item) {
-		 	    	  return {
-		 	    		   label:item.displayName + " <"  + item.emailId + ">",
-		 	    		   value:item.displayName + " <"  + item.emailId + ">",
-		 	    		   userId:item.userId,
-		 	    		   emailId:item.emailId	   
-						};
-		 	       }));
-				}, {
-					"searchKey" : (request.term).trim(),
-					"columnName" : colName,
-					"columnValue" : colValue
-				}, true);
+				var responseData = JSON.parse(data);
+				response($.map(responseData, function(item) {
+					return {
+						label : item.displayName + " <" + item.emailId + ">",
+						value : item.displayName + " <" + item.emailId + ">",
+						userId : item.userId,
+						emailId : item.emailId
+					};
+				}));
+			}, {
+				"searchKey" : (request.term).trim(),
+				"columnName" : colName,
+				"columnValue" : colValue
+			}, true);
 		},
 		minLength : 1,
-		select : function (event, ui) {
+		select : function(event, ui) {
 			event.stopPropagation();
 			var element = event.target;
 			$(element).attr('agent-id', ui.item.userId);
@@ -10347,22 +9877,23 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 			$(element).attr('email-id', ui.item.emailId);
 			$(element).attr('val', ui.item.value);
 		},
-		close: function(event, ui) {},
-		create: function(event, ui) {
-	        $('.ui-helper-hidden-accessible').remove();
+		close : function(event, ui) {
 		},
-		open: function() {
+		create : function(event, ui) {
+			$('.ui-helper-hidden-accessible').remove();
+		},
+		open : function() {
 			$('.ui-autocomplete').addClass('ui-hdr-agent-dropdown').perfectScrollbar({
 				suppressScrollX : true
 			});
 			$('.ui-autocomplete').perfectScrollbar('update');
 		}
 	});
-	
+
 	$('.wc-review-agentname[data-name="agent-name"]').keyup(function(e) {
 		var oldVal = $(this).attr('val');
 		var cuurentVal = $(this).val();
-		if(oldVal == cuurentVal) {
+		if (oldVal == cuurentVal) {
 			return;
 		}
 		$(this).attr('agent-id', "");
@@ -10371,28 +9902,28 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 	});
 }
 
-function attachAutocompleteAliasDropdown(){
-	var companyId=$('#cur-company-id').val();
+function attachAutocompleteAliasDropdown() {
+	var companyId = $('#cur-company-id').val();
 	$('#match-user-email').autocomplete({
 		source : function(request, response) {
 			callAjaxGetWithPayloadData("/fetchagentsforadmin.do", function(data) {
-					var responseData = JSON.parse(data);
-					response($.map(responseData, function(item) {
-		 	    	  return {
-		 	    		   label:item.displayName + " <"  + item.emailId + ">",
-		 	    		   value:item.displayName + " <"  + item.emailId + ">",
-		 	    		   userId:item.userId,
-		 	    		   emailId:item.emailId	   
-						};
-		 	       }));
-				}, {
-					"searchKey" : request.term,
-					"columnName" : "companyId",
-					"columnValue" : companyId
-				}, true);
+				var responseData = JSON.parse(data);
+				response($.map(responseData, function(item) {
+					return {
+						label : item.displayName + " <" + item.emailId + ">",
+						value : item.displayName + " <" + item.emailId + ">",
+						userId : item.userId,
+						emailId : item.emailId
+					};
+				}));
+			}, {
+				"searchKey" : request.term,
+				"columnName" : "companyId",
+				"columnValue" : companyId
+			}, true);
 		},
 		minLength : 1,
-		select : function (event, ui) {
+		select : function(event, ui) {
 			event.stopPropagation();
 			var element = event.target;
 			$(element).attr('agent-id', ui.item.userId);
@@ -10400,22 +9931,23 @@ function attachAutocompleteAliasDropdown(){
 			$(element).attr('email-id', ui.item.emailId);
 			$(element).attr('val', ui.item.value);
 		},
-		close: function(event, ui) {},
-		create: function(event, ui) {
-	        $('.ui-helper-hidden-accessible').remove();
+		close : function(event, ui) {
 		},
-		open: function() {
+		create : function(event, ui) {
+			$('.ui-helper-hidden-accessible').remove();
+		},
+		open : function() {
 			$('.ui-autocomplete').addClass('ui-hdr-agent-dropdown').perfectScrollbar({
 				suppressScrollX : true
 			});
 			$('.ui-autocomplete').perfectScrollbar('update');
 		}
 	});
-	
+
 	$('#match-user-email').keyup(function(e) {
 		var oldVal = $(this).attr('val');
 		var cuurentVal = $(this).val();
-		if(oldVal == cuurentVal) {
+		if (oldVal == cuurentVal) {
 			return;
 		}
 		$(this).attr('agent-id', "");
@@ -10424,76 +9956,74 @@ function attachAutocompleteAliasDropdown(){
 	});
 }
 
-//send survey popup admin events
-function attachAutocompleteUserListDropdown(){
+// send survey popup admin events
+function attachAutocompleteUserListDropdown() {
 	$('#selected-user-txt').autocomplete({
 		source : function(request, response) {
 			var start = -1;
 			var rows = -1;
-			var url="./finduserbyemail.do?startIndex="+start+"&batchSize="+rows+"&searchKey="+request.term;
+			var url = "./finduserbyemail.do?startIndex=" + start + "&batchSize=" + rows + "&searchKey=" + request.term;
 			callAjaxGET(encodeURI(url), function(data) {
 				var responseData = JSON.parse(data);
 				response($.map(responseData, function(item) {
 					var displayName = item.firstName;
-					if(item.lastName != undefined) {
-						displayName = displayName +" "+ item.lastName;
+					if (item.lastName != undefined) {
+						displayName = displayName + " " + item.lastName;
 					}
-	 	    	  return {
-	 	    		   label:displayName,
-	 	    		   value:displayName,
-	 	    		   userId:item.userId  
+					return {
+						label : displayName,
+						value : displayName,
+						userId : item.userId
 					};
-	 	       }));
+				}));
 			}, true);
 		},
 		minLength : 0,
-		select : function (event, ui) {
+		select : function(event, ui) {
 			event.stopPropagation();
 			$('#selected-user-txt').val(ui.item.value);
 			$('#selected-user-txt').attr('val', ui.item.value);
 			$('#selected-userid-hidden').val(ui.item.userId);
 		},
-		close: function(event, ui) {},
-		create: function(event, ui) {
+		close : function(event, ui) {
 		},
-		open: function() {
+		create : function(event, ui) {
+		},
+		open : function() {
 			$('.ui-autocomplete').addClass('ui-hdr-agent-dropdown').perfectScrollbar({
 				suppressScrollX : true
 			});
 			$('.ui-autocomplete').perfectScrollbar('update');
 		}
 	});
-	
-	
+
 	$('#selected-user-txt').keyup(function(e) {
 		var oldVal = $(this).attr('val');
 		var cuurentVal = $(this).val();
-		if(oldVal == cuurentVal) {
+		if (oldVal == cuurentVal) {
 			return;
 		}
 		$('#selected-userid-hidden').val("");
 	});
-	
+
 }
 
-//url change popup
+// url change popup
 function saveProfileUrl() {
-	if(!validateprofileUrlEditForm()){
+	if (!validateprofileUrlEditForm()) {
 		return false;
 	}
 
 }
 
-
-
 function validateprofileUrlEditForm() {
 	var profileUrl = $('input[name="profileUrlBlock"]').val();
-	if(profileUrl == undefined ||  profileUrl == "") {
+	if (profileUrl == undefined || profileUrl == "") {
 		$('#overlay-toast').text("Please enter a valid profile name");
 		showToast();
 		return false;
 	}
-	
+
 	$.ajax({
 		url : "./updateprofileurl.do?searchKey=" + profileUrl,
 		type : "GET",
@@ -10502,12 +10032,11 @@ function validateprofileUrlEditForm() {
 		async : true,
 		success : function(data) {
 			var profileExists = data;
-			if(profileExists == "true"){
+			if (profileExists == "true") {
 				$('#overlay-toast').text("The entered profile name already exists");
 				showToast();
 				return false;
-			}
-			else{
+			} else {
 				$('#overlay-toast').text("Url updated successfully");
 				showToast();
 				hideActiveUserLogoutOverlay();
@@ -10517,11 +10046,11 @@ function validateprofileUrlEditForm() {
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			//redirectErrorpage();
+			// redirectErrorpage();
 		}
 	});
 }
@@ -10536,39 +10065,38 @@ function initializeVerticalsMasterForProfilePage() {
 			}
 		}, true, {});
 	} else {
-		initializeVerticalAutcomplete();		
+		initializeVerticalAutcomplete();
 	}
 }
 
 function attachEventsOnSocialMonitor() {
 	$("#select-hierarchy-level").off('change');
-	$("#select-hierarchy-level").on('change', function(){
+	$("#select-hierarchy-level").on('change', function() {
 		autocompleteData = [];
 		getRelevantEntities();
 	});
 	$('#prof-posts').off('scroll');
-	$('#prof-posts').on('scroll',function(){
+	$('#prof-posts').on('scroll', function() {
 		var scrollContainer = this;
-		if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) 
-				- (scrollContainer.clientHeight / 0.75))) && !isSocialMonitorPostLoaderRunning) {
-				
-				if (!doStopSocialMonitorPostAjaxRequest || socialMonitorPostBatch.length > 0){
-					fetchSearchedPostsSolr(false);
-				}
+		if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) - (scrollContainer.clientHeight / 0.75))) && !isSocialMonitorPostLoaderRunning) {
+
+			if (!doStopSocialMonitorPostAjaxRequest || socialMonitorPostBatch.length > 0) {
+				fetchSearchedPostsSolr(false);
+			}
 		}
 	});
 }
 
-//Zillow connect functions
+// Zillow connect functions
 function saveZillowEmailAddress() {
-	if(!validateZillowForm()){
+	if (!validateZillowForm()) {
 		return false;
 	}
 	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
-		if(data && data == "success") {
+		if (data && data == "success") {
 			showProfileLinkInEditProfilePage("zillow", $('input[name="zillowProfileName"]').val());
-            loadSocialMediaUrlInSettingsPage();
-            loadSocialMediaUrlInPopup();
+			loadSocialMediaUrlInSettingsPage();
+			loadSocialMediaUrlInPopup();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
 		} else {
@@ -10589,7 +10117,7 @@ function validateZillowForm() {
 	}
 }
 
-//Fucntion to update view as scroll in dashboard
+// Fucntion to update view as scroll in dashboard
 function updateViewAsScroll() {
 	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
 		$('#da-dd-wrapper').remove();
@@ -10602,9 +10130,9 @@ function updateViewAsScroll() {
 	}
 }
 
-//Sign up path functions
+// Sign up path functions
 
-//Address infromataion validation
+// Address infromataion validation
 function validateIndividaulAddressForm() {
 
 	if (!validateAddress1('com-address1', true)) {
@@ -10630,8 +10158,7 @@ function validateIndividaulAddressForm() {
 	return true;
 }
 
-
-//Summary form validation
+// Summary form validation
 function validateSummaryForm() {
 	if (!validateInputField('wc-industry')) {
 		$('#overlay-toast').html('Please enter industry');
@@ -10705,8 +10232,8 @@ function showActiveUserLogoutOverlay() {
 	$("#overlay-text").html("Please logout active user to proceed");
 	$('#overlay-continue').addClass("hide");
 	$('#overlay-cancel').html("Ok");
-	
-	$('#overlay-cancel').click(function(){
+
+	$('#overlay-cancel').click(function() {
 		hideActiveUserLogoutOverlay();
 		landingFlow();
 	});
@@ -10720,69 +10247,54 @@ function hideActiveUserLogoutOverlay() {
 	$("#overlay-text").html('');
 	$('#overlay-continue').removeClass("hide");
 	$('#overlay-cancel').html('');
-	
+
 	$('#overlay-cancel').unbind('click');
 }
 
-
 /**
-* Functions to confirm social authentication
-*/
+ * Functions to confirm social authentication
+ */
 function confirmSocialAuth(socialNetwork, callBackFunction, link) {
-	
+
 	var message = "";
-	
-	if(link && link.trim() != "" ) {
+
+	if (link && link.trim() != "") {
 		message = "Are you sure you want to disconnect your previous connection to " + socialNetwork + " and connect again";
 	} else {
 		message = "Are you sure you want to connect to " + socialNetwork;
 	}
-	
+
 	$('#overlay-header').html("Confirm user Authentication");
 	$("#overlay-text").html(message);
 	$('#overlay-continue').html("Ok");
 	$('#overlay-continue').attr("onclick", "");
 
 	$('#overlay-continue').click(function() {
-		if(callBackFunction != undefined && typeof(callBackFunction) == "function" ) {
+		if (callBackFunction != undefined && typeof (callBackFunction) == "function") {
 			$('#overlay-main').hide();
 			$('#overlay-continue').unbind('click');
 			callBackFunction();
 		}
 	});
-	
-	
+
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-main').show();
 };
 
-
-function confirmSocialAuthOk(callBackFunction){
-	if(callBackFunction != undefined && typeof(callBackFunction) == "function" ) {
+function confirmSocialAuthOk(callBackFunction) {
+	if (callBackFunction != undefined && typeof (callBackFunction) == "function") {
 		$('#overlay-main').hide();
 		callBackFunction();
 	}
 }
 
-	/*
-	 * callAjaxGET("./sendsurveyinvitation.do", function(data) {
-		$('#overlay-send-survey').html(data);
-		if ($("#welcome-popup-invite").length) {
-			$('#overlay-send-survey').removeClass("hide");
-			$('#overlay-send-survey').show();
-		}
-	}, true);
-	 * 
-	 * $('#overlay-main').show();
-	$('#overlay-continue').show();
-	$('#overlay-continue').html("Submit");
-	$('#overlay-cancel').html("Cancel");
-	$('#overlay-header').html("Start DryRun");
-	$('#overlay-text').html("Are you sure you want to delete user ?");
-	$('#overlay-continue').attr("onclick", "");*/
+/*
+ * callAjaxGET("./sendsurveyinvitation.do", function(data) { $('#overlay-send-survey').html(data); if ($("#welcome-popup-invite").length) { $('#overlay-send-survey').removeClass("hide"); $('#overlay-send-survey').show(); } }, true);
+ * 
+ * $('#overlay-main').show(); $('#overlay-continue').show(); $('#overlay-continue').html("Submit"); $('#overlay-cancel').html("Cancel"); $('#overlay-header').html("Start DryRun"); $('#overlay-text').html("Are you sure you want to delete user ?"); $('#overlay-continue').attr("onclick", "");
+ */
 
-
-$(document).on('click','#en-dry-save',function(e){
+$(document).on('click', '#en-dry-save', function(e) {
 	e.stopPropagation();
 	if (validateEncompassInput('encompass-form-div')) {
 		var state = $("#encompass-state").val();
@@ -10790,66 +10302,63 @@ $(document).on('click','#en-dry-save',function(e){
 		if (state != 'prod') {
 			warn = false;
 		}
-		if(warn){
+		if (warn) {
 			confirmEncompassEdit();
 		} else {
 			initiateEncompassSaveConnection(false);
 		}
 	}
-	
+
 });
 
 function confirmEncompassEdit() {
-	
-	
+
 	$('#overlay-header').html("Confirm Edit");
 	$('#overlay-text').html("This action can affect the way we fetch your encompass records");
 	$('#overlay-continue').html("Edit");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-continue').off();
-	$('#overlay-continue').click(function(){
+	$('#overlay-continue').click(function() {
 		initiateEncompassSaveConnection(true);
 	});
-	
+
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
 
-function initiateEncompassSaveConnection(warn){
-    var username=document.getElementById('encompass-username').value;
-	var password=document.getElementById('encompass-password').value;
-	var url=document.getElementById('encompass-url').value;
+function initiateEncompassSaveConnection(warn) {
+	var username = document.getElementById('encompass-username').value;
+	var password = document.getElementById('encompass-password').value;
+	var url = document.getElementById('encompass-url').value;
 	var payload = {
-			"username" : username,
-			"password":password,
-			"url":url
-		};
+		"username" : username,
+		"password" : password,
+		"url" : url
+	};
 	showOverlay();
-    callAjaxGetWithPayloadData(getLocationOrigin()+"/rest/encompass/testcredentials.do",
-    		saveEncompassDetailsCallBack, payload,true,'#en-dry-save');
-    if (warn) {
-    	$('#overlay-cancel').click();
+	callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/encompass/testcredentials.do", saveEncompassDetailsCallBack, payload, true, '#en-dry-save');
+	if (warn) {
+		$('#overlay-cancel').click();
 	}
 }
-    
-$(document).on('click','#en-dry-enable',function(){
-  
-    callAjaxPOST("/enableencompassdetails.do",
-			testEnableCompassCallBack,true,'#en-dry-enable');	
-    
+
+$(document).on('click', '#en-dry-enable', function() {
+
+	callAjaxPOST("/enableencompassdetails.do", testEnableCompassCallBack, true, '#en-dry-enable');
+
 });
-function testEnableCompassCallBack(response){
+function testEnableCompassCallBack(response) {
 	var map = response;
-	if (map== "Successfully enabled encompass connection") {
+	if (map == "Successfully enabled encompass connection") {
 		showInfo(map);
 		$("#encompass-state").val('prod');
 		showEncompassButtons();
 	} else {
 		showError(map);
-	}	
-	
+	}
+
 };
-function showEncompassButtons(){
+function showEncompassButtons() {
 	var state = $("#encompass-state").val();
 	if (state == 'dryrun') {
 		$('#en-dry-enable').show();
@@ -10865,26 +10374,25 @@ function showEncompassButtons(){
 		$('#en-generate-report').hide();
 	}
 }
-$(document).on('click','#en-disconnect',function(){
-    if(isRealTechOrSSAdmin) {
-    	callAjaxPOST("/disableencompassdetails.do",
-    			testDisconnectCompassCallBack,true,'#en-disconnect');
-    } else {
-    	$('#overlay-toast').html('Please contact SuccessTeam@SocialSurvey.com or call 1-888-701-4512.');
+$(document).on('click', '#en-disconnect', function() {
+	if (isRealTechOrSSAdmin) {
+		callAjaxPOST("/disableencompassdetails.do", testDisconnectCompassCallBack, true, '#en-disconnect');
+	} else {
+		$('#overlay-toast').html('Please contact SuccessTeam@SocialSurvey.com or call 1-888-701-4512.');
 		showToast();
-    }
+	}
 });
 
-function testDisconnectCompassCallBack(response){
+function testDisconnectCompassCallBack(response) {
 	var map = response;
-	if (map== "Successfully disabled encompass connection") {
+	if (map == "Successfully disabled encompass connection") {
 		$("#encompass-state").val('dryrun');
 		showEncompassButtons();
-		showInfo(map);	
+		showInfo(map);
 	} else {
 		showError(map);
-	}	
-	
+	}
+
 };
 
 $(document).on('click', '#en-generate-report', function() {
@@ -10897,60 +10405,59 @@ $(document).on('click', '#en-generate-report', function() {
 		$('#overlay-header').html("Send Report");
 		$('#overlay-main').show();
 		$('#overlay-continue').off();
-		$('#overlay-continue').click(function(){
-			var encompassNoOfdays = document.getElementById('encompass-no-of-days').value;	
-			var encompassReportEmail= document.getElementById('encompass-report-email').value;
-			var payload ={
-					"encompassNoOfdays":encompassNoOfdays,
-			        "encompassReportEmail":encompassReportEmail
+		$('#overlay-continue').click(function() {
+			var encompassNoOfdays = document.getElementById('encompass-no-of-days').value;
+			var encompassReportEmail = document.getElementById('encompass-report-email').value;
+			var payload = {
+				"encompassNoOfdays" : encompassNoOfdays,
+				"encompassReportEmail" : encompassReportEmail
 			};
-			 callAjaxPostWithPayloadData("/enableencompassreportgeneration.do",
-					 testGenerateReportCallBack, payload,true,'#en-generate-report');
+			callAjaxPostWithPayloadData("/enableencompassreportgeneration.do", testGenerateReportCallBack, payload, true, '#en-generate-report');
 		});
 	}, true);
 });
 
-function testGenerateReportCallBack(response){
+function testGenerateReportCallBack(response) {
 	$('#overlay-cancel').click();
 	var map = response;
-	if (map== "Successfully enabled encompass report generation ") {
-		showInfo(map);	
+	if (map == "Successfully enabled encompass report generation ") {
+		showInfo(map);
 	} else {
 		showError(map);
-	}	
-	
+	}
+
 };
 
-function encompassCretentials(){
-	var username=document.getElementById('encompass-username').value;
-	var password=document.getElementById('encompass-password').value;
-	var url=document.getElementById('encompass-url').value;
+function encompassCretentials() {
+	var username = document.getElementById('encompass-username').value;
+	var password = document.getElementById('encompass-password').value;
+	var url = document.getElementById('encompass-url').value;
 	var payload = {
-			"username" : username,
-			"password":password,
-			"url":url
-		};
-	
-	if (validateEncompassTestInput('encompass-form-div')) {
-		showOverlay();
-	callAjaxGetWithPayloadData(getLocationOrigin()+"/rest/encompass/testcredentials.do",
-			testEncompassConnectionCallBack, payload,true,'#en-test-connection');
+		"username" : username,
+		"password" : password,
+		"url" : url
 	};
 
+	if (validateEncompassTestInput('encompass-form-div')) {
+		showOverlay();
+		callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/encompass/testcredentials.do", testEncompassConnectionCallBack, payload, true, '#en-test-connection');
+	}
+	;
+
 };
 
-function paintReviews(result, isRequestFromDashBoard){
-	//Check if there are more reviews left
+function paintReviews(result, isRequestFromDashBoard) {
+	// Check if there are more reviews left
 	var resultSize = result.length;
 
-	if(isRequestFromDashBoard){
+	if (isRequestFromDashBoard) {
 		displayReviewOnDashboard();
 	} else {
 		displayReviewOnEditProfile();
 	}
-	
+
 	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
-	
+
 	var reviewsHtml = "";
 	$.each(result, function(i, reviewItem) {
 		var scoreFixVal = 1;
@@ -10958,63 +10465,59 @@ function paintReviews(result, isRequestFromDashBoard){
 		var lastItemClass = "ppl-review-item";
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
-        }
+		}
 		var custName = reviewItem.customerFirstName;
-		if(reviewItem.customerLastName != undefined){
+		if (reviewItem.customerLastName != undefined) {
 			custName += ' ' + reviewItem.customerLastName;
 		}
 		custName = custName || "";
 		var custNameArray = custName.split(' ');
 		var custDispName = custNameArray[0];
-		if(custNameArray[1] != undefined && custNameArray[1].trim() != ""){
-			custDispName += ' '+custNameArray[1].substr(0,1).toUpperCase()+'.';
+		if (custNameArray[1] != undefined && custNameArray[1].trim() != "") {
+			custDispName += ' ' + custNameArray[1].substr(0, 1).toUpperCase() + '.';
 		}
-		reviewsHtml = reviewsHtml +
-			'<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName)
-				+ ' data-cust-last-name=' + encodeURIComponent(reviewItem.customerLastName) + ' data-agent-name=' + encodeURIComponent(reviewItem.agentName)
-				+ ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review) + '" data-customeremail="'
-				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
+		reviewsHtml = reviewsHtml + '<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName) + ' data-cust-last-name=' + encodeURIComponent(reviewItem.customerLastName) + ' data-agent-name=' + encodeURIComponent(reviewItem.agentName) + ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review) + '" data-customeremail="' + reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';
-		reviewsHtml += '			<div class="ppl-head-1">'+custDispName+'</div>';
+		reviewsHtml += '			<div class="ppl-head-1">' + custDispName + '</div>';
 		if (date != null) {
 			date = convertUserDateToLocale(date);
-			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy") + '</div>'; 
+			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy") + '</div>';
 		}
 
 		reviewsHtml += '		</div>';
-		if(isRequestFromDashBoard) {
-			reviewsHtml += '<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="'+reviewItem.source+'" data-source="'+reviewItem.score+'">';
-			if(reviewItem.source == "Zillow"){
+		if (isRequestFromDashBoard) {
+			reviewsHtml += '<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="' + reviewItem.source + '" data-source="' + reviewItem.score + '">';
+			if (reviewItem.source == "Zillow") {
 				reviewsHtml += '<div class="rating-image float-left icn-zillow" title="Zillow"></div>';
-				reviewsHtml += '<div class="rating-rounded float-left">'+Number.parseFloat(reviewItem.score).toFixed(1)+'</div>';
+				reviewsHtml += '<div class="rating-rounded float-left">' + Number.parseFloat(reviewItem.score).toFixed(1) + '</div>';
 			}
 			reviewsHtml += '</div>';
 			reviewsHtml += '</div>';
 		} else {
 			reviewsHtml += '    	<div class="float-right ppl-header-right">';
-			reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
+			reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="' + reviewItem.source + '" data-rating="' + reviewItem.score + '"></div>';
 			reviewsHtml += '		</div>';
 			reviewsHtml += '	</div>';
 		}
-		
-		if(reviewItem.summary != null && reviewItem.summary.length > 0){
-			reviewsHtml += '<div class="ppl-content">'+reviewItem.summary+'</div>';
+
+		if (reviewItem.summary != null && reviewItem.summary.length > 0) {
+			reviewsHtml += '<div class="ppl-content">' + reviewItem.summary + '</div>';
 		}
-		
+
 		if (reviewItem.review.length > 250) {
-			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
+			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">' + reviewItem.review + '</span><span class="review-less-text">' + reviewItem.review.substr(0, 250) + '</span><span class="review-more-button">More</span>';
 		} else {
-			reviewsHtml += '<div class="ppl-content">'+reviewItem.review;
+			reviewsHtml += '<div class="ppl-content">' + reviewItem.review;
 		}
-		if(reviewItem.source == "Zillow") {
-			reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
+		if (reviewItem.source == "Zillow") {
+			reviewsHtml += '<br><a class="view-zillow-link" href="' + reviewItem.sourceId + '"  target="_blank">View on zillow</a>';
 		}
-		if(reviewItem.customerLastName != null && reviewItem.customerLastName != "")
-			reviewItem.customerLastName = reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ".";
+		if (reviewItem.customerLastName != null && reviewItem.customerLastName != "")
+			reviewItem.customerLastName = reviewItem.customerLastName.substring(0, 1).toUpperCase() + ".";
 		else
 			reviewItem.customerLastName = "";
-		if(reviewItem.agentName == undefined || reviewItem.agentName == null)
+		if (reviewItem.agentName == undefined || reviewItem.agentName == null)
 			reviewItem.agentName = "us";
 
 		reviewsHtml += '	</div>';
@@ -11023,14 +10526,14 @@ function paintReviews(result, isRequestFromDashBoard){
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' +reviewItem.completeProfileUrl.replace("localhost","127.0.0.1")+ '&description=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' .&redirect_uri=https://www.facebook.com"></span>';
+		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' + reviewItem.completeProfileUrl.replace("localhost", "127.0.0.1") + '&description=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' .&redirect_uri=https://www.facebook.com"></span>';
 		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
-		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url='+ reviewItem.completeProfileUrl +'"></span>';	
-		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
-		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
+		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url=' + reviewItem.completeProfileUrl + '"></span>';
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
+		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"' + '' + 'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
-		if(reviewItem.source != "Zillow")
+		if (reviewItem.source != "Zillow")
 			reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
@@ -11038,38 +10541,35 @@ function paintReviews(result, isRequestFromDashBoard){
 		reviewsHtml += '</div>';
 	});
 
-	if(result.length > 0){
+	if (result.length > 0) {
 		$('#reviews-container').show();
 	}
 
-	if(isRequestFromDashBoard){
+	if (isRequestFromDashBoard) {
 		hideLoaderOnPagination($('#review-details'));
-	} else { 
+	} else {
 		hideLoaderOnPagination($('#prof-review-item'));
 	}
-	/*if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
-		$("#prof-review-item").html('');
-	}*/
+	/*
+	 * if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) { $("#prof-review-item").html(''); }
+	 */
 	if (isRequestFromDashBoard) {
 		$('#review-details').append(reviewsHtml);
 	} else {
 		$("#prof-review-item").append(reviewsHtml);
 
 		$("#prof-reviews-header").parent().show();
-		$(".review-ratings").each(
-				function() {
-					changeRatingPattern($(this).data("rating"), $(this), false,
-							$(this).data("source"));
-				});
+		$(".review-ratings").each(function() {
+			changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
+		});
 	}
 	setTimeout(function() {
 		$(window).trigger('scroll');
 	}, 100);
 }
-$(document).on('click','.review-more-button',function(){
+$(document).on('click', '.review-more-button', function() {
 	$(this).parent().find('.review-less-text').hide();
 	$(this).parent().find('.review-complete-txt').show();
 	$(this).parent().find('.view-zillow-link').show();
 	$(this).hide();
 });
-

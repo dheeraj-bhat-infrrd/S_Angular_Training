@@ -37,8 +37,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import sun.misc.BASE64Decoder;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -65,6 +63,7 @@ import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Phone;
 import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.RealtorToken;
@@ -115,6 +114,8 @@ import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.BotRequestUtils;
+
+import sun.misc.BASE64Decoder;
 
 
 @Controller
@@ -227,7 +228,8 @@ public class ProfileManagementController
             Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
             if ( hierarchyDetails == null ) {
                 LOG.error( "Unable to fetch primary profile for this user " );
-                throw new FatalException( "Unable to fetch primary profile for type : " + entityType + " and ID : " + entityId );
+                throw new FatalException(
+                    "Unable to fetch primary profile for type : " + entityType + " and ID : " + entityId );
             }
             branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
             regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
@@ -238,8 +240,8 @@ public class ProfileManagementController
                 + agentId );
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException while showing profile page. Reason :" + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         } catch ( ProfileNotFoundException e ) {
             LOG.error( "No profile found for the user ", e );
             return JspResolver.NO_PROFILES_FOUND;
@@ -269,9 +271,10 @@ public class ProfileManagementController
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
-                throw new InternalServerException( new ProfileServiceErrorCode(
-                    CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_PROFILE,
-                    "Error occured while fetching company profile" ), e.getMessage() );
+                throw new InternalServerException(
+                    new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE,
+                        CommonConstants.SERVICE_CODE_COMPANY_PROFILE, "Error occured while fetching company profile" ),
+                    e.getMessage() );
             }
             profileSettings = companyProfile;
             model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
@@ -289,7 +292,7 @@ public class ProfileManagementController
                 setSettingSetByEntityInModel( model, regionProfile );
                 //Check if social media override is allowed
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
-                
+
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID,
                         regionProfile.getIden() );
@@ -298,9 +301,10 @@ public class ProfileManagementController
                         throw new FatalException( "Unable to fetch primary profile this user " + regionProfile.getIden() );
                     }
                 } catch ( InvalidSettingsStateException e ) {
-                    throw new InternalServerException( new ProfileServiceErrorCode(
-                        CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
-                        "Error occured while fetching region profile" ), e.getMessage() );
+                    throw new InternalServerException(
+                        new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
+                            CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile" ),
+                        e.getMessage() );
                 } catch ( ProfileNotFoundException e ) {
                     LOG.error( "No profile found for the user ", e );
                     return JspResolver.NO_PROFILES_FOUND;
@@ -308,7 +312,7 @@ public class ProfileManagementController
 
                 regionProfile = profileManagementService.fillUnitSettings( regionProfile,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null,
-                    map , false);
+                    map, false );
 
                 // aggregated disclaimer
                 String disclaimer = profileManagementService.aggregateDisclaimer( regionProfile, CommonConstants.REGION_ID );
@@ -325,9 +329,10 @@ public class ProfileManagementController
                     CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
-                throw new InternalServerException( new ProfileServiceErrorCode(
-                    CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
-                    "Error occured while fetching region profile" ), e.getMessage() );
+                throw new InternalServerException(
+                    new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
+                        CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile" ),
+                    e.getMessage() );
             }
             profileSettings = regionProfile;
             model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
@@ -349,7 +354,7 @@ public class ProfileManagementController
 
                 //set setting detail by branch Setting
                 setSettingSetByEntityInModel( model, branchProfile );
-                
+
                 //Check if social media override is allowed
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
                 try {
@@ -361,16 +366,17 @@ public class ProfileManagementController
                     }
 
                 } catch ( InvalidSettingsStateException e ) {
-                    throw new InternalServerException( new ProfileServiceErrorCode(
-                        CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
-                        "Error occured while fetching branch profile" ), e.getMessage() );
+                    throw new InternalServerException(
+                        new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
+                            CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile" ),
+                        e.getMessage() );
                 } catch ( ProfileNotFoundException e ) {
                     LOG.error( "No profile found for the user ", e );
                     return JspResolver.NO_PROFILES_FOUND;
                 }
                 branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, null, map , false);
+                    branchProfile, null, map, false );
                 // aggregated disclaimer
                 String disclaimer = profileManagementService.aggregateDisclaimer( branchProfile, CommonConstants.BRANCH_ID );
                 branchProfile.setDisclaimer( disclaimer );
@@ -386,9 +392,10 @@ public class ProfileManagementController
                     CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
-                throw new InternalServerException( new ProfileServiceErrorCode(
-                    CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
-                    "Error occured while fetching branch profile" ), e.getMessage() );
+                throw new InternalServerException(
+                    new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
+                        CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile" ),
+                    e.getMessage() );
             } catch ( NoRecordsFetchedException e ) {
                 LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
             }
@@ -405,7 +412,7 @@ public class ProfileManagementController
             OrganizationUnitSettings regionProfile = null;
             OrganizationUnitSettings branchProfile = null;
             AgentSettings individualProfile = null;
-            
+
             try {
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
@@ -414,7 +421,7 @@ public class ProfileManagementController
 
                 //set setting detail by agent Setting
                 setSettingSetByEntityInModel( model, individualProfile );
-                
+
                 //Check if social media override is allowed
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
 
@@ -439,8 +446,8 @@ public class ProfileManagementController
                 }
 
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, individualProfile, map , false);
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
+                    individualProfile, map, false );
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
                 String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
                 individualProfile.setDisclaimer( disclaimer );
@@ -458,8 +465,7 @@ public class ProfileManagementController
                 profileSettings = individualProfile;
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
-                model.addAttribute(
-                    "message",
+                model.addAttribute( "message",
                     messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME,
                         DisplayMessageType.ERROR_MESSAGE ).getMessage() );
                 return JspResolver.NOT_FOUND_PAGE;
@@ -472,15 +478,17 @@ public class ProfileManagementController
         model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
         model.addAttribute( "profileSettings", profileSettings );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
-        
+
         //email message to verify
-        if(profileSettings.getContact_details() != null && profileSettings.getContact_details().getMail_ids() != null ){
-            if(!profileSettings.getContact_details().getMail_ids().getIsWorkEmailVerified()){
+        if ( profileSettings.getContact_details() != null && profileSettings.getContact_details().getMail_ids() != null ) {
+            if ( !profileSettings.getContact_details().getMail_ids().getIsWorkEmailVerified() ) {
                 String workMailVerificationTitle;
-                if(profileSettings.getContact_details().getMail_ids().getIsWorkMailVerifiedByAdmin()){
-                    workMailVerificationTitle = "A request has been sent to admin to verify the email " + profileSettings.getContact_details().getMail_ids().getWorkEmailToVerify();
-                }else{
-                    workMailVerificationTitle = "Please verify the email address " + profileSettings.getContact_details().getMail_ids().getWorkEmailToVerify();
+                if ( profileSettings.getContact_details().getMail_ids().getIsWorkMailVerifiedByAdmin() ) {
+                    workMailVerificationTitle = "A request has been sent to admin to verify the email "
+                        + profileSettings.getContact_details().getMail_ids().getWorkEmailToVerify();
+                } else {
+                    workMailVerificationTitle = "Please verify the email address "
+                        + profileSettings.getContact_details().getMail_ids().getWorkEmailToVerify();
                 }
                 model.addAttribute( "workMailVerificationTitle", workMailVerificationTitle );
             }
@@ -544,7 +552,7 @@ public class ProfileManagementController
         } else {
             isContactNoSetByEntity = false;
         }
-        
+
         if ( entitySetting.getContact_details() != null && entitySetting.getContact_details().getMail_ids() != null
             && entitySetting.getContact_details().getMail_ids().getWork() != null
             && !entitySetting.getContact_details().getMail_ids().getWork().isEmpty() ) {
@@ -552,7 +560,7 @@ public class ProfileManagementController
         } else {
             isWorkEmailSetByEntity = false;
         }
-        
+
         model.addAttribute( "isLogoSetByEntity", isLogoSetByEntity );
         model.addAttribute( "isWebAddressSetByEntity", isWebAddressSetByEntity );
         model.addAttribute( "isContactNoSetByEntity", isContactNoSetByEntity );
@@ -662,7 +670,8 @@ public class ProfileManagementController
         LockSettings lockSettings = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -676,7 +685,8 @@ public class ProfileManagementController
             String fieldId = request.getParameter( "id" );
             boolean fieldState = Boolean.parseBoolean( request.getParameter( "state" ) );
             if ( fieldId == null || fieldId.isEmpty() ) {
-                throw new InvalidInputException( "Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR );
+                throw new InvalidInputException( "Name passed can not be null or empty",
+                    DisplayMessageConstants.GENERAL_ERROR );
             }
 
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -708,10 +718,11 @@ public class ProfileManagementController
                     }
                     if ( fieldId.equalsIgnoreCase( "web-address-work-lock" ) ) {
                         if ( fieldState ) {
-                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_WORK, true );
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_WORK,
+                                true );
                         } else {
-                            settingsLocker
-                                .lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_WORK, false );
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_WORK,
+                                false );
                         }
                     }
 
@@ -722,7 +733,7 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.ABOUT_ME, false );
                         }
                     }
-                    
+
                     if ( fieldId.equalsIgnoreCase( "email-work-lock" ) ) {
                         if ( fieldState ) {
                             settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.EMAIL_ID_WORK, true );
@@ -774,7 +785,7 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.ABOUT_ME, false );
                         }
                     }
-                    
+
                     if ( fieldId.equalsIgnoreCase( "email-work-lock" ) ) {
                         if ( fieldState ) {
                             settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.EMAIL_ID_WORK, true );
@@ -826,7 +837,7 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.ABOUT_ME, false );
                         }
                     }
-                    
+
                     if ( fieldId.equalsIgnoreCase( "email-work-lock" ) ) {
                         if ( fieldState ) {
                             settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.EMAIL_ID_WORK, true );
@@ -834,7 +845,7 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.EMAIL_ID_WORK, false );
                         }
                     }
-                    
+
                     userManagementService.updateBranch( branch );
                 }
             } else {
@@ -860,7 +871,8 @@ public class ProfileManagementController
 
 
     // Update lockSettings
-    private LockSettings updateLockSettings( LockSettings lockSettings, LockSettings parentLock, String fieldId, boolean status )
+    private LockSettings updateLockSettings( LockSettings lockSettings, LockSettings parentLock, String fieldId,
+        boolean status )
     {
         LOG.debug( "Method updateLockSettings() called from ProfileManagementController" );
 
@@ -928,7 +940,8 @@ public class ProfileManagementController
         ContactDetailsSettings contactDetailsSettings = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -1051,7 +1064,8 @@ public class ProfileManagementController
 
         try {
             User user = sessionHelper.getCurrentUser();
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             UserHierarchyAssignments assignments = (UserHierarchyAssignments) session
@@ -1065,7 +1079,8 @@ public class ProfileManagementController
             // Get the profile address parameters
             String name = request.getParameter( "profName" );
             if ( name == null || name.isEmpty() ) {
-                throw new InvalidInputException( "Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR );
+                throw new InvalidInputException( "Name passed can not be null or empty",
+                    DisplayMessageConstants.GENERAL_ERROR );
             }
 
             String title = request.getParameter( "profTitle" );
@@ -1284,7 +1299,8 @@ public class ProfileManagementController
         ContactDetailsSettings contactDetailsSettings = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -1427,7 +1443,8 @@ public class ProfileManagementController
         ContactDetailsSettings contactDetailsSettings = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -1571,7 +1588,8 @@ public class ProfileManagementController
         ContactDetailsSettings contactDetailsSettings = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -1704,7 +1722,8 @@ public class ProfileManagementController
         String logoUrl = "";
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -1821,7 +1840,8 @@ public class ProfileManagementController
         String profileImageUrl = "";
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -1976,17 +1996,19 @@ public class ProfileManagementController
         ContactDetailsSettings contactDetailsSettings = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
-            
-            ContactDetailsSettings sessionContactDetail =  profileSettings.getContact_details();
-            if(sessionContactDetail.getMail_ids() == null)
+
+            ContactDetailsSettings sessionContactDetail = profileSettings.getContact_details();
+            if ( sessionContactDetail.getMail_ids() == null )
                 sessionContactDetail.setMail_ids( new MailIdSettings() );
-            
-            boolean isWorkEmailLockedByCompany = settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY , Long.parseLong(user.getCompany().getSettingsLockStatus() ) , SettingsForApplication.EMAIL_ID_WORK );
-            
-            
+
+            boolean isWorkEmailLockedByCompany = settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY,
+                Long.parseLong( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.EMAIL_ID_WORK );
+
+
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
@@ -2012,7 +2034,7 @@ public class ProfileManagementController
                     if ( mailid.getKey().equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
                         mailIdSettings.setWorkEmailToVerify( mailid.getValue() );
                         mailIdSettings.setWorkEmailVerified( false );
-                    }else if(mailid.getKey().equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ){
+                    } else if ( mailid.getKey().equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
                         mailIdSettings.setPersonalEmailToVerify( mailid.getValue() );
                         mailIdSettings.setPersonalEmailVerified( false );
                     }
@@ -2038,16 +2060,16 @@ public class ProfileManagementController
                 contactDetailsSettings = companySettings.getContact_details();
 
                 // Send verification Links
-                sendVerificationLinks( mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings );
+                sendVerificationLinks( mailIds, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                    companySettings );
 
                 contactDetailsSettings = updateMailSettings( companySettings.getIden(), contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION , false );
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, false );
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
                 userSettings.setCompanySettings( companySettings );
-                
+
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
@@ -2056,21 +2078,23 @@ public class ProfileManagementController
                 contactDetailsSettings = regionSettings.getContact_details();
 
                 // Send verification Links
-                if(isWorkEmailLockedByCompany){
-                    profileManagementService.generateAndSendEmailVerificationRequestLinkToAdmin( mailIds, user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings );                    
-                }else{
-                    sendVerificationLinks( mailIds,
-                        MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings );
+                if ( isWorkEmailLockedByCompany ) {
+                    profileManagementService.generateAndSendEmailVerificationRequestLinkToAdmin( mailIds,
+                        user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                        regionSettings );
+                } else {
+                    sendVerificationLinks( mailIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                        regionSettings );
                 }
-                
+
 
                 contactDetailsSettings = updateMailSettings( regionSettings.getIden(), contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION , isWorkEmailLockedByCompany);
+                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, isWorkEmailLockedByCompany );
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
-                
+
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
@@ -2079,20 +2103,22 @@ public class ProfileManagementController
                 contactDetailsSettings = branchSettings.getContact_details();
 
                 // Send verification Links
-                if(isWorkEmailLockedByCompany){
-                    profileManagementService.generateAndSendEmailVerificationRequestLinkToAdmin( mailIds, user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings );                    
-                }else{
-                    sendVerificationLinks( mailIds,
-                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings );
+                if ( isWorkEmailLockedByCompany ) {
+                    profileManagementService.generateAndSendEmailVerificationRequestLinkToAdmin( mailIds,
+                        user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                        branchSettings );
+                } else {
+                    sendVerificationLinks( mailIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                        branchSettings );
                 }
 
                 contactDetailsSettings = updateMailSettings( branchSettings.getIden(), contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION , isWorkEmailLockedByCompany );
+                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, isWorkEmailLockedByCompany );
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
-                
+
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
@@ -2101,15 +2127,17 @@ public class ProfileManagementController
                 contactDetailsSettings = agentSettings.getContact_details();
 
                 // Send verification Links
-                if(isWorkEmailLockedByCompany){
-                    profileManagementService.generateAndSendEmailVerificationRequestLinkToAdmin( mailIds, user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings );                    
-                }else{
-                    sendVerificationLinks( mailIds,
-                        MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings );
+                if ( isWorkEmailLockedByCompany ) {
+                    profileManagementService.generateAndSendEmailVerificationRequestLinkToAdmin( mailIds,
+                        user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                        agentSettings );
+                } else {
+                    sendVerificationLinks( mailIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                        agentSettings );
                 }
 
                 contactDetailsSettings = updateMailSettings( agentSettings.getIden(), contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION , isWorkEmailLockedByCompany );
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, isWorkEmailLockedByCompany );
                 contactDetailsSettings = profileManagementService.updateAgentContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings );
                 agentSettings.setContact_details( contactDetailsSettings );
@@ -2123,26 +2151,25 @@ public class ProfileManagementController
             profileSettings.setContact_details( sessionContactDetail );
 
             LOG.info( "Maild ids updated successfully" );
-            
-            if(isWorkEmailLockedByCompany){
-                model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.MAIL_IDS_UPDATE_REQUEST_SUCCESSFUL,
-                    DisplayMessageType.SUCCESS_MESSAGE ) );
-            }else{
-                model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL,
-                    DisplayMessageType.SUCCESS_MESSAGE ) );
+
+            if ( isWorkEmailLockedByCompany ) {
+                model.addAttribute( "message", messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.MAIL_IDS_UPDATE_REQUEST_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+            } else {
+                model.addAttribute( "message", messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
             }
-            
+
         } catch ( UserAlreadyExistsException userAlreadyExistsException ) {
-            LOG.error(
-                "UserAlreadyExistsException while updating Mail ids. Reason :" + userAlreadyExistsException.getMessage(),
+            LOG.error( "UserAlreadyExistsException while updating Mail ids. Reason :" + userAlreadyExistsException.getMessage(),
                 userAlreadyExistsException );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.USERNAME_ALREADY_TAKEN,
                 DisplayMessageType.ERROR_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while updating Mail ids. Reason :" + nonFatalException.getMessage(),
                 nonFatalException );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.MAIL_IDS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.MAIL_IDS_UPDATE_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         LOG.info( "Method updateEmailds() finished from ProfileManagementController" );
@@ -2159,8 +2186,8 @@ public class ProfileManagementController
      * @throws UndeliveredEmailException
      */
     // send verification links
-    private void sendVerificationLinks( List<MiscValues> mailIds, String entityType,
-        OrganizationUnitSettings userSettings ) throws InvalidInputException, UndeliveredEmailException
+    private void sendVerificationLinks( List<MiscValues> mailIds, String entityType, OrganizationUnitSettings userSettings )
+        throws InvalidInputException, UndeliveredEmailException
     {
         LOG.debug( "Method sendVerificationLinks() called from ProfileManagementController" );
         Map<String, String> urlParams = null;
@@ -2174,11 +2201,12 @@ public class ProfileManagementController
                 urlParams.put( CommonConstants.EMAIL_TYPE, CommonConstants.EMAIL_TYPE_WORK );
                 urlParams.put( CommonConstants.ENTITY_ID_COLUMN, userSettings.getIden() + "" );
                 urlParams.put( CommonConstants.ENTITY_TYPE_COLUMN, entityType );
-                urlParams.put( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE, CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER );
+                urlParams.put( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE,
+                    CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER );
 
-                profileManagementService.generateVerificationUrl( urlParams, applicationBaseUrl
-                    + CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION, emailId, userSettings.getContact_details()
-                    .getName() );
+                profileManagementService.generateVerificationUrl( urlParams,
+                    applicationBaseUrl + CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION, emailId,
+                    userSettings.getContact_details().getName() );
             }
         }
         LOG.debug( "Method sendVerificationLinks() finished from ProfileManagementController" );
@@ -2187,7 +2215,7 @@ public class ProfileManagementController
 
     // Update mail ids
     private ContactDetailsSettings updateMailSettings( long entityId, ContactDetailsSettings contactDetailsSettings,
-        List<MiscValues> mailIds, String entityType , boolean verifiedByAdmin ) throws InvalidInputException
+        List<MiscValues> mailIds, String entityType, boolean verifiedByAdmin ) throws InvalidInputException
     {
         LOG.debug( "Method updateMailSettings() called from ProfileManagementController" );
         if ( contactDetailsSettings == null ) {
@@ -2243,7 +2271,8 @@ public class ProfileManagementController
         ContactDetailsSettings contactDetailsSettings = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -2349,7 +2378,7 @@ public class ProfileManagementController
 
     // update phone numbers
     private ContactDetailsSettings updatePhoneNumbers( ContactDetailsSettings contactDetailsSettings,
-        List<MiscValues> phoneNumbers ) throws InvalidInputException
+        List<MiscValues> phoneNumbers ) throws NonFatalException
     {
         LOG.debug( "Method updatePhoneNumbers() called from ProfileManagementController" );
         if ( contactDetailsSettings == null ) {
@@ -2364,10 +2393,22 @@ public class ProfileManagementController
         for ( MiscValues phoneNumber : phoneNumbers ) {
             String key = phoneNumber.getKey();
             String value = phoneNumber.getValue();
-            if ( key.equalsIgnoreCase( "work" ) ) {
-                phoneNumberSettings.setWork( value );
-            } else if ( key.equalsIgnoreCase( "personal" ) ) {
-                phoneNumberSettings.setPersonal( value );
+            if ( key.equalsIgnoreCase( "work" ) || key.equalsIgnoreCase( "personal" ) ) {
+                Phone phone = null;
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    phone = mapper.readValue( value, TypeFactory.defaultInstance().constructType( Phone.class ) );
+                } catch ( IOException ioException ) {
+                    throw new NonFatalException( "Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR,
+                        ioException );
+                }
+                if ( key.equalsIgnoreCase( "work" ) ) {
+                    phoneNumberSettings.setWork( phone.getFormattedPhoneNumber() );
+                    phoneNumberSettings.setPhone1( phone );
+                } else if ( key.equalsIgnoreCase( "personal" ) ) {
+                    phoneNumberSettings.setPersonal( phone.getFormattedPhoneNumber() );
+                    phoneNumberSettings.setPhone2( phone );
+                }
             } else if ( key.equalsIgnoreCase( "fax" ) ) {
                 phoneNumberSettings.setFax( value );
             } else {
@@ -2399,7 +2440,8 @@ public class ProfileManagementController
         ContactDetailsSettings contactDetailsSettings = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -2465,8 +2507,8 @@ public class ProfileManagementController
                         if ( key.equalsIgnoreCase( "work" ) ) {
                             settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_WORK, true );
                         } else if ( key.equalsIgnoreCase( "personal" ) ) {
-                            settingsSetter
-                                .setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_PERSONAL, true );
+                            settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_PERSONAL,
+                                true );
                         }
                     }
                     userManagementService.updateRegion( region );
@@ -2489,8 +2531,8 @@ public class ProfileManagementController
                         if ( key.equalsIgnoreCase( "work" ) ) {
                             settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_WORK, true );
                         } else if ( key.equalsIgnoreCase( "personal" ) ) {
-                            settingsSetter
-                                .setSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_PERSONAL, true );
+                            settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_PERSONAL,
+                                true );
                         }
                     }
                     userManagementService.updateBranch( branch );
@@ -2582,7 +2624,8 @@ public class ProfileManagementController
         SocialMediaTokens socialMediaTokens = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -2658,8 +2701,8 @@ public class ProfileManagementController
                 }
                 socialMediaTokens = agentSettings.getSocialMediaTokens();
                 socialMediaTokens = updateFacebookToken( socialMediaTokens, fbLink );
-                profileManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, socialMediaTokens );
                 agentSettings.setSocialMediaTokens( socialMediaTokens );
                 userSettings.setAgentSettings( agentSettings );
             } else {
@@ -2711,7 +2754,8 @@ public class ProfileManagementController
         SocialMediaTokens socialMediaTokens = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -2788,8 +2832,8 @@ public class ProfileManagementController
                 }
                 socialMediaTokens = agentSettings.getSocialMediaTokens();
                 socialMediaTokens = updateTwitterToken( socialMediaTokens, twitterLink );
-                profileManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, socialMediaTokens );
                 agentSettings.setSocialMediaTokens( socialMediaTokens );
                 userSettings.setAgentSettings( agentSettings );
             } else {
@@ -2841,7 +2885,8 @@ public class ProfileManagementController
         SocialMediaTokens socialMediaTokens = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -2918,8 +2963,8 @@ public class ProfileManagementController
                 }
                 socialMediaTokens = agentSettings.getSocialMediaTokens();
                 socialMediaTokens = updateLinkedinToken( linkedinLink, socialMediaTokens );
-                profileManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, socialMediaTokens );
                 agentSettings.setSocialMediaTokens( socialMediaTokens );
                 userSettings.setAgentSettings( agentSettings );
             } else {
@@ -2970,7 +3015,8 @@ public class ProfileManagementController
         HttpSession session = request.getSession( false );
         SocialMediaTokens socialMediaTokens = null;
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -3069,8 +3115,8 @@ public class ProfileManagementController
                 }
                 socialMediaTokens = agentSettings.getSocialMediaTokens();
                 socialMediaTokens = updateYelpLink( yelpLink, socialMediaTokens );
-                profileManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, socialMediaTokens );
                 for ( ProfileStage stage : agentSettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "YELP_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -3092,8 +3138,8 @@ public class ProfileManagementController
                 CommonConstants.YELP_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
 
             LOG.info( "YelpLinked in link updated successfully" );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.YELP_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.YELP_TOKEN_UPDATE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while updating yelp link in profile. Reason :" + nonFatalException.getMessage(),
                 nonFatalException );
@@ -3133,7 +3179,8 @@ public class ProfileManagementController
         SocialMediaTokens socialMediaTokens = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -3209,8 +3256,8 @@ public class ProfileManagementController
                 }
                 socialMediaTokens = agentSettings.getSocialMediaTokens();
                 socialMediaTokens = updateGoogleToken( socialMediaTokens, gplusLink );
-                profileManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, socialMediaTokens );
                 agentSettings.setSocialMediaTokens( socialMediaTokens );
                 userSettings.setAgentSettings( agentSettings );
             } else {
@@ -3224,8 +3271,7 @@ public class ProfileManagementController
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.GPLUS_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error(
-                "NonFatalException while updating GooglePlus link in profile. Reason :" + nonFatalException.getMessage(),
+            LOG.error( "NonFatalException while updating GooglePlus link in profile. Reason :" + nonFatalException.getMessage(),
                 nonFatalException );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.GPLUS_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
@@ -3263,7 +3309,8 @@ public class ProfileManagementController
         SocialMediaTokens socialMediaTokens = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -3343,8 +3390,8 @@ public class ProfileManagementController
                 socialMediaTokens = agentSettings.getSocialMediaTokens();
                 socialMediaTokens = socialManagementService.checkOrAddZillowLastUpdated( socialMediaTokens );
                 socialMediaTokens = updateZillowLink( zillowlink, socialMediaTokens );
-                profileManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, socialMediaTokens );
                 agentSettings.setSocialMediaTokens( socialMediaTokens );
                 userSettings.setAgentSettings( agentSettings );
             } else {
@@ -3397,7 +3444,8 @@ public class ProfileManagementController
         SocialMediaTokens socialMediaTokens = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -3473,8 +3521,8 @@ public class ProfileManagementController
                 }
                 socialMediaTokens = agentSettings.getSocialMediaTokens();
                 socialMediaTokens = updateRealtorLink( realtorLink, socialMediaTokens );
-                profileManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, socialMediaTokens );
                 agentSettings.setSocialMediaTokens( socialMediaTokens );
                 userSettings.setAgentSettings( agentSettings );
             } else {
@@ -3487,7 +3535,7 @@ public class ProfileManagementController
             //Add action to social connection history
             socialManagementService.updateSocialConnectionsHistory( entityType, entityId, socialMediaTokens,
                 CommonConstants.REALTOR_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
-            
+
             LOG.info( "realtor updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.REALTOR_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -3531,7 +3579,8 @@ public class ProfileManagementController
         SocialMediaTokens socialMediaTokens = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -3608,8 +3657,8 @@ public class ProfileManagementController
                 }
                 socialMediaTokens = agentSettings.getSocialMediaTokens();
                 socialMediaTokens = updateLendingTreeLink( lendingTreeLink, socialMediaTokens );
-                profileManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, socialMediaTokens );
                 agentSettings.setSocialMediaTokens( socialMediaTokens );
                 userSettings.setAgentSettings( agentSettings );
             } else {
@@ -3618,11 +3667,11 @@ public class ProfileManagementController
             }
 
             profileSettings.setSocialMediaTokens( socialMediaTokens );
-            
+
             //Update social connection history
             socialManagementService.updateSocialConnectionsHistory( entityType, entityId, socialMediaTokens,
                 CommonConstants.LENDINGTREE_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
-            
+
             LOG.info( "lendingTree updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.LENDINGTREE_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -3673,7 +3722,8 @@ public class ProfileManagementController
         List<Achievement> achievements = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -3777,7 +3827,8 @@ public class ProfileManagementController
         List<Association> associations = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -3872,7 +3923,8 @@ public class ProfileManagementController
         Licenses licenses = null;
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -3909,8 +3961,8 @@ public class ProfileManagementController
                 if ( regionSettings == null ) {
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
-                licenses = profileManagementService.addLicences(
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, authorisedIn );
+                licenses = profileManagementService.addLicences( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                    regionSettings, authorisedIn );
                 regionSettings.setLicenses( licenses );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
@@ -3918,8 +3970,8 @@ public class ProfileManagementController
                 if ( branchSettings == null ) {
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
-                licenses = profileManagementService.addLicences(
-                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, authorisedIn );
+                licenses = profileManagementService.addLicences( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                    branchSettings, authorisedIn );
                 branchSettings.setLicenses( licenses );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
@@ -3951,8 +4003,8 @@ public class ProfileManagementController
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while updating licence details. Reason :" + nonFatalException.getMessage(),
                 nonFatalException );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.LICENSES_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.LICENSES_UPDATE_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         LOG.info( "Method updateProfileLicenses() finished from ProfileManagementController" );
@@ -3967,7 +4019,8 @@ public class ProfileManagementController
         HttpSession session = request.getSession( false );
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || entityType == null ) {
@@ -4007,8 +4060,8 @@ public class ProfileManagementController
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while updating expertise. Reason :" + nonFatalException.getMessage(),
                 nonFatalException );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.EXPERTISE_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message", messageUtils
+                .getDisplayMessage( DisplayMessageConstants.EXPERTISE_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         LOG.info( "Method updateExpertise() finished from ProfileManagementController" );
@@ -4023,7 +4076,8 @@ public class ProfileManagementController
         HttpSession session = request.getSession( false );
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || entityType == null ) {
@@ -4068,7 +4122,8 @@ public class ProfileManagementController
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.HOBBIES_UPDATE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while updating hobbies. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            LOG.error( "NonFatalException while updating hobbies. Reason :" + nonFatalException.getMessage(),
+                nonFatalException );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.HOBBIES_UPDATE_UNSUCCESSFUL,
                 DisplayMessageType.ERROR_MESSAGE ) );
         }
@@ -4079,6 +4134,7 @@ public class ProfileManagementController
 
 
     // JIRA SS-97 by RM-06 : EOC
+
 
     /*
      * Method to find a user on the basis of first and last names provided.
@@ -4109,16 +4165,16 @@ public class ProfileManagementController
             try {
                 if ( patternFirst == null && patternLast == null ) {
                     LOG.error( "Invalid search key passed in method findAProfileScroll()." );
-                    throw new InvalidInputException( messageUtils.getDisplayMessage(
-                        DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN, DisplayMessageType.ERROR_MESSAGE )
-                        .getMessage() );
+                    throw new InvalidInputException(
+                        messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN,
+                            DisplayMessageType.ERROR_MESSAGE ).getMessage() );
                 }
                 if ( !patternFirst.trim().matches( CommonConstants.FINDAPRO_FIRST_NAME_REGEX )
                     && !patternLast.trim().matches( CommonConstants.FINDAPRO_LAST_NAME_REGEX ) ) {
                     LOG.error( "Invalid search key passed in method findAProfileScroll()." );
-                    throw new InvalidInputException( messageUtils.getDisplayMessage(
-                        DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN, DisplayMessageType.ERROR_MESSAGE )
-                        .getMessage() );
+                    throw new InvalidInputException(
+                        messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN,
+                            DisplayMessageType.ERROR_MESSAGE ).getMessage() );
                 }
 
                 int startIndex = 0;
@@ -4199,7 +4255,7 @@ public class ProfileManagementController
                     userIds.add( (Long) solrDocument.getFieldValue( "userId" ) );
                 }
                 //Check if userIds are not empty
-                if(!userIds.isEmpty())
+                if ( !userIds.isEmpty() )
                     users = userManagementService.getMultipleUsersByUserId( userIds );
 
                 userList.setUsers( users );
@@ -4250,8 +4306,8 @@ public class ProfileManagementController
                 throw new InvalidInputException( "iden is invalid in initProListByProfileLevelPage",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
-            Collection<UserFromSearch> solrResult = profileManagementService
-                .getProListByProfileLevel( iden, profileLevel, 0, 0 );
+            Collection<UserFromSearch> solrResult = profileManagementService.getProListByProfileLevel( iden, profileLevel, 0,
+                0 );
             if ( solrResult != null ) {
                 model.addAttribute( "numfound", solrResult.size() );
             }
@@ -4299,13 +4355,15 @@ public class ProfileManagementController
                     userList.setUserFound( results.getNumFound() );
                     model.addAttribute( "usersList", userList );
                 } catch ( InvalidInputException e ) {
-                    throw new InternalServerException( new ProfileServiceErrorCode(
-                        CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE, CommonConstants.SERVICE_CODE_PRO_LIST_FETCH,
-                        "Could not fetch users list." ), e.getMessage() );
+                    throw new InternalServerException(
+                        new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE,
+                            CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list." ),
+                        e.getMessage() );
                 } catch ( SolrException e ) {
-                    throw new InternalServerException( new ProfileServiceErrorCode(
-                        CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE, CommonConstants.SERVICE_CODE_PRO_LIST_FETCH,
-                        "Could not fetch users list." ), e.getMessage() );
+                    throw new InternalServerException(
+                        new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE,
+                            CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list." ),
+                        e.getMessage() );
                 }
             } catch ( InternalServerException e ) {
                 return JspResolver.ERROR_PAGE;
@@ -4398,6 +4456,7 @@ public class ProfileManagementController
      * ); return JspResolver.PROFILE_PAGE; }
      */
 
+
     /**
      * Method to return branch profile page
      * 
@@ -4474,8 +4533,8 @@ public class ProfileManagementController
             }
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException while fetching hierarchy. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         LOG.info( "Method getAdminHierarchy() finished from ProfileManagementController" );
@@ -4483,8 +4542,8 @@ public class ProfileManagementController
     }
 
 
-    private Model getCompanyHierarchy( Model model, HttpServletRequest request ) throws InvalidInputException,
-        ProfileNotFoundException
+    private Model getCompanyHierarchy( Model model, HttpServletRequest request )
+        throws InvalidInputException, ProfileNotFoundException
     {
         LOG.debug( "Method getCompanyHierarchy() called from ProfileManagementController" );
         List<Region> regions;
@@ -4506,8 +4565,8 @@ public class ProfileManagementController
             model.addAttribute( "branches", branches );
         } catch ( NoRecordsFetchedException e ) {
             LOG.error( "NoRecordsFetchedException while fetching company hierarchy branches. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         // Fetching Individuals under Company
@@ -4516,8 +4575,8 @@ public class ProfileManagementController
             model.addAttribute( "individuals", individuals );
         } catch ( NoRecordsFetchedException e ) {
             LOG.error( "NoRecordsFetchedException while fetching company hierarchy individuals. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         LOG.debug( "Method getCompanyHierarchy() finished from ProfileManagementController" );
@@ -4533,8 +4592,8 @@ public class ProfileManagementController
             model = getCompanyHierarchy( model, request );
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException while fetching company hierarchy. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         LOG.info( "Method getCompanyHierarchyDirect() finished from ProfileManagementController" );
@@ -4550,8 +4609,8 @@ public class ProfileManagementController
             model = getRegionHierarchy( model, request );
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException while fetching region hierarchy. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         LOG.info( "Method getRegionHierarchyOnClick() finished from ProfileManagementController" );
@@ -4587,8 +4646,8 @@ public class ProfileManagementController
             model.addAttribute( "individuals", individuals );
         } catch ( NoRecordsFetchedException e ) {
             LOG.error( "NoRecordsFetchedException while fetching region hierarchy. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         LOG.debug( "Method getRegionHierarchy() finished from ProfileManagementController" );
@@ -4604,8 +4663,8 @@ public class ProfileManagementController
             model = getBranchHierarchy( model, request );
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException while fetching branch hierarchy. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         LOG.info( "Method getBranchHierarchyOnClick() finished from ProfileManagementController" );
@@ -4672,9 +4731,10 @@ public class ProfileManagementController
 
             model.addAttribute( "reviews", reviewItems );
         } catch ( InvalidInputException e ) {
-            throw new InternalServerException( new ProfileServiceErrorCode(
-                CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_REVIEWS,
-                "Something went wrong while fetching reviews" ), e.getMessage() );
+            throw new InternalServerException(
+                new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
+                    CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching reviews" ),
+                e.getMessage() );
         }
 
         LOG.info( "Method fetchReviews() finished from ProfileManagementController" );
@@ -4743,9 +4803,10 @@ public class ProfileManagementController
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, notRecommended );
             }
         } catch ( InvalidInputException e ) {
-            throw new InternalServerException( new ProfileServiceErrorCode(
-                CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_REVIEWS,
-                "Something went wrong while fetching reviews" ), e.getMessage() );
+            throw new InternalServerException(
+                new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE,
+                    CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching reviews" ),
+                e.getMessage() );
         }
 
         LOG.info( "Method fetchReviewCount() finished from ProfileManagementController" );
@@ -4805,9 +4866,10 @@ public class ProfileManagementController
                     aggregateAbusive );
             }
         } catch ( InvalidInputException e ) {
-            throw new InternalServerException( new ProfileServiceErrorCode(
-                CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_REVIEWS,
-                "Something went wrong while fetching Average rating" ), e.getMessage() );
+            throw new InternalServerException(
+                new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE,
+                    CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching Average rating" ),
+                e.getMessage() );
         }
 
         LOG.info( "Method fetchAverageRating() finished from ProfileManagementController" );
@@ -4839,22 +4901,22 @@ public class ProfileManagementController
 
         try {
             String verificationType = profileManagementService.updateEmailVerificationStatus( encryptedUrlParams );
-            if(verificationType.equals( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN )){
+            if ( verificationType.equals( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN ) ) {
                 model.addAttribute( "message", messageUtils.getDisplayMessage(
                     DisplayMessageConstants.EMAIL_VERIFICATION_BY_ADMIN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
-            }else if(verificationType.equals( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER )){
+            } else if ( verificationType.equals( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER ) ) {
                 model.addAttribute( "message", messageUtils.getDisplayMessage(
                     DisplayMessageConstants.EMAIL_VERIFICATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
             }
-            
+
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException while verifying email. Reason : " + e.getMessage(), e );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_VERIFICATION_URL,
                 DisplayMessageType.ERROR_MESSAGE ) );
         } catch ( NonFatalException nfe ) {
             LOG.error( "NonFatalException while updating verified email. Reason : " + nfe.getMessage(), nfe );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.EMAIL_ID_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.EMAIL_ID_UPDATE_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ) );
         }
         LOG.info( "Method to verify email finished" );
         return JspResolver.LOGIN;
@@ -4907,12 +4969,14 @@ public class ProfileManagementController
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while deleting status of user. Reason :" + nonFatalException.getMessage(),
                 nonFatalException );
-            return messageUtils.getDisplayMessage( DisplayMessageConstants.STATUS_CAN_NOT_BE_DELETED,
-                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            return messageUtils
+                .getDisplayMessage( DisplayMessageConstants.STATUS_CAN_NOT_BE_DELETED, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage();
         }
         LOG.info( "Method to delete status of the user finished" );
-        return messageUtils.getDisplayMessage( DisplayMessageConstants.STATUS_DELETED_SUCCESSFULLY,
-            DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        return messageUtils
+            .getDisplayMessage( DisplayMessageConstants.STATUS_DELETED_SUCCESSFULLY, DisplayMessageType.SUCCESS_MESSAGE )
+            .getMessage();
     }
 
 
@@ -4999,7 +5063,8 @@ public class ProfileManagementController
         HttpSession session = request.getSession( false );
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -5061,8 +5126,8 @@ public class ProfileManagementController
             profileSettings.setDisclaimer( disclaimer );
 
             LOG.info( "Disclaimer details updated successfully" );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.DISCLAIMER_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.DISCLAIMER_UPDATE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while updating Disclaimer details. Reason :" + nonFatalException.getMessage(),
                 nonFatalException );
@@ -5282,7 +5347,7 @@ public class ProfileManagementController
                     companySettings.setProfileName( profileName );
                     companySettings.setProfileUrl( profileUrl );
                     userSettings.setCompanySettings( companySettings );
-                    try{
+                    try {
                         userManagementService.updateProfileUrlInCompanySettings( profileName, profileUrl, companySettings );
                     } catch ( InvalidInputException e1 ) {
                         LOG.error( "Error occured. Reason : " + e );

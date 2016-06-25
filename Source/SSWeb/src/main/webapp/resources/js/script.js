@@ -23,6 +23,21 @@ var cityLookupList; // cityLookupList
 var phoneFormat = '(ddd) ddd-dddd'; // defualt phone format
 var selectedCountryRegEx = "";
 
+function getPhoneNumber(phoneId) {
+	var countryData = $('#' + phoneId).intlTelInput("getSelectedCountryData");
+	var number = $('#' + phoneId).intlTelInput("getNumber");
+	if (number != "") {
+		number = number.substring(countryData.dialCode.length + 1, number.length + 1);
+		return {
+			"number" : number,
+			"countryCode" : "+" + countryData.dialCode,
+			"extension" : $('#' + phoneId).intlTelInput("getExtension"),
+			"countryAbbr" : countryData.iso2,
+			"formattedPhoneNumber" : $('#' + phoneId).val()
+		};
+	}
+}
+
 function buildMessageDiv() {
 	if ($('.err-nw-wrapper').length == 0) {
 		var errorDiv = $("<div id='err-nw-wrapper' class='err-nw-wrapper'>");
