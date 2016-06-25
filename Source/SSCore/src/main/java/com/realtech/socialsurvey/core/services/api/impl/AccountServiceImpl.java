@@ -473,16 +473,12 @@ public class AccountServiceImpl implements AccountService
     {
         LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + company.getCompany() );
 
-        String contactNumber = null;
-        if ( phone != null ) {
-            contactNumber = phone.getCountryCode() + "-" + phone.getNumber() + "x" + phone.getExtension();
-        }
         VerticalsMaster verticalsMaster = verticalMastersDao
             .findByColumn( VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, "CUSTOM" )
             .get( CommonConstants.INITIAL_INDEX );
         Map<String, String> companyDetails = new HashMap<String, String>();
         companyDetails.put( CommonConstants.COMPANY_NAME, company.getCompany() );
-        companyDetails.put( CommonConstants.COMPANY_CONTACT_NUMBER, contactNumber );
+        companyDetails.put( CommonConstants.COMPANY_CONTACT_NUMBER, phone != null ? phone.getFormattedPhoneNumber() : null );
         companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO );
         companyDetails.put( CommonConstants.VERTICAL, verticalsMaster.getVerticalName() );
         organizationManagementService.addOrganizationalDetails( user, company, companyDetails );
