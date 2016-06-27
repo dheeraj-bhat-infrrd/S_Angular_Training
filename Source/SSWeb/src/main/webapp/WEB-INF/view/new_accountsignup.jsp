@@ -62,5 +62,11 @@
 <script src="${initParam.resourcesPath}/resources/js/phoneFormat.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/card-validator/card-validator.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/dropzone.js"></script>
+<script>
+$(document).ready(function(){
+	$(window).resize(leftposition);
+});
+
+</script>
 </body>
 </html>
