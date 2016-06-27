@@ -117,25 +117,6 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		}
 	}
 
-	$scope.getPhoneNumber = function(phoneId) {
-		var countryData = $('#' + phoneId).intlTelInput("getSelectedCountryData");
-		var number = $('#' + phoneId).intlTelInput("getNumber");
-		if (number != "") {
-			if (number.indexOf("+1") != -1) {
-				number = number.substring(2, number.length + 1);
-			} else {
-				number = number.substring(countryData.dialCode.length + 1, number.length + 1);
-			}
-			return {
-				"number" : number,
-				"countryCode" : "+" + countryData.dialCode,
-				"extension" : $('#' + phoneId).intlTelInput("getExtension"),
-				"countryAbbr" : countryData.iso2,
-				"formattedPhoneNumber" : $('#' + phoneId).val()
-			};
-		}
-	}
-
 	$scope.setPhone = function(phoneId, phone) {
 		if (phone != null) {
 			$('#' + phoneId).intlTelInput("setCountry", phone.countryAbbr);
@@ -176,7 +157,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 		if ($scope.signInForm.$valid) {
 			showOverlay();
 			$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-			$scope.accountRegistration.phone = $scope.getPhoneNumber("reg-phone");
+			$scope.accountRegistration.phone = getPhoneNumber("reg-phone");
 			$scope.accountRegistration.planId = planId;
 			LoginService.signup($scope.accountRegistration).then(function(response) {
 				$rootScope.userId = response.data.userId;
@@ -332,8 +313,8 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 
 	$scope.saveProfileDetails = function() {
 		showOverlay();
-		$rootScope.userProfile.phone1 = $scope.getPhoneNumber("reg-phone1");
-		$rootScope.userProfile.phone2 = $scope.getPhoneNumber("reg-phone2");
+		$rootScope.userProfile.phone1 = getPhoneNumber("reg-phone1");
+		$rootScope.userProfile.phone2 = getPhoneNumber("reg-phone2");
 		if ($rootScope.userProfile.website != null && $rootScope.userProfile.website != "") {
 			UserProfileService.validateWebAddress($rootScope.userProfile.website).then(function(response) {
 				$scope.isValidWebAddress = true;
@@ -540,7 +521,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 	};
 
 	$scope.saveCompanyProfileDetails = function() {
-		$rootScope.companyProfile.officePhone = $scope.getPhoneNumber("reg-phone-office");
+		$rootScope.companyProfile.officePhone = getPhoneNumber("reg-phone-office");
 		var countryData = $("#country").countrySelect("getSelectedCountryData");
 		$rootScope.companyProfile.location.country.code = countryData.iso2;
 		$rootScope.companyProfile.location.name = countryData.name;
