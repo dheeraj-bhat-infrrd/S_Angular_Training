@@ -25,7 +25,7 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-<input type="hidden" id="sel-prof-country-code" value="${contactdetail.contact_numbers.phone1.countryAbbr}">
+<input type="hidden" id="sel-prof-country-code" value="${contactNumbers.phone1.countryAbbr}">
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-mail"></div>
 	<%-- <div class="float-left lp-con-row-item" data-email="work">${mailIds.work}</div> --%>

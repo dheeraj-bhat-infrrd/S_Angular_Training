@@ -263,10 +263,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Value ( "${ZILLOW_ENDPOINT}")
     private String zillowEndpoint;
 
-    @Value( "${AMAZON_IMAGE_BUCKET}" )
+    @Value ( "${AMAZON_IMAGE_BUCKET}")
     private String amazonImageBucket;
 
-    @Value( "${CDN_PATH}" )
+    @Value ( "${CDN_PATH}")
     private String cdnUrl;
 
     @Autowired
@@ -610,8 +610,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     OrganizationUnitSettings aggregateAgentProfile( OrganizationUnitSettings companySettings,
-        OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSettings, OrganizationUnitSettings agentSettings )
-        throws InvalidInputException
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSettings,
+        OrganizationUnitSettings agentSettings ) throws InvalidInputException
     {
         LOG.debug( "Method aggregateAgentProfile() called from ProfileManagementService" );
         if ( companySettings == null || agentSettings == null ) {
@@ -649,8 +649,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    OrganizationUnitSettings aggregateProfileData( OrganizationUnitSettings parentProfile,
-        OrganizationUnitSettings userProfile, LockSettings userLock )
+    OrganizationUnitSettings aggregateProfileData( OrganizationUnitSettings parentProfile, OrganizationUnitSettings userProfile,
+        LockSettings userLock )
     {
         LOG.debug( "Method aggregateProfileData() called from ProfileManagementService" );
 
@@ -727,12 +727,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     && userProfile.getContact_details().getContact_numbers() != null ) {
                     userProfile.getContact_details().getContact_numbers()
                         .setWork( parentProfile.getContact_details().getContact_numbers().getWork() );
+                    userProfile.getContact_details().getContact_numbers()
+                        .setPhone1( parentProfile.getContact_details().getContact_numbers().getPhone1() );
                     userLock.setWorkPhoneLocked( true );
                 }
                 if ( parentLock.getIsPersonalPhoneLocked() && !userLock.getIsPersonalPhoneLocked()
                     && userProfile.getContact_details().getContact_numbers() != null ) {
                     userProfile.getContact_details().getContact_numbers()
                         .setPersonal( parentProfile.getContact_details().getContact_numbers().getPersonal() );
+                    userProfile.getContact_details().getContact_numbers()
+                        .setPhone2( parentProfile.getContact_details().getContact_numbers().getPhone2() );
                     userLock.setPersonalPhoneLocked( true );
                 }
                 if ( parentLock.getIsFaxPhoneLocked() && !userLock.getIsFaxPhoneLocked()
@@ -886,8 +890,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     // Lock Settings
     @Override
-    public LockSettings updateLockSettings( String collection, OrganizationUnitSettings unitSettings, LockSettings lockSettings )
-        throws InvalidInputException
+    public LockSettings updateLockSettings( String collection, OrganizationUnitSettings unitSettings,
+        LockSettings lockSettings ) throws InvalidInputException
     {
         if ( lockSettings == null ) {
             throw new InvalidInputException( "LockSettings passed can not be null" );
@@ -1057,8 +1061,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     // Social Tokens
     @Override
-    public void updateSocialMediaTokens( String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens )
-        throws InvalidInputException
+    public void updateSocialMediaTokens( String collection, OrganizationUnitSettings unitSettings,
+        SocialMediaTokens mediaTokens ) throws InvalidInputException
     {
         if ( mediaTokens == null ) {
             throw new InvalidInputException( "Media tokens passed was null" );
@@ -1161,8 +1165,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     @Override
     @Transactional
-    public List<AgentSettings> getIndividualsForCompany( String companyProfileName ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException
+    public List<AgentSettings> getIndividualsForCompany( String companyProfileName )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
             throw new InvalidInputException( "companyProfileName is null or empty in getIndividualsForCompany" );
@@ -1171,8 +1175,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         List<AgentSettings> users = null;
         OrganizationUnitSettings companySettings = getCompanyProfileByProfileName( companyProfileName );
         if ( companySettings != null ) {
-            Region defaultRegion = organizationManagementService.getDefaultRegionForCompany( companyDao.findById(
-                Company.class, companySettings.getIden() ) );
+            Region defaultRegion = organizationManagementService
+                .getDefaultRegionForCompany( companyDao.findById( Company.class, companySettings.getIden() ) );
             if ( defaultRegion != null ) {
                 Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion( defaultRegion.getRegionId() );
                 users = getIndividualsByBranchId( defaultBranch.getBranchId() );
@@ -1191,16 +1195,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     @Override
     @Transactional
-    public List<AgentSettings> getIndividualsForCompany( long companyId ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException
+    public List<AgentSettings> getIndividualsForCompany( long companyId )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         if ( companyId <= 0l ) {
             throw new InvalidInputException( "Invalid companyId passed in getIndividualsForCompany" );
         }
         LOG.info( "Method getIndividualsForCompany called for companyId: " + companyId );
         List<AgentSettings> users = null;
-        Region defaultRegion = organizationManagementService.getDefaultRegionForCompany( companyDao.findById( Company.class,
-            companyId ) );
+        Region defaultRegion = organizationManagementService
+            .getDefaultRegionForCompany( companyDao.findById( Company.class, companyId ) );
         if ( defaultRegion != null ) {
             Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion( defaultRegion.getRegionId() );
             users = getIndividualsByBranchId( defaultBranch.getBranchId() );
@@ -1288,8 +1292,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new ProfileNotFoundException( "Unable to get branch with this iden " + branchSettings.getIden() );
 
         }
-        OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branch
-            .getRegion().getRegionId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+            branch.getRegion().getRegionId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
 
         branchSettings = aggregateBranchProfile( companySettings, regionSettings, branchSettings );
 
@@ -1328,8 +1332,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     @Override
     @Transactional
-    public OrganizationUnitSettings getIndividualByProfileName( String agentProfileName ) throws ProfileNotFoundException,
-        InvalidInputException, NoRecordsFetchedException
+    public OrganizationUnitSettings getIndividualByProfileName( String agentProfileName )
+        throws ProfileNotFoundException, InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method getIndividualByProfileName called for agentProfileName:" + agentProfileName );
 
@@ -1457,57 +1461,57 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( companySettings.getSocialMediaTokens() != null ) {
             SocialMediaTokens companyTokens = validateSocialMediaTokens( companySettings );
 
-            if ( ( entityTokens.getFacebookToken().getFacebookPageLink() == null || entityTokens.getFacebookToken()
-                .getFacebookPageLink().equals( "" ) )
+            if ( ( entityTokens.getFacebookToken().getFacebookPageLink() == null
+                || entityTokens.getFacebookToken().getFacebookPageLink().equals( "" ) )
                 && companyTokens.getFacebookToken().getFacebookPageLink() != null
                 && !companyTokens.getFacebookToken().getFacebookPageLink().equals( "" ) ) {
                 entityTokens.getFacebookToken().setFacebookPageLink( companyTokens.getFacebookToken().getFacebookPageLink() );
             }
-            if ( ( entityTokens.getGoogleToken().getProfileLink() == null || entityTokens.getGoogleToken().getProfileLink()
-                .equals( "" ) )
+            if ( ( entityTokens.getGoogleToken().getProfileLink() == null
+                || entityTokens.getGoogleToken().getProfileLink().equals( "" ) )
                 && companyTokens.getGoogleToken().getProfileLink() != null
                 && !companyTokens.getGoogleToken().getProfileLink().equals( "" ) ) {
                 entityTokens.getGoogleToken().setProfileLink( companyTokens.getGoogleToken().getProfileLink() );
             }
-            if ( ( entityTokens.getLinkedInToken().getLinkedInPageLink() == null || entityTokens.getLinkedInToken()
-                .getLinkedInPageLink().equals( "" ) )
+            if ( ( entityTokens.getLinkedInToken().getLinkedInPageLink() == null
+                || entityTokens.getLinkedInToken().getLinkedInPageLink().equals( "" ) )
                 && companyTokens.getLinkedInToken().getLinkedInPageLink() != null
                 && !companyTokens.getLinkedInToken().getLinkedInPageLink().equals( "" ) ) {
                 entityTokens.getLinkedInToken().setLinkedInPageLink( companyTokens.getLinkedInToken().getLinkedInPageLink() );
             }
-            if ( ( entityTokens.getRssToken().getProfileLink() == null || entityTokens.getRssToken().getProfileLink()
-                .equals( "" ) )
+            if ( ( entityTokens.getRssToken().getProfileLink() == null
+                || entityTokens.getRssToken().getProfileLink().equals( "" ) )
                 && companyTokens.getRssToken().getProfileLink() != null
                 && !companyTokens.getRssToken().getProfileLink().equals( "" ) ) {
                 entityTokens.getRssToken().setProfileLink( companyTokens.getRssToken().getProfileLink() );
             }
-            if ( ( entityTokens.getTwitterToken().getTwitterPageLink() == null || entityTokens.getTwitterToken()
-                .getTwitterPageLink().equals( "" ) )
+            if ( ( entityTokens.getTwitterToken().getTwitterPageLink() == null
+                || entityTokens.getTwitterToken().getTwitterPageLink().equals( "" ) )
                 && companyTokens.getTwitterToken().getTwitterPageLink() != null
                 && !companyTokens.getTwitterToken().getTwitterPageLink().equals( "" ) ) {
                 entityTokens.getTwitterToken().setTwitterPageLink( companyTokens.getTwitterToken().getTwitterPageLink() );
             }
-            if ( ( entityTokens.getYelpToken().getYelpPageLink() == null || entityTokens.getYelpToken().getYelpPageLink()
-                .equals( "" ) )
+            if ( ( entityTokens.getYelpToken().getYelpPageLink() == null
+                || entityTokens.getYelpToken().getYelpPageLink().equals( "" ) )
                 && companyTokens.getYelpToken().getYelpPageLink() != null
                 && !companyTokens.getYelpToken().getYelpPageLink().equals( "" ) ) {
                 entityTokens.getYelpToken().setYelpPageLink( companyTokens.getYelpToken().getYelpPageLink() );
             }
-            if ( ( entityTokens.getZillowToken().getZillowProfileLink() == null || entityTokens.getZillowToken()
-                .getZillowProfileLink().equals( "" ) )
+            if ( ( entityTokens.getZillowToken().getZillowProfileLink() == null
+                || entityTokens.getZillowToken().getZillowProfileLink().equals( "" ) )
                 && companyTokens.getZillowToken().getZillowProfileLink() != null
                 && !companyTokens.getZillowToken().getZillowProfileLink().equals( "" ) ) {
                 entityTokens.getZillowToken().setZillowProfileLink( companyTokens.getZillowToken().getZillowProfileLink() );
             }
-            if ( ( entityTokens.getLendingTreeToken().getLendingTreeProfileLink() == null || entityTokens.getLendingTreeToken()
-                .getLendingTreeProfileLink().equals( "" ) )
+            if ( ( entityTokens.getLendingTreeToken().getLendingTreeProfileLink() == null
+                || entityTokens.getLendingTreeToken().getLendingTreeProfileLink().equals( "" ) )
                 && companyTokens.getLendingTreeToken().getLendingTreeProfileLink() != null
                 && !companyTokens.getLendingTreeToken().getLendingTreeProfileLink().equals( "" ) ) {
-                entityTokens.getLendingTreeToken().setLendingTreeProfileLink(
-                    companyTokens.getLendingTreeToken().getLendingTreeProfileLink() );
+                entityTokens.getLendingTreeToken()
+                    .setLendingTreeProfileLink( companyTokens.getLendingTreeToken().getLendingTreeProfileLink() );
             }
-            if ( ( entityTokens.getRealtorToken().getRealtorProfileLink() == null || entityTokens.getRealtorToken()
-                .getRealtorProfileLink().equals( "" ) )
+            if ( ( entityTokens.getRealtorToken().getRealtorProfileLink() == null
+                || entityTokens.getRealtorToken().getRealtorProfileLink().equals( "" ) )
                 && companyTokens.getRealtorToken().getRealtorProfileLink() != null
                 && !companyTokens.getRealtorToken().getRealtorProfileLink().equals( "" ) ) {
                 entityTokens.getRealtorToken().setRealtorProfileLink( companyTokens.getRealtorToken().getRealtorProfileLink() );
@@ -1596,8 +1600,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public UserCompositeEntity getCompositeUserObjectByProfileName( String agentProfileName, boolean checkStatus )
         throws ProfileNotFoundException
     {
-        LOG.info( "Getting the user composite object by profile name: " + agentProfileName + " and check status: "
-            + checkStatus );
+        LOG.info(
+            "Getting the user composite object by profile name: " + agentProfileName + " and check status: " + checkStatus );
         if ( agentProfileName == null || agentProfileName.isEmpty() ) {
             LOG.error( "agentProfileName is null or empty while getting agent settings" );
             throw new ProfileNotFoundException( "agentProfileName is null or empty while getting agent settings" );
@@ -1608,8 +1612,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao
             .fetchOrganizationUnitSettingsByProfileName( agentProfileName,
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-        if ( organizationUnitSettings == null || ( organizationUnitSettings.getStatus() != null && (
-            organizationUnitSettings.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) ) {
+        if ( organizationUnitSettings == null || ( organizationUnitSettings.getStatus() != null
+            && ( organizationUnitSettings.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) ) {
             LOG.warn( "No profile found with profile name: " + agentProfileName );
             throw new ProfileNotFoundException( "No profile found with profile name: " + agentProfileName );
         } else {
@@ -1713,8 +1717,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     @Override
     @Transactional
-    public List<AgentSettings> getIndividualsByRegionId( long regionId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public List<AgentSettings> getIndividualsByRegionId( long regionId ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method getIndividualsByRegionId called for regionId: " + regionId );
         List<AgentSettings> users = null;
@@ -1818,17 +1821,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
             if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
                 SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
-
+        
                 // adding yelpUrl
                 if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
                     review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
                 }
-
+        
                 // adding zillowUrl
                 if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
                     review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
                 }
-
+        
                 // adding lendingTreeUrl
                 if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
                     review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
@@ -2032,8 +2035,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * @throws UndeliveredEmailException
      */
     @Override
-    public void generateAndSendEmailVerificationRequestLinkToAdmin( List<MiscValues> mailIds, long companyId,
-        String entityType, OrganizationUnitSettings entitySettings ) throws InvalidInputException, UndeliveredEmailException
+    public void generateAndSendEmailVerificationRequestLinkToAdmin( List<MiscValues> mailIds, long companyId, String entityType,
+        OrganizationUnitSettings entitySettings ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method generateAndSendEmailVerificationRequestLinkToAdmin started " );
         Map<String, String> urlParams = null;
@@ -2065,8 +2068,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 urlParams.put( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE,
                     CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN );
 
-                String verficationUrl = urlGenerator.generateUrl( urlParams, applicationBaseUrl
-                    + CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION );
+                String verficationUrl = urlGenerator.generateUrl( urlParams,
+                    applicationBaseUrl + CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION );
                 emailServices.sendEmailVerificationRequestMailToAdmin( verficationUrl, companyAdmin.getEmailId(), adminName,
                     emailId, entitySettings.getContact_details().getName() );
             }
@@ -2091,8 +2094,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String collection = urlParams.get( CommonConstants.ENTITY_TYPE_COLUMN );
         String verificationType = urlParams.get( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE );
 
-        OrganizationUnitSettings unitSettings = organizationUnitSettingsDao
-            .fetchOrganizationUnitSettingsById( iden, collection );
+        OrganizationUnitSettings unitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( iden,
+            collection );
         ContactDetailsSettings contactDetails = unitSettings.getContact_details();
         MailIdSettings mailIds = contactDetails.getMail_ids();
         User companyAdmin = null;
@@ -2167,8 +2170,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     if ( companyAdmin.getLastName() != null && !companyAdmin.getLastName().isEmpty() ) {
                         adminName = companyAdmin.getFirstName() + " " + companyAdmin.getLastName();
                     }
-                    emailServices.sendEmailVerifiedNotificationMailToAdmin( companyAdmin.getLoginName(),
-                        adminName, emailVerified, unitSettings.getContact_details().getName() );
+                    emailServices.sendEmailVerifiedNotificationMailToAdmin( companyAdmin.getLoginName(), adminName,
+                        emailVerified, unitSettings.getContact_details().getName() );
                 }
             }
         } else if ( emailType.equals( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
@@ -2270,8 +2273,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * Method to fetch all users under the specified list of regions
      */
     @Override
-    public List<AgentSettings> getIndividualsByRegionIds( Set<Long> regionIds ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public List<AgentSettings> getIndividualsByRegionIds( Set<Long> regionIds )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method getIndividualsByBranchIds called for regionIds:" + regionIds );
         List<AgentSettings> users = null;
@@ -2353,13 +2356,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         if ( settings != null ) {
             LOG.debug( "Sending the contact us mail to the agent" );
-            emailServices.sendContactUsMail( settings.getContact_details().getMail_ids().getWork(), settings
-                .getContact_details().getName(), senderName, senderMailId, message );
+            emailServices.sendContactUsMail( settings.getContact_details().getMail_ids().getWork(),
+                settings.getContact_details().getName(), senderName, senderMailId, message );
             LOG.debug( "Contact us mail sent!" );
         } else {
             LOG.error( "No records found for agent settings of profile name : " + profileName + " in mongo" );
-            throw new NoRecordsFetchedException( "No records found for agent settings of profile name : " + profileName
-                + " in mongo" );
+            throw new NoRecordsFetchedException(
+                "No records found for agent settings of profile name : " + profileName + " in mongo" );
         }
     }
 
@@ -2486,8 +2489,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         //If agent, get social posts for only that agent.
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            posts = socialPostDao
-                .getSocialPosts( entityId, CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.AGENT_ID, startIndex, numOfRows, startDate,
+                endDate );
             //If company, get social posts for that company, all the regions, branches and agents in that company.
         } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             //Get social posts for company
@@ -2524,8 +2527,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
             if ( getIndividualsByRegionId( entityId ) != null ) {
                 for ( AgentSettings user : getIndividualsByRegionId( entityId ) ) {
-                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex,
-                        numOfRows, startDate, endDate ) );
+                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows,
+                        startDate, endDate ) );
                 }
             }
             //Get all social posts for branch
@@ -2536,8 +2539,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             //Get social posts for all the users in the branch
             if ( getIndividualsByBranchId( entityId ) != null ) {
                 for ( AgentSettings user : getIndividualsByBranchId( entityId ) ) {
-                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex,
-                        numOfRows, startDate, endDate ) );
+                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows,
+                        startDate, endDate ) );
                 }
             }
         }
@@ -2623,14 +2626,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Company positions passed are not proper" );
         }
         LOG.info( "Updating company positions" );
-        organizationUnitSettingsDao.updateParticularKeyAgentSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_COMPANY_POSITIONS, companyPositions, agentSettings );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_COMPANY_POSITIONS,
+            companyPositions, agentSettings );
         LOG.info( "Updated company positions." );
     }
 
 
     @Override
-    public void updateProfileStages( List<ProfileStage> profileStages, OrganizationUnitSettings settings, String collectionName )
+    public void updateProfileStages( List<ProfileStage> profileStages, OrganizationUnitSettings settings,
+        String collectionName )
     {
         LOG.info( "Method to update profile stages started." );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -2709,7 +2713,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null ) {
                         review.setLendingTreeProfileUrl( mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() );
                     }
-                    if ( mediaTokens.getRealtorToken() != null && mediaTokens.getRealtorToken().getRealtorProfileLink() != null ) {
+                    if ( mediaTokens.getRealtorToken() != null
+                        && mediaTokens.getRealtorToken().getRealtorProfileLink() != null ) {
                         review.setRealtorProfileUrl( mediaTokens.getRealtorToken().getRealtorProfileLink() );
                     }
                 }
@@ -2766,7 +2771,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             User user = userManagementService.getUserByUserId( unitSettings.getIden() );
 
             for ( UserProfile userProfile : user.getUserProfiles() ) {
-                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                if ( userProfile.getProfilesMaster()
+                    .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
                     if ( userProfile.getBranchId() > 0l ) {
                         entitySetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
                             userProfile.getBranchId(), MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
@@ -2774,7 +2780,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         LOG.warn( "Not a valid branch id for branch profile: " + userProfile + ". Skipping the record" );
                     }
                 }
-                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                if ( userProfile.getProfilesMaster()
+                    .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                     if ( userProfile.getRegionId() > 0l ) {
                         entitySetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
                             userProfile.getRegionId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
@@ -2782,7 +2789,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         LOG.warn( "Not a valid region id for region profile: " + userProfile + ". Skipping the record" );
                     }
                 }
-                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+                if ( userProfile.getProfilesMaster()
+                    .getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
                     if ( userProfile.getRegionId() > 0l ) {
                         entitySetting = organizationManagementService.getCompanySettings( user );
                     } else {
@@ -2790,7 +2798,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     }
                 }
 
-                if ( entitySetting != null && entitySetting.getDisclaimer() != null && !entitySetting.getDisclaimer().isEmpty() ) {
+                if ( entitySetting != null && entitySetting.getDisclaimer() != null
+                    && !entitySetting.getDisclaimer().isEmpty() ) {
                     return entitySetting.getDisclaimer();
                 }
                 entitySetting = null;
@@ -2885,8 +2894,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public List<BreadCrumb> getIndividualsBreadCrumb( Long userId ) throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException
+    public List<BreadCrumb> getIndividualsBreadCrumb( Long userId )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         User user = userDao.findById( User.class, userId );
 
@@ -2903,8 +2912,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         Company company = userProfile.getCompany();
-        AccountType accountType = AccountType.getAccountType( company.getLicenseDetails().get( 0 ).getAccountsMaster()
-            .getAccountsMasterId() );
+        AccountType accountType = AccountType
+            .getAccountType( company.getLicenseDetails().get( 0 ).getAccountsMaster().getAccountsMasterId() );
 
         LOG.info( "Method getIndividualsBreadCrumb called :" );
         List<BreadCrumb> breadCrumbList = new ArrayList<>();
@@ -2932,8 +2941,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 if ( branch == null ) {
                     throw new InvalidInputException( "No branch with ID : " + userProfile.getBranchId() + " was found" );
                 } else if ( branch.getRegion() == null ) {
-                    throw new InvalidInputException( "No region associated to branch with ID : " + userProfile.getBranchId()
-                        + " was found" );
+                    throw new InvalidInputException(
+                        "No region associated to branch with ID : " + userProfile.getBranchId() + " was found" );
                 }
                 Region region = branch.getRegion();
                 //Region region = regionDao.findById( Region.class, userProfile.getRegionId() );
@@ -2954,8 +2963,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public List<BreadCrumb> getRegionsBreadCrumb( OrganizationUnitSettings regionProfile ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public List<BreadCrumb> getRegionsBreadCrumb( OrganizationUnitSettings regionProfile )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method getRegionsBreadCrumb called :" );
         List<BreadCrumb> breadCrumbList = new ArrayList<>();
@@ -2973,8 +2982,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public List<BreadCrumb> getBranchsBreadCrumb( OrganizationUnitSettings branchProfile ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public List<BreadCrumb> getBranchsBreadCrumb( OrganizationUnitSettings branchProfile )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method getBranchsBreadCrumb called :" );
         List<BreadCrumb> breadCrumbList = new ArrayList<>();
@@ -2998,14 +3007,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         BreadCrumb breadCrumb = new BreadCrumb();
         breadCrumb.setBreadCrumbProfile( company.getCompany() );
-        breadCrumb.setBreadCrumbUrl( organizationManagementService.getCompanySettings( company.getCompanyId() )
-            .getCompleteProfileUrl() );
+        breadCrumb.setBreadCrumbUrl(
+            organizationManagementService.getCompanySettings( company.getCompanyId() ).getCompleteProfileUrl() );
         breadCrumbList.add( breadCrumb );
     }
 
 
-    void updateCrumbListWithBranchName( List<BreadCrumb> breadCrumbList, Branch branch ) throws InvalidInputException,
-        NoRecordsFetchedException
+    void updateCrumbListWithBranchName( List<BreadCrumb> breadCrumbList, Branch branch )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         if ( branch.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
             BreadCrumb breadCrumb = new BreadCrumb();
@@ -3022,8 +3031,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( region.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
             BreadCrumb breadCrumb = new BreadCrumb();
             breadCrumb.setBreadCrumbProfile( region.getRegion() );
-            breadCrumb.setBreadCrumbUrl( organizationManagementService.getRegionSettings( region.getRegionId() )
-                .getCompleteProfileUrl() );
+            breadCrumb.setBreadCrumbUrl(
+                organizationManagementService.getRegionSettings( region.getRegionId() ).getCompleteProfileUrl() );
             breadCrumbList.add( breadCrumb );
         }
     }
@@ -3039,8 +3048,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public List<OrganizationUnitSettings> getCompanyList( String verticalName ) throws InvalidInputException,
-        ProfileNotFoundException
+    public List<OrganizationUnitSettings> getCompanyList( String verticalName )
+        throws InvalidInputException, ProfileNotFoundException
     {
         LOG.info( "Method getCompanyList called :" );
         List<OrganizationUnitSettings> companyList = organizationUnitSettingsDao.getCompanyListByVerticalName( verticalName );
@@ -3359,8 +3368,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         companyProfileData.setCompanyLogo( logoUrl );
 
         if ( agentSettings != null ) {
-            if ( !parentLockSettings.getIsLogoLocked() && logoUrl != null && !logoUrl.isEmpty() && (
-                agentSettings.getLogo() == null || agentSettings.getLogo().isEmpty() ) ) {
+            if ( !parentLockSettings.getIsLogoLocked() && logoUrl != null && !logoUrl.isEmpty()
+                && ( agentSettings.getLogo() == null || agentSettings.getLogo().isEmpty() ) ) {
                 agentSettings.setLogo( logoUrl );
             }
             agentSettings.setCompanyProfileData( companyProfileData );
@@ -3383,8 +3392,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException,
-        ProfileNotFoundException
+    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId )
+        throws InvalidInputException, ProfileNotFoundException
     {
         Map<String, Long> hierarchyDetials = new HashMap<String, Long>();
         Map<String, Long> hierarchyMap = new HashMap<String, Long>();
@@ -3446,8 +3455,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         long companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
         long regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
         long branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
-        List<SettingsDetails> settingsDetailsList = settingsManager
-            .getScoreForCompleteHeirarchy( companyId, branchId, regionId );
+        List<SettingsDetails> settingsDetailsList = settingsManager.getScoreForCompleteHeirarchy( companyId, branchId,
+            regionId );
 
         LOG.info( "Calculate lock and setting score " );
         Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
@@ -3498,11 +3507,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             //update currentLockAggregateValue
             String sCurrentLockValue = String.valueOf( currentLockAggregateValue );
             if ( sCurrentLockValue.length() >= SettingsForApplication.EMAIL_ID_WORK.getIndex() ) {
-                String preIndexLockValueSubString = sCurrentLockValue.substring( 0, sCurrentLockValue.length()
-                    - SettingsForApplication.EMAIL_ID_WORK.getIndex() );
+                String preIndexLockValueSubString = sCurrentLockValue.substring( 0,
+                    sCurrentLockValue.length() - SettingsForApplication.EMAIL_ID_WORK.getIndex() );
                 String indexLockValueSubString = String.valueOf( CommonConstants.LOCKED_BY_NONE );
-                String postIndexLockValueSubString = sCurrentLockValue.substring( sCurrentLockValue.length()
-                    - SettingsForApplication.EMAIL_ID_WORK.getIndex() + 1 );
+                String postIndexLockValueSubString = sCurrentLockValue
+                    .substring( sCurrentLockValue.length() - SettingsForApplication.EMAIL_ID_WORK.getIndex() + 1 );
 
                 sCurrentLockValue = preIndexLockValueSubString + indexLockValueSubString + postIndexLockValueSubString;
                 currentLockAggregateValue = Long.parseLong( sCurrentLockValue );
@@ -3512,8 +3521,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
 
-        Map<SettingsForApplication, OrganizationUnit> closestSettings = settingsManager.getClosestSettingLevel(
-            String.valueOf( currentSetAggregateValue ), String.valueOf( currentLockAggregateValue ) );
+        Map<SettingsForApplication, OrganizationUnit> closestSettings = settingsManager
+            .getClosestSettingLevel( String.valueOf( currentSetAggregateValue ), String.valueOf( currentLockAggregateValue ) );
 
 
         if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
@@ -3545,10 +3554,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
 
                 if ( unitSettings.getContact_details() != null ) {
-                    if ( ( unitSettings.getContact_details().getAddress1() != null && !unitSettings.getContact_details()
-                        .getAddress1().isEmpty() )
-                        || ( unitSettings.getContact_details().getAddress2() != null && !unitSettings.getContact_details()
-                            .getAddress2().isEmpty() ) ) {
+                    if ( ( unitSettings.getContact_details().getAddress1() != null
+                        && !unitSettings.getContact_details().getAddress1().isEmpty() )
+                        || ( unitSettings.getContact_details().getAddress2() != null
+                            && !unitSettings.getContact_details().getAddress2().isEmpty() ) ) {
                         closestSettings.put( SettingsForApplication.ADDRESS, OrganizationUnit.AGENT );
                     }
                 }
@@ -3700,8 +3709,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         }
 
-        OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branch
-            .getRegion().getRegionId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+            branch.getRegion().getRegionId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
         return regionSettings;
     }
 
@@ -3738,7 +3747,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    OrganizationUnitSettings setAggregateBasicData( OrganizationUnitSettings userProfile, OrganizationUnitSettings parentProfile )
+    OrganizationUnitSettings setAggregateBasicData( OrganizationUnitSettings userProfile,
+        OrganizationUnitSettings parentProfile )
     {
 
         if ( userProfile.getContact_details() == null ) {
@@ -3944,12 +3954,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
                     contactNumberSettings.setWork( companyUnitSettings.getContact_details().getContact_numbers().getWork() );
+                    contactNumberSettings
+                        .setPhone1( companyUnitSettings.getContact_details().getContact_numbers().getPhone1() );
                 } else if ( entry.getValue() == OrganizationUnit.REGION ) {
                     contactNumberSettings.setWork( regionUnitSettings.getContact_details().getContact_numbers().getWork() );
+                    contactNumberSettings.setPhone1( regionUnitSettings.getContact_details().getContact_numbers().getPhone1() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
                     contactNumberSettings.setWork( branchUnitSettings.getContact_details().getContact_numbers().getWork() );
+                    contactNumberSettings.setPhone1( branchUnitSettings.getContact_details().getContact_numbers().getPhone1() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     contactNumberSettings.setWork( agentUnitSettings.getContact_details().getContact_numbers().getWork() );
+                    contactNumberSettings.setPhone1( agentUnitSettings.getContact_details().getContact_numbers().getPhone1() );
                 }
                 contactDetails.setContact_numbers( contactNumberSettings );
                 userProfile.setContact_details( contactDetails );
@@ -4036,9 +4051,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         socialMediaTokens
                             .setLendingTreeToken( companyUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
                     } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                        socialMediaTokens.setLendingTreeToken( regionUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                        socialMediaTokens
+                            .setLendingTreeToken( regionUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
                     } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                        socialMediaTokens.setLendingTreeToken( branchUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                        socialMediaTokens
+                            .setLendingTreeToken( branchUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
                     } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                         socialMediaTokens.setLendingTreeToken( agentUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
                     }
@@ -4176,8 +4193,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException,
-        IOException
+    Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException, IOException
     {
         Map<String, Object> map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
         return map;
@@ -4214,8 +4230,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         try {
                             // Replace - with spaces in zillow screen name
                             zillowScreenName = zillowScreenName.replaceAll( "-", " " );
-                            response = zillowIntegrationApi
-                                .fetchZillowReviewsByScreennameWithMaxCount( zwsId, zillowScreenName );
+                            response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
+                                zillowScreenName );
                         } catch ( Exception e ) {
                             LOG.error( "Exception caught while fetching zillow reviews" + e.getMessage() );
                             reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
@@ -4243,8 +4259,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             try {
                                 map = convertJsonStringToMap( responseString );
                                 if ( checkMapForError( map ) ) {
-                                    reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, new Exception(
-                                        (String) map.get( ZILLOW_JSON_TEXT_KEY ) ) );
+                                    reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName,
+                                        new Exception( (String) map.get( ZILLOW_JSON_TEXT_KEY ) ) );
                                     // return new ArrayList<SurveyDetails>();
                                 }
                             } catch ( JsonParseException e ) {
@@ -4352,8 +4368,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         boolean webAddressLocked = true;
         boolean phoneNumberLocked = true;
         boolean workEmailLocked = true;
-        List<SettingsDetails> settingsDetailsList = settingsManager
-            .getScoreForCompleteHeirarchy( companyId, branchId, regionId );
+        List<SettingsDetails> settingsDetailsList = settingsManager.getScoreForCompleteHeirarchy( companyId, branchId,
+            regionId );
         Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
         long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
         LockSettings parentLock = new LockSettings();
@@ -4682,10 +4698,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails = new SurveyDetails();
                 if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
                     surveyDetails.setCompanyId( profile.getIden() );
-                } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                } else if ( collectionName
+                    .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
                     surveyDetails.setRegionId( profile.getIden() );
                     surveyDetails.setCompanyId( companyId );
-                } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+                } else if ( collectionName
+                    .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
                     try {
                         Branch branch = branchDao.findById( Branch.class, profile.getIden() );
                         if ( branch != null ) {
@@ -4747,7 +4765,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyHandler.updateZillowSummaryInExistingSurveyDetails( surveyDetails );
             }
 
-            if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) && fromBatch ) {
+            if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
+                && fromBatch ) {
                 postToTempTable( collectionName, profile, surveyDetails, review );
             }
 
@@ -4888,7 +4907,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Override
-    public void imageLoader() {
+    public void imageLoader()
+    {
         try {
             new File( CommonConstants.TEMP_FOLDER ).mkdir();
 
@@ -4911,8 +4931,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 try {
                     String image = loadImages( companySetting.getValue() );
                     if ( image != null ) {
-                        updateProfileImage(
-                            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySetting.getValue(), image );
+                        updateProfileImage( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                            companySetting.getValue(), image );
                     }
                 } catch ( Exception e ) {
                     LOG.error( "Exception caught in ImageLoader while copying image from linkedin to SocialSurvey server. "
@@ -4926,8 +4946,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 try {
                     String image = loadImages( regionSetting.getValue() );
                     if ( image != null ) {
-                        updateProfileImage(
-                            MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSetting.getValue(), image );
+                        updateProfileImage( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                            regionSetting.getValue(), image );
                     }
                 } catch ( Exception e ) {
                     LOG.error( "Exception caught in ImageLoader while copying image from linkedin to SocialSurvey server. "
@@ -4941,8 +4961,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 try {
                     String image = loadImages( branchSetting.getValue() );
                     if ( image != null ) {
-                        updateProfileImage(
-                            MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSetting.getValue(), image );
+                        updateProfileImage( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                            branchSetting.getValue(), image );
                     }
                 } catch ( Exception e ) {
                     LOG.error( "Exception caught in ImageLoader while copying image from linkedin to SocialSurvey server. "
@@ -4956,8 +4976,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 try {
                     String image = loadImages( agentSetting.getValue() );
                     if ( image != null ) {
-                        updateProfileImage(
-                            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSetting.getValue(), image );
+                        updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                            agentSetting.getValue(), image );
                     }
                 } catch ( Exception e ) {
                     LOG.error( "Exception caught in ImageLoader while copying image from linkedin to SocialSurvey server. "
@@ -4985,6 +5005,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
         }
     }
+
 
     private String loadImages( OrganizationUnitSettings setting ) throws Exception
     {
