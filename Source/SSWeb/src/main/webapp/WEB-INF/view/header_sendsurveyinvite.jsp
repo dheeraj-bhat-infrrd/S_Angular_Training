@@ -21,19 +21,19 @@
 					<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
 					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
 					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
-					<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>
+					<div class="wc-review-tc4 last float-left"><div class="wc-review-rmv-icn hide"></div></div>
 				</div>
 				<div class="wc-review-tr clearfix">
 					<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
 					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
 					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
-					<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn"></div></div>
+					<div class="wc-review-tc4 last float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
 				<div class="wc-review-tr clearfix">
 					<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
 					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
 					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
-					<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn"></div></div>
+					<div class="wc-review-tc4 last float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
 			</div>
 		</div>

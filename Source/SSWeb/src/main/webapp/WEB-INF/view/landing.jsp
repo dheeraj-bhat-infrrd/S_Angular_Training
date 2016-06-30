@@ -61,7 +61,7 @@ function landingFlow() {
 		$('#overlay-send-survey').find('#wc-review-table-inner').children().each(function() {
 			if (!$(this).hasClass('wc-review-hdr')) {
 				$(this).children().each(function(){
-					if (!$(this).hasClass('wc-review-tc5')){
+					if (!$(this).hasClass('last')){
 						var input=$(this).children(":input").val();
 						console.log(input);
 						if(input!=""){

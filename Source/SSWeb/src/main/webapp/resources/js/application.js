@@ -209,7 +209,7 @@ $(document).on('click', function(e) {
 		$('#overlay-send-survey').find('#wc-review-table-inner').children().each(function() {
 			if (!$(this).hasClass('wc-review-hdr')) {
 				$(this).children().each(function(){
-					if (!$(this).hasClass('wc-review-tc5')){
+					if (!$(this).hasClass('last')){
 						var input=$(this).children(":input").val();
 						console.log(input);
 						if(input!=""){
@@ -8931,7 +8931,7 @@ function showSurveysUnderResolution(startIndexCmp, batchSizeCmp) {
 $(document).on('input', '#wc-review-table-inner[data-role="agent"] input', function() {
 	var parentDiv = $(this).parent().parent();
 	if (parentDiv.is(':last-child')) {
-		var htmlData = '<div class="wc-review-tr clearfix">' + '<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' + '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' + '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' + '<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
+		var htmlData = '<div class="wc-review-tr clearfix">' + '<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' + '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' + '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' + '<div class="wc-review-tc4 last float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
 		parentDiv.after(htmlData);
 
 		// enable remove button
@@ -8953,7 +8953,7 @@ $(document).on('input', '#wc-review-table-inner[data-role="admin"] input', funct
 	$(this).siblings().addClass('hidden');
 	var parentDiv = $(this).parent().parent();
 	if (parentDiv.is(':last-child')) {
-		var htmlData = '<div class="wc-review-tr clearfix">' + '<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div></div>' + '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' + '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' + '<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' + '<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
+		var htmlData = '<div class="wc-review-tr clearfix">' + '<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div></div>' + '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' + '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' + '<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' + '<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
 		parentDiv.after(htmlData);
 
 		// enable remove button
@@ -9270,7 +9270,7 @@ $(document).on('click', '#wc-send-survey', function() {
 
 	for (var i = 0; i < receiversListLength; i++) {
 		for (var j = i + 1; j < receiversListLength; j++) {
-			if (receiversList[i].emailId == receiversList[j].emailId || receiversList[i].agentEmailId == receiversList[j].agentEmailId) {
+			if (receiversList[i].emailId == receiversList[j].emailId && receiversList[i].agentEmailId == receiversList[j].agentEmailId) {
 				$('#overlay-toast').html("Can't enter same email address multiple times for same user");
 				showToast();
 				allowrequest = false;
