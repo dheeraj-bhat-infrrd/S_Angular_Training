@@ -3,12 +3,13 @@
 <div id="welcome-popup-invite" class="welcome-popup-wrapper">
 	<div class="welcome-popup-hdr-wrapper clearfix">
 		<div class="float-left wc-hdr-txt"><spring:message code="label.sendsurvey.key" /></div>
-		<div class="float-right popup-close-icn wc-skip-btn wc-final-skip"></div>
+		<div class="float-right popup-close-icn  wc-final-skip" style="cursor:pointer;"></div>
 	</div>
 	<div class="welcome-popup-body-wrapper clearfix">
 		<div class="wc-popup-body-hdr"><spring:message code="label.happyreviews.key" /></div>
 		<div id="wc-review-table" class="wc-popup-body-cont wc-review-table-cont wc-admin-table">
-			<div id="wc-review-table-inner" class="wc-review-table" data-role="admin" user-email-id="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal.emailId}">
+			<div id="wc-review-table-inner" class="wc-review-table" style="position:relative" data-role="admin" user-email-id="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal.emailId}">
+				<div id="send-survey-dash" class="hide wc-review-hdr"></div>
 				<div class="wc-review-tr wc-review-hdr clearfix">
 					<div class="wc-review-th1 float-left"><spring:message code="label.agentname.key" /></div>
 					<div class="wc-review-th2 float-left"><spring:message code="label.firstname.key" /></div>
@@ -18,30 +19,30 @@
 				</div>
 				<div class="wc-review-tr clearfix">
 					<div class="wc-review-tc1 float-left pos-relative">
-						<input data-name="agent-name" class="wc-review-input wc-review-agentname">
+						<input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div>
 					</div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>
-					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>
-					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>
-					<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn hide"></div></div>
+					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name" ><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
+					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
+					<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn hide"></div></div>
 				</div>
 				<div class="wc-review-tr clearfix">
 					<div class="wc-review-tc1 float-left pos-relative">
-						<input data-name="agent-name" class="wc-review-input wc-review-agentname">
+						<input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div>
 					</div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>
-					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>
-					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>
-					<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn"></div></div>
+					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
+					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation  validationemail hidden"></div></div>
+					<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
 				<div class="wc-review-tr clearfix">
 					<div class="wc-review-tc1 float-left pos-relative">
-						<input data-name="agent-name" class="wc-review-input wc-review-agentname">
+						<input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div>
 					</div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>
-					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>
-					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>
-					<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn"></div></div>
+					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
+					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
+					<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
 			</div>
 		</div>
