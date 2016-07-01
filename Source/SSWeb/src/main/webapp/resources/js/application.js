@@ -8906,13 +8906,16 @@ function showSurveysUnderResolution(startIndexCmp, batchSizeCmp) {
 		startIndexCmp += batchSizeCmp;
 	}, payload, true);
 }
+var surveyId=4;
 // Send Survey Agent
 $(document).on('input', '#wc-review-table-inner[data-role="agent"] input', function() {
+	$(this).removeClass('error-survey');
+	$(this).siblings().addClass('hidden');
 	var parentDiv = $(this).parent().parent();
 	if (parentDiv.is(':last-child')) {
-		var htmlData = '<div class="wc-review-tr  clearfix">' + '<div class="wc-review-tc1 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' + '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' + '<div class="wc-review-tc3 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' + '<div class="wc-review-tc4 last float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
+		var htmlData = '<div id="survey-'+surveyId+'" class="wc-review-tr  clearfix">' + '<div class="wc-review-tc1 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' + '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' + '<div class="wc-review-tc3 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' + '<div class="wc-review-tc4 last float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
 		parentDiv.after(htmlData);
-
+		surveyId++;
 		// enable remove button
 		if ($('#wc-review-table-inner').children().length > 2) {
 			$('.wc-review-rmv-icn').show();
@@ -8926,15 +8929,16 @@ $(document).on('input', '#wc-review-table-inner[data-role="agent"] input', funct
 	}
 });
 
+var surveyAdminId=4;
 // Send Survey Admin
 $(document).on('input', '#wc-review-table-inner[data-role="admin"] input', function() {
 	$(this).removeClass('error-survey');
 	$(this).siblings().addClass('hidden');
 	var parentDiv = $(this).parent().parent();
 	if (parentDiv.is(':last-child')) {
-		var htmlData = '<div class="wc-review-tr clearfix">' + '<div class="wc-review-tc1 survey-user float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div></div>' + '<div class="wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' + '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' + '<div class="wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' + '<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
+		var htmlData = '<div id="survey-'+surveyAdminId+'"class="wc-review-tr clearfix">' + '<div class="wc-review-tc1 survey-user float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div></div>' + '<div class="wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' + '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' + '<div class="wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' + '<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
 		parentDiv.after(htmlData);
-         num++;
+		surveyAdminId++;
 		// enable remove button
 		if ($('#wc-review-table-inner').children().length > 2) {
 			$('.wc-review-rmv-icn').show();
@@ -9223,9 +9227,11 @@ $(document).on('click', '#wc-send-survey', function() {
 				 if (firstname == "") {
 						$(this).find('.wc-review-fname').addClass("error-survey");
 						$(this).find('.validationfname').html("Firstname is required").removeClass("hidden");
+						allowrequest=false;
 					} if (emailId == ""){
 						$(this).find('.wc-review-email').addClass("error-survey");
 						$(this).find('.validationemail').html("EmailId is required").removeClass("hidden");
+						allowrequest=false;
 					}
 				}
 				
@@ -9261,7 +9267,8 @@ $(document).on('click', '#wc-send-survey', function() {
 						allowrequest = false;
 						return false;
 					}
-					receiversList.push(receiver);
+					receiversList.push({"key" : $(this).attr('id'), "value" : receiver});
+					/*receiversList.push(receiver);*/
 				} else {
 					$(this).find('.wc-review-email').addClass("error-survey");
 					$(this).find('.validationemail').html("Enter a valid email").removeClass("hidden");
@@ -9285,16 +9292,26 @@ $(document).on('click', '#wc-send-survey', function() {
 
 	for (var i = 0; i < receiversListLength; i++) {
 		for (var j = i + 1; j < receiversListLength; j++) {
-			if (receiversList[i].emailId == receiversList[j].emailId && receiversList[i].agentEmailId == receiversList[j].agentEmailId) {
-				$('#overlay-toast').html("Can't enter same email address multiple times for same user");
-				showToast();
+			if (receiversList[i].value.emailId == receiversList[j].value.emailId && receiversList[i].value.agentEmailId == receiversList[j].value.agentEmailId) {
+				/*$('#overlay-toast').html("Can't enter same email address multiple times for same user");
+				showToast();*/
+				console.log("#"+receiversList[i].key);
+				$("#"+receiversList[i].key).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
+				$("#"+receiversList[i].key).find(".survey-email").find(':nth-child(2)').html("Duplicate not allowed").removeClass("hidden");
+				$("#"+receiversList[j].key).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
+				$("#"+receiversList[j].key).find(".survey-email").find(':nth-child(2)').html("Duplicate not allowed").removeClass("hidden");
 				allowrequest = false;
 				return false;
 			}
 		}
 	}
-
-	receiversList = JSON.stringify(receiversList);
+	
+	var rec = [];
+	for (key in receiversList){
+        rec.push(receiversList[key].value);
+   }
+console.log(rec);
+	receiversList = JSON.stringify(rec);
 	var payload = {
 		"receiversList" : receiversList,
 		"source" : 'agent'
