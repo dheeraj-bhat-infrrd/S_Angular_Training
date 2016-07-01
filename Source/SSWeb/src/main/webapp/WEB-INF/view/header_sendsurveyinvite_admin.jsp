@@ -18,30 +18,30 @@
 					<div class="wc-review-th5 float-left"></div>
 				</div>
 				<div class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 float-left pos-relative">
-						<input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div>
+					<div class="wc-review-tc1 survey-user  float-left pos-relative">
+						<input data-name="agent-name" class="wc-review-input  wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div>
 					</div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name" ><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name" ><div class="validation validationfname hidden"></div></div>
 					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
-					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
+					<div class="wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
 					<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn hide"></div></div>
 				</div>
 				<div class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 float-left pos-relative">
+					<div class="wc-review-tc1 survey-user float-left pos-relative">
 						<input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div>
 					</div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
 					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
-					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation  validationemail hidden"></div></div>
+					<div class="wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation  validationemail hidden"></div></div>
 					<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
 				<div class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 float-left pos-relative">
+					<div class="wc-review-tc1 survey-user float-left pos-relative">
 						<input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div>
 					</div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
 					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
-					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
+					<div class="wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
 					<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
 			</div>

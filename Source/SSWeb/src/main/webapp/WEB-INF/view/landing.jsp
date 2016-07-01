@@ -63,7 +63,6 @@ function landingFlow() {
 				$(this).children().each(function(){
 					if (!$(this).hasClass('last')){
 						var input=$(this).children(":input").val();
-						console.log(input);
 						if(input!=""){
 							end=true;
 							$('#overlay-header-survey').html("Warning");
