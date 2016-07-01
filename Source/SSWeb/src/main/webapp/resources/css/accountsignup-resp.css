@@ -80,7 +80,7 @@
 		font-size: 14px;
 	}
 	.reg-right-description-profile {
-		font-size: 14px;
+		font-size: 15px;
 	}
 	.reg-right-description-linkedin {
 		font-size: 25px;
@@ -92,11 +92,6 @@
 		font-size: 15px;
 	}
 	
-    /* .reg-prof-img , .reg-prof-img-detail{
-    width: 260px;
-    height: 200px;
-    margin-top: 20px;
-    } */
     .payment-right-description{
 	width:100%;
 	margin:auto;
@@ -106,14 +101,8 @@
      margin-left: 7px;
     }
     .reg-right-center{
-      left: 60%;
       width: 310px;
     }
-    .reg-right-center-profile{
-      left: 60%;
-      width: 310px;
-    }
-    
     .reg-side-linkedin-img {
      width: 215px;
      height: 75px;
@@ -124,19 +113,18 @@
     height: 200px;
     margin-top: 20px;
 }
+.reg-company-deatil-ul {
+    margin-left: 208px;
+}
     
 
 }
 @media ( max-width :1175px)and (min-width:991px) {
   .reg-prof-img, .reg-prof-img-detail {
-    width: 260px;
-    height: 200px;
+    width: 400px;
+    height: 240px;
     margin-top: 20px;
 }
-.reg-right-center-profile {
-	    width: 445px;
-	}
-	
 }
 
 
@@ -162,17 +150,14 @@
    .reg-right-center{
       width: 599px;
     }
-    .reg-right-center-profile{
-      width: 599px;
-    }
     .reg-right-description{
       font-size: 29px;
     }
     .reg-right-description-profile{
-      font-size: 29px;
+      font-size: 35px;
     }
     .reg-right-description-linkedin{
-      font-size: 35px;
+      font-size: 45px;
     }
      .reg-right-description-pay{
       font-size: 22px;
@@ -181,37 +166,30 @@
       font-size: 24px;
     }
     .reg-1-pg {
-    /* width: 376px; */
         width: 563px; 
     margin-left: -21px;
    }
     
   .reg-company-deatil-ul{
-    margin-left:40px;
+    margin-left:145px;
     }
     .reg-side-linkedin-img{
-      width: 340px;
-      height: 116px;
+      width: 450px;
+      height: 175px;
     }
-    .reg-prof-img{
-      width: 570px;
-      height: 340px;
+    .reg-prof-img,.reg-prof-img-detail{
+      width: 900px;
+      height: 400px;
     } 
-    .reg-right-center-profile{
-    left: 51%;
-    } 
-    .reg-right-center{
-     left:51%;
+    .reg-right-center-linkedin{
+      width:700px;
+    }
+    .reg-right-center-profile {
+      width:900px;
     }
  }
-@media(min-width:993px)and (max-width:1650px){
-	 .reg-right-center {
-		left: 57%;
-	}
-	
-   
-}
-}
+
+
 @media(max-width:900px){
 	.reg-right-description-payment {
       width: 80%;
@@ -222,6 +200,7 @@
 	.reg-li>ul>li{
 	 padding:2px;
 	}
+	
 	
 	
 }

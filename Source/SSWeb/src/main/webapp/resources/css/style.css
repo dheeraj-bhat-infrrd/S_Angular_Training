@@ -360,8 +360,7 @@
     background-color: #fff;
     color: #434245;
     width: 50%;
-    min-width: 486px;
-    max-width: 624px;
+    width: 486px;
     float: left;
     z-index: 1;
     overflow-y: auto;
@@ -530,7 +529,7 @@
 }
 .reg-right-description{
 	color:#fff;
-	font-size: 19px;
+	font-size: 22px;
     opacity: 0.6;
     font-family: 'OpenSans';
     margin: auto;
@@ -538,7 +537,7 @@
 }
 .reg-right-description-profile{
 	color:#fff;
-	font-size: 22px;
+	font-size: 24px;
     opacity: 0.6;
     font-family: 'OpenSans';
     margin: auto;
@@ -546,7 +545,7 @@
 }
 .reg-right-description-linkedin{
 	color:#fff;
-	font-size: 25px;
+	font-size: 35px;
     opacity: 0.6;
     font-family: 'OpenSans';
     margin: auto;
@@ -572,8 +571,8 @@
 
 .reg-side-linkedin-img{
 	background:url(../images/sidebar-import-profile.png)center no-repeat;
-	width: 270px;
-    height: 100px;
+	width: 400px;
+    height: 200px;
     margin: 25px auto;
     background-size: contain;
 }
@@ -598,29 +597,23 @@
 }
 .reg-prof-img{
 	background:url(../images/sidebar-public-profile.png)center no-repeat;
-	width: 500px;
-    height: 302px;
+	width: 700px;
+    height: 370px;
     margin: auto;
-    margin-top: 35px;
+    margin-top: 45px;
     background-size: contain;
 }
 .reg-prof-img-detail{
 	background:url(../images/sidebar-professional-details.png)center no-repeat;
-	width: 500px;
-    height: 302px;
+	width: 700px;
+    height: 370px;
     margin: auto;
-    margin-top: 35px;
+    margin-top: 45px;
     background-size: contain;
 }
 .prof-line{
 	text-align:center;
     
-}
-.prof-line-2{
-	width:305px;
-}
-.prof-line-3{
-	width:400px;
 }
 .reg-back{
 	color:#dcdcdc;
@@ -631,23 +624,20 @@
     height: 33px;
     margin-top: 20px;
 }
-.reg-right-center{
+.reg-right-center,.reg-right-center-linkedin,.reg-right-center-profile{
 	position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: 58%;
     right: 0;
-    width:400px;
-   
+}
+.reg-right-center{
+	width:450px;
+}
+.reg-right-center-linkedin{
+    width:500px;
 }
 .reg-right-center-profile{
-	position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 55%;
-    right: 0;
-    width:500px;
-   
+	width:700px;
 }
 
 .reg-payment-container{
@@ -950,11 +940,11 @@ font-size: 40px;
 
 .reg-1-pg {
     margin-top: 15px;
-    width: 362px;
-    margin-left: 2px;
+    width: 413px;
+    margin-left: -8px;
 }
 .reg-company-deatil-ul{
-    margin-left:43px;
+    margin-left:130px;
 }
 .reg-bold{
 	font-weight:600 !important;

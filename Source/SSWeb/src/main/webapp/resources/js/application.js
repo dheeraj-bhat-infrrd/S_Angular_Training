@@ -6455,27 +6455,7 @@ var usPhoneRegEx = {
 		}
 	}
 };
-function maskPhoneNumber(phoneId, iso2) {
-	if (iso2 == 'us') {
-		$('#phone-number-work').mask(phoneFormatWithExtension, usPhoneRegEx);
-	} else {
-		$('#phone-number-work').unmask(phoneFormat);
-		$('#phone-number-work').keypress(function(e) {
-			var count = $('#phone-number-work').val().length;
-			if (count > 24) {
-				return false;
-			} else {
-				var regex = new RegExp("^[0-9-.() ]+$");
-				var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-				if (regex.test(str)) {
-					return true;
-				}
-				e.preventDefault();
-				return false;
-			}
-		});
-	}
-}
+
 var countryPhone = /^[0-9-.()x ]+$/;
 
 // Phone numbers in contact details

@@ -1,5 +1,5 @@
 app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', '$window', function($cookies, $scope, $location, $rootScope, UserProfileService, CompanyProfileService, $window) {
-
+	leftposition();
 	// this will set the expiration to 1 day
 	var now = new Date(), exp = new Date();
 	exp.setDate(exp.getDate() + 1);
@@ -95,28 +95,6 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 		return errorMessage;
 	}
 
-	$scope.maskPhoneNumber = function(phoneId, iso2) {
-		if (iso2 == 'us') {
-			$('#' + phoneId).mask(phoneFormatWithExtension, usPhoneRegEx);
-		} else {
-			$('#' + phoneId).unmask(phoneFormat);
-			$('#' + phoneId).keypress(function(e) {
-				var count = $('#' + phoneId).val().length;
-				if (count > 24) {
-					return false;
-				} else {
-					var regex = new RegExp("^[0-9-.() ]+$");
-					var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-					if (regex.test(str)) {
-						return true;
-					}
-					e.preventDefault();
-					return false;
-				}
-			});
-		}
-	}
-
 	$scope.setPhone = function(phoneId, phone) {
 		if (phone != null) {
 			$('#' + phoneId).intlTelInput("setCountry", phone.countryAbbr);
@@ -135,6 +113,7 @@ app.controller('newSignupController', [ '$cookies', '$scope', '$location', '$roo
 } ]);
 
 app.controller('accountSignupController', [ '$cookies', '$scope', '$location', 'vcRecaptchaService', 'LoginService', '$rootScope', function($cookies, $scope, $location, vcRecaptchaService, LoginService, $rootScope) {
+	leftposition();
 	$scope.activate = 0;
 	$scope.accountRegistration = {};
 	$scope.response = null;
@@ -150,7 +129,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 
 	$('#reg-phone').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$("#reg-phone").on("countrychange", function(e, countryData) {
-		$scope.maskPhoneNumber("reg-phone", countryData.iso2);
+		maskPhoneNumber("reg-phone", countryData.iso2);
 	});
 
 	$scope.submitLogin = function() {
@@ -193,6 +172,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 } ]);
 
 app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'LinkedinService', 'UserProfileService', '$window', function($scope, $location, $rootScope, LinkedinService, UserProfileService, $window) {
+	leftposition();
 	$window.ScopeToShare = $scope;
 	if ($rootScope.redirect) {
 		if (linkedinResponse != null) {
@@ -215,6 +195,7 @@ app.controller('linkedInController', [ '$scope', '$location', '$rootScope', 'Lin
 } ]);
 
 app.controller('signupcompleteController', [ '$cookies', '$scope', '$rootScope', function($cookies, $scope, $rootScope) {
+	leftposition();
 	$scope.clearCookie();
 	$cookies.remove("planId");
 
@@ -226,26 +207,33 @@ app.controller('signupcompleteController', [ '$cookies', '$scope', '$rootScope',
 } ]);
 
 app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfileService', '$rootScope', function($scope, $http, $location, UserProfileService, $rootScope) {
-
+	leftposition();
 	$('#reg-phone1').intlTelInput({
 		utilsScript : "../resources/js/utils.js"
+	}).done(function() {
+		if (angular.isDefined($rootScope.userProfile)) {
+			$scope.setPhone("reg-phone1", $rootScope.userProfile.phone1);
+		}
 	});
 	$('#reg-phone1').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$("#reg-phone1").on("countrychange", function(e, countryData) {
-		$scope.maskPhoneNumber("reg-phone1", countryData.iso2);
+		maskPhoneNumber("reg-phone1", countryData.iso2);
 	});
 	$('#reg-phone2').intlTelInput({
 		utilsScript : "../resources/js/utils.js"
+	}).done(function() {
+		if (angular.isDefined($rootScope.userProfile)) {
+			$scope.setPhone("reg-phone2", $rootScope.userProfile.phone2);
+		}
 	});
 	$('#reg-phone2').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$("#reg-phone2").on("countrychange", function(e, countryData) {
-		$scope.maskPhoneNumber("reg-phone2", countryData.iso2);
+		maskPhoneNumber("reg-phone2", countryData.iso2);
 	});
 	$scope.isValidWebAddress = true;
 
 	$scope.validatePhone1 = function() {
 		return angular.isDefined($rootScope.userProfile) && angular.isDefined($rootScope.userProfile.phone1) && $rootScope.userProfile.phone1 != null && $rootScope.userProfile.phone1.formattedPhoneNumber != null && $rootScope.userProfile.phone1.formattedPhoneNumber != "";
-
 	}
 
 	$scope.isValidPhone1 = $scope.validatePhone1();
@@ -357,16 +345,20 @@ app.controller('profileController', [ '$scope', '$http', '$location', 'UserProfi
 } ]);
 
 app.controller('companyController', [ '$scope', '$location', 'CompanyProfileService', '$rootScope', function($scope, $location, CompanyProfileService, $rootScope) {
-
+	leftposition();
 	$scope.usa = true;
 	$scope.canada = false;
 	$scope.others = false;
 	$('#reg-phone-office').intlTelInput({
 		utilsScript : "../resources/js/utils.js"
+	}).done(function() {
+		if (angular.isDefined($rootScope.companyProfile)) {
+			$scope.setPhone("reg-phone-office", $rootScope.companyProfile.officePhone);
+		}
 	});
 	$('#reg-phone-office').mask(phoneFormatWithExtension, usPhoneRegEx);
 	$('#reg-phone-office').on("countrychange", function(e, countryData) {
-		$scope.maskPhoneNumber("reg-phone-office", countryData.iso2);
+		maskPhoneNumber("reg-phone-office", countryData.iso2);
 	});
 	$("#country").countrySelect();
 
@@ -570,6 +562,7 @@ app.controller('companyController', [ '$scope', '$location', 'CompanyProfileServ
 } ]);
 
 app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '$rootScope', '$filter', 'PasswordService', function($scope, PaymentService, $location, $rootScope, $filter, PasswordService) {
+	leftposition();
 	$scope.individual = true;
 	$scope.business = false;
 	$scope.enterprise = false;
@@ -806,17 +799,17 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 		PaymentService.makePayment($rootScope.companyId, $scope.selectedPlan.planId, dataToSend).then(function(response) {
 			hideOverlay();
 			PasswordService.isPasswordAlreadySet($rootScope.userId).then(function(response) {
-				$rootScope.completeHeader="Sign-up Complete";
-				$rootScope.welcomeButton="Get Started";
-				$rootScope.download=true;
+				$rootScope.completeHeader = "Sign-up Complete";
+				$rootScope.welcomeButton = "Get Started";
+				$rootScope.download = true;
 				$rootScope.signUpCompleteMessage = "Congratulations for starting your FREE trial. We want you to get the most value from this tool. There are still a few tasks to complete before sending survey requests to customers.";
 				$rootScope.setPasswordMessage = "Be sure to check your email. We have sent a verification link to you that will need to be clicked to set your account password.";
 				if ($scope.selectedPlan.planId == 3) {
 					$rootScope.signUpCompleteMessage = "Thankyou for your interest in an Enterprise account. A member of our team will contact you within 1 business day.";
-					$rootScope.completeHeader="Request Sent";
-					$rootScope.welcomeButton="Close";
-					$rootScope.signUpCompleteMessageContact="You may also contact us at 1-888-701-4512 or getstarted@socialsurvey.com";
-					$rootScope.download=false;
+					$rootScope.completeHeader = "Request Sent";
+					$rootScope.welcomeButton = "Close";
+					$rootScope.signUpCompleteMessageContact = "You may also contact us at 1-888-701-4512 or getstarted@socialsurvey.com";
+					$rootScope.download = false;
 				}
 				if (response.data) {
 					$rootScope.setPasswordMessage = "";
@@ -863,6 +856,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 } ]);
 
 app.controller('passwordController', [ '$scope', '$location', '$rootScope', 'PasswordService', function($scope, $location, $rootScope, PasswordService) {
+	leftposition();
 	$scope.firstName = $rootScope.firstName;
 	$scope.lastName = $rootScope.lastName;
 
@@ -887,7 +881,7 @@ function showPopUp(header, message) {
 		$('#overlay-continue').unbind('click');
 	});
 	$('#overlay-main').show();
-}
+};
 
 function formattedDate(date) {
 	var d = new Date(date || Date.now()), month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear();
@@ -896,4 +890,27 @@ function formattedDate(date) {
 	if (day.length < 2)
 		day = '0' + day;
 	return [ month, day, year ].join('/');
-}
+};
+function leftposition() {
+	var rightcontainer = $('.reg-right-container').width();
+	var leftcontainer = $('.reg-left-container').width();
+	var rightcentermain = $('.reg-right-center').width();
+	var rightcenterlinkedin = $('.reg-right-center-linkedin').width();
+	var rightcenterprofile = $('.reg-right-center-profile').width();
+	var rightcenter;
+	var centerelement;
+	if (rightcentermain != null) {
+		rightcenter = rightcentermain;
+		centerelement = '.reg-right-center';
+	} else if (rightcenterlinkedin != null) {
+		rightcenter = rightcenterlinkedin;
+		centerelement = '.reg-right-center-linkedin';
+	} else if (rightcenterprofile != null) {
+		rightcenter = rightcenterprofile;
+		centerelement = '.reg-right-center-profile';
+	}
+	var left = ((rightcontainer - (leftcontainer + rightcenter)) / 2) + leftcontainer;
+
+	$(centerelement).css('left', left + 'px');
+};
+
