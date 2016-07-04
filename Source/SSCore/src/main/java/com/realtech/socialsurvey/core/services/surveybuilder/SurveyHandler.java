@@ -51,21 +51,21 @@ public interface SurveyHandler
      * @param stage
      * @throws Exception
      */
-    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType,
-        String answer, int stage );
+    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer,
+        int stage );
 
 
     /*
      * Method to update customer review and final score on the basis of rating questions in
      * SURVEY_DETAILS.
      */
-    public void updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review,
-        boolean isAbusive, String agreedToShare );
+    public void updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
+        String agreedToShare );
 
 
     public SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String url, String source , long surveyPreIntitiationId , boolean isOldRecord , boolean retakeSurvey) throws SolrException,
-        NoRecordsFetchedException, InvalidInputException;
+        int reminderCount, String custRelationWithAgent, String url, String source, long surveyPreIntitiationId,
+        boolean isOldRecord, boolean retakeSurvey ) throws SolrException, NoRecordsFetchedException, InvalidInputException;
 
 
     public SurveyDetails getSurveyDetails( long agentId, String customerEmail, String firstName, String lastName );
@@ -101,10 +101,12 @@ public interface SurveyHandler
     public String getMoodsToSendMail();
 
 
-    public void increaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException, InvalidInputException;
+    public void increaseSurveyCountForAgent( long agentId )
+        throws SolrException, NoRecordsFetchedException, InvalidInputException;
 
 
-    public void decreaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException, InvalidInputException;
+    public void decreaseSurveyCountForAgent( long agentId )
+        throws SolrException, NoRecordsFetchedException, InvalidInputException;
 
 
     public String getGoogleShareUri();
@@ -122,8 +124,8 @@ public interface SurveyHandler
 
 
     public void sendSurveyRestartMail( String custFirstName, String custLastName, String custEmail,
-        String custRelationWithAgent, User user, String link ) throws InvalidInputException, UndeliveredEmailException,
-        ProfileNotFoundException;
+        String custRelationWithAgent, User user, String link )
+        throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
 
     public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName,
@@ -136,9 +138,9 @@ public interface SurveyHandler
     public void deleteSurveyPreInitiationDetailsPermanently( SurveyPreInitiation surveyPreInitiation );
 
 
-    public String composeLink( long userId, String custEmail, String custFirstName, String custaLastName , long surveyPreInitiationId , boolean retakeSurvey   )
-        throws InvalidInputException;
-    
+    public String composeLink( long userId, String custEmail, String custFirstName, String custaLastName,
+        long surveyPreInitiationId, boolean retakeSurvey ) throws InvalidInputException;
+
 
     public void markSurveyAsStarted( SurveyPreInitiation surveyPreInitiation );
 
@@ -189,15 +191,15 @@ public interface SurveyHandler
      * @throws ProfileNotFoundException 
      */
     public void initiateSurveyRequest( long agentId, String recipientEmailId, String recipientFirstname,
-        String recipientLastname, String source ) throws DuplicateSurveyRequestException, InvalidInputException,
-        SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException,
-        ProfileNotFoundException;
+        String recipientLastname, String source )
+        throws DuplicateSurveyRequestException, InvalidInputException, SelfSurveyInitiationException, SolrException,
+        NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException;
 
-//    Commented as Zillow surveys are not stored in database, SS-1276
-//    void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
+    //    Commented as Zillow surveys are not stored in database, SS-1276
+    //    void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
-//  Commented as Zillow surveys are not stored in database, SS-1276
-//    void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
+    //  Commented as Zillow surveys are not stored in database, SS-1276
+    //    void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows );
@@ -243,6 +245,7 @@ public interface SurveyHandler
      */
     public List<BulkSurveyDetail> processBulkSurvey( List<BulkSurveyDetail> bulkSurveyDetailList, long companyId );
 
+
     void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException;
 
 
@@ -256,6 +259,7 @@ public interface SurveyHandler
 
 
     public void updateModifiedOnColumnForEntity( String collectionName, long entityId );
+
 
     /**
      * Returns array of swear words. Its used only for testing. Not for development
@@ -273,7 +277,8 @@ public interface SurveyHandler
     public double getFormattedSurveyScore( double surveyScore );
 
 
-    public void moveSurveysToAnotherUser( long fromUserId, long toUserId ) throws InvalidInputException, NoRecordsFetchedException, SolrException;
+    public void moveSurveysToAnotherUser( long fromUserId, long toUserId )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 
     public void deleteExistingZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
@@ -287,6 +292,7 @@ public interface SurveyHandler
      */
     public void importSurveyVOToDBs( SurveyImportVO surveyImportVO ) throws NonFatalException;
 
+
     public void updateZillowSummaryInExistingSurveyDetails( SurveyDetails surveyDetails );
 
 
@@ -295,4 +301,7 @@ public interface SurveyHandler
 
 
     void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
+
+
+    public boolean hasCustomerAlreadySurveyed( long currentAgentId, String customerEmailId );
 }
