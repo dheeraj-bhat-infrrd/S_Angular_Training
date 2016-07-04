@@ -205,6 +205,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         List<UserUploadVO> userList = upload.getUsers();
         if ( userList == null || userList.isEmpty() ) {
             LOG.warn( "Empty userList" );
+	        deletedUsersStatus = updateUploadStatusToDone( deletedUsersStatus, CommonConstants.UPLOAD_DELETED_USERS, deletedUsers );
             return;
         }
         List<UserUploadVO> deletedUsersList = new ArrayList<UserUploadVO>();
@@ -254,6 +255,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         List<BranchUploadVO> branches = upload.getBranches();
         if ( branches == null || branches.isEmpty() ) {
             LOG.warn( "Empty branch list" );
+            deletedBranchesStatus = updateUploadStatusToDone( deletedBranchesStatus, CommonConstants.UPLOAD_DELETED_BRANCHES,
+                deletedBranches );
             return;
         }
         List<BranchUploadVO> deletedBranchesList = new ArrayList<BranchUploadVO>();
@@ -320,6 +323,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         List<RegionUploadVO> regions = upload.getRegions();
         if ( regions == null || regions.isEmpty() ) {
             LOG.warn( "Empty region list" );
+	        deletedRegionsStatus = updateUploadStatusToDone( deletedRegionsStatus, CommonConstants.UPLOAD_DELETED_REGIONS,
+		        deletedRegions );
             return;
         }
         List<RegionUploadVO> deletedRegionsList = new ArrayList<RegionUploadVO>();
