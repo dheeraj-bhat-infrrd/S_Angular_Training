@@ -9289,21 +9289,30 @@ $(document).on('click', '#wc-send-survey', function() {
 
 	// check if there is no duplicate entries
 	var receiversListLength = receiversList.length;
-
+    var surveyIndex=[];
+    var duplicate=false;
 	for (var i = 0; i < receiversListLength; i++) {
 		for (var j = i + 1; j < receiversListLength; j++) {
 			if (receiversList[i].value.emailId == receiversList[j].value.emailId && receiversList[i].value.agentEmailId == receiversList[j].value.agentEmailId) {
-				/*$('#overlay-toast').html("Can't enter same email address multiple times for same user");
-				showToast();*/
-				console.log("#"+receiversList[i].key);
-				$("#"+receiversList[i].key).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
-				$("#"+receiversList[i].key).find(".survey-email").find(':nth-child(2)').html("Duplicate not allowed").removeClass("hidden");
-				$("#"+receiversList[j].key).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
-				$("#"+receiversList[j].key).find(".survey-email").find(':nth-child(2)').html("Duplicate not allowed").removeClass("hidden");
-				allowrequest = false;
-				return false;
+				surveyIndex.push(i);
+				surveyIndex.push(j);
 			}
 		}
+	}console.log(surveyIndex);
+	if(surveyIndex.length!=0){
+		duplicate=true;
+		for(var k=0;k<surveyIndex.length;k++){
+		$("#"+receiversList[surveyIndex[k]].key).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
+		$("#"+receiversList[surveyIndex[k]].key).find(".survey-email").find(':nth-child(2)').html("Duplicate not allowed").removeClass("hidden");
+		/*$("#"+receiversList[surveyIndex[k]].key).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
+		$("#"+receiversList[surveyIndex[k]].key).find(".survey-email").find(':nth-child(2)').html("Duplicate not allowed").removeClass("hidden");*/
+		
+		}
+		
+	}
+	if(duplicate){
+		allowrequest = false;
+		return false;
 	}
 	
 	var rec = [];
