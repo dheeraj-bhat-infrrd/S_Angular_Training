@@ -9177,23 +9177,46 @@ $(document).on('click', '#wc-send-survey', function() {
 	for (key in receiversList) {
 		rec.push(receiversList[key].value);
 	}
-	receiversList = JSON.stringify(rec);
+	var receiverList = JSON.stringify(rec);
 	var payload = {
-		"receiversList" : receiversList,
+		"receiversList" : receiverList,
 		"source" : 'agent'
 	};
 	if (columnName != undefined) {
 		payload = {
-			"receiversList" : receiversList,
+			"receiversList" : receiverList,
 			"source" : 'admin',
 			"columnName" : columnName,
 		};
 	}
+	var surveyed=[];
+	var alreadysureyed=false;
 	if (allowrequest) {
 		callAjaxPostWithPayloadData("./getalreadysurveyedemailids.do", function(data) {
 			var alreadySurveyedEmails = $.parseJSON(data);
+			//To check if the email had already surveyed
 			if (alreadySurveyedEmails.length != 0) {
-				console.log(alreadySurveyedEmails);
+				for (var i = 0; i < receiversListLength; i++) {
+					for (var j = 0; j < alreadySurveyedEmails.length; j++) {
+						if (receiversList[i].value.emailId == alreadySurveyedEmails[j]) {
+							alreadysureyed=true;
+							surveyed.push(i);
+						}
+					}
+				}
+				
+				if (surveyed.length != 0) {
+					for (var k = 0; k < surveyed.length; k++) {
+						$("#" + receiversList[surveyed[k]].key).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
+						$("#" + receiversList[surveyed[k]].key).find(".survey-email").find(':nth-child(2)').html("Already surveyed").removeClass("hidden");
+					}
+
+				}
+				if(alreadysureyed){
+					allowrequest = false;
+					return false;
+				}
+				
 			} else {
 				$('#send-survey-dash').removeClass("hide");
 				callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
@@ -9206,9 +9229,9 @@ $(document).on('click', '#wc-send-survey', function() {
 					} else if (data.indexOf("Success") > -1) {
 						var response = $.parseJSON(data);
 						if (response.surveySentCount == 1)
-							showInfo(response.surveySentCount + ' survey request sent successfully!');
+							showInfo(response.surveySentCount + ' Survey Request Sent Successfully!');
 						else
-							showInfo(response.surveySentCount + ' survey requests sent successfully!');
+							showInfo(response.surveySentCount + ' Survey Requests Sent Successfully!');
 					} else {
 						$('#overlay-toast').html(data);
 					}
