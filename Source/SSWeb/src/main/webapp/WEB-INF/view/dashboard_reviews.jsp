@@ -37,69 +37,11 @@
 		<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
 			data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
 			data-review="${fn:escapeXml(feedback.review)}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide">
-			
-			<%-- <div class="ppl-header-wrapper clearfix">
-				<div class="float-left ppl-header-left">
-					<div class="ppl-head-1">
-						<c:choose>
-							<c:when test="${fn:toLowerCase(feedback.customerLastName) eq 'null'}">
-								${feedback.customerFirstName}
-							</c:when>
-							<c:otherwise>
-								${feedback.customerFirstName} ${feedback.customerLastName}
-							</c:otherwise>
-						</c:choose>
-					</div>
-					<div class="ppl-head-2" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
-						value="${feedback.modifiedOn}" />">
-					</div>
-				</div>
-				<div class="float-right ppl-header-right">
-					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">
-					</div>
-					<c:if test="${feedback.source != 'Zillow'}">
-						<div class="report-resend-icn-container clearfix float-right">
-							<!-- <div class="report-abuse-txt report-txt">Report</div> -->
-							
-							<div class="restart-survey-mail-txt report-txt">Retake</div>
-						</div>
-					</c:if>
-				</div>
-			</div> --%>
 			<div class="ppl-header-wrapper clearfix">
 			<div class="float-left ppl-header-right">
 					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">
 					</div>
-					<%-- <c:if test="${feedback.source != 'Zillow'}">
-						<div class="report-resend-icn-container clearfix float-right">	
-							<div class="restart-survey-mail-txt report-txt">Retake</div>
-						</div>
-					</c:if>  --%>
 				</div>
-				<%-- <div class="float-left ppl-header-left dsh-resp-review hide">
-					<div class="ppl-head-1 ">
-					<span class="float-left"> &#8212; Reviewed by </span>
-						<c:choose>
-							<c:when test="${fn:toLowerCase(feedback.customerLastName) eq 'null'}">
-								<span class="float-left" style="margin-left:5px;font-weight:600 !important;"> ${feedback.customerFirstName} </span >
-							</c:when>
-							<c:otherwise>
-								<span class="float-left" style="margin-left:5px;font-weight:600 !important;"> ${feedback.customerFirstName} ${feedback.customerLastName}</span>
-							</c:otherwise>
-						</c:choose>
-						<c:if test="${profilemasterid !=4}">
-					<span class="float-left " style="margin-left:5px;">for<a style="color:#236CAF;font-weight: 600 !important;" href="${feedback.completeProfileUrl}" target="_blank"> ${feedback.agentName}</a></span>
-					</c:if>
-					<span class="float-left" style="margin: 0 5px;">&#8212;</span>
-					<div class="ppl-head-2 review-detail-profile float-left" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
-						value="${feedback.modifiedOn}" />"> 
-					</div>
-					</div>
-					
-				</div> --%>
-
-
-
 				<c:choose>
 					<c:when test="${feedback.source =='encompass'}">
 						<div class='verified-badge  verify-image float-right'
@@ -116,13 +58,9 @@
 						<div class='unverified-badge  verify-image-ss float-right'></div>
 					</c:otherwise>
 				</c:choose>
-
-
 				<div class=" ppl-header-left review-sm-screen ">
-
-
-
-
+ <!-- stash  -->
+				<c:set value="${fn:escapeXml(feedback.review)}" var="review"></c:set>
 					<c:choose>
 						<c:when test="${ not empty feedback.surveyCompletedDate}">
 							<div class="ppl-head-2 review-detail-profile float-left"
@@ -154,9 +92,6 @@
 								${feedback.customerFirstName} ${feedback.customerLastName}</span>
 						</c:otherwise>
 					</c:choose>
-					
-					
-					
 					<c:if test="${profilemasterid !=4}">
 					<c:if test="${not empty feedback.agentName }">
 						<span class="float-left " style="margin-left: 5px;">for<a
@@ -195,16 +130,9 @@
 						</c:choose>
 							</c:otherwise>
 						</c:choose>
-						
 				</div>
-				
-				
 			</div>
 			</div>
-
-
-			
-			<%-- <div class="ppl-content">${feedback.review}</div> --%>
 			<c:choose>
 				<c:when test="${fn:length(feedback.review)>250}">
 					<div class="ppl-content review-height">
@@ -222,8 +150,6 @@
 			</c:choose>
 			
 			<div class="ppl-share-wrapper clearfix share-plus-height" >
-				<%-- <div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key" /></div> --%>
-				<!-- <div class="float-left icn-share icn-plus-open" style="display: block;"></div> -->
 				<div class="float-left clearfix ppl-share-social hide" style="display: block;">
 				
 					<span id ="fb_${loop.index}"class="float-left ppl-share-icns icn-fb-rev" title="Facebook" onclick ="getDashboardImageandCaption(${loop.index})" data-link="https://www.facebook.com/dialog/feed?${feedback.faceBookShareUrl}&link=${fn:replace(feedback.completeProfileUrl, 'localhost', '127.0.0.1')}&description=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)} .&redirect_uri=https://www.facebook.com"></span>
@@ -248,24 +174,6 @@
                        </span>
                        
 				</div>
-				<!-- <div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div> -->
-				<%-- <div class="float-right dash-flag-retake">
-					<div class="clearfix">
-						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
-							title="Report"></div>
-						<c:if test="${feedback.source != 'Zillow'}">
-							<!-- <span class="report-resend-icn-container clearfix float-right"> -->
-								<div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div>
-							
-						</c:if>
-						<c:if test="${feedback.source == 'Zillow'}">
-							<!-- <span class="report-resend-icn-container clearfix float-right"> -->
-								<div style="margin-top: 7px;height: 28px;width: 19px;"></div>
-							
-						</c:if>
-					</div>
-				</div> --%>
-				
 				<c:if test="${feedback.source != 'Zillow'}">
 				<div class="float-right dash-flag-retake">
 					<div class="clearfix">
@@ -280,7 +188,6 @@
 					<div class="clearfix">
 						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
 							title="Report"></div>
-								<!-- <div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div> -->
 					</div>
 				</div>
 				</c:if>

@@ -2,6 +2,7 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <c:if test="${not empty profile}">
 	<c:if
 		test="${not empty profile.contact_details && not empty profile.contact_details.name }">
@@ -629,7 +630,7 @@
                 </c:if>
                 <c:if test="${not empty reviews}">
                 <div class="people-say-wrapper rt-content-main" id="reviews-container">
-                	<div class="clearfix">
+                	<div class="clearfix" style="display: block;border-bottom: 1px solid #dcdcdc;padding: 15px 0;">
 	                    <div class="main-con-header float-left" id="prof-reviews-header">
 	                    	<span class="ppl-say-txt-st">What people say</span> about ${profName }
 	                    </div>
@@ -653,7 +654,7 @@
 									<%-- <div itemprop="itemReviewed" itemscope itemtype="http://schema.org/ProfilePage">
 										<meta itemprop="name" content="${reviewItem.agentName}">
 									</div> --%>
-									<div class="ppl-header-wrapper clearfix">
+									<%-- <div class="ppl-header-wrapper clearfix">
 										<div class="float-left ppl-header-left">
 											<div itemprop="author" itemscope itemtype="http://schema.org/Person" class="ppl-head-1"><span itemprop="name">${reviewItem.customerFirstName } ${reviewItem.customerLastName }</span></div>
 											<div class="ppl-head-2"><fmt:formatDate value="${reviewItem.modifiedOn}" pattern="d MMM yyyy"/></div>
@@ -664,9 +665,117 @@
 												<div itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating" class="rating-rounded float-left"><span itemprop="ratingValue"><fmt:formatNumber maxFractionDigits="2" minFractionDigits="2" value="${reviewItem.score}"/></span></div>
 											</div>
 										</div>
-									</div>
+									</div> --%>
+									<div class="ppl-header-wrapper clearfix">
+			<div class="float-left ppl-header-right">
+					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
+						<c:set var="star" value="Integer.parseInt(${reviewItem.score}*4)"></c:set>
+						<%int no = Integer.parseInt(request.getParameter("numberMax"));%>
+						<c:choose>
+						<c:when test="${reviewItem.source =='Zillow'}">
+						<div class="rating-image cursor-pointer  float-left star-rating-green-4.50" title="4.7/5.0"></div>
+					</c:when>
+					<c:otherwise>
+						<div class="rating-image  cursor-pointer float-left star-rating-1.25" title="1.3/5.0"></div>
+					</c:otherwise>
+					</c:choose>
+					
+					<div class="rating-rounded float-left" style="font-size:15px;line-height:22px;">4.7</div>
+					</div>
+				</div>
+				<c:choose>
+					<c:when test="${reviewItem.source =='encompass'}">
+						<div class='verified-badge  verify-image float-right'
+							title='Click here to know more'></div>
+					</c:when>
+					<c:when test="${reviewItem.source =='DOTLOOP'}">
+						<div class='verified-badge  verify-image float-right'
+							title='Click here to know more'></div>
+					</c:when>
+					<c:when test="${reviewItem.source =='Zillow'}">
+						<div class='zillow-badge  verify-image-zillow float-right'></div>
+					</c:when>
+					<c:otherwise>
+						<div class='unverified-badge  verify-image-ss float-right'></div>
+					</c:otherwise>
+				</c:choose>
+				<div class=" ppl-header-left review-sm-screen ">
+				<c:set value="${fn:escapeXml(reviewItem.review)}" var="review"></c:set>
+					<c:choose>
+						<c:when test="${ not empty reviewItem.surveyCompletedDate}">
+							<div class="ppl-head-2 review-detail-profile float-left"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${reviewItem.surveyCompletedDate}" />">
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="ppl-head-2 review-detail-profile float-left"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${reviewItem.modifiedOn}" />">
+							</div>
+						</c:otherwise>
+					</c:choose>
+					<div class="ppl-head-1 " style="clear:both">
+					<span class="float-left"> Reviewed by </span>
+					<c:choose>
+						<c:when test="${fn:toLowerCase(reviewItem.customerLastName) eq 'null'}">
+							<span class="float-left"
+								style="margin-left: 5px; font-weight: 600 !important;">
+								${reviewItem.customerFirstName} </span>
+						</c:when>
+						<c:otherwise>
+							<span class="float-left"
+								style="margin-left: 5px; font-weight: 600 !important;">
+								${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
+						</c:otherwise>
+					</c:choose>
+					<c:if test="${profilemasterid !=4}">
+					<c:if test="${not empty reviewItem.agentName }">
+						<span class="float-left " style="margin-left: 5px;">for<a
+							style="color: #236CAF; font-weight: 600 !important;"
+							href="${reviewItem.completeProfileUrl}" target="_blank">
+								${reviewItem.agentName}</a></span>
+					</c:if>
+					</c:if>
+
+						<c:choose>
+							<c:when test="${ not empty reviewItem.summary }">
+								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.summary}</div>
+							</c:when>
+							<c:otherwise>
+							<c:choose>
+							<c:when
+								test="${not (empty reviewItem.surveyGeoLocation and empty reviewItem.surveyType)}">
+								<div class="ppl-content " style="clear:both;padding-top:0px !important;">${reviewItem.surveyGeoLocation}
+									<span>${reviewItem.surveyType}</span>
+								</div>
+							</c:when>
+							<c:otherwise>
+							    <c:if test="${reviewItem.source ne 'customer'}">
+                                    <div style="clear:both"><spring:message code="label.completedTransaction.key"/>
+                                           <c:choose>
+                                        <c:when test="${ not empty reviewItem.surveyTransactionDate} ">
+                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${ reviewItem.surveyTransactionDate}" />"></span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${reviewItem.modifiedOn}" />"></span>
+                                        </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </c:if>
+							</c:otherwise>
+						</c:choose>
+							</c:otherwise>
+						</c:choose>
+				</div>
+			</div>
+			</div>
 									<div class="ppl-content" itemprop="reviewBody">${reviewItem.review}</div>
-									<div class="ppl-share-wrapper clearfix">
+									<!-- <div class="ppl-share-wrapper clearfix">
 										<div class="float-left blue-text ppl-share-shr-txt">Share</div>
 										<div class="float-left clearfix ppl-share-social">
 											<div class="float-left ppl-share-icns icn-fb icn-fb-pp"></div>
@@ -675,7 +784,47 @@
 											<div class="float-left ppl-share-icns icn-gplus"></div>
 											<div class="float-left ppl-share-icns icn-yelp"></div>
 										</div>
-									</div>
+									</div> -->
+									<div class="ppl-share-wrapper clearfix share-plus-height" >
+				<div class="float-left clearfix ppl-share-social ">
+					<span id = "fb_${loop.index}"class="float-left ppl-share-icns icn-fb-rev" title="Facebook" onclick = "getImageandCaptionProfile(${loop.index});"
+						data-link="https://www.facebook.com/dialog/feed?${reviewItem.faceBookShareUrl}&link=${fn:replace(reviewItem.completeProfileUrl, 'localhost', '127.0.0.1')}&description=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey -${fn:escapeXml(reviewItem.review)} .&redirect_uri=https://www.facebook.com"></span>
+					
+                            <c:choose>
+                                <c:when test="${fn:length(reviewItem.review) > 109}">
+                                    <c:set var="twitterReview" value="${fn:substring(reviewItem.review,0,105)}..."></c:set>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:set var="twitterReview" value="${reviewItem.review}"></c:set>
+                                </c:otherwise>
+                            </c:choose>
+					        <input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(twitterReview)}"/>
+
+						    <span class="float-left ppl-share-icns icn-twit-rev" id ="twitt_${loop.index}" onclick="twitterProfileFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(twitterReview)}&url=${reviewItem.completeProfileUrl}"></span>
+						 <span
+						class="float-left ppl-share-icns icn-lin-rev" title="LinkedIn"
+						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)} + &source="></span>
+					<span class="float-left" title="Google+">
+						<button
+							class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"
+							data-contenturl="${reviewItem.completeProfileUrl}"
+							data-clientid="${reviewItem.googleApi}"
+							data-cookiepolicy="single_host_origin"
+							data-prefilltext="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)}"
+							data-calltoactionlabel="USE"
+							data-calltoactionurl="${reviewItem.completeProfileUrl}">
+							<span class="icon">&nbsp;</span> <span class="label">share</span>
+						</button>
+					</span>
+				</div>
+				<div class="float-right dash-flag-retake ">
+					<div class="clearfix">
+						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
+							title="Report"></div>
+					</div>
+				</div>
+			</div>
+									
 								</div>
 							</c:forEach>
 					</div>

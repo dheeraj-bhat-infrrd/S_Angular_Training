@@ -398,22 +398,10 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 
 function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	var ratingIntVal = 0;
-/*
-	if (ratingIntVal % 1 == 0) {
-		ratingIntVal = parseInt(rating);
-	} else {
-		ratingIntVal = parseInt(rating) + 1;
-	}
-
-	var roundedFloatingVal = parseFloat(rating).toFixed(2);
-	var ratingImgHtml = "";*/
 	var roundedFloatingVal = parseFloat(rating).toFixed(1);
 	var ratingFloat= parseFloat(roundedFloatingVal).toFixed(2);
-	/*ratingIntVal= (Math.round(rating * 4) / 4).toFixed(2);*/
 	var ratingInt= parseInt(ratingFloat*4);
 	ratingIntVal=(ratingInt/4).toFixed(2);
-	
-	
 	if(source != undefined && source == "Zillow"){
 		ratingImgHtml = "<div class='rating-image cursor-pointer  float-left star-rating-green-"+ ratingIntVal +"' title='"+roundedFloatingVal+"/5.0' ></div>";
 	}else if(source =="encompass" || source == "DOTLOOP"){
