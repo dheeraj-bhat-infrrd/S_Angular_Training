@@ -1,5 +1,21 @@
 package com.realtech.socialsurvey.core.starter;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.stereotype.Component;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -31,23 +47,9 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.stereotype.Component;
+
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -56,6 +58,7 @@ import java.util.Map;
 @Component ( "dotloopreviewprocessor")
 public class DotloopReviewProcessor extends QuartzJobBean
 {
+
 
     private static final Logger LOG = LoggerFactory.getLogger( DotloopReviewProcessor.class );
 
@@ -80,7 +83,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
     private BatchTrackerService batchTrackerService;
 
     private CRMBatchTrackerService crmBatchTrackerService;
-    
+
     private CRMBatchTrackerHistoryService crmBatchTrackerHistoryService;
 
     private EmailServices emailServices;
@@ -93,10 +96,10 @@ public class DotloopReviewProcessor extends QuartzJobBean
     private static final String BUYER_ROLE = "Buyer";
 
     private static final String SOLD_STATUS = "Sold";
-    
+
     private boolean newLoopFound = false;
     private boolean newRecordFound = false;
-    private int newRecordFoundCount=0;
+    private int newRecordFoundCount = 0;
 
 
     @Override
@@ -120,8 +123,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
             LOG.error( "Error in dotloop review processor", e );
             try {
                 //update batch tracker with error message
-                batchTrackerService.updateErrorForBatchTrackerByBatchType(
-                    CommonConstants.BATCH_TYPE_DOT_LOOP_REVIEW_PROCESSOR, e.getMessage() );
+                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_DOT_LOOP_REVIEW_PROCESSOR,
+                    e.getMessage() );
                 //send report bug mail to admin
                 batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_DOT_LOOP_REVIEW_PROCESSOR,
                     System.currentTimeMillis(), e );
@@ -140,7 +143,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
 
         try {
             String entityType = null; // to maintain entry in crm batch tracker
-            CrmBatchTracker crmBatchTracker=null;
+            CrmBatchTracker crmBatchTracker = null;
             //get entity type and id
             if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
                 entityType = CommonConstants.COMPANY_ID_COLUMN;
@@ -173,17 +176,19 @@ public class DotloopReviewProcessor extends QuartzJobBean
                                 updateDotLoopCrmInfo( collectionName, organizationUnitSettings, dotLoopCrmInfo );
                             }
                             //insert crmbatchTrackerHistory with count of Records Fetched
-                            crmBatchTracker=crmBatchTrackerService.getCrmBatchTracker(entityType, entityId, CommonConstants.CRM_SOURCE_DOTLOOP);
-                            if(crmBatchTracker!=null)
-                            crmBatchTrackerHistoryService.insertCrmBatchTrackerHistory(newRecordFoundCount,crmBatchTracker.getCrmBatchTrackerId());
+                            crmBatchTracker = crmBatchTrackerService.getCrmBatchTracker( entityType, entityId,
+                                CommonConstants.CRM_SOURCE_DOTLOOP );
+                            if ( crmBatchTracker != null )
+                                crmBatchTrackerHistoryService.insertCrmBatchTrackerHistory( newRecordFoundCount,
+                                    crmBatchTracker.getCrmBatchTrackerId() );
                             // update  last run end time and count of new records found in crm batch tracker
                             crmBatchTrackerService.updateLastRunEndTimeByEntityTypeAndSourceType( entityType, entityId,
-                                CommonConstants.CRM_SOURCE_DOTLOOP,newRecordFoundCount );
+                                CommonConstants.CRM_SOURCE_DOTLOOP, newRecordFoundCount );
 
                         } catch ( Exception e ) {
                             LOG.error( "Exception caught for collection " + collectionName + "having iden as "
                                 + organizationUnitSettings.getIden(), e );
-                            // update  error message in crm batch tracker 
+                            // update  error message in crm batch tracker
                             crmBatchTrackerService.updateErrorForBatchTrackerByEntityTypeAndSourceType( entityType, entityId,
                                 CommonConstants.CRM_SOURCE_DOTLOOP, e.getMessage() );
                             try {
@@ -286,7 +291,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
         // new records and then add the new record.
         LOG.debug( "Processing loops for profile id: " + profileId + " and byPassRecords flag: " + byPassRecords );
         for ( LoopProfileMapping loop : loops ) {
-            try{
+            try {
                 // Setting profile id for the loop
                 loop.setProfileId( profileId );
                 // if status is not sold, stop the process and send a mail to the admin
@@ -295,7 +300,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                     throw new FatalException( "Found a loop status which is not sold. Details: Loop view id: "
                         + loop.getLoopViewId() + " for profile id: " + profileId + ". Collection: " + collectionName + " ID: "
                         + organizationUnitId );
-                    
+
                 }
                 // check if the record is present in the database then skip the loop. if not, then
                 // process it
@@ -328,11 +333,11 @@ public class DotloopReviewProcessor extends QuartzJobBean
                     LOG.info( "Loop " + loop.getLoopId() + " for profile " + profileId + " is present. Hence skipping." );
                     continue;
                 }
-            }catch(FatalException e){
+            } catch ( FatalException e ) {
                 try {
                     emailServices.sendFatalExceptionEmail( applicationAdminEmail, e.getMessage() );
                 } catch ( InvalidInputException | UndeliveredEmailException e1 ) {
-                    LOG.error( "Error while sending mail to admin " , e );
+                    LOG.error( "Error while sending mail to admin ", e );
                 }
             }
         }
@@ -381,39 +386,40 @@ public class DotloopReviewProcessor extends QuartzJobBean
                     String agentEmailId = null;
                     //If buying agent
                     if ( participant.getRole() != null && participant.getRole().equalsIgnoreCase( BUYING_AGENT_ROLE )
-                        && participant.getMemberOfMyTeam() != null && participant.getMemberOfMyTeam()
-                        .equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+                        && participant.getMemberOfMyTeam() != null
+                        && participant.getMemberOfMyTeam().equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
                         agentEmailId = participant.getEmail();
-                        if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
-                            if ( agentEmailId != null && !agentEmailId.isEmpty() ) {
+                        if ( agentEmailId != null && !agentEmailId.isEmpty() ) {
+                            if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
                                 agentEmailId = utils.maskEmailAddress( agentEmailId );
-                                if ( buyingAgentEmailIdList == null )
-                                    buyingAgentEmailIdList = new ArrayList<>();
-                                buyingAgentEmailIdList.add( agentEmailId );
                             }
+                            if ( buyingAgentEmailIdList == null )
+                                buyingAgentEmailIdList = new ArrayList<>();
+                            buyingAgentEmailIdList.add( agentEmailId );
                         }
                     }
 
                     //If selling agent
-                    if ( participant.getRole() != null && ( participant.getRole().equalsIgnoreCase( SELLING_AGENT_ROLE )
-                        || participant.getRole().equalsIgnoreCase( LISTING_AGENT_ROLE ) )
-                        && participant.getMemberOfMyTeam() != null && participant.getMemberOfMyTeam()
-                        .equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+                    if ( participant.getRole() != null
+                        && ( participant.getRole().equalsIgnoreCase( SELLING_AGENT_ROLE )
+                            || participant.getRole().equalsIgnoreCase( LISTING_AGENT_ROLE ) )
+                        && participant.getMemberOfMyTeam() != null
+                        && participant.getMemberOfMyTeam().equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
                         agentEmailId = participant.getEmail();
-                        if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
-                            if ( agentEmailId != null && !agentEmailId.isEmpty() ) {
+                        if ( agentEmailId != null && !agentEmailId.isEmpty() ) {
+                            if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
                                 agentEmailId = utils.maskEmailAddress( agentEmailId );
-                                if ( sellingAgentEmailIdList == null )
-                                    sellingAgentEmailIdList = new ArrayList<>();
-                                sellingAgentEmailIdList.add( agentEmailId );
                             }
+                            if ( sellingAgentEmailIdList == null )
+                                sellingAgentEmailIdList = new ArrayList<>();
+                            sellingAgentEmailIdList.add( agentEmailId );
                         }
                     }
 
                     //If buyer
                     if ( participant.getRole() != null && participant.getRole().equalsIgnoreCase( BUYER_ROLE )
-                        && participant.getMemberOfMyTeam() != null && participant.getMemberOfMyTeam()
-                        .equalsIgnoreCase( CommonConstants.NO_STRING ) ) {
+                        && participant.getMemberOfMyTeam() != null
+                        && participant.getMemberOfMyTeam().equalsIgnoreCase( CommonConstants.NO_STRING ) ) {
                         if ( participant.getEmail() != null && !participant.getEmail().isEmpty() ) {
                             if ( buyersMap == null ) {
                                 buyersMap = new HashMap<>();
@@ -428,8 +434,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
 
                     //If seller
                     if ( participant.getRole() != null && participant.getRole().equalsIgnoreCase( SELLER_ROLE )
-                        && participant.getMemberOfMyTeam() != null && participant.getMemberOfMyTeam()
-                        .equalsIgnoreCase( CommonConstants.NO_STRING ) ) {
+                        && participant.getMemberOfMyTeam() != null
+                        && participant.getMemberOfMyTeam().equalsIgnoreCase( CommonConstants.NO_STRING ) ) {
                         if ( participant.getEmail() != null && !participant.getEmail().isEmpty() ) {
                             if ( sellersMap == null ) {
                                 sellersMap = new HashMap<>();
@@ -444,11 +450,13 @@ public class DotloopReviewProcessor extends QuartzJobBean
                 }
 
                 //Send surveys from buying agent to buyers
-                if ( buyersMap != null && buyersMap.size() > 0 && buyingAgentEmailIdList != null && !buyingAgentEmailIdList.isEmpty() ) {
+                if ( buyersMap != null && buyersMap.size() > 0 && buyingAgentEmailIdList != null
+                    && !buyingAgentEmailIdList.isEmpty() ) {
                     for ( String buyingAgentEmailId : buyingAgentEmailIdList ) {
                         for ( String buyerEmailId : buyersMap.keySet() ) {
                             SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
-                            surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName, organizationUnitId );
+                            surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName,
+                                organizationUnitId );
                             surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
                             surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                             surveyPreInitiation.setCustomerEmailId( buyerEmailId );
@@ -474,11 +482,11 @@ public class DotloopReviewProcessor extends QuartzJobBean
                 } else {
                     LOG.warn( "Incomplete details from participants call for loop view id" );
                 }
-                
-                
+
+
                 //Send surveys from selling agents to sellers
-                if ( sellersMap != null && sellersMap.size() > 0 && sellingAgentEmailIdList != null && !sellingAgentEmailIdList
-                    .isEmpty() ) {
+                if ( sellersMap != null && sellersMap.size() > 0 && sellingAgentEmailIdList != null
+                    && !sellingAgentEmailIdList.isEmpty() ) {
                     for ( String sellingAgentEmailId : sellingAgentEmailIdList ) {
                         for ( String sellerEmailId : sellersMap.keySet() ) {
                             SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
@@ -582,7 +590,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
 
     /**
      * Fetches records from dot loop
-     * 
+     *
      * @param dotloopCrmInfo
      * @param unitSettings
      */
@@ -590,7 +598,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
         OrganizationUnitSettings unitSettings )
     {
         String apiKeysStr = dotloopCrmInfo.getApi();
-        List<String> apiKeyList = Arrays.asList(apiKeysStr.split("\\s*,\\s*"));
+        List<String> apiKeyList = Arrays.asList( apiKeysStr.split( "\\s*,\\s*" ) );
         for ( String apiKey : apiKeyList ) {
             apiKey = apiKey.trim();
             LOG.debug( "Fetching reviews for api key: " + apiKey + " with id: " + unitSettings.getIden() );
@@ -623,24 +631,25 @@ public class DotloopReviewProcessor extends QuartzJobBean
                                     LOG.info( "Records for profile id: " + profileId + " is already present" );
                                     byPassRecords = false;
                                 } else {
-                                    LOG.info( "Proile id is not processed for profile id: " + profileId + ". Bypassing all records. Just adding into tracker" );
+                                    LOG.info( "Proile id is not processed for profile id: " + profileId
+                                        + ". Bypassing all records. Just adding into tracker" );
                                     byPassRecords = true;
                                 }
                                 do {
                                     LOG.debug( "Gettig batch " + batchNumber + " for closed records for profile " + profileId );
-                                    loopResponse = dotloopIntegrationApi
-                                        .fetchClosedProfiles( authorizationHeader, profileId, batchNumber );
+                                    loopResponse = dotloopIntegrationApi.fetchClosedProfiles( authorizationHeader, profileId,
+                                        batchNumber );
                                     if ( loopResponse != null ) {
-                                        loopResponseString = new String( ( (TypedByteArray) loopResponse.getBody() ).getBytes() );
+                                        loopResponseString = new String(
+                                            ( (TypedByteArray) loopResponse.getBody() ).getBytes() );
                                         if ( loopResponseString == null || loopResponseString.equals( "[]" ) ) {
                                             // no more records
                                             LOG.debug( "No more loops ids for profile: " + profileId );
                                             break;
                                         } else {
                                             LOG.debug( "Processing batch: " + batchNumber + " for profile: " + profileId );
-                                            loopEntities = new Gson().fromJson( loopResponseString, new TypeToken<List<LoopProfileMapping>>()
-                                            {
-                                            }.getType() );
+                                            loopEntities = new Gson().fromJson( loopResponseString,
+                                                new TypeToken<List<LoopProfileMapping>>() {}.getType() );
                                             // process loop entites. If there are no records for the
                                             // profile id in the tracker
                                             processLoopEntites( collectionName, loopEntities, profileId, byPassRecords,
@@ -684,7 +693,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                 }
             }
         }
-        
+
     }
 
 

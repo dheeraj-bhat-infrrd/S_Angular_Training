@@ -138,6 +138,13 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 || validationObject.isUserHeadersInvalid() ) {
                 throw new InvalidInputException();
             }
+            if ( validationObject.isBranchHeadersInvalid() ) {
+                throw new InvalidInputException( "Office sheet headers are invalid" );
+            } else if ( validationObject.isRegionHeadersInvalid() ) {
+	            throw new InvalidInputException( "Region sheet headers are invalid" );
+            } else if ( validationObject.isUserHeadersInvalid() ) {
+	            throw new InvalidInputException( "User sheet headers are invalid" );
+            }
             uploadValidationService.validateHeirarchyUpload( validationObject, regionErrors, branchErrors, userErrors );
         } catch ( IOException e ) {
             e.printStackTrace();
@@ -1707,7 +1714,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     boolean isUserUploadEmpty( UserUploadVO user )
     {
         if ( ( user.getSourceUserId() == null || user.getSourceUserId().isEmpty() )
-            && ( user.getFirstName() == null || user.getSourceUserId().isEmpty() )
+            && ( user.getFirstName() == null || user.getFirstName().isEmpty() )
             && ( user.getLastName() == null || user.getLastName().isEmpty() )
             && ( user.getTitle() == null || user.getTitle().isEmpty() )
             && ( user.getSourceBranchId() == null || user.getSourceBranchId().isEmpty() )
