@@ -9006,13 +9006,13 @@ $(document).on('click', '#wc-send-survey', function() {
 				$(this).children().each(function() {
 					if ($(this).hasClass('survey-user')) {
 						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("User is required").removeClass("hidden");
+						$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
 					} else if ($(this).hasClass('survey-fname')) {
 						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("Firstname is required").removeClass("hidden");
+						$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
 					} else if ($(this).hasClass('survey-email')) {
 						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("Email is required").removeClass("hidden");
+						$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
 					}
 				});
 			}
@@ -9045,15 +9045,15 @@ $(document).on('click', '#wc-send-survey', function() {
 			if (agentId == undefined) {
 				if (firstname != "" || emailId != "" || lastname != "") {
 					$(this).find('.wc-review-agentname').addClass("error-survey");
-					$(this).find('.validationagent').html("User not found").removeClass("hidden");
+					$(this).find('.validationagent').html("User not found.").removeClass("hidden");
 					allowrequest = false;
 					if (firstname == "") {
 						$(this).find('.wc-review-fname').addClass("error-survey");
-						$(this).find('.validationfname').html("Firstname is required").removeClass("hidden");
+						$(this).find('.validationfname').html("Firstname is required.").removeClass("hidden");
 					}
 					if (emailId == "") {
 						$(this).find('.wc-review-email').addClass("error-survey");
-						$(this).find('.validationemail').html("EmailId is required").removeClass("hidden");
+						$(this).find('.validationemail').html("EmailId is required.").removeClass("hidden");
 					}
 
 				}
@@ -9061,15 +9061,15 @@ $(document).on('click', '#wc-send-survey', function() {
 			else if (agentname != "" && agentId == "") {
 
 				$(this).find('.wc-review-agentname').addClass("error-survey");
-				$(this).find('.validationagent').html("User not found").removeClass("hidden");
+				$(this).find('.validationagent').html("User not found.").removeClass("hidden");
 				allowrequest = false;
 				if (firstname == "") {
 					$(this).find('.wc-review-fname').addClass("error-survey");
-					$(this).find('.validationfname').html("Firstname is required").removeClass("hidden");
+					$(this).find('.validationfname').html("Firstname is required.").removeClass("hidden");
 				}
 				if (emailId == "") {
 					$(this).find('.wc-review-email').addClass("error-survey");
-					$(this).find('.validationemail').html("EmailId is required").removeClass("hidden");
+					$(this).find('.validationemail').html("EmailId is required.").removeClass("hidden");
 				}
 			}
 
@@ -9078,18 +9078,18 @@ $(document).on('click', '#wc-send-survey', function() {
 				if (firstname != "" || emailId != "" || lastname != "") {
 					if (!myself) {
 						$(this).find('.wc-review-agentname').addClass("error-survey");
-						$(this).find('.validationagent').html("User not found").removeClass("hidden");
+						$(this).find('.validationagent').html("User not found.").removeClass("hidden");
 						allowrequest = false;
 					}
 
 					if (firstname == "") {
 						$(this).find('.wc-review-fname').addClass("error-survey");
-						$(this).find('.validationfname').html("Firstname is required").removeClass("hidden");
+						$(this).find('.validationfname').html("Firstname is required.").removeClass("hidden");
 						allowrequest = false;
 					}
 					if (emailId == "") {
 						$(this).find('.wc-review-email').addClass("error-survey");
-						$(this).find('.validationemail').html("EmailId is required").removeClass("hidden");
+						$(this).find('.validationemail').html("EmailId is required.").removeClass("hidden");
 						allowrequest = false;
 					}
 				}
@@ -9100,13 +9100,13 @@ $(document).on('click', '#wc-send-survey', function() {
 				if (firstname == "") {
 					$(this).find('.wc-review-fname').addClass("error-survey");
 					$(this).find('.wc-review-fname').siblings().css("display", "block");
-					$(this).find('.validationfname').html("Firstname is required").removeClass("hidden");
+					$(this).find('.validationfname').html("Firstname is required.").removeClass("hidden");
 					allowrequest = false;
 				}
 				if (emailId == "") {
 					$(this).find('.wc-review-email').addClass("error-survey");
 					$(this).find('.wc-review-email').siblings().css("display", "block");
-					$(this).find('.validationemail').html("EmailId is required").removeClass("hidden");
+					$(this).find('.validationemail').html("EmailId is required.").removeClass("hidden");
 					allowrequest = false;
 				}
 			}
@@ -9132,7 +9132,7 @@ $(document).on('click', '#wc-send-survey', function() {
 					});
 				} else {
 					$(this).find('.wc-review-email').addClass("error-survey");
-					$(this).find('.validationemail').html("Enter a valid email").removeClass("hidden");
+					$(this).find('.validationemail').html("Enter a valid email.").removeClass("hidden");
 					$(this).find('.wc-review-email').siblings().css("display", "block");
 					allowrequest = false;
 				}
@@ -9164,7 +9164,7 @@ $(document).on('click', '#wc-send-survey', function() {
 		duplicate = true;
 		for (var k = 0; k < surveyIndex.length; k++) {
 			$("#" + receiversList[surveyIndex[k]].key).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
-			$("#" + receiversList[surveyIndex[k]].key).find(".survey-email").find(':nth-child(2)').html("Duplicate not allowed").removeClass("hidden");
+			$("#" + receiversList[surveyIndex[k]].key).find(".survey-email").find(':nth-child(2)').html("Duplicate not allowed.").removeClass("hidden");
 		}
 
 	}
@@ -9177,23 +9177,46 @@ $(document).on('click', '#wc-send-survey', function() {
 	for (key in receiversList) {
 		rec.push(receiversList[key].value);
 	}
-	receiversList = JSON.stringify(rec);
+	var receiverList = JSON.stringify(rec);
 	var payload = {
-		"receiversList" : receiversList,
+		"receiversList" : receiverList,
 		"source" : 'agent'
 	};
 	if (columnName != undefined) {
 		payload = {
-			"receiversList" : receiversList,
+			"receiversList" : receiverList,
 			"source" : 'admin',
 			"columnName" : columnName,
 		};
 	}
+	var surveyed=[];
+	var alreadysureyed=false;
 	if (allowrequest) {
 		callAjaxPostWithPayloadData("./getalreadysurveyedemailids.do", function(data) {
 			var alreadySurveyedEmails = $.parseJSON(data);
+			//To check if the email had already surveyed
 			if (alreadySurveyedEmails.length != 0) {
-				console.log(alreadySurveyedEmails);
+				for (var i = 0; i < receiversListLength; i++) {
+					for (var j = 0; j < alreadySurveyedEmails.length; j++) {
+						if (receiversList[i].value.emailId == alreadySurveyedEmails[j]) {
+							alreadysureyed=true;
+							surveyed.push(i);
+						}
+					}
+				}
+				
+				if (surveyed.length != 0) {
+					for (var k = 0; k < surveyed.length; k++) {
+						$("#" + receiversList[surveyed[k]].key).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
+						$("#" + receiversList[surveyed[k]].key).find(".survey-email").find(':nth-child(2)').html("Already surveyed.").removeClass("hidden");
+					}
+
+				}
+				if(alreadysureyed){
+					allowrequest = false;
+					return false;
+				}
+				
 			} else {
 				$('#send-survey-dash').removeClass("hide");
 				callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
@@ -9206,9 +9229,9 @@ $(document).on('click', '#wc-send-survey', function() {
 					} else if (data.indexOf("Success") > -1) {
 						var response = $.parseJSON(data);
 						if (response.surveySentCount == 1)
-							showInfo(response.surveySentCount + ' survey request sent successfully!');
+							showInfo(response.surveySentCount + ' Survey Request Sent Successfully!');
 						else
-							showInfo(response.surveySentCount + ' survey requests sent successfully!');
+							showInfo(response.surveySentCount + ' Survey Requests Sent Successfully!');
 					} else {
 						$('#overlay-toast').html(data);
 					}
