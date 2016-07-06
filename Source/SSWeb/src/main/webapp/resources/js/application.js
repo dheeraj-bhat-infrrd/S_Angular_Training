@@ -9141,12 +9141,12 @@ $(document).on('click', '#wc-send-survey', function() {
 	});
 
 	// Check if recievers list empty
-	if (receiversList.length == 0) {
+	/*if (receiversList.length == 0) {
 		$('#overlay-toast').html('Add customers to send survey request!');
 		showToast();
 		allowrequest = false;
 		return false;
-	}
+	}*/
 
 	// check if there is no duplicate entries
 	var receiversListLength = receiversList.length;
@@ -9245,7 +9245,7 @@ $(document).on('click', '#wc-send-survey', function() {
 });
 
 $(document).on('click', '#wc-skip-send-survey', function() {
-	$('#overlay-send-survey').html('');
+	$('#overlay-send-survey').hide();
 	enableBodyScroll();
 });
 
