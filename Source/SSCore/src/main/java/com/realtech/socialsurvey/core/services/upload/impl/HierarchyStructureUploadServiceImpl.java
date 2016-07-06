@@ -432,7 +432,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                         upload.getRegionSourceMapping().put( branchUpload.getSourceRegionId(), branch.getRegion().getRegionId() );
                     }*/
                     if ( branchUpload.getSourceBranchId() != null && !branchUpload.getSourceBranchId().isEmpty() ) {
-                        upload.getBranchSourceMapping().put( branchUpload.getSourceBranchId(), branch.getBranchId() );
+                        upload.getBranchSourceMapping().put( processSourceId( branchUpload.getSourceBranchId() ), branch.getBranchId() );
                     }
 
                     upload.setBranches( branchesToBeUploaded );
@@ -617,7 +617,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     mapRegionModificationHistory( regionUpload, region );
                     // map the id mapping
                     if ( regionUpload.getSourceRegionId() != null && !regionUpload.getSourceRegionId().isEmpty() ) {
-                        upload.getRegionSourceMapping().put( regionUpload.getSourceRegionId(), region.getRegionId() );
+                        upload.getRegionSourceMapping().put( processSourceId( regionUpload.getSourceRegionId() ), region.getRegionId() );
                     }
 
                     //Store the updated regionUploads in upload
@@ -2118,7 +2118,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 mapUserModificationHistory( userToBeUploaded, user );
                 //map the id mapping
                 if ( userToBeUploaded.getSourceUserId() != null && !userToBeUploaded.getSourceUserId().isEmpty() ) {
-                    upload.getUserSourceMapping().put( userToBeUploaded.getSourceUserId(), userToBeUploaded.getUserId() );
+                    upload.getUserSourceMapping().put( processSourceId( userToBeUploaded.getSourceUserId() ), userToBeUploaded.getUserId() );
                 }
                 //Store the updated userUploads in upload
                 upload.setUsers( usersToUpload );
@@ -2153,6 +2153,15 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             modifiedUsers );
         LOG.debug( "Finished uploading users to the database" );
     }
+
+
+	String processSourceId( String sourceId )
+	{
+		if ( sourceId.contains( "." ) ) {
+			sourceId = sourceId.replace( ".", "" );
+		}
+		return sourceId;
+	}
 
 
     /**
