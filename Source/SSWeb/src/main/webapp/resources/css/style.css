@@ -603,6 +603,14 @@
     margin-top: 45px;
     background-size: contain;
 }
+.reg-company-img{
+	background:url(../images/sidebar-company-details.png)center no-repeat;
+	width: 700px;
+    height: 370px;
+    margin: auto;
+    margin-top: 45px;
+    background-size: contain;
+}
 .reg-prof-img-detail{
 	background:url(../images/sidebar-professional-details.png)center no-repeat;
 	width: 700px;
@@ -936,7 +944,12 @@ font-size: 40px;
 
 .reg-1-pg {
     margin-top: 15px;
-    width: 413px;
+    width: 421px;
+    margin-left: -8px;
+}
+.reg-company-pg {
+    margin-top: 15px;
+    width: 477px;
     margin-left: -8px;
 }
 .reg-company-deatil-ul{

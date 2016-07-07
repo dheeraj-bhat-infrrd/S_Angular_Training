@@ -97,8 +97,12 @@
 	margin:auto;
     }
     .reg-1-pg{
-     width: 263px;
+     width: 268px;
      margin-left: 7px;
+    }
+    .reg-company-pg{
+     width: 304px;
+     margin-left: 11px;
     }
     .reg-right-center{
       width: 310px;
@@ -108,7 +112,7 @@
      height: 75px;
     
     }
-    .reg-prof-img, .reg-prof-img-detail {
+    .reg-prof-img, .reg-prof-img-detail,.reg-company-img {
     width: 305px;
     height: 200px;
     margin-top: 20px;
@@ -120,7 +124,7 @@
 
 }
 @media ( max-width :1175px)and (min-width:991px) {
-  .reg-prof-img, .reg-prof-img-detail {
+  .reg-prof-img, .reg-prof-img-detail,.reg-company-img  {
     width: 400px;
     height: 240px;
     margin-top: 20px;
@@ -177,7 +181,7 @@
       width: 450px;
       height: 175px;
     }
-    .reg-prof-img,.reg-prof-img-detail{
+    .reg-prof-img,.reg-prof-img-detail,.reg-company-img{
       width: 900px;
       height: 400px;
     } 
