@@ -1,0 +1,101 @@
+<div class="main-reg-wrapper">
+	<div class="reg-left-container">
+		<div class="reg-ss-logo"></div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="arrow-steps clearfix">
+				<div class="step done">
+					<span> <a>Profile</a></span>
+				</div>
+				<div class="step current">
+					<span><a>Company</a></span>
+				</div>
+				<div class="step">
+					<span><a>Payment</a></span>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div id="err-nw-wrapper" class="err-nw-wrapper reg-error ">
+				<span class="err-new-close"></span> <span id="err-nw-txt"></span>
+			</div>
+		</div>
+		<form name="companyProfileForm" novalidate>
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px;">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 reg-create-account">Company Details</div>
+				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Country *</div>
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<input class="reg-details" type="text" id="country" ng-click="selectCountry()" ng-init="initCountry()">
+				</div>
+				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Address *</div>
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px" ng-class="{ 'has-error-reg' : companydetailsubmitted && !companyProfile.address}">
+					<textarea class="reg-details form-control-reg" id="textarea" style="padding: 10px;" type="text" name="address" required ng-model="companyProfile.address"></textarea>
+					<p ng-show="(companydetailsubmittedusa || companydetailsubmitted || companydetailsubmittedcanada) && !companyProfile.address" class="help-block-reg">Address is required.</p>
+				</div>
+				<div ng-show="usa">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix">
+						<div class="reg-req-field" style="width: 37%; float: left;">City *</div>
+						<div class="reg-req-field" style="width: 27%; float: left; margin-left: 4%;">State *</div>
+						<div class="reg-req-field" style="width: 30%; margin-left: 2%; float: left">ZIP *</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="form-group " style="padding: 0; width: 37%; float: left;" ng-class="{ 'has-error-reg' : companydetailsubmittedusa && !companyProfile.city}">
+							<input style="width: 100%" class=" reg-comp-add form-control-reg" name="city" type="text" ng-model="companyProfile.city" required />
+							<p ng-show="companydetailsubmittedusa && !companyProfile.city" class="help-block-reg">City is required.</p>
+						</div>
+						<div class="form-group " style="padding: 0; width: 27%; float: left; margin-left: 3%;" ng-class="{ 'has-error-reg' : companydetailsubmittedusa && !companyProfile.state}">
+							<select style="width: 100%; margin-left: 2%;" class="reg-comp-add form-control-reg" name="state" ng-model="companyProfile.state" required ng-options="state.statecode as state.statecode for state in usStates">
+								<option value=''>State</option>
+							</select>
+							<p ng-show="companydetailsubmittedusa && !companyProfile.state" class="help-block-reg">State is required.</p>
+						</div>
+						<div class="form-group " style="padding: 0; width: 30%; float: left; margin-left: 3%;" ng-class="{ 'has-error-reg' : companydetailsubmittedusa && !companyProfile.zip}">
+							<input style="width: 100%" class=" reg-comp-add  form-control-reg" name="zip" ng-model="companyProfile.zip" style="margin-left: 2%;" type="text" required />
+							<p ng-show="companydetailsubmittedusa && !companyProfile.zip" class="help-block-reg">ZIP is required.</p>
+						</div>
+					</div>
+				</div>
+				<div ng-show="canada">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix">
+						<div class="reg-req-field" style="width: 37%; float: left">City*</div>
+						<div class="reg-req-field" style="width: 27%; float: left; margin-left: 4%;">Province *</div>
+						<div class="reg-req-field" style="width: 30%; margin-left: 2%; float: left">Postal Code *</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						<div class="form-group " style="padding: 0; width: 37%; float: left" ng-class="{ 'has-error-reg' : companydetailsubmittedcanada && !companyProfile.city}">
+							<input style="width: 100%" class=" reg-comp-add form-control-reg" name="city" ng-model="companyProfile.city" style="margin-left: 2%;" type="text" required />
+							<p ng-show="companydetailsubmittedcanada && !companyProfile.city" class="help-block-reg">City is required.</p>
+						</div>
+						<div class="form-group " style="padding: 0; width: 27%; float: left; margin-left: 3%;" ng-class="{ 'has-error-reg' : companydetailsubmittedcanada && !companyProfile.state}">
+							<input style="width: 100%" class=" reg-comp-add form-control-reg" name="state" type="text" ng-model="companyProfile.state" required />
+							<p ng-show="companydetailsubmittedcanada && !companyProfile.state" class="help-block-reg">Province is required.</p>
+						</div>
+						<div class="form-group " style="padding: 0; width: 30%; float: left; margin-left: 3%;" ng-class="{ 'has-error-reg' : companydetailsubmittedcanada && !companyProfile.zip}">
+							<input style="width: 100%" class=" reg-comp-add  form-control-reg" name="postalcode" ng-model="companyProfile.zip" style="margin-left: 2%;" type="text" required />
+							<p ng-show="companydetailsubmittedcanada && !companyProfile.zip" class="help-block-reg">Postalcode is required.</p>
+						</div>
+					</div>
+				</div>
+				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Office Phone *</div>
+				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-class="{'has-error-reg' : (companydetailsubmittedusa || companydetailsubmitted || companydetailsubmittedcanada) && !isValidOfficePhone}">
+					<input class="reg-details form-control-reg" type="text" id="reg-phone-office" ng-init="setPhone('reg-phone-office', companyProfile.officePhone);" name="officePhone" ng-keypress="isValidOfficePhone = true" ng-model="officePhone" />
+					<p ng-show="(companydetailsubmittedusa || companydetailsubmitted || companydetailsubmittedcanada) && !isValidOfficePhone" class="help-block-reg">Office phone number is required.</p>
+				</div>
+			</div>
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top: 30px">
+				<div class="reg-back" ng-click="backOnCompanyDetail()">&lt;&lt;Back</div>
+				<div style="width: 120px; margin: auto;">
+					<button class="reg-next" ng-class="{'regen':(companyProfile.address && companyProfile.city && companyProfile.state && companyProfile.zip && isValidOfficePhone)||(others && companyProfile.address && isValidOfficePhone)}" ng-click="saveCompanyProfileDetails()">
+						Next <span style="font-size: 12px;"><i class="fa fa-arrow-right" aria-hidden="true"></i></span>
+					</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="reg-right-container">
+		<div class="reg-right-center-profile">
+			<div class="reg-right-description-profile prof-line reg-bold">Google loves to promote local businesses</div>
+			<div class="reg-right-description-profile prof-line reg-bold">Give us your full address so we can help</div>
+			<div class="reg-company-img"></div>
+		</div>
+	</div>
+</div>

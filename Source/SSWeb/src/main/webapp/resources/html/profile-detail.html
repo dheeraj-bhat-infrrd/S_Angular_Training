@@ -1,0 +1,64 @@
+
+<div class="main-reg-wrapper">
+	<div class="reg-left-container">
+		<div class="reg-ss-logo"></div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="arrow-steps clearfix">
+				<div class="step current">
+					<span> <a>Profile</a></span>
+				</div>
+				<div class="step">
+					<span><a>Company</a></span>
+				</div>
+				<div class="step">
+					<span><a>Payment</a></span>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div id="err-nw-wrapper" class="err-nw-wrapper reg-error ">
+				<span class="err-new-close"></span> <span id="err-nw-txt"></span>
+			</div>
+		</div>
+		<form ng-submit="saveProfileDetails()" name="detailsForm" novalidate>
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px;">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  reg-create-account">Professional Details</div>
+				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Phone1 *</div>
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-class="{'has-error-reg' : prodetailsubmitted && !isValidPhone1}">
+					<input class="reg-details form-control-reg" type="text" id="reg-phone1" ng-init="setPhone('reg-phone1', userProfile.phone1);" name="phone1" ng-keypress="isValidPhone1=true" ng-model="phone" />
+					<p ng-show="prodetailsubmitted && !isValidPhone1" class="help-block-reg">Phone number is required.</p>
+				</div>
+				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Phone2</div>
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<input class="reg-details" type="tel" id="reg-phone2" ng-init="setPhone('reg-phone2', userProfile.phone2);" name="phone2" />
+				</div>
+				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Website</div>
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-class="{'has-error-reg' : prodetailsubmitted && !isValidWebAddress}">
+					<input class="reg-details form-control-reg" type="text" placeholder="https://www.example.com" name="website" ng-model="userProfile.website" ng-change="isValidWebAddress=true" />
+					<p ng-show="prodetailsubmitted && !isValidWebAddress" class="help-block-reg">A valid website is required.</p>
+				</div>
+				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Location</div>
+				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-bottom: 30px;">
+					<input class="reg-details" type="text" placeholder="e.g. San Francisco Bay Area" name="location" ng-model="userProfile.location" />
+				</div>
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix">
+					<div class="reg-back" ng-click="backOnProfileDetail()">&lt;&lt;Back</div>
+					<div style="width: 120px; margin: auto;">
+						<button class="reg-next" type="submit" ng-class="{'regen':isValidWebAddress && isValidPhone1}" ng-click="prodetailsubmitted=true">
+							Next <span style="font-size: 12px;"><i class="fa fa-arrow-right" aria-hidden="true"></i></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="reg-right-container">
+		<div class="reg-right-center-profile"> 
+			<div class="reg-right-description-profile prof-line reg-bold">To dominate search, link your SocialSurvey</div>
+			<div class="reg-right-description-profile prof-line reg-bold">page to your existing company website</div>
+			<div class="reg-right-description-profile prof-line reg-bold" style="margin-top:25px">Get customers from Google local </div>
+			<div class="reg-right-description-profile prof-line reg-bold">search...provide your location</div>
+			<div class="reg-prof-img-detail"></div>
+		</div>
+	</div>
+</div>

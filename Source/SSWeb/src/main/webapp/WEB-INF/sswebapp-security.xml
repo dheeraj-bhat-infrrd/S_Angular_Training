@@ -41,6 +41,8 @@
 		<intercept-url pattern="/showregistrationpage.do" access="permitAll" />
 		<intercept-url pattern="/registrationpage.do" access="permitAll" />
 		<intercept-url pattern="/register.do" access="permitAll" />
+		<intercept-url pattern="/accountsignup.do" access="permitAll" />
+		<intercept-url pattern="/accountsignupredirect.do" access="permitAll" />
 		
 		<!-- Mail URL Resolver Services -->
 		<intercept-url pattern="/mail.do" access="permitAll" />
@@ -59,6 +61,10 @@
 		
 		<!--  generate api key -->
 		<intercept-url pattern="/generateApiKey.do" access="permitAll" />
+
+		<!-- Registration urls -->
+		<intercept-url pattern="registeraccount/*.do" access="permitAll" />
+		<intercept-url pattern="/newlogin.do" access="permitAll" />
 
 		<!-- Restricted Services -->
 		<intercept-url pattern="/*.do" access="isAuthenticated()" />

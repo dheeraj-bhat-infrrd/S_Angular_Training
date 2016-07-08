@@ -1,0 +1,439 @@
+body {  
+    background-image: url("../images/all-bg.png");
+    line-height: 180%;
+}
+
+.top {
+    background-image: url("../img/sample-cloud.png");
+    background-repeat: repeat-x;
+    background-position: -245px -133px;
+    width: 100%;
+    height: 515px;
+    margin-top: -5px;
+    text-align: center;
+}
+
+.top>.first-message {
+    color: #FBFFCB;
+    margin: 0 0 10px;
+    padding: 162px 0px 0px 90px;
+    font-size: 36px;
+    font-family: Candara, Calibri, Segoe, "Segoe UI", Optima, Arial,
+    sans-serif;
+    position: absolute;
+    text-shadow: 2px 2px 3px black;
+}
+
+.top>.second-message {
+    margin: 420px 0px 0px 90px;
+    color: #C0D8E9;
+    position: absolute;
+    font-size: 33px;
+    text-shadow: 2px 2px 2px black;
+}
+
+.name {
+    position: absolute;
+    left: 50px;
+    top: 100px;
+    width: 300px;
+    color: white;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 70px;
+    text-shadow: 3px 3px 8px black;
+}
+
+.cf-core {
+    margin: 310px 0px 0px 510px;
+    position: absolute;
+}
+
+.top>.btn {
+    position: absolute;
+    top: 300px;
+    left: 160px;
+}
+
+.bottom-bg {
+
+}
+
+h3 {
+    line-height: 27px;
+    font-size: 18px;
+}
+
+textarea {
+    resize: none;
+}
+
+.box-content {
+    margin-left: 50px;
+    margin-top: 8px;
+    margin-bottom: 50px;
+}
+
+.picons {
+    background-image: url("http://www.wysoko.org/css/csg-4f5739713cdcc.png");
+    background-repeat: no-repeat;
+    background-position: top left;
+    margin-bottom: -16px;
+    margin-right: 10px;
+    margin-left: 4px;
+    display: inline-block;
+}
+
+.picons-37 {
+    background-position: -84px -1105px;
+    width: 34px;
+    height: 35px;
+}
+
+.main-header {
+    padding-top: 34px;
+    padding-bottom: 34px;
+}
+
+.main-header h1 {
+    text-align: center;
+    margin-bottom: -6px;
+    font-size: 36px;
+}
+
+.main-header .lead {
+    color: #8D8D8D;
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 13px;
+}
+
+footer {
+    background-color: black;
+    height: 60px;
+    text-shadow: none;
+}
+
+footer .container {
+    text-align: left;
+    width: auto;
+    max-width: 680px;
+}
+
+footer .container .credit {
+    color: lightgray;
+    padding: 8px;
+}
+
+.thumbnail {
+    background-color: white;
+}
+
+.footer-cloud {
+    padding-top: 8px;
+}
+
+.free {
+    color: #8D8D8D;
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    padding-top: 0px;
+}
+
+input[type="text"],input[type="email"] {
+    height: 33px;
+}
+
+.bs-docs-sidenav {
+    width: 100%;
+    margin: 10px 0px 15px 0px;
+}
+
+.notify {
+    width: 500px;
+    margin: auto;
+    padding-top: 10px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 9999;
+}
+
+.block-container {
+    border: 1px solid #333333;
+    margin: 20px auto;
+    float: none;
+}
+
+.sign-in-btn {
+    margin-top: 63px;
+    margin-left: 35px;
+}
+
+.marketplace-unit {
+    padding: 25px 60px 0px 60px;
+    margin-bottom: 30px;
+    font-size: 18px;
+    font-weight: 200;
+    line-height: 30px;
+    color: inherit;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+}
+
+.marketplace-unit h1 {
+    font-size: 60px;
+    line-height: 1;
+    letter-spacing: -1px;
+    color: inherit;
+}
+
+.row-fluid [class*="span"] {
+    margin-left: 0px;
+    margin-right: 13px;
+}
+
+.subhead {
+    border-bottom: 0px;
+}
+
+.moreinfo-title {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.moreinfo-url a {
+    padding-left: 10px;
+    cursor: pointer;
+    color: darkgray;
+}
+
+.navbar {
+    margin-bottom: 0px;
+}
+
+* {
+    margin: 0;
+}
+
+html, body {
+    height: 100%;
+}
+
+.wrapper {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -155px; /* the bottom margin is the negative value of the footer's height */
+}
+
+.footer, .push {
+}
+
+.cloud-footer {
+    padding: 9px;
+    color: lightgray;
+}
+
+a.cloudstaria-home , a.cloudstaria-home:link, a.cloudstaria-home:visited {
+    color: white;
+    text-decoration: none;
+}
+
+.moreinfo-create-addon {
+    padding: 100px 105px 0px 17px;
+    text-align: right;
+}
+
+#addon-name {
+    width:250px;
+    float:left;
+}
+
+.loading {
+    float:right;
+    padding-top:5px;
+    margin-right:13px;
+}
+
+.glyphicon.spinning {
+    animation: spin 1s infinite linear;
+    -webkit-animation: spin2 1s infinite linear;
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg);}
+}
+
+.creating-history {
+    font-style: italic;
+    float: left;
+    list-style-type: none;
+    text-align: left;
+}
+
+.ng-enter {
+    transition: 0.75s;
+    opacity: 0;
+}
+
+.ng-enter-active {
+    opacity: 1;
+}
+
+.ng-leave {
+    transition: 0.75s;
+    opacity: 1;
+}
+
+.ng-leave-active {
+    opacity: 0;
+}
+
+.label,.glyphicon { margin-right:5px; }
+
+.signup-body {
+    height: 500px;
+    background-color: #3193B0;
+    border-radius: 2px;
+}
+.signup-main {
+    border-style: solid;
+    height: 207px;
+    border-width: 1px;
+    border-radius: 3px;
+    margin: -10px;
+    background-image: url("../img/sign-up.jpg");
+    background-size: 576px 351px;
+    background-repeat: no-repeat;
+    background-position-y: -98px;
+}
+.signup-message {
+    text-align: center;
+    color: white;
+    margin-top: 21px;
+    font-size: 32px;
+    text-shadow: 2px 2px #445F5C;
+    font-family: 'Avant Garde', Avantgarde, 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+}
+.signup-small-message {
+    text-align: center;
+    margin-top: 10px;
+    color: white;
+    font-family: 'Avant Garde', Avantgarde, 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+}
+.signup-input {
+    -webkit-transition: all 0.30s ease-in-out;
+    -moz-transition: all 0.30s ease-in-out;
+    -ms-transition: all 0.30s ease-in-out;
+    -o-transition: all 0.30s ease-in-out;
+    outline: none;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 65%;
+    background: #fff;
+    margin-bottom: 4%;
+    border: 1px solid #ccc;
+    padding-left: 10px;
+    color: #555;
+    font: 95% Arial, Helvetica, sans-serif;
+    font-family: 'Avant Garde', Avantgarde, 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+}
+.signup-input:focus {
+    box-shadow: 0 0 5px #43D1AF;
+    padding-left: 10px;
+    border: 1px solid #43D1AF;
+}
+.signup-input-holder {
+    margin-top: 45px;
+    text-align: center;
+}
+.signup-button {
+    background: #FEDA71;
+    background: -moz-linear-gradient(top,#FEDA71 0%,#FEBB49 100%);
+    background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#FEDA71),color-stop(100%,#FEBB49));
+    background: -webkit-linear-gradient(top,#FEDA71 0%,#FEBB49 100%);
+    background: -o-linear-gradient(top,#FEDA71 0%,#FEBB49 100%);
+    background: -ms-linear-gradient(top,#FEDA71 0%,#FEBB49 100%);
+    background: linear-gradient(top,#FEDA71 0%,#FEBB49 100%);
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#FEDA71',endColorstr='#FEBB49',GradientType=0);
+    padding:5px 16px;
+    color:#623F1D;
+    font-family:'Helvetica Neue',sans-serif;
+    font-size:16px;
+    border-radius:20px;
+    -moz-border-radius:20px;
+    -webkit-border-radius:20px;
+    border:1px solid #623F1D;
+    font-family: 'Avant Garde', Avantgarde, 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+}
+.signup-button-disabled {
+    background: #FEDA71;
+    background: -moz-linear-gradient(top,#FEDA71 0%, #E0D1A3 100%);
+    background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#FEDA71),color-stop(100%,#E0D1A3));
+    background: -webkit-linear-gradient(top,#FEDA71 0%,#E0D1A3 100%);
+    background: -o-linear-gradient(top,#FEDA71 0%,#E0D1A3 100%);
+    background: -ms-linear-gradient(top,#FEDA71 0%,#E0D1A3 100%);
+    background: linear-gradient(top,#FEDA71 0%,#E0D1A3 100%);
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#FEDA71',endColorstr='#E0D1A3',GradientType=0);
+    padding:5px 16px;
+    color: rgba(188, 186, 196, 0.86);
+    font-family:'Helvetica Neue',sans-serif;
+    font-size:16px;
+    border-radius:20px;
+    -moz-border-radius:20px;
+    -webkit-border-radius:20px;
+    border:1px solid #623F1D;
+    font-family: 'Avant Garde', Avantgarde, 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+}
+.signup-message-bottom {
+    font-family: 'Avant Garde', Avantgarde, 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+    color: white;
+    text-align: center;
+    font-size: 13px;
+    line-height: 20px;
+    margin-top: 20px;
+}
+.signUp-fade.ng-enter {
+    transition:0.5s linear all;
+    opacity:0;
+}
+.signUp-fade.ng-enter.ng-enter-active {
+    opacity:1;
+}
+.register-btn {
+    width: 100%;
+}
+.register-header {
+    text-align: center;
+    font-family: 'Avant Garde', Avantgarde, 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+}
+.registration {
+    background-image: url('../img/members-only.png');
+    background-repeat: no-repeat;
+    background-attachment: inherit;
+    background-position: -99px -107px;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    opacity: 0.1;
+}
+.panel {
+    background-color: transparent;
+}
+.register {
+    font-family: 'Avant Garde', Avantgarde, 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+}
+.swagger-ui-wrap {
+	margin-left: 0 !important;
+    margin-right: 0 !important;
+}

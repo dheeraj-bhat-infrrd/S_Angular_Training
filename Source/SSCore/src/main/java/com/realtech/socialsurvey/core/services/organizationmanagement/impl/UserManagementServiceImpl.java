@@ -1,21 +1,26 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
-import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
-import com.realtech.socialsurvey.core.entities.*;
-import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
-import com.realtech.socialsurvey.core.services.generator.UrlService;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.utils.FileOperations;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -28,10 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -45,17 +51,45 @@ import com.realtech.socialsurvey.core.dao.UserEmailMappingDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProListUser;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RemovedUser;
+import com.realtech.socialsurvey.core.entities.SettingsDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserApiKey;
+import com.realtech.socialsurvey.core.entities.UserEmailMapping;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserInvite;
+import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.UsercountModificationNotification;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
+import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -69,8 +103,11 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
+import com.realtech.socialsurvey.core.utils.FileOperations;
 import com.realtech.socialsurvey.core.vo.UserList;
 
 
@@ -78,7 +115,7 @@ import com.realtech.socialsurvey.core.vo.UserList;
  * JIRA:SS-34 BY RM02 Implementation for User management services
  */
 @DependsOn ( "generic")
-@Component
+@Service
 public class UserManagementServiceImpl implements UserManagementService, InitializingBean
 {
 
@@ -201,12 +238,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Autowired
     private FileOperations fileOperations;
 
-    @Value( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}" )
+    @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     private String paramOrderTakeSurveyReminder;
 
-    @Value( "${PARAM_ORDER_TAKE_SURVEY}" )
+    @Value ( "${PARAM_ORDER_TAKE_SURVEY}")
     private String paramOrderTakeSurvey;
-    
+
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_SUBJECT}")
     String paramOrderTakeSurveySubject;
 
@@ -214,7 +251,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Autowired
     private EmailFormatHelper emailFormatHelper;
 
-    @Value( "${APPLICATION_LOGO_URL}" )
+    @Value ( "${APPLICATION_LOGO_URL}")
     private String applicationLogoUrl;
 
 
@@ -1899,8 +1936,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 throw new UserAlreadyExistsException( "user with specified email id already exists" );
             }
         }
+
         LOG.debug( "Calling method to store the registration invite" );
-        storeCompanyAdminInvitation( queryParam, emailId );
+        Company company = companyDao.findById( Company.class, CommonConstants.DEFAULT_COMPANY_ID );
+        storeCompanyAdminInvitation( queryParam, emailId, company );
 
         LOG.debug( "Calling email services to send registration invitation mail" );
         emailServices.sendRegistrationInviteMail( url, emailId, firstName, lastName );
@@ -1939,11 +1978,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param emailId
      * @throws NonFatalException
      */
-    private void storeCompanyAdminInvitation( String queryParam, String emailId )
+    private void storeCompanyAdminInvitation( String queryParam, String emailId, Company company )
     {
         LOG.debug( "Method storeInvitation called with query param : " + queryParam + " and emailId : " + emailId );
         UserInvite userInvite = null;
-        Company company = companyDao.findById( Company.class, CommonConstants.DEFAULT_COMPANY_ID );
         ProfilesMaster profilesMaster = profilesMasterDao.findById( ProfilesMaster.class,
             CommonConstants.PROFILES_MASTER_NO_PROFILE_ID );
 
@@ -2249,6 +2287,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 .setProfileStages( profileCompletionList.getProfileCompletionList( agentSettings.getProfileStages() ) );
         }
         return agentSettings;
+    }
+
+
+    @Override
+    public ContactDetailsSettings fetchAgentContactDetailByEncryptedId( String userEncryptedId ) throws InvalidInputException
+    {
+        LOG.info( "Getting agent settings for userEncryptedId id: " + userEncryptedId );
+        if ( userEncryptedId == null || userEncryptedId.isEmpty() ) {
+            throw new InvalidInputException( "Invalid userEncrypted id for fetching user settings" );
+        }
+        ContactDetailsSettings contactDetailsSettings = organizationUnitSettingsDao
+            .fetchAgentContactDetailByEncryptedId( userEncryptedId );
+
+        return contactDetailsSettings;
     }
 
 
@@ -2571,6 +2623,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         agentSettings.setModifiedOn( System.currentTimeMillis() );
         agentSettings.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
 
+        //set encrypted id
+        agentSettings.setUserEncryptedId( generateUserEncryptedId( user.getUserId() ) );
+
+
         //Set status to incomplete
         agentSettings.setStatus( CommonConstants.STATUS_INCOMPLETE_MONGO );
 
@@ -2619,6 +2675,27 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         organizationUnitSettingsDao.insertAgentSettings( agentSettings );
         LOG.info( "Inserted into agent settings" );
+    }
+
+
+    @Override
+    public String generateUserEncryptedId( long userId ) throws InvalidInputException
+    {
+        LOG.debug( "method generateUserEncryptedId started for user id  " + userId );
+
+        long hashedUserId = String.valueOf( userId ).hashCode();
+        String hashedUserIdStr = String.valueOf( hashedUserId );
+        String paddedBitString = "";
+        if ( hashedUserIdStr.length() < 12 ) {
+            for ( int i = 0; i < 12 - hashedUserIdStr.length(); i++ ) {
+                paddedBitString += (int) ( 10.0 * Math.random() );
+            }
+            hashedUserIdStr += paddedBitString;
+        }
+
+        String userEncryptedId = encryptionHelper.encodeBase64( hashedUserIdStr );
+        return userEncryptedId;
+
     }
 
 
@@ -3111,14 +3188,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Added newly added user {} to mongo", user.getFirstName() );
 
         LOG.debug( "Adding newly added user {} to solr", user.getFirstName() );
-        try {
-            solrSearchService.addUserToSolr( user );
-        } catch ( SolrException e ) {
-            LOG.error( "SolrException caught in addCorporateAdmin(). Nested exception is ", e );
-            organizationManagementService.removeOrganizationUnitSettings( user.getUserId(),
-                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-            throw e;
-        }
+        //        try {
+        //            solrSearchService.addUserToSolr( user );
+        //        } catch ( SolrException e ) {
+        //            LOG.error( "SolrException caught in addCorporateAdmin(). Nested exception is ", e );
+        //            organizationManagementService.removeOrganizationUnitSettings( user.getUserId(),
+        //                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        //            throw e;
+        //        }
         LOG.debug( "Added newly added user {} to solr", user.getFirstName() );
 
         return user;
@@ -4042,9 +4119,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     {
         try {
             // update last start time
-            batchTrackerService
-                .getLastRunEndTimeAndUpdateLastStartTimeByBatchType( CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER,
-                    CommonConstants.BATCH_NAME_CRM_DATA_AGENT_ID_MAPPER );
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER, CommonConstants.BATCH_NAME_CRM_DATA_AGENT_ID_MAPPER );
 
             Map<String, Object> corruptRecords = surveyHandler.mapAgentsInSurveyPreInitiation();
             sendCorruptDataFromCrmNotificationMail( corruptRecords );
@@ -4241,6 +4317,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         cell7.setCellValue( "Reason For Failure" );
         return sheet;
     }
+
+
     @Override
     @Transactional
     public User getAdminUserByCompanyId( long companyId )
@@ -4284,7 +4362,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     User user = null;
                     try {
                         user = getUserByUserId( survey.getAgentId() );
-                    }catch(InvalidInputException ie){
+                    } catch ( InvalidInputException ie ) {
                         LOG.warn( "Invalid user mapped to the agent id" );
                         continue;
                     }
@@ -4317,20 +4395,23 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                             LOG.debug( "Check if survey is eligible for a reminder mail" );
                             long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
                             long currentTime = System.currentTimeMillis();
-                            if ( surveyHandler
-                                .checkSurveyReminderEligibility( surveyLastRemindedTime, currentTime, reminderInterval ) ) {
+                            if ( surveyHandler.checkSurveyReminderEligibility( surveyLastRemindedTime, currentTime,
+                                reminderInterval ) ) {
                                 if ( survey.getReminderCounts() < reminderCount ) {
-                                    sendSurveyReminderEmail( emailServices, organizationManagementService, survey, company.getCompanyId() );
+                                    sendSurveyReminderEmail( emailServices, organizationManagementService, survey,
+                                        company.getCompanyId() );
                                     surveyHandler.markSurveyAsSent( survey );
                                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
                                 } else {
-                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId() + " has exceeded the reminder count " );
+                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId()
+                                        + " has exceeded the reminder count " );
                                 }
                             }
                         } else {
                             LOG.debug( "Sending survey initiation mail" );
                             // check if the mail is an older mail
-                            sendSurveyInitiationEmail( emailServices, organizationManagementService, survey, company.getCompanyId() );
+                            sendSurveyInitiationEmail( emailServices, organizationManagementService, survey,
+                                company.getCompanyId() );
                             surveyHandler.markSurveyAsSent( survey );
                             surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
 
@@ -4351,19 +4432,44 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "Error in IncompleteSurveyReminderSender", e );
             try {
                 //update batch tracker with error message
-                batchTrackerService
-                    .updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER,
-                        e.getMessage() );
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER, e.getMessage() );
                 //send report bug mail to admin
-                batchTrackerService
-                    .sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER,
-                        System.currentTimeMillis(), e );
+                batchTrackerService.sendMailToAdminRegardingBatchError(
+                    CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER, System.currentTimeMillis(), e );
             } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
                 LOG.error( "Error while updating error message in IncompleteSurveyReminderSender " );
             } catch ( UndeliveredEmailException e1 ) {
                 LOG.error( "Error while sending report excption mail to admin " );
             }
         }
+    }
+
+
+    @Transactional
+    @Override
+    public User activateCompanyAdmin( User companyAdmin )
+        throws InvalidInputException, HierarchyAlreadyExistsException, SolrException
+    {
+        LOG.info( "UserManagementService.activateCompanyAdmin started" );
+        //Update the USER table status
+        companyAdmin.setStatus( CommonConstants.STATUS_ACTIVE );
+        companyAdmin.setIsAtleastOneUserprofileComplete( 1 );
+        userDao.update( companyAdmin );
+
+        //Update the user's user profiles
+        userProfileDao.activateAllUserProfilesForUser( companyAdmin );
+
+        //Activate agent in mongo
+        AgentSettings agentSettings = getUserSettings( companyAdmin.getUserId() );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.STATUS_COLUMN,
+            CommonConstants.STATUS_ACTIVE_MONGO, agentSettings );
+
+        //Activate agent in Solr
+        solrSearchService.editUserInSolr( companyAdmin.getUserId(), CommonConstants.STATUS_COLUMN,
+            String.valueOf( CommonConstants.STATUS_ACTIVE ) );
+        LOG.info( "UserManagementService.activateCompanyAdmin finished" );
+        return companyAdmin;
     }
 
 
@@ -4384,9 +4490,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             agentName = user.getFirstName();
         }
 
-        String surveyLink = surveyHandler
-            .composeLink( survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(),
-                survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
+        String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
         try {
             companySettings = organizationManagementService.getCompanySettings( companyId );
         } catch ( InvalidInputException e ) {
@@ -4484,7 +4589,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
         surveyLink = urlService.shortenUrl( surveyLink );
         LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
-        
+
         String mailBody = "";
         String mailSubject = "";
         if ( companySettings != null && companySettings.getMail_content() != null
@@ -4523,24 +4628,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
         }
         //replace legends
-        mailSubject = emailFormatHelper
-            .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
-                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-                companyDisclaimer, agentDisclaimer, agentLicenses );
+        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink,
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(),
+            user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
+            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
-        mailBody = emailFormatHelper
-            .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
-                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-                companyDisclaimer, agentDisclaimer, agentLicenses );
+        mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink,
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(),
+            user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
+            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
         //JIRA SS-473 end
 
         //send mail
         try {
-            emailServices
-                .sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );
+            emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
+                user.getEmailId() );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
@@ -4564,9 +4667,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             agentName = user.getFirstName();
         }
 
-        String surveyLink = surveyHandler
-            .composeLink( survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(),
-                survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
+        String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
         try {
             companySettings = organizationManagementService.getCompanySettings( companyId );
         } catch ( InvalidInputException e ) {
@@ -4694,21 +4796,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
             }
 
-            mailBody = emailFormatHelper
-                .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
-                    survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                    companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-                    companyDisclaimer, agentDisclaimer, agentLicenses );
+            mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink,
+                survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
+                survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
-            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName; 
+            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
             }
-            mailSubject = emailFormatHelper
-                .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
-                    survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                    companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-                    companyDisclaimer, agentDisclaimer, agentLicenses );
+            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink,
+                survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
+                survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
             //JIRA SS-473 end
 
@@ -4717,7 +4817,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             mailSubject = fileOperations.getContentFromFile(
                 EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT );
 
-            mailSubject = emailFormatHelper.replaceEmailBodyWithParams( mailSubject, Arrays.asList( paramOrderTakeSurveySubject.split( "," ) ) );
+            mailSubject = emailFormatHelper.replaceEmailBodyWithParams( mailSubject,
+                Arrays.asList( paramOrderTakeSurveySubject.split( "," ) ) );
 
             mailBody = fileOperations.getContentFromFile(
                 EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
@@ -4741,27 +4842,26 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
         }
         //replace the legends
-        mailBody = emailFormatHelper
-            .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
-                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-                companyDisclaimer, agentDisclaimer, agentLicenses );
-        mailSubject = emailFormatHelper
-            .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
-                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
-                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-                companyDisclaimer, agentDisclaimer, agentLicenses );
+        mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink,
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(),
+            user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
+            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink,
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(),
+            user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
+            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
         //JIRA SS-473 end
 
         //send the mail
         try {
-            emailServices
-                .sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );
+            emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
+                user.getEmailId() );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
     }
+
 
     private void sendMailToAgent( SurveyPreInitiation survey )
     {
@@ -4790,5 +4890,29 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             return true;
         }
         return false;
+    }
+
+
+    @Override
+    public void inviteCorporateToRegister( User user, int planId ) throws InvalidInputException, UndeliveredEmailException
+    {
+        Map<String, String> urlParams = new HashMap<String, String>();
+        urlParams.put( CommonConstants.FIRST_NAME, user.getFirstName() );
+        urlParams.put( CommonConstants.LAST_NAME, user.getLastName() );
+        urlParams.put( CommonConstants.USER_ID, String.valueOf( user.getUserId() ) );
+        urlParams.put( CommonConstants.COMPANY_ID, String.valueOf( user.getCompany().getCompanyId() ) );
+        urlParams.put( CommonConstants.PLAN_ID, String.valueOf( planId ) );
+        urlParams.put( CommonConstants.CURRENT_TIMESTAMP, String.valueOf( System.currentTimeMillis() ) );
+        urlParams.put( CommonConstants.UNIQUE_IDENTIFIER, generateUniqueIdentifier() );
+
+        String url = urlGenerator.generateUrl( urlParams, applicationBaseUrl + CommonConstants.SET_REGISTRATION_PASSWORD );
+        String queryParam = extractUrlQueryParam( url );
+
+        Company company = companyDao.findById( Company.class, user.getCompany().getCompanyId() );
+        storeCompanyAdminInvitation( queryParam, user.getEmailId(), company );
+
+        LOG.debug( "Calling email services to send registration invitation mail" );
+        //emailServices.sendRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName() );
+        emailServices.sendNewRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName(), planId );
     }
 }

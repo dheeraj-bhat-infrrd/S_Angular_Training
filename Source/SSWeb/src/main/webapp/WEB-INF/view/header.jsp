@@ -27,6 +27,7 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/intlTelInput.css">
 </head>
 <body>
 	<div id="overlay-linkedin-import" class="overlay-login overlay-main hide"></div>
@@ -87,6 +88,30 @@
 					</div>
 					<div class="float-left ol-btn-wrapper">
 						<div id="overlay-cancel" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="overlay-main-survey" class="overlay-main-survey hide">
+		<div id="overlay-pop-up" class="overlay-disable-wrapper">
+			<div id="overlay-header-survey" class="ol-header">
+				<!-- Populated by javascript -->
+			</div>
+			<div class="ol-content">
+				<div id="overlay-text-survey" class="ol-txt">
+					<!-- Populated by javascript -->
+				</div>
+				<div class="clearfix">
+					<div class="float-left ol-btn-wrapper">
+						<div id="overlay-continue-survey" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+					<div class="float-left ol-btn-wrapper">
+						<div id="overlay-cancel-survey" class="ol-btn cursor-pointer">
 							<!-- Populated by javascript -->
 						</div>
 					</div>
