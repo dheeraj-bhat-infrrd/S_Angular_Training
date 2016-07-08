@@ -50,6 +50,23 @@
 		</c:when>
 	</c:choose>
 </c:if>
+<c:choose>
+	<c:when test="${entityType == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+	
+	
+
+</c:choose>
 <!DOCTYPE>
 <html>
 <head>
@@ -704,7 +721,7 @@
 				</c:choose>
 				<div class=" ppl-header-left review-sm-screen ">
 				<c:set value="${fn:escapeXml(reviewItem.review)}" var="review"></c:set>
-					<c:choose>
+					<%-- <c:choose>
 						<c:when test="${ not empty reviewItem.surveyCompletedDate}">
 							<div class="ppl-head-2 review-detail-profile float-left"
 								data-modified="false"
@@ -717,6 +734,24 @@
 								data-modified="false"
 								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
 						value="${reviewItem.modifiedOn}" />">
+							</div>
+						</c:otherwise>
+					</c:choose> --%>
+					<c:choose>
+						<c:when test="${ not empty reviewItem.surveyCompletedDate}">
+							<div class="ppl-head-2 review-detail-profile float-left"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${reviewItem.surveyCompletedDate}" />"><fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${reviewItem.surveyCompletedDate}" />
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="ppl-head-2 review-detail-profile float-left"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${reviewItem.modifiedOn}" />"><fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${reviewItem.modifiedOn}" />
 							</div>
 						</c:otherwise>
 					</c:choose>
@@ -750,7 +785,7 @@
 									class="cursor-pointer"
 									style="color: #236CAF; font-weight: 600 !important;"
 									href="${reviewItem.completeProfileUrl}" target="_blank">
-										${reviewItem.agentName}</a><span>${profilemasterid}</span></span>
+										${reviewItem.agentName}</a></span>
 							</c:if>
 						</c:if>
 					
@@ -773,11 +808,13 @@
                                            <c:choose>
                                         <c:when test="${ not empty reviewItem.surveyTransactionDate} ">
                                             <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-                            value="${ reviewItem.surveyTransactionDate}" />"></span>
+                            value="${ reviewItem.surveyTransactionDate}" />"><fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${ reviewItem.surveyTransactionDate}" /></span>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-                            value="${reviewItem.modifiedOn}" />"></span>
+                            value="${reviewItem.modifiedOn}" />"><fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${reviewItem.modifiedOn}" /></span>
                                         </c:otherwise>
                                         </c:choose>
                                     </div>
