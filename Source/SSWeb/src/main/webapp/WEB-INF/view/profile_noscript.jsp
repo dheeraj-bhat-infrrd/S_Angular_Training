@@ -669,18 +669,21 @@
 									<div class="ppl-header-wrapper clearfix">
 			<div class="float-left ppl-header-right">
 					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
-						<c:set var="star" value="Integer.parseInt(${reviewItem.score}*4)"></c:set>
-						<%int no = Integer.parseInt(request.getParameter("numberMax"));%>
+ 					<c:set var="star" value="${reviewItem.score}"/>
+ 					<fmt:formatNumber var="star1" value="${star}" minFractionDigits="1" maxFractionDigits="1"/>
+                    <fmt:formatNumber var="star2" value="${star1}"  maxFractionDigits="2"/>
+                    <fmt:parseNumber var="star3" integerOnly="true" type="number" value="${star2*4}" />					
+					<fmt:formatNumber var="star4" value="${star3/4}" minFractionDigits="2" maxFractionDigits="2"/>
 						<c:choose>
 						<c:when test="${reviewItem.source =='Zillow'}">
-						<div class="rating-image cursor-pointer  float-left star-rating-green-4.50" title="4.7/5.0"></div>
+						<div class="rating-image cursor-pointer  float-left star-rating-green-${star4}" title="${star1}/5.0"></div>
 					</c:when>
 					<c:otherwise>
-						<div class="rating-image  cursor-pointer float-left star-rating-1.25" title="1.3/5.0"></div>
+						<div class="rating-image  cursor-pointer float-left star-rating-${star4}" title="${star1}/5.0"></div>
 					</c:otherwise>
 					</c:choose>
 					
-					<div class="rating-rounded float-left" style="font-size:15px;line-height:22px;">4.7</div>
+					<div class="rating-rounded float-left" style="font-size:15px;line-height:22px;">${star1}</div>
 					</div>
 				</div>
 				<c:choose>
@@ -731,14 +734,26 @@
 								${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
 						</c:otherwise>
 					</c:choose>
-					<c:if test="${profilemasterid !=4}">
+					<%-- <c:if test="${profilemasterid !=4}">
 					<c:if test="${not empty reviewItem.agentName }">
 						<span class="float-left " style="margin-left: 5px;">for<a
 							style="color: #236CAF; font-weight: 600 !important;"
 							href="${reviewItem.completeProfileUrl}" target="_blank">
 								${reviewItem.agentName}</a></span>
 					</c:if>
-					</c:if>
+					</c:if> --%>
+					
+					
+					<c:if test="${profilemasterid !=4}">
+							<c:if test="${not empty reviewItem.agentName}">
+								<span class="float-left" style="margin-left: 5px;">for<a
+									class="cursor-pointer"
+									style="color: #236CAF; font-weight: 600 !important;"
+									href="${reviewItem.completeProfileUrl}" target="_blank">
+										${reviewItem.agentName}</a><span>${profilemasterid}</span></span>
+							</c:if>
+						</c:if>
+					
 
 						<c:choose>
 							<c:when test="${ not empty reviewItem.summary }">
