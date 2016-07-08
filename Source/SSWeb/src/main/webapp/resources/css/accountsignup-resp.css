@@ -155,13 +155,13 @@
       width: 599px;
     }
     .reg-right-description{
-      font-size: 29px;
+      font-size: 25px;
     }
     .reg-right-description-profile{
-      font-size: 35px;
+      font-size: 25px;
     }
     .reg-right-description-linkedin{
-      font-size: 45px;
+      font-size: 25px;
     }
      .reg-right-description-pay{
       font-size: 22px;
@@ -178,7 +178,7 @@
     margin-left:145px;
     }
     .reg-side-linkedin-img{
-      width: 450px;
+      width: 384px;
       height: 175px;
     }
     .reg-prof-img,.reg-prof-img-detail,.reg-company-img{
@@ -191,6 +191,10 @@
     .reg-right-center-profile {
       width:900px;
     }
+    .reg-company-pg {
+        width: 542px;
+    }
+    
  }
 
 
