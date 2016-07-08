@@ -9007,12 +9007,15 @@ $(document).on('click', '#wc-send-survey', function() {
 					if ($(this).hasClass('survey-user')) {
 						$(this).find(':nth-child(1)').addClass("error-survey");
 						$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
+						allowrequest = false;
 					} else if ($(this).hasClass('survey-fname')) {
 						$(this).find(':nth-child(1)').addClass("error-survey");
 						$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
+						allowrequest = false;
 					} else if ($(this).hasClass('survey-email')) {
 						$(this).find(':nth-child(1)').addClass("error-survey");
 						$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
+						allowrequest = false;
 					}
 				});
 			}
