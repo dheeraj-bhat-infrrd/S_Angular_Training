@@ -56,7 +56,7 @@ function landingFlow() {
 		parent.next('.welcome-popup-wrapper').show();
 	});
 	
-	$('body').on('click', '.wc-final-skip', function(){ 
+	$('body').on('click', '.wc-final-skip-close', function(){ 
 		var end=false;
 		$('#overlay-send-survey').find('#wc-review-table-inner').children().each(function() {
 			if (!$(this).hasClass('wc-review-hdr')) {
@@ -94,6 +94,10 @@ function landingFlow() {
 		}
 		
 		
+	});
+	$('body').on('click', '.wc-final-skip', function(){
+		$(this).closest('.overlay-login').hide().html('');
+		enableBodyScroll();
 	});
 	
 	$('body').on('click', '.lnk-final-skip.wc-final-skip', function(){
