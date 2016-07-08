@@ -79,6 +79,7 @@ public interface CommonConstants
     public static final String START_SURVEY = "rest/survey/start";
     public static final String SHOW_SURVEY_PAGE_FOR_URL = "rest/survey/showsurveypageforurl";
     public static final String SHOW_SURVEY_PAGE = "rest/survey/showsurveypage";
+    public static final String SET_REGISTRATION_PASSWORD = "/registeraccount/setregistrationpassword.do";
 
     /**
      * Status constants
@@ -88,6 +89,7 @@ public interface CommonConstants
     public static final int STATUS_INACTIVE = 0;
     public static final int STATUS_SURVEY_TEMPLATE = 2;
     public static final int STATUS_NOT_VERIFIED = 2;
+    public static final int STATUS_INCOMPLETE = 4;
     public static final int STATUS_UNDER_PROCESSING = 2;
     public static final int STATUS_ACCOUNT_DISABLED = 2;
     public static final int STATUS_COMPANY_DISABLED = 2;
@@ -201,7 +203,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR = "HierarchySettingsCorrector";
     public static final String BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "ZillowReviewProcessorAndAutoPoster";
     public static final String BATCH_TYPE_HIERARCHY_UPLOAD_PROCESSOR = "HierarchyUploadProcessor";
-    
+
     //batch name constant for batch tracker
     public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
     public static final String BATCH_NAME_SOCIAL_MONITOR_LAST_BUILD = "Social Post Import In Solr";
@@ -225,11 +227,11 @@ public interface CommonConstants
     public static final String COMPANIES_BILLING_REPORT_GENERATOR = "Companies Billing Report Generator";
     public static final String BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "Zillow review processor and auto poster";
     public static final String BATCH_NAME_HIERARCHY_UPLOAD_PROCESSOR = "Company Hierarchy Upload Processor";
-    
+
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USERS_REPORT = "Company user report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_HIERARCHY_REPORT = "Hierarchy report";
-    
+
     /**
      * Mongo entities and column name constants
      */
@@ -271,9 +273,9 @@ public interface CommonConstants
     public static final String AGREE_SHARE_COLUMN_FALSE = "false";
     public static final String PROFILE_IMAGE_THUMBNAIL_COLUMN = "profileImageUrlThumbnail";
     public static final String LOGO_THUMBNAIL_COLUMN = "logoThumbnail";
-    public static final String IS_PROFILE_IMAGE_PROCESSED_COLUMN ="isProfileImageProcessed";
-    public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN ="isLogoImageProcessed";
-    public static final String IS_UNMARKED_ABUSIVE_COLUMN ="isUnmarkedAbusive";
+    public static final String IS_PROFILE_IMAGE_PROCESSED_COLUMN = "isProfileImageProcessed";
+    public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN = "isLogoImageProcessed";
+    public static final String IS_UNMARKED_ABUSIVE_COLUMN = "isUnmarkedAbusive";
     public static final String DELETED_SOCIAL_MEDIA_TOKENS_COLUMN = "deletedSocialTokens";
     public static final String SHOW_SURVEY_ON_UI_COLUMN = "showSurveyOnUI";
     public static final String SUMMARY_COLUMN = "summary";
@@ -343,7 +345,7 @@ public interface CommonConstants
     public static final String USER_PROFILE_SETTINGS = "profileSettings";
     public static final String USER_ACCOUNT_SETTINGS = "accountSettings";
     public static final String USER_APP_SETTINGS = "appSettings";
-    public static final String COMPLAIN_REG_SETTINGS= "complaintRegSettings";
+    public static final String COMPLAIN_REG_SETTINGS = "complaintRegSettings";
     public static final String ERROR = "error";
     public static final String MESSAGE = "message";
     public static final String EMAIL_TYPE = "emailtype";
@@ -441,10 +443,10 @@ public interface CommonConstants
     public static final String TEMP_FOLDER = "Temp";
     public static final String LINKEDIN_URL_PART = "licdn";
     public static final String FILE_SEPARATOR = "/";
-    
+
     public static final String ACTIVE_SUBSCRIPTION_MAIL_SUBJECT = "Active Subscription List in Braintree";
     public static final String TRANSACTION_LIST_MAIL_SUBJECT = "Transaction list for Subscription ";
-    
+
     public static final String ADMIN_RECEPIENT_DISPLAY_NAME = "Admin";
 
     /**
@@ -495,7 +497,7 @@ public interface CommonConstants
     public static final String ENCOMPASS_PASSWORD_COLUMN = "password";
     public static final String ENCOMPASS_GENERATE_REPORT_COLUMN = "generateReport";
     public static final String ENCOMPASS_DEFAULT_FEILD_ID = "1997";
-    
+
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
@@ -881,18 +883,18 @@ public interface CommonConstants
     public static final String BULK_SURVEY_VALID = "Valid";
 
     public static final String BULK_SURVEY_INVALID = "Invalid";
-    
+
     // aggregate constants
     public static final String AGGREGATE_BY_DAY = "day";
     public static final String AGGREGATE_BY_WEEK = "week";
     public static final String AGGREGATE_BY_MONTH = "month";
     public static final String AGGREGATE_BY_YEAR = "year";
-    
+
     // Survey mood constant
     public static final String SURVEY_MOOD_GREAT = "Great";
     public static final String SURVEY_MOOD_OK = "OK";
     public static final String SURVEY_MOOD_UNPLEASANT = "Unpleasant";
-    
+
     // image types
     public static final String IMAGE_TYPE_LOGO = "logo";
     public static final String IMAGE_TYPE_PROFILE = "profile";
@@ -916,22 +918,22 @@ public interface CommonConstants
     public static final String URL_DETAILS_ACCESS_DATES_COLUMN = "accessDates";
     public static final String URL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
     public static final String URL_DETAILS_QUERY_PARAMS_COLUMN = "queryParams";
-    
+
     public static final String URL_PARAM_RESET_PASSWORD = "resetorset";
     public static final String URL_PARAM_RESETORSET_VALUE_RESET = "reset";
     public static final String URL_PARAM_RESETORSET_VALUE_SET = "set";
-    
+
     public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE = "verificationRequestType";
     public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN = "admin";
     public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER = "user";
-    
-    
+
+
     public static final String URL_PARAM_RETAKE_SURVEY = "retakeSurvey";
-    
+
 
     //Url Details Mongo Column constants
     public static final String URL_COLUMN = "url";
-    
+
     //mark abusive by application constant
     public static final String REPORT_ABUSE_BY_APPLICSTION_NAME = "Application";
     public static final String REPORT_ABUSE_BY_APPLICSTION_EMAIL = "Reported By Application";
@@ -946,7 +948,7 @@ public interface CommonConstants
     public static final String MESSAGE_HASH_COLUMN = "messageHash";
     public static final String FORWARD_MAIL_DETAILS_STATUS_COLUMN = "status";
     public static final String FORWARD_MAIL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
-    
+
     //Social Media Connections History constants
     public static final String SOCIAL_MEDIA_DISCONNECTED = "disconnected";
     public static final String SOCIAL_MEDIA_CONNECTED = "connected";
@@ -974,8 +976,8 @@ public interface CommonConstants
     public static final String HEADER_INVITED_USERS = "Invited Users ";
     public static final String HEADER_ACTIVE_USERS = "Active Users";
     public static final String HEADER_ADOPTION_RATES = "Adoption Rates";
-    
-    
+
+
     // Constants for Billing Report
     public static final String HEADER_ADDRESS = "Address";
     public static final String HEADER_USER_ID = "User ID";
@@ -990,7 +992,7 @@ public interface CommonConstants
 
     // MySQL IS_ZILLOW_CONNECTED column name constant
     public static final String IS_ZILLOW_CONNECTED_COLUMN = "IS_ZILLOW_CONNECTED";
-    
+
     // sections that can be hidden from public profile page
     public static final String HIDE_RECENT_POSTS = "recent_posts";
     public static final String HIDE_SOCIAL_REVIEW = "social_reviews";
@@ -1004,7 +1006,7 @@ public interface CommonConstants
     public static final String LINKEDIN_LABEL = "LINKEDIN";
     public static final String TWITTER_LABEL = "TWITTER";
     public static final String FACEBOOK_LABEL = "FACEBOOK";
-    
+
     // Status in mongo for active and inactive records
     public static final String STATUS_ACTIVE_MONGO = "A";
     public static final String STATUS_DELETED_MONGO = "D";
@@ -1065,7 +1067,7 @@ public interface CommonConstants
     public static final String CHR_YELP = "Yelp";
     public static final String CHR_LENDING_TREE = "Lendingtree";
     public static final String CHR_REALTOR = "Realtor";
-    
+
     public static final String SOCIAL_SURVEY_ACCESS_LAVEL = "SocialSurvey Access Level ";
     public static final String SOCIAL_SURVEY_INVITE_SENT = "SocialSurvey Invite sent";
     public static final String DATE_LAST_INVITE_SENT = "Date last invite sent";
@@ -1079,11 +1081,11 @@ public interface CommonConstants
     public static final String DATE_ADOPTION_COMPLETED = "Date Adoption completed";
     public static final String DATE_LAST_SURVEY_SENT = "Date last survey sent";
     public static final String DATE_LAST_SURVEY_POSTED = "Date last survey posted";
-    
+
     //user report mail subject and body
     public static final String COMPANY_USERS_REPORT_MAIL_SUBJ = "Company Users Report for ";
-    public static final String COMPANY_USERS_REPORT_MAIL_BODY =  "Here is the company users report you requested. Please refer to the attachment for the report.";
-    
+    public static final String COMPANY_USERS_REPORT_MAIL_BODY = "Here is the company users report you requested. Please refer to the attachment for the report.";
+
     //API Call details constants
     public static final String EXTERNAL_API_CALL_DETAILS_COLLECTION = "EXTERNAL_API_CALL_DETAILS";
     public static final String HTTP_METHOD_GET = "GET";
@@ -1121,9 +1123,9 @@ public interface CommonConstants
     public static final String USER_DELETE_ERROR_LIST = "USER_DELETE";
     public static final String BRANCH_DELETE_ERROR_LIST = "BRANCH_DELETE";
     public static final String REGION_DELETE_ERROR_LIST = "REGION_DELETE";
-    
+
     //Hierarchy upload status constants
-    
+
     public static final int HIERARCHY_UPLOAD_ENTITY_INITIATED = 1;
     public static final int HIERARCHY_UPLOAD_ENTITY_STARTED = 2;
     public static final int HIERARCHY_UPLOAD_ENTITY_DONE = 0;
@@ -1131,10 +1133,10 @@ public interface CommonConstants
     public static final int HIERARCHY_UPLOAD_UPLOAD_COMPLETE = 4;
     public static final int HIERARCHY_UPLOAD_ERROR = 5;
     public static final int HIERARCHY_UPLOAD_NO_UPLOAD = 6;
-    
+
     public static final char UPLOAD_MODE_APPEND = 'A';
     public static final char UPLOAD_MODE_REPLACE = 'R';
-    
+
     //Hierarchy upload message constants
     public static final String UPLOAD_MSG_INITIATED = "Import initiated";
     public static final String UPLOAD_MSG_STARTED = "Import started";
@@ -1156,20 +1158,25 @@ public interface CommonConstants
     public static final String UPLOAD_ADDED_USERS = "No. of users added : ";
     public static final String UPLOAD_MODIFIED_USERS = "No. of users modified : ";
     public static final String UPLOAD_DELETED_USERS = "No. of users deleted : ";
-    
-    
+
+
     //Company registration stage
     public static final String COMPANY_REGISTRATION_STAGE_STARTED = "The registration has been initiated";
     public static final String COMPANY_REGISTRATION_STAGE_COMPLETE = "The registrtion has been completed successfully";
     public static final String COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING = "The registration has been initiated, but no payment has been made";
-    
+
     public static final String ENCOMPASS_CONNECTION = "ENCOMPASS_CONNECTION";
     public static final String ACTION_ENABLED = "ENABLED";
     public static final String ACTION_DISABLED = "DISABLED";
-    
+
     public static final int UNMATCHED_USER_TABID = 1;
     public static final int PROCESSED_USER_TABID = 2;
     public static final int MAPPED_USER_TABID = 3;
     public static final int CORRUPT_USER_TABID = 4;
-    
+
+    public static final String ACCOUNT_REGISTER = "ACCREG";
+    public static final int ENTERPRISE_PLAN_ID = 3;
+
+    public static final String PLAN_ID = "planId";
+
 }

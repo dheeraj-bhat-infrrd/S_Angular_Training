@@ -1,14 +1,72 @@
 package com.realtech.socialsurvey.core.services.social.impl;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.sql.Timestamp;
-import java.util.*;
-
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
-import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.dao.ExternalSurveyTrackerDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SocialPostDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.ZillowTempPostDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.AgentMediaPostResponseDetails;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyMediaPostResponseDetails;
+import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.EntityMediaPostResponseDetails;
+import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
+import com.realtech.socialsurvey.core.entities.MediaPostDetails;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.RegionMediaPostResponseDetails;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.ZillowTempPost;
+import com.realtech.socialsurvey.core.enums.ProfileStages;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
+import com.realtech.socialsurvey.core.vo.UserList;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
+import facebook4j.Facebook;
+import facebook4j.FacebookException;
+import facebook4j.FacebookFactory;
+import facebook4j.PostUpdate;
+import facebook4j.auth.AccessToken;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -29,43 +87,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.ExternalSurveyTrackerDao;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.dao.SocialPostDao;
-import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
-import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
-import com.realtech.socialsurvey.core.dao.UserDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.dao.ZillowTempPostDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.enums.ProfileStages;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
-import com.realtech.socialsurvey.core.services.social.SocialManagementService;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
-import com.realtech.socialsurvey.core.vo.UserList;
-import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
-import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
-
-import facebook4j.Facebook;
-import facebook4j.FacebookException;
-import facebook4j.FacebookFactory;
-import facebook4j.PostUpdate;
-import facebook4j.auth.AccessToken;
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -73,6 +94,19 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -99,6 +133,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private UserManagementService userManagementService;
+
+	@Autowired
+	private SolrSearchService solrSearchService;
 
     @Autowired
     private BatchTrackerService batchTrackerService;
@@ -264,6 +301,20 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         return mediaTokens;
     }
 
+    @Override
+    public SocialMediaTokens updateSocialMediaTokens( String collection, long iden,
+        SocialMediaTokens mediaTokens ) throws InvalidInputException
+    {
+        if ( mediaTokens == null ) {
+            throw new InvalidInputException( "Social Tokens passed can not be null" );
+        }
+        LOG.info( "Updating Social Tokens information" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden(
+            MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, mediaTokens, iden, collection );
+        LOG.info( "Social Tokens updated successfully" );
+        return mediaTokens;
+    }
+
 
     @Override
     public SocialMediaTokens updateAgentSocialMediaTokens( AgentSettings agentSettings, SocialMediaTokens mediaTokens )
@@ -406,7 +457,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     linkedInPost += "/shares?oauth2_access_token="
                         + settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
                     linkedInPost += "&format=json";
-                    try {
+					//SS-585 begin
+					String reviewId = Integer.toHexString( String.valueOf( System.currentTimeMillis() ).hashCode() ) + Integer
+						.toHexString( String.valueOf( settings.getIden() ).hashCode() );
+					linkedInPost += "&reviewid=" + reviewId;
+					//SS-585 end
+					try {
                         HttpClient client = HttpClientBuilder.create().build();
                         HttpPost post = new HttpPost( linkedInPost );
 
@@ -447,7 +503,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         }
 
                         String profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                            + settings.getProfileUrl();
+                            + agentSettings.getProfileUrl();
                         message = StringEscapeUtils.escapeXml( message );
 
                         message = message.replace( "&amp;lmnlf;", "\\n" ).replace( "&amp;dash;", "\\u2014" );
@@ -684,8 +740,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     @Override
-    public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, OrganizationUnitSettings unitSettings,
-        String collectionName ) throws InvalidInputException
+    public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, boolean removeFeed,
+        OrganizationUnitSettings unitSettings, String collectionName ) throws InvalidInputException
     {
         LOG.debug( "Method disconnectSocialNetwork() called" );
 
@@ -697,18 +753,30 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 profileStage.setOrder( ProfileStages.FACEBOOK_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.FACEBOOK_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN;
+				if ( removeFeed ) {
+					//Remove from SOCIAL_POST
+					removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
+				}
                 break;
 
             case CommonConstants.TWITTER_SOCIAL_SITE:
                 profileStage.setOrder( ProfileStages.TWITTER_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.TWITTER_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_TWITTER_SOCIAL_MEDIA_TOKEN;
+				if ( removeFeed ) {
+					//Remove from SOCIAL_POST
+					removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
+				}
                 break;
 
             case CommonConstants.GOOGLE_SOCIAL_SITE:
                 profileStage.setOrder( ProfileStages.GOOGLE_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.GOOGLE_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_SOCIAL_MEDIA_TOKEN;
+				if ( removeFeed ) {
+					//Remove from SOCIAL_POST
+					removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
+				}
                 break;
 
             case CommonConstants.LINKEDIN_SOCIAL_SITE:
@@ -760,6 +828,50 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         LOG.debug( "Method disconnectSocialNetwork() finished" );
 
         return organizationUnitSettings;
+    }
+
+
+    void removeFromSocialPosts( String collectionName, long entityId, String source ) throws InvalidInputException
+    {
+        LOG.info( "Method to remove social posts started for collectionName : " + collectionName + " entityId : " + entityId
+            + " source : " + source );
+        if ( collectionName == null || collectionName.isEmpty() )
+            throw new InvalidInputException( "Entity type cannot be empty" );
+        if ( entityId <= 0 )
+            throw new InvalidInputException( "Invalid entity Id" );
+        if ( source == null || source.isEmpty() )
+            throw new InvalidInputException( "Source cannot be empty" );
+
+        String entityType = null;
+        switch ( collectionName ) {
+            case CommonConstants.AGENT_SETTINGS_COLLECTION:
+                entityType = CommonConstants.AGENT_ID_COLUMN;
+                break;
+            case CommonConstants.BRANCH_SETTINGS_COLLECTION:
+                entityType = CommonConstants.BRANCH_ID_COLUMN;
+                break;
+            case CommonConstants.REGION_SETTINGS_COLLECTION:
+                entityType = CommonConstants.REGION_ID_COLUMN;
+                break;
+            case CommonConstants.COMPANY_SETTINGS_COLLECTION:
+                entityType = CommonConstants.COMPANY_ID_COLUMN;
+                break;
+            default:
+                throw new InvalidInputException( "Invalid entity type :" + entityType );
+        }
+
+		//Remove from mongo
+        socialPostDao.removeSocialPostsForEntityAndSource( entityType, entityId, source );
+
+		//Remove from solr
+		try {
+			solrSearchService.removeSocialPostsFromSolr( entityType, entityId, source );
+		} catch ( SolrException e ) {
+			throw new InvalidInputException( "A Solr exception occurred while removing social posts. Reason : ", e );
+		}
+
+		LOG.info( "Method to remove social posts finished for collectionName : " + collectionName + " entityId : " + entityId
+            + " source : " + source );
     }
 
 
@@ -899,11 +1011,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         //Post for agent
         if ( socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
-
             if ( agentSettings != null ) {
-                postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
-                    serverBaseUrl, agentSettings, socialMediaPostDetails.getAgentMediaPostDetails(),
-                    agentMediaPostResponseDetails, isZillow );
+                User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
+                if ( agent != null && agent.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                    postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
+                        serverBaseUrl, agentSettings, socialMediaPostDetails.getAgentMediaPostDetails(),
+                        agentMediaPostResponseDetails, isZillow );
+                }
             }
         }
 
@@ -915,9 +1029,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 OrganizationUnitSettings companySetting = organizationManagementService
                     .getCompanySettings( socialMediaPostDetails.getCompanyMediaPostDetails().getCompanyId() );
                 if ( companySetting != null ) {
-                    postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
-                        serverBaseUrl, companySetting, socialMediaPostDetails.getCompanyMediaPostDetails(),
-                        companyMediaPostResponseDetails, isZillow );
+                    Company company = organizationManagementService.getCompanyById( companySetting.getIden() );
+                    if ( company != null && company.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                        postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
+                            serverBaseUrl, companySetting, socialMediaPostDetails.getCompanyMediaPostDetails(),
+                            companyMediaPostResponseDetails, isZillow );
+                    }
                 }
             }
 
@@ -929,10 +1046,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     OrganizationUnitSettings setting = organizationManagementService
                         .getRegionSettings( regionMediaPostDetails.getRegionId() );
                     if ( setting != null ) {
-                        RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
-                            regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
-                        postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
-                            serverBaseUrl, setting, regionMediaPostDetails, regionMediaPostResponseDetails, isZillow );
+                        Region region = userManagementService.getRegionById( setting.getIden() );
+                        if ( region != null && region.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                            RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
+                                regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
+                            postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage,
+                                rating, serverBaseUrl, setting, regionMediaPostDetails, regionMediaPostResponseDetails, isZillow );
+                        }
                     }
 
                 }
@@ -946,10 +1066,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
                     BranchMediaPostResponseDetails branchMediaPostResponseDetails = getBMPRDFromBMPRDList(
                         branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
-
-                    if ( setting != null ) {
-                        postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
-                            serverBaseUrl, setting, branchMediaPostDetails, branchMediaPostResponseDetails, isZillow );
+                    Branch branch = userManagementService.getBranchById( setting.getIden() );
+                    if ( branch != null && branch.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                        if ( setting != null ) {
+                            postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage,
+                                rating, serverBaseUrl, setting, branchMediaPostDetails, branchMediaPostResponseDetails, isZillow );
+                        }
                     }
                 }
 
@@ -1049,9 +1171,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         if ( socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
 
             if ( agentSettings != null ) {
-                postToLinkedInForAHierarchy( agentSettings, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
-                    linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
-                    socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails );
+                User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
+                if ( agent != null && agent.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                    postToLinkedInForAHierarchy( agentSettings, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                        linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
+                        socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails );
+                }
             }
         }
 
@@ -1062,9 +1187,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 OrganizationUnitSettings companySetting = organizationManagementService
                     .getCompanySettings( socialMediaPostDetails.getCompanyMediaPostDetails().getCompanyId() );
                 if ( companySetting != null ) {
-                    postToLinkedInForAHierarchy( companySetting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
-                        linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
-                        socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails );
+                    Company company = userManagementService.getCompanyById( companySetting.getIden() );
+                    if ( company != null && company.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                        postToLinkedInForAHierarchy( companySetting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                            linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
+                            socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails );
+                    }
                 }
             }
 
@@ -1078,9 +1206,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( setting != null ) {
                         RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                             regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
-                        postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
-                            linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings, regionMediaPostDetails,
-                            regionMediaPostResponseDetails );
+                        Region region = userManagementService.getRegionById( setting.getIden() );
+                        if ( region != null && region.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                            postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                                linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
+                                regionMediaPostDetails, regionMediaPostResponseDetails );
+                        }
                     }
                 }
             }
@@ -1093,9 +1224,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( setting != null ) {
                         BranchMediaPostResponseDetails branchMediaPostResponseDetails = getBMPRDFromBMPRDList(
                             branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
-                        postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
-                            linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings, branchMediaPostDetails,
-                            branchMediaPostResponseDetails );
+                        Branch branch = userManagementService.getBranchById( setting.getIden() );
+                        if ( branch != null && branch.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                            postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                                linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
+                                branchMediaPostDetails, branchMediaPostResponseDetails );
+                        }
                     }
                 }
             }
@@ -1105,7 +1239,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
-    void postToLinkedInForAHierarchy( OrganizationUnitSettings setting, Double rating, boolean isZillow,
+    void
+	postToLinkedInForAHierarchy( OrganizationUnitSettings setting, Double rating, boolean isZillow,
         String updatedLinkedInMessage, String linkedinMessage, String linkedinProfileUrl, String linkedinMessageFeedback,
         OrganizationUnitSettings companySettings, AgentSettings agentSettings, MediaPostDetails mediaPostDetails,
         EntityMediaPostResponseDetails mediaPostResponseDetails )
@@ -1186,8 +1321,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             AgentSettings agentSettings = userManagementService
                 .getUserSettings( socialMediaPostDetails.getAgentMediaPostDetails().getAgentId() );
             if ( agentSettings != null ) {
-                postToTwitterForAHierarchy( agentSettings, rating, companyId, twitterMessage,
-                    socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails );
+                User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
+                if ( agent != null && agent.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                    postToTwitterForAHierarchy( agentSettings, rating, companyId, twitterMessage,
+                        socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails );
+                }
             }
 
         }
@@ -1200,8 +1338,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 OrganizationUnitSettings companySetting = organizationManagementService
                     .getCompanySettings( socialMediaPostDetails.getCompanyMediaPostDetails().getCompanyId() );
                 if ( companySetting != null ) {
-                    postToTwitterForAHierarchy( companySetting, rating, companyId, twitterMessage,
-                        socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails );
+                    Company company = userManagementService.getCompanyById( companySetting.getIden() );
+                    if ( company != null && company.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                        postToTwitterForAHierarchy( companySetting, rating, companyId, twitterMessage,
+                            socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails );
+                    }
                 }
             }
 
@@ -1214,8 +1355,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( setting != null ) {
                         RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                             regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
-                        postToTwitterForAHierarchy( setting, rating, companyId, twitterMessage, regionMediaPostDetails,
-                            regionMediaPostResponseDetails );
+                        Region region = userManagementService.getRegionById( setting.getIden() );
+                        if ( region != null && region.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                            postToTwitterForAHierarchy( setting, rating, companyId, twitterMessage, regionMediaPostDetails,
+                                regionMediaPostResponseDetails );
+                        }
                     }
 
                 }
@@ -1230,8 +1374,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( setting != null ) {
                         BranchMediaPostResponseDetails branchMediaPostResponseDetails = getBMPRDFromBMPRDList(
                             branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
-                        postToTwitterForAHierarchy( setting, rating, companyId, twitterMessage, branchMediaPostDetails,
-                            branchMediaPostResponseDetails );
+                        Branch branch = userManagementService.getBranchById( setting.getIden() );
+                        if ( branch != null && branch.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+                            postToTwitterForAHierarchy( setting, rating, companyId, twitterMessage, branchMediaPostDetails,
+                                branchMediaPostResponseDetails );
+                        }
                     }
 
                 }
@@ -1306,6 +1453,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         try {
             String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName );
             User agent = userManagementService.getUserByUserId( agentId );
+
+			if ( agent.getCompany() == null || agent.getCompany().getStatus() == CommonConstants.STATUS_INACTIVE
+				|| agent.getStatus() == CommonConstants.STATUS_INACTIVE )
+				return true;
+
             int accountMasterId = 0;
             try {
                 AccountsMaster masterAccount = agent.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX )
@@ -1697,7 +1849,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.FACEBOOK_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.FACEBOOK;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1708,7 +1860,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.TWITTER_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.TWITTER;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1719,7 +1871,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.GOOGLE_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.GOOGLE_PLUS;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1730,7 +1882,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.LINKEDIN_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.LINKED_IN;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1741,7 +1893,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.ZILLOW_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.ZILLOW;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1752,7 +1904,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.YELP_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.YELP;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1763,7 +1915,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.REALTOR_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.REALTOR;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history
@@ -1774,7 +1926,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String socialMedia = CommonConstants.LENDINGTREE_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.LENDING_TREE;
                 //disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
                 updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
                 //update social connections history

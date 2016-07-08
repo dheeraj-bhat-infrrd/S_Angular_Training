@@ -1,12 +1,12 @@
 package com.realtech.socialsurvey.core.services.mail;
 
-import java.util.List;
-import java.util.Map;
-
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -348,7 +348,7 @@ public interface EmailServices
      */
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
         String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
-        String surveyLink, String logoUrl ) throws InvalidInputException;
+        String surveyLink, String logoUrl, String agentDisclaimer, String agentLicenses ) throws InvalidInputException;
 
 
     void sendZillowCallExceededMailToAdmin( int count ) throws InvalidInputException, UndeliveredEmailException;
@@ -400,6 +400,19 @@ public interface EmailServices
     public void sendZillowReviewComplaintHandleMail( String recipientMailId, String customerName, String rating, String reviewUrl )
         throws InvalidInputException, UndeliveredEmailException;
 
+
+	/**
+	 *
+     * @param url
+     * @param recipientMailId
+     * @param firstName
+     * @param lastName
+     * @param planId
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+	public void sendNewRegistrationInviteMail( String url, String recipientMailId, String firstName, String lastName,
+        int planId ) throws InvalidInputException, UndeliveredEmailException;
 
     public void sendCompanyRegistrationStageMail( String firstName, String lastName, List<String> recipientMailIds,
         String registrationStage, String name, String details, boolean isImmediate ) throws InvalidInputException,

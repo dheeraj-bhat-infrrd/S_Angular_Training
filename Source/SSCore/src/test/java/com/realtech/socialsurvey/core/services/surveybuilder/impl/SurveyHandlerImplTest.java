@@ -6,18 +6,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.hibernate.criterion.Criterion;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -31,7 +27,6 @@ import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -189,19 +184,19 @@ public class SurveyHandlerImplTest
     }
 
 
-    //Tests for checkIfTimeIntervalHasExpired
-    @Test
+    //Tests for checkSurveyReminderEligibility
+    /*@Test
     public void checkIfTimeIntervalHasExpiredTestExpired()
     {
-        assertTrue( "Test", surveyHandlerImpl.checkIfTimeIntervalHasExpired( 0, 86400000, 0 ) );
+        assertTrue( "Test", surveyHandlerImpl.checkSurveyReminderEligibility( 0, 86400000, 0 ) );
     }
 
 
     @Test
     public void checkIfTimeIntervalHasExpiredTestNotExpired()
     {
-        assertFalse( "Test", surveyHandlerImpl.checkIfTimeIntervalHasExpired( 0, 1, 1 ) );
-    }
+        assertFalse( "Test", surveyHandlerImpl.checkSurveyReminderEligibility( 0, 1, 1 ) );
+    }*/
 
 
     //Tests for initiateSurveyRequest

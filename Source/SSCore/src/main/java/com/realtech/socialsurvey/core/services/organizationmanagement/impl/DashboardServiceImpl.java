@@ -295,7 +295,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     private long getCompletedSurveyCount( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
         boolean filterAbusive ) throws InvalidInputException
     {
-        return surveyDetailsDao.getCompletedSurveyCount( columnName, columnValue, startDate, endDate, filterAbusive, false );
+        //JIRA SS-580(exclude zillow reviews)
+        return surveyDetailsDao.getCompletedSurveyCount( columnName, columnValue, startDate, endDate, filterAbusive, true );
     }
 
 

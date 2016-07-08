@@ -332,6 +332,33 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	
+	<bean id="userencryptedidupdaterjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.AgentSettingUserEncryptedIdUpdater" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="userManagementService" value-ref="userManagementService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
+	<!-- Setting bulk survey import job detail -->
+	<bean id="surveyimporterjobdetail"
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+				  value="com.realtech.socialsurvey.core.starter.BulkSurveyImporter" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
@@ -358,7 +385,7 @@
 	<bean id="incompletesurveycron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="incompletesurveyjobdetail" />
-		<property name="cronExpression" value="0 06 * * * ?" />
+		<property name="cronExpression" value="0 08 * * * ?" />
 	</bean>
 
 	<!-- setting cron for update subscription price -->
@@ -434,7 +461,7 @@
 	<bean id="crmdataagentidmappercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="crmdataagentidmapperjobdetail" />
-		<property name="cronExpression" value="0 10 * * * ?" />
+		<property name="cronExpression" value="0 6 * * * ?" />
 	</bean>
 
 	<!-- setting cron for loading image from linkedin to amazon server -->
@@ -487,7 +514,7 @@
 	<bean id="dotloopcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="dotloopjobdetail" />
-		<property name="cronExpression" value="0 0 1 * * ?" />
+		<property name="cronExpression" value="0 01 7 * * ?" />
 	</bean>
 
 	<bean id="imageprocessingcron"
@@ -500,6 +527,23 @@
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="zillowreviewprocessandautopostjobdetail" />
 		<property name="cronExpression" value="0 0 8 * * ?" />
+	</bean>
+	
+	
+	<bean id="userencryptedidupdatercron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="userencryptedidupdaterjobdetail" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="1000" />
+	</bean>
+
+
+	<!-- setting cron for bulk survey import -->
+	<bean id="surveyimportercron"
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="surveyimporterjobdetail" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="2000" />
 	</bean>
 
 	<!-- Scheduler factory -->
@@ -527,6 +571,7 @@
 				<!-- <ref bean="companiesbillingreportjobdetail" /> -->
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<ref bean="zillowreviewprocessandautopostjobdetail" />
+				<ref bean="surveyimporterjobdetail" />
 			</list>
 		</property>
 
@@ -554,6 +599,7 @@
 				<!-- <ref bean="companiesbillingreportcron" /> -->
 				<!-- <ref bean="hierarchysettingscron" /> -->
 				<ref bean="zillowreviewprocessandautopostcron" />
+				<ref bean="surveyimportercron" />
 			</list>
 		</property>
 		<property name="quartzProperties">

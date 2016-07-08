@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.utils;
 
 import static org.junit.Assert.assertEquals;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -8,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;

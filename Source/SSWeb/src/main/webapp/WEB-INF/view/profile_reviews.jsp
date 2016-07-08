@@ -33,7 +33,11 @@
 	<c:when test="${entityType == 'agentId'}">
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
+	
+	
+
 </c:choose>
+        <c:set value="${fn:escapeXml(reviewItem.review)}" var="review"></c:set>
 		<div data-firstname="${reviewItem.customerFirstName}"
 			data-lastname="${reviewItem.customerLastName}" data-agentid="${reviewItem.agentId}" survey-mongo-id="${reviewItem._id}"
 			data-review="${fn:escapeXml(reviewItem.review)}" data-score="${reviewItem.score}" data-customeremail="${reviewItem.customerEmail}"
@@ -104,18 +108,20 @@
 							</c:when>
 							
 							<c:otherwise>
-								<div style="clear:both"><spring:message code="label.completedTransaction.key"/>
-                                       <c:choose>
-									<c:when test="${ not empty reviewItem.surveyTransactionDate} ">
-										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-						value="${ reviewItem.surveyTransactionDate}" />"></span>
-									</c:when>
-									<c:otherwise>
-										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-						value="${reviewItem.modifiedOn}" />"></span>
-									</c:otherwise>
-									</c:choose>
-								</div>
+							    <c:if test="${reviewItem.source ne 'customer'}">
+                                    <div style="clear:both"><spring:message code="label.completedTransaction.key"/>
+                                           <c:choose>
+                                        <c:when test="${ not empty reviewItem.surveyTransactionDate} ">
+                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${ reviewItem.surveyTransactionDate}" />"></span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+                            value="${reviewItem.modifiedOn}" />"></span>
+                                        </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </c:if>
 							</c:otherwise>
 						</c:choose>
 							</c:otherwise>
@@ -125,18 +131,23 @@
 			</div>
 			
 			<c:choose>
-				<c:when test="${fn:length(reviewItem.review)>250}">
+				<c:when test="${fn:length(review)>250}">
 					<div class="ppl-content review-height">
-						<span class="review-complete-txt">${reviewItem.review}</span>
+						<span class="review-complete-txt">${review}</span>
 						<c:if test="${reviewItem.source=='Zillow' }">
                           <br><span><a class="view-zillow-link hide" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
-						<span class="review-less-text">${fn:substring(reviewItem.review, 0, 250)}</span>
+						<span class="review-less-text">${fn:substring(review, 0, 250)}</span>
 							<span class="review-more-button">read full review</span>
 					</div>
 				</c:when>
 				<c:otherwise>
-					<div class="ppl-content review-height">${reviewItem.review}</div>
+					<div class="ppl-content review-height">
+					    <span>${review}</span>
+                            <c:if test="${reviewItem.source=='Zillow' }">
+                              <br><span><a class="view-zillow-link" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
+                            </c:if>
+					</div>
 				</c:otherwise>
 			</c:choose>
 			<div class="ppl-share-wrapper clearfix share-plus-height" >
@@ -157,7 +168,7 @@
 						    <span class="float-left ppl-share-icns icn-twit-rev" id ="twitt_${loop.index}" onclick="twitterProfileFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(twitterReview)}&url=${reviewItem.completeProfileUrl}"></span>
 						 <span
 						class="float-left ppl-share-icns icn-lin-rev" title="LinkedIn"
-						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)} + &source="></span>
+						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)}&reviewid=${reviewItem._id}&source="></span>
 					<span class="float-left" title="Google+">
 						<button
 							class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"

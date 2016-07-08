@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.entities.Plan;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.dao.ForwardMailDetailsDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.ForwardMailDetails;
@@ -144,6 +146,59 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
         LOG.info( "Successfully sent registration invite mail" );
     }
+
+
+	@Async
+	@Override
+	public void sendNewRegistrationInviteMail( String url, String recipientMailId, String firstName, String lastName,
+		int planId ) throws InvalidInputException, UndeliveredEmailException
+	{
+		LOG.info( "Method sendNewRegistrationInviteMail started for url : " + url + " firstName : " + firstName + " lastName : "
+			+ lastName + " and planId : " + planId );
+		if ( url == null || url.isEmpty() ) {
+			LOG.error( "Url is empty or null for sending registration invite mail " );
+			throw new InvalidInputException( "Url is empty or null for sending registration invite mail " );
+		}
+		if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+			LOG.error( "Recipient email Id is empty or null for sending registration invite mail " );
+			throw new InvalidInputException( "Recipient email Id is empty or null for sending registration invite mail " );
+		}
+		if ( firstName == null || firstName.isEmpty() ) {
+			LOG.error( "Firstname is empty or null for sending registration invite mail " );
+			throw new InvalidInputException( "Firstname is empty or null for sending registration invite mail " );
+		}
+
+		LOG.info( "Initiating URL Service to shorten the url " + url );
+		url = urlService.shortenUrl( url );
+		LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+		String subjectFileName =
+			EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.NEW_REGISTRATION_MAIL_SUBJECT;
+		// Preparing full name of the recipient
+		String fullName = firstName;
+		if ( lastName != null && !lastName.isEmpty() ) {
+			fullName = firstName + " " + lastName;
+		}
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+
+		//When the plan is individual or small business
+		if ( planId < Plan.ENTERPRISE.getPlanId() ) {
+			messageBodyReplacements.setFileName(
+				EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.NEW_REGISTRATION_MAIL_BODY );
+		} else {
+			messageBodyReplacements.setFileName(
+				EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.NEW_REGISTRATION_ENTERPRISE_MAIL_BODY );
+		}
+		messageBodyReplacements.setReplacementArgs(
+			Arrays.asList( appLogoUrl, fullName, url, url, url, recipientMailId, appBaseUrl, appBaseUrl ) );
+
+		LOG.debug( "Calling email sender to send mail" );
+		emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
+		LOG.info(
+			"Method sendNewRegistrationInviteMail finished for url : " + url + " firstName : " + firstName + " lastName : "
+				+ lastName + " and planId : " + planId );
+	}
 
 
     @Async
@@ -1726,7 +1781,11 @@ public class EmailServicesImpl implements EmailServices
         EmailEntity emailEntity = new EmailEntity();
         emailEntity.setRecipients( recipients );
         emailEntity.setSenderName( name );
-        emailEntity.setSenderEmailId( "u" + userId + "@" + defaultEmailDomain );
+        
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
+        
+        //JIRA SS-60 //pass stored encrypted id in mongo for the user
+        emailEntity.setSenderEmailId( "u-" + agentSettings.getUserEncryptedId() + "@" + defaultEmailDomain );
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );
 
         LOG.debug( "Prepared email entity for sending mail" );
@@ -1737,9 +1796,8 @@ public class EmailServicesImpl implements EmailServices
     @Override
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
         String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
-        String surveyLink, String logoUrl ) throws InvalidInputException
+        String surveyLink, String logoUrl, String agentDisclaimer, String agentLicenses ) throws InvalidInputException
     {
-
         LOG.info( "Sending manual survey reminder mail." );
 
         String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
@@ -1783,16 +1841,23 @@ public class EmailServicesImpl implements EmailServices
             mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
                 new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
         }
+
+        //JIRA SS-473 begin
+        String companyDisclaimer = "";
+        if ( companySettings.getDisclaimer() != null )
+            companyDisclaimer = companySettings.getDisclaimer();
+
         //replace legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, surveyLink,
             survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
             survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-            fullAddress, "", user.getProfileName() );
+            fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, surveyLink,
             survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
             survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-            fullAddress, "", user.getProfileName() );
+            fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+        //JIRA SS-473 end
         //send mail
         try {
             sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );

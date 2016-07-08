@@ -40,6 +40,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserAssignment;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -472,7 +473,9 @@ public class UserManagementController
             usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
 
             model.addAttribute( "userslist", usersList );
-        } catch ( NonFatalException e ) {
+        } catch (
+
+        NonFatalException e ) {
             LOG.error( "NonFatalException in findusers. Reason : " + e.getMessage(), e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -585,7 +588,8 @@ public class UserManagementController
 
             try {
                 if ( checkIfTheUserCanBeDeleted( loggedInUser, userToRemove ) ) {
-                    userManagementService.deleteUserDataFromAllSources( loggedInUser, userIdToRemove, CommonConstants.STATUS_INACTIVE );
+                    userManagementService.deleteUserDataFromAllSources( loggedInUser, userIdToRemove,
+                        CommonConstants.STATUS_INACTIVE );
                 } else {
                     statusMap.put( "status", CommonConstants.ERROR );
                 }
@@ -1197,7 +1201,9 @@ public class UserManagementController
 
             // update the last login time and number of logins
             userManagementService.updateUserLoginTimeAndNum( user );
-        } catch ( NonFatalException e ) {
+        } catch (
+
+        NonFatalException e ) {
             LOG.error( "NonFatalException while setting new Password. Reason : " + e.getMessage(), e );
             redirectAttributes.addFlashAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -1650,22 +1656,21 @@ public class UserManagementController
         String lastName = request.getParameter( "lastName" );
         String emailId = request.getParameter( "emailId" );
 
-        if ( firstName != null  && firstName != "" ) {
+        if ( firstName != null && firstName != "" ) {
             firstName = replaceQuoteInString( firstName );
         }
 
-        if ( lastName != null  && lastName != "" ) {
+        if ( lastName != null && lastName != "" ) {
             lastName = replaceQuoteInString( lastName );
         }
 
-        
-        
+
         String fullName = firstName;
         if ( lastName != null && lastName != "" ) {
             fullName += " " + lastName;
         }
-        
-        
+
+
         try {
             long userId = 0;
             try {
@@ -1946,8 +1951,8 @@ public class UserManagementController
         }
         LOG.debug( "change password form parameters validated successfully" );
     }
-    
-    
+
+
     private String replaceQuoteInString( String str )
     {
         if ( str.contains( "\"" ) ) {

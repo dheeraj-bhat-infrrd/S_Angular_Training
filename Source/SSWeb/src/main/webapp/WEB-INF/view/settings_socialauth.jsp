@@ -15,7 +15,7 @@
 	<c:choose>
 		<c:when test="${not empty facebookLink}">
 			<div class="social-media-disconnect float-left ${socialDisabled}"
-				onclick="disconnectSocialMedia('facebook', ${isAutoLogin})" title="Disconnect"></div>
+				onclick="disconnectSocialMedia(event,'facebook', ${isAutoLogin})" title="Disconnect"></div>
 		</c:when>
 		<c:otherwise>
 			<div class="social-media-disconnect social-media-disconnect-disabled float-left ${socialDisabled}"></div>
@@ -31,7 +31,7 @@
 	<c:choose>
 		<c:when test="${not empty twitterLink}">
 			<div class="social-media-disconnect float-left ${socialDisabled}"
-				onclick="disconnectSocialMedia('twitter', ${isAutoLogin})" title="Disconnect"></div>
+				onclick="disconnectSocialMedia(event,'twitter', ${isAutoLogin})" title="Disconnect"></div>
 		</c:when>
 		<c:otherwise>
 			<div class="social-media-disconnect social-media-disconnect-disabled float-left ${socialDisabled}"></div>
@@ -47,7 +47,7 @@
 	<c:choose>
 		<c:when test="${not empty linkedinLink}">
 			<div class="social-media-disconnect float-left ${socialDisabled}"
-				onclick="disconnectSocialMedia('linkedin', ${isAutoLogin})" title="Disconnect"></div>
+				onclick="disconnectSocialMedia(event,'linkedin', ${isAutoLogin})" title="Disconnect"></div>
 		</c:when>
 		<c:otherwise>
 			<div class="social-media-disconnect social-media-disconnect-disabled float-left ${socialDisabled}"></div>
@@ -63,7 +63,7 @@
 	<c:choose>
 		<c:when test="${not empty googleLink}">
 			<div class="social-media-disconnect float-left ${socialDisabled}"
-				onclick="disconnectSocialMedia('google', ${isAutoLogin})" title="Disconnect"></div>
+				onclick="disconnectSocialMedia(event,'google', ${isAutoLogin})" title="Disconnect"></div>
 		</c:when>
 		<c:otherwise>
 			<div class="social-media-disconnect social-media-disconnect-disabled float-left ${socialDisabled}"></div>

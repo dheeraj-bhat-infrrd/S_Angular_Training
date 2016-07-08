@@ -2277,6 +2277,38 @@ public class SolrSearchServiceImpl implements SolrSearchService
     }
 
 
+    @Override
+    public void removeSocialPostsFromSolr( String entityType, long entityId, String source ) throws SolrException
+    {
+        LOG.info( "Method to remove social posts from Solr started for entityType : " + entityType + " entityId : " + entityId
+			+ " and source : " + source );
+		if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) )
+            entityType = CommonConstants.USER_ID_SOLR;
+        SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
+        String solrQuery = entityType + ":" + entityId;
+		solrQuery += " AND " + CommonConstants.SOURCE_SOLR + ":" + source;
+        switch ( entityType ) {
+            case CommonConstants.COMPANY_ID_COLUMN:
+                solrQuery += " AND " + CommonConstants.REGION_ID_COLUMN + ":\"-1\"";
+            case CommonConstants.REGION_ID_COLUMN:
+                solrQuery += " AND " + CommonConstants.BRANCH_ID_COLUMN + ":\"-1\"";
+            case CommonConstants.BRANCH_ID_COLUMN:
+                solrQuery += " AND " + CommonConstants.USER_ID_SOLR + ":\"-1\"";
+                break;
+        }
+        try {
+            solrServer.deleteByQuery( solrQuery );
+            solrServer.commit();
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "SolrServerException while deleting social posts" );
+            throw new SolrException( "Exception while removing social posts. Reason : " + e.getMessage(), e );
+        }
+
+        LOG.info(
+            "Method to remove social posts from Solr finished for entityType : " + entityType + " entityId : " + entityId );
+    }
+
+
     private Collection<BranchFromSearch> getBranchesFromSolrDocuments( SolrDocumentList documentList )
     {
         Map<Long, BranchFromSearch> matchedBranches = new LinkedHashMap<>();

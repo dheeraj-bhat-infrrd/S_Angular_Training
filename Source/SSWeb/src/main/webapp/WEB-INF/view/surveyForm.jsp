@@ -29,6 +29,10 @@
       <div class="hdr-wrapper">
          <div class="container hdr-container clearfix">
             <div class="float-left hdr-logo"></div>
+            <c:if test="${not empty logo}">
+                <div class="float-right" style="background: url(${logo}) no-repeat center; background-size: contain; width: 140px; height: 60px;"></div>
+            </c:if>
+
          </div>
       </div>
       <div id="err-nw-wrapper" class="err-nw-wrapper"
@@ -41,7 +45,11 @@
          class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
          <div class="container">
             <div class="sq-ques-wrapper">
-               <div id="agnt-img" class="sq-top-img"></div>
+               <div id="agnt-img" class="sq-top-img">
+                  <c:if test="${not empty profileImage}">
+                    <img class="hr-ind-img" src="${profileImage}">
+                  </c:if>
+               </div>
                <div data-ques-type="user-details" class="sq-quest-item">
                   <div class="sq-ques">
                      <i>

@@ -83,7 +83,7 @@ public class PrepareBillingReport implements Runnable
                         fileUpload.setStatus( CommonConstants.STATUS_INACTIVE );
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         csvUploadService.updateFileUploadRecord( fileUpload );
-                    } catch ( InvalidInputException | UndeliveredEmailException | ProfileNotFoundException e ) {
+                    } catch ( Exception e ) {
                         LOG.error( "Error in generating billing report generator " , e );
                         try {
                             String reportType = null;

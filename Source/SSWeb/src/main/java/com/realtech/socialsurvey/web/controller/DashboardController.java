@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -115,19 +116,19 @@ public class DashboardController
 
     @Autowired
     private SurveyPreInitiationService surveyPreInitiationService;
-    
+
     @Autowired
     private EmailFormatHelper emailFormatHelper;
 
     @Autowired
     BatchTrackerService batchTrackerService;
-    
+
     @Autowired
     private AdminReports adminReport;
 
     @Value ( "${APPLICATION_SUPPORT_EMAIL}")
     private String applicationSupportEmail;
-    
+
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
 
@@ -165,7 +166,8 @@ public class DashboardController
         if ( user.getCompany() != null && user.getCompany().getLicenseDetails() != null
             && !user.getCompany().getLicenseDetails().isEmpty()
             && user.getCompany().getLicenseDetails().get( 0 ).getAccountsMaster() != null ) {
-            if ( user.getCompany().getLicenseDetails().get( 0 ).getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+            if ( user.getCompany().getLicenseDetails().get( 0 ).getAccountsMaster()
+                .getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
                 model.addAttribute( "columnValue", entityId );
                 modelSet = true;
@@ -173,21 +175,25 @@ public class DashboardController
         }
 
         String profileName = "";
+        boolean isPasswordSet = true;
+        if ( user.getIsForcePassword() == 1 && user.getLoginPassword() == null ) {
+            isPasswordSet = false;
+        }
         if ( !modelSet ) {
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
-                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( isPasswordSet ) );
                 profileName = user.getCompany().getCompany();
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
-                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( isPasswordSet ) );
                 profileName = solrSearchService.searchRegionById( entityId );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
-                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( isPasswordSet ) );
                 profileName = solrSearchService.searchBranchNameById( entityId );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
@@ -236,7 +242,8 @@ public class DashboardController
                 try {
                     columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
                 } catch ( NumberFormatException e ) {
-                    LOG.error( "NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId." );
+                    LOG.error(
+                        "NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId." );
                     throw e;
                 }
 
@@ -253,7 +260,8 @@ public class DashboardController
                 try {
                     columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
                 } catch ( NumberFormatException e ) {
-                    LOG.error( "NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId." );
+                    LOG.error(
+                        "NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId." );
                     throw e;
                 }
 
@@ -269,8 +277,8 @@ public class DashboardController
                 columnValue = user.getUserId();
 
                 unitSettings = userManagementService.getUserSettings( columnValue );
-                model
-                    .addAttribute( "name", user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ) );
+                model.addAttribute( "name",
+                    user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ) );
                 model.addAttribute( "title", unitSettings.getContact_details().getTitle() );
                 model.addAttribute( "company", user.getCompany().getCompany() );
                 model.addAttribute( "location", unitSettings.getContact_details().getLocation() );
@@ -284,12 +292,12 @@ public class DashboardController
             if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 allowOverrideForSocialMedia = unitSettings.isAllowOverrideForSocialMedia();
             } else {
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                    .getCompanyId() );
+                OrganizationUnitSettings companySettings = organizationManagementService
+                    .getCompanySettings( user.getCompany().getCompanyId() );
                 allowOverrideForSocialMedia = companySettings.isAllowOverrideForSocialMedia();
             }
             model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
-            
+
             // calculating details for circles
             int numberOfDays = -1;
             try {
@@ -304,7 +312,8 @@ public class DashboardController
             if ( realtechAdmin ) {
                 columnName = null;
             }
-            LOG.debug( "Getting the survey score." );;
+            LOG.debug( "Getting the survey score." );
+            ;
             double surveyScore = dashboardService.getSurveyScore( columnName, columnValue, numberOfDays, realtechAdmin );
             //get formatted survey score using rating format  
             surveyScore = surveyHandler.getFormattedSurveyScore( surveyScore );
@@ -369,7 +378,8 @@ public class DashboardController
             String columnValueStr = request.getParameter( "columnValue" );
             columnValue = Long.parseLong( columnValueStr );
         } catch ( NumberFormatException e ) {
-            LOG.error( "NumberFormatException caught in getSurveyCount() while converting columnValue for regionId/branchId/agentId." );
+            LOG.error(
+                "NumberFormatException caught in getSurveyCount() while converting columnValue for regionId/branchId/agentId." );
             throw e;
         }
 
@@ -388,13 +398,14 @@ public class DashboardController
         }
 
         try {
-            model.addAttribute( "allSurveySent", dashboardService.getAllSurveyCountForStatistics( columnName, columnValue, numberOfDays ) );
+            model.addAttribute( "allSurveySent",
+                dashboardService.getAllSurveyCountForStatistics( columnName, columnValue, numberOfDays ) );
             model.addAttribute( "completedSurvey",
                 dashboardService.getCompleteSurveyCount( columnName, columnValue, numberOfDays ) );
             model.addAttribute( "clickedSurvey",
                 dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-            model.addAttribute( "socialPosts",
-                dashboardService.getSocialPostsForPastNdaysWithHierarchyForStatistics( columnName, columnValue, numberOfDays ) );
+            model.addAttribute( "socialPosts", dashboardService
+                .getSocialPostsForPastNdaysWithHierarchyForStatistics( columnName, columnValue, numberOfDays ) );
             model.addAttribute( "importedFromZillow",
                 dashboardService.getZillowImportCount( columnName, columnValue, numberOfDays ) );
         } catch ( InvalidInputException e ) {
@@ -430,7 +441,8 @@ public class DashboardController
                 String columnValueStr = request.getParameter( "columnValue" );
                 columnValue = Long.parseLong( columnValueStr );
             } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId." );
+                LOG.error(
+                    "NumberFormatException in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId." );
                 throw e;
             }
 
@@ -450,8 +462,8 @@ public class DashboardController
             LOG.info( "Method to get details for generating graph, getGraphDetailsForWeek() finished." );
 
             try {
-                return new Gson().toJson( dashboardService.getSurveyDetailsForGraph( columnName, columnValue, numberOfDays,
-                    realtechAdmin ) );
+                return new Gson().toJson(
+                    dashboardService.getSurveyDetailsForGraph( columnName, columnValue, numberOfDays, realtechAdmin ) );
             } catch ( ParseException e ) {
                 LOG.error( "Parse Exception occurred in getSurveyDetailsForGraph(). Nested exception is ", e );
                 return e.getMessage();
@@ -556,7 +568,8 @@ public class DashboardController
                 String columnValue = request.getParameter( "columnValue" );
                 if ( columnValue == null || columnValue.isEmpty() ) {
                     LOG.error( "Null or empty value passed for Region/BranchId. Please pass valid value." );
-                    throw new InvalidInputException( "Null or empty value passed for Region/BranchId. Please pass valid value." );
+                    throw new InvalidInputException(
+                        "Null or empty value passed for Region/BranchId. Please pass valid value." );
                 }
 
                 try {
@@ -675,8 +688,8 @@ public class DashboardController
             for ( SurveyPreInitiation surveyPreInitiation : surveyDetails ) {
                 if ( surveyPreInitiation.getAgentId() > 0 ) {
                     surveyPreInitiation.setAgentEmailId( surveyPreInitiation.getUser().getEmailId() );
-                    surveyPreInitiation.setAgentName( surveyPreInitiation.getUser().getFirstName() + " "
-                        + surveyPreInitiation.getUser().getLastName() );
+                    surveyPreInitiation.setAgentName(
+                        surveyPreInitiation.getUser().getFirstName() + " " + surveyPreInitiation.getUser().getLastName() );
                 }
             }
 
@@ -715,18 +728,19 @@ public class DashboardController
                     incompleteSurveyId = Long.parseLong( incompleteSurveyIdStr );
                     incompleteSurveyIds.add( incompleteSurveyId );
                 } catch ( NumberFormatException e ) {
-                    throw new NonFatalException( "Number format exception occured while parsing incomplet survey id : "
-                        + incompleteSurveyIdStr, e );
+                    throw new NonFatalException(
+                        "Number format exception occured while parsing incomplet survey id : " + incompleteSurveyIdStr, e );
                 }
             }
             //Remove records from Survey Pre Initiation table
             List<SurveyPreInitiation> surveys = surveyPreInitiationService.deleteSurveyReminder( incompleteSurveyIds );
-            
+
             //Remove records from Survey Details collection, if any
             dashboardService.deleteSurveyDetailsByPreInitiation( surveys );
-            
+
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "Nonfatal exception occured in method cancelSurveyReminder, reason : " + nonFatalException.getMessage() );
+            LOG.error(
+                "Nonfatal exception occured in method cancelSurveyReminder, reason : " + nonFatalException.getMessage() );
             return CommonConstants.ERROR;
         }
         return CommonConstants.SUCCESS_ATTRIBUTE;
@@ -810,7 +824,8 @@ public class DashboardController
                 String columnValue = request.getParameter( "columnValue" );
                 if ( columnValue == null || columnValue.isEmpty() ) {
                     LOG.error( "Null or empty value passed for Region/BranchId. Please pass valid value." );
-                    throw new InvalidInputException( "Null or empty value passed for Region/BranchId. Please pass valid value." );
+                    throw new InvalidInputException(
+                        "Null or empty value passed for Region/BranchId. Please pass valid value." );
                 }
 
                 try {
@@ -824,6 +839,10 @@ public class DashboardController
 
             // Searching based on searchKey
             String searchKey = request.getParameter( "searchKey" );
+            if ( searchKey.contains( "<" ) ) {
+                searchKey = searchKey.substring( 0, searchKey.indexOf( "<" ) ).trim();
+                System.out.println( searchKey );
+            }
             solrDocuments = solrSearchService.searchBranchRegionOrAgentByName( CommonConstants.USER_DISPLAY_NAME_SOLR,
                 searchKey, idenFieldName, iden );
         } catch ( NonFatalException e ) {
@@ -892,8 +911,8 @@ public class DashboardController
         }
 
         try {
-            surveyDetails = profileManagementService.getIncompleteSurvey( iden, 0, 0, startIndex, batchSize, profileLevel,
-                null, null, realtechAdmin );
+            surveyDetails = profileManagementService.getIncompleteSurvey( iden, 0, 0, startIndex, batchSize, profileLevel, null,
+                null, realtechAdmin );
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
             throw e;
@@ -911,15 +930,14 @@ public class DashboardController
         long regionOrBranchId = 0;
         List<SolrDocument> result = null;
         boolean isRealTechOrSSAdmin = false;
-        
-       
+
 
         try {
-            
-            if(user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(user.getUserId())){
+
+            if ( user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) {
                 isRealTechOrSSAdmin = true;
             }
-            
+
             String searchColumn = request.getParameter( "searchColumn" );
             if ( searchColumn == null || searchColumn.isEmpty() ) {
                 LOG.error( "Invalid value (null/empty) passed for search criteria." );
@@ -963,8 +981,8 @@ public class DashboardController
                 }
             } else if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 try {
-                    result = solrSearchService.searchBranchRegionOrAgentByName( searchColumn, searchKey, columnName, user
-                        .getCompany().getCompanyId() );
+                    result = solrSearchService.searchBranchRegionOrAgentByName( searchColumn, searchKey, columnName,
+                        user.getCompany().getCompanyId() );
                 } catch ( InvalidInputException e ) {
                     LOG.error(
                         "InvalidInputException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
@@ -1043,7 +1061,8 @@ public class DashboardController
             if ( survey != null ) {
                 //                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
                 //                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
-                surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName , survey.getSurveyPreIntitiationId() , false);
+                surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName,
+                    survey.getSurveyPreIntitiationId(), false );
             }
 
             try {
@@ -1156,8 +1175,21 @@ public class DashboardController
                 }
                 //JIRA SS-1363 end
 
+                //JIRA SS-473 begin
+                String agentDisclaimer = "";
+                String agentLicenses = "";
+
+                if ( agentSettings.getDisclaimer() != null )
+                    agentDisclaimer = agentSettings.getDisclaimer();
+
+                if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+                    agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+                }
+
                 emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
-                    agentTitle, companyName, survey, surveyLink, logoUrl );
+                    agentTitle, companyName, survey, surveyLink, logoUrl, agentDisclaimer, agentLicenses );
+
+                //JIRA SS-473 end
             } catch ( InvalidInputException e ) {
                 LOG.error( "Exception occurred while trying to send survey reminder mail to : " + customerEmail );
                 throw e;
@@ -1211,7 +1243,8 @@ public class DashboardController
                     if ( survey != null ) {
                         //                        surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
                         //                            surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
-                        surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName , survey.getSurveyPreIntitiationId() , false );
+                        surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName,
+                            survey.getSurveyPreIntitiationId(), false );
                     }
 
                     AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
@@ -1247,8 +1280,8 @@ public class DashboardController
                                 agentSettings.getIden() );
                             if ( map == null ) {
                                 LOG.error( "Unable to fetch primary profile for this user " );
-                                throw new FatalException( "Unable to fetch primary profile this user "
-                                    + agentSettings.getIden() );
+                                throw new FatalException(
+                                    "Unable to fetch primary profile this user " + agentSettings.getIden() );
                             }
                         } catch ( InvalidInputException e ) {
                             e.printStackTrace();
@@ -1319,13 +1352,26 @@ public class DashboardController
                     }
                     //JIRA SS-1363 end
 
+                    //JIRA SS-473 begin
+                    String agentDisclaimer = "";
+                    String agentLicenses = "";
+
+                    if ( agentSettings.getDisclaimer() != null )
+                        agentDisclaimer = agentSettings.getDisclaimer();
+
+                    if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+                        agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+                    }
+
                     emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
-                        agentTitle, companyName, survey, surveyLink, logoUrl );
+                        agentTitle, companyName, survey, surveyLink, logoUrl, agentDisclaimer, agentLicenses );
+
+                    //JIRA SS-473 end
 
                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
                 } catch ( NumberFormatException e ) {
-                    throw new NonFatalException( "Number format exception occured while parsing incomplete survey id : "
-                        + incompleteSurveyIdStr, e );
+                    throw new NonFatalException(
+                        "Number format exception occured while parsing incomplete survey id : " + incompleteSurveyIdStr, e );
                 }
             }
         } catch ( NonFatalException nonFatalException ) {
@@ -1362,8 +1408,8 @@ public class DashboardController
                 try {
                     startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
                 } catch ( ParseException e ) {
-                    LOG.error(
-                        "ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e );
+                    LOG.error( "ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ",
+                        e );
                 }
             }
 
@@ -1373,8 +1419,8 @@ public class DashboardController
                 try {
                     endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
                 } catch ( ParseException e ) {
-                    LOG.error(
-                        "ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e );
+                    LOG.error( "ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ",
+                        e );
                 }
             }
 
@@ -1531,7 +1577,8 @@ public class DashboardController
                     startDate, endDate, null );
                 String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
                     + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
-                XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData( surveyDetails, fileName, profileLevel, companyId );
+                XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData( surveyDetails, fileName,
+                    profileLevel, companyId );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
                 String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
@@ -1697,14 +1744,16 @@ public class DashboardController
                 try {
                     startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
                 } catch ( ParseException e ) {
-                    LOG.error( "ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ", e );
+                    LOG.error( "ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ",
+                        e );
                 }
             }
             if ( endDateStr != null && !endDateStr.isEmpty() ) {
                 try {
                     endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
                 } catch ( ParseException e ) {
-                    LOG.error( "ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ", e );
+                    LOG.error( "ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ",
+                        e );
                 }
             }
 
@@ -1790,12 +1839,14 @@ public class DashboardController
             try {
                 surveyHandler.initiateSurveyRequest( user.getUserId(), custEmail, custFirstName, custLastName, "customer" );
             } catch ( SelfSurveyInitiationException e ) {
-                errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
-                    DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                errorMsg = messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION, DisplayMessageType.ERROR_MESSAGE )
+                    .getMessage();
                 throw new NonFatalException( e.getMessage(), e.getErrorCode() );
             } catch ( DuplicateSurveyRequestException e ) {
-                errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
-                    DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                errorMsg = messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST, DisplayMessageType.ERROR_MESSAGE )
+                    .getMessage();
                 throw new NonFatalException( e.getMessage(), e.getErrorCode() );
             }
 
@@ -1813,6 +1864,59 @@ public class DashboardController
 
 
     @ResponseBody
+    @RequestMapping ( value = "/getalreadysurveyedemailids", method = RequestMethod.POST)
+    public String getAlreadySurveyedEmailIds( HttpServletRequest request )
+    {
+        LOG.info( "Method getAlreadySurveyedEmailIds() called from DashboardController." );
+        User user = sessionHelper.getCurrentUser();
+        List<SurveyRecipient> surveyRecipients = null;
+        long agentId = 0;
+        String errorMsg = "error";
+        List<String> alreadySurveyedEmails = new ArrayList<String>();
+        try {
+            String source = request.getParameter( "source" );
+            String payload = request.getParameter( "receiversList" );
+            try {
+                if ( payload == null ) {
+                    throw new InvalidInputException( "SurveyRecipients passed was null or empty" );
+                }
+                surveyRecipients = new ObjectMapper().readValue( payload,
+                    TypeFactory.defaultInstance().constructCollectionType( List.class, SurveyRecipient.class ) );
+            } catch ( IOException ioException ) {
+                throw new NonFatalException( "Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR,
+                    ioException );
+            }
+            if ( source.equalsIgnoreCase( CommonConstants.SURVEY_REQUEST_AGENT ) ) {
+                agentId = user.getUserId();
+            }
+
+            if ( !surveyRecipients.isEmpty() ) {
+                for ( SurveyRecipient recipient : surveyRecipients ) {
+                    long currentAgentId = 0;
+                    if ( agentId != 0 ) {
+                        currentAgentId = agentId;
+                    } else if ( recipient.getAgentId() != 0 ) {
+                        currentAgentId = recipient.getAgentId();
+                    } else {
+                        throw new InvalidInputException( "Agent id can not be null" );
+                    }
+
+                    if ( surveyHandler.hasCustomerAlreadySurveyed( currentAgentId, recipient.getEmailId() ) ) {
+                        alreadySurveyedEmails.add( recipient.getEmailId() );
+                    }
+                }
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException caught in getAlreadySurveyedEmailIds(). Nested exception is ", e );
+            return errorMsg;
+        }
+
+        LOG.info( "Method getAlreadySurveyedEmailIds() finished from DashboardController." );
+        return new Gson().toJson( alreadySurveyedEmails );
+    }
+
+
+    @ResponseBody
     @RequestMapping ( value = "/sendmultiplesurveyinvites", method = RequestMethod.POST)
     public String sendMultipleSurveyInvitations( HttpServletRequest request )
     {
@@ -1820,7 +1924,10 @@ public class DashboardController
         User user = sessionHelper.getCurrentUser();
         List<SurveyRecipient> surveyRecipients = null;
         long agentId = 0;
-        String errorMsg = null;
+        String selfSurveyErrorMsg = null;
+        String duplicateSurveyErrorMsg = null;
+        String errorMsg = "";
+        int surveySentCount = 0;
 
         try {
             String source = request.getParameter( "source" );
@@ -1830,8 +1937,8 @@ public class DashboardController
                 if ( payload == null ) {
                     throw new InvalidInputException( "SurveyRecipients passed was null or empty" );
                 }
-                surveyRecipients = new ObjectMapper().readValue( payload, TypeFactory.defaultInstance()
-                    .constructCollectionType( List.class, SurveyRecipient.class ) );
+                surveyRecipients = new ObjectMapper().readValue( payload,
+                    TypeFactory.defaultInstance().constructCollectionType( List.class, SurveyRecipient.class ) );
             } catch ( IOException ioException ) {
                 throw new NonFatalException( "Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR,
                     ioException );
@@ -1851,10 +1958,12 @@ public class DashboardController
             if ( !surveyRecipients.isEmpty() ) {
                 for ( int i = 0; i < surveyRecipients.size(); i++ ) {
                     for ( int j = i + 1; j < surveyRecipients.size(); j++ ) {
-                        if ( surveyRecipients.get( i ).getEmailId().equalsIgnoreCase( surveyRecipients.get( j ).getEmailId() ) ) {
+                        if ( surveyRecipients.get( i ).getEmailId()
+                            .equalsIgnoreCase( surveyRecipients.get( j ).getEmailId() ) ) {
                             if ( surveyRecipients.get( i ).getAgentEmailId()
                                 .equalsIgnoreCase( surveyRecipients.get( j ).getAgentEmailId() ) ) {
-                                throw new InvalidInputException( "Can't enter same email address multiple times for same user" );
+                                throw new InvalidInputException(
+                                    "Can't enter same email address multiple times for same user" );
                             }
                         }
                     }
@@ -1877,17 +1986,31 @@ public class DashboardController
                     try {
                         surveyHandler.initiateSurveyRequest( currentAgentId, recipient.getEmailId(), recipient.getFirstname(),
                             recipient.getLastname(), source );
+                        surveySentCount++;
                     } catch ( SelfSurveyInitiationException e ) {
-                        errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
-                            DisplayMessageType.ERROR_MESSAGE ).getMessage();
-                        throw new NonFatalException( e.getMessage(), e.getErrorCode() );
+                        if ( selfSurveyErrorMsg == null ) {
+                            selfSurveyErrorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
+                                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                        }
                     } catch ( DuplicateSurveyRequestException e ) {
-                        errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
-                            DisplayMessageType.ERROR_MESSAGE ).getMessage();
-                        throw new NonFatalException( e.getMessage(), e.getErrorCode() );
-
+                        if ( duplicateSurveyErrorMsg == null ) {
+                            duplicateSurveyErrorMsg = messageUtils
+                                .getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
+                                    DisplayMessageType.ERROR_MESSAGE )
+                                .getMessage() + " The duplicate addresses are : " + recipient.getEmailId();
+                        } else {
+                            duplicateSurveyErrorMsg += ", " + recipient.getEmailId();
+                        }
                     }
-
+                }
+                if ( selfSurveyErrorMsg != null ) {
+                    errorMsg += selfSurveyErrorMsg + "\n";
+                }
+                if ( duplicateSurveyErrorMsg != null ) {
+                    errorMsg += duplicateSurveyErrorMsg;
+                }
+                if ( !errorMsg.isEmpty() ) {
+                    throw new NonFatalException( "NonFatalException occurred while sending surveys" );
                 }
             }
         } catch ( NonFatalException e ) {
@@ -1895,11 +2018,10 @@ public class DashboardController
             if ( errorMsg == null )
                 errorMsg = "error";
             return errorMsg;
-
         }
 
         LOG.info( "Method sendMultipleSurveyInvitations() finished from DashboardController." );
-        return "Success";
+        return "{\"status\" : \"Success\", \"surveySentCount\" : " + surveySentCount + "}";
     }
 
 
@@ -1920,8 +2042,8 @@ public class DashboardController
             } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
                 stages = new ArrayList<>( organizationManagementService.getRegionSettings( columnValue ).getProfileStages() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
-                stages = new ArrayList<>( organizationManagementService.getBranchSettingsDefault( columnValue )
-                    .getProfileStages() );
+                stages = new ArrayList<>(
+                    organizationManagementService.getBranchSettingsDefault( columnValue ).getProfileStages() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
                 stages = new ArrayList<>( userManagementService.getUserSettings( columnValue ).getProfileStages() );
             }
@@ -2008,23 +2130,24 @@ public class DashboardController
         String lastName = request.getParameter( "lastName" );
         String surveyId = request.getParameter( "surveyId" );
         try {
-            
-            if(surveyId == null || surveyId.isEmpty()){
-                throw new InvalidInputException("Passed parameter survey id is null or empty");
+
+            if ( surveyId == null || surveyId.isEmpty() ) {
+                throw new InvalidInputException( "Passed parameter survey id is null or empty" );
             }
-            
+
             if ( agentIdStr == null || agentIdStr.isEmpty() ) {
                 throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
             }
             long agentId = Long.parseLong( agentIdStr );
-            surveyHandler.changeStatusOfSurvey( surveyId , true );
+            surveyHandler.changeStatusOfSurvey( surveyId, true );
             SurveyDetails survey = surveyHandler.getSurveyDetails( surveyId );
             User user = userManagementService.getUserByUserId( agentId );
-            Map<String , String> urlParams  = urlGenerator.decryptUrl( survey.getUrl() );
+            Map<String, String> urlParams = urlGenerator.decryptUrl( survey.getUrl() );
             urlParams.put( CommonConstants.URL_PARAM_RETAKE_SURVEY, "true" );
-            String updatedUrl = urlGenerator.generateUrl( urlParams, surveyHandler.getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
+            String updatedUrl = urlGenerator.generateUrl( urlParams,
+                surveyHandler.getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
             surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,
-                updatedUrl);
+                updatedUrl );
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in makeSurveyEditable(). Nested exception is ", e );
         }
@@ -2165,8 +2288,8 @@ public class DashboardController
             try {
                 Company company = organizationManagementService.getCompanyById( iden );
                 String profileLevel = getProfileLevel( columnName );
-                String fileName = "User_Adoption_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
-                    + ( new Timestamp( new Date().getTime() ) ) + EXCEL_FILE_EXTENSION;
+                String fileName = "User_Adoption_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName()
+                    + "-" + ( new Timestamp( new Date().getTime() ) ) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadUserAdoptionReportData( iden );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
@@ -2199,7 +2322,7 @@ public class DashboardController
         }
         LOG.info( "Method to get user adoption report file getUserAdoptionReportFile() finished." );
     }
-    
+
 
     /**
      * Controller to generate and send billing report by mail
@@ -2213,33 +2336,34 @@ public class DashboardController
     {
         LOG.info( "Method to get billing report file getBillingReportFile() started." );
         String message = "";
-        try{
-        User user = sessionHelper.getCurrentUser();
-        if ( !(user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(user.getUserId())) ) {
-            throw new UnsupportedOperationException( "User is not authorized to perform this action" );
-        }
-        //Check if a request already exists
         try {
-            List<FileUpload> fileUpload = dashboardService.getActiveBillingReports();
-            LOG.info( "A request already exists for getting the billing report." );
-            
-            message = "A request already exists for getting the billing report.";
-            if(fileUpload != null && fileUpload.size() > 0)
-                if( fileUpload.get( 0 ) != null && fileUpload.get( 0 ).getFileName() != null && ! fileUpload.get( 0 ).getFileName().isEmpty())
-                    message += " Mail Address is : " + fileUpload.get( 0 ).getFileName();
-             
-            
-        } catch ( NoRecordsFetchedException e ) {
-            //Request doesn't already exist. Create one.
-            LOG.info( "There is no existing request for getting the billing report" );
+            User user = sessionHelper.getCurrentUser();
+            if ( !( user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) ) {
+                throw new UnsupportedOperationException( "User is not authorized to perform this action" );
+            }
+            //Check if a request already exists
+            try {
+                List<FileUpload> fileUpload = dashboardService.getActiveBillingReports();
+                LOG.info( "A request already exists for getting the billing report." );
 
-            //Get value from Mail ID column
-            String mailId = request.getParameter( "mailid" );
-            adminReport.createEntryInFileUploadForBillingReport( mailId );
-            message = "The Billing Report will be mailed to you shortly";
-        }
-        
-        }catch(NonFatalException e){
+                message = "A request already exists for getting the billing report.";
+                if ( fileUpload != null && fileUpload.size() > 0 )
+                    if ( fileUpload.get( 0 ) != null && fileUpload.get( 0 ).getFileName() != null
+                        && !fileUpload.get( 0 ).getFileName().isEmpty() )
+                        message += " Mail Address is : " + fileUpload.get( 0 ).getFileName();
+
+
+            } catch ( NoRecordsFetchedException e ) {
+                //Request doesn't already exist. Create one.
+                LOG.info( "There is no existing request for getting the billing report" );
+
+                //Get value from Mail ID column
+                String mailId = request.getParameter( "mailid" );
+                adminReport.createEntryInFileUploadForBillingReport( mailId );
+                message = "The Billing Report will be mailed to you shortly";
+            }
+
+        } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );
             message = "Error while generating billing report request";
         }
@@ -2247,25 +2371,25 @@ public class DashboardController
         return message;
     }
 
-    
+
     @ResponseBody
-    @RequestMapping ( value = "/downloadcompanyuserreport" )
+    @RequestMapping ( value = "/downloadcompanyuserreport")
     public String getCompanyUsersReport( HttpServletRequest request )
     {
         LOG.info( "Method getCompanyUsersReport() started." );
         String status = CommonConstants.SUCCESS_ATTRIBUTE;
-        try{
+        try {
             User user = sessionHelper.getCurrentUser();
-            if ( !(user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(user.getUserId())) ) {
+            if ( !( user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) ) {
                 throw new UnsupportedOperationException( "User is not authorized to perform this action" );
             }
-            
+
             String mailId = request.getParameter( "mailid" );
             String companyIdStr = request.getParameter( "companyId" );
             long companyId;
-            
-            if(companyIdStr == null || companyIdStr.isEmpty()){
-                throw new InvalidInputException("Passed parameter companyId is invalid");
+
+            if ( companyIdStr == null || companyIdStr.isEmpty() ) {
+                throw new InvalidInputException( "Passed parameter companyId is invalid" );
             }
             try {
                 companyId = Long.parseLong( companyIdStr );
@@ -2275,14 +2399,14 @@ public class DashboardController
                     e );
                 throw e;
             }
-             adminReport.createEntryInFileUploadForCompanyUserReport( mailId , companyId);
-            
-        }catch(NonFatalException e){
+            adminReport.createEntryInFileUploadForCompanyUserReport( mailId, companyId );
+
+        } catch ( NonFatalException e ) {
             status = CommonConstants.ERROR;
-            LOG.error( "Error while getting Company Users Report" , e );
+            LOG.error( "Error while getting Company Users Report", e );
         }
         LOG.info( "Method getCompanyUsersReport() finished." );
-        
+
         return status;
     }
 
@@ -2299,7 +2423,7 @@ public class DashboardController
 
         try {
             User user = sessionHelper.getCurrentUser();
-            if ( !(user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(user.getUserId())) ) {
+            if ( !( user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) ) {
                 throw new UnsupportedOperationException( "User is not authorized to perform this action" );
             }
 
@@ -2327,6 +2451,6 @@ public class DashboardController
         LOG.info( "Method to get company hierarchy report file, getCompanyHierarchyReportFile() ended." );
         return status;
     }
- 
+
 }
 // JIRA SS-137 : by RM-05 : EOC
