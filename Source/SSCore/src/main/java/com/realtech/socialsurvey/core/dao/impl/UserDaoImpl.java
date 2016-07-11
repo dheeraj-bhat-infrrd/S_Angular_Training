@@ -109,7 +109,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             Criterion criterion = Restrictions.or(
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE ) );
             criteria.add( criterion );
             criteria.addOrder( Order.asc( "firstName" ) );
             criteria.addOrder( Order.asc( "lastName" ) );
@@ -138,7 +139,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             Criterion criterion = Restrictions.or(
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE ) );
             criteria.add( criterion );
             criteria.addOrder( Order.asc( "firstName" ) );
             criteria.addOrder( Order.asc( "lastName" ) );
@@ -168,7 +170,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             Criterion criterion = Restrictions.or(
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE ) );
             criteria.add( criterion );
         } catch ( HibernateException hibernateException ) {
             throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
@@ -241,7 +244,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             Criterion criterion = Restrictions.or(
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE ) );
             criteria.add( criterion );
         } catch ( HibernateException hibernateException ) {
             throw new DatabaseException( "Exception caught in getActiveUserByEmailAndCompany() ", hibernateException );
@@ -297,7 +301,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             Criterion criterion = Restrictions.or(
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE ) );
             criteria.add( criterion );
             criteria.addOrder( Order.asc( "firstName" ) );
             criteria.addOrder( Order.asc( "lastName" ) );
@@ -381,7 +386,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             Criterion criterion = Restrictions.or(
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE ) );
             criteria.add( criterion );
 
             if ( start > -1 )
@@ -420,7 +426,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             Criterion criterion = Restrictions.or(
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE ) );
             criteria.add( criterion );
 
             //count distinct users by email id
