@@ -246,7 +246,7 @@
 
 		var countryData = $('#phone-number-work').intlTelInput("getSelectedCountryData");
 		$("#phone-number-work").on("countrychange", function(e, countryData) {
-			maskPhoneNumber("#phone-number-work", countryData.iso2);
+			maskPhoneNumber("phone-number-work", countryData.iso2);
 		});
 
 		initializeWorkPhoneNumber();
