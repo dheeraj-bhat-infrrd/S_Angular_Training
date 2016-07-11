@@ -8862,8 +8862,7 @@ label.url-change-input-label {
 	pointer-events: none;
 }
 .widget-display{
-	border: 1px solid #dcdcdc;
-	height: 405px !important;
+	height: 500px !important;
 	padding: 10px;
 	margin: 1px;
 }
