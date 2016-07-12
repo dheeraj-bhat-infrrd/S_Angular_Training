@@ -37,6 +37,7 @@ public class SurveyDetails
     private String zillowProfileUrl;
     private String lendingTreeProfileUrl;
     private String realtorProfileUrl;
+    private String googleBusinessProfileUrl;
     private String source;
     private String sourceId;
     private String agreedToShare;
@@ -667,5 +668,16 @@ public class SurveyDetails
     public void setSurveyType( String surveyType )
     {
         this.surveyType = surveyType;
+    }
+
+    public String getGoogleBusinessProfileUrl()
+    {
+        return googleBusinessProfileUrl;
+    }
+
+
+    public void setGoogleBusinessProfileUrl( String googleBusinessProfileUrl )
+    {
+        this.googleBusinessProfileUrl = googleBusinessProfileUrl;
     }
 }

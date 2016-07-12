@@ -1873,6 +1873,44 @@ public class SurveyManagementController
             surveyAndStage.put( "realtorEnabled", false );
         }
 
+	    //Google Business Token
+        try {
+            if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null
+                && agentSettings.getSocialMediaTokens().getGoogleBusinessToken() != null
+                && agentSettings.getSocialMediaTokens().getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+                surveyAndStage.put( "googleBusinessEnabled", true );
+                surveyAndStage.put( "googleBusinessLink", agentSettings.getSocialMediaTokens().getGoogleBusinessToken()
+                    .getGoogleBusinessLink() );
+            } else {
+                // Adding Realtor Url of the closest in hierarchy connected with Realtor.
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getGoogleBusinessToken() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getGoogleBusinessToken()
+                    .getGoogleBusinessLink() != null ) {
+                    surveyAndStage.put( "googleBusinessEnabled", true );
+                    surveyAndStage.put( "googleBusinessLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
+                        .getGoogleBusinessToken().getGoogleBusinessLink() );
+                } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+                    && regionSettings.getSocialMediaTokens().getGoogleBusinessToken() != null
+                    && regionSettings.getSocialMediaTokens().getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+                    surveyAndStage.put( "googleBusinessEnabled", true );
+                    surveyAndStage.put( "googleBusinessLink", regionSettings.getSocialMediaTokens().getGoogleBusinessToken()
+                        .getGoogleBusinessLink() );
+                } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                    && companySettings.getSocialMediaTokens().getGoogleBusinessToken() != null
+                    && companySettings.getSocialMediaTokens().getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+                    surveyAndStage.put( "googleBusinessEnabled", true );
+                    surveyAndStage.put( "googleBusinessLink", companySettings.getSocialMediaTokens().getGoogleBusinessToken()
+                    .getGoogleBusinessLink() );
+                } else
+                    surveyAndStage.put( "googleBusinessEnabled", false );
+            }
+        } catch ( NullPointerException e ) {
+            surveyAndStage.put( "googleBusinessEnabled", false );
+        }
+
         // adding facebook and google plus api keys for customer share
         surveyAndStage.put( "fbAppId", facebookAppId );
         surveyAndStage.put( "googlePlusAppId", googlePlusId );
