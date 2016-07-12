@@ -98,6 +98,7 @@ var googleEnabled;
 var zillowEnabled;
 var lendingtreeEnabled;
 var realtorEnabled;
+var googleBusinessEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
 var companyLogo;
@@ -5352,6 +5353,7 @@ function paintSurveyPage(jsonData) {
 	zillowEnabled = Boolean(jsonData.responseJSON.zillowEnabled);
 	lendingtreeEnabled = Boolean(jsonData.responseJSON.lendingtreeEnabled);
 	realtorEnabled = Boolean(jsonData.responseJSON.realtorEnabled);
+	googleBusinessEnabled = Boolean(jsonData.responseJSON.googleBusinessEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
 	fb_app_id = jsonData.responseJSON.fbAppId;
@@ -5389,6 +5391,12 @@ function paintSurveyPage(jsonData) {
 		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink) + "#reviews-section");
 	} else {
 		$('#realtor-btn').remove();
+	}
+
+	if (googleBusinessEnabled) {
+	    $('#google-business-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.googleBusinessLink));
+	} else {
+	    $('#google-business-btn').remove();
 	}
 
 	companyLogo = jsonData.responseJSON.companyLogo;
@@ -7265,6 +7273,16 @@ $('body').on('click', '#prof-edit-social-link .icn-realtor', function() {
 	$('#social-token-text').val(link);
 });
 
+$('body').on('click', '#prof-edit-social-link .icn-google-business', function() {
+    $('#social-token-text').show();
+    var link = $(this).attr("data-link");
+    $('#social-token-text').attr({
+        "placeholder" : "Add Google Business link",
+        "onblur" : "updateGoogleBusinessLink(this.value);$('#social-token-text').hide();"
+    });
+    $('#social-token-text').val(link);
+});
+
 function updateRealtorLink(link) {
 	var payload = {
 		"realtorLink" : link
@@ -7276,6 +7294,19 @@ function updateRealtorLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
+}
+
+function updateGoogleBusinessLink(link) {
+    var payload = {
+        "googleBusinessLink" : link
+    };
+    if (isValidUrl(link)) {
+        callAjaxPostWithPayloadData("./updateGoogleBusinessLink.do", callBackUpdateSocialLink, payload, true);
+        showProfileLinkInEditProfilePage("googleBusiness", link);
+    } else {
+        $('#overlay-toast').html("Enter a valid url");
+        showToast();
+    }
 }
 
 function callBackUpdateSocialLink(data) {

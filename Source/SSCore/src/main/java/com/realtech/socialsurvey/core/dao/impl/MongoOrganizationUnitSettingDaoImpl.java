@@ -96,6 +96,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_YELP_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.yelpToken";
     public static final String KEY_LENDINGTREE_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.lendingTreeToken";
     public static final String KEY_REALTOR_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.realtorToken";
+    public static final String KEY_GOOGLE_BUSINESS_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.googleBusinessToken";
     public static final String KEY_CONTACT_NAME = "contact_details.name";
     public static final String KEY_POSTIONS = "positions";
     public static final String KEY_STATUS = "status";

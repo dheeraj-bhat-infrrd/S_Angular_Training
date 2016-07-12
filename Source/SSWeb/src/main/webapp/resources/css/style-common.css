@@ -1984,8 +1984,12 @@ button.paypal.is-active {
 .icn-realtor {
 	background: url(../csssprites/icons_social.png) no-repeat -200px 0;
 }
+.social-item-icon.icn-google-business {
+ background-position: -400px 3px;
+}
+
 .icn-google-business{
-	background: url(../csssprites/icons_social_20160622.png) no-repeat -400px -38px;
+	background: url(../csssprites/icons_social_20160622.png) no-repeat -400px 3px;
 }
 .icn-flag {
 	background: url(../images/ss-icon-small-grey-circle-flag.png) no-repeat;
@@ -7401,7 +7405,7 @@ tr.u-tbl-header td {
 	background-position: -200px -38px;
 }
 .icn-social-add.icn-google-business{
-	background-position: -400px 3px;
+	background-position: -400px -38px;
 }
 
 .lp-input-cont {

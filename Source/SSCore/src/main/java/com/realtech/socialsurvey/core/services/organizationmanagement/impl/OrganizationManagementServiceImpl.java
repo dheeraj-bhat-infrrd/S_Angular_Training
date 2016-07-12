@@ -6708,6 +6708,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Lending tree is not set" );
             }
+            if ( unitSettings.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
+                LOG.debug( "Google business is set" );
+                setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * factor;
+            } else {
+                LOG.debug( "Google business is not set" );
+            }
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
         return setterValue;
@@ -7185,6 +7191,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Lending tree is not set" );
             }
+	        if ( regionSetting.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
+		        LOG.debug( "Google business is set" );
+		        setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * 2;
+	        } else {
+		        LOG.debug( "Google business is not set" );
+	        }
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
         region.setSettingsSetStatus( String.valueOf( setterValue ) );
@@ -7301,6 +7313,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Lending tree is not set" );
             }
+	        if ( branchSetting.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
+		        LOG.debug( "Google business is set" );
+		        setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * 4;
+	        } else {
+		        LOG.debug( "Google business is not set" );
+	        }
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
         branch.setSettingsSetStatus( String.valueOf( setterValue ) );
@@ -7408,6 +7426,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Lending tree is not set" );
             }
+	        if ( companySetting.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
+		        LOG.debug( "Google business is set" );
+		        setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * 1;
+	        } else {
+		        LOG.debug( "Google business is not set" );
+	        }
         }
 
         LOG.debug( "Final Settings setter value : " + setterValue );

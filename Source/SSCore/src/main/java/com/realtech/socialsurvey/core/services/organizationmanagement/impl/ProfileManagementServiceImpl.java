@@ -25,6 +25,7 @@ import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.UnavailableException;
 
+import com.realtech.socialsurvey.core.entities.GoogleBusinessToken;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import org.apache.commons.io.FileUtils;
@@ -1516,6 +1517,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 && !companyTokens.getRealtorToken().getRealtorProfileLink().equals( "" ) ) {
                 entityTokens.getRealtorToken().setRealtorProfileLink( companyTokens.getRealtorToken().getRealtorProfileLink() );
             }
+            if (
+                ( entityTokens.getGoogleBusinessToken().getGoogleBusinessLink() == null || entityTokens.getGoogleBusinessToken()
+                    .getGoogleBusinessLink().equals( "" ) )
+                    && companyTokens.getGoogleBusinessToken().getGoogleBusinessLink() != null && !companyTokens
+                    .getGoogleBusinessToken().getGoogleBusinessLink().equals( "" ) ) {
+                entityTokens.getGoogleBusinessToken()
+                    .setGoogleBusinessLink( companyTokens.getGoogleBusinessToken().getGoogleBusinessLink() );
+            }
         }
 
         LOG.info( "Method aggregateSocialProfiles executed successfully: " + entityTokens.toString() );
@@ -1559,6 +1568,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( mediaTokens.getRealtorToken() == null ) {
             mediaTokens.setRealtorToken( new RealtorToken() );
         }
+	    if ( mediaTokens.getGoogleBusinessToken() == null ) {
+		    mediaTokens.setGoogleBusinessToken( new GoogleBusinessToken() );
+	    }
         return mediaTokens;
     }
 
@@ -2717,6 +2729,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         && mediaTokens.getRealtorToken().getRealtorProfileLink() != null ) {
                         review.setRealtorProfileUrl( mediaTokens.getRealtorToken().getRealtorProfileLink() );
                     }
+	                if ( mediaTokens.getGoogleBusinessToken() != null
+		                && mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+		                review.setGoogleBusinessProfileUrl( mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink() );
+	                }
                 }
             }
         }
@@ -3633,6 +3649,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         closestSettings.put( SettingsForApplication.LENDING_TREE, OrganizationUnit.AGENT );
                     }
                 }
+                if ( unitSettings.getSocialMediaTokens() != null ) {
+                    if ( unitSettings.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
+                        closestSettings.put( SettingsForApplication.GOOGLE_BUSINESS, OrganizationUnit.AGENT );
+                    }
+                }
 
             }
         }
@@ -4097,6 +4118,28 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     }
                 }
                 userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.GOOGLE_BUSINESS ) {
+	            SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+	            if ( socialMediaTokens == null ) {
+		            socialMediaTokens = new SocialMediaTokens();
+	            }
+	            //get google business token from upper hierarchy in case of public profile page.
+	            if ( isFetchRequiredDataFromHierarchy ) {
+		            if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+			            socialMediaTokens
+				            .setGoogleBusinessToken( companyUnitSettings.getSocialMediaTokens().getGoogleBusinessToken() );
+		            } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+			            socialMediaTokens
+				            .setGoogleBusinessToken( regionUnitSettings.getSocialMediaTokens().getGoogleBusinessToken() );
+		            } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+			            socialMediaTokens
+				            .setGoogleBusinessToken( branchUnitSettings.getSocialMediaTokens().getGoogleBusinessToken() );
+		            } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+			            socialMediaTokens
+				            .setGoogleBusinessToken( agentUnitSettings.getSocialMediaTokens().getGoogleBusinessToken() );
+		            }
+	            }
+	            userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.ZILLOW ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
                 if ( socialMediaTokens == null ) {

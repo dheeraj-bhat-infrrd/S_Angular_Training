@@ -1417,6 +1417,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                     userReportToPopulate.add( "" );
                 }
 
+                //google business
+                if ( userSettings != null && userSettings.getSocialMediaTokens() != null
+                    && userSettings.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
+                    userReportToPopulate
+                        .add( userSettings.getSocialMediaTokens().getGoogleBusinessToken().getGoogleBusinessLink() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
                 //lending tree
                 if ( userSettings != null && userSettings.getSocialMediaTokens() != null
                     && userSettings.getSocialMediaTokens().getLendingTreeToken() != null ) {
@@ -1483,6 +1492,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         userReportToPopulate.add( CommonConstants.CHR_ZILLOW );
         userReportToPopulate.add( CommonConstants.CHR_YELP );
         userReportToPopulate.add( CommonConstants.CHR_REALTOR );
+        userReportToPopulate.add( CommonConstants.CHR_GOOGLE_BUSINESS );
         userReportToPopulate.add( CommonConstants.CHR_LENDING_TREE );
 
         userReportToPopulate.add( CommonConstants.DATE_ADOPTION_COMPLETED );
