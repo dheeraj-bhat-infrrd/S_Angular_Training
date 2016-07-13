@@ -254,7 +254,7 @@ public class EmailFormatHelper {
 			LOG.error( "An error occurred while fetching the profile. Reason : ", e );
 		}
 
-		content = content.replace( "[facebook_link]", processUrl(twitter_link) );
+		content = content.replace( "[facebook_link]", processUrl(facebook_link) );
 		content = content.replace( "[twitter_link]", processUrl(twitter_link) );
 		content = content.replace( "[linkedin_link]", processUrl(linkedin_link) );
 		content = content.replace( "[google_plus_link]", processUrl(google_plus_link) );
