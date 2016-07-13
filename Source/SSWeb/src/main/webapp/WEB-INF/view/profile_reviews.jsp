@@ -49,22 +49,6 @@
 						data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
 					</div>
 				</div>
-				<%-- <div class="float-left ppl-header-left" style="width:290px;">
-					<div class="ppl-head-1 review-detail-profile">
-					<span class="float-left"> &#8212; Reviewed by </span>
-						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
-						<c:if test="${profilemasterid !=4}">
-					<span class="float-left" style="margin-left:5px;">for<a class="cursor-pointer" style="color:#236CAF;font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank"> ${reviewItem.agentName}</a></span>
-					</c:if>
-					</div>
-					<span class="float-left" style="margin: 0 5px;line-height: 22px;">&#8212;</span>
-					<div class="ppl-head-2 float-left" data-modified="false" 
-						data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
-						value="${reviewItem.modifiedOn}" />"></div>
-						
-				</div> --%>
-				
-				
 				<c:choose>
 					<c:when test="${reviewItem.source =='encompass'}">
 						<div class='verified-badge  verify-image float-right'
@@ -81,9 +65,7 @@
 						<div class='unverified-badge  verify-image-ss float-right'></div>
 					</c:otherwise>
 				</c:choose>
-				
 				<div class="ppl-header-left review-sm-screen " >
-				
 				<c:choose>
 						<c:when test="${ not empty reviewItem.surveyCompletedDate}">
 							<div class="ppl-head-2 review-detail-profile float-left"
@@ -100,9 +82,6 @@
 							</div>
 						</c:otherwise>
 					</c:choose>
-				<%-- <div class="ppl-head-2 float-left" data-modified="false" 
-						data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
-						value="${reviewItem.modifiedOn}" />"></div> --%>
 					<div class="ppl-head-1 review-detail-profile" style="clear:both">
 					<span class="float-left">  Reviewed by </span>
 						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
@@ -115,12 +94,6 @@
 										${reviewItem.agentName}</a></span>
 							</c:if>
 						</c:if>
-						
-						
-						
-						
-						
-						
 						<c:choose>
 							<c:when test="${ not empty reviewItem.summary }">
 								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.summary}</div>
@@ -153,13 +126,8 @@
 						</c:choose>
 							</c:otherwise>
 						</c:choose>
-					
 					</div>
-					
-					
-						
 				</div>
-				
 			</div>
 			
 			<c:choose>
@@ -183,10 +151,6 @@
 				</c:otherwise>
 			</c:choose>
 			<div class="ppl-share-wrapper clearfix share-plus-height" >
-				<%-- <div class="float-left blue-text ppl-share-shr-txt">
-					<spring:message code="label.share.key" />
-				</div> --%>
-				<!-- <div class="float-left icn-share icn-plus-open"></div> -->
 				<div class="float-left clearfix ppl-share-social ">
 					<span id = "fb_${loop.index}"class="float-left ppl-share-icns icn-fb-rev" title="Facebook" onclick = "getImageandCaptionProfile(${loop.index});"
 						data-link="https://www.facebook.com/dialog/feed?${reviewItem.faceBookShareUrl}&link=${fn:replace(reviewItem.completeProfileUrl, 'localhost', '127.0.0.1')}&description=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey -${fn:escapeXml(reviewItem.review)} .&redirect_uri=https://www.facebook.com"></span>
@@ -218,22 +182,13 @@
 						</button>
 					</span>
 				</div>
-				<!-- <div class="float-left icn-share icn-remove icn-rem-size hide"></div> -->
 				<div class="float-right dash-flag-retake ">
 					<div class="clearfix">
 						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
 							title="Report"></div>
-						<%-- <c:if test="${reviewItem.source != 'Zillow'}">
-							 <span class="report-resend-icn-container clearfix float-right"> 
-								<div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div>
-							
-						</c:if> --%>
 					</div>
 				</div>
 			</div>
-			
-			
-			<%-- <div class="ppl-content">${reviewItem.review}</div> --%>
 		</div>
 	</c:forEach>
 </c:if>

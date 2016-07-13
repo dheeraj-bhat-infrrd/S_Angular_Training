@@ -839,6 +839,10 @@ public class DashboardController
 
             // Searching based on searchKey
             String searchKey = request.getParameter( "searchKey" );
+            if ( searchKey.contains( "<" ) ) {
+                searchKey = searchKey.substring( 0, searchKey.indexOf( "<" ) ).trim();
+                System.out.println( searchKey );
+            }
             solrDocuments = solrSearchService.searchBranchRegionOrAgentByName( CommonConstants.USER_DISPLAY_NAME_SOLR,
                 searchKey, idenFieldName, iden );
         } catch ( NonFatalException e ) {
@@ -1860,6 +1864,59 @@ public class DashboardController
 
 
     @ResponseBody
+    @RequestMapping ( value = "/getalreadysurveyedemailids", method = RequestMethod.POST)
+    public String getAlreadySurveyedEmailIds( HttpServletRequest request )
+    {
+        LOG.info( "Method getAlreadySurveyedEmailIds() called from DashboardController." );
+        User user = sessionHelper.getCurrentUser();
+        List<SurveyRecipient> surveyRecipients = null;
+        long agentId = 0;
+        String errorMsg = "error";
+        List<String> alreadySurveyedEmails = new ArrayList<String>();
+        try {
+            String source = request.getParameter( "source" );
+            String payload = request.getParameter( "receiversList" );
+            try {
+                if ( payload == null ) {
+                    throw new InvalidInputException( "SurveyRecipients passed was null or empty" );
+                }
+                surveyRecipients = new ObjectMapper().readValue( payload,
+                    TypeFactory.defaultInstance().constructCollectionType( List.class, SurveyRecipient.class ) );
+            } catch ( IOException ioException ) {
+                throw new NonFatalException( "Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR,
+                    ioException );
+            }
+            if ( source.equalsIgnoreCase( CommonConstants.SURVEY_REQUEST_AGENT ) ) {
+                agentId = user.getUserId();
+            }
+
+            if ( !surveyRecipients.isEmpty() ) {
+                for ( SurveyRecipient recipient : surveyRecipients ) {
+                    long currentAgentId = 0;
+                    if ( agentId != 0 ) {
+                        currentAgentId = agentId;
+                    } else if ( recipient.getAgentId() != 0 ) {
+                        currentAgentId = recipient.getAgentId();
+                    } else {
+                        throw new InvalidInputException( "Agent id can not be null" );
+                    }
+
+                    if ( surveyHandler.hasCustomerAlreadySurveyed( currentAgentId, recipient.getEmailId() ) ) {
+                        alreadySurveyedEmails.add( recipient.getEmailId() );
+                    }
+                }
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException caught in getAlreadySurveyedEmailIds(). Nested exception is ", e );
+            return errorMsg;
+        }
+
+        LOG.info( "Method getAlreadySurveyedEmailIds() finished from DashboardController." );
+        return new Gson().toJson( alreadySurveyedEmails );
+    }
+
+
+    @ResponseBody
     @RequestMapping ( value = "/sendmultiplesurveyinvites", method = RequestMethod.POST)
     public String sendMultipleSurveyInvitations( HttpServletRequest request )
     {
@@ -1870,6 +1927,7 @@ public class DashboardController
         String selfSurveyErrorMsg = null;
         String duplicateSurveyErrorMsg = null;
         String errorMsg = "";
+        int surveySentCount = 0;
 
         try {
             String source = request.getParameter( "source" );
@@ -1928,6 +1986,7 @@ public class DashboardController
                     try {
                         surveyHandler.initiateSurveyRequest( currentAgentId, recipient.getEmailId(), recipient.getFirstname(),
                             recipient.getLastname(), source );
+                        surveySentCount++;
                     } catch ( SelfSurveyInitiationException e ) {
                         if ( selfSurveyErrorMsg == null ) {
                             selfSurveyErrorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
@@ -1959,11 +2018,10 @@ public class DashboardController
             if ( errorMsg == null )
                 errorMsg = "error";
             return errorMsg;
-
         }
 
         LOG.info( "Method sendMultipleSurveyInvitations() finished from DashboardController." );
-        return "Success";
+        return "{\"status\" : \"Success\", \"surveySentCount\" : " + surveySentCount + "}";
     }
 
 

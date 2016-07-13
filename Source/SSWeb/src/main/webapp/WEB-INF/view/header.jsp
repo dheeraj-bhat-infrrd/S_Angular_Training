@@ -95,6 +95,30 @@
 			</div>
 		</div>
 	</div>
+	<div id="overlay-main-survey" class="overlay-main-survey hide">
+		<div id="overlay-pop-up" class="overlay-disable-wrapper">
+			<div id="overlay-header-survey" class="ol-header">
+				<!-- Populated by javascript -->
+			</div>
+			<div class="ol-content">
+				<div id="overlay-text-survey" class="ol-txt">
+					<!-- Populated by javascript -->
+				</div>
+				<div class="clearfix">
+					<div class="float-left ol-btn-wrapper">
+						<div id="overlay-continue-survey" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+					<div class="float-left ol-btn-wrapper">
+						<div id="overlay-cancel-survey" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div id="email-map-pop-up" class="bd-srv-email hide">
 	<input type="hidden" id="current-user-id">
 	<div class="container bd-q-container">
