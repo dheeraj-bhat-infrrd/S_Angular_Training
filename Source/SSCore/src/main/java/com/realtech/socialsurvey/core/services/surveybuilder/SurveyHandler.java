@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.surveybuilder;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -295,4 +296,7 @@ public interface SurveyHandler
 
 
     void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
+
+    String replaceGatewayQuestionText( String questionText, OrganizationUnitSettings agentSettings, User user,
+        OrganizationUnitSettings companySettings, SurveyDetails survey ) throws InvalidInputException;
 }
