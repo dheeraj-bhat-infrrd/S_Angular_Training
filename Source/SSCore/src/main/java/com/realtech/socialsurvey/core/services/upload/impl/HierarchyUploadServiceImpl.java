@@ -138,6 +138,13 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 || validationObject.isUserHeadersInvalid() ) {
                 throw new InvalidInputException();
             }
+            if ( validationObject.isBranchHeadersInvalid() ) {
+                throw new InvalidInputException( "Office sheet headers are invalid" );
+            } else if ( validationObject.isRegionHeadersInvalid() ) {
+	            throw new InvalidInputException( "Region sheet headers are invalid" );
+            } else if ( validationObject.isUserHeadersInvalid() ) {
+	            throw new InvalidInputException( "User sheet headers are invalid" );
+            }
             uploadValidationService.validateHeirarchyUpload( validationObject, regionErrors, branchErrors, userErrors );
         } catch ( IOException e ) {
             e.printStackTrace();
@@ -534,9 +541,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         if ( cellIndex == REGION_ID_INDEX ) {
                             if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
                                 && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
-                                uploadedRegion.setSourceRegionId( String.valueOf( (long) cell.getNumericCellValue() ).trim() );
+                                uploadedRegion.setSourceRegionId( processSourceId( String.valueOf( (long) cell.getNumericCellValue() ).trim() ) );
                             } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
-                                uploadedRegion.setSourceRegionId( cell.getStringCellValue().trim() );
+                                uploadedRegion.setSourceRegionId( processSourceId( cell.getStringCellValue().trim() ) );
                             }
                         } else if ( cellIndex == REGION_NAME_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                             uploadedRegion.setRegionName( cell.getStringCellValue().trim() );
@@ -669,9 +676,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         if ( cellIndex == BRANCH_ID_INDEX ) {
                             if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
                                 && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
-                                uploadedBranch.setSourceBranchId( String.valueOf( (long) cell.getNumericCellValue() ).trim() );
+                                uploadedBranch.setSourceBranchId( processSourceId( String.valueOf( (long) cell.getNumericCellValue() ).trim() ) );
                             } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
-                                uploadedBranch.setSourceBranchId( cell.getStringCellValue().trim() );
+                                uploadedBranch.setSourceBranchId( processSourceId( cell.getStringCellValue().trim() ) );
                             }
                         } else if ( cellIndex == BRANCH_NAME_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                             uploadedBranch.setBranchName( cell.getStringCellValue().trim() );
@@ -741,6 +748,14 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         }
     }
 
+
+    String processSourceId( String sourceId )
+    {
+        if ( sourceId.contains( "." ) ) {
+            sourceId = sourceId.replace( ".", "" );
+        }
+        return sourceId;
+    }
 
     void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> userErrors,
         boolean isAppend ) throws InvalidInputException
@@ -822,9 +837,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         if ( cellIndex == USER_ID_INDEX ) {
                             if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
                                 && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
-                                uploadedUser.setSourceUserId( String.valueOf( (long) cell.getNumericCellValue() ).trim() );
+                                uploadedUser.setSourceUserId( processSourceId( String.valueOf( (long) cell.getNumericCellValue() ).trim() ) );
                             } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
-                                uploadedUser.setSourceUserId( cell.getStringCellValue().trim() );
+                                uploadedUser.setSourceUserId( processSourceId( cell.getStringCellValue().trim() ) );
                             }
                         } else if ( cellIndex == USER_FIRST_NAME_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                             uploadedUser.setFirstName( cell.getStringCellValue().trim() );
@@ -836,37 +851,37 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                             if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
                                 && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
                                 uploadedUser.setAssignedBranches(
-                                    Arrays.asList( String.valueOf( (long) cell.getNumericCellValue() ).split( "\\s*,\\s*" ) ) );
+                                    Arrays.asList( processSourceId( String.valueOf( (long) cell.getNumericCellValue() ) ).split( "\\s*,\\s*" ) ) );
                             } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
                                 uploadedUser
-                                    .setAssignedBranches( Arrays.asList( cell.getStringCellValue().split( "\\s*,\\s*" ) ) );
+                                    .setAssignedBranches( Arrays.asList( processSourceId( cell.getStringCellValue() ).split( "\\s*,\\s*" ) ) );
                             }
                         } else if ( cellIndex == USER_REGION_ID_INDEX ) {
                             if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
                                 && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
                                 uploadedUser.setAssignedRegions(
-                                    Arrays.asList( String.valueOf( (long) cell.getNumericCellValue() ).split( "\\s*,\\s*" ) ) );
+                                    Arrays.asList( processSourceId( String.valueOf( (long) cell.getNumericCellValue() ) ).split( "\\s*,\\s*" ) ) );
                             } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
                                 uploadedUser
-                                    .setAssignedRegions( Arrays.asList( cell.getStringCellValue().split( "\\s*,\\s*" ) ) );
+                                    .setAssignedRegions( Arrays.asList( processSourceId( cell.getStringCellValue() ).split( "\\s*,\\s*" ) ) );
                             }
                         } else if ( cellIndex == USER_BRANCH_ID_ADMIN_INDEX ) {
                             if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
                                 && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
                                 uploadedUser.setAssignedBranchesAdmin(
-                                    Arrays.asList( String.valueOf( (long) cell.getNumericCellValue() ).split( "\\s*,\\s*" ) ) );
+                                    Arrays.asList( processSourceId( String.valueOf( (long) cell.getNumericCellValue() ) ).split( "\\s*,\\s*" ) ) );
                             } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
                                 uploadedUser.setAssignedBranchesAdmin(
-                                    Arrays.asList( cell.getStringCellValue().split( "\\s*,\\s*" ) ) );
+                                    Arrays.asList( processSourceId( cell.getStringCellValue() ).split( "\\s*,\\s*" ) ) );
                             }
                         } else if ( cellIndex == USER_REGION_ID_ADMIN_INDEX ) {
                             if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
                                 && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
                                 uploadedUser.setAssignedRegionsAdmin( Arrays.asList(
-                                    String.valueOf( (long) (long) cell.getNumericCellValue() ).split( "\\s*,\\s*" ) ) );
+	                                processSourceId( String.valueOf( (long) cell.getNumericCellValue() ) ).split( "\\s*,\\s*" ) ) );
                             } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
                                 uploadedUser
-                                    .setAssignedRegionsAdmin( Arrays.asList( cell.getStringCellValue().split( "\\s*,\\s*" ) ) );
+                                    .setAssignedRegionsAdmin( Arrays.asList( processSourceId( cell.getStringCellValue() ).split( "\\s*,\\s*" ) ) );
                             }
                         } else if ( cellIndex == USER_EMAIL_INDEX ) {
                             String emailId = cell.getStringCellValue().trim();
@@ -1707,7 +1722,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     boolean isUserUploadEmpty( UserUploadVO user )
     {
         if ( ( user.getSourceUserId() == null || user.getSourceUserId().isEmpty() )
-            && ( user.getFirstName() == null || user.getSourceUserId().isEmpty() )
+            && ( user.getFirstName() == null || user.getFirstName().isEmpty() )
             && ( user.getLastName() == null || user.getLastName().isEmpty() )
             && ( user.getTitle() == null || user.getTitle().isEmpty() )
             && ( user.getSourceBranchId() == null || user.getSourceBranchId().isEmpty() )

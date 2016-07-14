@@ -2403,6 +2403,10 @@ public class SocialManagementController
                 if ( tokens.getRealtorToken() != null && tokens.getRealtorToken().getRealtorProfileLink() != null ) {
                     model.addAttribute( "realtorLink", tokens.getRealtorToken().getRealtorProfileLink() );
                 }
+	            if ( tokens.getGoogleBusinessToken() != null
+		            && tokens.getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+		            model.addAttribute( "googleBusinessLink", tokens.getGoogleBusinessToken().getGoogleBusinessLink() );
+	            }
             }
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occured in getSocialMediaTokenonSettingsPage()" );

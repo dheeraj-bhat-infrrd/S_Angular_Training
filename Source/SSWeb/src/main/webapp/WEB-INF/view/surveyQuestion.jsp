@@ -212,6 +212,7 @@
 					</div>
 					<div id="social-post-links" class="share-social-link-cont hide row">
 						<a id="realtor-btn" target="_blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.realtor_com.txt"/></a>
+						<a id="google-business-btn" target="blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.google_business.txt"/></a>
 						<a id="lt-btn" target="_blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.lending_tree.txt"/></a>
 						<a id="zillow-btn" target="_blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.zillow.txt"/></a>
 						<a id="ylp-btn" target="_blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.yelp.txt"/></a>

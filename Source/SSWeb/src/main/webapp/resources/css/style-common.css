@@ -1993,6 +1993,13 @@ button.paypal.is-active {
 .icn-realtor {
 	background: url(../csssprites/icons_social.png) no-repeat -200px 0;
 }
+.social-item-icon.icn-google-business {
+ background-position: -400px 3px;
+}
+
+.icn-google-business{
+	background: url(../csssprites/icons_social_20160622.png) no-repeat -400px 3px;
+}
 .icn-flag {
 	background: url(../images/ss-icon-small-grey-circle-flag.png) no-repeat;
 	margin-top: 3px;
@@ -7417,6 +7424,9 @@ tr.u-tbl-header td {
 .icn-social-add.icn-realtor {
 	background-position: -200px -38px;
 }
+.icn-social-add.icn-google-business{
+	background-position: -400px -38px;
+}
 
 .lp-input-cont {
 	width: 300px;
@@ -8876,8 +8886,7 @@ label.url-change-input-label {
 	pointer-events: none;
 }
 .widget-display{
-	border: 1px solid #dcdcdc;
-	height: 405px !important;
+	height: 500px !important;
 	padding: 10px;
 	margin: 1px;
 }

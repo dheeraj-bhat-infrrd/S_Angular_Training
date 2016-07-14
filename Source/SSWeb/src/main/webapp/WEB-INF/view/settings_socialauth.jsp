@@ -80,7 +80,7 @@
 	<c:choose>
 		<c:when test="${not empty zillowLink}">
 			<div class="social-media-disconnect float-left"
-				onclick="disconnectSocialMedia('zillow')" title="Disconnect"></div>
+				onclick="disconnectSocialMedia(event,'zillow')" title="Disconnect"></div>
 		</c:when>
 		<c:otherwise>
 			<div class="social-media-disconnect social-media-disconnect-disabled float-left"></div>

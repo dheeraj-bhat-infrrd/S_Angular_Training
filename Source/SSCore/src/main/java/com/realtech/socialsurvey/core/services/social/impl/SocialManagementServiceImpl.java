@@ -807,6 +807,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_REALTOR_SOCIAL_MEDIA_TOKEN;
                 break;
 
+	        case CommonConstants.GOOGLE_BUSINESS_SOCIAL_SITE:
+		        ignore = true;
+		        keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_BUSINESS_SOCIAL_MEDIA_TOKEN;
+		        break;
+
             default:
                 throw new InvalidInputException( "Invalid social media token entered" );
         }
@@ -1759,6 +1764,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     socialUpdateAction.setLink( mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() );
                 break;
 
+	        case CommonConstants.GOOGLE_BUSINESS_SOCIAL_SITE:
+		        if ( ( mediaTokens.getGoogleBusinessToken() != null )
+			        && ( mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink() != null)
+			        && !( mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink().isEmpty() ) )
+			        socialUpdateAction.setLink( mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink() );
+		        break;
+
             default:
                 throw new InvalidInputException( "Invalid social media token entered" );
         }
@@ -1925,6 +1937,17 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             if ( mediaTokens.getLendingTreeToken() != null ) {
                 String socialMedia = CommonConstants.LENDINGTREE_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.LENDING_TREE;
+                //disconnect social network in mongo
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
+                //Update settings set status
+                updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
+                //update social connections history
+                updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
+                    CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
+            }
+            if ( mediaTokens.getGoogleBusinessToken() != null ) {
+                String socialMedia = CommonConstants.GOOGLE_BUSINESS_SOCIAL_SITE;
+                SettingsForApplication settings = SettingsForApplication.GOOGLE_BUSINESS;
                 //disconnect social network in mongo
                 disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 //Update settings set status
@@ -2351,7 +2374,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
         Map<String, String> socialSiteUrlMap = new HashMap<String, String>();
 
-        // Enabling Zillow, Realtor, Lending tree and Yelp from agent settings
+        // Enabling Zillow, Realtor, Lending tree, Google Business and Yelp from agent settings
         if ( agentSettings != null ) {
             if ( agentSettings.getSocialMediaTokens() != null ) {
                 if ( agentSettings.getSocialMediaTokens().getRealtorToken() != null ) {
@@ -2370,10 +2393,14 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
                         generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, agentSettings ) );
                 }
+	            if ( agentSettings.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
+		            socialSiteUrlMap.put( CommonConstants.GOOGLE_BUSINESS_LABEL,
+			            generateSocialSiteUrl( survey, CommonConstants.GOOGLE_BUSINESS_LABEL, agentSettings ) );
+	            }
             }
         }
 
-        // Enabling Zillow, Realtor, Lending tree and Yelp if anyone closest in hierarchy to agent has
+        // Enabling Zillow, Realtor, Lending tree, Google Business and Yelp if anyone closest in hierarchy to agent has
         // configured in settings.
         for ( OrganizationUnitSettings setting : branchSettings ) {
             if ( setting.getSocialMediaTokens() != null ) {
@@ -2397,6 +2424,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
                         generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, setting ) );
                 }
+	            if ( setting.getSocialMediaTokens().getGoogleBusinessToken() != null
+		            && socialSiteUrlMap.get( CommonConstants.GOOGLE_BUSINESS_LABEL ) == null ) {
+		            socialSiteUrlMap.put( CommonConstants.GOOGLE_BUSINESS_LABEL,
+			            generateSocialSiteUrl( survey, CommonConstants.GOOGLE_BUSINESS_LABEL, setting ) );
+	            }
             }
         }
         for ( OrganizationUnitSettings setting : regionSettings ) {
@@ -2421,6 +2453,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
                         generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, setting ) );
                 }
+	            if ( setting.getSocialMediaTokens().getGoogleBusinessToken() != null
+		            && socialSiteUrlMap.get( CommonConstants.GOOGLE_BUSINESS_LABEL ) == null ) {
+		            socialSiteUrlMap.put( CommonConstants.GOOGLE_BUSINESS_LABEL,
+			            generateSocialSiteUrl( survey, CommonConstants.GOOGLE_BUSINESS_LABEL, setting ) );
+	            }
             }
         }
         for ( OrganizationUnitSettings setting : companySettings ) {
@@ -2445,6 +2482,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
                         generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, setting ) );
                 }
+	            if ( setting.getSocialMediaTokens().getGoogleBusinessToken() != null
+		            && socialSiteUrlMap.get( CommonConstants.GOOGLE_BUSINESS_LABEL ) == null ) {
+		            socialSiteUrlMap.put( CommonConstants.GOOGLE_BUSINESS_LABEL,
+			            generateSocialSiteUrl( survey, CommonConstants.GOOGLE_BUSINESS_LABEL, setting ) );
+	            }
             }
         }
 
@@ -2474,6 +2516,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             + " at SocialSurvey - " + survey.getReview();
         reviewText = utils.urlEncodeText( reviewText );
         switch ( socialSite ) {
+            case CommonConstants.GOOGLE_BUSINESS_LABEL:
+                url = organizationUnitSettings.getSocialMediaTokens().getGoogleBusinessToken().getGoogleBusinessLink();
+                break;
             case CommonConstants.REALTOR_LABEL:
                 url = organizationUnitSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink()
                     + "#reviews-section";
