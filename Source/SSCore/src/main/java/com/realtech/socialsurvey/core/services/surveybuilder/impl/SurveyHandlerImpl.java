@@ -2852,8 +2852,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         int duplicateSurveyInterval = 0;
         User currentAgent = userDao.findById( User.class, currentAgentId );
         if ( currentAgent != null && currentAgent.getCompany() != null ) {
-            OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
-                currentAgent.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            OrganizationUnitSettings companySettings = organizationUnitSettingsDao
+                .fetchOrganizationUnitSettingsById( currentAgent.getCompany().getCompanyId(),
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
             if ( companySettings != null && companySettings.getSurvey_settings() != null
                 && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 )
                 duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
@@ -2862,18 +2863,18 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         // check if incomplete survey exist
         List<SurveyPreInitiation> incompleteSurveyCustomers = null;
         if ( duplicateSurveyInterval > 0 ) {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays( currentAgentId,
-                customerEmailId, duplicateSurveyInterval );
+            incompleteSurveyCustomers = surveyPreInitiationDao
+                .getSurveyByAgentIdAndCustomeEmailForPastNDays( currentAgentId, customerEmailId, duplicateSurveyInterval );
         } else {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( currentAgentId,
-                customerEmailId );
+            incompleteSurveyCustomers = surveyPreInitiationDao
+                .getSurveyByAgentIdAndCustomeEmail( currentAgentId, customerEmailId );
         }
 
         // check if completed survey exist
         SurveyDetails survey;
         if ( duplicateSurveyInterval > 0 ) {
-            survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmailAndNoOfDays( currentAgentId, customerEmailId, null,
-                null, duplicateSurveyInterval );
+            survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmailAndNoOfDays( currentAgentId, customerEmailId, null, null,
+                duplicateSurveyInterval );
         } else {
             survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( currentAgentId, customerEmailId, null, null );
         }
@@ -2881,5 +2882,124 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             return true;
         }
         return false;
+    }
+
+
+	@Override
+    public String replaceGatewayQuestionText( String questionText, OrganizationUnitSettings agentSettings, User user,
+        OrganizationUnitSettings companySettings, SurveyDetails survey ) throws InvalidInputException
+	{
+	    if ( user == null ) {
+		    LOG.error( "User cannot be null" );
+		    throw new InvalidInputException( "User cannot be null" );
+	    }
+	    if ( questionText == null || questionText.isEmpty() ) {
+		    LOG.error( "Gateway question empty" );
+		    throw new InvalidInputException( "Gateway question empty" );
+	    }
+	    if ( agentSettings == null ) {
+		    LOG.error( "Agent Settings cannot be null" );
+		    throw new InvalidInputException( "Agent Settings cannot be null" );
+	    }
+	    if ( companySettings == null ) {
+		    LOG.error( "Company Settings cannot be null" );
+		    throw new InvalidInputException( "Company Settings cannot be null" );
+	    }
+	    if ( survey == null ) {
+		    LOG.error( "Survey details cannot be null" );
+		    throw new InvalidInputException( "Survey details cannot be null" );
+	    }
+
+        LOG.info( "Method replaceGateQuestionText started for User : " + user.getUserId() );
+        DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+        String agentDisclaimer = "";
+        String agentLicenses = "";
+        String companyDisclaimer = "";
+
+        if ( companySettings != null && companySettings.getDisclaimer() != null )
+            companyDisclaimer = companySettings.getDisclaimer();
+
+        if ( agentSettings.getDisclaimer() != null )
+            agentDisclaimer = agentSettings.getDisclaimer();
+
+        if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
+            agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
+        }
+        String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
+        String agentPhone = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null
+            && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
+            agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+        }
+        String agentTitle = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
+            agentTitle = agentSettings.getContact_details().getTitle();
+        }
+        String agentSignature = emailFormatHelper
+            .buildAgentSignature( survey.getAgentName(), agentPhone, agentTitle, user.getCompany().getCompany() );
+
+        String logoUrl = getLogoUrl( user, (AgentSettings) agentSettings );
+
+        LOG.info( "Method replaceGateQuestionText started for User : " + user.getUserId() );
+
+        return emailFormatHelper
+            .replaceLegends( false, questionText, getApplicationBaseUrl(), logoUrl, null, survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), survey.getAgentName(), agentSignature, survey.getCustomerEmail(),
+                user.getEmailId(), user.getCompany().getCompany(), dateFormat.format( new Date() ), currentYear, "", "",
+                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+
+    }
+
+
+    String getLogoUrl( User user, AgentSettings agentSettings )
+    {
+        if ( user == null ) {
+            LOG.error( "User cannot be null" );
+            return null;
+        }
+        LOG.info( "Method getLogoUrl started for user : " + user.getUserId() );
+        Map<String, Long> hierarchyMap = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        String logoUrl = null;
+        try {
+            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+            if ( map == null ) {
+                LOG.error( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
+            }
+            hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+
+            long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+            long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+            long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+            OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+            if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+                logoUrl = companySettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+                logoUrl = regionSettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                OrganizationUnitSettings branchSettings = null;
+                try {
+                    branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                } catch ( NoRecordsFetchedException e ) {
+                    e.printStackTrace();
+                }
+                if ( branchSettings != null ) {
+                    logoUrl = branchSettings.getLogo();
+                }
+            } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                logoUrl = agentSettings.getLogo();
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.error( "An InvalidInputException occurred while fetching logo url. Reason : ", e );
+        } catch ( ProfileNotFoundException e ) {
+            LOG.error( "A ProfileNotFounnException occurred while fetching logo url. Reason : ", e );
+        } catch ( InvalidSettingsStateException e ) {
+            LOG.error( "An InvalidSettingsStateException occurred while fetching logo url. Reason : ", e );
+        }
+        LOG.info( "Method getLogoUrl finished for user : " + user.getUserId() );
+        return logoUrl;
     }
 }
