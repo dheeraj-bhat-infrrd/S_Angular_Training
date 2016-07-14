@@ -10805,3 +10805,17 @@ $(document).on('click', '.review-more-button', function() {
 	$(this).parent().find('.view-zillow-link').show();
 	$(this).hide();
 });
+$(document).on('click','ul.accordion li',function(){
+	if($(this).find(".email-category").hasClass('expanded')){
+		$(this).find(".email-category").removeClass('expanded');
+		$(this).find(".email-content").css('display','none');
+	}else{
+		$(this).find(".email-category").addClass('expanded');
+		$(this).find(".email-content").css('display','block');
+		
+	}
+	
+});
+$(document).on('click','.email-content',function(event){
+	event.stopPropagation();
+});
