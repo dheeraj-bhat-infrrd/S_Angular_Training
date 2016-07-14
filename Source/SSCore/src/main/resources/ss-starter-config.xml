@@ -265,6 +265,13 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="loneWolfIntegrationApiBuilder" value-ref="loneWolfIntegrationApiBuilder" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+				<entry key="crmBatchTrackerService" value-ref="crmBatchTrackerService" />
+				<entry key="crmBatchTrackerHistoryService" value-ref="crmBatchTrackerHistoryService" />
+				<entry key="emailServices" value-ref="emailServices" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="applicationAdminEmail" value="${APPLICATION_ADMIN_EMAIL}" />
+				<entry key="applicationAdminName" value="${APPLICATION_ADMIN_NAME}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />

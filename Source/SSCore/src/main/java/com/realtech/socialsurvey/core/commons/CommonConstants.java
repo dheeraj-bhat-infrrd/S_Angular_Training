@@ -1182,4 +1182,8 @@ public interface CommonConstants
 
     public static final String PLAN_ID = "planId";
 
+    public static final String BATCH_TYPE_LONE_WOLF_REVIEW_PROCESSOR = "loneWolfReviewProcessor";
+    public static final String BATCH_NAME_LONE_WOLF_REVIEW_PROCESSOR = "Lone Wolf Review Processor";
+    public static final String CRM_SOURCE_LONEWOLF = "LONEWOLF";
+
 }
