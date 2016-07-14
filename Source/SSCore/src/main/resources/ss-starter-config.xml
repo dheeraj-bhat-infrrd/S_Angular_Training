@@ -446,7 +446,7 @@
 
 	<bean id="lonewolfcron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="lonewolfjobdetail" />
-		<property name="cronExpression" value="0 0/2 * 1/1 * ? *" />
+		<property name="cronExpression" value="0 0/1 * 1/1 * ? *" />
 	</bean>
 
 	<bean id="imageprocessingcron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -519,6 +519,7 @@
 				<ref bean="hierarchyuploadcron" />
 				<ref bean="billingreportcron" />
 				<ref bean="dotloopcron" />
+				<ref bean="lonewolfcron" />
 				<ref bean="surveyfileuploadcron" />
 				<ref bean="solrreviewcounterupdatercron" />
 				<!-- <ref bean="setcompanyidsinsocialpostscron" /> -->
