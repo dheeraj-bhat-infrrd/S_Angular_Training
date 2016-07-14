@@ -12,6 +12,19 @@ public class SocialMediaTokens
     private ZillowToken zillowToken;
     private LendingTreeToken lendingTreeToken;
     private RealtorToken realtorToken;
+    private GoogleBusinessToken googleBusinessToken;
+
+
+    public GoogleBusinessToken getGoogleBusinessToken()
+    {
+        return googleBusinessToken;
+    }
+
+
+    public void setGoogleBusinessToken( GoogleBusinessToken googleBusinessToken )
+    {
+        this.googleBusinessToken = googleBusinessToken;
+    }
 
 
     public FacebookToken getFacebookToken()
@@ -127,6 +140,7 @@ public class SocialMediaTokens
     {
         return "SocialMediaTokens [facebookToken=" + facebookToken + ", twitterToken=" + twitterToken + ", linkdenInToken="
             + linkedInToken + ", yelpToken=" + yelpToken + ", googleToken=" + googleToken + ", rssToken=" + rssToken
-            + ", zillowToken=" + zillowToken + ", lendingTreeToken=" + lendingTreeToken + "]";
+            + ", zillowToken=" + zillowToken + ", lendingTreeToken=" + lendingTreeToken + ", googleBusinessToken="
+            + googleBusinessToken + "]";
     }
 }

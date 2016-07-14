@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
 
+import com.realtech.socialsurvey.core.entities.GoogleBusinessToken;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -513,10 +514,10 @@ public class ProfileManagementController
 
 
     /**
-     * 
+     *
      * @param model
      * @param entitySetting
-     * @throws InvalidInputException 
+     * @throws InvalidInputException
      */
     private void setSettingSetByEntityInModel( Model model, OrganizationUnitSettings entitySetting )
         throws InvalidInputException
@@ -656,7 +657,7 @@ public class ProfileManagementController
 
     /**
      * Method to update profile lock settings
-     * 
+     *
      * @param model
      * @param request
      * @return
@@ -927,7 +928,7 @@ public class ProfileManagementController
 
     /**
      * Method to update about profile details
-     * 
+     *
      * @param model
      * @param request
      */
@@ -1050,7 +1051,7 @@ public class ProfileManagementController
 
     /**
      * Method to update profile addresses in profile
-     * 
+     *
      * @param model
      * @param request
      * @return
@@ -1285,7 +1286,7 @@ public class ProfileManagementController
 
     /**
      * Method to update profile addresses in profile
-     * 
+     *
      * @param model
      * @param request
      * @return
@@ -1708,7 +1709,7 @@ public class ProfileManagementController
 
     /**
      * Method to add or update profile logo
-     * 
+     *
      * @param model
      * @param request
      * @param fileLocal
@@ -1983,7 +1984,7 @@ public class ProfileManagementController
 
     /**
      * Method to update email id for profile
-     * 
+     *
      * @param model
      * @param request
      */
@@ -2178,7 +2179,7 @@ public class ProfileManagementController
 
 
     /**
-     * 
+     *
      * @param mailIds
      * @param entityType
      * @param userSettings
@@ -2257,7 +2258,7 @@ public class ProfileManagementController
 
     /**
      * Method to update phone numbers of a profile
-     * 
+     *
      * @param model
      * @param request
      * @return
@@ -2427,7 +2428,7 @@ public class ProfileManagementController
 
     /**
      * Method to update web addresses for a profile
-     * 
+     *
      * @param model
      * @param request
      */
@@ -3435,6 +3436,144 @@ public class ProfileManagementController
     }
 
 
+	@RequestMapping (value = "/updateGoogleBusinessLink")
+	public String updateGoogleBusinessLink( Model model, HttpServletRequest request )
+	{
+		LOG.info( "Method updateGoogleBusinessLink() started" );
+		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession( false );
+		SocialMediaTokens socialMediaTokens = null;
+
+		try {
+			UserSettings userSettings = (UserSettings) session
+				.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+				.getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+			long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+			String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+			if ( userSettings == null || profileSettings == null || entityType == null ) {
+				throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
+			}
+
+			String googleBusinessLink = request.getParameter( "googleBusinessLink" );
+			try {
+				if ( googleBusinessLink == null || googleBusinessLink.isEmpty() ) {
+					throw new InvalidInputException( "googleBusinessLink passed was null or empty",
+						DisplayMessageConstants.GENERAL_ERROR );
+				}
+				urlValidationHelper.validateUrl( googleBusinessLink );
+			} catch ( IOException e ) {
+				throw new InvalidInputException( "googleBusinessLink passed was invalid", DisplayMessageConstants.GENERAL_ERROR,
+					e );
+			}
+			if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+				if ( companySettings == null ) {
+					throw new InvalidInputException( "No company settings found in current session" );
+				}
+				socialMediaTokens = companySettings.getSocialMediaTokens();
+				socialMediaTokens = updateGoogleBusinessLink( googleBusinessLink, socialMediaTokens );
+				profileManagementService
+					.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+						socialMediaTokens );
+				companySettings.setSocialMediaTokens( socialMediaTokens );
+				userSettings.setCompanySettings( companySettings );
+				Company company = userManagementService.getCompanyById( companySettings.getIden() );
+				if ( company != null ) {
+					settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.GOOGLE_BUSINESS, true );
+					userManagementService.updateCompany( company );
+				}
+			} else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+				if ( regionSettings == null ) {
+					throw new InvalidInputException( "No Region settings found in current session" );
+				}
+				socialMediaTokens = regionSettings.getSocialMediaTokens();
+				socialMediaTokens = updateGoogleBusinessLink( googleBusinessLink, socialMediaTokens );
+				profileManagementService
+					.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+						socialMediaTokens );
+				regionSettings.setSocialMediaTokens( socialMediaTokens );
+				userSettings.getRegionSettings().put( entityId, regionSettings );
+				Region region = userManagementService.getRegionById( regionSettings.getIden() );
+				if ( region != null ) {
+					settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.GOOGLE_BUSINESS, true );
+					userManagementService.updateRegion( region );
+				}
+			} else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+				OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+				if ( branchSettings == null ) {
+					throw new InvalidInputException( "No Branch settings found in current session" );
+				}
+				socialMediaTokens = branchSettings.getSocialMediaTokens();
+				socialMediaTokens = updateGoogleBusinessLink( googleBusinessLink, socialMediaTokens );
+				profileManagementService
+					.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+						socialMediaTokens );
+				branchSettings.setSocialMediaTokens( socialMediaTokens );
+				userSettings.getRegionSettings().put( entityId, branchSettings );
+				Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+				if ( branch != null ) {
+					settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.GOOGLE_BUSINESS, true );
+					userManagementService.updateBranch( branch );
+				}
+			} else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+				AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+				if ( agentSettings == null ) {
+					throw new InvalidInputException( "No Agent settings found in current session" );
+				}
+				socialMediaTokens = agentSettings.getSocialMediaTokens();
+				socialMediaTokens = updateGoogleBusinessLink( googleBusinessLink, socialMediaTokens );
+				profileManagementService
+					.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+						socialMediaTokens );
+				agentSettings.setSocialMediaTokens( socialMediaTokens );
+				userSettings.setAgentSettings( agentSettings );
+			} else {
+				throw new InvalidInputException( "Invalid input exception occurred in updating lendingTree token.",
+					DisplayMessageConstants.GENERAL_ERROR );
+			}
+			profileSettings.setSocialMediaTokens( socialMediaTokens );
+
+			//Add action to social connection history
+			socialManagementService.updateSocialConnectionsHistory( entityType, entityId, socialMediaTokens,
+				CommonConstants.GOOGLE_BUSINESS_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+
+			LOG.info( "google business updated successfully" );
+			model.addAttribute( "message", messageUtils
+				.getDisplayMessage( DisplayMessageConstants.GOOGLE_BUSINESS_TOKEN_UPDATE_SUCCESSFUL,
+					DisplayMessageType.SUCCESS_MESSAGE ) );
+		} catch ( NonFatalException nonFatalException ) {
+			LOG.error(
+				"NonFatalException while updating googleBusinessLink in profile. Reason :" + nonFatalException.getMessage(),
+				nonFatalException );
+			model.addAttribute( "message", messageUtils
+				.getDisplayMessage( DisplayMessageConstants.GOOGLE_BUSINESS_TOKEN_UPDATE_UNSUCCESSFUL,
+					DisplayMessageType.ERROR_MESSAGE ) );
+		}
+		LOG.info( "Method updateGoogleBusinessLink() finished" );
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	private SocialMediaTokens updateGoogleBusinessLink( String googleBusinessLink, SocialMediaTokens socialMediaTokens )
+	{
+		LOG.debug( "Method updateGoogleBusinessLink() called from ProfileManagementController" );
+		if ( socialMediaTokens == null ) {
+			LOG.debug( "No social media token in profile added" );
+			socialMediaTokens = new SocialMediaTokens();
+		}
+		if ( socialMediaTokens.getGoogleBusinessToken() == null ) {
+			socialMediaTokens.setGoogleBusinessToken( new GoogleBusinessToken() );
+		}
+
+		GoogleBusinessToken googleBusinessToken = socialMediaTokens.getGoogleBusinessToken();
+		googleBusinessToken.setGoogleBusinessLink( googleBusinessLink );
+		socialMediaTokens.setGoogleBusinessToken( googleBusinessToken );
+		LOG.debug( "Method updateGoogleBusinessLink() finished from ProfileManagementController" );
+		return socialMediaTokens;
+	}
+
+
     @RequestMapping ( value = "/updateRealtorlink", method = RequestMethod.POST)
     public String updateRealtorLink( Model model, HttpServletRequest request )
     {
@@ -3708,7 +3847,7 @@ public class ProfileManagementController
 
     /**
      * Method to update achievements in profile
-     * 
+     *
      * @param model
      * @param request
      * @return
@@ -3813,7 +3952,7 @@ public class ProfileManagementController
 
     /**
      * Method to update associations in profile
-     * 
+     *
      * @param model
      * @param request
      * @return
@@ -3910,7 +4049,7 @@ public class ProfileManagementController
 
     /**
      * Method to update licenses for profile
-     * 
+     *
      * @param model
      * @param request
      */
@@ -4281,7 +4420,7 @@ public class ProfileManagementController
 
     /**
      * Method to initiate find a pro page based on profile level and iden
-     * 
+     *
      * @param profileLevel
      * @param iden
      * @return
@@ -4403,7 +4542,7 @@ public class ProfileManagementController
 
     /**
      * Method to return company profile page
-     * 
+     *
      * @param profileName
      * @param model
      * @return
@@ -4426,7 +4565,7 @@ public class ProfileManagementController
 
     /**
      * Method to return region profile page
-     * 
+     *
      * @param companyProfileName
      * @param regionProfileName
      * @param model
@@ -4459,7 +4598,7 @@ public class ProfileManagementController
 
     /**
      * Method to return branch profile page
-     * 
+     *
      * @param companyProfileName
      * @param branchProfileName
      * @param model
@@ -4491,7 +4630,7 @@ public class ProfileManagementController
 
     /**
      * Method to return agent profile page
-     * 
+     *
      * @param agentProfileName
      * @param model
      * @return
@@ -4879,7 +5018,7 @@ public class ProfileManagementController
 
     /**
      * Method to verify a new emailId
-     * 
+     *
      * @param encryptedUrlParams
      * @param request
      * @param model
@@ -5051,7 +5190,7 @@ public class ProfileManagementController
 
     /**
      * Method to update about profile details
-     * 
+     *
      * @param model
      * @param request
      */
@@ -5192,7 +5331,7 @@ public class ProfileManagementController
 
     /**
      * Method to show the widget popup
-     * 
+     *
      * @param iden
      * @param accountType
      * @return
