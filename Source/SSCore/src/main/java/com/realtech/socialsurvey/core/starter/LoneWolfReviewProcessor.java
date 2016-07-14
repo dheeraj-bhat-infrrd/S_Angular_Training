@@ -122,7 +122,10 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
 
                     LOG.info( "Getting lonewolf records for company id: " + organizationUnitSettings.getId() );
                     LoneWolfCrmInfo loneWolfCrmInfo = (LoneWolfCrmInfo) organizationUnitSettings.getCrm_info();
-                    if ( loneWolfCrmInfo.getApi() != null && !loneWolfCrmInfo.getApi().isEmpty() ) {
+                    if ( loneWolfCrmInfo.getApitoken() != null && !loneWolfCrmInfo.getApitoken().isEmpty()
+                        && loneWolfCrmInfo.getClientCode() != null && !loneWolfCrmInfo.getClientCode().isEmpty()
+                        && loneWolfCrmInfo.getSecretkey() != null && !loneWolfCrmInfo.getSecretkey().isEmpty() ) {
+                        
                         entityId = organizationUnitSettings.getIden();
 
                         //make an entry in crm batch tracker and update last run start time
