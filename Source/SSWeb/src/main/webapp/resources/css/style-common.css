@@ -7899,16 +7899,17 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 }
 
 .st-subject-label {
-	width: 30%;
 	font-size: 15px;
+    font-weight: 600 !important;
 }
 
 .st-subject-input-cont {
-	width: 70%;
+	width: 74%; 
+	margin-left:10px;
 }
 
 .st-subject-input {
-	width: 250px;
+	width: 100%;
 	max-width: 100%;
 	height: 40px;
 	line-height: 20px;
@@ -8940,11 +8941,11 @@ ul.accordion li {
 ul.accordion li>a {
     display: block;
     padding: 0 0 13px 0;
-    color: #000;
+    color: #444444;
     font: 600 1.333em 'Open Sans', Helvetca, Arial, sans-serif;
     outline: none;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600 !important;
 }
 ul.accordion li>div {
@@ -8992,5 +8993,8 @@ ul.accordion li>a:before {
 }
 .legend-wrapper{
 	margin-top:5px;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 

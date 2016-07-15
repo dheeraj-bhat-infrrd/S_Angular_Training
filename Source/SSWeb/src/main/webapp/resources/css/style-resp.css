@@ -1590,12 +1590,12 @@
     .st-subject-label {
 		font-size: 13px;
 		display: table-cell;
-		line-height: normal;
+		line-height: 34px;
 		vertical-align: middle;
 	}
-	.st-subject-cont {
+	/* .st-subject-cont {
 		display: table;
-	}
+	} */
 	.bd-ans-smiley {
 		background: url(../csssprites/smileys.png) no-repeat -56px -150px;
 	}
@@ -1731,8 +1731,26 @@
   .contact-phone-edit{
     margin-top: 8px;
   }
+  .hide-header{
+	   display:none;
+	}
+  .legend-height{
+       height: 413px;
+	}
+ .st-subject-input-cont{
+	 width:45%;
+	}
+	
  
 
+}
+@media (min-width: 992px){
+	.hide-header{
+	   display:block !important;
+	}
+	.st-subject-input-cont {
+    width: 74%;
+ }
 }
 
 
@@ -2306,6 +2324,7 @@
     -moz-transform: scale(0.888);
     -webkit-transform-origin:0 0;
     }
+   
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
@@ -2437,5 +2456,14 @@
 	}
 	.v-hr-tbl-icn-wraper, .v-um-tbl-icn-wraper {
 		display: block !important;
+	}
+	.hide-header{
+	   display:none;
+	}
+	.legend-height{
+       height: 431px;
+	}
+	.st-subject-input-cont{
+	 width:66%;
 	}
 }
