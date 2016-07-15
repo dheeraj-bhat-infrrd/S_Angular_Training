@@ -473,6 +473,7 @@
 									</div>
 								</div>
 							</div>
+
 						</div></li>
 					<li class="col-lg-12 col-md-12 col-sm-12 col-xs-12"><a href="#" class="email-category">Retake Survey Request</a>
 					<div class="email-content" style="">
@@ -507,7 +508,7 @@
 										</div>
 									</div>
 								</div>
-									
+	
 								</div>
 								
 								<div class="st-header-txt-wrapper">

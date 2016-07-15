@@ -225,7 +225,7 @@ public class RegistrationController
 					return "redirect:/" + JspResolver.LOGIN + ".do";
 				} else {
 					// take to complete registration
-					if (invitedUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED || invitedUser.getStatus() == CommonConstants.STATUS_INCOMPLETE ) {
+					if (invitedUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED) {
 						redirectAttributes.addFlashAttribute(CommonConstants.COMPANY, invitedUser.getCompany().getCompanyId());
 						redirectAttributes.addFlashAttribute(CommonConstants.FIRST_NAME, invitedUser.getFirstName());
 						redirectAttributes.addFlashAttribute(CommonConstants.EMAIL_ID, emailAddress);

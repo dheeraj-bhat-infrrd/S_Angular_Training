@@ -56,6 +56,45 @@ function landingFlow() {
 		parent.next('.welcome-popup-wrapper').show();
 	});
 	
+	$('body').on('click', '.wc-final-skip-close', function(){ 
+		var end=false;
+		$('#overlay-send-survey').find('#wc-review-table-inner').children().each(function() {
+			if (!$(this).hasClass('wc-review-hdr')) {
+				$(this).children().each(function(){
+					if (!$(this).hasClass('last')){
+						var input=$(this).children(":input").val();
+						if(input!=""){
+							end=true;
+							$('#overlay-header-survey').html("Warning");
+							$('#overlay-text-survey').html("Closing this window without submitting will delete any data rows entered.Are you sure you want to close?")
+							$('#overlay-continue-survey').html("Ok");
+	                        $('#overlay-cancel-survey').html("Cancel");
+							$('#overlay-main-survey').show();
+							$('#overlay-continue-survey').off();
+							$('#overlay-continue-survey').click(function() {
+								$('#overlay-main-survey').hide();
+								$('#overlay-send-survey').hide();
+								enableBodyScroll();
+							});
+							$('#overlay-cancel-survey').off();
+							$('#overlay-cancel-survey').click(function() {
+								$('#overlay-main-survey').hide();
+							});
+						}
+					}
+					
+				});
+				
+			}
+
+		});
+		if(!end){
+			$('#overlay-send-survey').hide();
+			enableBodyScroll();
+		}
+		
+		
+	});
 	$('body').on('click', '.wc-final-skip', function(){
 		$(this).closest('.overlay-login').hide().html('');
 		enableBodyScroll();
