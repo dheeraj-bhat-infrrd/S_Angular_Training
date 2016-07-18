@@ -8957,7 +8957,7 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 	var parentDiv = $('#wc-review-table-inner');
 
 	// disable remove button
-	if (parentDiv.children().length <= 3) {
+	if (parentDiv.children().length <= 4) {
 		$('.wc-review-rmv-icn').hide();
 	}
 	$(this).parent().parent().remove();
