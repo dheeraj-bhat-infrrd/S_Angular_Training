@@ -362,6 +362,7 @@ public interface CommonConstants
     public static final String YELP_SOCIAL_SITE = "yelp";
     public static final String LENDINGTREE_SOCIAL_SITE = "lendingtree";
     public static final String REALTOR_SOCIAL_SITE = "realtor";
+    public static final String GOOGLE_BUSINESS_SOCIAL_SITE = "google business";
     public static final String GOOGLE_SOCIAL_SITE = "google";
     public static final String SOCIAL_SURVEY_SOCIAL_SITE = "socialsurvey";
     public static final String TWITTER_BASE_URL = "www.twitter.com/";
@@ -999,6 +1000,7 @@ public interface CommonConstants
 
     // Social Post Connection Buttons
     public static final String REALTOR_LABEL = "REALTOR.COM";
+    public static final String GOOGLE_BUSINESS_LABEL = "GOOGLE BUSINESS";
     public static final String LENDING_TREE_LABEL = "LENDING TREE";
     public static final String ZILLOW_LABEL = "ZILLOW";
     public static final String YELP_LABEL = "YELP!";
@@ -1067,6 +1069,7 @@ public interface CommonConstants
     public static final String CHR_YELP = "Yelp";
     public static final String CHR_LENDING_TREE = "Lendingtree";
     public static final String CHR_REALTOR = "Realtor";
+    public static final String CHR_GOOGLE_BUSINESS = "Google Business";
 
     public static final String SOCIAL_SURVEY_ACCESS_LAVEL = "SocialSurvey Access Level ";
     public static final String SOCIAL_SURVEY_INVITE_SENT = "SocialSurvey Invite sent";
@@ -1178,5 +1181,9 @@ public interface CommonConstants
     public static final int ENTERPRISE_PLAN_ID = 3;
 
     public static final String PLAN_ID = "planId";
+
+    public static final String BATCH_TYPE_LONE_WOLF_REVIEW_PROCESSOR = "loneWolfReviewProcessor";
+    public static final String BATCH_NAME_LONE_WOLF_REVIEW_PROCESSOR = "Lone Wolf Review Processor";
+    public static final String CRM_SOURCE_LONEWOLF = "LONEWOLF";
 
 }

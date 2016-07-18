@@ -22,7 +22,8 @@ public enum SettingsForApplication
     WEB_ADDRESS_PERSONAL( 100000000000000l, 15 ),
     ABOUT_ME( 1000000000000000l, 16 ),
     EMAIL_ID_PERSONAL( 10000000000000000l, 17 ),
-    EMAIL_ID_WORK( 100000000000000000l, 18 );
+    EMAIL_ID_WORK( 100000000000000000l, 18 ),
+    GOOGLE_BUSINESS( 1000000000000000000l, 19 );
 
     private final long order;
     private final int index; // the order is the not the index. 1 means units, 2 means tens decimal
@@ -84,7 +85,8 @@ public enum SettingsForApplication
             return EMAIL_ID_PERSONAL;
         } else if ( index == 18 ) {
             return EMAIL_ID_WORK;
-
+        } else if ( index == 19 ) {
+            return GOOGLE_BUSINESS;
         } else {
             return null;
         }

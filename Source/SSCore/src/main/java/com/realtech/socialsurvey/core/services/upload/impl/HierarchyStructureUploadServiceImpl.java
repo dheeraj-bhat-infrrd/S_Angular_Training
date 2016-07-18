@@ -205,6 +205,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         List<UserUploadVO> userList = upload.getUsers();
         if ( userList == null || userList.isEmpty() ) {
             LOG.warn( "Empty userList" );
+	        deletedUsersStatus = updateUploadStatusToDone( deletedUsersStatus, CommonConstants.UPLOAD_DELETED_USERS, deletedUsers );
             return;
         }
         List<UserUploadVO> deletedUsersList = new ArrayList<UserUploadVO>();
@@ -254,6 +255,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         List<BranchUploadVO> branches = upload.getBranches();
         if ( branches == null || branches.isEmpty() ) {
             LOG.warn( "Empty branch list" );
+            deletedBranchesStatus = updateUploadStatusToDone( deletedBranchesStatus, CommonConstants.UPLOAD_DELETED_BRANCHES,
+                deletedBranches );
             return;
         }
         List<BranchUploadVO> deletedBranchesList = new ArrayList<BranchUploadVO>();
@@ -320,6 +323,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         List<RegionUploadVO> regions = upload.getRegions();
         if ( regions == null || regions.isEmpty() ) {
             LOG.warn( "Empty region list" );
+	        deletedRegionsStatus = updateUploadStatusToDone( deletedRegionsStatus, CommonConstants.UPLOAD_DELETED_REGIONS,
+		        deletedRegions );
             return;
         }
         List<RegionUploadVO> deletedRegionsList = new ArrayList<RegionUploadVO>();
@@ -427,7 +432,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                         upload.getRegionSourceMapping().put( branchUpload.getSourceRegionId(), branch.getRegion().getRegionId() );
                     }*/
                     if ( branchUpload.getSourceBranchId() != null && !branchUpload.getSourceBranchId().isEmpty() ) {
-                        upload.getBranchSourceMapping().put( branchUpload.getSourceBranchId(), branch.getBranchId() );
+                        upload.getBranchSourceMapping().put( processSourceId( branchUpload.getSourceBranchId() ), branch.getBranchId() );
                     }
 
                     upload.setBranches( branchesToBeUploaded );
@@ -612,7 +617,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     mapRegionModificationHistory( regionUpload, region );
                     // map the id mapping
                     if ( regionUpload.getSourceRegionId() != null && !regionUpload.getSourceRegionId().isEmpty() ) {
-                        upload.getRegionSourceMapping().put( regionUpload.getSourceRegionId(), region.getRegionId() );
+                        upload.getRegionSourceMapping().put( processSourceId( regionUpload.getSourceRegionId() ), region.getRegionId() );
                     }
 
                     //Store the updated regionUploads in upload
@@ -1509,8 +1514,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             //Add branch assignments
             for ( String sourceBranchId : addedAssignments ) {
-                if ( upload.getBranchSourceMapping().containsKey( sourceBranchId ) ) {
-                    long branchId = upload.getBranchSourceMapping().get( sourceBranchId );
+                if ( upload.getBranchSourceMapping().containsKey( processSourceId( sourceBranchId ) ) ) {
+                    long branchId = upload.getBranchSourceMapping().get( processSourceId( sourceBranchId ) );
                     Branch branch = userManagementService.getBranchById( branchId );
                     if ( branch == null ) {
                         throw new UserAssignmentException(
@@ -1533,8 +1538,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             //Remove branch assignments
             for ( String sourceBranchId : deletedAssignments ) {
-                if ( upload.getBranchSourceMapping().containsKey( sourceBranchId ) ) {
-                    long branchId = upload.getBranchSourceMapping().get( sourceBranchId );
+                if ( upload.getBranchSourceMapping().containsKey( processSourceId( sourceBranchId ) ) ) {
+                    long branchId = upload.getBranchSourceMapping().get( processSourceId( sourceBranchId ) );
                     Branch branch = userManagementService.getBranchById( branchId );
                     if ( branch == null ) {
                         throw new UserAdditionException(
@@ -1646,8 +1651,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             //Add region assignments
             for ( String sourceRegionId : addedAssignments ) {
-                if ( upload.getRegionSourceMapping().containsKey( sourceRegionId ) ) {
-                    long regionId = upload.getRegionSourceMapping().get( sourceRegionId );
+                if ( upload.getRegionSourceMapping().containsKey( processSourceId( sourceRegionId ) ) ) {
+                    long regionId = upload.getRegionSourceMapping().get( processSourceId( sourceRegionId ) );
                     organizationManagementService.assignRegionToUser( adminUser, regionId, assigneeUser, isAdmin );
                 } else {
                     throw new UserAssignmentException( "unable to resolve sourceRegionId : " + sourceRegionId );
@@ -1664,8 +1669,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             //Remove region assignments
             for ( String sourceRegionId : deletedAssignments ) {
-                if ( upload.getRegionSourceMapping().containsKey( sourceRegionId ) ) {
-                    long regionId = upload.getRegionSourceMapping().get( sourceRegionId );
+                if ( upload.getRegionSourceMapping().containsKey( processSourceId( sourceRegionId ) ) ) {
+                    long regionId = upload.getRegionSourceMapping().get( processSourceId( sourceRegionId ) );
                     Branch branch = organizationManagementService.getDefaultBranchForRegion( regionId );
                     if ( branch == null ) {
                         throw new UserAdditionException(
@@ -2113,7 +2118,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 mapUserModificationHistory( userToBeUploaded, user );
                 //map the id mapping
                 if ( userToBeUploaded.getSourceUserId() != null && !userToBeUploaded.getSourceUserId().isEmpty() ) {
-                    upload.getUserSourceMapping().put( userToBeUploaded.getSourceUserId(), userToBeUploaded.getUserId() );
+                    upload.getUserSourceMapping().put( processSourceId( userToBeUploaded.getSourceUserId() ), userToBeUploaded.getUserId() );
                 }
                 //Store the updated userUploads in upload
                 upload.setUsers( usersToUpload );
@@ -2148,6 +2153,15 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             modifiedUsers );
         LOG.debug( "Finished uploading users to the database" );
     }
+
+
+	String processSourceId( String sourceId )
+	{
+		if ( sourceId.contains( "." ) ) {
+			sourceId = sourceId.replace( ".", "" );
+		}
+		return sourceId;
+	}
 
 
     /**
