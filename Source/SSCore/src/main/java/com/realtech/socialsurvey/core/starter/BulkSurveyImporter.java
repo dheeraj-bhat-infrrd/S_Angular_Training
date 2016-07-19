@@ -28,6 +28,7 @@ import java.util.List;
 public class BulkSurveyImporter extends QuartzJobBean
 {
     private static String fileName = "./surveyimport.xlsx";
+	private static String source = "eEndorsement";
     public static final Logger LOG = LoggerFactory.getLogger( BillingReportGenerator.class );
 
     private static final int USER_ID_INDEX = 2;
@@ -136,7 +137,7 @@ public class BulkSurveyImporter extends QuartzJobBean
             List<SurveyImportVO> surveyImportVOs = getSurveyListFromCsv();
             if ( surveyImportVOs != null && !surveyImportVOs.isEmpty() ) {
                 for ( SurveyImportVO surveyImportVO : surveyImportVOs ) {
-                    surveyHandler.importSurveyVOToDBs( surveyImportVO );
+                    surveyHandler.importSurveyVOToDBs( surveyImportVO, source );
                 }
             }
         } catch ( NonFatalException e ) {

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,9 +140,16 @@ public class AdminController
                 // Deleting company from MySQL
                 company.setStatus( CommonConstants.STATUS_COMPANY_DELETED );
                 organizationManagementService.updateCompany( company );
+	            try {
+		            organizationManagementService.purgeCompany( company );
+	            } catch ( InvalidInputException e ) {
+		            LOG.error( "An error occurred while purging company : " + companyId + ". Reason : ", e );
+	            } catch ( SolrException e ) {
+		            LOG.error( "An error occurred while purging company : " + companyId + ". Reason : ", e );
+	            }
                 
                 // marking comapny to be deleted forcefully during purge batch
-                organizationManagementService.forceDeleteDisabledAccount( company.getCompanyId(), loggedInUser.getUserId() );
+                //organizationManagementService.forceDeleteDisabledAccount( company.getCompanyId(), loggedInUser.getUserId() );
             }
         }
         return message;
