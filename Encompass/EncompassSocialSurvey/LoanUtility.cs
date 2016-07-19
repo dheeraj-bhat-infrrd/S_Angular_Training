@@ -18,6 +18,7 @@ namespace EncompassSocialSurvey
 
         private static int DAYS_INTERVAL = EncompassSocialSurveyConfiguration.DefaultDaysIntervalToFetch; // should not get loans older than DAYS_INTERVAL from NOW
         private DateTime lastFetchedTime = Convert.ToDateTime(EncompassSocialSurveyConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME);
+        private static long SUMMIT_ID = EncompassSocialSurveyConfiguration.SummitCompanyId;
 
         #endregion
 
@@ -136,10 +137,26 @@ namespace EncompassSocialSurvey
                             noOfDays = days;
                         else
                             noOfDays = EncompassSocialSurveyConstant.DAYS_BEFORE;
+
+                        //If the company is summit, get records only from 18/7/2016
+                        if (runningCompanyId == SUMMIT_ID)
+                        {
+                            int daysSinceStart = (DateTime.Now - EncompassSocialSurveyConstant.SUMMIT_BEGIN_TIME).Days;
+                            if (noOfDays > daysSinceStart)
+                                noOfDays = daysSinceStart;
+                        }
                     }
                     else
                     {
-                        noOfDays = DAYS_INTERVAL;
+                        //If the company is summit, get records only from 18/7/2016
+                        if (runningCompanyId == SUMMIT_ID)
+                        {
+                            noOfDays = (DateTime.Now - EncompassSocialSurveyConstant.SUMMIT_BEGIN_TIME).Days;
+                        }
+                        else
+                        {
+                            noOfDays = DAYS_INTERVAL;
+                        }
                     }
                 }
                 else
