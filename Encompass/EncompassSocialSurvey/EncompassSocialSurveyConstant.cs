@@ -38,12 +38,19 @@ namespace EncompassSocialSurvey
         public const string DISABLE_GENERATE_REPORT_URL = "disable_generate_report_url";
 
         public const string MAX_NO_OF_PARALLEL_THREADS = "MaxNoOfParallelThreads";
+        //Summit Company ID
+        public const string SUMMIT_ID = "summit_company_id";
 
         
         // MM/dd/yyyy
         public const string LAST_REMINDER_TIME = "01/01/1970";
         public const string DEFAULT_ENGAGEMENT_CLOSE_TIME = "01/01/1970";
         public static readonly DateTime EPOCH_TIME = new DateTime(1970, 1, 2, 0, 0, 0);
+
+        //TODO: Convert this into a map
+        //Starting Date Time for Summit
+        public static readonly DateTime SUMMIT_BEGIN_TIME = new DateTime(2016, 7, 18, 0, 0, 0);
+        
         public const int REMINDER_COUNT = 0;
         public const int STATUS = 4;
 
