@@ -1,18 +1,29 @@
 package com.realtech.socialsurvey.core.utils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import org.apache.commons.lang.WordUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,6 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @Component
 public class EmailFormatHelper {
@@ -35,6 +48,12 @@ public class EmailFormatHelper {
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
+
+	@Autowired
+	private SurveyHandler surveyHandler;
+
+	@Autowired
+	private SurveyPreInitiationDao surveyPreInitiationDao;
 	
 	private static final String PARAM_PATTERN_REGEX = "\\[(.*?)\\]";
 	private static final String PARAM_PATTERN = "%s";
@@ -115,6 +134,7 @@ public class EmailFormatHelper {
 	}
 
 
+	@Transactional
 	public String replaceLegends( boolean isSubject, String content, String baseUrl, String logoUrl, String link,
 		String custFirstName, String custLastName, String agentName, String agentSignature, String recipientMailId,
 		String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress, String links,
@@ -127,6 +147,7 @@ public class EmailFormatHelper {
             throw new InvalidInputException( "Content passed in replaceLegends is null or empty" );
         }
 
+		long agentId = 0;
         String customerName = getCustomerDisplayNameForEmail( custFirstName, custLastName );
 
         content = content.replaceAll( "\\[BaseUrl\\]", "" + baseUrl );
@@ -176,9 +197,6 @@ public class EmailFormatHelper {
 		String realtor_com_link = null;
 
 		//JIRA SS-626 begin
-		//TODO: Fetch agentSettings from emailId
-		//TODO: Fetch companySettings.
-		//TODO: Get links according to the hierarchy
 		try {
 			User user = userManagementService.getUserByEmailAddress( senderEmail );
 			if ( user == null ) {
@@ -191,6 +209,7 @@ public class EmailFormatHelper {
 			if ( user.getCompany() == null ) {
 				throw new NoRecordsFetchedException( "No company found for user Id: " + user.getUserId() );
 			}
+			agentId = user.getUserId();
 			OrganizationUnitSettings companySettings = organizationManagementService
 				.getCompanySettings( user.getCompany().getCompanyId() );
 			if ( companySettings == null ) {
@@ -273,8 +292,9 @@ public class EmailFormatHelper {
 		content = content.replace( "[company_lending_tree_link]", processUrl(company_lending_tree_link) );
 		content = content.replace( "[company_realtor_com_link]", processUrl(company_realtor_com_link) );
 
-
-
+		Map<String, String> surveyMap = fetchSurveySourceId( agentId, recipientMailId, initiatedDate );
+		content = content.replace( "[survey_source_id]", surveyMap.get( CommonConstants.SURVEY_SOURCE_ID_COLUMN ) );
+		content = content.replace( "[survey_source]", surveyMap.get( CommonConstants.SURVEY_SOURCE_COLUMN ) );
 		//JIRA SS-626 end
         content = content.replaceAll( "null", "" );
         LOG.info( "Method to replace legends with values called, replaceLegends() ended");
@@ -285,5 +305,68 @@ public class EmailFormatHelper {
 		if ( url == null )
 			return "";
 		return url;
+	}
+
+
+	@Transactional
+	Map fetchSurveySourceId( long agentId, String customerEmailAddress, String dateStr ) throws InvalidInputException
+	{
+		LOG.info( "Method fetchSurveySourceId started for agentId : " + agentId + " and customer : " + customerEmailAddress );
+		if ( agentId <= 0 ) {
+			throw new InvalidInputException( "Invalid Agent ID : " + agentId );
+		}
+		if ( customerEmailAddress == null || customerEmailAddress.isEmpty() )
+			throw new InvalidInputException( "Customer Email Address cannot be empty" );
+		if ( dateStr == null || dateStr.isEmpty() )
+			throw new InvalidInputException( "initiated dateStr cannot be empty" );
+		Map<String, String> surveyMap = new HashMap<>();
+		DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+		Date date = null;
+		try {
+			date = dateFormat.parse( dateStr );
+		} catch ( ParseException e ) {
+			throw new InvalidInputException( "A Date parse exception occurred. Reason : ", e );
+		}
+		String surveySourceId = "";
+		String surveySource = "";
+		List<SurveyPreInitiation> surveyList = surveyPreInitiationDao
+			.getSurveyByAgentIdAndCustomeEmail( agentId, customerEmailAddress );
+		if ( surveyList.isEmpty() ) {
+			throw new InvalidInputException( "No survey found!" );
+		}
+		long oneDay = 1000 * 60 * 60 * 24;
+		if ( surveyList.size() > 1 ) {
+			for ( SurveyPreInitiation survey : surveyList ) {
+				if ( Math.abs( survey.getCreatedOn().getTime() - date.getTime() ) <= oneDay ) {
+					surveySourceId = fetchSurveySourceId( survey );
+					if ( survey.getSurveySource() != null )
+						surveySource = survey.getSurveySource();
+					break;
+				}
+			}
+		} else {
+			SurveyPreInitiation survey = surveyList.get( 0 );
+			surveySourceId = fetchSurveySourceId( survey );
+			if ( survey.getSurveySource() != null )
+				surveySource = survey.getSurveySource();
+		}
+		LOG.info( "Method fetchSurveySourceId finished for agentId : " + agentId + " and customer : " + customerEmailAddress );
+		surveyMap.put( CommonConstants.SURVEY_SOURCE_ID_COLUMN, surveySourceId );
+		surveyMap.put( CommonConstants.SURVEY_SOURCE_COLUMN, surveySource );
+		return surveyMap;
+	}
+
+	//@Transactional
+	String fetchSurveySourceId( SurveyPreInitiation survey ) throws InvalidInputException
+	{
+		LOG.info( "Method fetchSurveySourceId started." );
+		if ( survey == null ) {
+			throw new InvalidInputException( "Survey cannot be null" );
+		}
+		String surveySourceId = "";
+		if ( survey.getSurveySourceId() != null )
+			surveySourceId = survey.getSurveySourceId();
+		LOG.info( "Method fetchSurveySourceId finished." );
+		return surveySourceId;
 	}
 }
