@@ -245,5 +245,7 @@ public final class DisplayMessageConstants
     public static final String SUCCESSFULLY_CREATED_SS_ADMIN = "SUCCESSFULLY_CREATED_SS_ADMIN";
 
     public static final String LONEWOLF_CONNECTION_SUCCESSFUL = "LONEWOLF_CONNECTION_SUCCESSFUL";
+    public static final String LONEWOLF_ENABLE_SUCCESSFUL = "LONEWOLF_ENABLE_SUCCESSFUL";
+    public static final String LONEWOLF_DISABLE_SUCCESSFUL = "LONEWOLF_DISABLE_SUCCESSFUL";
 }
 

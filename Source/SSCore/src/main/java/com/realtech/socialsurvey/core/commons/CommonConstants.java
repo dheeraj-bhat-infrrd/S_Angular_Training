@@ -1169,6 +1169,7 @@ public interface CommonConstants
     public static final String COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING = "The registration has been initiated, but no payment has been made";
 
     public static final String ENCOMPASS_CONNECTION = "ENCOMPASS_CONNECTION";
+    public static final String LONEWOLF_CONNECTION = "LONEWOLF_CONNECTION";
     public static final String ACTION_ENABLED = "ENABLED";
     public static final String ACTION_DISABLED = "DISABLED";
 
@@ -1185,5 +1186,8 @@ public interface CommonConstants
     public static final String BATCH_TYPE_LONE_WOLF_REVIEW_PROCESSOR = "loneWolfReviewProcessor";
     public static final String BATCH_NAME_LONE_WOLF_REVIEW_PROCESSOR = "Lone Wolf Review Processor";
     public static final String CRM_SOURCE_LONEWOLF = "LONEWOLF";
+    
+    public static final String LONEWOLF_DRY_RUN_STATE = "dryrun";
+    public static final String LONEWOLF_PRODUCTION_STATE = "prod";
 
 }

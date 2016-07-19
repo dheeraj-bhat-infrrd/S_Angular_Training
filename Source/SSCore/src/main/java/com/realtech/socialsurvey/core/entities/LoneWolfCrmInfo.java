@@ -11,6 +11,8 @@ public class LoneWolfCrmInfo extends CRMInfo
     private long branchId;
     private long agentId;
     private boolean recordsBeenFetched;
+    
+    private String state;
 
 
     public String getApitoken()
@@ -106,5 +108,17 @@ public class LoneWolfCrmInfo extends CRMInfo
     public void setRecordsBeenFetched( boolean recordsBeenFetched )
     {
         this.recordsBeenFetched = recordsBeenFetched;
+    }
+
+
+    public String getState()
+    {
+        return state;
+    }
+
+
+    public void setState( String state )
+    {
+        this.state = state;
     }
 }
