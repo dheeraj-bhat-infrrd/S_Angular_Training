@@ -1,44 +1,16 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.sql.Timestamp;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Repository;
-
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.CustomAggregationOperation;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
-import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -47,6 +19,35 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
+import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Repository;
+
+import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /*
@@ -764,9 +765,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue,
         boolean fetchAbusive, boolean forStatistics )
     {
-        LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
+        LOG.info( "Method to count number of social posts by customers, getSocialPostsCountBasedOnHierarchy() started." );
         long socialPostCount = 0;
-
         Date endDate = null;
         Date startDate = null;
         if ( numberOfDays >= 0 ) {
@@ -774,204 +774,102 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             startDate = getNdaysBackDate( numberOfDays );
         }
 
-        Query query = new Query();
+		List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+	    //criteria for abusive reviews
+	    if ( !fetchAbusive ) {
 
-        //criteria for abusive reviews
-        if ( !fetchAbusive ) {
-            query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) );
-        }
-
-
-        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+		    criteriaList.add( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) );
+	    }
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
-            query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
+	        criteriaList.add( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
 
         if ( forStatistics ) {
-            query
-                .addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+	        criteriaList.add( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
         }
 
         if ( columnName == null ) {
         } else {
-            query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).ne( null ) );
+	        criteriaList.add( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).ne( null ) );
             if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                query.addCriteria( Criteria.where(
+	            criteriaList.add( Criteria.where(
                     CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN )
                     .ne( null ) );
-                query.addCriteria( Criteria.where(
+	            criteriaList.add( Criteria.where(
                     CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN
                         + "." + CommonConstants.COMPANY_ID_COLUMN ).is( columnValue ) );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
-                query.addCriteria( Criteria.where(
+	            criteriaList.add( Criteria.where(
                     CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN )
                     .ne( null ) );
-                query.addCriteria( Criteria.where(
+	            criteriaList.add( Criteria.where(
                     CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
                         + "." + CommonConstants.REGION_ID_COLUMN ).is( columnValue ) );
 
             } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
-                query.addCriteria( Criteria.where(
+	            criteriaList.add( Criteria.where(
                     CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN )
                     .ne( null ) );
-                query.addCriteria( Criteria.where(
+	            criteriaList.add( Criteria.where(
                     CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN
                         + "." + CommonConstants.BRANCH_ID_COLUMN ).is( columnValue ) );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
 
-                query.addCriteria( Criteria.where(
+	            criteriaList.add( Criteria.where(
                     CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN )
                     .ne( null ) );
-                query.addCriteria( Criteria.where(
+	            criteriaList.add( Criteria.where(
                     CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN
                         + "." + CommonConstants.AGENT_ID_COLUMN ).is( columnValue ) );
 
             }
 
             if ( startDate != null && endDate == null ) {
-                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+	            criteriaList.add( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
             } else if ( startDate == null && endDate != null ) {
-                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+	            criteriaList.add( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
             } else if ( startDate != null && endDate != null ) {
-                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+	            criteriaList.add( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
             }
 
-            List<SurveyDetails> surveyDetails = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+	        criteriaList.add( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
 
-            if ( surveyDetails != null ) {
-                for ( SurveyDetails survey : surveyDetails ) {
+	        Criteria criteria = new Criteria().andOperator( criteriaList.toArray( new Criteria[criteriaList.size()] ) );
 
-                    List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn();
-                    if ( sharedOnAgent != null ) {
-                        socialPostCount += sharedOnAgent.size();
-                    }
-                    if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
-                        for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
-                            .getBranchMediaPostDetailsList() ) {
-                            if ( branchMediaPostDetails.getSharedOn() != null ) {
-                                socialPostCount += branchMediaPostDetails.getSharedOn().size();
-                            }
-                        }
-                    }
-                    if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
-                        for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
-                            .getRegionMediaPostDetailsList() ) {
-                            if ( regionMediaPostDetails.getSharedOn() != null ) {
-                                socialPostCount += regionMediaPostDetails.getSharedOn().size();
-                            }
-                        }
-                    }
-                    if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null ) {
-                        List<String> sharedOnCompany = survey.getSocialMediaPostDetails().getCompanyMediaPostDetails()
-                            .getSharedOn();
-                        if ( sharedOnCompany != null ) {
-                            socialPostCount += sharedOnCompany.size();
-                        }
-                    }
+	        //BEGIN PERFORMANCE OPTIMISATION
+	        List<AggregationOperation> operations = new ArrayList<>();
+	        operations.add( new MatchOperation( criteria ) );
+	        DBObject firstGroup = new BasicDBObject( "$group", new BasicDBObject( CommonConstants.DEFAULT_MONGO_ID_COLUMN,
+		        "$_id" )
+		        .append("agent", new BasicDBObject( "$push", "$socialMediaPostDetails.agentMediaPostDetails" ) )
+		        .append( "company", new BasicDBObject( "$push", "$socialMediaPostDetails.companyMediaPostDetails" ) )
+		        .append( "branch", new BasicDBObject( "$first", "$socialMediaPostDetails.branchMediaPostDetailsList" ) )
+		        .append( "region", new BasicDBObject( "$first", "$socialMediaPostDetails.regionMediaPostDetailsList" ) ) );
+	        operations.add( new CustomAggregationOperation( firstGroup ) );
+	        DBObject project = new BasicDBObject( "$project", new BasicDBObject( "comb", new BasicDBObject( "$setUnion",
+		        Arrays.asList("$company", "$branch", "$region", "$agent") ) ) );
+	        operations.add( new CustomAggregationOperation( project ) );
+			operations.add( Aggregation.unwind( "$comb" ) );
+	        DBObject secondGroup = new BasicDBObject( "$group",
+		        new BasicDBObject( CommonConstants.DEFAULT_MONGO_ID_COLUMN, "count" )
+			        .append( "count", new BasicDBObject( "$sum", new BasicDBObject( "$size", "$comb.sharedOn" ) ) ) );
+	        operations.add( new CustomAggregationOperation( secondGroup ) );
+			Aggregation aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, operations );
+	        LOG.info( "Aggregation : " + aggregation.toString() );
+	        AggregationResults<SurveyDetails> result = mongoTemplate
+		        .aggregate( aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class );
 
-
-                    /*if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                        List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
-                            .getSharedOn();
-                        if ( sharedOnAgent != null ) {
-                            socialPostCount += sharedOnAgent.size();
-                        }
-                        if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
-                            for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
-                                .getBranchMediaPostDetailsList() ) {
-                                if ( branchMediaPostDetails.getSharedOn() != null ) {
-                                    socialPostCount += branchMediaPostDetails.getSharedOn().size();
-                                }
-                            }
-                        }
-                        if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
-                            for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
-                                .getRegionMediaPostDetailsList() ) {
-                                if ( regionMediaPostDetails.getSharedOn() != null ) {
-                                    socialPostCount += regionMediaPostDetails.getSharedOn().size();
-                                }
-                            }
-                        }
-                        if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null ) {
-                            List<String> sharedOnCompany = survey.getSocialMediaPostDetails().getCompanyMediaPostDetails()
-                                .getSharedOn();
-                            if ( sharedOnCompany != null ) {
-                                socialPostCount += sharedOnCompany.size();
-                            }
-                        }
-
-                    } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
-                        List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
-                            .getSharedOn();
-                        if ( sharedOnAgent != null ) {
-                            socialPostCount += sharedOnAgent.size();
-                        }
-                        if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
-                            for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
-                                .getRegionMediaPostDetailsList() ) {
-                                if ( regionMediaPostDetails.getSharedOn() != null ) {
-                                    socialPostCount += regionMediaPostDetails.getSharedOn().size();
-                                }
-                            }
-                        }
-                        if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
-                            for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
-                                .getBranchMediaPostDetailsList() ) {
-                                if ( branchMediaPostDetails.getRegionId() == columnValue ) {
-                                    if ( branchMediaPostDetails.getSharedOn() != null ) {
-                                        socialPostCount += branchMediaPostDetails.getSharedOn().size();
-                                    }
-                                }
-                            }
-                        }
-
-                    } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
-                        List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
-                            .getSharedOn();
-                        if ( sharedOnAgent != null ) {
-                            socialPostCount += sharedOnAgent.size();
-                        }
-                        for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
-                            .getBranchMediaPostDetailsList() ) {
-                            socialPostCount += branchMediaPostDetails.getSharedOn().size();
-                        }
-
-                    } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
-                        List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
-                            .getSharedOn();
-                        if ( sharedOnAgent != null ) {
-                            socialPostCount += sharedOnAgent.size();
-                        }
-                        if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
-                            for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
-                                .getBranchMediaPostDetailsList() ) {
-                                if ( branchMediaPostDetails.getSharedOn() != null ) {
-                                    socialPostCount += branchMediaPostDetails.getSharedOn().size();
-                                }
-                            }
-                        }
-                        if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
-                            for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
-                                .getRegionMediaPostDetailsList() ) {
-                                if ( regionMediaPostDetails.getSharedOn() != null ) {
-                                    socialPostCount += regionMediaPostDetails.getSharedOn().size();
-                                }
-                            }
-                        }
-                        if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null ) {
-                            List<String> sharedOnCompany = survey.getSocialMediaPostDetails().getCompanyMediaPostDetails()
-                                .getSharedOn();
-                            if ( sharedOnCompany != null ) {
-                                socialPostCount += sharedOnCompany.size();
-                            }
-                        }
-
-                    }*/
-                }
-
-            }
+	        if ( result != null ) {
+		        List<BasicDBObject> initiatorCount = (List<BasicDBObject>) result.getRawResults().get( "result" );
+		        if ( initiatorCount != null && !initiatorCount.isEmpty() ){
+			        Map<String, Object> resultObj = (Map<String, Object>) initiatorCount.get( 0 );
+                    String countStr = resultObj.get("count").toString();
+			        socialPostCount = Long.parseLong( countStr );
+		        }
+	        }
         }
-
+        LOG.info( "Method to count number of social posts by customers, getSocialPostsCountBasedOnHierarchy() finished." );
         return socialPostCount;
     }
 
