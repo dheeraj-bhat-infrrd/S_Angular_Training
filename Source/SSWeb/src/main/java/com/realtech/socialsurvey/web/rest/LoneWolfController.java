@@ -39,8 +39,8 @@ public class LoneWolfController extends AbstractController
     
     private static final Logger LOG = LoggerFactory.getLogger( LoneWolfController.class );
     
-    @Value ( "${LONEWOLF_APP_URL}")
-    private String lonewolfTestUrl;
+    @Value ( "${LONEWOLF_ENDPOINT}")
+    private String loneWolfEndpoint;
     
     /**
      * Controller to make a call to the lonewolf application and test the credentials
@@ -103,7 +103,7 @@ public class LoneWolfController extends AbstractController
                 restTemplate.getMessageConverters().add( new FormHttpMessageConverter() );
                 restTemplate.getMessageConverters().add( new MappingJackson2HttpMessageConverter() );
                 //Make request to the lonewolf application and get the response
-                String responseBody = restTemplate.postForObject( lonewolfTestUrl, requestEntity, String.class );
+                String responseBody = restTemplate.postForObject( loneWolfEndpoint, requestEntity, String.class );
                 Map<String, String> responseMap = new Gson().fromJson( responseBody,
                     new TypeToken<Map<String, String>>() {}.getType() );
                 if ( Boolean.parseBoolean( responseMap.get( CommonConstants.STATUS_COLUMN ) ) ) {
