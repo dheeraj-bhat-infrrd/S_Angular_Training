@@ -714,6 +714,41 @@ function validateURL(elementId) {
 	}
 }
 
+//Function to validate Lone Wolf Input
+function validateLoneWolf(elementId) {
+	var msg;
+	if(elementId=='lone-api'){
+		msg="Please enter API token";
+	}else if(elementId=='lone-consumer-key'){
+		msg="Please enter Consumer Key";
+	}else if(elementId=='lone-secret-key'){
+		msg="Please enter Secret Key";
+	}else if(elementId=='lone-host'){
+		msg="Please enter Host";
+	}else if(elementId=='lone-client'){
+		msg="Please enter Client Code";
+	}
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).val() != "") {
+			$('#' + elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#overlay-toast').html(msg);
+			showToast();
+			return false;
+		}
+	} else {
+		if ($('#' + elementId).val() != "") {
+			$('#' + elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#' + elementId).next('.hm-item-err-2').html(msg);
+			$('#' + elementId).next('.hm-item-err-2').show();
+			return false;
+		}
+	}
+}
+
 function validateReminderInterval(elementId) {
 	if ($('#' + elementId).val() != "") {
 		if (numberRegEx.test($('#' + elementId).val())) {

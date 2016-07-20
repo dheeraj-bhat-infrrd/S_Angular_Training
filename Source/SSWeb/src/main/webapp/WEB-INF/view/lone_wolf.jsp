@@ -5,8 +5,17 @@
 	<div class="row">
 		<div class="um-top-row cleafix">
 			<div class="clearfix um-top-form-wrapper">
+			<!-- set lone wolf details -->
+				<c:if test="${appSettings != null && appSettings.crm_info != null && appSettings.crm_info.crm_source == 'Lone Wolf'}">
+					<c:set var="loneapi" value="${appSettings.crm_info.crm_username}" />
+					<c:set var="loneconsumer" value="${appSettings.crm_info.crm_password}" />
+					<c:set var="lonesceret" value="${appSettings.crm_info.url}" />
+					<c:set var="lonehost" value="${appSettings.crm_info.crm_fieldId}" />
+					<c:set var="loneclient" value="${ appSettings.crm_info.state }" />
+					<c:set var="lonestate" value="${ appSettings.crm_info.state }" />
+				</c:if>
 				<form id="lone-wolf-form">
-					<input id="lone-state" type="hidden" value="" />
+					<input id="lone-state" type="hidden" value="${lonestate}" />
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
@@ -85,7 +94,7 @@
 							<div id="lone-disconnect" class="float-left enc-state-icon cursor-pointer hide" style="display: none;">Disconnect</div>
 						</div>
 						<c:if test="${isRealTechOrSSAdmin}">
-							<div id="lone-test-connection" class="float-left enc-state-icon cursor-pointer" onclick="">Test Connection</div>
+							<div id="lone-test-connection" class="float-left enc-state-icon cursor-pointer" onclick="loneWolfCretentials();">Test Connection</div>
 							<div id="lone-generate-report" class="float-left enc-state-icon cursor-pointer hide">Generate Report</div>
 						</c:if>
 					</div>
@@ -98,5 +107,12 @@
 	<span id="overlay-toast" class="overlay-toast"></span>
 </div>
 <script>
-	
+$(document).ready(function() {
+	showLoneWolfButtons();
+	isRealTechOrSSAdmin = $
+	{
+		isRealTechOrSSAdmin
+	}
+	;
+});
 </script>

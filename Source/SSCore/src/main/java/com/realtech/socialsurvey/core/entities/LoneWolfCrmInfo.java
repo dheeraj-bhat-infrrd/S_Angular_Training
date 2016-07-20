@@ -10,12 +10,53 @@ public class LoneWolfCrmInfo extends CRMInfo
     private long regionId;
     private long branchId;
     private long agentId;
-    private boolean recordsBeenFetched;
-    
     private String state;
+    private String host;
+    private int numberOfDays;
+    private String emailAddressForReport;
+    private boolean generateReport;
+    
+    public String getHost() {
+		return host;
+	}
 
 
-    public String getApitoken()
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+
+	public int getNumberOfDays() {
+		return numberOfDays;
+	}
+
+
+	public void setNumberOfDays(int numberOfDays) {
+		this.numberOfDays = numberOfDays;
+	}
+
+
+	public String getEmailAddressForReport() {
+		return emailAddressForReport;
+	}
+
+
+	public void setEmailAddressForReport(String emailAddressForReport) {
+		this.emailAddressForReport = emailAddressForReport;
+	}
+
+
+	public boolean isGenerateReport() {
+		return generateReport;
+	}
+
+
+	public void setGenerateReport(boolean generateReport) {
+		this.generateReport = generateReport;
+	}
+
+
+	public String getApitoken()
     {
         return apitoken;
     }
@@ -98,19 +139,7 @@ public class LoneWolfCrmInfo extends CRMInfo
         this.agentId = agentId;
     }
 
-
-    public boolean isRecordsBeenFetched()
-    {
-        return recordsBeenFetched;
-    }
-
-
-    public void setRecordsBeenFetched( boolean recordsBeenFetched )
-    {
-        this.recordsBeenFetched = recordsBeenFetched;
-    }
-
-
+    
     public String getState()
     {
         return state;
