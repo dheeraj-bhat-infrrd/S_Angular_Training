@@ -122,9 +122,9 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
 
                     LOG.info( "Getting lonewolf records for company id: " + organizationUnitSettings.getId() );
                     LoneWolfCrmInfo loneWolfCrmInfo = (LoneWolfCrmInfo) organizationUnitSettings.getCrm_info();
-                    if ( loneWolfCrmInfo.getApitoken() != null && !loneWolfCrmInfo.getApitoken().isEmpty()
+                    if ( loneWolfCrmInfo.getApiToken() != null && !loneWolfCrmInfo.getApiToken().isEmpty()
                         && loneWolfCrmInfo.getClientCode() != null && !loneWolfCrmInfo.getClientCode().isEmpty()
-                        && loneWolfCrmInfo.getSecretkey() != null && !loneWolfCrmInfo.getSecretkey().isEmpty() ) {
+                        && loneWolfCrmInfo.getSecretKey() != null && !loneWolfCrmInfo.getSecretKey().isEmpty() ) {
                         
                         entityId = organizationUnitSettings.getIden();
 

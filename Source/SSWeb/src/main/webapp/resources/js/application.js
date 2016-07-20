@@ -3945,7 +3945,7 @@ function validateLoneWolfInput(elementId) {
 		}
 	}
 
-	return LoneValid;
+	return isLoneValid;
 }
 // Check for encompass input fields for testConnection (except fieldid)
 function validateEncompassTestInput(elementId) {
@@ -10633,7 +10633,7 @@ $(document).on('click', '#en-dry-save', function(e) {
 
 });
 $(document).on('click','#lone-dry-save',function(e){
-	e.stopPropogation();
+	e.stopPropagation();
 	if(validateLoneWolfInput('lone-wolf-form-div')){
 		var state =$("#lone-state").val();
 		var warn =true;
@@ -10703,9 +10703,9 @@ function initiateLoneWolfSaveConnection(warn) {
 	var host=document.getElementById('lone-host').value;
 	var client=document.getElementById('lone-client').value;
 	var payload = {
-			"apitoken":api,
-			"consumerkey":consumer,
-			"secretkey":secret,
+			"apiToken":api,
+			"consumerKey":consumer,
+			"secretKey":secret,
 		    "host":host,
 		    "clientCode":client
 	};
@@ -10908,9 +10908,9 @@ function loneWolfCretentials() {
 	var host=document.getElementById('lone-host').value;
 	var client =document.getElementById('lone-client').value;
 	var payload = {
-		"apitoken":api,
-		"consumerkey":consumer,
-		"secretkey":secret,
+		"apiToken":api,
+		"consumerKey":consumer,
+		"secretKey":secret,
 		"host":host,
 		"clientCode":client
 	};
