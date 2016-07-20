@@ -2407,7 +2407,6 @@ public class OrganizationManagementController
                 loneWolfCrmInfo.setConsumerkey( consumerkey );
                 loneWolfCrmInfo.setSecretkey( secretkey );
                 loneWolfCrmInfo.setClientCode( clientCode );
-                loneWolfCrmInfo.setRecordsBeenFetched( false );
                 OrganizationUnitSettings unitSettings = null;
                 String collectionName = "";
                 if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
