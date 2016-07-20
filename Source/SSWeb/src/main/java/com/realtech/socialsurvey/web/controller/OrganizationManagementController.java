@@ -2403,9 +2403,9 @@ public class OrganizationManagementController
                 && !secretkey.isEmpty() && clientCode != null && !clientCode.isEmpty() ) {
                 LoneWolfCrmInfo loneWolfCrmInfo = new LoneWolfCrmInfo();
                 loneWolfCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_LONEWOLF );
-                loneWolfCrmInfo.setApitoken( apitoken );
-                loneWolfCrmInfo.setConsumerkey( consumerkey );
-                loneWolfCrmInfo.setSecretkey( secretkey );
+                loneWolfCrmInfo.setApiToken( apitoken );
+                loneWolfCrmInfo.setConsumerKey( consumerkey );
+                loneWolfCrmInfo.setSecretKey( secretkey );
                 loneWolfCrmInfo.setClientCode( clientCode );
                 OrganizationUnitSettings unitSettings = null;
                 String collectionName = "";
