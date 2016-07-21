@@ -661,7 +661,7 @@ function validateEncompassUserName(elementId) {
 			$('#' + elementId).next('.hm-item-err-2').hide();
 			return true;
 		} else {
-			$('#' + elementId).next('.hm-item-err-2').html('Please enter user name');
+			$('#' + elementId).next('.hm-item-err-2').html('Please enter user name.');
 			$('#' + elementId).next('.hm-item-err-2').show();
 			return false;
 		}
@@ -684,7 +684,7 @@ function validateEncompassPassword(elementId) {
 			$('#' + elementId).next('.hm-item-err-2').hide();
 			return true;
 		} else {
-			$('#' + elementId).next('.hm-item-err-2').html('Please enter password');
+			$('#' + elementId).next('.hm-item-err-2').html('Please enter password.');
 			$('#' + elementId).next('.hm-item-err-2').show();
 			return false;
 		}
@@ -707,7 +707,7 @@ function validateURL(elementId) {
 			$('#' + elementId).next('.hm-item-err-2').hide();
 			return true;
 		} else {
-			$('#' + elementId).next('.hm-item-err-2').html('Please enter url');
+			$('#' + elementId).next('.hm-item-err-2').html('Please enter url.');
 			$('#' + elementId).next('.hm-item-err-2').show();
 			return false;
 		}
@@ -718,15 +718,15 @@ function validateURL(elementId) {
 function validateLoneWolf(elementId) {
 	var msg;
 	if(elementId=='lone-api'){
-		msg="Please enter API token";
+		msg="Please enter API token.";
 	}else if(elementId=='lone-consumer-key'){
-		msg="Please enter Consumer Key";
+		msg="Please enter Consumer Key.";
 	}else if(elementId=='lone-secret-key'){
-		msg="Please enter Secret Key";
+		msg="Please enter Secret Key.";
 	}else if(elementId=='lone-host'){
-		msg="Please enter Host";
+		msg="Please enter Host.";
 	}else if(elementId=='lone-client'){
-		msg="Please enter Client Code";
+		msg="Please enter Client Code.";
 	}
 	if ($(window).width() < 768) {
 		if ($('#' + elementId).val() != "") {
