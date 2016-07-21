@@ -93,7 +93,7 @@ public class LoneWolfController extends AbstractController
 
                 //processing retrofit response and building rest response
                 if ( transactionResponse != null ) {
-                    if ( transactionResponse.getStatus() == HttpStatus.SC_NOT_FOUND ) {
+                    if ( transactionResponse.getStatus() == HttpStatus.SC_OK ) {
                         status = true;
                     } else {
                         String responseString = new String( ( (TypedByteArray) transactionResponse.getBody() ).getBytes() );
@@ -102,6 +102,9 @@ public class LoneWolfController extends AbstractController
                         message = responseMap.get( "Message" );
                     }
                 }
+                resultMap.put( CommonConstants.STATUS_COLUMN, status );
+                resultMap.put( CommonConstants.MESSAGE, message );
+                response = Response.ok( new Gson().toJson( resultMap ) ).build();
             } catch ( Exception e ) {
                 throw new InternalServerException( new LoneWolfErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ), e.getMessage() );
@@ -109,9 +112,6 @@ public class LoneWolfController extends AbstractController
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
         }
-        resultMap.put( CommonConstants.STATUS_COLUMN, status );
-        resultMap.put( CommonConstants.MESSAGE, message );
-        response = Response.ok( new Gson().toJson( resultMap ) ).build();
 
         LOG.debug( "returning response: " + response);
         LOG.info( "Method to test lonewolf credentials finished." );

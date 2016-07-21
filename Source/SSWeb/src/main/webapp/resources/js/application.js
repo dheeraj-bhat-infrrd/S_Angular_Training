@@ -3790,7 +3790,7 @@ function saveEncompassDetails(formid) {
 }
 function saveLoneWolfDetails(formid) {
 	if (validateLoneWolfInput(formid)) {
-		var url = "./savelonedetails.do";
+		var url = "./savelonewolfdetails.do";
 		callAjaxFormSubmit(url, testConnectionLoneSaveCallBack, formid);
 	}
 }

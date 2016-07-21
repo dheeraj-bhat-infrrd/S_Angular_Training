@@ -28,4 +28,4 @@ where up.PROFILES_MASTER_ID IN (3,4)
 , (select @runningUserId := 1) as a
 , (SELECT @groupedUserId := 0) as b
 ) as outerQuery
-where outerQuery.ranked_user_id = 1)
+where outerQuery.ranked_user_id = 1);

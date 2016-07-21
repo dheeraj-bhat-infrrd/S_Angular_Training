@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.LoneWolfCrmInfo;
@@ -177,12 +181,13 @@ public class LoneWolfManagementController
         HttpSession session = request.getSession( false );
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        boolean status = false;
         String message = null;
         try {
-            String apitoken = request.getParameter( "lonewolf-apitoken" );
-            String consumerkey = request.getParameter( "lonewolf-consumerkey" );
-            String secretkey = request.getParameter( "lonewolf-secretkey" );
-            String clientCode = request.getParameter( "lonewolf-clientCode" );
+            String apitoken = request.getParameter( "lone-api" );
+            String consumerkey = request.getParameter( "lone-consumer-key" );
+            String secretkey = request.getParameter( "lone-secret-key" );
+            String clientCode = request.getParameter( "lone-client" );
             if ( apitoken != null && !apitoken.isEmpty() && consumerkey != null && !consumerkey.isEmpty() && secretkey != null
                 && !secretkey.isEmpty() && clientCode != null && !clientCode.isEmpty() ) {
                 LoneWolfCrmInfo loneWolfCrmInfo = new LoneWolfCrmInfo();
@@ -221,14 +226,24 @@ public class LoneWolfManagementController
                 organizationManagementService.updateCRMDetailsForAnyUnitSettings( unitSettings, collectionName, loneWolfCrmInfo,
                     "com.realtech.socialsurvey.core.entities.LoneWolfCrmInfo" );
                 unitSettings.setCrm_info( loneWolfCrmInfo );
+                status = true;
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.LONEWOLF_CONNECTION_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            } else {
+                //TODO configure message and update this code
+                message = "Input parameter cannot be empty";
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while testing lonewolf detials. Reason : " + e.getMessage(), e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
-        return message;
+        LOG.info( "Inside method saveLoneWolfDetails finished." );
+        
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "message", message );
+        String response = new Gson().toJson( responseMap );
+        return response;
     }
 
 }
