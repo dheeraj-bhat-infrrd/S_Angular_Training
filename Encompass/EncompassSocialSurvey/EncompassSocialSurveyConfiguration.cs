@@ -67,6 +67,14 @@ namespace EncompassSocialSurvey
             }
         }
 
+        public static long SummitCompanyId
+        {
+            get
+            {
+                return long.Parse(System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.SUMMIT_ID]);
+            }
+        }
+
 
         public static string TempFolderPath
         {

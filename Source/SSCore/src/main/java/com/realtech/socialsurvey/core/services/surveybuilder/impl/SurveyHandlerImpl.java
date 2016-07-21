@@ -2713,7 +2713,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Transactional
     @Override
-    public void importSurveyVOToDBs( SurveyImportVO surveyImportVO ) throws NonFatalException
+    public void importSurveyVOToDBs( SurveyImportVO surveyImportVO, String source ) throws NonFatalException
     {
         LOG.info( "Method SurveyHandlerImpl.importSurveyVOToDBs started" );
         User user = userManagementService.getUserByUserId( surveyImportVO.getUserId() );
@@ -2724,8 +2724,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             throw new InvalidInputException( "AgentSettings empty for user: " + user.getUserId() );
         //Resolve customerFirstName and customerLastName
         surveyImportVO = resolveCustomerName( surveyImportVO );
-        SurveyPreInitiation surveyPreInitiation = importSurveyVOToSurveyPreInitiation( surveyImportVO, user );
-        SurveyDetails details = importSurveyVOToMongo( surveyImportVO, surveyPreInitiation, user );
+        SurveyPreInitiation surveyPreInitiation = importSurveyVOToSurveyPreInitiation( surveyImportVO, user, source );
+        SurveyDetails details = importSurveyVOToMongo( surveyImportVO, surveyPreInitiation, user, source );
         String serverBaseUrl = getApplicationBaseUrl();
         String agentProfileLink = serverBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + settings.getProfileUrl();
         socialManagementService.postToSocialMedia( details.getAgentName(), agentProfileLink, details.getCustomerFirstName(),
@@ -2767,12 +2767,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    SurveyPreInitiation importSurveyVOToSurveyPreInitiation( SurveyImportVO surveyImportVO, User user )
+    SurveyPreInitiation importSurveyVOToSurveyPreInitiation( SurveyImportVO surveyImportVO, User user, String source )
         throws InvalidInputException
     {
         LOG.info( "Method BulkSurveyImporter.importSurveyVOToSurveyPreInitiation started" );
         SurveyPreInitiation survey = new SurveyPreInitiation();
-        survey.setSurveySource( CommonConstants.SURVEY_REQUEST_AGENT );
+        survey.setSurveySource( source );
         survey.setCompanyId( user.getCompany().getCompanyId() );
         survey.setAgentId( user.getUserId() );
         survey.setAgentEmailId( user.getEmailId() );
@@ -2795,47 +2795,47 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    SurveyDetails importSurveyVOToMongo( SurveyImportVO surveyImportVO, SurveyPreInitiation surveyPreInitiation, User user )
-        throws InvalidInputException, ProfileNotFoundException
-    {
-        SurveyDetails surveyDetails = new SurveyDetails();
-        surveyDetails.setAgentId( user.getUserId() );
-        String agentName = user.getFirstName();
-        if ( user.getLastName() != null && !user.getLastName().isEmpty() )
-            agentName += " " + user.getLastName();
-        surveyDetails.setAgentName( agentName );
-        Map<String, Long> profile = userManagementService.getPrimaryUserProfileByAgentId( user.getUserId() );
-        surveyDetails.setBranchId( profile.get( CommonConstants.BRANCH_ID_COLUMN ) );
-        surveyDetails.setCustomerFirstName( surveyImportVO.getCustomerFirstName() );
-        String lastName = surveyImportVO.getCustomerLastName();
-        if ( lastName != null && !lastName.isEmpty() && !lastName.equalsIgnoreCase( "null" ) )
-            surveyDetails.setCustomerLastName( lastName );
-        surveyDetails.setCompanyId( user.getCompany().getCompanyId() );
-        surveyDetails.setCustomerEmail( surveyImportVO.getCustomerEmailAddress() );
-        surveyDetails.setRegionId( profile.get( CommonConstants.REGION_ID_COLUMN ) );
-        surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
-        surveyDetails.setReminderCount( 0 );
-        surveyDetails.setModifiedOn( surveyImportVO.getSurveyDate() );
-        surveyDetails.setCreatedOn( surveyImportVO.getSurveyDate() );
-        surveyDetails.setSurveyResponse( new ArrayList<SurveyResponse>() );
-        surveyDetails.setCustRelationWithAgent( null );
-        surveyDetails.setReview( surveyImportVO.getReview() );
-        surveyDetails.setScore( surveyImportVO.getScore() );
-        surveyDetails.setSurveyTransactionDate( surveyImportVO.getSurveyDate() );
+	SurveyDetails importSurveyVOToMongo( SurveyImportVO surveyImportVO, SurveyPreInitiation surveyPreInitiation, User user,
+		String source ) throws InvalidInputException, ProfileNotFoundException
+	{
+		SurveyDetails surveyDetails = new SurveyDetails();
+		surveyDetails.setAgentId( user.getUserId() );
+		String agentName = user.getFirstName();
+		if ( user.getLastName() != null && !user.getLastName().isEmpty() )
+			agentName += " " + user.getLastName();
+		surveyDetails.setAgentName( agentName );
+		Map<String, Long> profile = userManagementService.getPrimaryUserProfileByAgentId( user.getUserId() );
+		surveyDetails.setBranchId( profile.get( CommonConstants.BRANCH_ID_COLUMN ) );
+		surveyDetails.setCustomerFirstName( surveyImportVO.getCustomerFirstName() );
+		String lastName = surveyImportVO.getCustomerLastName();
+		if ( lastName != null && !lastName.isEmpty() && !lastName.equalsIgnoreCase( "null" ) )
+			surveyDetails.setCustomerLastName( lastName );
+		surveyDetails.setCompanyId( user.getCompany().getCompanyId() );
+		surveyDetails.setCustomerEmail( surveyImportVO.getCustomerEmailAddress() );
+		surveyDetails.setRegionId( profile.get( CommonConstants.REGION_ID_COLUMN ) );
+		surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
+		surveyDetails.setReminderCount( 0 );
+		surveyDetails.setModifiedOn( surveyImportVO.getSurveyDate() );
+		surveyDetails.setCreatedOn( surveyImportVO.getSurveyDate() );
+		surveyDetails.setSurveyResponse( new ArrayList<SurveyResponse>() );
+		surveyDetails.setCustRelationWithAgent( null );
+		surveyDetails.setReview( surveyImportVO.getReview() );
+		surveyDetails.setScore( surveyImportVO.getScore() );
+		surveyDetails.setSurveyTransactionDate( surveyImportVO.getSurveyDate() );
 
-        surveyDetails.setUrl(
-            composeLink( user.getUserId(), surveyImportVO.getCustomerEmailAddress(), surveyImportVO.getCustomerFirstName(),
-                surveyImportVO.getCustomerLastName(), surveyPreInitiation.getSurveyPreIntitiationId(), false ) );
-        surveyDetails.setEditable( false );
-        surveyDetails.setSource( CommonConstants.SURVEY_REQUEST_AGENT );
-        surveyDetails.setShowSurveyOnUI( true );
+		surveyDetails.setUrl(
+			composeLink( user.getUserId(), surveyImportVO.getCustomerEmailAddress(), surveyImportVO.getCustomerFirstName(),
+				surveyImportVO.getCustomerLastName(), surveyPreInitiation.getSurveyPreIntitiationId(), false ) );
+		surveyDetails.setEditable( false );
+		surveyDetails.setSource( source );
+		surveyDetails.setShowSurveyOnUI( true );
 
-        surveyDetails.setRetakeSurvey( false );
-        surveyDetails.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
-        surveyDetailsDao.insertSurveyDetails( surveyDetails );
-        surveyDetailsDao.updateSurveyAsClicked( surveyDetails.get_id() );
-        return surveyDetails;
-    }
+		surveyDetails.setRetakeSurvey( false );
+		surveyDetails.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
+		surveyDetailsDao.insertSurveyDetails( surveyDetails );
+		surveyDetailsDao.updateSurveyAsClicked( surveyDetails.get_id() );
+		return surveyDetails;
+	}
 
 
     @Override

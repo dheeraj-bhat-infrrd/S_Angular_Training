@@ -240,7 +240,12 @@ public final class DisplayMessageConstants
     public static final String INVALID_COMPANY_ID = "INVALID_COMPANY_ID";
     public static final String INVALID_SURVEY_JSON = "INVALID_SURVEY_JSON";
     public static final String INVALID_AUTHORIZATION_HEADER = "INVALID_AUTHORIZATION_HEADER";
-    
+
     public static final String INVALID_SOCIAL_POST_REMINDER_ERROR = "INVALID_SOCIAL_POST_REMINDER_ERROR";
     public static final String SUCCESSFULLY_CREATED_SS_ADMIN = "SUCCESSFULLY_CREATED_SS_ADMIN";
+
+    public static final String LONEWOLF_CONNECTION_SUCCESSFUL = "LONEWOLF_CONNECTION_SUCCESSFUL";
+    public static final String LONEWOLF_ENABLE_SUCCESSFUL = "LONEWOLF_ENABLE_SUCCESSFUL";
+    public static final String LONEWOLF_DISABLE_SUCCESSFUL = "LONEWOLF_DISABLE_SUCCESSFUL";
 }
+
