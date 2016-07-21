@@ -77,7 +77,7 @@
 								<jsp:include page="dotloop.jsp"></jsp:include>
 							</div>
 						</c:when>
-						<c:when test="${mapping.crmMaster.crmName == 'Lonewolf' && profilemasterid != 4}">
+						<c:when test="${mapping.crmMaster.crmName == 'Lone Wolf' && profilemasterid != 4}">
 							<div class="crm-setting-cont hide"
 								data-crm-type="${mapping.crmMaster.crmName }">
 									<jsp:include page="lone_wolf.jsp"></jsp:include>
