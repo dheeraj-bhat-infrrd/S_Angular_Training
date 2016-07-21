@@ -52,6 +52,10 @@
 								test="${mapping.crmMaster.crmName == 'Encompass' && profilemasterid != 1}">
 									<%-- Skip if crm mapping encompass and not company admin --%>
 								</c:when>
+								<c:when
+								test="${mapping.crmMaster.crmName == 'Lone Wolf' && profilemasterid == 4}">
+									<%-- Skip if crm mapping Loan Wolf and myself --%>
+								</c:when>
 							<c:otherwise>
 								<div class="crm-settings-dropdown-item"
 									data-crm-type="${mapping.crmMaster.crmName }">${mapping.crmMaster.crmName }</div>
@@ -73,6 +77,12 @@
 								<jsp:include page="dotloop.jsp"></jsp:include>
 							</div>
 						</c:when>
+						<c:when test="${mapping.crmMaster.crmName == 'Lone Wolf' && profilemasterid != 4}">
+							<div class="crm-setting-cont hide"
+								data-crm-type="${mapping.crmMaster.crmName }">
+									<jsp:include page="lone_wolf.jsp"></jsp:include>
+							</div>
+						</c:when>
 					</c:choose>
 				</c:forEach>
 			</div>
@@ -89,6 +99,8 @@
 	$(document).ready(function() {
 		$(document).attr("title", "Apps");
 		updateViewAsScroll();
+		console.log("${mapping.crmMaster.crmName}");
+		console.log("${profilemasterid}");
 
 		//Remove the dropdown icon if only one option for app available
 		if($('#crm-settings-dropdown-cont').children('.crm-settings-dropdown-item').length <= 1) {
