@@ -19,7 +19,6 @@ import com.realtech.socialsurvey.api.exceptions.ValidationException;
 @ControllerAdvice
 public class GlobalControllerExceptionHandler
 {
-
     private final static String ERRORS = "errors";
 
 
@@ -27,7 +26,6 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<Map<String, Object>> handleValidationException( ValidationException validationException )
     {
-
         Map<String, Object> result = createErrorResponse( validationException.getErrors() );
         return new ResponseEntity<Map<String, Object>>( result, HttpStatus.OK );
     }
@@ -37,7 +35,6 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<Map<String, Object>> handleBadRequestException( BadRequestException badRequestException )
     {
-
         Map<String, Object> result = createErrorResponse( badRequestException.getErrors() );
         return new ResponseEntity<Map<String, Object>>( result, HttpStatus.BAD_REQUEST );
     }
@@ -47,7 +44,6 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<String> handleSSApiException( SSApiException ssapiException )
     {
-
         return new ResponseEntity<String>( ssapiException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR );
     }
 
