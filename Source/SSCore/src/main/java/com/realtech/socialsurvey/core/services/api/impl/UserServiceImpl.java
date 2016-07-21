@@ -33,6 +33,7 @@ import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
 import com.realtech.socialsurvey.core.entities.UserEmailMapping;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -180,12 +181,13 @@ public class UserServiceImpl implements UserService
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userDao.update( user );
 
-        com.realtech.socialsurvey.core.entities.UserProfile userProfile = userProfileDao
-            .findById( com.realtech.socialsurvey.core.entities.UserProfile.class, userId );
-        userProfile.setProfileCompletionStage( stage );
-        userProfile.setModifiedBy( String.valueOf( userId ) );
-        userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        userProfileDao.update( userProfile );
+        for ( UserProfile profile : user.getUserProfiles() ) {
+            UserProfile userProfile = userProfileDao.findById( UserProfile.class, profile.getUserProfileId() );
+            userProfile.setProfileCompletionStage( stage );
+            userProfile.setModifiedBy( String.valueOf( userId ) );
+            userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            userProfileDao.update( userProfile );
+        }
         LOGGER.info( "Method updateStage finished for userId: " + userId + ", stage: " + stage );
     }
 

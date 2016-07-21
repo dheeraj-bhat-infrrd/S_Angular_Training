@@ -43,7 +43,32 @@
 						<br />
 						&nbsp&nbsp&nbsp&nbsp[CompanyDisclaimer] : Company's disclaimer,
 						&nbsp&nbsp&nbsp&nbsp[AgentDisclaimer] : User's disclaimer,
-                        &nbsp&nbsp&nbsp&nbsp[AgentLicense] : User's licenses
+                        &nbsp&nbsp&nbsp&nbsp[AgentLicense] : User's licenses,
+						<br />
+
+						&nbsp&nbsp&nbsp&nbsp[facebook_link] : Facebook Social Link,
+						&nbsp&nbsp&nbsp&nbsp[twitter_link] : Twitter Social Link,
+                        &nbsp&nbsp&nbsp&nbsp[linkedin_link] : LinkedIn Social Link,
+						<br />
+						&nbsp&nbsp&nbsp&nbsp[google_plus_link] : Google Plus Social Link,
+						&nbsp&nbsp&nbsp&nbsp[google_review_link] : Google Business Review Link,
+                        &nbsp&nbsp&nbsp&nbsp[yelp_link] : Yelp Social Link,
+						<br />
+						&nbsp&nbsp&nbsp&nbsp[zillow_link] : Zillow Social Link,
+						&nbsp&nbsp&nbsp&nbsp[lending_tree_link] : Lending Tree Social Link,
+                        &nbsp&nbsp&nbsp&nbsp[realtor_com_link] : Realtor Social Link,
+						<br />
+						&nbsp&nbsp&nbsp&nbsp[company_facebook_link] : Company's Facebook Social Link,
+						&nbsp&nbsp&nbsp&nbsp[company_twitter_link] : Company's Twitter Social Link,
+                        &nbsp&nbsp&nbsp&nbsp[company_linkedin_link] : Company's LinkedIn Social Link,
+						<br />
+						&nbsp&nbsp&nbsp&nbsp[company_google_plus_link] : Company's Google Plus Link,
+						&nbsp&nbsp&nbsp&nbsp[company_google_review_link] : Company's Google Business Review Link,
+                        &nbsp&nbsp&nbsp&nbsp[company_yelp_link] : Company's Yelp Social Link,
+						<br />
+						&nbsp&nbsp&nbsp&nbsp[company_zillow_link] : Company's Zillow Social Link,
+						&nbsp&nbsp&nbsp&nbsp[company_lending_tree_link] : Company's Lending Tree Social Link,
+                        &nbsp&nbsp&nbsp&nbsp[company_realtor_com_link] : Company's Realtor Social Link
 						<br />
 						<br />
 						Note: Only [AgentName] is allowed in Mail Subject
