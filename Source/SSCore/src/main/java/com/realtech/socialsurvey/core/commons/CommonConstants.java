@@ -362,6 +362,7 @@ public interface CommonConstants
     public static final String YELP_SOCIAL_SITE = "yelp";
     public static final String LENDINGTREE_SOCIAL_SITE = "lendingtree";
     public static final String REALTOR_SOCIAL_SITE = "realtor";
+    public static final String GOOGLE_BUSINESS_SOCIAL_SITE = "google business";
     public static final String GOOGLE_SOCIAL_SITE = "google";
     public static final String SOCIAL_SURVEY_SOCIAL_SITE = "socialsurvey";
     public static final String TWITTER_BASE_URL = "www.twitter.com/";
@@ -490,6 +491,7 @@ public interface CommonConstants
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
     public static final String SURVEY_SOURCE_BULK_UPLOAD = "bulk";
     public static final String SURVEY_SOURCE_FILE_UPLOAD = "upload";
+    public static final String SURVEY_SOURCE_FTP = "ftp";
     public static final String ENCOMPASS_DRY_RUN_STATE = "dryrun";
     public static final String ENCOMPASS_PRODUCTION_STATE = "prod";
     public static final String ENCOMPASS_CLIENT_URL_COLUMN = "clientUrl";
@@ -999,6 +1001,7 @@ public interface CommonConstants
 
     // Social Post Connection Buttons
     public static final String REALTOR_LABEL = "REALTOR.COM";
+    public static final String GOOGLE_BUSINESS_LABEL = "GOOGLE BUSINESS";
     public static final String LENDING_TREE_LABEL = "LENDING TREE";
     public static final String ZILLOW_LABEL = "ZILLOW";
     public static final String YELP_LABEL = "YELP!";
@@ -1067,6 +1070,7 @@ public interface CommonConstants
     public static final String CHR_YELP = "Yelp";
     public static final String CHR_LENDING_TREE = "Lendingtree";
     public static final String CHR_REALTOR = "Realtor";
+    public static final String CHR_GOOGLE_BUSINESS = "Google Business";
 
     public static final String SOCIAL_SURVEY_ACCESS_LAVEL = "SocialSurvey Access Level ";
     public static final String SOCIAL_SURVEY_INVITE_SENT = "SocialSurvey Invite sent";

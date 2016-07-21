@@ -3,8 +3,12 @@ package com.realtech.socialsurvey.web.rest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +18,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import org.apache.commons.lang.StringUtils;
@@ -1583,8 +1589,9 @@ public class SurveyManagementController
         boolean editable = false;
         BranchSettings branchSettings = null;
         OrganizationUnitSettings regionSettings = null;
+	    SurveyDetails survey = null;
         try {
-            SurveyDetails survey = storeInitialSurveyDetails( agentId, customerEmail, firstName, lastName, reminderCount,
+            survey = storeInitialSurveyDetails( agentId, customerEmail, firstName, lastName, reminderCount,
                 custRelationWithAgent, url, source , surveyPreIntitiationId , isOldRecord , retakeSurvey);
 
             if ( survey != null ) {
@@ -1629,8 +1636,8 @@ public class SurveyManagementController
         }
 
         //Used to set survey texts (which can be changed by the company admin)
-        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( userManagementService
-            .getUserByUserId( agentId ) );
+	    User user = userManagementService.getUserByUserId( agentId );
+	    OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
         OrganizationUnitSettings unitSettings = organizationManagementService.getAgentSettings( agentId );
         if ( unitSettings.getSurvey_settings() == null ) {
             SurveySettings surveySettings = new SurveySettings();
@@ -1665,27 +1672,39 @@ public class SurveyManagementController
             SurveySettings surveySettings = companySettings.getSurvey_settings();
             if ( surveySettings != null ) {
                 if ( surveySettings.getHappyText() != null && !( surveySettings.getHappyText().isEmpty() ) ) {
-                    surveyAndStage.put( "happyText", surveySettings.getHappyText() );
+                    surveyAndStage.put( "happyText", surveyHandler
+	                    .replaceGatewayQuestionText( surveySettings.getHappyText(), unitSettings, user, companySettings,
+		                    survey ) );
                     isHappyTextSet = true;
                 }
                 if ( surveySettings.getNeutralText() != null && !( surveySettings.getNeutralText().isEmpty() ) ) {
-                    surveyAndStage.put( "neutralText", surveySettings.getNeutralText() );
+                    surveyAndStage.put( "neutralText", surveyHandler
+	                    .replaceGatewayQuestionText( surveySettings.getNeutralText(), unitSettings, user, companySettings,
+		                    survey ) );
                     isNeutralTextSet = true;
                 }
                 if ( surveySettings.getSadText() != null && !surveySettings.getSadText().isEmpty() ) {
-                    surveyAndStage.put( "sadText", surveySettings.getSadText() );
+                    surveyAndStage.put( "sadText", surveyHandler
+	                    .replaceGatewayQuestionText( surveySettings.getSadText(), unitSettings, user, companySettings,
+		                    survey ) );
                     isSadTextSet = true;
                 }
                 if ( surveySettings.getHappyTextComplete() != null && !surveySettings.getHappyTextComplete().isEmpty() ) {
-                    surveyAndStage.put( "happyTextComplete", surveySettings.getHappyTextComplete() );
+                    surveyAndStage.put( "happyTextComplete", surveyHandler
+	                    .replaceGatewayQuestionText( surveySettings.getHappyTextComplete(), unitSettings, user, companySettings,
+		                    survey ) );
                     isHappyTextCompleteSet = true;
                 }
                 if ( surveySettings.getNeutralTextComplete() != null && !surveySettings.getNeutralTextComplete().isEmpty() ) {
-                    surveyAndStage.put( "neutralTextComplete", surveySettings.getNeutralTextComplete() );
+                    surveyAndStage.put( "neutralTextComplete", surveyHandler
+	                    .replaceGatewayQuestionText( surveySettings.getNeutralTextComplete(), unitSettings, user, companySettings,
+		                    survey ) );
                     isNeutralTextCompleteSet = true;
                 }
                 if ( surveySettings.getSadTextComplete() != null && !surveySettings.getSadTextComplete().isEmpty() ) {
-                    surveyAndStage.put( "sadTextComplete", surveySettings.getSadTextComplete() );
+                    surveyAndStage.put( "sadTextComplete", surveyHandler
+	                    .replaceGatewayQuestionText( surveySettings.getSadTextComplete(), unitSettings, user, companySettings,
+		                    survey ) );
                     isSadTextCompleteSet = true;
                 }
             }
@@ -1695,22 +1714,34 @@ public class SurveyManagementController
         if ( !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet ) ) {
             SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
             if ( !isHappyTextSet ) {
-                surveyAndStage.put( "happyText", defaultSurveySettings.getHappyText() );
+	            surveyAndStage.put( "happyText", surveyHandler
+		            .replaceGatewayQuestionText( defaultSurveySettings.getHappyText(), unitSettings, user, companySettings,
+			            survey ) );
             }
             if ( !isNeutralTextSet ) {
-                surveyAndStage.put( "neutralText", defaultSurveySettings.getNeutralText() );
+                surveyAndStage.put( "neutralText", surveyHandler
+	                .replaceGatewayQuestionText( defaultSurveySettings.getNeutralText(), unitSettings, user, companySettings,
+		                survey ) );
             }
             if ( !isSadTextSet ) {
-                surveyAndStage.put( "sadText", defaultSurveySettings.getSadText() );
+                surveyAndStage.put( "sadText", surveyHandler
+	                .replaceGatewayQuestionText( defaultSurveySettings.getSadText(), unitSettings, user, companySettings,
+		                survey ) );
             }
             if ( !isHappyTextCompleteSet ) {
-                surveyAndStage.put( "happyTextComplete", defaultSurveySettings.getHappyTextComplete() );
+                surveyAndStage.put( "happyTextComplete", surveyHandler
+	                .replaceGatewayQuestionText( defaultSurveySettings.getHappyTextComplete(), unitSettings, user, companySettings,
+		                survey ) );
             }
             if ( isNeutralTextCompleteSet ) {
-                surveyAndStage.put( "neutralTextComplete", defaultSurveySettings.getNeutralTextComplete() );
+                surveyAndStage.put( "neutralTextComplete",  surveyHandler
+	                .replaceGatewayQuestionText( defaultSurveySettings.getNeutralTextComplete(), unitSettings, user, companySettings,
+		                survey ) );
             }
             if ( isSadTextCompleteSet ) {
-                surveyAndStage.put( "sadTextComplete", defaultSurveySettings.getSadTextComplete() );
+                surveyAndStage.put( "sadTextComplete",  surveyHandler
+	                .replaceGatewayQuestionText( defaultSurveySettings.getSadTextComplete(), unitSettings, user, companySettings,
+		                survey ) );
             }
         }
 
@@ -1871,6 +1902,44 @@ public class SurveyManagementController
             }
         } catch ( NullPointerException e ) {
             surveyAndStage.put( "realtorEnabled", false );
+        }
+
+	    //Google Business Token
+        try {
+            if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null
+                && agentSettings.getSocialMediaTokens().getGoogleBusinessToken() != null
+                && agentSettings.getSocialMediaTokens().getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+                surveyAndStage.put( "googleBusinessEnabled", true );
+                surveyAndStage.put( "googleBusinessLink", agentSettings.getSocialMediaTokens().getGoogleBusinessToken()
+                    .getGoogleBusinessLink() );
+            } else {
+                // Adding Realtor Url of the closest in hierarchy connected with Realtor.
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getGoogleBusinessToken() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getGoogleBusinessToken()
+                    .getGoogleBusinessLink() != null ) {
+                    surveyAndStage.put( "googleBusinessEnabled", true );
+                    surveyAndStage.put( "googleBusinessLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
+                        .getGoogleBusinessToken().getGoogleBusinessLink() );
+                } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+                    && regionSettings.getSocialMediaTokens().getGoogleBusinessToken() != null
+                    && regionSettings.getSocialMediaTokens().getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+                    surveyAndStage.put( "googleBusinessEnabled", true );
+                    surveyAndStage.put( "googleBusinessLink", regionSettings.getSocialMediaTokens().getGoogleBusinessToken()
+                        .getGoogleBusinessLink() );
+                } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                    && companySettings.getSocialMediaTokens().getGoogleBusinessToken() != null
+                    && companySettings.getSocialMediaTokens().getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+                    surveyAndStage.put( "googleBusinessEnabled", true );
+                    surveyAndStage.put( "googleBusinessLink", companySettings.getSocialMediaTokens().getGoogleBusinessToken()
+                    .getGoogleBusinessLink() );
+                } else
+                    surveyAndStage.put( "googleBusinessEnabled", false );
+            }
+        } catch ( NullPointerException e ) {
+            surveyAndStage.put( "googleBusinessEnabled", false );
         }
 
         // adding facebook and google plus api keys for customer share
