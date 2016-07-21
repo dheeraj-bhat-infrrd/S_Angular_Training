@@ -3904,6 +3904,36 @@ function validateEncompassInput(elementId) {
 }
 
 
+
+// Check for encompass input fields for testConnection (except fieldid)
+function validateEncompassTestInput(elementId) {
+	isEncompassValid = true;
+	var isFocussed = false;
+
+	if (!validateEncompassUserName('encompass-username')) {
+		isEncompassValid = false;
+		if (!isFocussed) {
+			$('#encompass-username').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateEncompassPassword('encompass-password')) {
+		isEncompassValid = false;
+		if (!isFocussed) {
+			$('#encompass-password').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateURL('encompass-url')) {
+		isEncompassValid = false;
+		if (!isFocussed) {
+			$('#encompass-url').focus();
+			isFocussed = true;
+		}
+	}
+
+	return isEncompassValid;
+}
 var isLoneValid;
 function validateLoneWolfInput(elementId) {
 	isLoneValid = true;
@@ -3947,35 +3977,6 @@ function validateLoneWolfInput(elementId) {
 
 	return isLoneValid;
 }
-// Check for encompass input fields for testConnection (except fieldid)
-function validateEncompassTestInput(elementId) {
-	isEncompassValid = true;
-	var isFocussed = false;
-
-	if (!validateEncompassUserName('encompass-username')) {
-		isEncompassValid = false;
-		if (!isFocussed) {
-			$('#encompass-username').focus();
-			isFocussed = true;
-		}
-	}
-	if (!validateEncompassPassword('encompass-password')) {
-		isEncompassValid = false;
-		if (!isFocussed) {
-			$('#encompass-password').focus();
-			isFocussed = true;
-		}
-	}
-	if (!validateURL('encompass-url')) {
-		isEncompassValid = false;
-		if (!isFocussed) {
-			$('#encompass-url').focus();
-			isFocussed = true;
-		}
-	}
-
-	return isEncompassValid;
-}
 
 // validate dotloop form
 function validateDotloopInput() {
@@ -4000,6 +4001,7 @@ $('body').on('click', '.crm-settings-dropdown-item', function(e) {
 	var crmType = $(this).attr('data-crm-type');
 	$('#crm-settings-dropdown-sel-text').text(crmType);
 	$('.crm-setting-cont').hide();
+	$('.hm-item-err-2').hide();
 	$('.crm-setting-cont[data-crm-type="' + crmType + '"]').show();
 });
 
@@ -4011,6 +4013,22 @@ $('body').on('blur', '#encompass-password', function() {
 });
 $('body').on('blur', '#encompass-url', function() {
 	validateURL(this.id);
+});
+//Lone Wolf input
+$('body').on('blur', '#lone-api', function() {
+	validateLoneWolf(this.id);
+});
+$('body').on('blur', '#lone-consumer-key', function() {
+	validateLoneWolf(this.id);
+});
+$('body').on('blur', '#lone-secret-key', function() {
+	validateLoneWolf(this.id);
+});
+$('body').on('blur', '#lone-host', function() {
+	validateLoneWolf(this.id);
+});
+$('body').on('blur', '#lone-client', function() {
+	validateLoneWolf(this.id);
 });
 
 $('#dotloop-apikey').blur(function() {
@@ -10915,7 +10933,7 @@ function loneWolfCretentials() {
 		"clientCode":client
 	};
 
-	if (validateEncompassTestInput('lone-wolf-form-div')) {
+	if (validateLoneWolfInput('lone-wolf-form-div')) {
 		showOverlay();
 		callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/lonewolf/testcredentials.do", testLoneConnectionCallBack, payload, true, '#lone-test-connection');
 	}
