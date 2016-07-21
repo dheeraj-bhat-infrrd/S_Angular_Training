@@ -43,8 +43,8 @@
 							</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<div class="rfr_icn icn-password en-icn-pswd"></div>
-								<input id="lone-consumer-key" type="text"  class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Consumer Key" >
-								<div id="lone-consumer-error" class="hm-item-err-2 hide"></div>
+								<input id="lone-consumer-key" type="text"  class="um-item-row-txt en-user-name um-item-row-txt-OR en-form-align-left" placeholder="Consumer Key" >
+								<div id="lone-consumer-error" class="hm-item-err-2"></div>
 							</div>
 						</div>
 					</div>
