@@ -68,6 +68,9 @@ public class LoneWolfManagementController
         String message = null;
         OrganizationUnitSettings unitSettings = null;
         String collectionName = "";
+        int regionId = 0;
+        int branchId = 0;
+        int agentId = 0;
 
         try {
             switch ( entityType ) {
@@ -78,14 +81,17 @@ public class LoneWolfManagementController
                 case CommonConstants.REGION_ID:
                     collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getRegionSettings( entityId );
+                    regionId = (int) entityId;
                     break;
                 case CommonConstants.BRANCH_ID:
                     collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                    branchId = (int) entityId;
                     break;
                 case CommonConstants.AGENT_ID:
                     collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getAgentSettings( entityId );
+                    agentId = (int) entityId;
                     break;
             }
 
@@ -94,7 +100,7 @@ public class LoneWolfManagementController
             organizationManagementService.updateCRMDetailsForAnyUnitSettings( unitSettings, collectionName, lonewolfCrmInfo,
                 "com.realtech.socialsurvey.core.entities.LoneWolfCrmInfo" );
             organizationManagementService.logEvent( CommonConstants.LONEWOLF_CONNECTION, CommonConstants.ACTION_ENABLED,
-                eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
+                eventFiredBy, user.getCompany().getCompanyId(), agentId, regionId, branchId );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.LONEWOLF_ENABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
@@ -128,6 +134,9 @@ public class LoneWolfManagementController
         String message = null;
         OrganizationUnitSettings unitSettings = null;
         String collectionName = "";
+        int regionId = 0;
+        int branchId = 0;
+        int agentId = 0;
 
         try {
             switch ( entityType ) {
@@ -138,14 +147,17 @@ public class LoneWolfManagementController
                 case CommonConstants.REGION_ID:
                     collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getRegionSettings( entityId );
+                    regionId = (int) entityId;
                     break;
                 case CommonConstants.BRANCH_ID:
                     collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                    branchId = (int) entityId;
                     break;
                 case CommonConstants.AGENT_ID:
                     collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getAgentSettings( entityId );
+                    agentId = (int) entityId;
                     break;
             }
 
@@ -154,7 +166,7 @@ public class LoneWolfManagementController
             organizationManagementService.updateCRMDetailsForAnyUnitSettings( unitSettings, collectionName, lonewolfCrmInfo,
                 "com.realtech.socialsurvey.core.entities.LoneWolfCrmInfo" );
             organizationManagementService.logEvent( CommonConstants.LONEWOLF_CONNECTION, CommonConstants.ACTION_DISABLED,
-                eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
+                eventFiredBy, user.getCompany().getCompanyId(), agentId, regionId, branchId );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.LONEWOLF_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();

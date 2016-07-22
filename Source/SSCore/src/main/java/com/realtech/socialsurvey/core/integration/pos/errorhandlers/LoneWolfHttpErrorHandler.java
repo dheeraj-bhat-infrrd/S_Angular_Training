@@ -21,7 +21,7 @@ public class LoneWolfHttpErrorHandler implements ErrorHandler
         LOG.error( "Found error " + cause.getMessage() );
         Response response = cause.getResponse();
         if ( response != null && response.getStatus() != HttpStatus.SC_OK && response.getStatus() != HttpStatus.SC_CREATED ) {
-            return new LoneWolfAccessException( "Access Failure.", cause );
+            return new LoneWolfAccessException( "Error connecting to lone wolf.", cause );
         }
         return cause;
     }
