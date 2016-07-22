@@ -1660,7 +1660,7 @@ $(document).on('click', '#admin-hierarchy-rep-bnt', function(e) {
 	}
 	callAjaxGetWithPayloadData("./downloadcompanyhierarchyreport.do", function(data) {
 		if (data == "success") {
-			$('#overlay-toast').html('The Comapny Hierarchy Report will be mailed to you shortly');
+			$('#overlay-toast').html('The Company Hierarchy Report will be mailed to you shortly');
 			showToast();
 		}
 	}, payload, true);
