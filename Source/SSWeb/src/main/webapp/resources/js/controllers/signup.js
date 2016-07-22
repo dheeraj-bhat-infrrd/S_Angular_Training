@@ -712,7 +712,7 @@ app.controller('paymentController', [ '$scope', 'PaymentService', '$location', '
 			validCardDetails = false;
 		}
 
-		if (angular.isUndefined($scope.payment.zipCode) || !postalCodeValidation.isValid || ($scope.payment.zipCode.length != 5 && $scope.payment.zipCode.length != 10)) {
+		if ($scope.payment.zipCode && $scope.payment.zipCode.length > 0 && (!postalCodeValidation.isValid || ($scope.payment.zipCode.length != 5 && $scope.payment.zipCode.length != 10))) {
 			validCardDetails = false;
 		}
 
