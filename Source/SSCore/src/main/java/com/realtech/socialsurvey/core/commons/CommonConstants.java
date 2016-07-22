@@ -1085,6 +1085,7 @@ public interface CommonConstants
     public static final String DATE_ADOPTION_COMPLETED = "Date Adoption completed";
     public static final String DATE_LAST_SURVEY_SENT = "Date last survey sent";
     public static final String DATE_LAST_SURVEY_POSTED = "Date last survey posted";
+    public static final String USER_ADDRESS = "User Address";
 
     //user report mail subject and body
     public static final String COMPANY_USERS_REPORT_MAIL_SUBJ = "Company Users Report for ";

@@ -1452,6 +1452,20 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 else
                     userReportToPopulate.add( "" );
 
+	            String userAddress = "";
+	            if ( userSettings != null && userSettings.getContact_details() != null ) {
+		            if ( userSettings.getContact_details().getAddress1() != null ) {
+			            userAddress = userSettings.getContact_details().getAddress1();
+		            }
+		            if ( userSettings.getContact_details().getAddress2() != null ) {
+			            if ( userAddress.isEmpty() )
+				            userAddress = userSettings.getContact_details().getAddress2();
+			            else
+				            userAddress += " " + userSettings.getContact_details().getAddress2();
+		            }
+	            }
+	            userReportToPopulate.add( userAddress );
+
 
                 usersData.put( ( ++usersCounter ), userReportToPopulate );
                 userReportToPopulate = new ArrayList<>();
@@ -1498,6 +1512,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         userReportToPopulate.add( CommonConstants.DATE_ADOPTION_COMPLETED );
         userReportToPopulate.add( CommonConstants.DATE_LAST_SURVEY_SENT );
         userReportToPopulate.add( CommonConstants.DATE_LAST_SURVEY_POSTED );
+	    userReportToPopulate.add( CommonConstants.USER_ADDRESS );
 
         usersData.put( 1, userReportToPopulate );
 
@@ -1543,6 +1558,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         userReportToPopulate.add( "" );
         userReportToPopulate.add( "" );
         userReportToPopulate.add( "" );
+	    userReportToPopulate.add( "" );
 
         usersData.put( 2, userReportToPopulate );
 
