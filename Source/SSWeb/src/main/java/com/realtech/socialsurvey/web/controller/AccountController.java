@@ -10,6 +10,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 
+import com.realtech.socialsurvey.core.entities.ProfileStage;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -106,6 +108,9 @@ public class AccountController
 
     @Autowired
     private FileUploadService fileUploadService;
+
+    @Autowired
+    private ProfileManagementService profileManagementService;
 
     @Autowired
     private MessageUtils messageUtils;
@@ -590,6 +595,15 @@ public class AccountController
                         agentSettings = (AgentSettings) socialAsyncService.linkedInDataUpdate(
                             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, tokens );
 
+	                    //Update profile stages
+                        for ( ProfileStage stage : agentSettings.getProfileStages() ) {
+                            if ( stage.getProfileStageKey().equalsIgnoreCase( "LINKEDIN_PRF" ) ) {
+                                stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                            }
+                        }
+                        profileManagementService.updateProfileStages( agentSettings.getProfileStages(), agentSettings,
+                            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+	                    
                         User user = userManagementService.getUserByUserId( Long.parseLong( sId ) );
                         attributes.addFlashAttribute( "userId", user.getUserId() );
                         attributes.addFlashAttribute( "companyId", user.getCompany().getCompanyId() );
