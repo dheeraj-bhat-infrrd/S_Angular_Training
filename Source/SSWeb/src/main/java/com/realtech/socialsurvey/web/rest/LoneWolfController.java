@@ -25,7 +25,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.LoneWolfErrorCode;
 import com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntegrationApi;
 import com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntergrationApiBuilder;
-import com.realtech.socialsurvey.web.util.LoneWolfRestUtils;
+import com.realtech.socialsurvey.core.utils.LoneWolfRestUtils;
 
 import retrofit.mime.TypedByteArray;
 
@@ -84,6 +84,7 @@ public class LoneWolfController extends AbstractController
                     apiToken, clientCode );
 
                 LOG.debug( "Test connection authHeader: " + authHeader );
+                
                 LoneWolfIntegrationApi loneWolfIntegrationApi = loneWolfIntegrationApiBuilder.getLoneWolfIntegrationApi();
 
                 //calling get test transaction for id = test

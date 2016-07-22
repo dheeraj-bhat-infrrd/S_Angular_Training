@@ -270,8 +270,10 @@
 				<entry key="crmBatchTrackerHistoryService" value-ref="crmBatchTrackerHistoryService" />
 				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="loneWolfRestUtils" value-ref="loneWolfRestUtils" />
 				<entry key="applicationAdminEmail" value="${APPLICATION_ADMIN_EMAIL}" />
 				<entry key="applicationAdminName" value="${APPLICATION_ADMIN_NAME}" />
+				<entry key="loneWolfEndpoint" value="${LONEWOLF_ENDPOINT}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -562,6 +564,7 @@
 	<bean id="crmBatchTrackerService" class="com.realtech.socialsurvey.core.services.crmbatchtracker.impl.CRMBatchTrackerServiceImpl" />
 	<bean id="crmBatchTrackerHistoryService" class="com.realtech.socialsurvey.core.services.crmbatchtrackerhistory.impl.CRMBatchTrackerHistoryServiceImpl" />
 	<bean id="urlService" class="com.realtech.socialsurvey.core.services.generator.impl.UrlServiceImpl" />
+	<bean id="loneWolfRestUtils" class="com.realtech.socialsurvey.core.utils.LoneWolfRestUtils" />
 
 	<!-- Update subscription dependencies -->
 	<bean id="reviseSubscription" class="com.realtech.socialsurvey.core.starter.ReviseSubscriptionPrice" />
