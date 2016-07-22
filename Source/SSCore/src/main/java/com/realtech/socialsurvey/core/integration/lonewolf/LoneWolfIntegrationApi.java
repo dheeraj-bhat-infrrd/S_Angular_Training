@@ -11,8 +11,8 @@ public interface LoneWolfIntegrationApi
     public Response fetchClosedTransactions( @Header ( "Authorization") String authorizationHeader,
         @Header ( "Content-MD5") String md5Content );
     
-    @GET ( "/wolfconnect/transactions/v1/test")
+    @GET ( "/wolfconnect/transactions/v1?$top=1")
     public Response testConnection( @Header ( "Authorization") String authorizationHeader,
-        @Header ( "Content-MD5") String md5Content );
+        @Header ( "Content-MD5") String md5Content);
 
 }

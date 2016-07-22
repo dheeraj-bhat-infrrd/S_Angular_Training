@@ -15,7 +15,7 @@
 					<c:set var="lonestate" value="${ appSettings.crm_info.state }" />
 				</c:if>
 				<form id="lone-wolf-form">
-					<input id="lone-state" type="hidden" value="${lonestate}" />
+					<input id="lone-state" name="lone-state" type="hidden" value="${lonestate}" />
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
@@ -27,7 +27,7 @@
 							</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<div class="rfr_icn icn-password en-icn-pswd"></div>
-								<input id="lone-api" type="text"  class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="API Key" >
+								<input id="lone-api" name="lone-api" type="text"  class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="API Key" >
 								<div id="lone-api-error" class="hm-item-err-2"></div>
 							</div>
 						</div>
@@ -43,7 +43,7 @@
 							</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<div class="rfr_icn icn-password en-icn-pswd"></div>
-								<input id="lone-consumer-key" type="text"  class="um-item-row-txt en-user-name um-item-row-txt-OR en-form-align-left" placeholder="Consumer Key" >
+								<input id="lone-consumer-key" name="lone-consumer-key" type="text"  class="um-item-row-txt en-user-name um-item-row-txt-OR en-form-align-left" placeholder="Consumer Key" >
 								<div id="lone-consumer-error" class="hm-item-err-2"></div>
 							</div>
 						</div>
@@ -55,7 +55,7 @@
 							</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<div class="rfr_icn icn-password en-icn-pswd"></div>
-								<input id="lone-secret-key" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Secret Key" >
+								<input id="lone-secret-key" name="lone-secret-key" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Secret Key" >
 								<div id="lone-secret-key-error" class="hm-item-err-2"></div>
 							</div>
 						</div>
@@ -70,7 +70,7 @@
 							</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<div class="rfr_icn icn-url en-icn"></div>
-								<input id="lone-host" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Host" >
+								<input id="lone-host" name="lone-host" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Host" >
 								<div id="lone-host-error" class="hm-item-err-2"></div>
 							</div>
 						</div>
@@ -82,7 +82,7 @@
 							</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<div class="rfr_icn icn-fname en-icn-fname"></div>
-								<input id="lone-client" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Client Code" >
+								<input id="lone-client" name="lone-client" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Client Code" >
 								<div id="lone-client-error" class="hm-item-err-2"></div>
 							</div>
 						</div>
