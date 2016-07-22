@@ -89,7 +89,7 @@
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6">CVV *</div>
-						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6">Zip Code *</div>
+						<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6">Zip Code</div>
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
 						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 5px 0 0" ng-class="{ 'has-error-reg' : paymentsubmitted && (paymentForm.cvv.$error.required || (cvvSize == 3 && payment.cvv.length < 3) || (cvvSize == 4 && payment.cvv.length < 4))}">
 							<input class="reg-details form-control-reg" id="cvv" style="min-width: 0px" type="password" name="cvv" required ng-model="payment.cvv" />
@@ -98,9 +98,9 @@
 							<p ng-show="paymentsubmitted && !paymentForm.cvv.$error.required && cvvSize == 4 && payment.cvv.length < 4" class="help-block-reg">Valid 4-digit CVV number which can be found just above the account number on the front of your card is required.</p>
 						</div>
 						<!-- <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div> -->
-						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && (paymentForm.zipcode.$error.required || (payment.zipCode.length != 5 && payment.zipCode.length != 10))}">
-							<input class="reg-details form-control-reg" id="zip-code" style="min-width: 0px" type="text" name="zipcode" required ng-model="payment.zipCode" maxlength="10" />
-							<p ng-show="paymentsubmitted && (paymentForm.zipcode.$error.required || (payment.zipCode.length != 5 && payment.zipCode.length != 10))" class="help-block-reg">A 5 or 9 digit zip code is required.</p>
+						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding: 0 15px" ng-class="{ 'has-error-reg' : paymentsubmitted && (payment.zipCode && payment.zipCode.length > 0 && (payment.zipCode.length != 5 && payment.zipCode.length != 10))}">
+							<input class="reg-details form-control-reg" id="zip-code" style="min-width: 0px" type="text" name="zipcode" ng-model="payment.zipCode" maxlength="10" />
+							<p ng-show="paymentsubmitted && (payment.zipCode && payment.zipCode.length > 0 && (payment.zipCode.length != 5 && payment.zipCode.length != 10))" class="help-block-reg">A 5 or 9 digit zip code is required.</p>
 						</div>
 						</div>
 						<!-- <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div> -->
