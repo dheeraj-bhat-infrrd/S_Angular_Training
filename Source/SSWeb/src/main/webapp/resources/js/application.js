@@ -10835,45 +10835,34 @@ function testDisconnectLoneWolfCallBack(response) {
 $(document).on('click', '#en-generate-report', function() {
 	disableBodyScroll();
 	callAjaxGET("./dryrun.do", function(data) {
-		$('#overlay-text').html(data);
-		$('#overlay-continue').show();
-		$('#overlay-continue').html("Submit");
-		$('#overlay-cancel').html("Cancel");
-		$('#overlay-header').html("Send Report");
-		$('#overlay-main').show();
-		$('#overlay-continue').off();
-		$('#overlay-continue').click(function() {
-			var encompassNoOfdays = document.getElementById('encompass-no-of-days').value;
-			var encompassReportEmail = document.getElementById('encompass-report-email').value;
-			var payload = {
-				"encompassNoOfdays" : encompassNoOfdays,
-				"encompassReportEmail" : encompassReportEmail
-			};
-			callAjaxPostWithPayloadData("/enableencompassreportgeneration.do", testGenerateReportCallBack, payload, true, '#en-generate-report');
-		});
+		enableReportGeneration(data, "/enableencompassreportgeneration.do", testGenerateReportCallBack, '#en-generate-report');
 	}, true);
 });
 $(document).on('click', '#lone-generate-report', function() {
 	disableBodyScroll();
 	callAjaxGET("./lonedryrun.do", function(data) {
-		$('#overlay-text').html(data);
-		$('#overlay-continue').show();
-		$('#overlay-continue').html("Submit");
-		$('#overlay-cancel').html("Cancel");
-		$('#overlay-header').html("Send Report");
-		$('#overlay-main').show();
-		$('#overlay-continue').off();
-		$('#overlay-continue').click(function() {
-			var loneNoOfdays = document.getElementById('lone-no-of-days').value;
-			var loneReportEmail = document.getElementById('lone-report-email').value;
-			var payload = {
-				"loneNoOfdays" : loneNoOfdays,
-				"loneReportEmail" : loneReportEmail
-			};
-			callAjaxPostWithPayloadData("/enablelonewolfreportgeneration.do", testLoneGenerateReportCallBack, payload, true, '#lone-generate-report');
-		});
+		enableReportGeneration(data, "/enablelonewolfreportgeneration.do", testLoneGenerateReportCallBack, '#lone-generate-report');
 	}, true);
 });
+
+function enableReportGeneration(data, url, successCallback, reportGenerateButtonId) {
+	$('#overlay-text').html(data);
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Submit");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Send Report");
+	$('#overlay-main').show();
+	$('#overlay-continue').off();
+	$('#overlay-continue').click(function() {
+		var noOfdays = document.getElementById('no-of-days').value;
+		var reportEmail = document.getElementById('report-email').value;
+		var payload = {
+			"noOfdays" : noOfdays,
+			"reportEmail" : reportEmail
+		};
+		callAjaxPostWithPayloadData(url, successCallback, payload, true, reportGenerateButtonId);
+	});
+}
 function testLoneGenerateReportCallBack(response) {
 	$('#overlay-cancel').click();
 	var map = response;
@@ -10891,7 +10880,6 @@ function testGenerateReportCallBack(response) {
 	} else {
 		showError(map);
 	}
-
 };
 
 function encompassCretentials() {
