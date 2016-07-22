@@ -187,58 +187,73 @@ public class LoneWolfManagementController
             String apitoken = request.getParameter( "lone-api" );
             String consumerkey = request.getParameter( "lone-consumer-key" );
             String secretkey = request.getParameter( "lone-secret-key" );
+            String host = request.getParameter( "lone-host" );
             String clientCode = request.getParameter( "lone-client" );
-            if ( apitoken != null && !apitoken.isEmpty() && consumerkey != null && !consumerkey.isEmpty() && secretkey != null
-                && !secretkey.isEmpty() && clientCode != null && !clientCode.isEmpty() ) {
-                LoneWolfCrmInfo loneWolfCrmInfo = new LoneWolfCrmInfo();
-                loneWolfCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_LONEWOLF );
-                loneWolfCrmInfo.setApiToken( apitoken );
-                loneWolfCrmInfo.setConsumerKey( consumerkey );
-                loneWolfCrmInfo.setSecretKey( secretkey );
-                loneWolfCrmInfo.setClientCode( clientCode );
-                OrganizationUnitSettings unitSettings = null;
-                String collectionName = "";
-                if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
-                    unitSettings = organizationManagementService.getCompanySettings( entityId );
-                    if ( unitSettings != null ) {
-                        loneWolfCrmInfo.setCompanyId( unitSettings.getIden() );
-                    }
-                } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
-                    unitSettings = organizationManagementService.getRegionSettings( entityId );
-                    if ( unitSettings != null ) {
-                        loneWolfCrmInfo.setRegionId( unitSettings.getIden() );
-                    }
-                } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
-                    unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
-                    if ( unitSettings != null ) {
-                        loneWolfCrmInfo.setBranchId( unitSettings.getIden() );
-                    }
-                } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
-                    unitSettings = organizationManagementService.getAgentSettings( entityId );
-                    loneWolfCrmInfo.setAgentId( unitSettings.getIden() );
-                } else {
-                    throw new InvalidInputException( "Invalid entity type" );
-                }
-                organizationManagementService.updateCRMDetailsForAnyUnitSettings( unitSettings, collectionName, loneWolfCrmInfo,
-                    "com.realtech.socialsurvey.core.entities.LoneWolfCrmInfo" );
-                unitSettings.setCrm_info( loneWolfCrmInfo );
-                status = true;
-                message = messageUtils.getDisplayMessage( DisplayMessageConstants.LONEWOLF_CONNECTION_SUCCESSFUL,
-                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
-            } else {
-                //TODO configure message and update this code
-                message = "Input parameter cannot be empty";
+            String state = request.getParameter( "lone-state" );
+
+            if ( apitoken == null || apitoken.isEmpty() ) {
+                throw new InvalidInputException( "Api token cannot be empty" );
             }
+            if ( secretkey == null || secretkey.isEmpty() ) {
+                throw new InvalidInputException( "Secret key cannot be empty" );
+            }
+            if ( clientCode == null || clientCode.isEmpty() ) {
+                throw new InvalidInputException( "Client code cannot be empty" );
+            }
+            if ( state == null || state.isEmpty() || state.equals( CommonConstants.LONEWOLF_DRY_RUN_STATE ) ) {
+                state = CommonConstants.LONEWOLF_DRY_RUN_STATE;
+            } else {
+                state = CommonConstants.LONEWOLF_PRODUCTION_STATE;
+            }
+
+            LoneWolfCrmInfo loneWolfCrmInfo = new LoneWolfCrmInfo();
+            loneWolfCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_LONEWOLF );
+            loneWolfCrmInfo.setApiToken( apitoken );
+            loneWolfCrmInfo.setConsumerKey( consumerkey );
+            loneWolfCrmInfo.setSecretKey( secretkey );
+            loneWolfCrmInfo.setClientCode( clientCode );
+            loneWolfCrmInfo.setState( state );
+            loneWolfCrmInfo.setHost( host );
+            OrganizationUnitSettings unitSettings = null;
+            String collectionName = "";
+            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
+                if ( unitSettings != null ) {
+                    loneWolfCrmInfo.setCompanyId( unitSettings.getIden() );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+                if ( unitSettings != null ) {
+                    loneWolfCrmInfo.setRegionId( unitSettings.getIden() );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                if ( unitSettings != null ) {
+                    loneWolfCrmInfo.setBranchId( unitSettings.getIden() );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getAgentSettings( entityId );
+                loneWolfCrmInfo.setAgentId( unitSettings.getIden() );
+            } else {
+                throw new InvalidInputException( "Invalid entity type" );
+            }
+            organizationManagementService.updateCRMDetailsForAnyUnitSettings( unitSettings, collectionName, loneWolfCrmInfo,
+                "com.realtech.socialsurvey.core.entities.LoneWolfCrmInfo" );
+            unitSettings.setCrm_info( loneWolfCrmInfo );
+            status = true;
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.LONEWOLF_CONNECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                .getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while testing lonewolf detials. Reason : " + e.getMessage(), e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Inside method saveLoneWolfDetails finished." );
-        
+
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
         responseMap.put( "message", message );
