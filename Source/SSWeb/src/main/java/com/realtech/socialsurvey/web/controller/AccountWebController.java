@@ -41,12 +41,14 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.Plan;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
@@ -90,6 +92,7 @@ public class AccountWebController
     private SocialManagementService socialManagementService;
     private Payment gateway;
     private FileUploadService fileUploadService;
+    private ProfileManagementService profileManagementService;
     private MessageUtils messageUtils;
     private SessionHelper sessionHelper;
 
@@ -125,7 +128,8 @@ public class AccountWebController
     public AccountWebController( SSApiIntergrationBuilder apiBuilder, RequestUtils requestUtils, TokenHandler tokenHandler,
         OrganizationManagementService organizationManagementService, UserManagementService userManagementService,
         SocialAsyncService socialAsyncService, SocialManagementService socialManagementService, Payment gateway,
-        FileUploadService fileUploadService, MessageUtils messageUtils, SessionHelper sessionHelper )
+        FileUploadService fileUploadService, MessageUtils messageUtils, SessionHelper sessionHelper,
+        ProfileManagementService profileManagementService )
     {
         this.apiBuilder = apiBuilder;
         this.requestUtils = requestUtils;
@@ -138,6 +142,7 @@ public class AccountWebController
         this.fileUploadService = fileUploadService;
         this.messageUtils = messageUtils;
         this.sessionHelper = sessionHelper;
+        this.profileManagementService = profileManagementService;
     }
 
 
@@ -434,6 +439,15 @@ public class AccountWebController
                         AgentSettings agentSettings = userManagementService.getUserSettings( Long.parseLong( sId ) );
                         agentSettings = (AgentSettings) socialAsyncService.linkedInDataUpdate(
                             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, tokens );
+
+                        //Update profile stages
+                        for ( ProfileStage stage : agentSettings.getProfileStages() ) {
+                            if ( stage.getProfileStageKey().equalsIgnoreCase( "LINKEDIN_PRF" ) ) {
+                                stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                            }
+                        }
+                        profileManagementService.updateProfileStages( agentSettings.getProfileStages(), agentSettings,
+                            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
 
                         User user = userManagementService.getUserByUserId( Long.parseLong( sId ) );
                         attributes.addFlashAttribute( "userId", user.getUserId() );
