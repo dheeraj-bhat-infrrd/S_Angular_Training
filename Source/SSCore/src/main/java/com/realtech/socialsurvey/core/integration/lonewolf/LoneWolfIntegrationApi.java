@@ -7,12 +7,23 @@ import retrofit.http.Header;
 
 public interface LoneWolfIntegrationApi
 {
-    @GET ( "/wolfconnect/transactions/v1?$filter=StatusCode eq 'A'")
+    public static final String loneWolfTestConnectionUrl = "/wolfconnect/transactions/v1?$top=1";
+    public static final String loneWolfTransactionUrl = "/wolfconnect/transactions/v1?$top=1";
+    public static final String loneWolfMemberUrl = "/wolfconnect/members/v1";
+
+
+    @GET ( loneWolfTestConnectionUrl)
+    public Response testConnection( @Header ( "Authorization") String authorizationHeader,
+        @Header ( "Content-MD5") String md5Content );
+
+
+    @GET ( loneWolfTransactionUrl)
     public Response fetchClosedTransactions( @Header ( "Authorization") String authorizationHeader,
         @Header ( "Content-MD5") String md5Content );
-    
-    @GET ( "/wolfconnect/transactions/v1?$top=1")
-    public Response testConnection( @Header ( "Authorization") String authorizationHeader,
-        @Header ( "Content-MD5") String md5Content);
+
+
+    @GET ( loneWolfMemberUrl)
+    public Response fetchMemberDetails( @Header ( "Authorization") String authorizationHeader,
+        @Header ( "Content-MD5") String md5Content );
 
 }
