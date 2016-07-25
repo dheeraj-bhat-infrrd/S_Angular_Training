@@ -180,7 +180,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                                 CommonConstants.CRM_SOURCE_DOTLOOP );
                             if ( crmBatchTracker != null )
                                 crmBatchTrackerHistoryService.insertCrmBatchTrackerHistory( newRecordFoundCount,
-                                    crmBatchTracker.getCrmBatchTrackerId() );
+                                    crmBatchTracker.getCrmBatchTrackerId(), CommonConstants.CRM_SOURCE_DOTLOOP );
                             // update  last run end time and count of new records found in crm batch tracker
                             crmBatchTrackerService.updateLastRunEndTimeByEntityTypeAndSourceType( entityType, entityId,
                                 CommonConstants.CRM_SOURCE_DOTLOOP, newRecordFoundCount );

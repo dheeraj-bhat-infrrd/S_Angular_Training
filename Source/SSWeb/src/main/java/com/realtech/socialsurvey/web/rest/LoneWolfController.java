@@ -11,7 +11,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,9 +35,6 @@ public class LoneWolfController extends AbstractController
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( LoneWolfController.class );
-
-    @Value ( "${LONEWOLF_APP_CONNECTION_URL}")
-    private String loneWolfAppConnectionURL;
 
     @Autowired
     private LoneWolfRestUtils loneWolfRestUtils;
@@ -80,11 +76,11 @@ public class LoneWolfController extends AbstractController
                 }
 
                 //generating authorization header
-                String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( loneWolfAppConnectionURL, secretKey,
-                    apiToken, clientCode );
+                String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor(
+                    LoneWolfIntegrationApi.loneWolfTestConnectionUrl, secretKey, apiToken, clientCode );
 
                 LOG.debug( "Test connection authHeader: " + authHeader );
-                
+
                 LoneWolfIntegrationApi loneWolfIntegrationApi = loneWolfIntegrationApiBuilder.getLoneWolfIntegrationApi();
 
                 //calling get test transaction for id = test

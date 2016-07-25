@@ -30,7 +30,7 @@ public class CRMBatchTrackerHistoryServiceImpl implements
 
 	@Override
 	@Transactional
-	public void insertCrmBatchTrackerHistory(int countOfRecordsFetched, int crmBatchTrackerId)throws InvalidInputException {
+	public void insertCrmBatchTrackerHistory(int countOfRecordsFetched, int crmBatchTrackerId, String source)throws InvalidInputException {
 		// TODO Auto-generated method stub
 		
 	    LOG.debug( "method insertCrmBatchTrackerHistory started" );
@@ -43,9 +43,9 @@ public class CRMBatchTrackerHistoryServiceImpl implements
 			crmBatchTrackerHistory.setCountOfRecordsFetched(countOfRecordsFetched);
 			crmBatchTrackerHistory.setCrmBatchTrackerID(crmBatchTrackerId);
 			crmBatchTrackerHistory.setCreatedOn(new Timestamp(System.currentTimeMillis()));
-			crmBatchTrackerHistory.setCreatedBy(CommonConstants.CRM_SOURCE_DOTLOOP);
+			crmBatchTrackerHistory.setCreatedBy(source);
 			crmBatchTrackerHistory.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-			crmBatchTrackerHistory.setModifiedBy(CommonConstants.CRM_SOURCE_DOTLOOP);
+			crmBatchTrackerHistory.setModifiedBy(source);
 			crmBatchTrackerHistory.setStatus(CommonConstants.STATUS_ACTIVE);
 			crmBatchTrackerHistoryDao.save(crmBatchTrackerHistory);
 			

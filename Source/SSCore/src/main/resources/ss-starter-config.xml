@@ -271,9 +271,12 @@
 				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
 				<entry key="loneWolfRestUtils" value-ref="loneWolfRestUtils" />
+				<entry key="userManagementService" value-ref="userManagementService" />
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+				<entry key="utils" value-ref="utils" />
 				<entry key="applicationAdminEmail" value="${APPLICATION_ADMIN_EMAIL}" />
 				<entry key="applicationAdminName" value="${APPLICATION_ADMIN_NAME}" />
-				<entry key="loneWolfEndpoint" value="${LONEWOLF_ENDPOINT}" />
+				<entry key="maskEmail" value="${MASK_EMAIL_ADDRESS}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
