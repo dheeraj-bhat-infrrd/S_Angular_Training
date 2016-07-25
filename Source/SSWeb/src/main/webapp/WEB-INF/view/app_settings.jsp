@@ -57,8 +57,7 @@
 									<%-- Skip if crm mapping Loan Wolf and myself --%>
 								</c:when>
 							<c:otherwise>
-								<div class="crm-settings-dropdown-item"
-									data-crm-type="${mapping.crmMaster.crmName }">${mapping.crmMaster.crmName }</div>
+								<div class="crm-settings-dropdown-item" data-crm-type="${mapping.crmMaster.crmName }">${mapping.crmMaster.crmName }</div>
 							</c:otherwise>
 						</c:choose>
 					</c:forEach>
@@ -111,6 +110,8 @@
 		var crmSource = $('#crm-source').val();
 		if(crmSource && crmSource.toUpperCase() == "DOTLOOP") {
 			$('.crm-settings-dropdown-item[data-crm-type="Dotloop"]').trigger('click');
+		} else if(crmSource && crmSource.toUpperCase() == "LONEWOLF") {
+			$('.crm-settings-dropdown-item[data-crm-type="Lone Wolf"]').trigger('click');
 		} else {
 			$('#crm-settings-dropdown-cont').children('.crm-settings-dropdown-item:first').trigger('click');
 		}

@@ -16,8 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import retrofit.mime.TypedByteArray;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -28,6 +26,8 @@ import com.realtech.socialsurvey.core.exception.LoneWolfErrorCode;
 import com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntegrationApi;
 import com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntergrationApiBuilder;
 import com.realtech.socialsurvey.web.util.LoneWolfRestUtils;
+
+import retrofit.mime.TypedByteArray;
 
 
 @Controller
@@ -63,12 +63,10 @@ public class LoneWolfController extends AbstractController
     {
         LOG.info( "Method to test lonewolf credentials started for apiToken : " + apiToken + " secretKey : " + secretKey
             + " clientCode : " + clientCode + " started." );
-
         Response response = null;
         boolean status = false;
         String message = null;
         Map<String, Object> resultMap = new HashMap<String, Object>();
-
         try {
             try {
                 if ( StringUtils.isEmpty( apiToken ) ) {
@@ -84,17 +82,21 @@ public class LoneWolfController extends AbstractController
                 //generating authorization header
                 String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( loneWolfAppConnectionURL, secretKey,
                     apiToken, clientCode );
+
                 LOG.debug( "Test connection authHeader: " + authHeader );
                 LoneWolfIntegrationApi loneWolfIntegrationApi = loneWolfIntegrationApiBuilder.getLoneWolfIntegrationApi();
+
                 //calling get test transaction for id = test
                 retrofit.client.Response transactionResponse = loneWolfIntegrationApi.testConnection( authHeader,
                     loneWolfRestUtils.MD5_EMPTY );
+
                 LOG.debug( "Test connection response: " + transactionResponse );
 
                 //processing retrofit response and building rest response
                 if ( transactionResponse != null ) {
-                    if ( transactionResponse.getStatus() == HttpStatus.SC_NOT_FOUND ) {
+                    if ( transactionResponse.getStatus() == HttpStatus.SC_OK ) {
                         status = true;
+                        message = "Lone Wolf Test Connection Successful.";
                     } else {
                         String responseString = new String( ( (TypedByteArray) transactionResponse.getBody() ).getBytes() );
                         Map<String, String> responseMap = new Gson().fromJson( responseString,
@@ -102,6 +104,9 @@ public class LoneWolfController extends AbstractController
                         message = responseMap.get( "Message" );
                     }
                 }
+                resultMap.put( CommonConstants.STATUS_COLUMN, status );
+                resultMap.put( CommonConstants.MESSAGE, message );
+                response = Response.ok( new Gson().toJson( resultMap ) ).build();
             } catch ( Exception e ) {
                 throw new InternalServerException( new LoneWolfErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ), e.getMessage() );
@@ -109,11 +114,8 @@ public class LoneWolfController extends AbstractController
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
         }
-        resultMap.put( CommonConstants.STATUS_COLUMN, status );
-        resultMap.put( CommonConstants.MESSAGE, message );
-        response = Response.ok( new Gson().toJson( resultMap ) ).build();
 
-        LOG.debug( "returning response: " + response);
+        LOG.debug( "returning response: " + response );
         LOG.info( "Method to test lonewolf credentials finished." );
         return response.getEntity().toString();
     }

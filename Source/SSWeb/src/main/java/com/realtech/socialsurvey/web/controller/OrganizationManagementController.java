@@ -941,14 +941,14 @@ public class OrganizationManagementController
         User user = sessionHelper.getCurrentUser();
         String message;
         try {
-            String numOfDaysStr = request.getParameter( "encompassNoOfdays" );
+            String numOfDaysStr = request.getParameter( "noOfdays" );
 
             if ( numOfDaysStr == null || numOfDaysStr.isEmpty() ) {
                 throw new InvalidInputException( "Number of days cannot be empty" );
             }
 
             int numOfDays = Integer.parseInt( numOfDaysStr );
-            String emailIdForReport = request.getParameter( "encompassReportEmail" );
+            String emailIdForReport = request.getParameter( "reportEmail" );
             if ( emailIdForReport == null || emailIdForReport.isEmpty() ) {
                 throw new InvalidInputException( "emailId cannot be empty" );
             }
