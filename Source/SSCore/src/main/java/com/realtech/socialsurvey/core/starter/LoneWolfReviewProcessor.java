@@ -3,12 +3,14 @@ package com.realtech.socialsurvey.core.starter;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,7 @@ import com.realtech.socialsurvey.core.services.crmbatchtrackerhistory.CRMBatchTr
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.utils.LoneWolfRestUtils;
 
 
 @Component ( "lonewolfreviewprocessor")
@@ -35,24 +38,19 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
     private static final Logger LOG = LoggerFactory.getLogger( LoneWolfReviewProcessor.class );
 
     private LoneWolfIntergrationApiBuilder loneWolfIntegrationApiBuilder;
-
     private LoneWolfIntegrationApi loneWolfIntegrationApi;
-
     private BatchTrackerService batchTrackerService;
-
     private CRMBatchTrackerService crmBatchTrackerService;
-
     private CRMBatchTrackerHistoryService crmBatchTrackerHistoryService;
-
     private EmailServices emailServices;
-
     private OrganizationManagementService organizationManagementService;
-
+    private LoneWolfRestUtils loneWolfRestUtils;
     private int newRecordFoundCount = 0;
-
     private String applicationAdminEmail;
-
     private String applicationAdminName;
+
+    @Value ( "${LONEWOLF_ENDPOINT}")
+    private String loneWolfEndpoint;
 
 
     @Override
@@ -122,10 +120,10 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
 
                     LOG.info( "Getting lonewolf records for company id: " + organizationUnitSettings.getId() );
                     LoneWolfCrmInfo loneWolfCrmInfo = (LoneWolfCrmInfo) organizationUnitSettings.getCrm_info();
-                    if ( loneWolfCrmInfo.getApiToken() != null && !loneWolfCrmInfo.getApiToken().isEmpty()
-                        && loneWolfCrmInfo.getClientCode() != null && !loneWolfCrmInfo.getClientCode().isEmpty()
-                        && loneWolfCrmInfo.getSecretKey() != null && !loneWolfCrmInfo.getSecretKey().isEmpty() ) {
-                        
+                    if ( StringUtils.isEmpty( loneWolfCrmInfo.getApiToken() )
+                        && StringUtils.isEmpty( loneWolfCrmInfo.getClientCode() )
+                        && StringUtils.isEmpty( loneWolfCrmInfo.getSecretKey() ) ) {
+
                         entityId = organizationUnitSettings.getIden();
 
                         //make an entry in crm batch tracker and update last run start time
@@ -134,7 +132,8 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
 
                         try {
 
-                            //TODO Fetch transactions data from lonewolf and process it.
+                            //Fetch transactions data from lonewolf and process it.
+                            fetchLoneWolfTransactionsData( loneWolfCrmInfo );
 
                             //insert crmbatchTrackerHistory with count of Records Fetched
                             crmBatchTracker = crmBatchTrackerService.getCrmBatchTracker( entityType, entityId,
@@ -178,9 +177,21 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                 }
             }
         } catch ( InvalidInputException | NoRecordsFetchedException e1 ) {
-            LOG.info( "Could not get list of dotloop records" );
+            LOG.info( "Could not get list of lone wolf records" );
         }
 
+    }
+
+
+    private void fetchLoneWolfTransactionsData( LoneWolfCrmInfo loneWolfCrmInfo )
+    {
+        //generating authorization header
+        String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( loneWolfEndpoint, loneWolfCrmInfo.getSecretKey(),
+            loneWolfCrmInfo.getApiToken(), loneWolfCrmInfo.getClientCode() );
+
+        //calling get test transaction for id = test
+        // retrofit.client.Response transactionResponse = loneWolfIntegrationApi.testConnection( authHeader,
+        // loneWolfRestUtils.MD5_EMPTY );
     }
 
 

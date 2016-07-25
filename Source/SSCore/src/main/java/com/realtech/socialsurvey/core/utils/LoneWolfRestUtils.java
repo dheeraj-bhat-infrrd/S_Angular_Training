@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.web.util;
+package com.realtech.socialsurvey.core.utils;
 
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
