@@ -7351,7 +7351,8 @@ function callBackUpdateHobbies(data) {
  */
 
 // Update Social links - yelp
-$('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
+$('body').on('click', '#prof-edit-social-link .icn-yelp', function(e) {
+	e.stopPropagation();
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -7360,7 +7361,12 @@ $('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
 	});
 	$('#social-token-text').val(link);
 });
-
+$(document).on('click',function(){
+	$('#social-token-text').hide();
+});
+$(document).on('click','#social-token-text',function(e){
+	e.stopPropagation();
+});
 function updateYelpLink(link) {
 	var payload = {
 		"yelplink" : link
@@ -7384,7 +7390,8 @@ function updateYelpLink(link) {
  */
 
 // Update Social links - lendingTree
-$('body').on('click', '#prof-edit-social-link .icn-lendingtree', function() {
+$('body').on('click', '#prof-edit-social-link .icn-lendingtree', function(e) {
+	e.stopPropagation();
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -7407,7 +7414,8 @@ function updateLendingTreeLink(link) {
 	}
 }
 
-$('body').on('click', '#prof-edit-social-link .icn-realtor', function() {
+$('body').on('click', '#prof-edit-social-link .icn-realtor', function(e) {
+	e.stopPropagation();
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -7417,7 +7425,8 @@ $('body').on('click', '#prof-edit-social-link .icn-realtor', function() {
 	$('#social-token-text').val(link);
 });
 
-$('body').on('click', '#prof-edit-social-link .icn-google-business', function() {
+$('body').on('click', '#prof-edit-social-link .icn-google-business', function(e) {
+	e.stopPropagation();
     $('#social-token-text').show();
     var link = $(this).attr("data-link");
     $('#social-token-text').attr({
