@@ -119,7 +119,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 	$scope.response = null;
 	$scope.widgetId = null;
 	$scope.isEmailIdExist = false;
-
+    $scope.isNewRecaptcha=false;
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
 	};
@@ -131,8 +131,19 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 	$("#reg-phone").on("countrychange", function(e, countryData) {
 		maskPhoneNumber("reg-phone", countryData.iso2);
 	});
+	$scope.newRecaptcha=function(){
+		$scope.isNewRecaptcha=false;
+		$scope.activate = 1;
+	}
 
 	$scope.submitLogin = function() {
+		if($scope.isEmailIdExist== true){
+			return;
+		}
+		$scope.recaptcha=vcRecaptchaService.getResponse();
+		if($scope.recaptcha==""){
+			return;
+		}
 		if ($scope.signInForm.$valid) {
 			showOverlay();
 			$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
@@ -147,6 +158,9 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 			}, function(error) {
 				if (error.data.indexOf("already exists") > -1 && error.data.indexOf("User with Email") > -1) {
 					$scope.isEmailIdExist = true;
+					$scope.isNewRecaptcha=true;
+					grecaptcha.reset();
+					$scope.activate = 0;
 					hideOverlay();
 				} else {
 					showError($scope.getErrorMessage(error.data));

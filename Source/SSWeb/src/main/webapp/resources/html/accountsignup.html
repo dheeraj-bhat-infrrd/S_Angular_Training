@@ -51,8 +51,8 @@
 				</div>
 				<div class="reg-pswd-info col-lg-12 col-md-12 col-sm-12 col-xs-12">(Don't worry about setting a password right now, we'll email you a link to create one)</div>
 				<div class="clearfix reg-captcha-wrapper reg-item" style="width: 305px; margin: auto;">
-					<div vc-recaptcha key="model.key" on-create="setWidgetId(widgetId)" on-success="setResponse(response)" on-expire="cbExpiration()"></div>
-					<p ng-show="submitted && !response" class="help-block-reg">Let's make sure you are a real person, please check the box beside I'm not a robot!</p>
+					<div vc-recaptcha key="model.key" on-create="setWidgetId(widgetId)" on-success="setResponse(response);newRecaptcha()" on-expire="cbExpiration()"></div>
+					<p ng-show="(submitted && !response)|| isNewRecaptcha" class="help-block-reg">Let's make sure you are a real person, please check the box beside I'm not a robot!</p>
 				</div>
 				<div style="width: 125; margin: 25px auto;">
 					<button class="reg-next" ng-init="activate=0" type="submit" ng-class="{'regen':activate == 1 && signInForm.$valid}" ng-click="submitted=true">
