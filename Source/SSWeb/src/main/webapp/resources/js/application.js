@@ -7361,6 +7361,7 @@ $('body').on('click', '#prof-edit-social-link .icn-yelp', function(e) {
 $(document).on('click',function(){
 	$('#social-token-text').hide();
 });
+//hide input textbox for link
 $(document).on('click','#social-token-text',function(e){
 	e.stopPropagation();
 });
