@@ -5458,7 +5458,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
-        Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() );
+        //Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() );
         return unitSettings;
     }
 
@@ -5490,12 +5490,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( noOfDays >= 0 )
             startDate = new Timestamp( startTime.getTimeInMillis() );
 
-        List<Company> companyList = companyDao.searchCompaniesByNameAndKeyValue( searchKey, accountType, status,
+        List<Long> companyList = companyDao.searchCompaniesByNameAndKeyValue( searchKey, accountType, status,
             inCompleteCompany, startDate );
         Set<Long> companyIds = new HashSet<>();
-        for ( Company company : companyList ) {
+        companyIds.addAll( companyList );
+        /*for ( Company company : companyList ) {
             companyIds.add( company.getCompanyId() );
-        }
+        }*/
 
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
         Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() );
