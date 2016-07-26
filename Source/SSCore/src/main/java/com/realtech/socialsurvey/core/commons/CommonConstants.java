@@ -859,6 +859,8 @@ public interface CommonConstants
     // dotloop db keys
     public static final String KEY_DOTLOOP_PROFILE_ID_COLUMN = "profileId";
     public static final String KEY_DOTLOOP_PROFILE_LOOP_ID_COLUMN = "loopId";
+    public static final String KEY_DOTLOOP_PROPERTY_ADDRESS = "Property Address";
+	public static final String KEY_DOTLOOP_STATE = "stateOrProvince";
 
     // Social media message template constants
     public static final DecimalFormat RANKING_FORMAT_TWITTER = new DecimalFormat( "#.#" );

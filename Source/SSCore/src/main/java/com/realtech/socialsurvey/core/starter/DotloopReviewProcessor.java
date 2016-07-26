@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.entities.LoopDetails;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -370,7 +371,17 @@ public class DotloopReviewProcessor extends QuartzJobBean
         Response response = null;
         String responseString = null;
         List<DotLoopParticipant> participants = null;
+	    Map<String, String> cityStateMap = null;
+	    String city = null;
+	    String state = null;
         try {
+	        cityStateMap = getCityAndStateForLoop( loop, authorizationHeader );
+	        if ( cityStateMap != null && !cityStateMap.isEmpty() ) {
+		        if ( cityStateMap.containsKey( CommonConstants.CITY ) )
+			        city = cityStateMap.get( CommonConstants.CITY );
+		        if ( cityStateMap.containsKey( CommonConstants.STATE ) )
+			        state = cityStateMap.get( CommonConstants.STATE );
+	        }
             response = dotloopIntegrationApi.fetchLoopViewParticipants( authorizationHeader, loop.getProfileId(),
                 loop.getLoopViewId() );
             if ( response != null ) {
@@ -467,6 +478,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
                             surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
                             surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
                             surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
+	                        surveyPreInitiation.setCity( city );
+	                        surveyPreInitiation.setState( state );
                             // adding the loop view id in the source id for back tracking
                             surveyPreInitiation.setSurveySourceId( String.valueOf( loop.getLoopViewId() ) );
                             try {
@@ -502,6 +515,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
                             surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
                             surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
                             surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
+	                        surveyPreInitiation.setCity( city );
+	                        surveyPreInitiation.setState( state );
                             // adding the loop view id in the source id for back tracking
                             surveyPreInitiation.setSurveySourceId( String.valueOf( loop.getLoopViewId() ) );
                             try {
@@ -527,6 +542,57 @@ public class DotloopReviewProcessor extends QuartzJobBean
             LOG.error( "Could not fetch loop details for " + loop.getLoopViewId() + " for profile id: " + loop.getProfileId() );
         }
     }
+
+
+	/**
+	 * Method to get city and state values for loop
+	 * @param loop
+	 * @param authorizationHeader
+	 * @return
+	 */
+	private Map<String, String> getCityAndStateForLoop( LoopProfileMapping loop, String authorizationHeader )
+	{
+		LOG.info( "Method getCityAndStateForLoop() started" );
+		Map<String, String> cityStateMap = null;
+		String state = null;
+		String city = null;
+		String responseString = null;
+		LoopDetails details = null;
+		try {
+			Response response = dotloopIntegrationApi
+				.fetchLoopProfileDetail( authorizationHeader, loop.getProfileId(), loop.getLoopViewId() );
+			if ( response != null ) {
+				responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+				details = new Gson().fromJson( responseString, new TypeToken<LoopDetails>()
+				{
+				}.getType() );
+				if ( details != null ) {
+					Map<String, Map<String, String>> sections = details.getSections();
+					if ( sections != null && !sections.isEmpty() && sections
+						.containsKey( CommonConstants.KEY_DOTLOOP_PROPERTY_ADDRESS ) ) {
+						Map<String, String> propertyAddress = sections.get( CommonConstants.KEY_DOTLOOP_PROPERTY_ADDRESS );
+						if ( propertyAddress != null && !propertyAddress.isEmpty() ) {
+							if ( propertyAddress.containsKey( CommonConstants.KEY_DOTLOOP_STATE ) )
+								state = propertyAddress.get( CommonConstants.KEY_DOTLOOP_STATE );
+							if ( propertyAddress.containsKey( CommonConstants.CITY ) )
+								city = propertyAddress.get( CommonConstants.CITY );
+						}
+					}
+				}
+			}
+		} catch ( DotLoopAccessForbiddenException e ) {
+			LOG.error( "Could not fetch loop details for " + loop.getLoopViewId() + " for profile id: " + loop.getProfileId() );
+		}
+		if ( city != null || state != null ) {
+			cityStateMap = new HashMap<>();
+			if ( city != null )
+				cityStateMap.put( CommonConstants.CITY, city );
+			if ( state != null )
+				cityStateMap.put( CommonConstants.STATE, state );
+		}
+		LOG.info( "Method getCityAndStateForLoop() finished" );
+		return cityStateMap;
+	}
 
 
     private SurveyPreInitiation setCollectionDetails( SurveyPreInitiation surveyPreInitiation, String collectionName,
