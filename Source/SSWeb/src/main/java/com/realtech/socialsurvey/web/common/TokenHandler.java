@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 public class TokenHandler
 {
     private static final Logger LOG = LoggerFactory.getLogger( TokenHandler.class );
-    public SocialMediaTokens updateLinkedInToken( String accessToken, SocialMediaTokens mediaTokens, String profileLink )
+
+
+    public SocialMediaTokens updateLinkedInToken( String accessToken, SocialMediaTokens mediaTokens, String profileLink,
+        long expiresIn )
     {
         LOG.debug( "Method updateLinkedInToken() called from SocialManagementController" );
         if ( mediaTokens == null ) {
@@ -24,14 +27,13 @@ public class TokenHandler
                 mediaTokens.setLinkedInToken( new LinkedInToken() );
             }
         }
-
         mediaTokens.getLinkedInToken().setLinkedInAccessToken( accessToken );
+        mediaTokens.getLinkedInToken().setLinkedInAccessTokenExpiresIn( expiresIn );
+        mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn( System.currentTimeMillis() );
         if ( profileLink != null ) {
             profileLink = profileLink.split( "&" )[0];
             mediaTokens.getLinkedInToken().setLinkedInPageLink( profileLink );
         }
-        mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn( System.currentTimeMillis() );
-
         LOG.debug( "Method updateLinkedInToken() finished from SocialManagementController" );
         return mediaTokens;
     }

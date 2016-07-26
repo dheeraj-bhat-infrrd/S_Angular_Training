@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -420,6 +421,10 @@ public class AccountWebController
                     Map<String, Object> map = new Gson().fromJson( accessTokenStr,
                         new TypeToken<Map<String, String>>() {}.getType() );
                     String accessToken = (String) map.get( "access_token" );
+                    String expiresInStr = (String) map.get( "expires_in" );
+                    long expiresIn = 0;
+                    if(StringUtils.isNotBlank( expiresInStr ))
+                        expiresIn = Long.valueOf( expiresInStr ).longValue();
 
                     // fetching LinkedIn profile url
                     HttpGet httpGet = new HttpGet( linkedinProfileUri + accessToken );
@@ -431,7 +436,7 @@ public class AccountWebController
                     SocialMediaTokens tokens = null;
                     if ( unit.equalsIgnoreCase( AGENT_UNIT ) ) {
                         tokens = organizationManagementService.getAgentSocialMediaTokens( Long.parseLong( sId ) );
-                        tokens = tokenHandler.updateLinkedInToken( accessToken, tokens, profileLink );
+                        tokens = tokenHandler.updateLinkedInToken( accessToken, tokens, profileLink, expiresIn );
                         // update tokens
                         tokens = socialManagementService.updateSocialMediaTokens( CommonConstants.AGENT_SETTINGS_COLLECTION,
                             Long.parseLong( sId ), tokens );
