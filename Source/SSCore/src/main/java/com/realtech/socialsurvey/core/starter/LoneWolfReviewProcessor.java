@@ -148,7 +148,6 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                         //make an entry in crm batch tracker and update last run start time
                         crmBatchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType,
                             entityId, CommonConstants.CRM_SOURCE_LONEWOLF );
-
                         try {
 
                             //Fetch transactions data from lonewolf.
@@ -222,6 +221,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                                         agentCommission.getAgent().getFirstName(), agentCommission.getAgent().getLastName() ) );
                                     if ( transaction.getClientContacts() != null
                                         && !transaction.getClientContacts().isEmpty() ) {
+                                        //TODO implement logic to determine the relationship between agent and customer , SS-687
                                         for ( LoneWolfClientContact client : transaction.getClientContacts() ) {
                                             SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
                                             surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName,
@@ -247,6 +247,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                                                 }
                                             }
                                             surveyPreInitiation.setAgentEmailId( agentEmailId );
+                                            //TODO set agent name
                                             surveyPreInitiation
                                                 .setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
                                             surveyPreInitiation
@@ -320,6 +321,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
         if ( !StringUtils.isEmpty( firstName ) ) {
             key = key + firstName.trim();
         }
+        
         if ( !StringUtils.isEmpty( lastName ) ) {
             key = key + " " + lastName.trim();
         }
