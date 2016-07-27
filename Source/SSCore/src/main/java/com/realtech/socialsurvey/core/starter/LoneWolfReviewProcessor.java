@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
@@ -35,19 +33,15 @@ import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntegrationApi;
-import com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.crmbatchtracker.CRMBatchTrackerService;
 import com.realtech.socialsurvey.core.services.crmbatchtrackerhistory.CRMBatchTrackerHistoryService;
+import com.realtech.socialsurvey.core.services.lonewolf.LoneWolfIntegrationService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.utils.LoneWolfRestUtils;
-
-import retrofit.mime.TypedByteArray;
 
 
 @Component ( "lonewolfreviewprocessor")
@@ -55,14 +49,11 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
 {
     private static final Logger LOG = LoggerFactory.getLogger( LoneWolfReviewProcessor.class );
 
-    private LoneWolfIntergrationApiBuilder loneWolfIntegrationApiBuilder;
-    private LoneWolfIntegrationApi loneWolfIntegrationApi;
     private BatchTrackerService batchTrackerService;
     private CRMBatchTrackerService crmBatchTrackerService;
     private CRMBatchTrackerHistoryService crmBatchTrackerHistoryService;
     private EmailServices emailServices;
     private OrganizationManagementService organizationManagementService;
-    private LoneWolfRestUtils loneWolfRestUtils;
     private UserManagementService userManagementService;
     private SurveyHandler surveyHandler;
     private Utils utils;
@@ -70,6 +61,9 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
     private String applicationAdminEmail;
     private String applicationAdminName;
     private String maskEmail;
+    private String apiToken;
+    private String secretKey;
+    private LoneWolfIntegrationService loneWolfIntegrationService;
 
 
     @Override
@@ -137,25 +131,24 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                 LOG.info( "Looping through crm list of size: " + organizationUnitSettingsList.size() );
                 for ( OrganizationUnitSettings organizationUnitSettings : organizationUnitSettingsList ) {
 
-                    LOG.info( "Getting lonewolf records for company id: " + organizationUnitSettings.getId() );
+                    LOG.info( "Getting lonewolf records for company id: " + organizationUnitSettings.getIden() );
                     LoneWolfCrmInfo loneWolfCrmInfo = (LoneWolfCrmInfo) organizationUnitSettings.getCrm_info();
-                    if ( !StringUtils.isEmpty( loneWolfCrmInfo.getApiToken() )
-                        && !StringUtils.isEmpty( loneWolfCrmInfo.getClientCode() )
-                        && !StringUtils.isEmpty( loneWolfCrmInfo.getSecretKey() ) ) {
+                    if ( StringUtils.isNotEmpty( loneWolfCrmInfo.getClientCode() ) ) {
 
                         entityId = organizationUnitSettings.getIden();
 
                         //make an entry in crm batch tracker and update last run start time
                         crmBatchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType,
                             entityId, CommonConstants.CRM_SOURCE_LONEWOLF );
-
                         try {
 
                             //Fetch transactions data from lonewolf.
-                            List<LoneWolfTransaction> loneWolfTransactions = fetchLoneWolfTransactionsData( loneWolfCrmInfo );
+                            List<LoneWolfTransaction> loneWolfTransactions = loneWolfIntegrationService.fetchLoneWolfTransactionsData( secretKey,
+                                apiToken, loneWolfCrmInfo.getClientCode() );
 
                             //Fetch members data from lonewolf.
-                            Map<String, LoneWolfMember> membersByName = fetchLoneWolfMembersData( loneWolfCrmInfo );
+                            Map<String, LoneWolfMember> membersByName = fetchLoneWolfMembersDataMap( secretKey,
+                                apiToken, loneWolfCrmInfo.getClientCode() );
 
                             //Process lone wolf transactions and put it in survey pre initiation table to send surveys
                             processLoneWolfTransactions( loneWolfTransactions, membersByName, collectionName, entityId );
@@ -207,6 +200,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
     }
 
 
+    //TODO refactor this code and add all business scenarios
     private void processLoneWolfTransactions( List<LoneWolfTransaction> loneWolfTransactions,
         Map<String, LoneWolfMember> membersByName, String collectionName, long organizationUnitId )
     {
@@ -218,10 +212,10 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                         if ( tier != null && tier.getAgentCommissions() != null && !tier.getAgentCommissions().isEmpty() ) {
                             for ( LoneWolfAgentCommission agentCommission : tier.getAgentCommissions() ) {
                                 if ( agentCommission != null && agentCommission.getAgent() != null ) {
-                                    LoneWolfMember member = membersByName.get( getKeyForMembersDataMap(
-                                        agentCommission.getAgent().getFirstName(), agentCommission.getAgent().getLastName() ) );
-                                    if ( transaction.getClientContacts() != null
-                                        && !transaction.getClientContacts().isEmpty() ) {
+                                    LoneWolfMember member = membersByName.get( getKeyForMembersDataMap( agentCommission
+                                        .getAgent().getFirstName(), agentCommission.getAgent().getLastName() ) );
+                                    if ( transaction.getClientContacts() != null && !transaction.getClientContacts().isEmpty() ) {
+                                        //TODO implement logic to determine the relationship between agent and customer , SS-687
                                         for ( LoneWolfClientContact client : transaction.getClientContacts() ) {
                                             SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
                                             surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName,
@@ -247,8 +241,9 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                                                 }
                                             }
                                             surveyPreInitiation.setAgentEmailId( agentEmailId );
-                                            surveyPreInitiation
-                                                .setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
+                                            //TODO set agent name
+                                            surveyPreInitiation.setEngagementClosedTime( new Timestamp( System
+                                                .currentTimeMillis() ) );
                                             surveyPreInitiation
                                                 .setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
                                             surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_LONEWOLF );
@@ -271,39 +266,9 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
         }
     }
 
-
-    private List<LoneWolfTransaction> fetchLoneWolfTransactionsData( LoneWolfCrmInfo loneWolfCrmInfo )
+    private Map<String, LoneWolfMember> fetchLoneWolfMembersDataMap( String secretKey, String apiToken, String clientCode )
     {
-        //generating authorization header
-        String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( LoneWolfIntegrationApi.loneWolfTransactionUrl,
-            loneWolfCrmInfo.getSecretKey(), loneWolfCrmInfo.getApiToken(), loneWolfCrmInfo.getClientCode() );
-
-        //fetching lone wolf transaction data
-        retrofit.client.Response transactionResponse = loneWolfIntegrationApi.fetchClosedTransactions( authHeader,
-            loneWolfRestUtils.MD5_EMPTY );
-
-        String responseString = transactionResponse != null
-            ? new String( ( (TypedByteArray) transactionResponse.getBody() ).getBytes() ) : null;
-        List<LoneWolfTransaction> loneWolfTransactions = (List<LoneWolfTransaction>) (responseString != null
-            ? new Gson().fromJson( responseString, new TypeToken<List<LoneWolfTransaction>>() {}.getType() ) : null);
-
-        return loneWolfTransactions;
-    }
-
-
-    private Map<String, LoneWolfMember> fetchLoneWolfMembersData( LoneWolfCrmInfo loneWolfCrmInfo )
-    {
-        //generating authorization header
-        String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( LoneWolfIntegrationApi.loneWolfMemberUrl,
-            loneWolfCrmInfo.getSecretKey(), loneWolfCrmInfo.getApiToken(), loneWolfCrmInfo.getClientCode() );
-
-        //fetching lone wolf members data
-        retrofit.client.Response response = loneWolfIntegrationApi.fetchMemberDetails( authHeader,
-            loneWolfRestUtils.MD5_EMPTY );
-
-        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        List<LoneWolfMember> members = (List<LoneWolfMember>) (responseString != null
-            ? new Gson().fromJson( responseString, new TypeToken<List<LoneWolfMember>>() {}.getType() ) : null);
+        List<LoneWolfMember> members = loneWolfIntegrationService.fetchLoneWolfMembersData( secretKey, apiToken, clientCode );
         Map<String, LoneWolfMember> membersByName = new HashMap<String, LoneWolfMember>();
         if ( members != null && !members.isEmpty() ) {
             for ( LoneWolfMember member : members ) {
@@ -320,6 +285,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
         if ( !StringUtils.isEmpty( firstName ) ) {
             key = key + firstName.trim();
         }
+
         if ( !StringUtils.isEmpty( lastName ) ) {
             key = key + " " + lastName.trim();
         }
@@ -375,9 +341,6 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
 
     private void initializeDependencies( JobDataMap jobMap )
     {
-        loneWolfIntegrationApiBuilder = (LoneWolfIntergrationApiBuilder) jobMap.get( "loneWolfIntegrationApiBuilder" );
-        loneWolfIntegrationApi = loneWolfIntegrationApiBuilder.getLoneWolfIntegrationApi();
-        loneWolfRestUtils = (LoneWolfRestUtils) jobMap.get( "loneWolfRestUtils" );
         batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
         crmBatchTrackerService = (CRMBatchTrackerService) jobMap.get( "crmBatchTrackerService" );
         crmBatchTrackerHistoryService = (CRMBatchTrackerHistoryService) jobMap.get( "crmBatchTrackerHistoryService" );
@@ -387,7 +350,10 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
         surveyHandler = (SurveyHandler) jobMap.get( "surveyHandler" );
         utils = (Utils) jobMap.get( "utils" );
         maskEmail = (String) jobMap.get( "maskEmail" );
+        apiToken = (String) jobMap.get( "apiToken" );
+        secretKey = (String) jobMap.get( "secretKey" );
         applicationAdminEmail = (String) jobMap.get( "applicationAdminEmail" );
         applicationAdminName = (String) jobMap.get( "applicationAdminName" );
+        loneWolfIntegrationService = (LoneWolfIntegrationService) jobMap.get( "loneWolfIntegrationService" );
     }
 }

@@ -8,7 +8,7 @@ import retrofit.http.Header;
 public interface LoneWolfIntegrationApi
 {
     public static final String loneWolfTestConnectionUrl = "/wolfconnect/transactions/v1?$top=1";
-    public static final String loneWolfTransactionUrl = "/wolfconnect/transactions/v1?$top=1";
+    public static final String loneWolfTransactionUrl = "/wolfconnect/transactions/v1?$top=10";
     public static final String loneWolfMemberUrl = "/wolfconnect/members/v1";
 
 
