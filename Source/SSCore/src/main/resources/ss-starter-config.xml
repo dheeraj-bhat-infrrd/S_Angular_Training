@@ -264,19 +264,21 @@
 		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.LoneWolfReviewProcessor" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="loneWolfIntegrationApiBuilder" value-ref="loneWolfIntegrationApiBuilder" />
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 				<entry key="crmBatchTrackerService" value-ref="crmBatchTrackerService" />
 				<entry key="crmBatchTrackerHistoryService" value-ref="crmBatchTrackerHistoryService" />
 				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="loneWolfRestUtils" value-ref="loneWolfRestUtils" />
 				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="surveyHandler" value-ref="surveyHandler" />
 				<entry key="utils" value-ref="utils" />
 				<entry key="applicationAdminEmail" value="${APPLICATION_ADMIN_EMAIL}" />
 				<entry key="applicationAdminName" value="${APPLICATION_ADMIN_NAME}" />
 				<entry key="maskEmail" value="${MASK_EMAIL_ADDRESS}" />
+				<entry key="loneWolfIntegrationService" value-ref="loneWolfIntegrationService" />
+				<entry key="apiToken" value="${LONEWOLF_API_TOKEN}" />
+				<entry key="secretKey" value="${LONEWOLF_SECRET_KEY}" />
+				<entry key="consumerKey" value="${LONEWOLF_CONSUMER_KEY}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -568,6 +570,11 @@
 	<bean id="crmBatchTrackerHistoryService" class="com.realtech.socialsurvey.core.services.crmbatchtrackerhistory.impl.CRMBatchTrackerHistoryServiceImpl" />
 	<bean id="urlService" class="com.realtech.socialsurvey.core.services.generator.impl.UrlServiceImpl" />
 	<bean id="loneWolfRestUtils" class="com.realtech.socialsurvey.core.utils.LoneWolfRestUtils" />
+	
+	<bean id="loneWolfIntegrationService" class="com.realtech.socialsurvey.core.services.lonewolf.impl.LoneWolfIntegrationServiceImpl" >
+		<property name="loneWolfRestUtils" ref="loneWolfRestUtils" />
+		<property name="loneWolfIntegrationApiBuilder" ref="loneWolfIntegrationApiBuilder" />
+	</bean>
 
 	<!-- Update subscription dependencies -->
 	<bean id="reviseSubscription" class="com.realtech.socialsurvey.core.starter.ReviseSubscriptionPrice" />
@@ -593,7 +600,9 @@
 	<bean id="fileUploadService" class="com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl" />
 	<bean id="profileManagementService" class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.ProfileManagementServiceImpl" />
 	<bean id="dotloopIntegrationApiBuilder" class="com.realtech.socialsurvey.core.integration.dotloop.DotloopIntergrationApiBuilder" />
-	<bean id="loneWolfIntegrationApiBuilder" class="com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntergrationApiBuilder" />
+	<bean id="loneWolfIntegrationApiBuilder" class="com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntergrationApiBuilder" >
+		<property name="loneWolfEndpoint" value="${LONEWOLF_ENDPOINT}" />
+	</bean>
 	<bean id="regionsFullImport" class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />
 	<bean id="branchesFullImport" class="com.realtech.socialsurvey.core.utils.solr.BranchesFullImport" />
 	<bean id="usersFullImport" class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />
