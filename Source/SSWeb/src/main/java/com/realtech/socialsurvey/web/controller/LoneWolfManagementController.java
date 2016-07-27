@@ -195,19 +195,8 @@ public class LoneWolfManagementController
         boolean status = false;
         String message = null;
         try {
-            String apitoken = request.getParameter( "lone-api" );
-            String consumerkey = request.getParameter( "lone-consumer-key" );
-            String secretkey = request.getParameter( "lone-secret-key" );
-            String host = request.getParameter( "lone-host" );
             String clientCode = request.getParameter( "lone-client" );
             String state = request.getParameter( "lone-state" );
-
-            if ( StringUtils.isEmpty( apitoken ) ) {
-                throw new InvalidInputException( "Api token cannot be empty" );
-            }
-            if ( StringUtils.isEmpty( secretkey ) ) {
-                throw new InvalidInputException( "Secret key cannot be empty" );
-            }
             if ( StringUtils.isEmpty( clientCode ) ) {
                 throw new InvalidInputException( "Client code cannot be empty" );
             }
@@ -219,12 +208,8 @@ public class LoneWolfManagementController
 
             LoneWolfCrmInfo loneWolfCrmInfo = new LoneWolfCrmInfo();
             loneWolfCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_LONEWOLF );
-            loneWolfCrmInfo.setApiToken( apitoken );
-            loneWolfCrmInfo.setConsumerKey( consumerkey );
-            loneWolfCrmInfo.setSecretKey( secretkey );
             loneWolfCrmInfo.setClientCode( clientCode );
             loneWolfCrmInfo.setState( state );
-            loneWolfCrmInfo.setHost( host );
             OrganizationUnitSettings unitSettings = null;
             String collectionName = "";
             if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {

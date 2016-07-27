@@ -717,15 +717,7 @@ function validateURL(elementId) {
 //Function to validate Lone Wolf Input
 function validateLoneWolf(elementId) {
 	var msg;
-	if(elementId=='lone-api'){
-		msg="Please enter API token.";
-	}else if(elementId=='lone-consumer-key'){
-		msg="Please enter Consumer Key.";
-	}else if(elementId=='lone-secret-key'){
-		msg="Please enter Secret Key.";
-	}else if(elementId=='lone-host'){
-		msg="Please enter Host.";
-	}else if(elementId=='lone-client'){
+	if(elementId=='lone-client'){
 		msg="Please enter Client Code.";
 	}
 	if ($(window).width() < 768) {

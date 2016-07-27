@@ -56,11 +56,14 @@ import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.common.TokenHandler;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+
 import facebook4j.Account;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
 import facebook4j.ResponseList;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -82,6 +85,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import retrofit.mime.TypedByteArray;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -90,6 +94,7 @@ import twitter4j.auth.RequestToken;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -998,6 +1003,10 @@ public class SocialManagementController
             String accessTokenStr = httpclient.execute( httpPost, new BasicResponseHandler() );
             Map<String, Object> map = new Gson().fromJson( accessTokenStr, new TypeToken<Map<String, String>>() {}.getType() );
             String accessToken = (String) map.get( "access_token" );
+            String expiresInStr = (String) map.get( "expires_in" );
+            long expiresIn = 0;
+            if(StringUtils.isNotBlank( expiresInStr ))
+                expiresIn = Long.valueOf( expiresInStr ).longValue();
 
             // fetching linkedin profile url
             HttpGet httpGet = new HttpGet( linkedinProfileUri + accessToken );
@@ -1014,7 +1023,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                 companySettings.setSocialMediaTokens( mediaTokens );
@@ -1041,7 +1050,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                 regionSettings.setSocialMediaTokens( mediaTokens );
@@ -1068,7 +1077,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                 branchSettings.setSocialMediaTokens( mediaTokens );
@@ -1096,7 +1105,7 @@ public class SocialManagementController
                 }
 
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
 
@@ -1195,15 +1204,15 @@ public class SocialManagementController
 
             String accessToken = "";
             String refreshToken = "";
+            String expiresIn = "";
             Map<String, Object> tokenData = new Gson().fromJson( tokenResponse.getBody(),
                 new TypeToken<Map<String, String>>() {}.getType() );
             if ( tokenData != null ) {
-                LOG.debug( "Google access token: " + tokenData.get( "access_token" ) + ", Refresh Token: "
-                    + tokenData.get( "refresh_token" ) );
-                accessToken = tokenData.get( "access_token" ).toString();
-                refreshToken = tokenData.get( "refresh_token" ).toString();
+                accessToken = (String) tokenData.get( "access_token" );
+                refreshToken = (String) tokenData.get( "refresh_token" );
+                expiresIn = (String) tokenData.get( "expires_in" );                
             }
-            LOG.info( "Access Token: " + accessToken + ", Refresh Token: " + refreshToken );
+            LOG.debug( "Google access token: " + accessToken + ", Refresh Token: " + refreshToken + ", Expires In: " + expiresIn );
 
             HttpClient httpclient = HttpClientBuilder.create().build();
             HttpGet httpGet = new HttpGet( googleProfileUri + accessToken );
@@ -1225,7 +1234,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink );
+                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                 companySettings.setSocialMediaTokens( mediaTokens );
@@ -1251,7 +1260,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink );
+                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                 regionSettings.setSocialMediaTokens( mediaTokens );
@@ -1278,7 +1287,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink );
+                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                 branchSettings.setSocialMediaTokens( mediaTokens );
@@ -1306,7 +1315,7 @@ public class SocialManagementController
                 }
 
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink );
+                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
                 for ( ProfileStage stage : agentSettings.getProfileStages() ) {
@@ -1343,7 +1352,7 @@ public class SocialManagementController
 
 
     private SocialMediaTokens updateGoogleToken( String accessToken, String refreshToken, SocialMediaTokens mediaTokens,
-        String profileLink )
+        String profileLink, String expiresIn )
     {
         LOG.debug( "Method updateGoogleToken() called from SocialManagementController" );
         if ( mediaTokens == null ) {
@@ -1361,6 +1370,8 @@ public class SocialManagementController
         mediaTokens.getGoogleToken().setGoogleAccessToken( accessToken );
         mediaTokens.getGoogleToken().setGoogleRefreshToken( refreshToken );
         mediaTokens.getGoogleToken().setGoogleAccessTokenCreatedOn( System.currentTimeMillis() );
+        if(StringUtils.isNotBlank( expiresIn ))
+            mediaTokens.getGoogleToken().setGoogleAccessTokenExpiresIn( Long.valueOf( expiresIn ).longValue() );
 
         LOG.debug( "Method updateGoogleToken() finished from SocialManagementController" );
         return mediaTokens;

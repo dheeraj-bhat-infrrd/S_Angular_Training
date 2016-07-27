@@ -3936,34 +3936,6 @@ function validateLoneWolfInput(elementId) {
 	isLoneValid = true;
 	var isFocussed = false;
 
-	if (!validateLoneWolf('lone-api')) {
-		isLoneValid = false;
-		if (!isFocussed) {
-			$('#lone-api').focus();
-			isFocussed = true;
-		}
-	}
-	if (!validateLoneWolf('lone-consumer-key')) {
-		isLoneValid = false;
-		if (!isFocussed) {
-			$('#lone-consumer-key').focus();
-			isFocussed = true;
-		}
-	}
-	if (!validateLoneWolf('lone-secret-key')) {
-		isLoneValid = false;
-		if (!isFocussed) {
-			$('#lone-secret-key').focus();
-			isFocussed = true;
-		}
-	}
-	if (!validateLoneWolf('lone-host')) {
-		isLoneValid = false;
-		if (!isFocussed) {
-			$('#lone-host').focus();
-			isFocussed = true;
-		}
-	}
 	if (!validateLoneWolf('lone-client')) {
 		isLoneValid = false;
 		if (!isFocussed) {
@@ -4012,18 +3984,7 @@ $('body').on('blur', '#encompass-url', function() {
 	validateURL(this.id);
 });
 // Lone Wolf input
-$('body').on('blur', '#lone-api', function() {
-	validateLoneWolf(this.id);
-});
-$('body').on('blur', '#lone-consumer-key', function() {
-	validateLoneWolf(this.id);
-});
-$('body').on('blur', '#lone-secret-key', function() {
-	validateLoneWolf(this.id);
-});
-$('body').on('blur', '#lone-host', function() {
-	validateLoneWolf(this.id);
-});
+
 $('body').on('blur', '#lone-client', function() {
 	validateLoneWolf(this.id);
 });
@@ -7361,6 +7322,7 @@ $('body').on('click', '#prof-edit-social-link .icn-yelp', function(e) {
 $(document).on('click',function(){
 	$('#social-token-text').hide();
 });
+//hide input textbox for link
 $(document).on('click','#social-token-text',function(e){
 	e.stopPropagation();
 });
@@ -10717,16 +10679,8 @@ function initiateEncompassSaveConnection(warn) {
 }
 
 function initiateLoneWolfSaveConnection(warn) {
-	var api = document.getElementById('lone-api').value;
-	var consumer = document.getElementById('lone-consumer-key').value;
-	var secret = document.getElementById('lone-secret-key').value;
-	var host = document.getElementById('lone-host').value;
 	var client = document.getElementById('lone-client').value;
 	var payload = {
-		"apiToken" : api,
-		"consumerKey" : consumer,
-		"secretKey" : secret,
-		"host" : host,
 		"clientCode" : client
 	};
 	showOverlay();
@@ -10910,16 +10864,8 @@ function encompassCretentials() {
 
 };
 function loneWolfCretentials() {
-	var api = document.getElementById('lone-api').value;
-	var consumer = document.getElementById('lone-consumer-key').value;
-	var secret = document.getElementById('lone-secret-key').value;
-	var host = document.getElementById('lone-host').value;
 	var client = document.getElementById('lone-client').value;
 	var payload = {
-		"apiToken" : api,
-		"consumerKey" : consumer,
-		"secretKey" : secret,
-		"host" : host,
 		"clientCode" : client
 	};
 

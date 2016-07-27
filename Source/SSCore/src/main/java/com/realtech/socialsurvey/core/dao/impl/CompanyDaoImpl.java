@@ -12,6 +12,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,9 +93,15 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
     }
 
 
+    /**
+     * 
+     * This method will return the list of company ids
+     * 
+     */
+    
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<Company> searchCompaniesByNameAndKeyValue( String namePattern, int accountType, int status,
+    public List<Long> searchCompaniesByNameAndKeyValue( String namePattern, int accountType, int status,
         boolean inCompleteCompany , Timestamp startDate )
     {
         Criteria criteria = getSession().createCriteria( Company.class );
@@ -120,7 +127,8 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
                         + accountType + ")" ) );
             }
         }
-        criteria.addOrder( Order.asc( "company" ) );
+        criteria.setProjection(Projections.property("companyId"));
+        //criteria.addOrder( Order.asc( "company" ) );
         return criteria.list();
     }
 
