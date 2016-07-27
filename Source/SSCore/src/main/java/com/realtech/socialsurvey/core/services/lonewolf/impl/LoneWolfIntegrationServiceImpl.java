@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 
 import com.google.gson.Gson;
@@ -73,6 +74,22 @@ public class LoneWolfIntegrationServiceImpl implements LoneWolfIntegrationServic
             new TypeToken<List<LoneWolfMember>>() {}.getType() ) : null;
 
         return members;
+    }
+
+
+    @Override
+    public Response testLoneWolfCompanyCredentials( String secretKey, String apiToken, String clientCode )
+    {
+        loneWolfIntegrationApi = loneWolfIntegrationApiBuilder.getLoneWolfIntegrationApi();
+        //generating authorization header
+        String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( LoneWolfIntegrationApi.loneWolfTestConnectionUrl,
+            secretKey, apiToken, clientCode );
+        //calling get test transaction for id = test
+        Response transactionResponse = loneWolfIntegrationApi.testConnection( authHeader,
+            loneWolfRestUtils.MD5_EMPTY );
+        LOG.debug( "Test connection response: " + transactionResponse );
+        
+        return transactionResponse;
     }
 
 
