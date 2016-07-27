@@ -97,6 +97,12 @@ public class SurveyPreInitiation implements Serializable
     @Column ( name = "ERROR_CODE")
     private String errorCode;
 
+    @Column ( name = "STATE")
+    private String state;
+
+	@Column ( name = "CITY")
+	private String city;
+
     @Transient
     private String errorCodeDescription;
 
@@ -376,4 +382,27 @@ public class SurveyPreInitiation implements Serializable
         this.collectionName = collectionName;
     }
 
+
+	public String getState()
+	{
+		return state;
+	}
+
+
+	public void setState( String state )
+	{
+		this.state = state;
+	}
+
+
+	public String getCity()
+	{
+		return city;
+	}
+
+
+	public void setCity( String city )
+	{
+		this.city = city;
+	}
 }
