@@ -7,72 +7,11 @@
 			<div class="clearfix um-top-form-wrapper">
 				<!-- set lone wolf details -->
 				<c:if test="${appSettings != null && appSettings.crm_info != null && appSettings.crm_info.crm_source == 'LONEWOLF'}">
-					<c:set var="loneapi" value="${appSettings.crm_info.apiToken}" />
-					<c:set var="loneconsumer" value="${appSettings.crm_info.consumerKey}" />
-					<c:set var="lonesceret" value="${appSettings.crm_info.secretKey}" />
-					<c:set var="lonehost" value="${appSettings.crm_info.host}" />
 					<c:set var="loneclient" value="${ appSettings.crm_info.clientCode }" />
 					<c:set var="lonestate" value="${ appSettings.crm_info.state }" />
 				</c:if>
 				<form id="lone-wolf-form">
 					<input id="lone-state" name="lone-state" type="hidden" value="${lonestate}" />
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
-						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
-								<spring:message code="label.crm.apitoken.key" />
-							</div>
-							<div class="clearfix float-right st-username-icons">
-								<div class="um-item-row-icon margin-left-0"></div>
-								<div class="um-item-row-icon margin-left-0"></div>
-							</div>
-							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
-								<div class="rfr_icn icn-password en-icn-pswd"></div>
-								<input id="lone-api" name="lone-api" value="${loneapi}" type="text" class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="API Key">
-								<div id="lone-api-error" class="hm-item-err-2"></div>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden">
-						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
-								<spring:message code="label.crm.consumer.key" />
-							</div>
-							<div class="clearfix float-right st-password-icons">
-								<div class="um-item-row-icon margin-left-0"></div>
-								<div class="um-item-row-icon margin-left-0"></div>
-							</div>
-							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
-								<div class="rfr_icn icn-password en-icn-pswd"></div>
-								<input id="lone-consumer-key" name="lone-consumer-key" value="${loneconsumer}" type="text" class="um-item-row-txt en-user-name um-item-row-txt-OR en-form-align-left" placeholder="Consumer Key">
-								<div id="lone-consumer-error" class="hm-item-err-2"></div>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item ">
-						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
-								<spring:message code="label.crm.secretkey.key" />
-							</div>
-							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
-								<div class="rfr_icn icn-password en-icn-pswd"></div>
-								<input id="lone-secret-key" name="lone-secret-key" value="${lonesceret}" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Secret Key">
-								<div id="lone-secret-key-error" class="hm-item-err-2"></div>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden lone-space" style="height: 90px"></div>
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding">
-						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
-								<spring:message code="label.crn.host.key" />
-							</div>
-							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
-								<div class="rfr_icn icn-url en-icn"></div>
-								<input id="lone-host" name="lone-host" value="${lonehost}" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Host">
-								<div id="lone-host-error" class="hm-item-err-2"></div>
-							</div>
-						</div>
-					</div>
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
@@ -85,7 +24,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="encompass-btn">
+					<div class="encompass-btn clearfix">
 						<div>
 							<div id="lone-dry-save" class="float-left enc-state-icon cursor-pointer">Save</div>
 							<div id="lone-dry-enable" class="float-left enc-state-icon cursor-pointer hide" style="display: none;">Enable</div>
