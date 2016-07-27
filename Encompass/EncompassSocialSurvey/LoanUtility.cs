@@ -209,7 +209,8 @@ namespace EncompassSocialSurvey
 
                         forLoanVM_Borrower.CustomerFirstName = fieldValues[2];
                         forLoanVM_Borrower.CustomerLastName = fieldValues[3];
-
+                        forLoanVM_Borrower.State = fieldValues[9];
+                        forLoanVM_Borrower.City = fieldValues[10];
                         string agentEmailId = (loanOfficer != null) ? loanOfficer.Email : "";
                         string emailId = fieldValues[4];
 

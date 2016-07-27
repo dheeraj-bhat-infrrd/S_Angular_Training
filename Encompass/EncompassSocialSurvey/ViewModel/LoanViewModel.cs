@@ -21,5 +21,7 @@ namespace EncompassSocialSurvey.ViewModel
         public string CreatedOn { get; set; }
         public string ModifiedOn { get; set; }
         public string LoanNumber { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
     }
 }
