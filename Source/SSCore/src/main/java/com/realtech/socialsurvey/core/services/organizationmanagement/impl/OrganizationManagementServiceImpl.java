@@ -5490,16 +5490,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( noOfDays >= 0 )
             startDate = new Timestamp( startTime.getTimeInMillis() );
 
-        List<Long> companyList = companyDao.searchCompaniesByNameAndKeyValue( searchKey, accountType, status,
+        List<Long> companyIdList = companyDao.searchCompaniesByNameAndKeyValue( searchKey, accountType, status,
             inCompleteCompany, startDate );
+        
         Set<Long> companyIds = new HashSet<>();
-        companyIds.addAll( companyList );
-        /*for ( Company company : companyList ) {
-            companyIds.add( company.getCompanyId() );
-        }*/
+        companyIds.addAll( companyIdList );
 
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
-        Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() );
+        //Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() );
         return unitSettings;
     }
 

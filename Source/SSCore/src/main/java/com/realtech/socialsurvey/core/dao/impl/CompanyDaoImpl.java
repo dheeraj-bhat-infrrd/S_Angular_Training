@@ -93,6 +93,12 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
     }
 
 
+    /**
+     * 
+     * This method will return the list of company ids
+     * 
+     */
+    
     @SuppressWarnings ( "unchecked")
     @Override
     public List<Long> searchCompaniesByNameAndKeyValue( String namePattern, int accountType, int status,
@@ -121,7 +127,7 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
                         + accountType + ")" ) );
             }
         }
-        criteria.setProjection( Projections.property("companyId"));
+        criteria.setProjection(Projections.property("companyId"));
         //criteria.addOrder( Order.asc( "company" ) );
         return criteria.list();
     }
