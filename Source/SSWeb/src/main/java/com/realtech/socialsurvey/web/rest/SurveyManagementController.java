@@ -623,13 +623,15 @@ public class SurveyManagementController
                 if ( surveyPreInitiation == null ) {
                     surveyPreInitiation = surveyHandler.preInitiateSurvey( user, customerEmail, custFirstName, custLastName, 0, null, surveySource );
 
-                } 
-               
+                }
+
                 surveyAndStage = getSurvey( agentId, urlParams.get( CommonConstants.CUSTOMER_EMAIL_COLUMN ),
                     surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(),
-                    surveyPreInitiation.getReminderCounts(), surveyPreInitiation.getCustomerInteractionDetails(),
-                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName , surveyPreInitiation.getSurveyPreIntitiationId() , retakeSurvey ),
-                    surveyPreInitiation.getSurveySource() , surveyPreInitiation.getSurveyPreIntitiationId() , isOldRecord , retakeSurvey);
+                    surveyPreInitiation.getReminderCounts(), surveyPreInitiation.getCustomerInteractionDetails(), surveyHandler
+                        .composeLink( agentId, customerEmail, custFirstName, custLastName,
+                            surveyPreInitiation.getSurveyPreIntitiationId(), retakeSurvey ),
+                    surveyPreInitiation.getSurveySource(), surveyPreInitiation.getState(), surveyPreInitiation.getCity(),
+                    surveyPreInitiation.getSurveyPreIntitiationId(), isOldRecord, retakeSurvey );
 
                 if(surveyPreInitiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED)
                     surveyHandler.markSurveyAsStarted( surveyPreInitiation );
@@ -1565,11 +1567,12 @@ public class SurveyManagementController
 
 
     private SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String url, String source , long surveyPreIntitiationId , boolean isOldRecord , boolean retakeSurvey ) throws SolrException,
-        NoRecordsFetchedException, InvalidInputException
+        int reminderCount, String custRelationWithAgent, String url, String source, String state, String city,
+        long surveyPreIntitiationId, boolean isOldRecord, boolean retakeSurvey )
+        throws SolrException, NoRecordsFetchedException, InvalidInputException
     {
         return surveyHandler.storeInitialSurveyDetails( agentId, customerEmail, firstName, lastName, reminderCount,
-            custRelationWithAgent, url, source ,surveyPreIntitiationId , isOldRecord , retakeSurvey );
+            custRelationWithAgent, url, source, state, city, surveyPreIntitiationId , isOldRecord , retakeSurvey );
     }
 
 
@@ -1580,8 +1583,9 @@ public class SurveyManagementController
 
 
     private Map<String, Object> getSurvey( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String url, String source , long surveyPreIntitiationId , boolean isOldRecord , boolean retakeSurvey) throws InvalidInputException,
-        SolrException, NoRecordsFetchedException
+        int reminderCount, String custRelationWithAgent, String url, String source, String state, String city,
+        long surveyPreIntitiationId, boolean isOldRecord, boolean retakeSurvey )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
         Integer stage = null;
         Map<String, Object> surveyAndStage = new HashMap<>();
@@ -1592,7 +1596,7 @@ public class SurveyManagementController
 	    SurveyDetails survey = null;
         try {
             survey = storeInitialSurveyDetails( agentId, customerEmail, firstName, lastName, reminderCount,
-                custRelationWithAgent, url, source , surveyPreIntitiationId , isOldRecord , retakeSurvey);
+                custRelationWithAgent, url, source, state, city, surveyPreIntitiationId , isOldRecord , retakeSurvey);
 
             if ( survey != null ) {
                 

@@ -74,7 +74,7 @@ public class DummySurveyGenerator {
 					}
 					// Trigger survey (Store initial details)
 					SurveyDetails surveyDetails = surveyHandler.storeInitialSurveyDetails(user.getUserId(), custEmail + count + custEmailDomain, custEmail + count, custEmail
-							+ "last", 0, "transacted", "http://localhost:8080/" + CommonConstants.SHOW_SURVEY_PAGE, MongoSocialPostDaoImpl.KEY_SOURCE_SS , user.getUserId() , false , false);
+							+ "last", 0, "transacted", "http://localhost:8080/" + CommonConstants.SHOW_SURVEY_PAGE, MongoSocialPostDaoImpl.KEY_SOURCE_SS, "", "", user.getUserId() , false , false);
 					// Fetch survey for each agent
 					List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(user.getUserId());
 					// Store answer to each question

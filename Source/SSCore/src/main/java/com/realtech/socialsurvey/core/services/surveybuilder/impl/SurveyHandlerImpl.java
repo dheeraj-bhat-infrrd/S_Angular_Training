@@ -209,8 +209,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     @Transactional
     public SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String baseUrl, String source, long surveyPreIntitiationId,
-        boolean isOldRecord, boolean retakeSurvey ) throws SolrException, NoRecordsFetchedException, InvalidInputException
+        int reminderCount, String custRelationWithAgent, String baseUrl, String source, String state, String city,
+        long surveyPreIntitiationId, boolean isOldRecord, boolean retakeSurvey )
+        throws SolrException, NoRecordsFetchedException, InvalidInputException
     {
         LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() started." );
         String agentName;
@@ -253,6 +254,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         surveyDetails.setRetakeSurvey( retakeSurvey );
         surveyDetails.setSurveyPreIntitiationId( surveyPreIntitiationId );
+        surveyDetails.setState( state );
+        surveyDetails.setCity( city );
 
         SurveyDetails survey = null;
         //if survey request is old get survey by agent id and customer email

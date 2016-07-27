@@ -580,7 +580,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).in( companyIds ) );
         query.fields().include( KEY_CONTACT_DETAILS ).include( KEY_PROFILE_NAME ).include( KEY_VERTICAL ).include( KEY_IDEN )
             .include( KEY_PROFILE_IMAGE ).exclude( "_id" );
-        
+
         query.with(new Sort(Direction.ASC, KEY_CONTACT_NAME));
 
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
