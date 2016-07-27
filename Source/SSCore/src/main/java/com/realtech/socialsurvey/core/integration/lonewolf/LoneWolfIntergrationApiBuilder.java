@@ -23,6 +23,18 @@ public class LoneWolfIntergrationApiBuilder implements InitializingBean
     private String loneWolfEndpoint;
 
 
+    public String getLoneWolfEndpoint()
+    {
+        return loneWolfEndpoint;
+    }
+
+
+    public void setLoneWolfEndpoint( String loneWolfEndpoint )
+    {
+        this.loneWolfEndpoint = loneWolfEndpoint;
+    }
+
+
     public LoneWolfIntegrationApi getLoneWolfIntegrationApi()
     {
         return loneWolfIntegrationApi;
