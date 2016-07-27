@@ -65,8 +65,9 @@ public interface SurveyHandler
 
 
     public SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String url, String source, long surveyPreIntitiationId,
-        boolean isOldRecord, boolean retakeSurvey ) throws SolrException, NoRecordsFetchedException, InvalidInputException;
+        int reminderCount, String custRelationWithAgent, String url, String source, String state, String city,
+        long surveyPreIntitiationId, boolean isOldRecord, boolean retakeSurvey )
+        throws SolrException, NoRecordsFetchedException, InvalidInputException;
 
 
     public SurveyDetails getSurveyDetails( long agentId, String customerEmail, String firstName, String lastName );
