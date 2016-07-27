@@ -284,8 +284,8 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
 
         String responseString = transactionResponse != null
             ? new String( ( (TypedByteArray) transactionResponse.getBody() ).getBytes() ) : null;
-        List<LoneWolfTransaction> loneWolfTransactions = responseString != null
-            ? new Gson().fromJson( responseString, new TypeToken<List<LoneWolfTransaction>>() {}.getType() ) : null;
+        List<LoneWolfTransaction> loneWolfTransactions = (List<LoneWolfTransaction>) (responseString != null
+            ? new Gson().fromJson( responseString, new TypeToken<List<LoneWolfTransaction>>() {}.getType() ) : null);
 
         return loneWolfTransactions;
     }
@@ -302,8 +302,8 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
             loneWolfRestUtils.MD5_EMPTY );
 
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        List<LoneWolfMember> members = responseString != null
-            ? new Gson().fromJson( responseString, new TypeToken<List<LoneWolfMember>>() {}.getType() ) : null;
+        List<LoneWolfMember> members = (List<LoneWolfMember>) (responseString != null
+            ? new Gson().fromJson( responseString, new TypeToken<List<LoneWolfMember>>() {}.getType() ) : null);
         Map<String, LoneWolfMember> membersByName = new HashMap<String, LoneWolfMember>();
         if ( members != null && !members.isEmpty() ) {
             for ( LoneWolfMember member : members ) {
