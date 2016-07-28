@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.*;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -1321,6 +1322,8 @@ public interface OrganizationManagementService
 
 
     public List<OrganizationUnitSettings> fetchUnitSettingsConnectedToZillow( String collectionName, List<Long> ids );
+    
+    public List<OrganizationUnitSettings> fetchUnitSettingsForSocialMediaTokens( String collectionName );
 
 
     public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser,

@@ -1193,5 +1193,8 @@ public interface CommonConstants
     
     public static final String LONEWOLF_DRY_RUN_STATE = "dryrun";
     public static final String LONEWOLF_PRODUCTION_STATE = "prod";
+    
+    public static final String BATCH_TYPE_SOCIAL_MEDIA_TOKEN_EXPIRY_SCHEDULER = "socialMediaTokenExpiryScheduler";
+    public static final String BATCH_NAME_SOCIAL_MEDIA_TOKEN_EXPIRY_SCHEDULER = "Social Media Token Expiry Scheduler";
 
 }
