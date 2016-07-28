@@ -114,11 +114,21 @@
                                         <c:when test="${ not empty reviewItem.surveyTransactionDate} ">
                                             <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
                             value="${ reviewItem.surveyTransactionDate}" />"></span>
-                                        </c:when>
+														<c:choose>
+															<c:when test="${not empty reviewItem.city && not empty reviewItem.state}">
+																<span> in ${reviewItem.city}, ${reviewItem.state}.</span>
+															</c:when>
+														</c:choose>
+													</c:when>
                                         <c:otherwise>
                                             <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
                             value="${reviewItem.modifiedOn}" />"></span>
-                                        </c:otherwise>
+														<c:choose>
+															<c:when test="${not empty reviewItem.city && not empty reviewItem.state}">
+																<span> in ${reviewItem.city}, ${reviewItem.state}.</span>
+															</c:when>
+														</c:choose>
+													</c:otherwise>
                                         </c:choose>
                                     </div>
                                 </c:if>
