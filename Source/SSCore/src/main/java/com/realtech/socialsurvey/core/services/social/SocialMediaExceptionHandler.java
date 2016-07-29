@@ -7,6 +7,6 @@ public interface SocialMediaExceptionHandler
     
     void handleFacebookException(FacebookException e);
     
-    void handleLinkedinException(FacebookException e);
+    void handleLinkedinException();
 
 }

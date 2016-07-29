@@ -20,7 +20,7 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
     }
 
     @Override
-    public void handleLinkedinException( FacebookException e )
+    public void handleLinkedinException()
     {
         // TODO Auto-generated method stub
         

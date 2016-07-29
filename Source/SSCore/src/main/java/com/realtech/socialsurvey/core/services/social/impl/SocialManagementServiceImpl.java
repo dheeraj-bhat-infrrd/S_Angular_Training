@@ -62,15 +62,19 @@ import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.core.vo.UserList;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
+
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
 import facebook4j.PostUpdate;
 import facebook4j.auth.AccessToken;
+
+import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -87,6 +91,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -519,6 +524,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             String responseString = response.toString();
                             LOG.info( "Server response while posting on linkedin : " + responseString );
                             JSONObject entityUpdateResponseObj = new JSONObject( EntityUtils.toString( response.getEntity() ) );
+                            
+                            if(response.getStatusLine()!= null && response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+                                //TODO call SocialMediaExceptionHandler
+                            }
+                            
                             if ( responseString.contains( "201 Created" ) ) {
                                 String updateUrl = (String) entityUpdateResponseObj.get( "updateUrl" );
                                 linkedinPostResponse.setReferenceUrl( updateUrl );
