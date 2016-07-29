@@ -8,6 +8,7 @@ public class LoneWolfClientContact
     private String FirstName;
     private String LastName;
     private List<LoneWolfEmailAddress> EmailAddresses;
+    private LoanWolfClientContactType ContactType;
 
 
     public String getFirstName()
@@ -43,5 +44,17 @@ public class LoneWolfClientContact
     public void setEmailAddresses( List<LoneWolfEmailAddress> emailAddresses )
     {
         EmailAddresses = emailAddresses;
+    }
+
+
+    public LoanWolfClientContactType getContactType()
+    {
+        return ContactType;
+    }
+
+
+    public void setContactType( LoanWolfClientContactType contactType )
+    {
+        ContactType = contactType;
     }
 }

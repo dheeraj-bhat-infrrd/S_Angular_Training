@@ -2,7 +2,10 @@ package com.realtech.socialsurvey.core.utils;
 
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.crypto.Mac;
@@ -10,7 +13,12 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 
 
 @Component
@@ -23,6 +31,10 @@ public class LoneWolfRestUtils
     public final String MD5_EMPTY = "1B2M2Y8AsgTpgAmY7PhCfg==";
     public final String H_MAC_SHA256 = "HmacSHA256";
     public final String DATE_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSSX";
+    public final String TRANSACTION_DATE_FORMAT = "yyyy-MM-dd";
+    
+    @Autowired
+    private URLGenerator urlGenerator;
 
     public String generateAuthorizationHeaderFor( String resourceUri, String secretkey, String apiToken, String clientCode)
     {
@@ -88,4 +100,42 @@ public class LoneWolfRestUtils
         return authHeader;
     }
 
+    
+    public String generateFilterQueryParamFor()
+    {
+        LOG.info( "Method generateFilterQueryParamFor started." );
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat(TRANSACTION_DATE_FORMAT);
+        String todayDate =  sdf.format(cal.getTime());
+        cal.add( Calendar.DATE, -1 );
+        String yesterdayDate =  sdf.format(cal.getTime());
+        
+        String fitler = "StatusCode+eq+'A'+and+CloseDate+ge+datetimeoffset'"+ yesterdayDate +"'+and+CloseDate+lt+datetimeoffset'"+todayDate+"'";
+        
+        LOG.info( "Method generateFilterQueryParamFor finished." );
+        return fitler;
+    }
+    
+    
+    
+    public String addRequestParamInResourceURI( String resourceUri, Map<String, String> queryParam) throws InvalidInputException
+    {
+        LOG.debug( "Method addRequestParamInResourceURI started." );
+        StringBuilder completeURL  = new StringBuilder();
+        completeURL.append(resourceUri);
+       if(queryParam.size() > 0){
+           completeURL.append("?");
+               for(String key : queryParam.keySet()){
+                   completeURL.append(key);
+                   completeURL.append("=");
+                   completeURL.append(queryParam.get(key));
+                   completeURL.append("&");
+               }
+       }
+       
+       completeURL.deleteCharAt(completeURL.length()-1);
+       
+       LOG.debug( "Method addRequestParamInResourceURI ended." );
+       return completeURL.toString();
+    }
 }
