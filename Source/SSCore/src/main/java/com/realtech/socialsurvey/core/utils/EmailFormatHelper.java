@@ -12,17 +12,24 @@ import java.util.regex.Pattern;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.FatalException;
+import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import org.apache.commons.lang.WordUtils;
 import org.jsoup.Jsoup;
@@ -202,25 +209,48 @@ public class EmailFormatHelper {
 			if ( user == null ) {
 				throw new NoRecordsFetchedException( "No user found" );
 			}
+			agentId = user.getUserId();
 			AgentSettings agentSettings = userManagementService.getUserSettings( user.getUserId() );
+			OrganizationUnitSettings branchSettings = null;
+			OrganizationUnitSettings regionSettings = null;
+			OrganizationUnitSettings companySettings = null;
 			if ( agentSettings == null ) {
 				throw new NoRecordsFetchedException( "No agent setting found" );
 			}
-			if ( user.getCompany() == null ) {
-				throw new NoRecordsFetchedException( "No company found for user Id: " + user.getUserId() );
+			OrganizationUnitSettings profileSettings = null;
+
+			Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+			if ( hierarchyMap != null && !hierarchyMap.isEmpty() ){
+				if ( hierarchyMap.containsKey( CommonConstants.COMPANY_ID_COLUMN ) )
+					companySettings = organizationManagementService
+						.getCompanySettings( hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN ) );
+				if ( hierarchyMap.containsKey( CommonConstants.REGION_ID_COLUMN ) )
+					regionSettings = organizationManagementService
+						.getRegionSettings( hierarchyMap.get( CommonConstants.REGION_ID_COLUMN ) );
+				if ( hierarchyMap.containsKey( CommonConstants.BRANCH_ID_COLUMN ) )
+					branchSettings = organizationManagementService
+						.getBranchSettingsDefault( hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
 			}
-			agentId = user.getUserId();
-			OrganizationUnitSettings companySettings = organizationManagementService
-				.getCompanySettings( user.getCompany().getCompanyId() );
-			if ( companySettings == null ) {
-				throw new NoRecordsFetchedException(
-					"No company setting found for company Id : " + user.getCompany().getCompanyId() );
+			Map<SettingsForApplication, OrganizationUnit> map = null;
+			try {
+				map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID,
+					agentSettings.getIden() );
+				if ( map == null ) {
+					LOG.error( "Unable to fetch primary profile for this user " );
+					throw new FatalException( "Unable to fetch primary profile this user " + agentSettings.getIden() );
+				}
+			} catch ( InvalidSettingsStateException e ) {
+				throw new InternalServerException(
+					new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
+						CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile" ),
+					e.getMessage() );
+			} catch ( ProfileNotFoundException e ) {
+				LOG.error( "No profile found for the user ", e );
 			}
-			if ( agentSettings.getProfileName() == null || agentSettings.getProfileName().isEmpty() ) {
-				throw new NoRecordsFetchedException( "No profileName found for userID : " + user.getUserId() );
-			}
-			OrganizationUnitSettings profileSettings = profileManagementService
-				.getIndividualSettingsByProfileName( agentSettings.getProfileName() );
+
+			profileSettings = profileManagementService
+				.fillUnitSettings( agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+					companySettings, regionSettings, branchSettings, agentSettings, map, true );
 
 			SocialMediaTokens socialMediaTokens = profileSettings.getSocialMediaTokens();
 			//Set aggregated values
