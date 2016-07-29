@@ -9027,6 +9027,7 @@ $(document).on('input', '#wc-review-table-inner[data-role="agent"] input', funct
 		if ($('#wc-review-table-inner').children().length > 2) {
 			$('.wc-review-rmv-icn').show();
 		}
+		$('#wc-review-table-inner').find(':nth-child(3)').find('.wc-review-rmv-icn').hide();
 
 		// setting up perfect scrollbar
 		setTimeout(function() {
@@ -9050,6 +9051,7 @@ $(document).on('input', '#wc-review-table-inner[data-role="admin"] input', funct
 		if ($('#wc-review-table-inner').children().length > 2) {
 			$('.wc-review-rmv-icn').show();
 		}
+		$('#wc-review-table-inner').find(':nth-child(3)').find('.wc-review-rmv-icn').hide();
 
 		// setting up perfect scrollbar
 		setTimeout(function() {
