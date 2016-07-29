@@ -228,6 +228,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
             }
             status.setRetries( RETRIES_INITIAL );
         } catch ( FacebookException e ) {
+            //TODO call SocialMediaExceptionHandler
             LOG.error( "Exception in Facebook feed extration. Reason: " + e.getMessage() );
 
             if ( lastFetchedPostId == null || lastFetchedPostId.isEmpty() ) {
