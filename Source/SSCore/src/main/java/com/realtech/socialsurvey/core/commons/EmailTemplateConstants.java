@@ -154,6 +154,7 @@ public final class EmailTemplateConstants {
 	public static final String NEW_REGISTRATION_MAIL_BODY = "NewRegistrationMailBody.html";
 	public static final String NEW_REGISTRATION_ENTERPRISE_MAIL_BODY = "NewRegistrationMailForEnterpriseBody.html";
     
-    
+	public static final String SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_SUBJECT = "SocialMediaTokenExpiryMail.txt";
+    public static final String SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_BODY = "SocialMediaTokenExpiryMail.html";
 
 }

@@ -2207,6 +2207,37 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.info( "Method sendCustomReportMail() finished." );
     }
+    
+    /**
+     * 
+     */
+    @Override
+    public void sendSocialMediaTokenExpiryEmail( String displayName, String errorMsg, String recipientMailId )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendSocialMediaTokenExpiryEmail() started." );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending sending report bug  mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending report bug  mail " );
+        }
+
+        LOG.info( "Saving EmailEntity with recipient mail id : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_BODY );
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, errorMsg ) );
+
+        LOG.info( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+
+        LOG.info( "Method sendSocialMediaTokenExpiryEmail() finished." );
+    }
 
 }
 

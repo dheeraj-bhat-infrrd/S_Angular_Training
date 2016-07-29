@@ -256,4 +256,6 @@ public interface OrganizationUnitSettingsDao
      * @return
      */
     public SocialMediaTokens fetchSocialMediaTokens(String collectionName, long iden);
+    
+    public List<OrganizationUnitSettings> fetchUnitSettingsForSocialMediaTokens( String collectionName );
 }

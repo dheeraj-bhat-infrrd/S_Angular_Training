@@ -283,6 +283,19 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	<!-- Setting lonewolf job detail -->
+	<bean id="socialMediaTokenExpiryJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.SocialMediaTokenExpiryScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+				<entry key="emailServices" value-ref="emailServices" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<bean id="imageprocessingjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.ImageProcessingStarter" />
@@ -460,6 +473,11 @@
 
 	<bean id="lonewolfcron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="lonewolfjobdetail" />
+		<property name="cronExpression" value="0 01 7 * * ?" />
+	</bean>
+	
+	<bean id="socialmediatokenexpirycron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="socialMediaTokenExpiryJobDetail" />
 		<property name="cronExpression" value="0 0/1 * 1/1 * ? *" />
 	</bean>
 
@@ -505,6 +523,7 @@
 				<ref bean="billingreportjobdetail" />
 				<ref bean="dotloopjobdetail" />
 				<ref bean="lonewolfjobdetail" />
+				<ref bean="socialMediaTokenExpiryJobDetail" />
 				<ref bean="surveyfileuploadjobdetail" />
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
@@ -534,6 +553,7 @@
 				<ref bean="billingreportcron" />
 				<ref bean="dotloopcron" />
 				<ref bean="lonewolfcron" />
+				<ref bean="socialmediatokenexpirycron" />
 				<ref bean="surveyfileuploadcron" />
 				<ref bean="solrreviewcounterupdatercron" />
 				<!-- <ref bean="setcompanyidsinsocialpostscron" /> -->
