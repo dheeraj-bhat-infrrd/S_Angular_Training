@@ -1,8 +1,10 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +33,8 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.LoanWolfContactType;
+import com.realtech.socialsurvey.core.enums.LoanWolfTransactionClassificationMode;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
@@ -42,6 +46,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.LoneWolfRestUtils;
 
 
 @Component ( "lonewolfreviewprocessor")
@@ -64,6 +69,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
     private String apiToken;
     private String secretKey;
     private LoneWolfIntegrationService loneWolfIntegrationService;
+    private LoneWolfRestUtils loneWolfRestUtils;
 
 
     @Override
@@ -106,7 +112,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
 
     private void startLoneWolfFeedProcessing( String collectionName )
     {
-        LOG.debug( "Inside method startLoneWolfFeedProcessing " );
+        LOG.debug( "Inside method startLoneWolfFeedProcessing for collection : " + collectionName );
 
         try {
             CrmBatchTracker crmBatchTracker = null;
@@ -142,16 +148,36 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                             entityId, CommonConstants.CRM_SOURCE_LONEWOLF );
                         try {
 
-                            //Fetch transactions data from lonewolf.
-                            List<LoneWolfTransaction> loneWolfTransactions = loneWolfIntegrationService.fetchLoneWolfTransactionsData( secretKey,
-                                apiToken, loneWolfCrmInfo.getClientCode() );
+                            //Fetch transactions data from lone wolf.
+                            int skip = 0;
+                            String filter = loneWolfRestUtils.generateFilterQueryParamFor();
+                            List<LoneWolfTransaction> loneWolfTransactionsBatch = null;
+                            List<LoneWolfTransaction> loneWolfTransactions = new ArrayList<LoneWolfTransaction>();
+                            do {
+                                LOG.debug( "Fetching record in batch of " + CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE );
+                                LOG.debug( "Fetching records start from " + skip );
+                                // use linked hash map to maintain the order
+                                Map<String, String> queryParam = new LinkedHashMap<String, String>();
+                                queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$TOP, String.valueOf( 1000 ) );
+                                queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$FILTER, filter );
+                                queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$ORDERBY,
+                                    CommonConstants.LONEWOLF_QUERY_PARAM_ORDERBY_VALUE );
+                                queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$SKIP, String.valueOf( skip ) );
+                                
+                                loneWolfTransactionsBatch = loneWolfIntegrationService.fetchLoneWolfTransactionsData(
+                                    secretKey, apiToken, loneWolfCrmInfo.getClientCode(), queryParam );
+                                loneWolfTransactions.addAll( loneWolfTransactionsBatch );
+
+                                skip += CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE;
+
+                            } while ( loneWolfTransactionsBatch != null && loneWolfTransactionsBatch.size() == CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE );
 
                             //Fetch members data from lonewolf.
-                            Map<String, LoneWolfMember> membersByName = fetchLoneWolfMembersDataMap( secretKey,
-                                apiToken, loneWolfCrmInfo.getClientCode() );
+                            Map<String, LoneWolfMember> membersById = fetchLoneWolfMembersDataMap( secretKey, apiToken,
+                                loneWolfCrmInfo.getClientCode() );
 
                             //Process lone wolf transactions and put it in survey pre initiation table to send surveys
-                            processLoneWolfTransactions( loneWolfTransactions, membersByName, collectionName, entityId );
+                            processLoneWolfTransactions( loneWolfTransactions, membersById, collectionName, entityId );
 
                             //insert crmbatchTrackerHistory with count of Records Fetched
                             crmBatchTracker = crmBatchTrackerService.getCrmBatchTracker( entityType, entityId,
@@ -204,70 +230,216 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
     private void processLoneWolfTransactions( List<LoneWolfTransaction> loneWolfTransactions,
         Map<String, LoneWolfMember> membersByName, String collectionName, long organizationUnitId )
     {
+        LOG.info( "method processLoneWolfTransactions started" );
         if ( !loneWolfTransactions.isEmpty() ) {
             for ( LoneWolfTransaction transaction : loneWolfTransactions ) {
-                newRecordFoundCount++;
-                if ( transaction != null && transaction.getTiers() != null && !transaction.getTiers().isEmpty() ) {
-                    for ( LoneWolfTier tier : transaction.getTiers() ) {
-                        if ( tier != null && tier.getAgentCommissions() != null && !tier.getAgentCommissions().isEmpty() ) {
-                            for ( LoneWolfAgentCommission agentCommission : tier.getAgentCommissions() ) {
-                                if ( agentCommission != null && agentCommission.getAgent() != null ) {
-                                    LoneWolfMember member = membersByName.get( getKeyForMembersDataMap( agentCommission
-                                        .getAgent().getFirstName(), agentCommission.getAgent().getLastName() ) );
-                                    if ( transaction.getClientContacts() != null && !transaction.getClientContacts().isEmpty() ) {
-                                        //TODO implement logic to determine the relationship between agent and customer , SS-687
-                                        for ( LoneWolfClientContact client : transaction.getClientContacts() ) {
-                                            SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
-                                            surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName,
-                                                organizationUnitId );
-                                            surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-                                            surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-                                            String customerEmailId = null;
-                                            if ( client.getEmailAddresses() != null && !client.getEmailAddresses().isEmpty() ) {
-                                                customerEmailId = client.getEmailAddresses().get( 0 ).getAddress();
-                                                if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
-                                                    customerEmailId = utils.maskEmailAddress( customerEmailId );
-                                                }
-                                            }
-                                            surveyPreInitiation.setCustomerEmailId( customerEmailId );
-                                            surveyPreInitiation.setCustomerFirstName( client.getFirstName() );
-                                            surveyPreInitiation.setCustomerLastName( client.getLastName() );
-                                            surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
-                                            String agentEmailId = null;
-                                            if ( member.getEmailAddresses() != null && !member.getEmailAddresses().isEmpty() ) {
-                                                agentEmailId = member.getEmailAddresses().get( 0 ).getAddress();
-                                                if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
-                                                    agentEmailId = utils.maskEmailAddress( agentEmailId );
-                                                }
-                                            }
-                                            surveyPreInitiation.setAgentEmailId( agentEmailId );
-                                            //TODO set agent name
-                                            surveyPreInitiation.setEngagementClosedTime( new Timestamp( System
-                                                .currentTimeMillis() ) );
-                                            surveyPreInitiation
-                                                .setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
-                                            surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_LONEWOLF );
-                                            surveyPreInitiation.setSurveySourceId( transaction.getNumber() );
-                                            try {
-                                                surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
-                                            } catch ( InvalidInputException e ) {
-                                                LOG.error( "Unable to insert this record ", e );
-                                            } catch ( Exception e ) {
-                                                LOG.error( "Unable to insert this record ", e );
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                try {
+                    if ( !isTransactionValid( transaction ) )
+                        continue;
+
+                    //get seller agent and client detail
+                    Map<String, LoneWolfClientContact> clientContactsForTransaction = getClientContactForTransaction( transaction );
+                    LoneWolfClientContact sellerClientContact = clientContactsForTransaction.get( LoanWolfContactType.SELLER
+                        .getCode() );
+                    LoneWolfClientContact buyerClientContact = clientContactsForTransaction.get( LoanWolfContactType.BUYER
+                        .getCode() );
+
+                    //get buyer seller member detail
+                    Map<String, LoneWolfMember> membersForTransaction = getMembersForTransaction( transaction, membersByName );
+                    LoneWolfMember sellerMember = membersForTransaction.get( LoanWolfTransactionClassificationMode.SELLING
+                        .getMode() );
+                    LoneWolfMember buyerMember = membersForTransaction.get( LoanWolfTransactionClassificationMode.LISTING
+                        .getMode() );
+
+                    //get classification code
+                    String classificationCode = transaction.getClassification().getCode();
+
+                    //generate survey pre initiation entry based on classification code
+                    if ( classificationCode.equals( LoanWolfTransactionClassificationMode.SELLING.getMode() ) ) {
+                        generateSurveyPreinitiaionAndSave( sellerClientContact, sellerMember, collectionName,
+                            organizationUnitId, transaction.getNumber() );
                     }
+                    if ( classificationCode.equals( LoanWolfTransactionClassificationMode.LISTING.getMode() ) ) {
+                        generateSurveyPreinitiaionAndSave( buyerClientContact, buyerMember, collectionName, organizationUnitId,
+                            transaction.getNumber() );
+                    }
+                    if ( classificationCode.equals( LoanWolfTransactionClassificationMode.OFFICEAGENTS.getMode() ) ) {
+                        generateSurveyPreinitiaionAndSave( sellerClientContact, sellerMember, collectionName,
+                            organizationUnitId, transaction.getNumber() );
+                        generateSurveyPreinitiaionAndSave( buyerClientContact, buyerMember, collectionName, organizationUnitId,
+                            transaction.getNumber() );
+                    }
+                    if ( classificationCode.equals( LoanWolfTransactionClassificationMode.DOUBLEAGENT.getMode() ) ) {
+                        generateSurveyPreinitiaionAndSave( sellerClientContact, sellerMember, collectionName,
+                            organizationUnitId, transaction.getNumber() );
+                        generateSurveyPreinitiaionAndSave( buyerClientContact, buyerMember, collectionName, organizationUnitId,
+                            transaction.getNumber() );
+                    }
+
+                } catch ( Exception e ) {
+                    LOG.error( "Error while processing transaction " + transaction.getId() );
                 }
             }
         }
     }
 
+
+    /**
+     * 
+     * @param transaction
+     * @return
+     */
+    private boolean isTransactionValid( LoneWolfTransaction transaction )
+    {
+
+        LOG.debug( "Metohd isTransactionValid started for transaction " + transaction.getId() );
+        //check if minimum 1 client is there in the transaction
+        if ( transaction.getClientContacts() == null || transaction.getClientContacts().size() == 0 )
+            return false;
+
+        //check if minimum 1 tire is there
+        if ( transaction.getTiers() == null || transaction.getTiers().size() == 0 )
+            return false;
+
+        LoneWolfTier tier = transaction.getTiers().get( 0 );
+        //check if minimum 1 agent is there
+        if ( tier == null || tier.getAgentCommissions() == null || tier.getAgentCommissions().size() == 0 )
+            return false;
+
+        if ( transaction.getClassification() == null || transaction.getClassification().getCode() == null )
+            return false;
+
+        LOG.debug( "Transaction is valid with id" + transaction.getId() );
+        return true;
+    }
+
+
+    /**
+     * 
+     * @param transaction
+     * @return
+     */
+    private Map<String, LoneWolfClientContact> getClientContactForTransaction( LoneWolfTransaction transaction )
+    {
+
+        LOG.debug( "Inside method getClientContactForTransaction " );
+        Map<String, LoneWolfClientContact> clientContactsForTransaction = new HashMap<String, LoneWolfClientContact>();
+        //get buyer seller contact details
+        for ( LoneWolfClientContact clientContact : transaction.getClientContacts() ) {
+            if ( clientContact.getContactType().getCode().equals( LoanWolfContactType.SELLER.getCode() ) ) {
+                clientContactsForTransaction.put( LoanWolfContactType.SELLER.getCode(), clientContact );
+            } else if ( clientContact.getContactType().getCode().equals( LoanWolfContactType.BUYER.getCode() ) ) {
+                clientContactsForTransaction.put( LoanWolfContactType.BUYER.getCode(), clientContact );
+            }
+        }
+
+        return clientContactsForTransaction;
+    }
+
+
+    /**
+     * 
+     * @param transaction
+     * @param membersByName
+     * @return
+     */
+    private Map<String, LoneWolfMember> getMembersForTransaction( LoneWolfTransaction transaction,
+        Map<String, LoneWolfMember> membersByName )
+    {
+
+        LOG.debug( "methd getMembersForTransaction started" );
+        LoneWolfMember member = null;
+        Map<String, LoneWolfMember> membersForTransaction = new HashMap<String, LoneWolfMember>();
+
+        for ( LoneWolfAgentCommission agentCommission : transaction.getTiers().get( 0 ).getAgentCommissions() ) {
+            if ( agentCommission.getEndCode().equals( LoanWolfTransactionClassificationMode.SELLING.getMode() ) ) {
+                LOG.info( "Found a seller for transaction with id : " + transaction.getId() );
+                member = membersByName.get( getKeyForMembersDataMap( agentCommission.getAgent().getFirstName(), agentCommission
+                    .getAgent().getLastName() ) );
+                membersForTransaction.put( LoanWolfTransactionClassificationMode.SELLING.getMode(), member );
+            } else if ( agentCommission.getEndCode().equals( LoanWolfTransactionClassificationMode.LISTING.getMode() ) ) {
+                LOG.info( "Found a buyer for transaction with id : " + transaction.getId() );
+                member = membersByName.get( getKeyForMembersDataMap( agentCommission.getAgent().getFirstName(), agentCommission
+                    .getAgent().getLastName() ) );
+                membersForTransaction.put( LoanWolfTransactionClassificationMode.LISTING.getMode(), member );
+            }
+        }
+        return membersForTransaction;
+    }
+
+
+    /**
+     * 
+     * @param client
+     * @param member
+     * @param collectionName
+     * @param organizationUnitId
+     * @throws InvalidInputException 
+     */
+    private void generateSurveyPreinitiaionAndSave( LoneWolfClientContact client, LoneWolfMember member, String collectionName,
+        long organizationUnitId, String transactionNumber )
+    {
+
+        LOG.debug( "Inside method generateSurveyPreinitiaionAndSave for transaction number : " + transactionNumber);
+        try {
+            if ( client == null ) {
+                LOG.error( "client is null for the transaction" );
+                throw new InvalidInputException( "Passed parameter client is null" );
+            }
+
+            if ( member == null ) {
+                LOG.error( "member is null for the transaction" );
+                throw new InvalidInputException( "Passed parameter member is null" );
+            }
+
+            SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+            surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName, organizationUnitId );
+            surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+            surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            String customerEmailId = null;
+            if ( client.getEmailAddresses() != null && !client.getEmailAddresses().isEmpty() ) {
+                customerEmailId = client.getEmailAddresses().get( 0 ).getAddress();
+                if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
+                    customerEmailId = utils.maskEmailAddress( customerEmailId );
+                }
+            }
+            surveyPreInitiation.setCustomerEmailId( customerEmailId );
+            surveyPreInitiation.setCustomerFirstName( client.getFirstName() );
+            surveyPreInitiation.setCustomerLastName( client.getLastName() );
+            surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
+            String agentEmailId = null;
+
+            if ( member.getEmailAddresses() != null && !member.getEmailAddresses().isEmpty() ) {
+                agentEmailId = member.getEmailAddresses().get( 0 ).getAddress();
+                if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
+                    agentEmailId = utils.maskEmailAddress( agentEmailId );
+                }
+            }
+            surveyPreInitiation.setAgentEmailId( agentEmailId );
+            surveyPreInitiation.setAgentName( member.getFirstName() + " " + member.getLastName() );
+            surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
+            surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+            surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_LONEWOLF );
+            surveyPreInitiation.setSurveySourceId( transactionNumber );
+            surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
+            newRecordFoundCount++;
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Error while inserting survey preinitiation " , e  );
+        }
+
+    }
+
+
+    /**
+     * 
+     * @param secretKey
+     * @param apiToken
+     * @param clientCode
+     * @return
+     */
     private Map<String, LoneWolfMember> fetchLoneWolfMembersDataMap( String secretKey, String apiToken, String clientCode )
     {
+        LOG.info( "method fetchLoneWolfMembersDataMap started "  );
         List<LoneWolfMember> members = loneWolfIntegrationService.fetchLoneWolfMembersData( secretKey, apiToken, clientCode );
         Map<String, LoneWolfMember> membersByName = new HashMap<String, LoneWolfMember>();
         if ( members != null && !members.isEmpty() ) {
@@ -275,6 +447,8 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                 membersByName.put( getKeyForMembersDataMap( member.getFirstName(), member.getLastName() ), member );
             }
         }
+        
+        LOG.info( "method fetchLoneWolfMembersDataMap ended "  );
         return membersByName;
     }
 
@@ -355,5 +529,6 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
         applicationAdminEmail = (String) jobMap.get( "applicationAdminEmail" );
         applicationAdminName = (String) jobMap.get( "applicationAdminName" );
         loneWolfIntegrationService = (LoneWolfIntegrationService) jobMap.get( "loneWolfIntegrationService" );
+        loneWolfRestUtils = (LoneWolfRestUtils) jobMap.get( "loneWolfRestUtils" );
     }
 }

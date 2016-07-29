@@ -5,12 +5,36 @@ import java.util.List;
 
 public class LoneWolfTransaction
 {
+    private String Id;
     private String Status;
     private String StatusCode;
     private List<LoneWolfClientContact> ClientContacts;
     private List<LoneWolfTier> Tiers;
     private String CloseDate;
     private String Number;
+    private LoneWolfClassification Classification;
+
+    public String getId()
+    {
+        return Id;
+    }
+
+
+    public void setId( String id )
+    {
+        Id = id;
+    }
+
+    public LoneWolfClassification getClassification()
+    {
+        return Classification;
+    }
+
+
+    public void setClassification( LoneWolfClassification classification )
+    {
+        Classification = classification;
+    }
 
 
     public String getNumber()

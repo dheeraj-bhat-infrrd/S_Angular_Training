@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.lonewolf.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +13,10 @@ import retrofit.mime.TypedByteArray;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.LoneWolfMember;
 import com.realtech.socialsurvey.core.entities.LoneWolfTransaction;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntegrationApi;
 import com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.services.lonewolf.LoneWolfIntegrationService;
@@ -36,23 +39,31 @@ public class LoneWolfIntegrationServiceImpl implements LoneWolfIntegrationServic
 
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<LoneWolfTransaction> fetchLoneWolfTransactionsData( String secretKey, String apiToken, String clientCode )
+    public List<LoneWolfTransaction> fetchLoneWolfTransactionsData( String secretKey, String apiToken, String clientCode ,Map<String, String> queryParam  ) throws InvalidInputException
     {
+        
+        LOG.debug( "Method fetchLoneWolfTransactionsData started " );
+        
         loneWolfIntegrationApi = loneWolfIntegrationApiBuilder.getLoneWolfIntegrationApi();
         //generating authorization header
-        String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( LoneWolfIntegrationApi.loneWolfTransactionUrl,
-            secretKey, apiToken, clientCode );
+        String completeURI = loneWolfRestUtils.addRequestParamInResourceURI( LoneWolfIntegrationApi.loneWolfTransactionUrl,
+            queryParam );
+        LOG.info( "URI generated for header is : " + completeURI );
+        String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( completeURI, secretKey, apiToken, clientCode );
 
         //fetching lone wolf transaction data
         retrofit.client.Response transactionResponse = loneWolfIntegrationApi.fetchClosedTransactions( authHeader,
-            loneWolfRestUtils.MD5_EMPTY );
+            loneWolfRestUtils.MD5_EMPTY , queryParam.get( CommonConstants.LONEWOLF_QUERY_PARAM_$TOP ) , queryParam.get( CommonConstants.LONEWOLF_QUERY_PARAM_$FILTER ),  queryParam.get( CommonConstants.LONEWOLF_QUERY_PARAM_$ORDERBY ) ,  queryParam.get( CommonConstants.LONEWOLF_QUERY_PARAM_$SKIP ) );
 
         String responseString = transactionResponse != null ? new String(
             ( (TypedByteArray) transactionResponse.getBody() ).getBytes() ) : null;
+            
+        LOG.info( "Response string is" + responseString );    
 
         List<LoneWolfTransaction> loneWolfTransactions = responseString != null ? (List<LoneWolfTransaction>) new Gson()
             .fromJson( responseString, new TypeToken<List<LoneWolfTransaction>>() {}.getType() ) : null;
 
+            LOG.debug( "Method fetchLoneWolfTransactionsData ended " );
         return loneWolfTransactions;
     }
 
@@ -61,6 +72,7 @@ public class LoneWolfIntegrationServiceImpl implements LoneWolfIntegrationServic
     @Override
     public List<LoneWolfMember> fetchLoneWolfMembersData( String secretKey, String apiToken, String clientCode )
     {
+        LOG.info( "Method fetchLoneWolfMembersData started " );
         loneWolfIntegrationApi = loneWolfIntegrationApiBuilder.getLoneWolfIntegrationApi();
         //generating authorization header
         String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( LoneWolfIntegrationApi.loneWolfMemberUrl,
@@ -73,6 +85,7 @@ public class LoneWolfIntegrationServiceImpl implements LoneWolfIntegrationServic
         List<LoneWolfMember> members = responseString != null ? (List<LoneWolfMember>) new Gson().fromJson( responseString,
             new TypeToken<List<LoneWolfMember>>() {}.getType() ) : null;
 
+            LOG.info( "Method fetchLoneWolfMembersData ended " );
         return members;
     }
 

@@ -5,9 +5,22 @@ import java.util.List;
 
 public class LoneWolfMember
 {
+    private String Id;
     private String FirstName;
     private String LastName;
     private List<LoneWolfEmailAddress> EmailAddresses;
+
+
+    public String getId()
+    {
+        return Id;
+    }
+
+
+    public void setId( String id )
+    {
+        Id = id;
+    }
 
 
     public String getFirstName()

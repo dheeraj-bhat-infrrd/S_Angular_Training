@@ -2,8 +2,21 @@ package com.realtech.socialsurvey.core.entities;
 
 public class LoneWolfAgent
 {
+    private String Id;
     private String FirstName;
     private String LastName;
+
+
+    public String getId()
+    {
+        return Id;
+    }
+
+
+    public void setId( String id )
+    {
+        Id = id;
+    }
 
 
     public String getFirstName()
