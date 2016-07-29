@@ -1119,6 +1119,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         } catch ( FacebookException e ) {
             LOG.error( "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
                 e );
+          //TODO call SocialMediaExceptionHandler
             SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
             facebookPostResponse
                 .setAccessToken( setting.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() );
