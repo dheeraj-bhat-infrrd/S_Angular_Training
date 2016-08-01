@@ -1,5 +1,48 @@
 package com.realtech.socialsurvey.core.services.social.impl;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import twitter4j.StatusUpdate;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.RequestToken;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.ExternalSurveyTrackerDao;
@@ -56,6 +99,7 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
@@ -68,50 +112,6 @@ import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
 import facebook4j.PostUpdate;
 import facebook4j.auth.AccessToken;
-
-import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import twitter4j.StatusUpdate;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.RequestToken;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.ConfigurationBuilder;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -171,6 +171,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private SettingsSetter settingsSetter;
+    
+    @Autowired
+    private SocialMediaExceptionHandler socialMediaExceptionHandler; 
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
@@ -526,7 +529,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             JSONObject entityUpdateResponseObj = new JSONObject( EntityUtils.toString( response.getEntity() ) );
                             
                             if(response.getStatusLine()!= null && response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-                                //TODO call SocialMediaExceptionHandler
+                              //call social media error handler for facebook exception
+                                socialMediaExceptionHandler.handleLinkedinException(settings);
                             }
                             
                             if ( responseString.contains( "201 Created" ) ) {
@@ -1129,7 +1133,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         } catch ( FacebookException e ) {
             LOG.error( "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
                 e );
-          //TODO call SocialMediaExceptionHandler
+            //call social media error handler for facebook exception
+            socialMediaExceptionHandler.handleFacebookException( e , setting );
+            //update Social Media Post Response
             SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
             facebookPostResponse
                 .setAccessToken( setting.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() );
@@ -1284,6 +1290,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 }
             }
         } catch ( Exception e ) {
+            //update SocialMediaPostResponse object
             SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
             linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
             linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
