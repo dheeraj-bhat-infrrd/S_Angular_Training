@@ -6,6 +6,9 @@ import java.util.Date;
 public class SurveyImportVO
 {
     private long userId;
+    private String userEmailId;
+    private String city;
+    private String state;
     private String customerFirstName;
     private String customerLastName;
     private String customerEmailAddress;
@@ -98,4 +101,40 @@ public class SurveyImportVO
 
 
     private String review;
+
+
+    public String getUserEmailId()
+    {
+        return userEmailId;
+    }
+
+
+    public void setUserEmailId( String userEmailId )
+    {
+        this.userEmailId = userEmailId;
+    }
+
+
+    public String getCity()
+    {
+        return city;
+    }
+
+
+    public void setCity( String city )
+    {
+        this.city = city;
+    }
+
+
+    public String getState()
+    {
+        return state;
+    }
+
+
+    public void setState( String state )
+    {
+        this.state = state;
+    }
 }

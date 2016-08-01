@@ -313,7 +313,7 @@ public class DashboardController
                 columnName = null;
             }
             LOG.debug( "Getting the survey score." );
-            ;
+
             double surveyScore = dashboardService.getSurveyScore( columnName, columnValue, numberOfDays, realtechAdmin );
             //get formatted survey score using rating format  
             surveyScore = surveyHandler.getFormattedSurveyScore( surveyScore );
@@ -408,6 +408,8 @@ public class DashboardController
                 .getSocialPostsForPastNdaysWithHierarchyForStatistics( columnName, columnValue, numberOfDays ) );
             model.addAttribute( "importedFromZillow",
                 dashboardService.getZillowImportCount( columnName, columnValue, numberOfDays ) );
+	        model.addAttribute( "importedFrom3rdParty",
+		        dashboardService.get3rdPartyImportCount( columnName, columnValue, numberOfDays ) );
         } catch ( InvalidInputException e ) {
             LOG.error( "Error: " + e.getMessage(), e );
 

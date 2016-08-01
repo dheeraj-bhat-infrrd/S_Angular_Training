@@ -490,6 +490,7 @@ public interface CommonConstants
     public static final String CRM_SOURCE_ENCOMPASS = "ENCOMPASS";
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
     public static final String SURVEY_SOURCE_BULK_UPLOAD = "bulk";
+    public static final String SURVEY_SOURCE_3RD_PARTY = "3rd Party Review";
     public static final String SURVEY_SOURCE_FILE_UPLOAD = "upload";
     public static final String SURVEY_SOURCE_FTP = "ftp";
     public static final String ENCOMPASS_DRY_RUN_STATE = "dryrun";

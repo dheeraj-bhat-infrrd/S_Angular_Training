@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -13,11 +15,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -147,6 +156,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${APPLICATION_LOGO_URL}")
     private String appLogoUrl;
 
+	@Value( "3RD_PARTY_IMPORT_PATH" )
+	private String thirdPartySurveyImportPath;
+
     @Value ( "${MAX_SURVEY_REMINDERS}")
     private int maxSurveyReminders;
 
@@ -198,6 +210,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
 
+	//TODO : Change this to handle emailIds
+	private static final int USER_EMAIL_ID_INDEX = 2;
+	private static final int CUSTOMER_FIRSTNAME_INDEX = 3;
+	private static final int CUSTOMER_LASTNAME_INDEX = 4;
+	private static final int CUSTOMER_EMAIL_INDEX = 7;
+	private static final int SURVEY_COMPLETION_INDEX = 0;
+	private static final int SCORE_INDEX = 5;
+	private static final int COMMENT_INDEX = 6;
+	private static final int CITY = 8;
+	private static final int STATE = 9;
 
     /**
      * Method to store question and answer format into mongo.
@@ -3002,4 +3024,117 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "Method getLogoUrl finished for user : " + user.getUserId() );
         return logoUrl;
     }
+
+	/**
+	 * Method to read the csv file and get a list of SurveyImportVO objects
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private List<SurveyImportVO> getSurveyListFromCsv() throws InvalidInputException
+	{
+		LOG.info( "BulkSurveyImporter.getSurveyListFromCsv started" );
+		InputStream fileStream = null;
+		List<SurveyImportVO> surveyList = new ArrayList<>();
+		try {
+			fileStream = new FileInputStream( thirdPartySurveyImportPath );
+			if ( fileStream == null )
+				return null;
+			XSSFWorkbook workBook = new XSSFWorkbook( fileStream );
+			XSSFSheet regionSheet = workBook.getSheetAt( 0 );
+			Iterator<Row> rows = regionSheet.rowIterator();
+			Iterator<Cell> cells = null;
+			XSSFRow row = null;
+			XSSFCell cell = null;
+			while ( rows.hasNext() ) {
+				row = (XSSFRow) rows.next();
+				// skip the first 1 row for the header
+				if ( row.getRowNum() < 1 ) {
+					continue;
+				}
+				SurveyImportVO survey = new SurveyImportVO();
+				LOG.info( "Processing row " + row.getRowNum() + " from the file." );
+				cells = row.cellIterator();
+				while ( cells.hasNext() ) {
+					cell = (XSSFCell) cells.next();
+					if ( cell.getColumnIndex() == USER_EMAIL_ID_INDEX ) {
+                        if ( !cell.getStringCellValue().trim().isEmpty() ) {
+							survey.setUserEmailId( cell.getStringCellValue().trim() );
+						}
+					} else if ( cell.getColumnIndex() == CUSTOMER_FIRSTNAME_INDEX && !cell.getStringCellValue().trim()
+						.isEmpty() ) {
+						survey.setCustomerFirstName( cell.getStringCellValue().trim() );
+					} else if ( cell.getColumnIndex() == CUSTOMER_LASTNAME_INDEX && !cell.getStringCellValue().trim()
+						.isEmpty() ) {
+						survey.setCustomerLastName( cell.getStringCellValue().trim() );
+					} else if ( cell.getColumnIndex() == CUSTOMER_EMAIL_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
+						survey.setCustomerEmailAddress( cell.getStringCellValue().trim() );
+					} else if ( cell.getColumnIndex() == SURVEY_COMPLETION_INDEX ) {
+						survey.setSurveyDate( cell.getDateCellValue() );
+					} else if ( cell.getColumnIndex() == SCORE_INDEX ) {
+						survey.setScore( cell.getNumericCellValue() );
+					} else if ( cell.getColumnIndex() == COMMENT_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
+						survey.setReview( cell.getStringCellValue() );
+					}
+				}
+				try {
+                    resolveEmailAddress( survey );
+					validateSurveyRow( survey );
+				} catch ( InvalidInputException e ) {
+					throw new InvalidInputException(
+						"Error occurred at row : " + row.getRowNum() + ". Reason : " + e.getMessage() );
+				}
+				surveyList.add( survey );
+			}
+		} catch ( IOException e ) {
+			e.printStackTrace();
+		}
+		LOG.info( "BulkSurveyImporter.getSurveyListFromCsv finished" );
+		return surveyList;
+	}
+
+    private void resolveEmailAddress( SurveyImportVO survey ) throws InvalidInputException
+    {
+	    if ( survey.getCustomerEmailAddress() == null || survey.getCustomerEmailAddress().isEmpty() ) {
+		    throw new InvalidInputException( "customer email address cannot be null" );
+	    }
+	    try {
+		    User user = userManagementService.getUserByEmailAddress( survey.getCustomerEmailAddress() );
+		    survey.setUserId( user.getUserId() );
+	    } catch ( NoRecordsFetchedException e ) {
+		    throw new InvalidInputException( "No user found with the email address : " + survey.getCustomerEmailAddress() );
+	    }
+    }
+
+	private static void validateSurveyRow( SurveyImportVO survey ) throws InvalidInputException
+	{
+		if ( survey.getUserId() <= 0 )
+			throw new InvalidInputException( "Invalid userId : " + survey.getUserId() );
+		if ( survey.getCustomerEmailAddress() == null || survey.getCustomerEmailAddress().isEmpty() )
+			throw new InvalidInputException( "Customer Email Address cannot be empty" );
+		if ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() )
+			throw new InvalidInputException( "Customer First Name cannot be empty" );
+		if ( survey.getReview() == null || survey.getReview().isEmpty() )
+			throw new InvalidInputException( "Review cannot be empty" );
+		if ( survey.getSurveyDate() == null )
+			throw new InvalidInputException( "Survey date cannot be empty" );
+		if ( survey.getScore() < 0.0 || survey.getScore() > 5.0 )
+			throw new InvalidInputException( "Invalid survey score : " + survey.getScore() );
+	}
+
+	@Override
+	public void begin3rdPartySurveyImport(){
+		LOG.info( "3rd party Survey Importer started" );
+		try {
+			List<SurveyImportVO> surveyImportVOs = getSurveyListFromCsv();
+			if ( surveyImportVOs != null && !surveyImportVOs.isEmpty() ) {
+				for ( SurveyImportVO surveyImportVO : surveyImportVOs ) {
+					importSurveyVOToDBs( surveyImportVO, CommonConstants.SURVEY_SOURCE_3RD_PARTY );
+				}
+			}
+			//TODO: Delete file from location
+		} catch ( NonFatalException e ) {
+			LOG.error( "An error occurred while uploading the surveys. Reason: ", e );
+		}
+		LOG.info( "3rd party Survey Importer finished" );
+	}
 }

@@ -309,4 +309,6 @@ public interface SurveyHandler
 
     public String replaceGatewayQuestionText( String questionText, OrganizationUnitSettings agentSettings, User user,
         OrganizationUnitSettings companySettings, SurveyDetails survey ) throws InvalidInputException;
+
+    void begin3rdPartySurveyImport();
 }
