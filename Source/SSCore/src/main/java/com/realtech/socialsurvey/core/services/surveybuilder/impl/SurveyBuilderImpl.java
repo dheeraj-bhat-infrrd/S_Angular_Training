@@ -317,6 +317,23 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		surveyQuestions.add(surveyQuestionDetails);
 		return surveyQuestions;
 	}
+	
+	@Override
+    @Transactional
+    public List<SurveyQuestionDetails> getSurveyByAgent(User user) throws InvalidInputException {
+        LOG.info("Method to get survey for agent id {} called.", user);
+        
+        List<SurveyQuestionDetails> surveyQuestions = getAllActiveQuestionsOfMappedSurvey(user);
+        // TODO Add the default question which will be shown at the end of survey.
+        SurveyQuestionDetails surveyQuestionDetails = new SurveyQuestionDetails();
+        surveyQuestionDetails.setIsRatingQuestion(CommonConstants.STATUS_ACTIVE);
+        surveyQuestionDetails.setQuestion(gatewayQuestion);
+        surveyQuestionDetails.setIsRatingQuestion(CommonConstants.YES);
+        surveyQuestionDetails.setQuestionType("sb-master");
+        surveyQuestions.add(surveyQuestionDetails);
+        LOG.info("Method to get survey for agent id {} finished.", user);
+        return surveyQuestions;
+    }
 
 	/**
 	 * Method to store questions as well as all the answers for each question.
@@ -498,6 +515,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	 * Method to fetch Survey Questions.
 	 */
 	private List<SurveyQuestionDetails> fetchSurveyQuestions(Survey survey) throws InvalidInputException {
+	    LOG.info( "Method fetchSurveyQuestions started." );
 		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.SURVEY_COLUMN, survey);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
@@ -539,6 +557,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			surveyQuestionDetails.setAnswers(answerOptionsToQuestion);
 			surveyQuestionDetailsList.add(surveyQuestionDetails);
 		}
+		LOG.info( "Method fetchSurveyQuestions finished." );
 		return surveyQuestionDetailsList;
 	}
 
