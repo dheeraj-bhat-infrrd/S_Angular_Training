@@ -359,31 +359,31 @@ public class EmailFormatHelper
 
         String customerName = getCustomerDisplayNameForEmail( custFirstName, custLastName );
 
-        content = StringUtils.replace( content, "\\[BaseUrl\\]", "" + baseUrl );
-        content = StringUtils.replace( content, "\\[AppBaseUrl\\]", "" + baseUrl );
-        content = StringUtils.replace( content, "\\[LogoUrl\\]", "" + logoUrl );
-        content = StringUtils.replace( content, "\\[Link\\]", "" + link );
-        content = StringUtils.replace( content, "\\[Links\\]", "" + links );
-        content = StringUtils.replace( content, "\\[Name\\]", "" + customerName );
+        content = StringUtils.replace( content, "[BaseUrl]", "" + baseUrl );
+        content = StringUtils.replace( content, "[AppBaseUrl]", "" + baseUrl );
+        content = StringUtils.replace( content, "[LogoUrl]", "" + logoUrl );
+        content = StringUtils.replace( content, "[Link]", "" + link );
+        content = StringUtils.replace( content, "[Links]", "" + links );
+        content = StringUtils.replace( content, "[Name]", "" + customerName );
         if ( !isSubject ) {
             content = content.replaceFirst( "\\[FirstName\\]", WordUtils.capitalize( custFirstName ) );
         }
 
-        content = StringUtils.replace( content, "\\[FirstName\\]", "" + custFirstName );
-        content = StringUtils.replace( content, "\\[AgentName\\]", "" + agentName );
-        content = content.replace( "[AgentSignature]", "" + agentSignature );
-        content = StringUtils.replace( content, "\\[RecipientEmail\\]", "" + recipientMailId );
-        content = StringUtils.replace( content, "\\[SenderEmail\\]", "" + senderEmail );
-        content = StringUtils.replace( content, "\\[CompanyName\\]", "" + companyName );
-        content = StringUtils.replace( content, "\\[InitiatedDate\\]", "" + initiatedDate );
-        content = StringUtils.replace( content, "\\[CurrentYear\\]", "" + currentYear );
-        content = StringUtils.replace( content, "\\[FullAddress\\]", "" + fullAddress );
-        content = StringUtils.replace( content, "\\[AgentProfileName\\]", "" + agentProfileName );
+        content = StringUtils.replace( content, "[FirstName]", "" + custFirstName );
+        content = StringUtils.replace( content, "[AgentName]", "" + agentName );
+        content = StringUtils.replace( content, "[AgentSignature]", "" + agentSignature );
+        content = StringUtils.replace( content, "[RecipientEmail]", "" + recipientMailId );
+        content = StringUtils.replace( content, "[SenderEmail]", "" + senderEmail );
+        content = StringUtils.replace( content, "[CompanyName]", "" + companyName );
+        content = StringUtils.replace( content, "[InitiatedDate]", "" + initiatedDate );
+        content = StringUtils.replace( content, "[CurrentYear]", "" + currentYear );
+        content = StringUtils.replace( content, "[FullAddress]", "" + fullAddress );
+        content = StringUtils.replace( content, "[AgentProfileName]", "" + agentProfileName );
 
         //JIRA SS-473 begin
-        content = content.replace( "[CompanyDisclaimer]", companyDisclaimer );
-        content = content.replace( "[AgentDisclaimer]", agentDisclaimer );
-        content = content.replace( "[AgentLicense]", agentLicense );
+        content = StringUtils.replace( content, "[CompanyDisclaimer]", companyDisclaimer );
+        content = StringUtils.replace( content, "[AgentDisclaimer]", agentDisclaimer );
+        content = StringUtils.replace( content, "[AgentLicense]", agentLicense );
         //JIRA SS-473 end
         String company_facebook_link = null;
         String company_twitter_link = null;
@@ -467,27 +467,27 @@ public class EmailFormatHelper
             LOG.error( "No user found with email address : " + senderEmail );
         }
 
-        content = content.replace( "[facebook_link]", processUrl( facebook_link ) );
-        content = content.replace( "[twitter_link]", processUrl( twitter_link ) );
-        content = content.replace( "[linkedin_link]", processUrl( linkedin_link ) );
-        content = content.replace( "[google_plus_link]", processUrl( google_plus_link ) );
-        content = content.replace( "[google_review_link]", processUrl( google_review_link ) );
-        content = content.replace( "[yelp_link]", processUrl( yelp_link ) );
-        content = content.replace( "[zillow_link]", processUrl( zillow_link ) );
-        content = content.replace( "[lending_tree_link]", processUrl( lending_tree_link ) );
-        content = content.replace( "[realtor_com_link]", processUrl( realtor_com_link ) );
-        content = content.replace( "[company_facebook_link]", processUrl( company_facebook_link ) );
-        content = content.replace( "[company_twitter_link]", processUrl( company_twitter_link ) );
-        content = content.replace( "[company_linkedin_link]", processUrl( company_linkedin_link ) );
-        content = content.replace( "[company_google_plus_link]", processUrl( company_google_plus_link ) );
-        content = content.replace( "[company_google_review_link]", processUrl( company_google_review_link ) );
-        content = content.replace( "[company_yelp_link]", processUrl( company_yelp_link ) );
-        content = content.replace( "[company_zillow_link]", processUrl( company_zillow_link ) );
-        content = content.replace( "[company_lending_tree_link]", processUrl( company_lending_tree_link ) );
-        content = content.replace( "[company_realtor_com_link]", processUrl( company_realtor_com_link ) );
+        content = StringUtils.replace( content, "[facebook_link]", processUrl( facebook_link ) );
+        content = StringUtils.replace( content, "[twitter_link]", processUrl( twitter_link ) );
+        content = StringUtils.replace( content, "[linkedin_link]", processUrl( linkedin_link ) );
+        content = StringUtils.replace( content, "[google_plus_link]", processUrl( google_plus_link ) );
+        content = StringUtils.replace( content, "[google_review_link]", processUrl( google_review_link ) );
+        content = StringUtils.replace( content, "[yelp_link]", processUrl( yelp_link ) );
+        content = StringUtils.replace( content, "[zillow_link]", processUrl( zillow_link ) );
+        content = StringUtils.replace( content, "[lending_tree_link]", processUrl( lending_tree_link ) );
+        content = StringUtils.replace( content, "[realtor_com_link]", processUrl( realtor_com_link ) );
+        content = StringUtils.replace( content, "[company_facebook_link]", processUrl( company_facebook_link ) );
+        content = StringUtils.replace( content, "[company_twitter_link]", processUrl( company_twitter_link ) );
+        content = StringUtils.replace( content, "[company_linkedin_link]", processUrl( company_linkedin_link ) );
+        content = StringUtils.replace( content, "[company_google_plus_link]", processUrl( company_google_plus_link ) );
+        content = StringUtils.replace( content, "[company_google_review_link]", processUrl( company_google_review_link ) );
+        content = StringUtils.replace( content, "[company_yelp_link]", processUrl( company_yelp_link ) );
+        content = StringUtils.replace( content, "[company_zillow_link]", processUrl( company_zillow_link ) );
+        content = StringUtils.replace( content, "[company_lending_tree_link]", processUrl( company_lending_tree_link ) );
+        content = StringUtils.replace( content, "[company_realtor_com_link]", processUrl( company_realtor_com_link ) );
 
-        content = content.replace( "[survey_source_id]", surveyMap.get( CommonConstants.SURVEY_SOURCE_ID_COLUMN ) );
-        content = content.replace( "[survey_source]", surveyMap.get( CommonConstants.SURVEY_SOURCE_COLUMN ) );
+        content = StringUtils.replace( content, "[survey_source_id]", surveyMap.get( CommonConstants.SURVEY_SOURCE_ID_COLUMN ) );
+        content = StringUtils.replace( content, "[survey_source]", surveyMap.get( CommonConstants.SURVEY_SOURCE_COLUMN ) );
         //JIRA SS-626 end
         content = StringUtils.replace( content, "null", "" );
         LOG.info( "Method to replace legends with values called, replaceLegends() ended" );
