@@ -9346,7 +9346,6 @@ $(document).on('click', '#wc-send-survey', function() {
 						$('#overlay-toast').html(data);
 					}
 
-					showToast();
 					enableBodyScroll();
 				}, payload, true);
 			}
