@@ -49,7 +49,7 @@ namespace EncompassSocialSurvey
 
         //TODO: Convert this into a map
         //Starting Date Time for Summit
-        public static readonly DateTime SUMMIT_BEGIN_TIME = new DateTime(2016, 7, 18, 0, 0, 0);
+        public static readonly DateTime SUMMIT_BEGIN_TIME = new DateTime(2016, 7, 16, 0, 0, 0);
         
         public const int REMINDER_COUNT = 0;
         public const int STATUS = 4;
