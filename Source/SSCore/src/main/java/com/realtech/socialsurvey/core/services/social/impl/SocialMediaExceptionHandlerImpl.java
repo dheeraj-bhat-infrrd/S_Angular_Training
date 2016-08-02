@@ -47,11 +47,9 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
                         && settings.getContact_details().getMail_ids().getWork() != null ) {
                         emailId = settings.getContact_details().getMail_ids().getWork();
                         LOG.info( "Sending bug mail to admin" );
-                        try {
-                            emailServices.sendSocialMediaTokenExpiryEmail( name, errorMsg, emailId );
-                        } catch ( InvalidInputException | UndeliveredEmailException e1 ) {
-                            LOG.error( "error while sending report bug mail to admin ", e );
-                        }
+                        //TODO update email template and than send mail with new parameter
+                        //emailServices.sendSocialMediaTokenExpiryEmail( name, errorMsg, emailId );
+                        
                     }
                 }
 
@@ -77,11 +75,9 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
                 && settings.getContact_details().getMail_ids().getWork() != null ) {
                 emailId = settings.getContact_details().getMail_ids().getWork();
                 LOG.info( "Sending bug mail to admin" );
-                try {
-                    emailServices.sendSocialMediaTokenExpiryEmail( name, errorMsg, emailId );
-                } catch ( InvalidInputException | UndeliveredEmailException e1 ) {
-                    LOG.error( "error while sending report bug mail to admin ", e1 );
-                }
+                //TODO update email template and than send mail with new parameter
+                 //emailServices.sendSocialMediaTokenExpiryEmail( name, errorMsg, emailId );
+               
             }
         }
     }
