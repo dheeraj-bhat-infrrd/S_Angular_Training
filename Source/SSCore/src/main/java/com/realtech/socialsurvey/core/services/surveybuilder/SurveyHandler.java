@@ -6,9 +6,11 @@ import java.util.Map;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+
 import org.apache.solr.client.solrj.SolrServerException;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -23,6 +25,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
+
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -64,9 +67,8 @@ public interface SurveyHandler
         String agreedToShare );
 
 
-    public SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String url, String source, String state, String city,
-        long surveyPreIntitiationId, boolean isOldRecord, boolean retakeSurvey )
+    public SurveyDetails storeInitialSurveyDetails(User user , SurveyPreInitiation surveyPreInitiation , String baseUrl, 
+        boolean isOldRecord, boolean retakeSurvey )
         throws SolrException, NoRecordsFetchedException, InvalidInputException;
 
 
@@ -309,5 +311,24 @@ public interface SurveyHandler
 
 
     public String replaceGatewayQuestionText( String questionText, OrganizationUnitSettings agentSettings, User user,
-        OrganizationUnitSettings companySettings, SurveyDetails survey ) throws InvalidInputException;
+        OrganizationUnitSettings companySettings, SurveyDetails survey , String logoUrl ) throws InvalidInputException;
+
+
+    public String getLogoUrl( User user, AgentSettings agentSettings );
+
+
+    public void updateSurveyStageForYelp( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
+    
+    public void updateSurveyStageForZillow( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
+    
+    public void updateSurveyStageForLendingTree( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
+    
+    public void updateSurveyStageForRealtor( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
+    
+    public void updateSurveyStageForGoogleBusinessToken( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
 }

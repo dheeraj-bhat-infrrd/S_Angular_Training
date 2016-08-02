@@ -46,6 +46,7 @@ import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
@@ -208,9 +209,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     @Transactional
-    public SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String baseUrl, String source, String state, String city,
-        long surveyPreIntitiationId, boolean isOldRecord, boolean retakeSurvey )
+    public SurveyDetails storeInitialSurveyDetails( User user , SurveyPreInitiation surveyPreInitiation , String baseUrl, 
+         boolean isOldRecord, boolean retakeSurvey )
         throws SolrException, NoRecordsFetchedException, InvalidInputException
     {
         LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() started." );
@@ -219,50 +219,50 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         long companyId = 0;
         long regionId = 0;
 
-        User user = userDao.findById( User.class, agentId );
         companyId = user.getCompany().getCompanyId();
         agentName = user.getFirstName() + " " + user.getLastName();
         for ( UserProfile userProfile : user.getUserProfiles() ) {
-            if ( userProfile.getAgentId() == agentId ) {
+            if ( userProfile.getAgentId() == surveyPreInitiation.getAgentId() ) {
                 branchId = userProfile.getBranchId();
                 regionId = userProfile.getRegionId();
             }
         }
 
         SurveyDetails surveyDetails = new SurveyDetails();
-        surveyDetails.setAgentId( agentId );
+        surveyDetails.setAgentId( surveyPreInitiation.getAgentId() );
         surveyDetails.setAgentName( agentName );
         surveyDetails.setBranchId( branchId );
-        surveyDetails.setCustomerFirstName( firstName );
+        surveyDetails.setCustomerFirstName( surveyPreInitiation.getCustomerFirstName() );
+        String lastName = surveyPreInitiation.getCustomerLastName();
         if ( lastName != null && !lastName.isEmpty() && !lastName.equalsIgnoreCase( "null" ) )
             surveyDetails.setCustomerLastName( lastName );
         surveyDetails.setCompanyId( companyId );
-        surveyDetails.setCustomerEmail( customerEmail );
+        surveyDetails.setCustomerEmail( surveyPreInitiation.getCustomerEmailId() );
         surveyDetails.setRegionId( regionId );
         surveyDetails.setStage( CommonConstants.INITIAL_INDEX );
-        surveyDetails.setReminderCount( reminderCount );
+        surveyDetails.setReminderCount( surveyPreInitiation.getReminderCounts() );
         surveyDetails.setModifiedOn( new Date( System.currentTimeMillis() ) );
         surveyDetails.setCreatedOn( new Date( System.currentTimeMillis() ) );
         surveyDetails.setSurveyResponse( new ArrayList<SurveyResponse>() );
-        surveyDetails.setCustRelationWithAgent( custRelationWithAgent );
+        surveyDetails.setCustRelationWithAgent( surveyPreInitiation.getCustomerInteractionDetails() );
 
         String surveyUrl = baseUrl;
         surveyDetails.setUrl( surveyUrl );
         surveyDetails.setEditable( true );
-        surveyDetails.setSource( source );
+        surveyDetails.setSource( surveyPreInitiation.getSurveySource() );
         surveyDetails.setShowSurveyOnUI( true );
 
         surveyDetails.setRetakeSurvey( retakeSurvey );
-        surveyDetails.setSurveyPreIntitiationId( surveyPreIntitiationId );
-        surveyDetails.setState( state );
-        surveyDetails.setCity( city );
+        surveyDetails.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
+        surveyDetails.setState( surveyPreInitiation.getState() );
+        surveyDetails.setCity( surveyPreInitiation.getCity() );
 
         SurveyDetails survey = null;
         //if survey request is old get survey by agent id and customer email
         if ( isOldRecord ) {
-            survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
+            survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( surveyPreInitiation.getAgentId(), surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getCustomerLastName(), lastName );
         } else {
-            survey = surveyDetailsDao.getSurveyBySurveyPreIntitiationId( surveyPreIntitiationId );
+            survey = surveyDetailsDao.getSurveyBySurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
         }
         LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() finished." );
 
@@ -273,7 +273,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             return surveyDetails;
         } else {
             //update survey PreIntitiation Id for survey
-            survey.setSurveyPreIntitiationId( surveyPreIntitiationId );
+            survey.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
             survey.setRetakeSurvey( retakeSurvey );
             surveyDetailsDao.updateSurveyDetailsBySurveyId( survey );
             return survey;
@@ -2890,7 +2890,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 	@Override
     public String replaceGatewayQuestionText( String questionText, OrganizationUnitSettings agentSettings, User user,
-        OrganizationUnitSettings companySettings, SurveyDetails survey ) throws InvalidInputException
+        OrganizationUnitSettings companySettings, SurveyDetails survey , String logoUrl) throws InvalidInputException
 	{
 	    if ( user == null ) {
 		    LOG.error( "User cannot be null" );
@@ -2941,7 +2941,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         String agentSignature = emailFormatHelper
             .buildAgentSignature( survey.getAgentName(), agentPhone, agentTitle, user.getCompany().getCompany() );
 
-        String logoUrl = getLogoUrl( user, (AgentSettings) agentSettings );
 
         LOG.info( "Method replaceGateQuestionText started for User : " + user.getUserId() );
 
@@ -2954,7 +2953,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    String getLogoUrl( User user, AgentSettings agentSettings )
+	/**
+	 * 
+	 * @param user
+	 * @param agentSettings
+	 * @return
+	 */
+	@Override
+    public String getLogoUrl( User user, AgentSettings agentSettings )
     {
         if ( user == null ) {
             LOG.error( "User cannot be null" );
@@ -3004,5 +3010,225 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.info( "Method getLogoUrl finished for user : " + user.getUserId() );
         return logoUrl;
+    }
+	
+	
+	/**
+     * 
+     * @param unitSettings
+     * @param branchSettings
+     * @param regionSettings
+     * @param companySettings
+     * @param surveyAndStage
+     */
+	@Override
+    public void updateSurveyStageForYelp(OrganizationUnitSettings unitSettings, BranchSettings branchSettings, OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage ){
+     // Fetching Yelp Url
+        try {
+            if ( unitSettings != null && unitSettings.getSocialMediaTokens() != null
+                && unitSettings.getSocialMediaTokens().getYelpToken() != null
+                && unitSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
+                surveyAndStage.put( "yelpEnabled", true );
+                surveyAndStage.put( "yelpLink", unitSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
+            } else {
+                // Adding Yelp Url of the closest in hierarchy connected with Yelp.
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getYelpToken() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
+                    surveyAndStage.put( "yelpEnabled", true );
+                    surveyAndStage.put( "yelpLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
+                        .getYelpToken().getYelpPageLink() );
+                } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+                    && regionSettings.getSocialMediaTokens().getYelpToken() != null
+                    && regionSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
+                    surveyAndStage.put( "yelpEnabled", true );
+                    surveyAndStage.put( "yelpLink", regionSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
+                } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                    && companySettings.getSocialMediaTokens().getYelpToken() != null
+                    && companySettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
+                    surveyAndStage.put( "yelpEnabled", true );
+                    surveyAndStage.put( "yelpLink", companySettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
+                } else
+                    surveyAndStage.put( "yelpEnabled", false );
+            }
+        } catch ( NullPointerException e ) {
+            surveyAndStage.put( "yelpEnabled", false );
+        }
+    }
+
+
+    @Override
+    public void updateSurveyStageForZillow( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage )
+    {
+     // Fetching Zillow Url
+        try {
+            if ( unitSettings != null && unitSettings.getSocialMediaTokens() != null
+                && unitSettings.getSocialMediaTokens().getZillowToken() != null
+                && unitSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
+                surveyAndStage.put( "zillowEnabled", true );
+                surveyAndStage.put( "zillowLink", unitSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() );
+            } else {
+                // Adding Zillow Url of the closest in hierarchy connected with Zillow.
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getZillowToken() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getZillowToken()
+                        .getZillowProfileLink() != null ) {
+                    surveyAndStage.put( "zillowEnabled", true );
+                    surveyAndStage.put( "zillowLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
+                        .getZillowToken().getZillowProfileLink() );
+                } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+                    && regionSettings.getSocialMediaTokens().getZillowToken() != null
+                    && regionSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
+                    surveyAndStage.put( "zillowEnabled", true );
+                    surveyAndStage.put( "zillowLink", regionSettings.getSocialMediaTokens().getZillowToken()
+                        .getZillowProfileLink() );
+                } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                    && companySettings.getSocialMediaTokens().getZillowToken() != null
+                    && companySettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
+                    surveyAndStage.put( "zillowEnabled", true );
+                    surveyAndStage.put( "zillowLink", companySettings.getSocialMediaTokens().getZillowToken()
+                        .getZillowProfileLink() );
+                } else
+                    surveyAndStage.put( "zillowEnabled", false );
+            }
+        } catch ( NullPointerException e ) {
+            surveyAndStage.put( "zillowEnabled", false );
+        }
+    }
+
+
+    @Override
+    public void updateSurveyStageForLendingTree( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage )
+    {
+        try {
+            if ( unitSettings != null && unitSettings.getSocialMediaTokens() != null
+                && unitSettings.getSocialMediaTokens().getLendingTreeToken() != null
+                && unitSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() != null ) {
+                surveyAndStage.put( "lendingtreeEnabled", true );
+                surveyAndStage.put( "lendingtreeLink", unitSettings.getSocialMediaTokens().getLendingTreeToken()
+                    .getLendingTreeProfileLink() );
+            } else {
+                // Adding LendingTree Url of the closest in hierarchy connected with LendingTree.
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getLendingTreeToken() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getLendingTreeToken()
+                        .getLendingTreeProfileLink() != null ) {
+                    surveyAndStage.put( "lendingtreeEnabled", true );
+                    surveyAndStage.put( "lendingtreeLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
+                        .getLendingTreeToken().getLendingTreeProfileLink() );
+                } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+                    && regionSettings.getSocialMediaTokens().getLendingTreeToken() != null
+                    && regionSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() != null ) {
+                    surveyAndStage.put( "lendingtreeEnabled", true );
+                    surveyAndStage.put( "lendingtreeLink", regionSettings.getSocialMediaTokens().getLendingTreeToken()
+                        .getLendingTreeProfileLink() );
+                } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                    && companySettings.getSocialMediaTokens().getLendingTreeToken() != null
+                    && companySettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() != null ) {
+                    surveyAndStage.put( "lendingtreeEnabled", true );
+                    surveyAndStage.put( "lendingtreeLink", companySettings.getSocialMediaTokens().getLendingTreeToken()
+                        .getLendingTreeProfileLink() );
+                } else
+                    surveyAndStage.put( "lendingtreeEnabled", false );
+            }
+        } catch ( NullPointerException e ) {
+            surveyAndStage.put( "lendingtreeEnabled", false );
+        }
+        
+    }
+
+
+    @Override
+    public void updateSurveyStageForRealtor( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage )
+    {
+        try {
+            if ( unitSettings != null && unitSettings.getSocialMediaTokens() != null
+                && unitSettings.getSocialMediaTokens().getRealtorToken() != null
+                && unitSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null ) {
+                surveyAndStage.put( "realtorEnabled", true );
+                surveyAndStage.put( "realtorLink", unitSettings.getSocialMediaTokens().getRealtorToken()
+                    .getRealtorProfileLink() );
+            } else {
+                // Adding Realtor Url of the closest in hierarchy connected with Realtor.
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getRealtorToken() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getRealtorToken()
+                        .getRealtorProfileLink() != null ) {
+                    surveyAndStage.put( "realtorEnabled", true );
+                    surveyAndStage.put( "realtorLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
+                        .getRealtorToken().getRealtorProfileLink() );
+                } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+                    && regionSettings.getSocialMediaTokens().getRealtorToken() != null
+                    && regionSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null ) {
+                    surveyAndStage.put( "realtorEnabled", true );
+                    surveyAndStage.put( "realtorLink", regionSettings.getSocialMediaTokens().getRealtorToken()
+                        .getRealtorProfileLink() );
+                } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                    && companySettings.getSocialMediaTokens().getRealtorToken() != null
+                    && companySettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null ) {
+                    surveyAndStage.put( "realtorEnabled", true );
+                    surveyAndStage.put( "realtorLink", companySettings.getSocialMediaTokens().getRealtorToken()
+                        .getRealtorProfileLink() );
+                } else
+                    surveyAndStage.put( "realtorEnabled", false );
+            }
+        } catch ( NullPointerException e ) {
+            surveyAndStage.put( "realtorEnabled", false );
+        }
+        
+    }
+
+    
+    public void updateSurveyStageForGoogleBusinessToken( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage )
+    {
+        
+        try {
+            if ( unitSettings != null && unitSettings.getSocialMediaTokens() != null
+                && unitSettings.getSocialMediaTokens().getGoogleBusinessToken() != null
+                && unitSettings.getSocialMediaTokens().getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+                surveyAndStage.put( "googleBusinessEnabled", true );
+                surveyAndStage.put( "googleBusinessLink", unitSettings.getSocialMediaTokens().getGoogleBusinessToken()
+                    .getGoogleBusinessLink() );
+            } else {
+                // Adding Realtor Url of the closest in hierarchy connected with Realtor.
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getGoogleBusinessToken() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getGoogleBusinessToken()
+                    .getGoogleBusinessLink() != null ) {
+                    surveyAndStage.put( "googleBusinessEnabled", true );
+                    surveyAndStage.put( "googleBusinessLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
+                        .getGoogleBusinessToken().getGoogleBusinessLink() );
+                } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+                    && regionSettings.getSocialMediaTokens().getGoogleBusinessToken() != null
+                    && regionSettings.getSocialMediaTokens().getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+                    surveyAndStage.put( "googleBusinessEnabled", true );
+                    surveyAndStage.put( "googleBusinessLink", regionSettings.getSocialMediaTokens().getGoogleBusinessToken()
+                        .getGoogleBusinessLink() );
+                } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                    && companySettings.getSocialMediaTokens().getGoogleBusinessToken() != null
+                    && companySettings.getSocialMediaTokens().getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+                    surveyAndStage.put( "googleBusinessEnabled", true );
+                    surveyAndStage.put( "googleBusinessLink", companySettings.getSocialMediaTokens().getGoogleBusinessToken()
+                    .getGoogleBusinessLink() );
+                } else
+                    surveyAndStage.put( "googleBusinessEnabled", false );
+            }
+        } catch ( NullPointerException e ) {
+            surveyAndStage.put( "googleBusinessEnabled", false );
+        }
     }
 }
