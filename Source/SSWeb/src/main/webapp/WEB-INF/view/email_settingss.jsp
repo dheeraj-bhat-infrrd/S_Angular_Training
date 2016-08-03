@@ -70,6 +70,9 @@
 						&nbsp&nbsp&nbsp&nbsp[company_lending_tree_link] : Company's Lending Tree Social Link,
                         &nbsp&nbsp&nbsp&nbsp[company_realtor_com_link] : Company's Realtor Social Link
 						<br />
+						&nbsp&nbsp&nbsp&nbsp[survey_source_id] : Source ID of the survey,
+						&nbsp&nbsp&nbsp&nbsp[survey_source] : Survey's source,
+						<br />
 						<br />
 						Note: Only [AgentName] is allowed in Mail Subject
 					</div>
