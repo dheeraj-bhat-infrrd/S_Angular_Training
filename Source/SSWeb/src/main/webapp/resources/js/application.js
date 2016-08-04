@@ -9079,6 +9079,7 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 	}, 1000);
 });
 var surveysent=false;
+var alreadysentsurvey=false;
 $(document).on('click', '#wc-send-survey', function() {
 	var allowrequest = true;
 	var receiversList = [];
@@ -9090,7 +9091,7 @@ $(document).on('click', '#wc-send-survey', function() {
 	var agentname = "";
 	var myself = false;
 	var end = false;
-	if(surveysent){
+	if(surveysent || alreadysentsurvey){
 		return;
 	}
 	$('#wc-review-table-inner').children().each(function() {
@@ -9305,6 +9306,10 @@ $(document).on('click', '#wc-send-survey', function() {
 	var surveyed = [];
 	var alreadysureyed = false;
 	if (allowrequest) {
+		if(alreadysentsurvey){
+			return;
+		}
+		alreadysentsurvey=true;
 		callAjaxPostWithPayloadData("./getalreadysurveyedemailids.do", function(data) {
 			var alreadySurveyedEmails = $.parseJSON(data);
 			// To check if the email had already surveyed
@@ -9332,6 +9337,10 @@ $(document).on('click', '#wc-send-survey', function() {
 
 			} else {
 				$('#send-survey-dash').removeClass("hide");
+				alreadysentsurvey=false;
+				if(surveysent){
+					return;
+				}
 				surveysent=true;
 				callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
 					$('#send-survey-dash').addClass("hide");
