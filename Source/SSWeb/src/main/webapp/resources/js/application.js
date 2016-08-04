@@ -9078,7 +9078,7 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 		$('#wc-review-table').perfectScrollbar('update');
 	}, 1000);
 });
-
+var surveysent=false;
 $(document).on('click', '#wc-send-survey', function() {
 	var allowrequest = true;
 	var receiversList = [];
@@ -9090,6 +9090,9 @@ $(document).on('click', '#wc-send-survey', function() {
 	var agentname = "";
 	var myself = false;
 	var end = false;
+	if(surveysent){
+		return;
+	}
 	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
 			$(this).children().each(function() {
@@ -9329,19 +9332,27 @@ $(document).on('click', '#wc-send-survey', function() {
 
 			} else {
 				$('#send-survey-dash').removeClass("hide");
+				surveysent=true;
 				callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
 					$('#send-survey-dash').addClass("hide");
 					$('.overlay-login').hide();
 					// Update the incomplete survey on dashboard
 					getIncompleteSurveyCount(colName, colValue);
 					if (data == "error") {
-						showError("Error while sending survey request!")
+						showError("Error while sending survey request!");
+						surveysent=false;
 					} else if (data.indexOf("Success") > -1) {
 						var response = $.parseJSON(data);
-						if (response.surveySentCount == 1)
+						if (response.surveySentCount == 1){
 							showInfo(response.surveySentCount + ' Survey Request Sent Successfully!');
-						else
+						    surveysent=false;
+						}
+							
+						else{
 							showInfo(response.surveySentCount + ' Survey Requests Sent Successfully!');
+							surveysent=false;
+						}
+							
 					} else {
 						$('#overlay-toast').html(data);
 					}
