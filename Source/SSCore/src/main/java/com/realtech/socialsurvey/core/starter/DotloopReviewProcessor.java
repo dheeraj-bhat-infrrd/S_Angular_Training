@@ -166,7 +166,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                     if ( dotLoopCrmInfo.getApi() != null && !dotLoopCrmInfo.getApi().isEmpty() ) {
                         entityId = organizationUnitSettings.getIden();
                         //make an entry in crm batch tracker and update last run start time
-                        crmBatchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType,
+                        crmBatchTrackerService.getRecentRecordFetchedAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType,
                             entityId, CommonConstants.CRM_SOURCE_DOTLOOP );
                         LOG.debug( "API key is " + dotLoopCrmInfo.getApi() );
                         try {
