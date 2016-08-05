@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.ForwardMailDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Plan;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -37,8 +38,25 @@ import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.mq.ProducerForQueue;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
+import org.apache.commons.lang.WordUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 // JIRA: SS-7: By RM02: BOC
@@ -63,7 +81,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Autowired
     private FileOperations fileOperations;
-    
+
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
@@ -86,7 +104,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Value ( "${APPLICATION_ADMIN_NAME}")
     private String applicationAdminName;
-    
+
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
 
@@ -96,10 +114,13 @@ public class EmailServicesImpl implements EmailServices
     @Autowired
     private ForwardMailDetailsDao forwardMailDetailsDao;
 
+	@Autowired
+	private UserManagementService userManagementService;
+
 
     /**
      * Method to send registration invite mail to a single recipient
-     * 
+     *
      * @throws InvalidInputException
      * @throws UndeliveredEmailException
      */
@@ -214,12 +235,12 @@ public class EmailServicesImpl implements EmailServices
         if ( entityName == null || entityName.isEmpty() ) {
             throw new InvalidInputException( "Name cannot be null" );
         }
-        
+
         if ( recipientMailIds == null || recipientMailIds.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending CompanyRegistrationStageMail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending CompanyRegistrationStageMail " );
         }
-        
+
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailIds );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.COMPANY_REGISTRATION_STAGE_MAIL_SUBJECT;
@@ -276,7 +297,7 @@ public class EmailServicesImpl implements EmailServices
 
     /**
      * Sends a reset password link to the user
-     * 
+     *
      * @param url
      * @param recipientMailId
      * @throws InvalidInputException
@@ -364,7 +385,7 @@ public class EmailServicesImpl implements EmailServices
 
     /**
      * Sends a mail to the user when his subscription payment fails.
-     * 
+     *
      * @param recipientMailId
      *            ,name,retryDays
      * @return
@@ -408,7 +429,7 @@ public class EmailServicesImpl implements EmailServices
 
     /**
      * Method to send mail with verification link to verify the account
-     * 
+     *
      * @param url
      * @param recipientMailId
      * @param recipientName
@@ -450,7 +471,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Successfully sent verification mail" );
     }
 
-    
+
     @Async
     @Override
     public void sendEmailVerificationRequestMailToAdmin( String url, String recipientMailId, String recipientName , String emailToVerify,  String entityName )
@@ -513,7 +534,7 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, fileContentReplacements, false, false );
         LOG.info( "Successfully sendEmailVerifiedNotificationMail" );
     }
-    
+
     @Override
     public void sendEmailVerifiedNotificationMailToAdmin( String recipientMailId, String recipientName ,  String verifiedEmail,  String entityName  )
         throws InvalidInputException, UndeliveredEmailException
@@ -531,7 +552,7 @@ public class EmailServicesImpl implements EmailServices
 
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
-        
+
         FileContentReplacements subjectFileContentReplacements = new FileContentReplacements();
         subjectFileContentReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.EMAIL_VERIFIED_NOTIFICATION_MAIL_TO_ADMIN_SUBJECT );
@@ -547,10 +568,10 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, subjectFileContentReplacements, fileContentReplacements, false, false );
         LOG.info( "Successfully sent EmailVerifiedNotificationMailToAdmin" );
     }
-    
+
     /**
      * Method to send mail with verification link to verify the account
-     * 
+     *
      * @param url
      * @param recipientMailId
      * @param recipientName
@@ -599,7 +620,7 @@ public class EmailServicesImpl implements EmailServices
     // JIRA SS-42 by RM-05 : BOC
     /**
      * Sends a link to new user to complete registration.
-     * 
+     *
      * @param url
      * @param recipientMailId
      * @throws InvalidInputException
@@ -1104,7 +1125,7 @@ public class EmailServicesImpl implements EmailServices
     /**
      * Sends the message from the contact us page as a mail to the respective
      * admin or agent
-     * 
+     *
      * @param recipientEmailId
      * @param displayName
      * @param senderEmailId
@@ -1234,7 +1255,7 @@ public class EmailServicesImpl implements EmailServices
 
     /**
      * Sends account blocking mail when retries fail
-     * 
+     *
      * @param recipientMailId
      * @param displayName
      * @throws UndeliveredEmailException
@@ -1273,7 +1294,7 @@ public class EmailServicesImpl implements EmailServices
 
     /**
      * Send mail to customer when his account is reactivated
-     * 
+     *
      * @param recipientMailId
      * @param displayName
      * @throws InvalidInputException
@@ -1689,7 +1710,7 @@ public class EmailServicesImpl implements EmailServices
 
 
     /**
-     * 
+     *
      */
     @Override
     public void sendHelpMailToAdmin( String senderEmail, String senderName, String displayName, String mailSubject,
@@ -1739,7 +1760,7 @@ public class EmailServicesImpl implements EmailServices
 
     /**
      * Method to prepare email entity required to send email
-     * 
+     *
      * @param recipientMailId
      * @return
      */
@@ -1754,7 +1775,7 @@ public class EmailServicesImpl implements EmailServices
 
     /**
      * Method to prepare email entity required to send email
-     * 
+     *
      * @param recipients
      * @return
      */
@@ -1773,6 +1794,7 @@ public class EmailServicesImpl implements EmailServices
 
     // creating email entity with senders email id as U<userid>@socialsurvey.me
     private EmailEntity prepareEmailEntityForSendingEmail( String recipientMailId, long userId, String name )
+	    throws InvalidInputException
     {
         LOG.debug( "Preparing email entity with recipent " + recipientMailId + " user id " + userId + " and name " + name );
         List<String> recipients = new ArrayList<String>();
@@ -1781,9 +1803,16 @@ public class EmailServicesImpl implements EmailServices
         EmailEntity emailEntity = new EmailEntity();
         emailEntity.setRecipients( recipients );
         emailEntity.setSenderName( name );
-        
+
         AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
-        
+	    //JIRA SS-700 begin
+	    if ( agentSettings.getUserEncryptedId() == null ) {
+		    agentSettings.setUserEncryptedId( userManagementService.generateUserEncryptedId( agentSettings.getIden() ) );
+		    organizationUnitSettingsDao
+			    .updateParticularKeyAgentSettings( CommonConstants.USER_ENCRYPTED_ID, agentSettings.getUserEncryptedId(),
+				    agentSettings );
+	    }
+	    //JIRA SS-700 end
         //JIRA SS-60 //pass stored encrypted id in mongo for the user
         emailEntity.setSenderEmailId( "u-" + agentSettings.getUserEncryptedId() + "@" + defaultEmailDomain );
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );
@@ -1868,7 +1897,7 @@ public class EmailServicesImpl implements EmailServices
 
 
     /**
-     * 
+     *
      */
     @Override
     public void sendReportBugMailToAdmin( String displayName, String errorMsg, String recipientMailId )
@@ -1987,8 +2016,6 @@ public class EmailServicesImpl implements EmailServices
      * @param recipientMailId
      * @param customerName
      * @param rating
-     * @param reviewSummary
-     * @param reviewDescription
      * @throws InvalidInputException
      * @throws UndeliveredEmailException
      * */
@@ -2141,7 +2168,7 @@ public class EmailServicesImpl implements EmailServices
 
 
     /**
-     * 
+     *
      */
     @Override
     public void sendCustomMail( String recipientName, String recipientMailId, String subject, String body,
