@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.Date;
 import java.util.List;
 
 public class FacebookToken {
@@ -11,6 +12,10 @@ public class FacebookToken {
 	private long facebookAccessTokenExpiresOn;
 	private List<FacebookPage> facebookPages;
 	private String facebookAccessTokenToPost;
+	
+	private boolean tokenExpiryAlertSent;
+	private Date tokenExpiryAlertTime;
+	private String tokenExpiryAlertEmail;
 	
 	public String getFacebookId() {
 		return facebookId;
@@ -68,7 +73,37 @@ public class FacebookToken {
 		this.facebookAccessTokenToPost = facebookAccessTokenToPost;
 	}
 
-	@Override
+	public boolean isTokenExpiryAlertSent()
+    {
+        return tokenExpiryAlertSent;
+    }
+
+    public void setTokenExpiryAlertSent( boolean tokenExpiryAlertSent )
+    {
+        this.tokenExpiryAlertSent = tokenExpiryAlertSent;
+    }
+
+    public Date getTokenExpiryAlertTime()
+    {
+        return tokenExpiryAlertTime;
+    }
+
+    public void setTokenExpiryAlertTime( Date tokenExpiryAlertTime )
+    {
+        this.tokenExpiryAlertTime = tokenExpiryAlertTime;
+    }
+
+    public String getTokenExpiryAlertEmail()
+    {
+        return tokenExpiryAlertEmail;
+    }
+
+    public void setTokenExpiryAlertEmail( String tokenExpiryAlertEmail )
+    {
+        this.tokenExpiryAlertEmail = tokenExpiryAlertEmail;
+    }
+
+    @Override
 	public String toString() {
 		return "FacebookToken [facebookId=" + facebookId + ", facebookPageLink=" + facebookPageLink + "]";
 	}

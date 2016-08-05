@@ -547,46 +547,6 @@ function shareOnTwitter(firstName, lastName, agentName, review, score, agentId){
 		});
 }
 
-function shareOnLinkedin(firstName, lastName, agentName, review, score, agentId){
-	var success= false;
-	var payload = {
-			"firstName" : firstName,
-			"lastName" : lastName,
-			"agentName" : agentName,
-			"review" : review,
-			"score" : score,
-			"agentId" : agentId
-		};
-		$.ajax({
-			url : "./postonlinkedin.do",
-			type : "GET",
-			dataType : "html",
-			cache : false,
-			data : payload,
-			success : function(data) {
-				if (data.errCode == undefined)
-					success = true;
-			},
-			complete : function(data) {
-				if (success) {
-					data = data.responseText;
-					if(data=='true')
-						$('#overlay-toast').html('No linkedin account setup in hierarchy to share.');
-					else
-						$('#overlay-toast').html('Successfully shared on linkedin.');
-					showToast(data);
-				}
-			},
-			error : function(e) {
-				if(e.status == 504) {
-					redirectToLoginPageOnSessionTimeOut(e.status);
-					return;
-				}
-				$('#overlay-toast').html(e.responseText);
-				showToast(e.responseText);
-			}
-		});
-}
 
 function shareOnYelp(agentId, location, yelpElement){
 	var success= false;

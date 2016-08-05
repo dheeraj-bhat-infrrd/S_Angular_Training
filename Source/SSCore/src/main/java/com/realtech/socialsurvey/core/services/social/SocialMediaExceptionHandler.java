@@ -7,8 +7,10 @@ import facebook4j.FacebookException;
 public interface SocialMediaExceptionHandler
 {
     
-    void handleFacebookException(FacebookException e , OrganizationUnitSettings settings);
+    void handleFacebookException(FacebookException e , OrganizationUnitSettings settings , String collectionName);
     
-    void handleLinkedinException(OrganizationUnitSettings settings);
+    void handleLinkedinException(OrganizationUnitSettings settings , String collectionName);
+
+    String generateAndSendSocialMedialTokenExpiryMail( OrganizationUnitSettings settings , String socialMediaType);
 
 }

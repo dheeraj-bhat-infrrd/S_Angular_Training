@@ -467,6 +467,6 @@ public interface EmailServices
         String entityName ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    void sendSocialMediaTokenExpiryEmail( String displayName, String errorMsg, String recipientMailId )
+    void sendSocialMediaTokenExpiryEmail( String displayName, String recipientMailId , String  updateConnectionUrl , String appLoginUrl , String socialMediaType )
         throws InvalidInputException, UndeliveredEmailException;
 }

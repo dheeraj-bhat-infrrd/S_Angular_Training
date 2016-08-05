@@ -293,6 +293,7 @@
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="socialManagementService" value-ref="socialManagementService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
