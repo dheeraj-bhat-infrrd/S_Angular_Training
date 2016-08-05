@@ -14,6 +14,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -32,6 +33,11 @@ public class LoneWolfRestUtils
     public final String H_MAC_SHA256 = "HmacSHA256";
     public final String DATE_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSSX";
     public final String TRANSACTION_DATE_FORMAT = "yyyy-MM-dd";
+    
+    
+    @Value ( "${LOAN_WOLF_INITIAL_RECORD_FETCHED_DAYS}")
+    private int loanWolfInitialREcordFEtchedDays;
+
     
     @Autowired
     private URLGenerator urlGenerator;
@@ -101,22 +107,33 @@ public class LoneWolfRestUtils
     }
 
     
-    public String generateFilterQueryParamFor()
+    public String generateFilterQueryParamFor(long recentRecordFetchedTime)
     {
-        LOG.info( "Method generateFilterQueryParamFor started." );
+        LOG.debug( "Method generateFilterQueryParamFor started." );
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat(TRANSACTION_DATE_FORMAT);
+        //get todays date and set as end date
         String todayDate =  sdf.format(cal.getTime());
-        cal.add( Calendar.DATE, -1 );
-        String yesterdayDate =  sdf.format(cal.getTime());
+        String endDate = todayDate;
         
-        yesterdayDate = "2016-07-03";
-        todayDate = "2016-08-03";
+        //check recentRecordFetchedTime if it's epoc time than fetch data for configure no of days
+        String startDate;
+        if(recentRecordFetchedTime == CommonConstants.EPOCH_TIME_IN_MILLIS){
+            LOG.info( "Recent record fetched time is epoc time so getting record for past configured days" );
+            int noOfDays = loanWolfInitialREcordFEtchedDays;
+            //get no of days old date
+            cal.add( Calendar.DATE, -(noOfDays) );
+             startDate =  sdf.format(cal.getTime());
+        }else{
+            //get date of last record fetched
+             startDate = sdf.format( new Date (recentRecordFetchedTime) );
+        }
         
-        String fitler = "StatusCode+eq+'A'+and+CloseDate+ge+datetimeoffset'"+ yesterdayDate +"'+and+CloseDate+lt+datetimeoffset'"+todayDate+"'";
+        String filter = "StatusCode+eq+'A'+and+CloseDate+ge+datetimeoffset'"+ startDate +"'+and+CloseDate+lt+datetimeoffset'"+endDate+"'";
+        LOG.info( "Created Filter query param is : " + filter );
         
-        LOG.info( "Method generateFilterQueryParamFor finished." );
-        return fitler;
+        LOG.debug( "Method generateFilterQueryParamFor finished." );
+        return filter;
     }
     
     
