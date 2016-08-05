@@ -14,6 +14,7 @@ import twitter4j.TwitterException;
 
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
@@ -107,7 +108,7 @@ public class SocialManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testUpdateLinkedinNullAgentSettings() throws NonFatalException
     {
-        socialManagementServiceImpl.updateLinkedin( null, TestConstants.TEST_STRING, TestConstants.TEST_STRING,
+        socialManagementServiceImpl.updateLinkedin( null, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, new OrganizationUnitSettings(), false, new AgentSettings(), new SocialMediaPostResponse() );
     }
 

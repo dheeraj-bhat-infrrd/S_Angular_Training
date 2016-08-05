@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.Plan;
+
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2212,7 +2213,7 @@ public class EmailServicesImpl implements EmailServices
      * 
      */
     @Override
-    public void sendSocialMediaTokenExpiryEmail( String displayName, String errorMsg, String recipientMailId )
+    public void sendSocialMediaTokenExpiryEmail( String displayName, String recipientMailId ,   String  updateConnectionUrl , String appLoginUrl , String socialMediaType)
         throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method sendSocialMediaTokenExpiryEmail() started." );
@@ -2231,7 +2232,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_BODY );
 
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, errorMsg ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, updateConnectionUrl , appLoginUrl , socialMediaType ) );
 
         LOG.info( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );

@@ -66,6 +66,8 @@ import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.EntityMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
+import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.MediaPostDetails;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
@@ -446,7 +448,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     @Override
-    public boolean updateLinkedin( OrganizationUnitSettings settings, String message, String linkedinProfileUrl,
+    public boolean updateLinkedin( OrganizationUnitSettings settings, String collectionName, String message, String linkedinProfileUrl,
         String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow, AgentSettings agentSettings,
         SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException
     {
@@ -529,8 +531,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             JSONObject entityUpdateResponseObj = new JSONObject( EntityUtils.toString( response.getEntity() ) );
                             
                             if(response.getStatusLine()!= null && response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-                              //call social media error handler for facebook exception
-                                socialMediaExceptionHandler.handleLinkedinException(settings);
+                              //call social media error handler for linkedin exception
+                                socialMediaExceptionHandler.handleLinkedinException(settings, collectionName);
                             }
                             
                             if ( responseString.contains( "201 Created" ) ) {
@@ -1034,7 +1036,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
                 if ( agent != null && agent.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                     postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
-                        serverBaseUrl, agentSettings, socialMediaPostDetails.getAgentMediaPostDetails(),
+                        serverBaseUrl, agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION , socialMediaPostDetails.getAgentMediaPostDetails(),
                         agentMediaPostResponseDetails, isZillow );
                 }
             }
@@ -1051,7 +1053,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     Company company = organizationManagementService.getCompanyById( companySetting.getIden() );
                     if ( company != null && company.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                         postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
-                            serverBaseUrl, companySetting, socialMediaPostDetails.getCompanyMediaPostDetails(),
+                            serverBaseUrl, companySetting, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION , socialMediaPostDetails.getCompanyMediaPostDetails(),
                             companyMediaPostResponseDetails, isZillow );
                     }
                 }
@@ -1070,7 +1072,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                                 regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
                             postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage,
-                                rating, serverBaseUrl, setting, regionMediaPostDetails, regionMediaPostResponseDetails, isZillow );
+                                rating, serverBaseUrl, setting, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,  regionMediaPostDetails, regionMediaPostResponseDetails, isZillow );
                         }
                     }
 
@@ -1089,7 +1091,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( branch != null && branch.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                         if ( setting != null ) {
                             postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage,
-                                rating, serverBaseUrl, setting, branchMediaPostDetails, branchMediaPostResponseDetails, isZillow );
+                                rating, serverBaseUrl, setting, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ,  branchMediaPostDetails, branchMediaPostResponseDetails, isZillow );
                         }
                     }
                 }
@@ -1102,7 +1104,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     void postToFacebookForAHierarchy( long companyId, AgentSettings agentSettings, String facebookMessage,
-        String updatedFacebookMessage, double rating, String serverBaseUrl, OrganizationUnitSettings setting,
+        String updatedFacebookMessage, double rating, String serverBaseUrl, OrganizationUnitSettings setting, String collectionType,
         MediaPostDetails mediaPostDetails, EntityMediaPostResponseDetails mediaPostResponseDetails, boolean isZillow )
         throws InvalidInputException
     {
@@ -1134,7 +1136,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             LOG.error( "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
                 e );
             //call social media error handler for facebook exception
-            socialMediaExceptionHandler.handleFacebookException( e , setting );
+            socialMediaExceptionHandler.handleFacebookException( e , setting , collectionType);
             //update Social Media Post Response
             SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
             facebookPostResponse
@@ -1195,7 +1197,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             if ( agentSettings != null ) {
                 User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
                 if ( agent != null && agent.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                    postToLinkedInForAHierarchy( agentSettings, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                    postToLinkedInForAHierarchy( agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
                         linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
                         socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails );
                 }
@@ -1211,7 +1213,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( companySetting != null ) {
                     Company company = userManagementService.getCompanyById( companySetting.getIden() );
                     if ( company != null && company.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                        postToLinkedInForAHierarchy( companySetting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                        postToLinkedInForAHierarchy( companySetting,MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
                             linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
                             socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails );
                     }
@@ -1230,7 +1232,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
                         Region region = userManagementService.getRegionById( setting.getIden() );
                         if ( region != null && region.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                            postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                            postToLinkedInForAHierarchy( setting,MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
                                 linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
                                 regionMediaPostDetails, regionMediaPostResponseDetails );
                         }
@@ -1248,7 +1250,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
                         Branch branch = userManagementService.getBranchById( setting.getIden() );
                         if ( branch != null && branch.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                            postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                            postToLinkedInForAHierarchy( setting, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
                                 linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
                                 branchMediaPostDetails, branchMediaPostResponseDetails );
                         }
@@ -1261,8 +1263,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
-    void
-	postToLinkedInForAHierarchy( OrganizationUnitSettings setting, Double rating, boolean isZillow,
+    void postToLinkedInForAHierarchy( OrganizationUnitSettings setting, String collectionName ,  Double rating, boolean isZillow,
         String updatedLinkedInMessage, String linkedinMessage, String linkedinProfileUrl, String linkedinMessageFeedback,
         OrganizationUnitSettings companySettings, AgentSettings agentSettings, MediaPostDetails mediaPostDetails,
         EntityMediaPostResponseDetails mediaPostResponseDetails )
@@ -1276,7 +1277,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
                 linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
 
-                if ( !updateLinkedin( setting, updatedLinkedInMessage, linkedinProfileUrl, linkedinMessageFeedback,
+                if ( !updateLinkedin( setting, collectionName, updatedLinkedInMessage, linkedinProfileUrl, linkedinMessageFeedback,
                     companySettings, isZillow, agentSettings, linkedinPostResponse ) ) {
                     List<String> socialList = mediaPostDetails.getSharedOn();
                     if ( !socialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
@@ -3143,5 +3144,31 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
         LOG.info( "Method to trigger complaint resolution workflow for a review, triggerComplaintResolutionWorkflowForZillowReview finished." );
         return false;
+    }
+    
+    /**
+     * 
+     * @param collectionName
+     * @param iden
+     * @param facebookToken
+     */
+    public void updateFacebookToken( String collectionName , long iden ,  FacebookToken facebookToken)
+    {
+        LOG.info( "Method updateFacebookToken() started" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( MongoOrganizationUnitSettingDaoImpl.KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN, facebookToken, iden, collectionName );
+        LOG.info( "Method updateFacebookToken() ended" );
+    }
+    
+    /**
+     * 
+     * @param collectionName
+     * @param iden
+     * @param linkedInToken
+     */
+    public void updateLinkedinToken( String collectionName , long iden ,  LinkedInToken linkedInToken)
+    {
+        LOG.info( "Method updateLinkedinToken() started" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN, linkedInToken, iden, collectionName );
+        LOG.info( "Method updateLinkedinToken() ended" );
     }
 }

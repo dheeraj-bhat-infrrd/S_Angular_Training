@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.Date;
+
 public class LinkedInToken {
 
 	private String linkedInId;
@@ -8,6 +10,10 @@ public class LinkedInToken {
 	// private String linkedInAccessTokenSecret;
 	private long linkedInAccessTokenCreatedOn;
 	private long linkedInAccessTokenExpiresIn;
+	
+	private boolean tokenExpiryAlertSent;
+    private Date tokenExpiryAlertTime;
+    private String tokenExpiryAlertEmail;
 
 	public String getLinkedInId() {
 		return linkedInId;
@@ -57,7 +63,37 @@ public class LinkedInToken {
 		this.linkedInAccessTokenExpiresIn = linkedInAccessTokenExpiresIn;
 	}
 
-	@Override
+	public boolean isTokenExpiryAlertSent()
+    {
+        return tokenExpiryAlertSent;
+    }
+
+    public void setTokenExpiryAlertSent( boolean tokenExpiryAlertSent )
+    {
+        this.tokenExpiryAlertSent = tokenExpiryAlertSent;
+    }
+
+    public Date getTokenExpiryAlertTime()
+    {
+        return tokenExpiryAlertTime;
+    }
+
+    public void setTokenExpiryAlertTime( Date tokenExpiryAlertTime )
+    {
+        this.tokenExpiryAlertTime = tokenExpiryAlertTime;
+    }
+
+    public String getTokenExpiryAlertEmail()
+    {
+        return tokenExpiryAlertEmail;
+    }
+
+    public void setTokenExpiryAlertEmail( String tokenExpiryAlertEmail )
+    {
+        this.tokenExpiryAlertEmail = tokenExpiryAlertEmail;
+    }
+
+    @Override
 	public String toString() {
 		return "LinkdenInToken [linkedInId=" + linkedInId + ", linkedInPageLink=" + linkedInPageLink + "]";
 	}
