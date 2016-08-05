@@ -684,28 +684,31 @@ public class SocialManagementController
         if ( mediaTokens == null ) {
             LOG.debug( "Media tokens do not exist. Creating them and adding the facebook access token" );
             mediaTokens = new SocialMediaTokens();
-            mediaTokens.setFacebookToken( new FacebookToken() );
-        } else {
-            LOG.debug( "Updating the existing media tokens for facebook" );
-            if ( mediaTokens.getFacebookToken() == null ) {
-                mediaTokens.setFacebookToken( new FacebookToken() );
-            }
+        }
+        
+        //check for facebook token
+        FacebookToken facebookToken = mediaTokens.getFacebookToken();
+        if(facebookToken == null){
+            facebookToken = new FacebookToken();
         }
 
+        //update profile link
         if ( profileLink != null )
-            mediaTokens.getFacebookToken().setFacebookPageLink( profileLink );
+            facebookToken.setFacebookPageLink( profileLink );
 
-        mediaTokens.getFacebookToken().setFacebookAccessToken( accessToken.getToken() );
-        mediaTokens.getFacebookToken().setFacebookAccessTokenCreatedOn( System.currentTimeMillis() );
+        //update access tokem
+        facebookToken.setFacebookAccessToken( accessToken.getToken() );
+        facebookToken.setFacebookAccessTokenCreatedOn( System.currentTimeMillis() );
         if ( accessToken.getExpires() != null )
-            mediaTokens.getFacebookToken().setFacebookAccessTokenExpiresOn( accessToken.getExpires() );
+            facebookToken.setFacebookAccessTokenExpiresOn( accessToken.getExpires() );
 
-        mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( accessToken.getToken() );
+        facebookToken.setFacebookAccessTokenToPost( accessToken.getToken() );
 
         Facebook facebook = new FacebookFactory().getInstance();
         facebook.setOAuthAppId( facebookClientId, facebookClientSecret );
         facebook.setOAuthAccessToken( new facebook4j.auth.AccessToken( accessToken.getToken() ) );
 
+        //update facebook pages
         ResponseList<Account> accounts;
         List<FacebookPage> facebookPages = new ArrayList<FacebookPage>();
         try {
@@ -723,8 +726,17 @@ public class SocialManagementController
         } catch ( FacebookException e ) {
             LOG.error( "Error while creating access token for facebook: " + e.getLocalizedMessage(), e );
         }
-        mediaTokens.getFacebookToken().setFacebookPages( facebookPages );
+        facebookToken.setFacebookPages( facebookPages );
+        
+        //update expiry email alert detail
+        facebookToken.setTokenExpiryAlertSent( false );
+        facebookToken.setTokenExpiryAlertEmail( null );
+        facebookToken.setTokenExpiryAlertTime( null );
+        
 
+        //update facebook token in media token
+        mediaTokens.setFacebookToken( facebookToken );
+        
         LOG.debug( "Method updateFacebookToken() finished from SocialManagementController" );
         return mediaTokens;
     }
