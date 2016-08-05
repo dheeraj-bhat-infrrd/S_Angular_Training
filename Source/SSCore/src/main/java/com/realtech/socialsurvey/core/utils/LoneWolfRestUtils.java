@@ -110,6 +110,9 @@ public class LoneWolfRestUtils
         cal.add( Calendar.DATE, -1 );
         String yesterdayDate =  sdf.format(cal.getTime());
         
+        yesterdayDate = "2016-07-03";
+        todayDate = "2016-08-03";
+        
         String fitler = "StatusCode+eq+'A'+and+CloseDate+ge+datetimeoffset'"+ yesterdayDate +"'+and+CloseDate+lt+datetimeoffset'"+todayDate+"'";
         
         LOG.info( "Method generateFilterQueryParamFor finished." );

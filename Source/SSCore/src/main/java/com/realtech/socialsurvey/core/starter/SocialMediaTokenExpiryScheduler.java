@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -22,6 +24,8 @@ import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
 
 
 @Component ( "socialMediaTokenExpiryScheduler")
@@ -32,13 +36,15 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
     private BatchTrackerService batchTrackerService;
     private EmailServices emailServices;
     private OrganizationManagementService organizationManagementService;
+    private SocialMediaExceptionHandler socialMediaExceptionHandler;
+    private SocialManagementService socialManagementService;
 
 
     @Override
     protected void executeInternal( JobExecutionContext jobExecutionContext ) throws JobExecutionException
     {
         try {
-            LOG.info( "Executing lonewolf review processor" );
+            LOG.info( "Executing SocialMediaTokenExpiryScheduler" );
 
             initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
 
@@ -63,7 +69,7 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
                     CommonConstants.BATCH_TYPE_SOCIAL_MEDIA_TOKEN_EXPIRY_SCHEDULER, e.getMessage() );
 
                 //send report bug mail to admin
-                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_LONE_WOLF_REVIEW_PROCESSOR,
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_SOCIAL_MEDIA_TOKEN_EXPIRY_SCHEDULER,
                     System.currentTimeMillis(), e );
             } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
                 LOG.error( "Error while updating error message in social media token expiry scheduler" );
@@ -74,6 +80,12 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
     }
 
 
+    /**
+     * 
+     * @param collectionName
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
     private void startProcessingForCollection( String collectionName ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "Inside method startProcessingForCollection started." );
@@ -88,9 +100,19 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
                 long tokenCreatedOn = smTokens.getLinkedInToken().getLinkedInAccessTokenCreatedOn();
                 long expirySeconds = smTokens.getLinkedInToken().getLinkedInAccessTokenExpiresIn();
                 if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ) {
-                    String emailId = "test@test.com";
-                    String name = "Linkedin User";
-                    sendTokenExpiryEmail( collectionName, name, emailId );
+                   LinkedInToken linkedInToken = smTokens.getLinkedInToken();
+                    if ( !linkedInToken.isTokenExpiryAlertSent() ) {
+                        //send alert mail to entity 
+                        String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( orgUnit , CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        //update alert mail detail in linkedin token
+                        if ( emailId != null ) {
+                            linkedInToken.setTokenExpiryAlertEmail( emailId );
+                            linkedInToken.setTokenExpiryAlertSent( true );
+                            linkedInToken.setTokenExpiryAlertTime( new Date() );
+                            socialManagementService.updateLinkedinToken( collectionName, orgUnit.getIden(), linkedInToken );
+                        }
+                    }
+
                 }
 
             }
@@ -99,28 +121,24 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
                 long tokenCreatedOn = smTokens.getFacebookToken().getFacebookAccessTokenCreatedOn();
                 long expirySeconds = smTokens.getFacebookToken().getFacebookAccessTokenExpiresOn();
                 if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ) {
-                    String emailId = "test@test.com";
-                    String name = "Facebook User";
-                    sendTokenExpiryEmail( collectionName, name, emailId );
+                    FacebookToken facebookToken = smTokens.getFacebookToken();
+                    if ( ! facebookToken.isTokenExpiryAlertSent() ) {
+                        LOG.debug( "Alert Mail hasn't send to sending alert mail for entity" );
+                        String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( orgUnit , CommonConstants.FACEBOOK_SOCIAL_SITE );
+                        //update alert detail in token
+                        if ( emailId != null ) {
+                            facebookToken.setTokenExpiryAlertEmail( emailId );
+                            facebookToken.setTokenExpiryAlertSent( true );
+                            facebookToken.setTokenExpiryAlertTime( new Date() );
+                            socialManagementService.updateFacebookToken( collectionName, orgUnit.getIden(), facebookToken );
+                        }
+                    }
                 }
             }
         }
         
         LOG.debug( "Inside method startProcessingForCollection finished." );
 
-    }
-
-
-    private void sendTokenExpiryEmail( String collectionName, String displayName, String emailId )
-    {
-        String errorMsg = "";
-        errorMsg += "<br>" + "Your social media token has expired." + "<br><br>";
-        LOG.info( "Sending bug mail to admin" );
-        try {
-            emailServices.sendSocialMediaTokenExpiryEmail( displayName, errorMsg, emailId );
-        } catch ( InvalidInputException | UndeliveredEmailException e ) {
-            LOG.error( "error while sending report bug mail to admin ", e );
-        }
     }
 
 
@@ -153,5 +171,7 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
         batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
         emailServices = (EmailServices) jobMap.get( "emailServices" );
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
+        socialMediaExceptionHandler = (SocialMediaExceptionHandler) jobMap.get( "socialMediaExceptionHandler" );
+        socialManagementService = (SocialManagementService) jobMap.get( "socialManagementService" );
     }
 }
