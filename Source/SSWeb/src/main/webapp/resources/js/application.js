@@ -9342,7 +9342,9 @@ $(document).on('click', '#wc-send-survey', function() {
 					return;
 				}
 				surveysent=true;
+				$('.ps-container').scrollTop(0).perfectScrollbar('update');
 				callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
+					
 					$('#send-survey-dash').addClass("hide");
 					$('.overlay-login').hide();
 					// Update the incomplete survey on dashboard
