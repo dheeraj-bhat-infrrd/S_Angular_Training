@@ -47,6 +47,9 @@ public class IncomingMailController
     @Autowired
     private EncryptionHelper encryptionHelper;
 
+	private static String NULL_USER_EMAIL_ADDRESS = "u-null@alert.socialsurvey.me";
+	private static String NULL_USER_EMAIL_ADDRESS_DEMO = "u-null@socialsurvey.me";
+
 
     /**
      *  Method to handle forwarding of customer reply to corresponding recipient based on below strategy :
@@ -144,8 +147,11 @@ public class IncomingMailController
             ContactDetailsSettings contactDetailsSettings = userManagementService.fetchAgentContactDetailByEncryptedId( userEncryptedId );
             if(contactDetailsSettings != null && contactDetailsSettings.getMail_ids() != null  )
                 resolvedMailId = contactDetailsSettings.getMail_ids().getWork();
-        } else if ( mailTo.contains( defaultFromAddress ) || mailTo.contains( applicationAdminEmail ) ) {
-            resolvedMailId = applicationAdminEmail;
+            if ( userEncryptedId == null )
+	            resolvedMailId = applicationAdminEmail;
+        } else if ( mailTo.contains( defaultFromAddress ) || mailTo.contains( applicationAdminEmail ) || mailTo
+	        .contains( NULL_USER_EMAIL_ADDRESS ) || mailTo.contains( NULL_USER_EMAIL_ADDRESS_DEMO ) ) {
+	        resolvedMailId = applicationAdminEmail;
         }
         LOG.info( "Mail id resolved to : " + resolvedMailId );
         LOG.info( "Method resolveMailTo() call ended to resolve mail to email id" );
@@ -159,7 +165,6 @@ public class IncomingMailController
             LOG.error( "Mail From passed cannot be null or empty" );
             return null;
         }
-
         LOG.info( "Method retrieveSenderInfoFromMailId() called to retrieve sender information from mail from id" );
         List<String> senderInfo = new ArrayList<String>();
         String parts[] = mailFrom.split( "<" );

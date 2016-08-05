@@ -283,6 +283,7 @@ public interface CommonConstants
     public static final String SUMMARY_COLUMN = "summary";
     public static final String REVIEW_COLUMN = "review";
     public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
+	public static final String USER_ENCRYPTED_ID = "userEncryptedId";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -1192,11 +1193,11 @@ public interface CommonConstants
     public static final String BATCH_TYPE_LONE_WOLF_REVIEW_PROCESSOR = "loneWolfReviewProcessor";
     public static final String BATCH_NAME_LONE_WOLF_REVIEW_PROCESSOR = "Lone Wolf Review Processor";
     public static final String CRM_SOURCE_LONEWOLF = "LONEWOLF";
-    
+
     // loan wol crm info
     public static final String LONEWOLF_DRY_RUN_STATE = "dryrun";
     public static final String LONEWOLF_PRODUCTION_STATE = "prod";
-    
+
     public static final String BATCH_TYPE_SOCIAL_MEDIA_TOKEN_EXPIRY_SCHEDULER = "socialMediaTokenExpiryScheduler";
     public static final String BATCH_NAME_SOCIAL_MEDIA_TOKEN_EXPIRY_SCHEDULER = "Social Media Token Expiry Scheduler";
 
@@ -1205,7 +1206,7 @@ public interface CommonConstants
     public static final String LONEWOLF_QUERY_PARAM_$FILTER = "$filter";
     public static final String LONEWOLF_QUERY_PARAM_$ORDERBY = "$OrderBy";
     public static final String LONEWOLF_QUERY_PARAM_$SKIP = "$skip";
-    
+
     public static final String LONEWOLF_QUERY_PARAM_ORDERBY_VALUE =  "CloseDate+desc";
     public static final int  LONEWOLF_TRANSACTION_API_BATCH_SIZE = 1000;
 
