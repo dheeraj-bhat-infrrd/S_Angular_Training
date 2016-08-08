@@ -89,6 +89,7 @@
 			</div>
 		</div>
 	</c:if>
+<c:if test="${importedFrom3rdParty > 0 }">
 	<div class="clearfix stat-icns-wrapper">
 		<div class="float-left stat-icn-lbl"><spring:message code="label.thirdpartyreviews.key" /></div>
 		<div id="thirdparty-icn" class="float-left stat-icns-item clearfix">
@@ -99,5 +100,5 @@
 				<div id='third-party' class='float-left stat-icn-txt-rt'>${importedFrom3rdParty}</div>
 		</div>
 	</div>
-	
+</c:if>
 </div>
