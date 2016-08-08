@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -157,7 +158,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${APPLICATION_LOGO_URL}")
     private String appLogoUrl;
 
-	@Value( "3RD_PARTY_IMPORT_PATH" )
+	@Value( "${3RD_PARTY_IMPORT_PATH}" )
 	private String thirdPartySurveyImportPath;
 
     @Value ( "${MAX_SURVEY_REMINDERS}")
@@ -199,6 +200,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${PARAM_ORDER_SURVEY_COMPLETION_UNPLEASANT_MAIL}")
     String paramOrderSurveyCompletionUnpleasantMail;
 
+	@Value ( "${MASK_EMAIL_ADDRESS}")
+	private String maskEmail;
+
     @Autowired
     private Utils utils;
 
@@ -212,15 +216,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
 
 	//TODO : Change this to handle emailIds
-	private static final int USER_EMAIL_ID_INDEX = 2;
-	private static final int CUSTOMER_FIRSTNAME_INDEX = 3;
-	private static final int CUSTOMER_LASTNAME_INDEX = 4;
-	private static final int CUSTOMER_EMAIL_INDEX = 7;
+	private static final int USER_EMAIL_ID_INDEX = 3;
+	private static final int CUSTOMER_FIRSTNAME_INDEX = 4;
+	private static final int CUSTOMER_LASTNAME_INDEX = 5;
+	private static final int CUSTOMER_EMAIL_INDEX = 8;
 	private static final int SURVEY_COMPLETION_INDEX = 0;
-	private static final int SCORE_INDEX = 5;
-	private static final int COMMENT_INDEX = 6;
-	private static final int CITY = 8;
-	private static final int STATE = 9;
+	private static final int SCORE_INDEX = 6;
+	private static final int COMMENT_INDEX = 7;
+	private static final int CITY_INDEX = 9;
+	private static final int STATE_INDEX = 10;
 
     /**
      * Method to store question and answer format into mongo.
@@ -2815,6 +2819,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         survey.setCreatedOn( currentTimestamp );
         survey.setModifiedOn( currentTimestamp );
         survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+	    survey.setCity( surveyImportVO.getCity() );
+	    survey.setState( surveyImportVO.getState() );
         surveyPreInitiationDao.save( survey );
         LOG.info( "Method BulkSurveyImporter.importSurveyVOToSurveyPreInitiation finished" );
         return survey;
@@ -2855,11 +2861,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setEditable( false );
         surveyDetails.setSource( source );
         surveyDetails.setShowSurveyOnUI( true );
-
+		surveyDetails.setCity( surveyImportVO.getCity() );
+	    surveyDetails.setState( surveyImportVO.getState() );
         surveyDetails.setRetakeSurvey( false );
         surveyDetails.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
         surveyDetailsDao.insertSurveyDetails( surveyDetails );
-        surveyDetailsDao.updateSurveyAsClicked( surveyDetails.get_id() );
         return surveyDetails;
     }
 
@@ -3078,16 +3084,29 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 						.isEmpty() ) {
 						survey.setCustomerLastName( cell.getStringCellValue().trim() );
 					} else if ( cell.getColumnIndex() == CUSTOMER_EMAIL_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
-						survey.setCustomerEmailAddress( cell.getStringCellValue().trim() );
+                        //Mask email address if required
+						String emailId = cell.getStringCellValue().trim();
+						if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
+							emailId = utils.maskEmailAddress( emailId );
+						}
+						survey.setCustomerEmailAddress( emailId );
 					} else if ( cell.getColumnIndex() == SURVEY_COMPLETION_INDEX ) {
 						survey.setSurveyDate( cell.getDateCellValue() );
 					} else if ( cell.getColumnIndex() == SCORE_INDEX ) {
 						survey.setScore( cell.getNumericCellValue() );
 					} else if ( cell.getColumnIndex() == COMMENT_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
 						survey.setReview( cell.getStringCellValue() );
+					} else if ( cell.getColumnIndex() == CITY_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
+						survey.setCity( cell.getStringCellValue() );
+					} else if ( cell.getColumnIndex() == STATE_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
+						survey.setState( cell.getStringCellValue() );
 					}
 				}
 				try {
+					//If object empty, get out of loop;
+					if ( isObjectEmpty(survey) ) {
+						break;
+					}
                     resolveEmailAddress( survey );
 					validateSurveyRow( survey );
 				} catch ( InvalidInputException e ) {
@@ -3096,11 +3115,28 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 				}
 				surveyList.add( survey );
 			}
+            fileStream.close();
+			//Delete file from location
+			File surveyFile = new File( thirdPartySurveyImportPath );
+			if ( surveyFile.delete() )
+				LOG.info( "Successfully deleted the third party import file" );
+			else
+				LOG.error( "Failed to delete third party import file." );
 		} catch ( IOException e ) {
 			e.printStackTrace();
 		}
 		LOG.info( "BulkSurveyImporter.getSurveyListFromCsv finished" );
 		return surveyList;
+	}
+
+
+	private boolean isObjectEmpty( SurveyImportVO survey )
+	{
+		if ( ( survey.getCustomerEmailAddress() == null || survey.getCustomerEmailAddress().isEmpty() ) && (
+			survey.getUserEmailId() == null || survey.getUserEmailId().isEmpty() ) ) {
+			return true;
+		}
+		return false;
 	}
 
     private void resolveEmailAddress( SurveyImportVO survey ) throws InvalidInputException
@@ -3109,7 +3145,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 		    throw new InvalidInputException( "customer email address cannot be null" );
 	    }
 	    try {
-		    User user = userManagementService.getUserByEmailAddress( survey.getCustomerEmailAddress() );
+		    User user = userManagementService.getUserByEmailAddress( survey.getUserEmailId() );
 		    survey.setUserId( user.getUserId() );
 	    } catch ( NoRecordsFetchedException e ) {
 		    throw new InvalidInputException( "No user found with the email address : " + survey.getCustomerEmailAddress() );
@@ -3142,7 +3178,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 					importSurveyVOToDBs( surveyImportVO, CommonConstants.SURVEY_SOURCE_3RD_PARTY );
 				}
 			}
-			//TODO: Delete file from location
 		} catch ( NonFatalException e ) {
 			LOG.error( "An error occurred while uploading the surveys. Reason: ", e );
 		}
