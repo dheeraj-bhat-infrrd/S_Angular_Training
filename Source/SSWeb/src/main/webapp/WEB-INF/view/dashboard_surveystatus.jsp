@@ -95,7 +95,7 @@
 			<c:choose>
 				<c:when test="${not empty allSurveySent && allSurveySent != 0 && not empty socialPosts && socialPosts != 0}">
 					<fmt:formatNumber type="number" var="socialPostsCount" value="${socialPosts * 20 / allSurveySent}" maxFractionDigits="0"/>
-					<c:forEach begin="1" end="${socialPosts<20?socialPosts:20}" var="counttwo">
+					<c:forEach begin="1" end="${importedFrom3rdParty<20?importedFrom3rdParty:20}" var="counttwo">
 						<div class="float-left stat-icn-img stat-icn-img-blue"></div>
 					</c:forEach>
 					<div id="social-posts" class="float-left stat-icn-txt-rt">${socialPosts}</div>
