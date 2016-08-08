@@ -137,20 +137,20 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                 LOG.info( "Looping through crm list of size: " + organizationUnitSettingsList.size() );
                 for ( OrganizationUnitSettings organizationUnitSettings : organizationUnitSettingsList ) {
 
-                    LOG.info( "Getting lonewolf records for company id: " + organizationUnitSettings.getIden() );
+                    LOG.info( "Getting lonewolf records for collection " + collectionName + " and id : " + organizationUnitSettings.getIden() );
                     LoneWolfCrmInfo loneWolfCrmInfo = (LoneWolfCrmInfo) organizationUnitSettings.getCrm_info();
                     if ( StringUtils.isNotEmpty( loneWolfCrmInfo.getClientCode() ) ) {
 
                         entityId = organizationUnitSettings.getIden();
 
                         //make an entry in crm batch tracker and update last run start time
-                        crmBatchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType,
+                        long recentRecordFetchedTime = crmBatchTrackerService.getRecentRecordFetchedAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType,
                             entityId, CommonConstants.CRM_SOURCE_LONEWOLF );
                         try {
 
                             //Fetch transactions data from lone wolf.
                             int skip = 0;
-                            String filter = loneWolfRestUtils.generateFilterQueryParamFor();
+                            String filter = loneWolfRestUtils.generateFilterQueryParamFor(recentRecordFetchedTime);
                             List<LoneWolfTransaction> loneWolfTransactionsBatch = null;
                             List<LoneWolfTransaction> loneWolfTransactions = new ArrayList<LoneWolfTransaction>();
                             do {
@@ -158,7 +158,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                                 LOG.debug( "Fetching records start from " + skip );
                                 // use linked hash map to maintain the order
                                 Map<String, String> queryParam = new LinkedHashMap<String, String>();
-                                queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$TOP, String.valueOf( 1000 ) );
+                                queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$TOP, String.valueOf( CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE ) );
                                 queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$FILTER, filter );
                                 queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$ORDERBY,
                                     CommonConstants.LONEWOLF_QUERY_PARAM_ORDERBY_VALUE );

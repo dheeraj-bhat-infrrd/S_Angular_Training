@@ -313,6 +313,7 @@ public interface SurveyHandler
         Map<SettingsForApplication, OrganizationUnit> mapPrimaryHierarchy, OrganizationUnitSettings rSettings,
         OrganizationUnitSettings bSettings, Map<String, String> surveyMap ) throws InvalidInputException;
 
+    public void begin3rdPartySurveyImport();
 
     public String getLogoUrl( User user, AgentSettings agentSettings );
 

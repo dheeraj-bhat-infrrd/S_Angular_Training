@@ -239,7 +239,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
             OrganizationUnitSettings settings = settingsDao
                 .fetchOrganizationUnitSettingsById( iden, collection );
           //call social media error handler for facebook exception
-            socialMediaExceptionHandler.handleFacebookException( e  , settings);
+            socialMediaExceptionHandler.handleFacebookException( e  , settings ,collection);
             
            
             

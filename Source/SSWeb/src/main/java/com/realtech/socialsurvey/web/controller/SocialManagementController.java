@@ -684,28 +684,31 @@ public class SocialManagementController
         if ( mediaTokens == null ) {
             LOG.debug( "Media tokens do not exist. Creating them and adding the facebook access token" );
             mediaTokens = new SocialMediaTokens();
-            mediaTokens.setFacebookToken( new FacebookToken() );
-        } else {
-            LOG.debug( "Updating the existing media tokens for facebook" );
-            if ( mediaTokens.getFacebookToken() == null ) {
-                mediaTokens.setFacebookToken( new FacebookToken() );
-            }
+        }
+        
+        //check for facebook token
+        FacebookToken facebookToken = mediaTokens.getFacebookToken();
+        if(facebookToken == null){
+            facebookToken = new FacebookToken();
         }
 
+        //update profile link
         if ( profileLink != null )
-            mediaTokens.getFacebookToken().setFacebookPageLink( profileLink );
+            facebookToken.setFacebookPageLink( profileLink );
 
-        mediaTokens.getFacebookToken().setFacebookAccessToken( accessToken.getToken() );
-        mediaTokens.getFacebookToken().setFacebookAccessTokenCreatedOn( System.currentTimeMillis() );
+        //update access tokem
+        facebookToken.setFacebookAccessToken( accessToken.getToken() );
+        facebookToken.setFacebookAccessTokenCreatedOn( System.currentTimeMillis() );
         if ( accessToken.getExpires() != null )
-            mediaTokens.getFacebookToken().setFacebookAccessTokenExpiresOn( accessToken.getExpires() );
+            facebookToken.setFacebookAccessTokenExpiresOn( accessToken.getExpires() );
 
-        mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( accessToken.getToken() );
+        facebookToken.setFacebookAccessTokenToPost( accessToken.getToken() );
 
         Facebook facebook = new FacebookFactory().getInstance();
         facebook.setOAuthAppId( facebookClientId, facebookClientSecret );
         facebook.setOAuthAccessToken( new facebook4j.auth.AccessToken( accessToken.getToken() ) );
 
+        //update facebook pages
         ResponseList<Account> accounts;
         List<FacebookPage> facebookPages = new ArrayList<FacebookPage>();
         try {
@@ -723,8 +726,17 @@ public class SocialManagementController
         } catch ( FacebookException e ) {
             LOG.error( "Error while creating access token for facebook: " + e.getLocalizedMessage(), e );
         }
-        mediaTokens.getFacebookToken().setFacebookPages( facebookPages );
+        facebookToken.setFacebookPages( facebookPages );
+        
+        //update expiry email alert detail
+        facebookToken.setTokenExpiryAlertSent( false );
+        facebookToken.setTokenExpiryAlertEmail( null );
+        facebookToken.setTokenExpiryAlertTime( null );
+        
 
+        //update facebook token in media token
+        mediaTokens.setFacebookToken( facebookToken );
+        
         LOG.debug( "Method updateFacebookToken() finished from SocialManagementController" );
         return mediaTokens;
     }
@@ -1541,74 +1553,7 @@ public class SocialManagementController
     }
 
 
-    @ResponseBody
-    @RequestMapping ( value = "/postonlinkedin", method = RequestMethod.GET)
-    public String postToLinkedin( HttpServletRequest request )
-    {
-        LOG.info( "Method to post feedback of customer on twitter started." );
-        String agentName = request.getParameter( "agentName" );
-        String custFirstName = request.getParameter( "firstName" );
-        String custLastName = request.getParameter( "lastName" );
-        String agentIdStr = request.getParameter( "agentId" );
-        String feedback = request.getParameter( "review" );
-        boolean linkedinNotSetup = true;
-
-        double rating = 0;
-        long agentId = 0;
-        try {
-            agentId = Long.parseLong( agentIdStr );
-            String ratingStr = request.getParameter( "score" );
-            rating = Double.parseDouble( ratingStr );
-        } catch ( NumberFormatException e ) {
-            LOG.error(
-                "Number format exception caught in postToLinkedin() while trying to convert agent Id. Nested exception is ",
-                e );
-            return e.getMessage();
-        }
-        String agentProfileLink = "";
-        String custDisplayName = null;
-        AgentSettings agentSettings = new AgentSettings();
-        try {
-            custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName );
-            agentSettings = userManagementService.getUserSettings( agentId );
-            if ( agentSettings != null && agentSettings.getProfileUrl() != null ) {
-                agentProfileLink = agentSettings.getProfileUrl();
-            }
-        } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException caught in postToFacebook(). Nested exception is ", e );
-        }
-
-        try {
-            User user = sessionHelper.getCurrentUser();
-            OrganizationUnitSettings companySettings = organizationManagementService
-                .getCompanySettings( user.getCompany().getCompanyId() );
-            List<OrganizationUnitSettings> settings = socialManagementService
-                .getBranchAndRegionSettingsForUser( user.getUserId() );
-            String message = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + custDisplayName
-                + " for " + agentName + " on SocialSurvey ";
-            String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-            message += linkedinProfileUrl;
-            message = message.replaceAll( "null", "" );
-            String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " " + feedback;
-            for ( OrganizationUnitSettings setting : settings ) {
-                try {
-                    if ( setting != null )
-                        if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
-                            linkedinMessageFeedback, companySettings, false, agentSettings, new SocialMediaPostResponse() ) )
-                            linkedinNotSetup = false;
-                } catch ( NonFatalException e ) {
-                    LOG.error(
-                        "NonFatalException caught in postToLinkedin() while trying to post to twitter. Nested excption is ",
-                        e );
-                }
-            }
-        } catch ( Exception e ) {
-            LOG.error( "Exception caught in postToLinkedin() while trying to post to twitter. Nested excption is ", e );
-        }
-        LOG.info( "Method to post feedback of customer to various pages of twitter finished." );
-        return linkedinNotSetup + "";
-    }
-
+   
 
     @ResponseBody
     @RequestMapping ( value = "/getyelplink", method = RequestMethod.GET)
