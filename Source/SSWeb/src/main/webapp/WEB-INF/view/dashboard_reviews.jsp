@@ -120,12 +120,22 @@
                                            <c:choose>
                                         <c:when test="${ not empty feedback.surveyTransactionDate} ">
                                             <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-                            value="${ feedback.surveyTransactionDate}" />"></span>
-                                        </c:when>
+                            value="${ feedback.surveyTransactionDate}" />"> </span>
+														<c:choose>
+															<c:when test="${not empty feedback.city && not empty feedback.state}">
+																<span> in ${feedback.city}, ${feedback.state}.</span>
+															</c:when>
+														</c:choose>
+													</c:when>
                                         <c:otherwise>
                                             <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
                             value="${feedback.modifiedOn}" />"></span>
-                                        </c:otherwise>
+														<c:choose>
+															<c:when test="${not empty feedback.city && not empty feedback.state}">
+																<span> in ${feedback.city}, ${feedback.state}.</span>
+															</c:when>
+														</c:choose>
+													</c:otherwise>
                                         </c:choose>
                                     </div>
                                 </c:if>

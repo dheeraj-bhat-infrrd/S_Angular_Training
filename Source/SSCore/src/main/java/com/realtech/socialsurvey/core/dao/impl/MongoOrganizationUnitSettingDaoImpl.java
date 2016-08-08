@@ -250,8 +250,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public void updateParticularKeyAgentSettings( String keyToUpdate, Object updatedRecord, AgentSettings agentSettings )
     {
-        LOG.info( "Updating unit setting in AGENT_SETTINGS with " + agentSettings + " for key: " + keyToUpdate + " wtih value: "
-            + updatedRecord );
+        LOG.info( "Updating unit setting in AGENT_SETTINGS with " + agentSettings + " for key: " + keyToUpdate
+            + " wtih value: " + updatedRecord );
         Query query = new Query();
         query.addCriteria( Criteria.where( "_id" ).is( agentSettings.getId() ) );
         Update update = new Update().set( keyToUpdate, updatedRecord );
@@ -351,9 +351,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.info( "Method fetchOrganizationUnitSettingsByProfileUrl called for profileUrl:" + profileUrl
             + " and collectionName:" + collectionName );
 
-        OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(
-            new BasicQuery( new BasicDBObject( KEY_PROFILE_URL, profileUrl ) ), OrganizationUnitSettings.class,
-            collectionName );
+        OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne( new BasicQuery( new BasicDBObject(
+            KEY_PROFILE_URL, profileUrl ) ), OrganizationUnitSettings.class, collectionName );
         setCompleteUrlForSettings( organizationUnitSettings, collectionName );
         LOG.info( "Successfully executed method fetchOrganizationUnitSettingsByProfileUrl" );
         return organizationUnitSettings;
@@ -407,8 +406,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
         // query records which are not deleted or incomplete
-        query.addCriteria( Criteria.where( KEY_STATUS )
-            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        query.addCriteria( Criteria.where( KEY_STATUS ).nin(
+            Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.fields().include( KEY_PROFILE_URL ).include( KEY_MODIFIED_ON ).exclude( "_id" );
         query.with( new Sort( Sort.Direction.DESC, KEY_MODIFIED_ON ) );
         if ( skipCount > 0 ) {
@@ -580,8 +579,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).in( companyIds ) );
         query.fields().include( KEY_CONTACT_DETAILS ).include( KEY_PROFILE_NAME ).include( KEY_VERTICAL ).include( KEY_IDEN )
             .include( KEY_PROFILE_IMAGE ).exclude( "_id" );
-        
-        query.with(new Sort(Direction.ASC, KEY_CONTACT_NAME));
+
+        query.with( new Sort( Direction.ASC, KEY_CONTACT_NAME ) );
 
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
 
@@ -615,20 +614,20 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         if ( settings != null && collectionName != null && !collectionName.isEmpty() ) {
             switch ( collectionName ) {
                 case CommonConstants.BRANCH_SETTINGS_COLLECTION:
-                    settings.setCompleteProfileUrl(
-                        applicationBaseUrl + CommonConstants.BRANCH_PROFILE_FIXED_URL + settings.getProfileUrl() );
+                    settings.setCompleteProfileUrl( applicationBaseUrl + CommonConstants.BRANCH_PROFILE_FIXED_URL
+                        + settings.getProfileUrl() );
                     break;
                 case CommonConstants.REGION_SETTINGS_COLLECTION:
-                    settings.setCompleteProfileUrl(
-                        applicationBaseUrl + CommonConstants.REGION_PROFILE_FIXED_URL + settings.getProfileUrl() );
+                    settings.setCompleteProfileUrl( applicationBaseUrl + CommonConstants.REGION_PROFILE_FIXED_URL
+                        + settings.getProfileUrl() );
                     break;
                 case CommonConstants.COMPANY_SETTINGS_COLLECTION:
-                    settings.setCompleteProfileUrl(
-                        applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL + settings.getProfileUrl() );
+                    settings.setCompleteProfileUrl( applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL
+                        + settings.getProfileUrl() );
                     break;
                 case CommonConstants.AGENT_SETTINGS_COLLECTION:
-                    settings.setCompleteProfileUrl(
-                        applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + settings.getProfileUrl() );
+                    settings.setCompleteProfileUrl( applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
+                        + settings.getProfileUrl() );
                     break;
             }
         }
@@ -683,8 +682,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
      * @throws NoRecordsFetchedException
      */
     @Override
-    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state )
-        throws InvalidInputException, NoRecordsFetchedException
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state ) throws InvalidInputException,
+        NoRecordsFetchedException
     {
         LOG.info( "Getting Company list for encompass where state : " + state );
         if ( state == null || state.isEmpty() ) {
@@ -786,14 +785,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         }
         Query query = new Query();
         if ( imageType.equals( CommonConstants.IMAGE_TYPE_PROFILE ) ) {
-            query
-                .addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR )
-                    .regex( StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) )
-                .addCriteria( Criteria.where( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN ).is( false ) );
+            query.addCriteria(
+                Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR ).regex(
+                    StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) ).addCriteria(
+                Criteria.where( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN ).is( false ) );
         } else if ( imageType.equals( CommonConstants.IMAGE_TYPE_LOGO ) ) {
-            query
-                .addCriteria( Criteria.where( CommonConstants.LOGO_COLUMN )
-                    .regex( StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) )
+            query.addCriteria(
+                Criteria.where( CommonConstants.LOGO_COLUMN ).regex( StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) )
                 .addCriteria( Criteria.where( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN ).is( false ) );
         } else {
             throw new InvalidInputException( "Invalid image type" );
@@ -801,8 +799,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.fields().include( CommonConstants.PROFILE_IMAGE_URL_SOLR ).include( CommonConstants.IDEN )
             .include( CommonConstants.LOGO_COLUMN ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
         LOG.debug( "Query: " + query.toString() );
-        List<OrganizationUnitSettings> unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class,
-            collectionName );
+        List<OrganizationUnitSettings> unitSettings = mongoTemplate
+            .find( query, OrganizationUnitSettings.class, collectionName );
         if ( unitSettings != null && unitSettings.size() > 0 ) {
             LOG.debug( "Found " + unitSettings.size() + " records." );
             images = new HashMap<>();
@@ -932,5 +930,34 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).exclude( "_id" );
         SocialMediaTokens tokens = mongoTemplate.findOne( query, SocialMediaTokens.class, collectionName );
         return tokens;
+    }
+
+
+    @Override
+    public List<OrganizationUnitSettings> fetchUnitSettingsForSocialMediaTokens( String collectionName )
+    {
+        LOG.info( "Fetching unit settings for social media token expiry from " + collectionName );
+        List<OrganizationUnitSettings> settings = null;
+
+        List<Criteria> cList = new ArrayList<>();
+
+        cList.add( Criteria.where( KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+        //cList.add( Criteria.where( KEY_TWITTER_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+        cList.add( Criteria.where( KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+        //cList.add( Criteria.where( KEY_GOOGLE_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+
+        Criteria criteria = new Criteria().orOperator( cList.toArray( new Criteria[cList.size()] ) );
+
+        Query query = new Query();
+        query.addCriteria( criteria );
+
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( KEY_CONTACT_DETAILS )
+            .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
+
+        settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
+        LOG.info( "Fetched " + ( settings != null ? settings.size() : "none" )
+            + " unit settings with social media tokens from " + collectionName );
+
+        return settings;
     }
 }

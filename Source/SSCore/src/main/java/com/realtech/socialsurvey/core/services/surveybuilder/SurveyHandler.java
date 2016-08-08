@@ -3,27 +3,29 @@ package com.realtech.socialsurvey.core.services.surveybuilder;
 import java.util.List;
 import java.util.Map;
 
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.SurveyImportVO;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
 import org.apache.solr.client.solrj.SolrServerException;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyImportVO;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
-import org.springframework.transaction.annotation.Transactional;
 
 
 public interface SurveyHandler
@@ -52,8 +54,7 @@ public interface SurveyHandler
      * @param stage
      * @throws Exception
      */
-    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer,
-        int stage );
+    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage );
 
 
     /*
@@ -64,8 +65,7 @@ public interface SurveyHandler
         String agreedToShare );
 
 
-    public SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String url, String source, long surveyPreIntitiationId,
+    public SurveyDetails storeInitialSurveyDetails( User user, SurveyPreInitiation surveyPreInitiation, String baseUrl,
         boolean isOldRecord, boolean retakeSurvey ) throws SolrException, NoRecordsFetchedException, InvalidInputException;
 
 
@@ -102,12 +102,12 @@ public interface SurveyHandler
     public String getMoodsToSendMail();
 
 
-    public void increaseSurveyCountForAgent( long agentId )
-        throws SolrException, NoRecordsFetchedException, InvalidInputException;
+    public void increaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException,
+        InvalidInputException;
 
 
-    public void decreaseSurveyCountForAgent( long agentId )
-        throws SolrException, NoRecordsFetchedException, InvalidInputException;
+    public void decreaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException,
+        InvalidInputException;
 
 
     public String getGoogleShareUri();
@@ -125,8 +125,8 @@ public interface SurveyHandler
 
 
     public void sendSurveyRestartMail( String custFirstName, String custLastName, String custEmail,
-        String custRelationWithAgent, User user, String link )
-        throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+        String custRelationWithAgent, User user, String link ) throws InvalidInputException, UndeliveredEmailException,
+        ProfileNotFoundException;
 
 
     public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName,
@@ -192,9 +192,10 @@ public interface SurveyHandler
      * @throws ProfileNotFoundException 
      */
     public void initiateSurveyRequest( long agentId, String recipientEmailId, String recipientFirstname,
-        String recipientLastname, String source )
-        throws DuplicateSurveyRequestException, InvalidInputException, SelfSurveyInitiationException, SolrException,
-        NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException;
+        String recipientLastname, String source ) throws DuplicateSurveyRequestException, InvalidInputException,
+        SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException,
+        ProfileNotFoundException;
+
 
     //    Commented as Zillow surveys are not stored in database, SS-1276
     //    void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
@@ -278,8 +279,8 @@ public interface SurveyHandler
     public double getFormattedSurveyScore( double surveyScore );
 
 
-    public void moveSurveysToAnotherUser( long fromUserId, long toUserId )
-        throws InvalidInputException, NoRecordsFetchedException, SolrException;
+    public void moveSurveysToAnotherUser( long fromUserId, long toUserId ) throws InvalidInputException,
+        NoRecordsFetchedException, SolrException;
 
 
     public void deleteExistingZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
@@ -308,7 +309,36 @@ public interface SurveyHandler
 
 
     public String replaceGatewayQuestionText( String questionText, OrganizationUnitSettings agentSettings, User user,
-        OrganizationUnitSettings companySettings, SurveyDetails survey ) throws InvalidInputException;
+        OrganizationUnitSettings companySettings, SurveyDetails survey, String logoUrl,
+        Map<SettingsForApplication, OrganizationUnit> mapPrimaryHierarchy, OrganizationUnitSettings rSettings,
+        OrganizationUnitSettings bSettings, Map<String, String> surveyMap ) throws InvalidInputException;
 
-    void begin3rdPartySurveyImport();
+    public void begin3rdPartySurveyImport();
+
+    public String getLogoUrl( User user, AgentSettings agentSettings );
+
+
+    public String getLogoUrlWithSettings( User user, AgentSettings agentSettings, OrganizationUnitSettings companySettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSettings,
+        Map<SettingsForApplication, OrganizationUnit> map );
+
+
+    public void updateSurveyStageForYelp( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
+
+
+    public void updateSurveyStageForZillow( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
+
+
+    public void updateSurveyStageForLendingTree( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
+
+
+    public void updateSurveyStageForRealtor( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
+
+
+    public void updateSurveyStageForGoogleBusinessToken( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
 }

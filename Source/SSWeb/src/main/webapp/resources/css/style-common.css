@@ -529,7 +529,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	width: 100%;
 	height: 100%;
 	z-index: 9999999;
-	background: url(../images/dashloader.gif) no-repeat center;
+	background: url(../images/dashloader.gif) no-repeat 50% 100px;
 	background-size: 50px 50px;
 	background-color: #fff;
 }
@@ -1066,7 +1066,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 }
 
 .um-item-row-left {
-	width: 80px;
+	width: 89px;
 	float: left;
 	line-height: 40px;
 }
@@ -2162,6 +2162,7 @@ button.paypal.is-active {
 .hm-item-err-2 {
 	margin-top: 10px;
 	color: #e00000;
+	margin-left: 30px;
 }
 
 .initial-dd-wrapper {

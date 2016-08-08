@@ -9,6 +9,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
+import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
@@ -114,7 +116,7 @@ public interface SocialManagementService
     public List<OrganizationUnitSettings> getBranchAndRegionSettingsForUser( long userId );
 
 
-    public boolean updateLinkedin( OrganizationUnitSettings settings, String message, String linkedinProfileUrl,
+    public boolean updateLinkedin( OrganizationUnitSettings settings, String collectionName ,String message, String linkedinProfileUrl,
         String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow, AgentSettings agentSettings,
         SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException;
 
@@ -248,5 +250,21 @@ public interface SocialManagementService
     public void imcompleteSocialPostReminderSender();
 
     public void zillowReviewProcessorStarter();
+    
+    /**
+     * 
+     * @param collectionName
+     * @param iden
+     * @param facebookToken
+     */
+    public void updateFacebookToken( String collectionName , long iden ,  FacebookToken facebookToken);
+    
+    /**
+     * 
+     * @param collectionName
+     * @param iden
+     * @param linkedInToken
+     */
+    public void updateLinkedinToken( String collectionName , long iden ,  LinkedInToken linkedInToken);
 }
 // JIRA SS-34 BY RM02 BOC

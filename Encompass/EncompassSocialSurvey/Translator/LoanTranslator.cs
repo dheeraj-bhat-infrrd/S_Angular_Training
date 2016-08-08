@@ -64,7 +64,9 @@ namespace EncompassSocialSurvey.Translator
                     ReminderCounts = loanVM.ReminderCounts,
                     LastReminderTime = CommonUtility.ConvertStringToDateTime(loanVM.LastReminderTime),
                     Status = loanVM.Status,
-                    CreatedOn = DateTime.Now
+                    CreatedOn = DateTime.Now,
+                    State = loanVM.City,
+                    City = loanVM.State
 
                 };
             }

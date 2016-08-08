@@ -164,6 +164,8 @@ public interface SurveyBuilder {
 	 */
 	public List<SurveyQuestionDetails> getSurveyByAgenId(long agentId) throws InvalidInputException;
 	
+	public List<SurveyQuestionDetails> getSurveyByAgent(User user) throws InvalidInputException;
+	
 	/**
 	 * Adds a default survey to the company based on the vertical of the company.
 	 * @param user

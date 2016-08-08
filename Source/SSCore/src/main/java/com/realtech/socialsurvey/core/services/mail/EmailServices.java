@@ -465,4 +465,8 @@ public interface EmailServices
      */
     void sendEmailVerifiedNotificationMailToAdmin( String recipientMailId, String recipientName, String verifiedEmail,
         String entityName ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    void sendSocialMediaTokenExpiryEmail( String displayName, String recipientMailId , String  updateConnectionUrl , String appLoginUrl , String socialMediaType )
+        throws InvalidInputException, UndeliveredEmailException;
 }

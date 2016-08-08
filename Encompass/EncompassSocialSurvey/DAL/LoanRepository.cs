@@ -252,6 +252,8 @@ namespace EncompassSocialSurvey.DAL
                         commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = loan.CreatedOn;
                         commandToInsert.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = DateTime.Now;
                         commandToInsert.Parameters.Add("?COLLECTION_NAME", MySqlDbType.VarChar, 250).Value = "COMPANY_SETTINGS";
+                        commandToInsert.Parameters.Add("?STATE", MySqlDbType.VarChar, 100).Value = loan.State;
+                        commandToInsert.Parameters.Add("?CITY", MySqlDbType.VarChar, 100).Value = loan.City;
 
                         //
                         commandToInsert.ExecuteNonQuery();

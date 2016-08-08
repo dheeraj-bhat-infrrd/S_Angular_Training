@@ -50,7 +50,15 @@
 														+ password.substring(password.indexOf("\"") + 1);
 											}
 								%>
-								<input id="encompass-password" type="password" readonly onfocus="$(this).removeAttr('readonly');" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Password" name="encompass-password" value="<%=formattedPassword%>">
+								<c:choose>
+								 <c:when test="${formattedPassword==null}">
+								 <c:set var="password" value=""/>
+								 </c:when>
+								 <c:otherwise>
+								 <c:set var="password" value="${formattedPassword}"/>
+								 </c:otherwise>
+								</c:choose>
+								<input id="encompass-password" type="password" readonly onfocus="$(this).removeAttr('readonly');" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Password" name="encompass-password" value="${password}">
 								<div id="encompass-password-error" class="hm-item-err-2 hide"></div>
 							</div>
 						</div>

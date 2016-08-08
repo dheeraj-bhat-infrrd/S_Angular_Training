@@ -11,7 +11,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
  */
 public interface CRMBatchTrackerService
 {
-    public long getLastRunEndTimeAndUpdateLastStartTimeByEntityTypeAndSourceType( String entutyType  , long entityId , String source) throws InvalidInputException;
+    public long getRecentRecordFetchedAndUpdateLastStartTimeByEntityTypeAndSourceType( String entutyType  , long entityId , String source) throws InvalidInputException;
 
     void updateErrorForBatchTrackerByEntityTypeAndSourceType( String entityType, long entityId, String source, String error )
         throws NoRecordsFetchedException, InvalidInputException;

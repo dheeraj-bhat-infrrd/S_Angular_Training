@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,9 +9,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 
-import com.realtech.socialsurvey.core.entities.ProfileStage;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -30,7 +28,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -45,12 +42,14 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.Plan;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
@@ -65,7 +64,6 @@ import com.realtech.socialsurvey.web.api.exception.SSAPIException;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.common.TokenHandler;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
-import com.realtech.socialsurvey.web.entities.PersonalProfile;
 import com.realtech.socialsurvey.web.ui.entities.AccountRegistration;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 
@@ -78,44 +76,25 @@ import retrofit.mime.TypedByteArray;
  * services directly but should call APIs
  */
 @Controller
-public class AccountController
+public class AccountWebController
 {
-    private static final Logger LOG = LoggerFactory.getLogger( AccountController.class );
+    private static final Logger LOG = LoggerFactory.getLogger( AccountWebController.class );
+    private static final String AGENT_UNIT = "agent";
+    private static final String BRANCH_UNIT = "branch";
+    private static final String REGION_UNIT = "region";
+    private static final String COMPANY_UNIT = "company";
 
-    @Autowired
     private SSApiIntergrationBuilder apiBuilder;
-
-    @Autowired
     private RequestUtils requestUtils;
-
-    @Autowired
     private TokenHandler tokenHandler;
-
-    @Autowired
     private OrganizationManagementService organizationManagementService;
-
-    @Autowired
     private UserManagementService userManagementService;
-
-    @Autowired
     private SocialAsyncService socialAsyncService;
-
-    @Autowired
     private SocialManagementService socialManagementService;
-
-    @Autowired
     private Payment gateway;
-
-    @Autowired
     private FileUploadService fileUploadService;
-
-    @Autowired
     private ProfileManagementService profileManagementService;
-
-    @Autowired
     private MessageUtils messageUtils;
-
-    @Autowired
     private SessionHelper sessionHelper;
 
     @Value ( "${LINKED_IN_API_KEY}")
@@ -145,13 +124,27 @@ public class AccountController
     @Value ( "${CDN_PATH}")
     private String amazonEndpoint;
 
-    @Value ( "${AMAZON_IMAGE_BUCKET}")
-    private String amazonImageBucket;
 
-    private static final String AGENT_UNIT = "agent";
-    private static final String BRANCH_UNIT = "branch";
-    private static final String REGION_UNIT = "region";
-    private static final String COMPANY_UNIT = "company";
+    @Autowired
+    public AccountWebController( SSApiIntergrationBuilder apiBuilder, RequestUtils requestUtils, TokenHandler tokenHandler,
+        OrganizationManagementService organizationManagementService, UserManagementService userManagementService,
+        SocialAsyncService socialAsyncService, SocialManagementService socialManagementService, Payment gateway,
+        FileUploadService fileUploadService, MessageUtils messageUtils, SessionHelper sessionHelper,
+        ProfileManagementService profileManagementService )
+    {
+        this.apiBuilder = apiBuilder;
+        this.requestUtils = requestUtils;
+        this.tokenHandler = tokenHandler;
+        this.organizationManagementService = organizationManagementService;
+        this.userManagementService = userManagementService;
+        this.socialAsyncService = socialAsyncService;
+        this.socialManagementService = socialManagementService;
+        this.gateway = gateway;
+        this.fileUploadService = fileUploadService;
+        this.messageUtils = messageUtils;
+        this.sessionHelper = sessionHelper;
+        this.profileManagementService = profileManagementService;
+    }
 
 
     @RequestMapping ( value = "/registeraccount/initiateregistration", method = RequestMethod.POST)
@@ -178,35 +171,6 @@ public class AccountController
         accountRequest.setPlanId( account.getPlanId() );
         Response response = api.initateRegistration( accountRequest );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        return responseString;
-    }
-
-
-    @RequestMapping ( value = "/registeraccount/getuserprofile", method = RequestMethod.GET)
-    @ResponseBody
-    public String getUserProfile( @QueryParam ( "userId") String userId )
-    {
-        String responseString = null;
-        SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Response response = api.getUserProfile( userId );
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        return responseString;
-    }
-
-
-    @RequestMapping ( value = "/registeraccount/updateuserprofile", method = RequestMethod.PUT)
-    @ResponseBody
-    public String updateUserProfile( @QueryParam ( "userId") String userId, @QueryParam ( "stage") String stage,
-        @RequestBody PersonalProfile personalProfile )
-    {
-        String responseString = null;
-        SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Response response = api.updateUserProfile( personalProfile, userId );
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        if ( response.getStatus() == HttpStatus.SC_OK ) {
-            response = api.updateUserProfileStage( userId, stage );
-            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        }
         return responseString;
     }
 
@@ -264,18 +228,6 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/registeraccount/getuserstage", method = RequestMethod.GET)
-    @ResponseBody
-    public String getUserStage( @QueryParam ( "userId") String userId )
-    {
-        String responseString = null;
-        SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Response response = api.getUserStage( userId );
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        return responseString;
-    }
-
-
     @RequestMapping ( value = "/registeraccount/getusstates", method = RequestMethod.GET)
     @ResponseBody
     public String getUsStates()
@@ -283,18 +235,6 @@ public class AccountController
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.getUsStates();
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        return responseString;
-    }
-
-
-    @RequestMapping ( value = "/registeraccount/updateuserstage", method = RequestMethod.PUT)
-    @ResponseBody
-    public String getUpdateUserStage( @QueryParam ( "userId") String userId, @QueryParam ( "stage") String stage )
-    {
-        String responseString = null;
-        SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Response response = api.updateUserProfileStage( userId, stage );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
     }
@@ -367,41 +307,6 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/registeraccount/uploaduserprofilelogo", method = RequestMethod.POST)
-    @ResponseBody
-    public String uploadUserProfileLogo( @QueryParam ( "userId") String userId, MultipartHttpServletRequest request )
-        throws InvalidInputException, IllegalStateException, IOException
-    {
-        String responseString = null;
-        SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Iterator<String> itr = request.getFileNames();
-        while ( itr.hasNext() ) {
-            String uploadedFile = itr.next();
-            MultipartFile file = request.getFile( uploadedFile );
-            File fileLocal = new File( CommonConstants.IMAGE_NAME );
-            file.transferTo( fileLocal );
-            String profileImageUrl = fileUploadService.uploadProfileImageFile( fileLocal, file.getOriginalFilename(), false );
-            profileImageUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
-                + CommonConstants.FILE_SEPARATOR + profileImageUrl;
-            Response response = api.updateUserProfileImage( userId, profileImageUrl );
-            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        }
-        return responseString;
-    }
-
-
-    @RequestMapping ( value = "/registeraccount/removeuserprofilelogo", method = RequestMethod.PUT)
-    @ResponseBody
-    public String removeUserProfileLogo( @QueryParam ( "userId") String userId )
-    {
-        String responseString = null;
-        SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Response response = api.removeUserProfileImage( userId );
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        return responseString;
-    }
-
-
     @RequestMapping ( value = "/registeraccount/makepayment", method = RequestMethod.POST)
     @ResponseBody
     public String makePayment( @QueryParam ( "companyId") String companyId, @QueryParam ( "planId") String planId,
@@ -422,48 +327,6 @@ public class AccountController
             }
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
-        return responseString;
-    }
-
-
-    @RequestMapping ( value = "/registeraccount/isregistrationpasswordset", method = RequestMethod.GET)
-    @ResponseBody
-    public boolean isRegistrationPasswordSet( @QueryParam ( "userId") String userId )
-        throws InvalidInputException, JsonProcessingException
-    {
-        User user = userManagementService.getUserByUserId( Long.parseLong( userId ) );
-        return user.getLoginPassword() != null ? true : false;
-    }
-
-
-    @RequestMapping ( value = "/registeraccount/setregistrationpassword")
-    public String setRegistrationPassword( @RequestParam ( "q") String encryptedUrlParams, RedirectAttributes attributes )
-        throws InvalidInputException, JsonProcessingException
-    {
-        Map<String, String> urlParams = userManagementService.validateRegistrationUrl( encryptedUrlParams );
-        long userId = Long.parseLong( urlParams.get( CommonConstants.USER_ID ) );
-        User user = userManagementService.getUserByUserId( userId );
-        if ( user.getLoginPassword() == null ) {
-            attributes.addFlashAttribute( "userId", Long.parseLong( urlParams.get( CommonConstants.USER_ID ) ) );
-            attributes.addFlashAttribute( "companyId", Long.parseLong( urlParams.get( CommonConstants.COMPANY_ID ) ) );
-            attributes.addFlashAttribute( "firstName", urlParams.get( CommonConstants.FIRST_NAME ) );
-            attributes.addFlashAttribute( "lastName", urlParams.get( CommonConstants.LAST_NAME ) );
-            attributes.addFlashAttribute( "setPassword", true );
-            return "redirect:/accountsignupredirect.do?PlanId=" + urlParams.get( CommonConstants.PLAN_ID );
-        } else {
-            return "redirect:/newlogin.do";
-        }
-    }
-
-
-    @RequestMapping ( value = "/registeraccount/savePassword", method = RequestMethod.PUT)
-    @ResponseBody
-    public String savePassword( @QueryParam ( "userId") String userId, @RequestBody String password )
-    {
-        String responseString = null;
-        SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Response response = api.savePassword( userId, password );
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
     }
 
@@ -490,19 +353,6 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/registeraccount/validatewebadress", method = RequestMethod.POST)
-    @ResponseBody
-    public String validateWebAddress( @RequestBody String webAddress )
-    {
-        String responseString = null;
-        SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Response response = api.validateWebAddress( webAddress );
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        return responseString;
-    }
-
-
-    // TODO: To be moved from register account to more generic
     @RequestMapping ( value = "/registeraccount/{organizationunit}/initlinkedinconnection", method = RequestMethod.POST)
     @ResponseBody
     public String initiateLinkedInConnection( @RequestBody String id,
@@ -521,7 +371,6 @@ public class AccountController
     }
 
 
-    // TODO: To be moved from register account to more generic
     @RequestMapping ( value = "/registeraccount/connectlinkedin", method = RequestMethod.GET)
     public String connectToLinkedIn( HttpServletRequest request, RedirectAttributes attributes ) throws InvalidInputException
     {
@@ -543,9 +392,6 @@ public class AccountController
         String errorCode = request.getParameter( "error" );
         if ( errorCode != null ) {
             LOG.error( "Error code : " + errorCode );
-            //            AuthError error = new AuthError();
-            //            error.setErrorCode( errorCode );
-            //            error.setReason( request.getParameter( "error_description" ) );
             response = errorCode;
         } else {
             try {
@@ -575,6 +421,10 @@ public class AccountController
                     Map<String, Object> map = new Gson().fromJson( accessTokenStr,
                         new TypeToken<Map<String, String>>() {}.getType() );
                     String accessToken = (String) map.get( "access_token" );
+                    String expiresInStr = (String) map.get( "expires_in" );
+                    long expiresIn = 0;
+                    if(StringUtils.isNotBlank( expiresInStr ))
+                        expiresIn = Long.valueOf( expiresInStr ).longValue();
 
                     // fetching LinkedIn profile url
                     HttpGet httpGet = new HttpGet( linkedinProfileUri + accessToken );
@@ -586,7 +436,7 @@ public class AccountController
                     SocialMediaTokens tokens = null;
                     if ( unit.equalsIgnoreCase( AGENT_UNIT ) ) {
                         tokens = organizationManagementService.getAgentSocialMediaTokens( Long.parseLong( sId ) );
-                        tokens = tokenHandler.updateLinkedInToken( accessToken, tokens, profileLink );
+                        tokens = tokenHandler.updateLinkedInToken( accessToken, tokens, profileLink, expiresIn );
                         // update tokens
                         tokens = socialManagementService.updateSocialMediaTokens( CommonConstants.AGENT_SETTINGS_COLLECTION,
                             Long.parseLong( sId ), tokens );
@@ -595,7 +445,7 @@ public class AccountController
                         agentSettings = (AgentSettings) socialAsyncService.linkedInDataUpdate(
                             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, tokens );
 
-	                    //Update profile stages
+                        //Update profile stages
                         for ( ProfileStage stage : agentSettings.getProfileStages() ) {
                             if ( stage.getProfileStageKey().equalsIgnoreCase( "LINKEDIN_PRF" ) ) {
                                 stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -603,7 +453,7 @@ public class AccountController
                         }
                         profileManagementService.updateProfileStages( agentSettings.getProfileStages(), agentSettings,
                             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-	                    
+
                         User user = userManagementService.getUserByUserId( Long.parseLong( sId ) );
                         attributes.addFlashAttribute( "userId", user.getUserId() );
                         attributes.addFlashAttribute( "companyId", user.getCompany().getCompanyId() );
