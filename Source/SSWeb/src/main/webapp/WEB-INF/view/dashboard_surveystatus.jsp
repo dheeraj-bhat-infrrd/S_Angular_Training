@@ -81,23 +81,23 @@
 		<div class="clearfix stat-icns-wrapper">
 			<div class="float-left stat-icn-lbl"><spring:message code="label.zillowreviews.key" /></div>
 			<div id="clicked-surv-icn" class="float-left stat-icns-item clearfix">
-				<fmt:formatNumber type="number" var="importedFromZillowCount" value="${importedFromZillow}" maxFractionDigits="0" />
 				<c:forEach begin="1" end="${importedFromZillow<20?importedFromZillow:20}" var="counttwo">
 					<div class='float-left stat-icn-img stat-icn-img-blue'></div>
 				</c:forEach>
+				<fmt:formatNumber type="number" var="importedFromZillowCount" value="${importedFromZillow}" maxFractionDigits="0" />
 				<div id='survey-zillow' class='float-left stat-icn-txt-rt'>${importedFromZillow}</div>
 			</div>
 		</div>
 	</c:if>
-<c:if test="${importedFrom3rdParty > 0 }">
+<c:if test="${not empty importedFromZillow && importedFrom3rdParty > 0 }">
 	<div class="clearfix stat-icns-wrapper">
 		<div class="float-left stat-icn-lbl"><spring:message code="label.thirdpartyreviews.key" /></div>
 		<div id="thirdparty-icn" class="float-left stat-icns-item clearfix">
-		<fmt:formatNumber type="number" var="importedFrom3rdParty" value="${importedFrom3rdParty}" maxFractionDigits="0" />
 				<c:forEach begin="1" end="${importedFrom3rdParty<20?importedFrom3rdParty:20}" var="counttwo">
 					<div class='float-left stat-icn-img stat-icn-img-blue'></div>
 				</c:forEach>
-				<div id='third-party' class='float-left stat-icn-txt-rt'>${importedFrom3rdParty}</div>
+                <fmt:formatNumber type="number" var="importedFrom3rdParty" value="${importedFrom3rdParty}" maxFractionDigits="0" />
+                <div id='third-party' class='float-left stat-icn-txt-rt'>${importedFrom3rdParty}</div>
 		</div>
 	</div>
 </c:if>
