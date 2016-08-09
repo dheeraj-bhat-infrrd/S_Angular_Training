@@ -791,6 +791,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( forStatistics ) {
 	        criteriaList.add( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN )
 		        .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) );
+        } else {
+            criteriaList
+                .add( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_3RD_PARTY ) );
         }
 
         if ( columnName == null ) {
