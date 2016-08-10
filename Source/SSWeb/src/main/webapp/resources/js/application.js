@@ -312,7 +312,15 @@ $(document).on('click', '#welcome-popup-invite', function(e) {
 $(document).on('click', '#overlay-pop-up', function(e) {
 	e.stopPropagation();
 });
-
+$(document).on('click', '.datepicker-months', function(e) {
+	e.stopPropagation();
+});
+$(document).on('click', '.month', function(e) {
+	e.stopPropagation();
+});
+$(document).on('click', '.year', function(e) {
+	e.stopPropagation();
+});
 $(document).on('click', '#report-abuse-pop-up', function(e) {
 	e.stopPropagation();
 });
@@ -8595,6 +8603,7 @@ $(document).on('click', '.checkbox-iscurrent', function(e) {
 });
 
 $(document).on('click', '.pos-remove-icn', function(e) {
+	e.stopPropagation();
 	$(this).parent().remove();
 	updatePositions();
 });
