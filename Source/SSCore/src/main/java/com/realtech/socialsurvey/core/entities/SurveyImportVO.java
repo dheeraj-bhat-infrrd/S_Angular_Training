@@ -6,6 +6,7 @@ import java.util.Date;
 public class SurveyImportVO
 {
     private long userId;
+    private String userEmailId;
     private String customerFirstName;
     private String customerLastName;
     private String customerEmailAddress;
@@ -97,5 +98,17 @@ public class SurveyImportVO
     }
 
 
-    private String review;
+	public String getUserEmailId()
+	{
+		return userEmailId;
+	}
+
+
+	public void setUserEmailId( String userEmailId )
+	{
+		this.userEmailId = userEmailId;
+	}
+
+
+	private String review;
 }
