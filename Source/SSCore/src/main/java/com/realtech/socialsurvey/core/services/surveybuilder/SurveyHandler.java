@@ -307,6 +307,7 @@ public interface SurveyHandler
 
     public boolean hasCustomerAlreadySurveyed( long currentAgentId, String customerEmailId );
 
+    void begin3rdPartySurveyImport();
 
     public String replaceGatewayQuestionText( String questionText, OrganizationUnitSettings agentSettings, User user,
         OrganizationUnitSettings companySettings, SurveyDetails survey, String logoUrl,
