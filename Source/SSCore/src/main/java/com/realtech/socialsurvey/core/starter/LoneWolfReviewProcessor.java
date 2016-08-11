@@ -130,6 +130,10 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                 entityType = CommonConstants.AGENT_ID_COLUMN;
             }
 
+            
+            //reset newRecordFoundCount for the enitiy
+            newRecordFoundCount = 0;
+            
             List<OrganizationUnitSettings> organizationUnitSettingsList = organizationManagementService
                 .getOrganizationUnitSettingsForCRMSource( CommonConstants.CRM_SOURCE_LONEWOLF, collectionName );
             if ( organizationUnitSettingsList != null && !organizationUnitSettingsList.isEmpty() ) {
