@@ -8830,7 +8830,7 @@ function updatePositions() {
 		showToast();
 	}
 
-	callAjaxPOSTWithTextData("/updatepositions.do?positions=" + positions, function(data) {
+	callAjaxPOSTWithTextData("/updatepositions.do?positions=" + encodeURIComponent(positions), function(data) {
 		if (data == "success") {
 			$('#overlay-toast').html("Positions updated successfully");
 			showToast();
