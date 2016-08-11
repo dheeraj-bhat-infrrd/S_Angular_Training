@@ -3359,11 +3359,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     }
                     resolveEmailAddress( survey );
                     validateSurveyRow( survey );
+                    surveyList.add( survey );
                 } catch ( InvalidInputException e ) {
-                    throw new InvalidInputException(
-                        "Error occurred at row : " + row.getRowNum() + ". Reason : " + e.getMessage() );
+                    LOG.error( "Error occurred at row : " + row.getRowNum() + ". Reason : " + e.getMessage() );
                 }
-                surveyList.add( survey );
             }
             fileStream.close();
             //Delete file from location
@@ -3373,7 +3372,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             else
                 LOG.error( "Failed to delete third party import file." );
         } catch ( IOException e ) {
-            e.printStackTrace();
+            LOG.error( "An IOException occurred while importing. Reason: ", e );
         }
         LOG.info( "BulkSurveyImporter.getSurveyListFromCsv finished" );
         return surveyList;
@@ -3399,7 +3398,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 			User user = userManagementService.getUserByEmailAddress( survey.getUserEmailId() );
 			survey.setUserId( user.getUserId() );
 		} catch ( NoRecordsFetchedException e ) {
-			throw new InvalidInputException( "No user found with the email address : " + survey.getCustomerEmailAddress() );
+			throw new InvalidInputException( "No user found with the email address : " + survey.getUserEmailId() );
 		}
 	}
 
@@ -3426,10 +3425,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 			List<SurveyImportVO> surveyImportVOs = getSurveyListFromCsv();
 			if ( surveyImportVOs != null && !surveyImportVOs.isEmpty() ) {
 				for ( SurveyImportVO surveyImportVO : surveyImportVOs ) {
-					importSurveyVOToDBs( surveyImportVO, CommonConstants.SURVEY_SOURCE_3RD_PARTY );
+					try {
+						importSurveyVOToDBs( surveyImportVO, CommonConstants.SURVEY_SOURCE_3RD_PARTY );
+					} catch ( Exception e ) {
+						LOG.error( "Error occurred while processing each survey. Reason :", e );
+					}
 				}
 			}
-			//TODO: Delete file from location
 		} catch ( NonFatalException e ) {
 			LOG.error( "An error occurred while uploading the surveys. Reason: ", e );
 		}
