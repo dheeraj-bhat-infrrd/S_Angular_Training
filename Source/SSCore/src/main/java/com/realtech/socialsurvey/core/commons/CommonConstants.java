@@ -1210,5 +1210,12 @@ public interface CommonConstants
 
     public static final String LONEWOLF_QUERY_PARAM_ORDERBY_VALUE =  "CloseDate+desc";
     public static final int  LONEWOLF_TRANSACTION_API_BATCH_SIZE = 1000;
+    
+    //Update Social Media From Email
+    public static final String SOCIAL_AUTH_FROM_EMAIL_URL = "rest/socialauthfromemail.do";
+    public static final String URL_PARAM_SOCIAL_MEDIA_TYPE = "social"; //Defile Social Media
+    public static final String URL_PARAM_COLUMN_NAME = "columnName"; //Entity Type
+    public static final String URL_PARAM_COLUMN_VALUE = "columnValue"; //Entity ID
+    public static final String URL_PARAM_ACCOUNT_MASTER_ID = "accountMasterId"; //For Account Type
 
 }

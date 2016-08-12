@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.core.services.social.impl;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
@@ -10,10 +12,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
@@ -36,6 +40,9 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
 
     @Autowired
     private SocialManagementService socialManagementService;
+    
+    @Autowired
+    private URLGenerator urlGenerator;
 
     private final int fbTokenExpireErrorCode = 190;
 
@@ -54,7 +61,7 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
                     if ( !facebookToken.isTokenExpiryAlertSent() ) {
                         LOG.debug( "Alert Mail hasn't send to sending alert mail for entity" );
                         //send mail to email id
-                        String emailId = generateAndSendSocialMedialTokenExpiryMail( settings , CommonConstants.FACEBOOK_SOCIAL_SITE );
+                        String emailId = generateAndSendSocialMedialTokenExpiryMail( settings , collectionName , CommonConstants.FACEBOOK_SOCIAL_SITE );
                         //update alert detail in token
                         if ( emailId != null ) {
                             facebookToken.setTokenExpiryAlertEmail( emailId );
@@ -82,7 +89,7 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
         if ( settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getLinkedInToken() != null ) {
             LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInToken();
             if ( !linkedInToken.isTokenExpiryAlertSent() ) {
-                String emailId = generateAndSendSocialMedialTokenExpiryMail( settings , CommonConstants.LINKEDIN_SOCIAL_SITE);
+                String emailId = generateAndSendSocialMedialTokenExpiryMail( settings , collectionName , CommonConstants.LINKEDIN_SOCIAL_SITE);
                 //update alert detail in token
                 if ( emailId != null ) {
                     linkedInToken.setTokenExpiryAlertEmail( emailId );
@@ -100,7 +107,7 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
      * 
      */
     @Override
-    public String generateAndSendSocialMedialTokenExpiryMail( OrganizationUnitSettings settings  , String socialMediaType)
+    public String generateAndSendSocialMedialTokenExpiryMail( OrganizationUnitSettings settings  , String collectionName , String socialMediaType)
     {
         LOG.debug( "Method generateAndSendSocialMedialTokenExpiryMail started()" );
         String emailId = null;
@@ -114,7 +121,9 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
                 try {
                     //TODO update the update connection url
                     String loginUrl = getApplicationLoginUrl();
-                    emailServices.sendSocialMediaTokenExpiryEmail( name, emailId, loginUrl, loginUrl , socialMediaType );
+                    String columnName = getCoulmnNameForCollection( collectionName );
+                    String connectionUpdateUrl = generateUpdateTokenUrl( socialMediaType, columnName, settings.getIden() );
+                    emailServices.sendSocialMediaTokenExpiryEmail( name, emailId, connectionUpdateUrl, loginUrl , socialMediaType );
                     LOG.debug( "Method generateAndSendSocialMedialTokenExpiryMail ended()" );
                     return emailId;
                 } catch ( InvalidInputException | UndeliveredEmailException e ) {
@@ -127,6 +136,20 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
         return null;
     }
 
+    
+    private String generateUpdateTokenUrl(String socialMedia , String columnName , long columnValue ) throws InvalidInputException{
+        LOG.info( "Method generateUpdateTokenUrl started" );
+        
+        Map<String ,String> params = new HashMap<String ,String>();
+        params.put( CommonConstants.URL_PARAM_SOCIAL_MEDIA_TYPE, socialMedia );
+        params.put( CommonConstants.URL_PARAM_COLUMN_NAME, columnName );
+        params.put( CommonConstants.URL_PARAM_COLUMN_VALUE, String.valueOf(columnValue) );
+        
+        String url = urlGenerator.generateUrl( params, appBaseUrl + CommonConstants.SOCIAL_AUTH_FROM_EMAIL_URL );
+        
+        LOG.info( "Method generateUpdateTokenUrl ended" );
+        return url;
+    }
 
     /**
      * 
@@ -138,5 +161,21 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
         String loginUrl = appBaseUrl + CommonConstants.LOGIN_URL;
         LOG.debug( "application login url is " + loginUrl );
         return loginUrl;
+    }
+    
+    
+    private String getCoulmnNameForCollection(String collectionName)
+    {
+        LOG.info( "Inside method getCoulmnNameForCollection" );
+        if(collectionName.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION )){
+            return CommonConstants.COMPANY_ID_COLUMN;
+        }else if(collectionName.equals( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION )){
+            return CommonConstants.REGION_ID_COLUMN;
+        }else if(collectionName.equals( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION )){
+            return CommonConstants.BRANCH_ID_COLUMN;
+        }else if(collectionName.equals( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )){
+            return CommonConstants.AGENT_ID_COLUMN;
+        }
+        return null;
     }
 }
