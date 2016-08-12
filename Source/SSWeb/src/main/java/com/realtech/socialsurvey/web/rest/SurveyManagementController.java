@@ -330,7 +330,11 @@ public class SurveyManagementController
                         surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
 
                         //SS-1435: Send survey details too.
-                        emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), customerName,
+                        //SS-715: Full customer name
+                        String displayName = survey.getCustomerFirstName();
+                        if(survey.getCustomerLastName() != null)
+                            displayName = displayName + " " + survey.getCustomerLastName();
+                        emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), displayName,
                             customerEmail, mood, surveyScore, surveyDetail );
                     }
 
