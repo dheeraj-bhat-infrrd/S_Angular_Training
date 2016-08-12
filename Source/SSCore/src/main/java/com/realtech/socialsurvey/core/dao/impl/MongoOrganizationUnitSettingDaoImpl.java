@@ -552,16 +552,18 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public List<OrganizationUnitSettings> getCompanyList()
     {
-        LOG.debug( "Method getCompanyList() called" );
+        LOG.info( "Method getCompanyList() started." );
 
         List<OrganizationUnitSettings> unitSettings = null;
         Query query = new Query();
         query.fields().include( KEY_CONTACT_DETAILS ).include( KEY_PROFILE_NAME ).include( KEY_VERTICAL ).include( KEY_IDEN )
             .exclude( "_id" );
         query.with( new Sort( Sort.Direction.DESC, KEY_MODIFIED_ON ) );
+        
+        LOG.debug( "query: " + query.toString());
 
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
-
+        LOG.info( "Method getCompanyList() finished." );
         return unitSettings;
     }
 
@@ -572,7 +574,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public List<OrganizationUnitSettings> getCompanyListByIds( Set<Long> companyIds )
     {
-        LOG.debug( "Method getCompanyList() called" );
+        LOG.debug( "Method getCompanyList() started." );
 
         List<OrganizationUnitSettings> unitSettings = null;
         Query query = new Query();
@@ -581,9 +583,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             .include( KEY_PROFILE_IMAGE ).exclude( "_id" );
 
         query.with( new Sort( Direction.ASC, KEY_CONTACT_NAME ) );
-
+        LOG.info( "Query: " + query.toString());
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
-
+        LOG.debug( "Method getCompanyList() finished." );
         return unitSettings;
     }
 
