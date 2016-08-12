@@ -49,7 +49,6 @@ import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -331,7 +330,9 @@ public class SurveyManagementController
 
                         //SS-1435: Send survey details too.
                         //SS-715: Full customer name
-                        String displayName = survey.getCustomerFirstName() + " " + survey.getCustomerLastName();
+                        String displayName = survey.getCustomerFirstName();
+                        if(survey.getCustomerLastName() != null)
+                            displayName = displayName + " " + survey.getCustomerLastName();
                         emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), displayName,
                             customerEmail, mood, surveyScore, surveyDetail );
                     }
