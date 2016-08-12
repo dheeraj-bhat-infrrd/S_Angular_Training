@@ -1684,32 +1684,32 @@ public class SurveyManagementController
             SurveySettings surveySettings = companySettings.getSurvey_settings();
             if ( StringUtils.isNotEmpty( surveySettings.getHappyText() ) ) {
                 surveyAndStage.put( "happyText", surveyHandler.replaceGatewayQuestionText( surveySettings.getHappyText(),
-                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isHappyTextSet = true;
             }
             if ( StringUtils.isNotEmpty( surveySettings.getNeutralText() )) {
                 surveyAndStage.put( "neutralText", surveyHandler.replaceGatewayQuestionText( surveySettings.getNeutralText(),
-                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isNeutralTextSet = true;
             }
             if ( StringUtils.isNotEmpty( surveySettings.getSadText() )) {
                 surveyAndStage.put( "sadText", surveyHandler.replaceGatewayQuestionText( surveySettings.getSadText(),
-                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isSadTextSet = true;
             }
             if ( StringUtils.isNotEmpty( surveySettings.getHappyTextComplete())) {
                 surveyAndStage.put( "happyTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    surveySettings.getHappyTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    surveySettings.getHappyTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isHappyTextCompleteSet = true;
             }
             if ( StringUtils.isNotEmpty( surveySettings.getNeutralTextComplete() )) {
                 surveyAndStage.put( "neutralTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    surveySettings.getNeutralTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    surveySettings.getNeutralTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isNeutralTextCompleteSet = true;
             }
             if ( StringUtils.isNotEmpty( surveySettings.getSadTextComplete() )) {
                 surveyAndStage.put( "sadTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    surveySettings.getSadTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    surveySettings.getSadTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isSadTextCompleteSet = true;
             }
             LOG.info( "Setting company specific values for surveyAndStage finished" );
@@ -1721,27 +1721,27 @@ public class SurveyManagementController
             SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
             if ( !isHappyTextSet ) {
                 surveyAndStage.put( "happyText", surveyHandler.replaceGatewayQuestionText(
-                    defaultSurveySettings.getHappyText(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    defaultSurveySettings.getHappyText(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             if ( !isNeutralTextSet ) {
                 surveyAndStage.put( "neutralText", surveyHandler.replaceGatewayQuestionText(
-                    defaultSurveySettings.getNeutralText(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    defaultSurveySettings.getNeutralText(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             if ( !isSadTextSet ) {
                 surveyAndStage.put( "sadText", surveyHandler.replaceGatewayQuestionText( defaultSurveySettings.getSadText(),
-                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             if ( !isHappyTextCompleteSet ) {
                 surveyAndStage.put( "happyTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    defaultSurveySettings.getHappyTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    defaultSurveySettings.getHappyTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             if ( isNeutralTextCompleteSet ) {
                 surveyAndStage.put( "neutralTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    defaultSurveySettings.getNeutralTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    defaultSurveySettings.getNeutralTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             if ( isSadTextCompleteSet ) {
                 surveyAndStage.put( "sadTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    defaultSurveySettings.getSadTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, regionSettings, surveyMap ) );
+                    defaultSurveySettings.getSadTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             LOG.info( "Setting default values for surveyAndStage finished" );
         }
