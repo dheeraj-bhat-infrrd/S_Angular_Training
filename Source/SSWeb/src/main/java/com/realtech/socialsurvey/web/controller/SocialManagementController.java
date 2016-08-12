@@ -1,67 +1,17 @@
 package com.realtech.socialsurvey.web.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
-import com.realtech.socialsurvey.core.dao.SocialPostDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
-import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
-import com.realtech.socialsurvey.core.entities.FacebookPage;
-import com.realtech.socialsurvey.core.entities.FacebookToken;
-import com.realtech.socialsurvey.core.entities.GoogleToken;
-import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfileStage;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SocialMonitorData;
-import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
-import com.realtech.socialsurvey.core.entities.SocialPost;
-import com.realtech.socialsurvey.core.entities.TwitterToken;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserSettings;
-import com.realtech.socialsurvey.core.entities.ZillowToken;
-import com.realtech.socialsurvey.core.enums.AccountType;
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
-import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
-import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
-import com.realtech.socialsurvey.core.services.social.SocialManagementService;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.web.common.ErrorResponse;
-import com.realtech.socialsurvey.web.common.JspResolver;
-import com.realtech.socialsurvey.web.common.TokenHandler;
-import com.realtech.socialsurvey.web.util.RequestUtils;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import facebook4j.Account;
-import facebook4j.Facebook;
-import facebook4j.FacebookException;
-import facebook4j.FacebookFactory;
-import facebook4j.ResponseList;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
@@ -92,18 +42,64 @@ import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
+import com.realtech.socialsurvey.core.dao.SocialPostDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
+import com.realtech.socialsurvey.core.entities.FacebookPage;
+import com.realtech.socialsurvey.core.entities.GoogleToken;
+import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialMonitorData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
+import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.TwitterToken;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.ZillowToken;
+import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.common.ErrorResponse;
+import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.common.TokenHandler;
+import com.realtech.socialsurvey.web.util.RequestUtils;
 
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import facebook4j.Facebook;
+import facebook4j.FacebookException;
 
 
 /**
@@ -226,6 +222,9 @@ public class SocialManagementController
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
 
+    @Autowired
+    private URLGenerator urlGenerator;
+
 
     /**
      * Returns the social authorization page
@@ -293,16 +292,10 @@ public class SocialManagementController
                 if ( socialFlow != null && !socialFlow.isEmpty() ) {
                     session.setAttribute( CommonConstants.SOCIAL_FLOW, socialFlow );
                 }
+                String linkedInAuth = socialManagementService.getLinkedinAuthUrl( linkedinRedirectUri );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuth );
 
-                StringBuilder linkedInAuth = new StringBuilder( linkedinAuthUri ).append( "?response_type=" ).append( "code" );
-                linkedInAuth.append( "&client_id=" ).append( linkedInApiKey );
-                linkedInAuth.append( "&redirect_uri=" ).append( serverBaseUrl ).append( linkedinRedirectUri );
-                linkedInAuth.append( "&state=" ).append( "SOCIALSURVEY" );
-                linkedInAuth.append( "&scope=" ).append( linkedinScope );
-
-                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuth.toString() );
-
-                LOG.info( "Returning the linkedin authorizationurl : " + linkedInAuth.toString() );
+                LOG.info( "Returning the linkedin authorizationurl : " + linkedInAuth );
                 break;
 
             // Building Google authUrl
@@ -419,7 +412,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 /*mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );*/
@@ -441,7 +434,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 /*mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );*/
@@ -463,7 +456,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 /*mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );*/
@@ -487,7 +480,7 @@ public class SocialManagementController
                 }
 
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 //mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
@@ -565,7 +558,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens(
@@ -591,7 +584,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
@@ -617,7 +610,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
@@ -645,7 +638,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
@@ -674,71 +667,6 @@ public class SocialManagementController
 
         model.addAttribute( "socialNetwork", "facebook" );
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
-    }
-
-
-    private SocialMediaTokens updateFacebookToken( facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens,
-        String profileLink )
-    {
-        LOG.debug( "Method updateFacebookToken() called from SocialManagementController" );
-        if ( mediaTokens == null ) {
-            LOG.debug( "Media tokens do not exist. Creating them and adding the facebook access token" );
-            mediaTokens = new SocialMediaTokens();
-        }
-        
-        //check for facebook token
-        FacebookToken facebookToken = mediaTokens.getFacebookToken();
-        if(facebookToken == null){
-            facebookToken = new FacebookToken();
-        }
-
-        //update profile link
-        if ( profileLink != null )
-            facebookToken.setFacebookPageLink( profileLink );
-
-        //update access tokem
-        facebookToken.setFacebookAccessToken( accessToken.getToken() );
-        facebookToken.setFacebookAccessTokenCreatedOn( System.currentTimeMillis() );
-        if ( accessToken.getExpires() != null )
-            facebookToken.setFacebookAccessTokenExpiresOn( accessToken.getExpires() );
-
-        facebookToken.setFacebookAccessTokenToPost( accessToken.getToken() );
-
-        Facebook facebook = new FacebookFactory().getInstance();
-        facebook.setOAuthAppId( facebookClientId, facebookClientSecret );
-        facebook.setOAuthAccessToken( new facebook4j.auth.AccessToken( accessToken.getToken() ) );
-
-        //update facebook pages
-        ResponseList<Account> accounts;
-        List<FacebookPage> facebookPages = new ArrayList<FacebookPage>();
-        try {
-            accounts = facebook.getAccounts();
-            FacebookPage facebookPage = null;
-            for ( Account account : accounts ) {
-                facebookPage = new FacebookPage();
-                facebookPage.setId( account.getId() );
-                facebookPage.setName( account.getName() );
-                facebookPage.setAccessToken( account.getAccessToken() );
-                facebookPage.setCategory( account.getCategory() );
-                facebookPage.setProfileUrl( facebookUri.concat( account.getId() ) );
-                facebookPages.add( facebookPage );
-            }
-        } catch ( FacebookException e ) {
-            LOG.error( "Error while creating access token for facebook: " + e.getLocalizedMessage(), e );
-        }
-        facebookToken.setFacebookPages( facebookPages );
-        
-        //update expiry email alert detail
-        facebookToken.setTokenExpiryAlertSent( false );
-        facebookToken.setTokenExpiryAlertEmail( null );
-        facebookToken.setTokenExpiryAlertTime( null );
-        
-
-        //update facebook token in media token
-        mediaTokens.setFacebookToken( facebookToken );
-        
-        LOG.debug( "Method updateFacebookToken() finished from SocialManagementController" );
-        return mediaTokens;
     }
 
 
@@ -2600,4 +2528,6 @@ public class SocialManagementController
         }
         return false;
     }
+    
+   
 }

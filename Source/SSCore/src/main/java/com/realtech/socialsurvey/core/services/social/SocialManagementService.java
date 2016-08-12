@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
+import facebook4j.auth.AccessToken;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.RequestToken;
@@ -266,5 +267,22 @@ public interface SocialManagementService
      * @param linkedInToken
      */
     public void updateLinkedinToken( String collectionName , long iden ,  LinkedInToken linkedInToken);
+
+
+    Facebook getFacebookInstanceByCallBackUrl( String callBackUrl );
+
+
+    String getFbRedirectUrIForEmailRequest( String columnName, String columnValue, String baseUrl )
+        throws InvalidInputException;
+
+
+    String getLinkedinRedirectUrIForEmailRequest( String columnName, String columnValue, String baseUrl )
+        throws InvalidInputException;
+
+
+    SocialMediaTokens updateFacebookToken( AccessToken accessToken, SocialMediaTokens mediaTokens, String profileLink );
+
+
+    String getLinkedinAuthUrl( String redirectUri );
 }
 // JIRA SS-34 BY RM02 BOC

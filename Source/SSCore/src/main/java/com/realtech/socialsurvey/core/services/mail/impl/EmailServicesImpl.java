@@ -2240,7 +2240,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_BODY );
 
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, updateConnectionUrl , appLoginUrl , socialMediaType ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, socialMediaType , updateConnectionUrl , appLoginUrl  ) );
 
         LOG.info( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );

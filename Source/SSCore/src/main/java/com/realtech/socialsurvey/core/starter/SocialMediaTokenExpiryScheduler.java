@@ -103,7 +103,7 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
                    LinkedInToken linkedInToken = smTokens.getLinkedInToken();
                     if ( !linkedInToken.isTokenExpiryAlertSent() ) {
                         //send alert mail to entity 
-                        String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( orgUnit , CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( orgUnit , collectionName , CommonConstants.LINKEDIN_SOCIAL_SITE );
                         //update alert mail detail in linkedin token
                         if ( emailId != null ) {
                             linkedInToken.setTokenExpiryAlertEmail( emailId );
@@ -124,7 +124,7 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
                     FacebookToken facebookToken = smTokens.getFacebookToken();
                     if ( ! facebookToken.isTokenExpiryAlertSent() ) {
                         LOG.debug( "Alert Mail hasn't send to sending alert mail for entity" );
-                        String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( orgUnit , CommonConstants.FACEBOOK_SOCIAL_SITE );
+                        String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( orgUnit , collectionName,  CommonConstants.FACEBOOK_SOCIAL_SITE );
                         //update alert detail in token
                         if ( emailId != null ) {
                             facebookToken.setTokenExpiryAlertEmail( emailId );

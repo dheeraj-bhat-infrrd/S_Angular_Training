@@ -11,6 +11,6 @@ public interface SocialMediaExceptionHandler
     
     void handleLinkedinException(OrganizationUnitSettings settings , String collectionName);
 
-    String generateAndSendSocialMedialTokenExpiryMail( OrganizationUnitSettings settings , String socialMediaType);
+    String generateAndSendSocialMedialTokenExpiryMail( OrganizationUnitSettings settings , String collectionName ,  String socialMediaType);
 
 }
