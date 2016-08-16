@@ -116,6 +116,14 @@ $(document).ready(function() {
    'columnName' :  columnName,
    'columnValue' : columnValue
   };
+  
+  var updateSelectedFBToken = "/saveSelectedAccessFacebookTokenForEmail.do?selectedAccessFacebookToken="
+		+ selectedAccessFacebookToken + "&selectedProfileUrl=" + selectedProfileUrl 
+		+ "&fbAccessToken=" + fbAccessToken 
+		+ "&columnName=" + columnName 
+		+ "&columnValue=" + columnValue ;
+  window.location.href = updateSelectedFBToken;
+  
   $.ajax({
    url : './saveSelectedAccessFacebookTokenForEmail.do',
    type : "GET",
