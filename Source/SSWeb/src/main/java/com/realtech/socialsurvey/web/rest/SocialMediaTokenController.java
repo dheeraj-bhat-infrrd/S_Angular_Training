@@ -604,6 +604,7 @@ public class SocialMediaTokenController
             LOG.error( "Error setting settings value. Reason : " + e.getLocalizedMessage(), e );
         }
 
+        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
         model.addAttribute( "socialNetwork", "facebook" );
         return JspResolver.SOCIAL_AUTH_MSG_FOR_EMAIL;
     }

@@ -26,7 +26,7 @@
     <div class="ss-logo-blue login-logo margin-bottom-25 margin-top-25"></div>
     <div class="login-txt text-center font-24 margin-bot-20">
      <div style="padding: 0px 20px;" class="clearfix">
-      <div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
+      <div  style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
        <c:choose>
         <c:when test="${success == 1}"><spring:message code="label.authorization.success" /></c:when>
         <c:when test="${message == 1}"><spring:message code="label.waitmessage.key" /></c:when>
@@ -34,7 +34,7 @@
        </c:choose>
       </div>
      </div>
-     <div style="font-size: 11px; text-align: center;">
+     <div id="close-text" style="font-size: 11px; text-align: center;">
       <c:choose>
        <c:when test="${success == 1}"><spring:message code="label.timer.key" /></c:when>
        <c:when test="${message == 1}"></c:when>
@@ -88,6 +88,7 @@
  
  // close on success
  setTimeout(function() {
+$('#close-text').text("Please close the tab and continue by logining in to Social Survey.");
   window.close();
  }, 3000);
 });
