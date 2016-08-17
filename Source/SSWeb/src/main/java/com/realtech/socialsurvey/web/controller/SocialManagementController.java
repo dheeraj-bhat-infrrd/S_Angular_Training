@@ -292,7 +292,7 @@ public class SocialManagementController
                 if ( socialFlow != null && !socialFlow.isEmpty() ) {
                     session.setAttribute( CommonConstants.SOCIAL_FLOW, socialFlow );
                 }
-                String linkedInAuth = socialManagementService.getLinkedinAuthUrl( linkedinRedirectUri );
+                String linkedInAuth = socialManagementService.getLinkedinAuthUrl( serverBaseUrl + linkedinRedirectUri );
                 model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuth );
 
                 LOG.info( "Returning the linkedin authorizationurl : " + linkedInAuth );
