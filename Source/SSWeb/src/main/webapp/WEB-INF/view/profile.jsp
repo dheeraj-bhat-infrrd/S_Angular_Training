@@ -69,12 +69,12 @@
 		<c:when test="${not empty profName}">
 			<c:choose>
 				<c:when test="${profileLevel == 'INDIVIDUAL'}">
-					<title>${profName}${title} ${companyName} ${location} ${vertical} Professional Reviews | SocialSurvey.me</title>
+					<title>${profName}${title}${companyName} ${location} ${vertical} Professional Reviews | SocialSurvey.me</title>
 					<meta name="keywords" content="${profName}, ${title}, ${companyName}, ${location}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description" content="Reviews for ${profName}. ${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional in ${location}. ${firstName} is the ${title} of ${companyName}.">
 				</c:when>
 				<c:otherwise>
-					<title>${profName}${vertical} Reviews | SocialSurvey.me</title>
+					<title>${profName}${vertical}Reviews | SocialSurvey.me</title>
 					<meta name="keywords" content="${profName}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description" content="Reviews for ${profName}. ${profName} has ${reviewsCount} reviews. ${profName} is a ${vertical} company in ${city} ${state} ${country}.">
 				</c:otherwise>
@@ -266,7 +266,7 @@
 										<c:otherwise> ${profName}</c:otherwise>
 									</c:choose>
 								</div>
-								<c:if test="${!profile.hiddenSection}">
+								<c:if test="${not empty profileSettings && !profile.hiddenSection}">
 									<c:choose>
 										<c:when test="${profileLevel == 'INDIVIDUAL'}">
 											<c:choose>
@@ -405,7 +405,7 @@
 							<div id="individual-details">
 								<!-- individual details like associations/hobbies/achievements come here -->
 							</div>
-							<c:if test="${!profile.hiddenSection}">
+							<c:if test="${not empty profileSettings && !profile.hiddenSection}">
 								<c:choose>
 									<c:when test="${not empty branchProfileName}">
 										<div id="branch-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
