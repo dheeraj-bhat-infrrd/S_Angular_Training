@@ -84,6 +84,11 @@ namespace EncompassSocialSurvey
                            + " : companyUserName : " + forCompCredential.EncompassCredential.UserName
                            + " : companyURL : " + forCompCredential.EncompassCredential.EncompassUrl);
 
+                        //send main to admin
+                        String StartMailSubject = "Starting loan processing for company: " + forCompCredential.CompanyName;
+                        String StartMailBodyText = "Starting loan processing for company: " + forCompCredential.CompanyName
+                        + "at : " + DateTime.Now;
+                        CommonUtility.SendMailToAdmin(StartMailSubject, StartMailBodyText);
 
                         Logger.Debug("Logging into encompass");
                         encompassGlobal.GetUserLoginSesssion(forCompCredential);
@@ -173,6 +178,12 @@ namespace EncompassSocialSurvey
                             Logger.Error("Caught an exception, loanFolder: Program.ProcessLoanForCompanies():", ex);
                         }
 
+
+                        //send main to admin
+                        String EndMailSubject = "Starting loan processing for company: " + forCompCredential.CompanyName;
+                        String EndMailBodyText = "Done loan processing for company: " + forCompCredential.CompanyName + " "
+                         + "at : " + DateTime.Now;
+                        CommonUtility.SendMailToAdmin(EndMailSubject, EndMailBodyText);
 
                         Logger.Info("Done loan processing for company: " + forCompCredential.CompanyName + " "
                          + " companyId: " + forCompCredential.EncompassCredential.CompanyId
