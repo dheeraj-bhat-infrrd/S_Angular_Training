@@ -468,6 +468,7 @@
 	<div class="float-left mob-icn inc-more"></div>
 </div>
 <script>
+var hiddenSection="${profileSettings.hiddenSection}";
 $(document).ready(function() {
 	
 	$(document).attr("title", "Profile Settings");

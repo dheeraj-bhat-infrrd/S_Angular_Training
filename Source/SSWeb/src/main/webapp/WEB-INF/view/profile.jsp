@@ -581,6 +581,7 @@
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script src='//www.google.com/recaptcha/api.js' async="async" defer="defer"></script>
 <script>
+var hiddenSection="${profile.hiddenSection}";
     $(document).ready(function(){
     	if($('#social-token-container').children('.social-item-icon').length == 0) {
         	$('#social-token-container').remove();

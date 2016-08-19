@@ -87,11 +87,14 @@
 						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
 						<c:if test="${profilemasterid !=4}">
 							<c:if test="${not empty reviewItem.agentName}">
-								<span class="float-left" style="margin-left: 5px;">for<a
-									class="cursor-pointer"
-									style="color: #236CAF; font-weight: 600 !important;"
-									href="${reviewItem.completeProfileUrl}" target="_blank">
-										${reviewItem.agentName}</a></span>
+							 <span class="float-left" style="margin-left: 5px;">for
+							 <c:if test="${hiddenSection== true}">
+							 ${reviewItem.agentName}
+							 </c:if>
+							 <c:if test="${hiddenSection==false}">
+							   <a class="cursor-pointer" style="color: #236CAF; font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank">
+								${reviewItem.agentName}</a>
+								</c:if></span>
 							</c:if>
 						</c:if>
 						<c:choose>

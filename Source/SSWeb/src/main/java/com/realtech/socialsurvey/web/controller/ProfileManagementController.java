@@ -4848,6 +4848,7 @@ public class ProfileManagementController
             double minScore = Double.parseDouble( request.getParameter( "minScore" ) );
             int startIndex = Integer.parseInt( request.getParameter( "startIndex" ) );
             int numRows = Integer.parseInt( request.getParameter( "numOfRows" ) );
+            boolean hiddenSection = Boolean.parseBoolean( request.getParameter( "hiddenSection" ) );
 
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( user.getCompany().getCompanyId(), minScore, maxScore,
@@ -4867,6 +4868,7 @@ public class ProfileManagementController
             profileManagementService.setAgentProfileUrlForReview( reviewItems );
 
             model.addAttribute( "reviews", reviewItems );
+            model.addAttribute( "hiddenSection", hiddenSection );
         } catch ( InvalidInputException e ) {
             throw new InternalServerException(
                 new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
