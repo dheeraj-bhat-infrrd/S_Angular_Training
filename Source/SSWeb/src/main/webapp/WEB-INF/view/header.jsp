@@ -8,7 +8,7 @@
 
 <!-- Account masters 1=Individual, 2=Team, 3=Company, 4=Enterprise, 5=Free Account -->
 <c:set var="accountMasterId" value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}"/>
-
+<c:set var="hiddenSectionDashboard" value="false"/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -177,7 +177,12 @@
 					<div class="header-links-item" onclick="showMainContent('./showbuildsurveypage.do');"><spring:message code="label.header.buildsurvey.key" /></div>
 				</c:if>
 				<c:if test="${accountMasterId != 5}">
+				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
 					<div class="header-links-item" onclick="showMainContent('./showcompanysettings.do');"><spring:message code="label.editsettings.key" /></div>
+				</c:if>
+				<c:if test="${!hiddenSectionDashboard}">
+					<div class="header-links-item" onclick="showMainContent('./showcompanysettings.do');"><spring:message code="label.editsettings.key" /></div>
+				</c:if>
 				</c:if>
 				<c:if test="${highestrole == 1}">
 					<div class="header-links-item" onclick="showMainContent('./showcomplaintressettings.do')"><spring:message code="label.complaintregsettings.key" /></div>
@@ -188,7 +193,12 @@
 				</c:if>
 				<!-- show apps for company admin other then individual/free account -->
 				<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
+				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
 					<div class="header-links-item" onclick="showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></div>
+				</c:if>
+				<c:if test="${!hiddenSectionDashboard}">
+					<div class="header-links-item" onclick="showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></div>
+				</c:if>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
 					<div class="header-links-item" onclick="showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></div>
@@ -202,7 +212,12 @@
 				<c:if test="${ highestrole == 1 }">
 					<div class="header-links-item" onclick="showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></div>
 				</c:if>
+				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
 				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
+				</c:if>
+				<c:if test="${!hiddenSectionDashboard}">
+				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
+				</c:if>
 				<div class="header-links-item" onclick="showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></div>
 				<div class="header-links-item" onclick="showMainContent('./showhelppage.do')"><spring:message code="label.help.key"/></div>
 				<c:choose>
@@ -237,7 +252,8 @@
 						<a href="javascript:showMainContent('./showbuildsurveypage.do')" onclick="showOverlay();"><spring:message code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${accountMasterId != 5}">
+				<c:if test="${accountMasterId != 5 }">
+				<c:if test="${hiddenSectionDashboard && highestrole!=4 }">
 					<div id="hdr-link-item-config" class="hdr-link-item hdr-link-item-config pos-relative">
 						<a href="javascript:showMainContent('./showcompanysettings.do')" onclick="showOverlay();"><spring:message code="label.configure.key" /></a>
 						<div id="hdr-config-settings-dropdown" class="hdr-link-item-dropdown-icn"></div>
@@ -265,20 +281,55 @@
 							</c:if>
 						</div>
 					</div>
+					</c:if>
+					<c:if test="${!hiddenSectionDashboard}">
+					<div id="hdr-link-item-config" class="hdr-link-item hdr-link-item-config pos-relative">
+						<a href="javascript:showMainContent('./showcompanysettings.do')" onclick="showOverlay();"><spring:message code="label.configure.key" /></a>
+						<div id="hdr-config-settings-dropdown" class="hdr-link-item-dropdown-icn"></div>
+						<div id="hdr-link-item-dropdown" class="hdr-link-item-dropdown hide">
+							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showcompanysettings.do');">
+								<spring:message code="label.settings.key" />
+							</div>
+							<c:if test="${highestrole == 1}">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showcomplaintressettings.do');">
+									<spring:message code="label.complaintregsettings.key" />
+								</div>
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showemailsettings.do');">
+									<spring:message code="label.emailsettings.key" />
+								</div>
+							</c:if>
+							<c:if test="true">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showwidget.do');">
+									<spring:message code="label.showwidget.key" />
+								</div>
+							</c:if>
+							<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showapps.do');">
+									<spring:message code="label.appsettings.key" />
+								</div>
+							</c:if>
+						</div>
+					</div>
+					</c:if>
 				</c:if>
 				<c:if test="${ highestrole == 1 }">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showsocialmonitortpage.do')" onclick="showOverlay();"><spring:message code="label.socialmonitor.key" /></a>
 					</div>
 				</c:if>
+				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
 				<div class="hdr-link-item">
 					<a href="javascript:showMainContent('./showprofilepage.do')" onclick="showOverlay();"><spring:message code="label.editprofile.key" /></a>
 				</div>
-				
+				</c:if>
+				<c:if test="${!hiddenSectionDashboard}">
+				<div class="hdr-link-item">
+					<a href="javascript:showMainContent('./showprofilepage.do')" onclick="showOverlay();"><spring:message code="label.editprofile.key" /></a>
+				</div>
+				</c:if>
 				<div class="hdr-link-item">
 					<a href="javascript:showMainContent('./showhelppage.do')" onclick="showOverlay();"><spring:message code="label.help.key" /></a>
 				</div>
-				
 			</div>
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">
@@ -335,3 +386,4 @@
 			</div>
 		</div>
 	</div>
+<script>var hiddenSection="${hiddenSectionDashboard}";</script>
