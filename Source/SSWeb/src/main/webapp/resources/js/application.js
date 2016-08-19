@@ -7646,7 +7646,7 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 
 	if (isReviewsRequestRunningEditProfile)
 		return; // Return if ajax request is still running
-	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore=" + minScore + "&startIndex=" + startIndex + "&numOfRows=" + numOfRows;
+	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore=" + minScore + "&startIndex=" + startIndex + "&numOfRows=" + numOfRows+ "&hiddenSection=" +hiddenSection;
 
 	isReviewsRequestRunningEditProfile = true;
 	if (!isNextBatch) {
