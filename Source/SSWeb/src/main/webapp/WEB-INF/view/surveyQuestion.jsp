@@ -205,7 +205,9 @@
 
 				<!-- Div for Error Messages -->
 				<div data-ques-type="error" class="sq-quest-item hide">
-					<div id="profile-link" class="sq-main-link"></div>
+				
+				<div id="profile-link" class="sq-main-link"></div>
+					
 					<div id="content-head" class="sq-main-txt">Error</div>
 					<div class="sq-ques">
 						<i><span id="content" class="sq-ques-txt"></span></i>
