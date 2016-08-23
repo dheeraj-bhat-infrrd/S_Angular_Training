@@ -170,7 +170,7 @@ public interface SurveyHandler
     /**
      * @param surveyPreInitiation
      */
-    public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
+    public SurveyPreInitiation saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
 
 
     void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName );
@@ -341,4 +341,7 @@ public interface SurveyHandler
 
     public void updateSurveyStageForGoogleBusinessToken( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
+
+
+    SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
 }

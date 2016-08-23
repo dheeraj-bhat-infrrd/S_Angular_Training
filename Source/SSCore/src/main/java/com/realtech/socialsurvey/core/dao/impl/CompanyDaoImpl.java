@@ -3,7 +3,10 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -377,6 +380,28 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         }
 
         return companies;
+    }
+    
+    
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Long , Company> getCompaniesByIds(Set<Long> ids)
+    {
+        LOG.debug( "method getCompaniesById started " );
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria( Company.class, "company" );
+        criteria.add( Restrictions.in( "companyId", ids ) );
+        List<Company> companies = criteria.list();
+        
+        Map<Long , Company> cpmanyiesById = new HashMap<Long , Company>();
+        for(Company company : companies){
+            cpmanyiesById.put( company.getCompanyId(), company );
+        }
+        
+        LOG.debug( "method getAllInvoicedActiveCompanies started ended" );
+        return cpmanyiesById;
+
     }
 }
 // JIRA SS-42 By RM-05 EOC
