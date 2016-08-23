@@ -5392,6 +5392,7 @@ function initSurveyWithUrl(q) {
 				firstName = data.responseJSON.customerFirstName;
 				lastName = data.responseJSON.customerLastName;
 				surveyId = data.responseJSON.surveyId;
+				hiddenSection=data.responseJSON.hiddenSection;
 				paintSurveyPage(data);
 				var message = $("#pst-srvy-div .bd-check-txt").html();
 				$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
@@ -5885,7 +5886,10 @@ function showMasterQuestionPage() {
 		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
-		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
+		if(!hiddenSection){
+			$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
+		}
+		
 		var fmt_rating = Number(rating).toFixed(1);
 		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
