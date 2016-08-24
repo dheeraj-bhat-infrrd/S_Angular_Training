@@ -8,7 +8,7 @@
 
 <!-- Account masters 1=Individual, 2=Team, 3=Company, 4=Enterprise, 5=Free Account -->
 <c:set var="accountMasterId" value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}"/>
-<c:set var="hiddenSectionDashboard" value="false"/>
+<c:set var="hiddenSectionDashboard" value="${hiddenSection}"/>
 <!DOCTYPE html>
 <html>
 <head>
