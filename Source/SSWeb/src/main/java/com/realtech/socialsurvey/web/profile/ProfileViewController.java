@@ -30,8 +30,10 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
@@ -51,6 +53,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -76,6 +79,9 @@ public class ProfileViewController
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
+
+    @Autowired
+    private UserManagementService userManagementService;
 
     @Autowired
     private BotRequestUtils botRequestUtils;
@@ -511,9 +517,7 @@ public class ProfileViewController
 
             AgentSettings individualProfile = null;
             try {
-
                 individualProfile = userCompositeObject.getAgentSettings();
-
 
                 if ( individualProfile == null || ( individualProfile.getStatus() != null
                     && ( individualProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) ) {
@@ -536,6 +540,7 @@ public class ProfileViewController
                     && companyProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) {
                     throw new ProfileNotFoundException( "Unable to find company profile for profile name " + agentProfileName );
                 }
+
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
                 if ( regionProfile == null || ( regionProfile.getStatus() != null
                     && regionProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) {
@@ -545,6 +550,47 @@ public class ProfileViewController
                 if ( branchProfile == null || ( branchProfile.getStatus() != null
                     && branchProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) {
                     throw new ProfileNotFoundException( "Unable to find branch profile for profile name " + agentProfileName );
+                }
+
+                if ( companyProfile.isHiddenSection() ) {
+                    Branch branch = userManagementService.getBranchById( branchId );
+                    if ( branch.getIsDefaultBySystem() == 1 ) {
+                        Region region = userManagementService.getRegionById( regionId );
+                        if ( region.getIsDefaultBySystem() == 1 ) {
+                            try {
+                                LOG.info( "Service to redirect to company profile page executed successfully" );
+                                response.sendRedirect( companyProfile.getCompleteProfileUrl() );
+                            } catch ( IOException e ) {
+                                LOG.error( "IOException : message : " + e.getMessage(), e );
+                                model.addAttribute( "message",
+                                    messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
+                                        DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                                return JspResolver.MESSAGE_HEADER;
+                            }
+                        } else {
+                            try {
+                                LOG.info( "Service to redirect to region profile page executed successfully" );
+                                response.sendRedirect( regionProfile.getCompleteProfileUrl() );
+                            } catch ( IOException e ) {
+                                LOG.error( "IOException : message : " + e.getMessage(), e );
+                                model.addAttribute( "message",
+                                    messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_REGION_PROFILENAME,
+                                        DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                                return JspResolver.MESSAGE_HEADER;
+                            }
+                        }
+                    } else {
+                        try {
+                            LOG.info( "Service to redirect to branch profile page executed successfully" );
+                            response.sendRedirect( branchProfile.getCompleteProfileUrl() );
+                        } catch ( IOException e ) {
+                            LOG.error( "IOException : message : " + e.getMessage(), e );
+                            model.addAttribute( "message",
+                                messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_BRANCH_PROFILENAME,
+                                    DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                            return JspResolver.MESSAGE_HEADER;
+                        }
+                    }
                 }
 
                 LOG.debug( "Getting settings by organization unit map" );

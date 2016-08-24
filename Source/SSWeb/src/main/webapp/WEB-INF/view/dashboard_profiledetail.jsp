@@ -103,4 +103,3 @@
 		</c:if>
 	</div>
 </div>
-<script>console.log("${hiddenSection} and prof id ${profilemasterid} ");</script>

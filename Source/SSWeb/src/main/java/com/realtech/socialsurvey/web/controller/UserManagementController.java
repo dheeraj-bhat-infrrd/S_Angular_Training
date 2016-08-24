@@ -40,7 +40,6 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserAssignment;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -1130,6 +1129,14 @@ public class UserManagementController
                 companyId = Long.parseLong( companyIdStr );
             } catch ( NumberFormatException e ) {
                 throw new InvalidInputException( "NumberFormat exception parsing companyId. Reason : " + e.getMessage(),
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+
+            try {
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+                redirectAttributes.addFlashAttribute( "hiddenSection", companySettings.isHiddenSection() );
+            } catch ( InvalidInputException e ) {
+                throw new InvalidInputException( "Invalid Input exception occured in method getCompanySettings()",
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
