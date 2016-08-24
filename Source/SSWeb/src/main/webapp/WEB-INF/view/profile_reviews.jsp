@@ -88,10 +88,10 @@
 						<c:if test="${profilemasterid !=4}">
 							<c:if test="${not empty reviewItem.agentName}">
 							 <span class="float-left" style="margin-left: 5px;">for
-							 <c:if test="${hiddenSection== true}">
+							 <c:if test="${hiddenSection}">
 							 ${reviewItem.agentName}
 							 </c:if>
-							 <c:if test="${hiddenSection==false}">
+							 <c:if test="${!hiddenSection}">
 							   <a class="cursor-pointer" style="color: #236CAF; font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank">
 								${reviewItem.agentName}</a>
 								</c:if></span>
