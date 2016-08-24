@@ -1796,8 +1796,24 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             name = name + " " + lastName;
         }
 
+        OrganizationUnitSettings companySettings = null;
+        boolean hiddenSection = false;
+        User user = null;
+        try {
+            user = this.getUserByEmail( emailId );
+            if ( user != null ) {
+                companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+                if ( companySettings != null ) {
+                    hiddenSection = companySettings.isHiddenSection();
+                }
+            }
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.error( "No record fetched for user with email id: " + emailId );
+        }
+
         // Send reset password link to the user email ID
-        emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName, holdSendingMail );
+        emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName, holdSendingMail,
+            hiddenSection );
     }
 
 
@@ -1895,9 +1911,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.debug( "Calling email services to send verification mail for user " + user.getEmailId() );
             String profileName = getUserSettings( user.getUserId() ).getProfileName();
 
+            OrganizationUnitSettings companySettings = null;
+            boolean hiddenSection = false;
+            if ( user != null ) {
+                companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+                if ( companySettings != null ) {
+                    hiddenSection = companySettings.isHiddenSection();
+                }
+            }
+
             emailServices.sendVerificationMail( verificationUrl, user.getEmailId(),
                 user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ), profileName,
-                user.getLoginName() );
+                user.getLoginName(), hiddenSection );
         } catch ( InvalidInputException e ) {
             throw new InvalidInputException( "Could not send mail for verification.Reason : " + e.getMessage(), e );
         }
