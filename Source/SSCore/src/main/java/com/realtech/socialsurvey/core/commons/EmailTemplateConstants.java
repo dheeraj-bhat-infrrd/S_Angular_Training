@@ -25,6 +25,7 @@ public final class EmailTemplateConstants {
 	public static final String ACCOUNT_UPGRADE_MAIL_SUBJECT = "AccountUpgradeMailSubject.txt";
 
 	public static final String COMPLETE_REGISTRATION_MAIL_BODY = "CompleteRegistrationMailBody.html";
+	public static final String COMPLETE_REGISTRATION_MAIL_BODY_CUSTOM = "CompleteRegistrationMailBodyCustom.html";
 	public static final String COMPLETE_REGISTRATION_MAIL_SUBJECT = "CompleteRegistrationMailSubject.txt";
 
 	public static final String CONTACT_US_MAIL_BODY = "ContactUsMailBody.html";
@@ -106,6 +107,7 @@ public final class EmailTemplateConstants {
 	public static final String SURVEY_RESTART_MAIL_SUBJECT = "SurveyRestartMailSubject.txt";
 
 	public static final String VERIFICATION_MAIL_BODY = "VerificationMailBody.html";
+	public static final String VERIFICATION_MAIL_BODY_CUSTOM = "VerificationMailBodyCustom.html";
 	public static final String VERIFICATION_MAIL_SUBJECT = "VerificationMailSubject.txt";
 	
 	public static final String REPORT_ABUSE_MAIL_BODY = "ReportAbuseMailBody.html";
