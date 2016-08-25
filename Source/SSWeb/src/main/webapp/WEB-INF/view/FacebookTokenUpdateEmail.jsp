@@ -73,7 +73,10 @@ $(document).ready(function() {
   }
  }
  
- 
+ var pages = "${pageNames}";
+ var selectPageText = $("<div style='margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;'> Select the profile, you want to connect to Social Survey! </div>");
+ if(pages.length > 0)
+ 	$("#page").append(selectPageText);
  
  var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;'>")
  <c:forEach var="page" items="${pageNames}" varStatus="loop">
@@ -117,7 +120,7 @@ $(document).ready(function() {
    'columnValue' : columnValue
   };
   
-  var updateSelectedFBToken = "/saveSelectedAccessFacebookTokenForEmail.do?selectedAccessFacebookToken="
+  var updateSelectedFBToken = "/rest/saveSelectedAccessFacebookTokenForEmail.do?selectedAccessFacebookToken="
 		+ selectedAccessFacebookToken + "&selectedProfileUrl=" + selectedProfileUrl 
 		+ "&fbAccessToken=" + fbAccessToken 
 		+ "&columnName=" + columnName 
