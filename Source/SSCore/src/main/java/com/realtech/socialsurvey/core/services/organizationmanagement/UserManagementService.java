@@ -622,5 +622,8 @@ public interface UserManagementService
 
     public User activateCompanyAdmin( User companyAdmin )
         throws InvalidInputException, HierarchyAlreadyExistsException, SolrException;
+
+
+    public List<Long> getExcludedUserIds();
 }
 // JIRA SS-34 BY RM02 BOC

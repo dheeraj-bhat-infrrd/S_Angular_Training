@@ -4940,4 +4940,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //emailServices.sendRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName() );
         emailServices.sendNewRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName(), planId );
     }
+
+
+    @Override
+    public List<Long> getExcludedUserIds()
+    {
+        List<Long> userIds = new ArrayList<Long>();
+        List<Long> companyIdsWithHiddenAttribute = organizationUnitSettingsDao
+            .fetchEntityIdsWithHiddenAttribute( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        List<User> users = userDao.findByColumnForMultipleValues( User.class, "COMPANY_ID", companyIdsWithHiddenAttribute );
+        if ( users != null && !users.isEmpty() ) {
+            for ( User user : users ) {
+                userIds.add( user.getUserId() );
+            }
+        }
+        return userIds;
+    }
 }
