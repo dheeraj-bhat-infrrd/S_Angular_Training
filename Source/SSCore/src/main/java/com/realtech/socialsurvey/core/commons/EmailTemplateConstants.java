@@ -83,6 +83,7 @@ public final class EmailTemplateConstants {
 	public static final String SURVEY_COMPLETION_ADMINS_MAIL_SUBJECT = "SurveyCompletionAdminsMailSubject.txt";
 
 	public static final String SURVEY_COMPLETION_MAIL_BODY = "SurveyCompletionMailBody.html";
+	public static final String SURVEY_COMPLETION_MAIL_BODY_CUSTOM = "SurveyCompletionMailBodyCustom.html";
 	public static final String SURVEY_COMPLETION_MAIL_SUBJECT = "SurveyCompletionMailSubject.txt";
 
 	public static final String SURVEY_INVITATION_MAIL_BODY = "SurveyInvitationMailBody.html";
