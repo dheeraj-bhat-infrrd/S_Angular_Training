@@ -35,9 +35,26 @@ import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.mq.ProducerForQueue;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
+import org.apache.commons.lang.WordUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 // JIRA: SS-7: By RM02: BOC
@@ -90,8 +107,8 @@ public class EmailServicesImpl implements EmailServices
     @Autowired
     private ForwardMailDetailsDao forwardMailDetailsDao;
 
-    @Autowired
-    private UserManagementService userManagementService;
+	@Autowired
+	private UserManagementService userManagementService;
 
 
     /**
@@ -510,7 +527,6 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Successfully sendEmailVerifiedNotificationMail" );
     }
 
-
     @Override
     public void sendEmailVerifiedNotificationMailToAdmin( String recipientMailId, String recipientName, String verifiedEmail,
         String entityName ) throws InvalidInputException, UndeliveredEmailException
@@ -545,7 +561,6 @@ public class EmailServicesImpl implements EmailServices
             fileContentReplacements, false, false );
         LOG.info( "Successfully sent EmailVerifiedNotificationMailToAdmin" );
     }
-
 
     /**
      * Method to send mail with verification link to verify the account
@@ -1789,7 +1804,7 @@ public class EmailServicesImpl implements EmailServices
 
     // creating email entity with senders email id as U<userid>@socialsurvey.me
     private EmailEntity prepareEmailEntityForSendingEmail( String recipientMailId, long userId, String name )
-        throws InvalidInputException
+	    throws InvalidInputException
     {
         LOG.debug( "Preparing email entity with recipent " + recipientMailId + " user id " + userId + " and name " + name );
         List<String> recipients = new ArrayList<String>();
@@ -1800,13 +1815,14 @@ public class EmailServicesImpl implements EmailServices
         emailEntity.setSenderName( name );
 
         AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
-        //JIRA SS-700 begin
-        if ( agentSettings.getUserEncryptedId() == null ) {
-            agentSettings.setUserEncryptedId( userManagementService.generateUserEncryptedId( agentSettings.getIden() ) );
-            organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.USER_ENCRYPTED_ID,
-                agentSettings.getUserEncryptedId(), agentSettings );
-        }
-        //JIRA SS-700 end
+	    //JIRA SS-700 begin
+	    if ( agentSettings.getUserEncryptedId() == null ) {
+		    agentSettings.setUserEncryptedId( userManagementService.generateUserEncryptedId( agentSettings.getIden() ) );
+		    organizationUnitSettingsDao
+			    .updateParticularKeyAgentSettings( CommonConstants.USER_ENCRYPTED_ID, agentSettings.getUserEncryptedId(),
+				    agentSettings );
+	    }
+	    //JIRA SS-700 end
         //JIRA SS-60 //pass stored encrypted id in mongo for the user
         emailEntity.setSenderEmailId( "u-" + agentSettings.getUserEncryptedId() + "@" + defaultEmailDomain );
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );

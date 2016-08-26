@@ -29,9 +29,8 @@ import java.util.List;
 public class BulkSurveyImporter extends QuartzJobBean
 {
     public static final Logger LOG = LoggerFactory.getLogger( BillingReportGenerator.class );
+
     private SurveyHandler surveyHandler;
-
-
 
 
     @Override
@@ -39,7 +38,7 @@ public class BulkSurveyImporter extends QuartzJobBean
     {
         LOG.info( "Bulk Survey Importer started" );
         initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
-	    surveyHandler.begin3rdPartySurveyImport();
+        surveyHandler.begin3rdPartySurveyImport();
         LOG.info( "Bulk Survey Importer finished" );
     }
 
