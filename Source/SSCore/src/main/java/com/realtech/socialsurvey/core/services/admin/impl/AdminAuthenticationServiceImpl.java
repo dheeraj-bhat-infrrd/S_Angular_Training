@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.admin.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,31 +35,28 @@ public class AdminAuthenticationServiceImpl implements AdminAuthenticationServic
 	public long validateAuthHeader( String authorizationHeader ) throws AuthorizationException
     {
 	    LOG.debug( " method validateAuthHeader started" );
-        Map<String, String> params = new HashMap<String, String>();
-        if ( authorizationHeader == null || authorizationHeader.isEmpty() ) {
+
+	    if (StringUtils.isBlank( authorizationHeader )) {
             throw new AuthorizationException( "Authorization header is null" );
         }
 
+        String encodedUserPassword = authorizationHeader.replaceFirst("Basic" + " ", "");
         
+        String plainText = null;
         try {
-            String plainText = encryptionHelper.decryptAES( authorizationHeader, "" );
-            String keyValuePairs[] = plainText.split( "&" );
-
-            for ( int counter = 0; counter < keyValuePairs.length; counter += 1 ) {
-                String[] keyValuePair = keyValuePairs[counter].split( "=" );
-                params.put( keyValuePair[0], keyValuePair[1] );
-            }
-        } catch ( InvalidInputException e ) {
+             plainText = encryptionHelper.decryptAES( encodedUserPassword, "" );
+        } catch ( Exception e ) {
             throw new AuthorizationException( "Authorization failure" );
         }
         
-        String comapnyIdStr = params.get( CommonConstants.COMPANY_ID_COLUMN );
-        String apiKey = params.get( CommonConstants.API_KEY_COLUMN );
-        String apiSecret = params.get( CommonConstants.API_SECRET_COLUMN );
         long comapnyId;
        
         boolean isValid;
         try {
+            String[] keyValuePair = plainText.split( ":" );
+            String apiKey = keyValuePair[0];
+            String apiSecret = keyValuePair[1];
+            String comapnyIdStr = apiSecret.split( "_" )[0];
             comapnyId = Long.valueOf( comapnyIdStr ) ;
             isValid = userManagementService.validateUserApiKey( apiKey, apiSecret, comapnyId );
         } catch ( NumberFormatException | InvalidInputException e ) {

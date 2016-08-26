@@ -3576,7 +3576,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         
         OrganizationUnitSettings settings = organizationManagementService.getCompanySettings( companyId );
         String apiKey =  settings.getProfileName();
-        String apiSecret = String.valueOf( companyId ) + String.valueOf(System.currentTimeMillis() );
+        String apiSecret = String.valueOf( companyId ) + "_" + String.valueOf(System.currentTimeMillis() );
         
         userApiKey.setApiKey( apiKey );
         userApiKey.setApiSecret( apiSecret );

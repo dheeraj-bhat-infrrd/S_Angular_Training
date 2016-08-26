@@ -21,9 +21,11 @@ import com.realtech.socialsurvey.api.models.SurveyVO;
 import com.realtech.socialsurvey.api.models.TransactionInfo;
 import com.realtech.socialsurvey.api.transformers.SurveyPreinitiationTransformer;
 import com.realtech.socialsurvey.api.transformers.SurveyTransformer;
+import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.exception.AuthorizationException;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -50,14 +52,17 @@ public class SurveyApiController {
 	
 	private AdminAuthenticationService adminAuthenticationService;
 	
+	private RestUtils restUtils;
+	
 	@Autowired
     public SurveyApiController( SurveyPreinitiationTransformer surveyPreinitiationTransformer , SurveyHandler surveyHandler  ,
-    		SurveyTransformer surveyTransformer , AdminAuthenticationService adminAuthenticationService)
+    		SurveyTransformer surveyTransformer , AdminAuthenticationService adminAuthenticationService ,  RestUtils restUtils)
     {
         this.surveyPreinitiationTransformer = surveyPreinitiationTransformer;
         this.surveyHandler = surveyHandler;
         this.surveyTransformer = surveyTransformer;
         this.adminAuthenticationService = adminAuthenticationService;
+        this.restUtils = restUtils;
     }
 	
 	
@@ -67,36 +72,47 @@ public class SurveyApiController {
         ) throws SSApiException
     {
 		
+		LOGGER.info( "SurveyApiController.postSurveyTransaction started" );
 		String authorizationHeader = request.getHeader( "Authorization" );
+		//authorize request
 		try {
 			adminAuthenticationService.validateAuthHeader( authorizationHeader );
-		} catch (AuthorizationException e1) {
-			return new ResponseEntity<String>( "Unauthorized" , HttpStatus.UNAUTHORIZED );
+		} catch (AuthorizationException e) {
+			return restUtils.getRestResponseEntity(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null);
 		}
 		
+        SurveyPreInitiation surveyPreInitiation;
+		try {
+			surveyPreInitiation = surveyPreinitiationTransformer.transformApiRequestToDomainObject(transactionInfo);
+		} catch (InvalidInputException e) {
+			return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, e.getMessage(), null, null);
+		}
+
+		
         try {
-            LOGGER.info( "SurveyApiController.postSurveyTransaction started" );
-            
-            SurveyPreInitiation surveyPreInitiation = surveyPreinitiationTransformer.transformApiRequestToDomainObject(transactionInfo);
             surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
-            
             LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
-            
-            Map<String,Object> responseMap = new java.util.HashMap<String,Object>();
-            responseMap.put("surveyId", surveyPreInitiation.getSurveyPreIntitiationId());
-            return new ResponseEntity<Map<String,Object>>( responseMap , HttpStatus.OK );
+            return restUtils.getRestResponseEntity(HttpStatus.CREATED, "inserted", "surveyId", surveyPreInitiation.getSurveyPreIntitiationId());
         } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e.getErrorCode() );
         }
+       
     }
 	
 	
 	@RequestMapping ( value = "/survey/{surveyId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Post Survey Transaction")
-    public ResponseEntity<?> getSurveyTransaction( @PathVariable ( "surveyId") String surveyId ) throws SSApiException
+    public ResponseEntity<?> getSurveyTransaction( @PathVariable ( "surveyId") String surveyId , HttpServletRequest request ) throws SSApiException
     {
         try {
             LOGGER.info( "SurveyApiController.getSurveyTransaction started" );
+            
+            String authorizationHeader = request.getHeader( "Authorization" );
+    		try {
+    			adminAuthenticationService.validateAuthHeader( authorizationHeader );
+    		} catch (AuthorizationException e1) {
+    			return restUtils.getRestResponseEntity(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null);
+    		}
             
             long surveyPreInitiationId;
             try{
@@ -104,6 +120,7 @@ public class SurveyApiController {
             }catch(NumberFormatException e){
             	throw new NonFatalException("Passed parameter surveyId is invalid");
             }
+            
             SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(surveyPreInitiationId);
             SurveyDetails review =  surveyHandler.getSurveyBySurveyPreIntitiationId(surveyPreInitiationId);
 
@@ -111,7 +128,7 @@ public class SurveyApiController {
             
             LOGGER.info( "SurveyApiController.getSurveyTransaction completed successfully" );
             
-            return new ResponseEntity<SurveyVO>( surveyVO , HttpStatus.OK );
+            return restUtils.getRestResponseEntity(HttpStatus.OK, "Request Successfully processed", "survey", surveyVO);
         } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e.getErrorCode() );
         }
