@@ -4948,7 +4948,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         List<Long> userIds = new ArrayList<Long>();
         List<Long> companyIdsWithHiddenAttribute = organizationUnitSettingsDao
             .fetchEntityIdsWithHiddenAttribute( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        List<User> users = userDao.findByColumnForMultipleValues( User.class, "COMPANY_ID", companyIdsWithHiddenAttribute );
+        List<User> users = userDao.findByColumnForMultipleValues( User.class, "company.companyId", companyIdsWithHiddenAttribute );
         if ( users != null && !users.isEmpty() ) {
             for ( User user : users ) {
                 userIds.add( user.getUserId() );

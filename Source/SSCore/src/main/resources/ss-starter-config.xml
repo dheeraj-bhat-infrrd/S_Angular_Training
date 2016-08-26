@@ -363,7 +363,7 @@
 	<!-- setting cron for incomplete survey reminder -->
 	<bean id="incompletesurveycron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="incompletesurveyjobdetail" />
-		<property name="cronExpression" value="0 0/5 * 1/1 * ? *" />
+		<property name="cronExpression" value="0 08 * * * ?" />
 	</bean>
 
 	<!-- setting cron for update subscription price -->
@@ -426,7 +426,7 @@
 	<!-- setting cron for mapping crm data agent id -->
 	<bean id="crmdataagentidmappercron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="crmdataagentidmapperjobdetail" />
-		<property name="cronExpression" value="0 0/5 * 1/1 * ? *" />
+		<property name="cronExpression" value="0 6 * * * ?" />
 	</bean>
 
 	<!-- setting cron for loading image from linkedin to amazon server -->
@@ -475,7 +475,7 @@
 
 	<bean id="lonewolfcron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="lonewolfjobdetail" />
-		<property name="cronExpression" value="0 0/5 * 1/1 * ? *" />
+		<property name="cronExpression" value="0 01 8 * * ?" />
 	</bean>
 	
 	<bean id="socialmediatokenexpirycron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
