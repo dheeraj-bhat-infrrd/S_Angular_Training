@@ -250,21 +250,23 @@
 							<c:otherwise> ${profName}</c:otherwise>
 						</c:choose>
 						</div>
-						<c:choose>
-						<c:when test="${profileLevel == 'INDIVIDUAL'}">
+						<c:if test="${not empty profile && !profile.hiddenSection}">
 							<c:choose>
-								<c:when test="${not empty profile.surveyUrl}">
-									<a href="${profile.surveyUrl}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
-								</c:when>
-								 <c:otherwise>
-									<a href="/rest/survey/showsurveypage/${profile.iden}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
-								</c:otherwise>						
+							<c:when test="${profileLevel == 'INDIVIDUAL'}">
+								<c:choose>
+									<c:when test="${not empty profile.surveyUrl}">
+										<a href="${profile.surveyUrl}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
+									</c:when>
+									 <c:otherwise>
+										<a href="/rest/survey/showsurveypage/${profile.iden}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
+									</c:otherwise>						
+								</c:choose>
+							</c:when>
+							<c:otherwise>
+								<a href="/initfindapro.do?profileLevel=${profileLevel}&iden=${profile.iden}&searchCriteria=${profile.contact_details.name}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
+							</c:otherwise>
 							</c:choose>
-						</c:when>
-						<c:otherwise>
-							<a href="/initfindapro.do?profileLevel=${profileLevel}&iden=${profile.iden}&searchCriteria=${profile.contact_details.name}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
-						</c:otherwise>
-						</c:choose>
+						</c:if>
 					</div>
             	</div>
             </div>
@@ -393,41 +395,43 @@
           			<div id="individual-details">
            				<!-- individual details like associations/hobbies/achievements come here -->
            			</div>
-                 	<c:choose>
-                   		<c:when test="${not empty branchProfileName}">
-                   			<div id="branch-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
-                   				<div class="left-assoc-wrapper">
-                   					<div class="left-panel-header"><spring:message code="label.ourbranch.key"/></div>
-                        			<div class="left-panel-content left-panel-content-adj" id="branch-individuals">
-                            			<!--branch hierarchy is displayed here  -->
-                        			</div>
-                        		</div>
-             				</div>
-                 		</c:when>
-                 		<c:when test="${not empty regionProfileName}">
-                  		 	<div id="region-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
-                  				<div class="left-assoc-wrapper">
-	                   		 	<input type="hidden" id="branchid-hidden"/>
-	                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
-		                        	<div class="left-panel-content left-panel-content-adj" id="region-branches">
-		                            	<!--region hierarchy is displayed here  -->
-		                        	</div>
+           			<c:if test="${not empty profile && !profile.hiddenSection}">
+	                 	<c:choose>
+	                   		<c:when test="${not empty branchProfileName}">
+	                   			<div id="branch-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
+	                   				<div class="left-assoc-wrapper">
+	                   					<div class="left-panel-header"><spring:message code="label.ourbranch.key"/></div>
+	                        			<div class="left-panel-content left-panel-content-adj" id="branch-individuals">
+	                            			<!--branch hierarchy is displayed here  -->
+	                        			</div>
+	                        		</div>
+	             				</div>
+	                 		</c:when>
+	                 		<c:when test="${not empty regionProfileName}">
+	                  		 	<div id="region-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
+	                  				<div class="left-assoc-wrapper">
+		                   		 	<input type="hidden" id="branchid-hidden"/>
+		                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
+			                        	<div class="left-panel-content left-panel-content-adj" id="region-branches">
+			                            	<!--region hierarchy is displayed here  -->
+			                        	</div>
+									</div>
 								</div>
-							</div>
-                 		</c:when>
-                 		<c:when test="${not empty companyProfileName}">
-                        	<div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
-              					<div class="left-assoc-wrapper">
-                		 			<input type="hidden" id="regionid-hidden"/>
-                		 			<input type="hidden" id="branchid-hidden"/>
-                		 			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
-                      				<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
-                          				<!--company hierarchy is displayed here  -->
-                      				</div>
-                     			</div>
-             				</div>
-              		 	</c:when>
-              		</c:choose>
+	                 		</c:when>
+	                 		<c:when test="${not empty companyProfileName}">
+	                        	<div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
+	              					<div class="left-assoc-wrapper">
+	                		 			<input type="hidden" id="regionid-hidden"/>
+	                		 			<input type="hidden" id="branchid-hidden"/>
+	                		 			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
+	                      				<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
+	                          				<!--company hierarchy is displayed here  -->
+	                      				</div>
+	                     			</div>
+	             				</div>
+	              		 	</c:when>
+	              		</c:choose>
+              		</c:if>
               		
                     <div class="prof-left-row prof-left-assoc bord-bot-dc">
                     	<div class="left-contact-wrapper">
@@ -577,6 +581,7 @@
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script src='//www.google.com/recaptcha/api.js' async="async" defer="defer"></script>
 <script>
+var hiddenSection="${profile.hiddenSection}";
     $(document).ready(function(){
     	if($('#social-token-container').children('.social-item-icon').length == 0) {
         	$('#social-token-container').remove();

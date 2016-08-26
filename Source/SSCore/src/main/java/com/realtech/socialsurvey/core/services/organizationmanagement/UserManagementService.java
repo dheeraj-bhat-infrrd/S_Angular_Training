@@ -604,15 +604,17 @@ public interface UserManagementService
         throws InvalidInputException, HierarchyAlreadyExistsException, SolrException;
 
 
-    UserApiKey getUserApiKeyForCompany( long companyId ) throws InvalidInputException;
+    public UserApiKey getUserApiKeyForCompany( long companyId ) throws InvalidInputException;
 
 
-    UserApiKey generateAndSaveUserApiKey( long companyId ) throws InvalidInputException;
+    public UserApiKey generateAndSaveUserApiKey( long companyId ) throws InvalidInputException;
 
 
-    List<UserApiKey> getActiveUserApiKeys();
+    public List<UserApiKey> getActiveUserApiKeys();
 
 
-    void updateStatusOfUserApiKey( long userApiKeyId, int status ) throws NoRecordsFetchedException;
+    public void updateStatusOfUserApiKey( long userApiKeyId, int status ) throws NoRecordsFetchedException;
+
+    public List<Long> getExcludedUserIds();
 }
 // JIRA SS-34 BY RM02 BOC

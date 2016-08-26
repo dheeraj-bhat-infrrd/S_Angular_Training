@@ -28,7 +28,7 @@ function landingFlow() {
 		var disableCookie="true";
 	}
 	
-	if (showLinkedInPopup == "true" && popupStatus == "Y") {
+	if (showLinkedInPopup == "true" && popupStatus == "Y" && hiddenSection== "false") {
 		linkedInDataImport();
 	}
 	else if (cookieValue !="true" && showSendSurveyPopup == "true" && popupStatus == "Y") {

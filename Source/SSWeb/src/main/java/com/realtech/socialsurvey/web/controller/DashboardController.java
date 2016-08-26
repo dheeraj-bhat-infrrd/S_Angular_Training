@@ -288,16 +288,20 @@ public class DashboardController
             }
 
             boolean allowOverrideForSocialMedia = false;
+            boolean hiddenSection = false;
             //Code to determine if social media can be overridden during autologin
             if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 allowOverrideForSocialMedia = unitSettings.isAllowOverrideForSocialMedia();
+                hiddenSection = unitSettings.isHiddenSection();
             } else {
                 OrganizationUnitSettings companySettings = organizationManagementService
                     .getCompanySettings( user.getCompany().getCompanyId() );
                 allowOverrideForSocialMedia = companySettings.isAllowOverrideForSocialMedia();
+                hiddenSection = companySettings.isHiddenSection();
             }
             model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
-
+            model.addAttribute( "hiddenSection", hiddenSection );
+            
             // calculating details for circles
             int numberOfDays = -1;
             try {
