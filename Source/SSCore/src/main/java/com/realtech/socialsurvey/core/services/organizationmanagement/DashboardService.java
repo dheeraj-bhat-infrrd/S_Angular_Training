@@ -106,9 +106,9 @@ public interface DashboardService
     public long getSocialPostsForPastNdaysWithHierarchyForStatistics( String columnName, long columnValue, int numberOfDays )
         throws InvalidInputException;
 
-	long get3rdPartyImportCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException;
+	public long get3rdPartyImportCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException;
 
-	/**
+    /**
      * 
      * @param companyId
      * @return

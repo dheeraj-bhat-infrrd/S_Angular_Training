@@ -1452,6 +1452,7 @@ public class SurveyManagementController
         OrganizationUnitSettings unitSettings = null;
         SurveyDetails survey = null;
         try {
+
             survey = surveyHandler.storeInitialSurveyDetails( user, surveyPreInitiation, url, isOldRecord, retakeSurvey );
 
             if ( survey != null ) {
@@ -1662,11 +1663,13 @@ public class SurveyManagementController
         surveyAndStage.put( "source", surveyPreInitiation.getSurveySource() );
         surveyAndStage.put("hiddenSection", companySettings.isHiddenSection() );
 
+
         LOG.info( "Method getSurvey finished." );
         return surveyAndStage;
     }
 
-
+    
+    
     private void reportBug( String socAppName, String name, Exception e )
     {
         try {

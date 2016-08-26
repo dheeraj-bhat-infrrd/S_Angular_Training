@@ -1166,7 +1166,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Override
     public long getCompletedSurveyCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
-        Timestamp endDate, boolean filterAbusive, boolean filterZillowAnd3rdPartyReviews ) throws InvalidInputException
+	    Timestamp endDate, boolean filterAbusive, boolean filterZillowAnd3rdPartyReviews ) throws InvalidInputException
     {
         LOG.info( "Getting completed survey count for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
         if ( organizationUnitColumn == null || organizationUnitColumn.isEmpty() ) {
@@ -1197,9 +1197,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
         }
-        if(filterZillowAnd3rdPartyReviews){
-	        query.addCriteria( Criteria.where( CommonConstants.SOURCE_COLUMN )
-		        .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) );
+	    if(filterZillowAnd3rdPartyReviews){
+		    query.addCriteria( Criteria.where( CommonConstants.SOURCE_COLUMN )
+			    .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) );
         }
         LOG.debug( "Query: " + query.toString() );
         long count = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
@@ -1291,7 +1291,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Found " + count + " completed surveys" );
         return count;
     }
-
+	
 
 	@Override
 	public long get3rdPartyImportCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
@@ -1365,9 +1365,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN, true ) ) );
         }
-	    pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject(
-		    "$nin", Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ) ) );
-	    // match non abusive survey
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject(
+	        "$nin", Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ) ) );
+        // match non abusive survey
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.IS_ABUSIVE_COLUMN, false ) ) );
         // match start date
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, new BasicDBObject(
@@ -1455,7 +1455,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         // Commented as Zillow surveys are not stored in database, SS-1276
         // match non zillow survey
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject(
-            "$nin", Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ) ) );
+	        "$nin", Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ) ) );
         // match start date
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.CREATED_ON, new BasicDBObject( "$gte",
             new Date( startDate.getTime() ) ) ) ) );
@@ -1540,7 +1540,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         // exclude zillow surveys
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject(
-            "$nin", Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ) ) );
+	        "$nin", Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ) ) );
         // match the survey stage should be complete
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.STAGE_COLUMN,
             CommonConstants.SURVEY_STAGE_COMPLETE ) ) );
@@ -1849,6 +1849,29 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 	                Aggregation
                     .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
             }
+        } else if ( startDate == null && endDate != null ) {
+	        if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+		        aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
+			        Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
+			        .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+			        Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
+			        Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
+			        Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
+			        .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
+			        Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
+				        Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+			        Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+	        } else {
+		        aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
+			        Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
+			        .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+			        Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
+			        Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
+			        .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
+			        Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
+				        Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+			        Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+	        }
         } else {
             if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
                 aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
@@ -2244,7 +2267,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( surveyDetails.getAgentId() ) );
         if ( surveyDetails.getSource().equalsIgnoreCase( CommonConstants.SURVEY_SOURCE_ZILLOW ) ) {
-            query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_ID_COLUMN ).is( surveyDetails.getSourceId() ) );
+	        query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_ID_COLUMN ).is( surveyDetails.getSourceId() ) );
         } else {
             query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( surveyDetails.getCustomerEmail() ) );
         }
