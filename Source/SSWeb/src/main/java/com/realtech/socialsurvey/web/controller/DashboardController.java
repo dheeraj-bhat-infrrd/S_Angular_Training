@@ -158,7 +158,13 @@ public class DashboardController
         if ( user == null ) {
             throw new NonFatalException( "NonFatalException while logging in. " );
         }
-
+        boolean hiddenSection = false;
+        OrganizationUnitSettings settings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+        if(settings != null){
+            hiddenSection = settings.isHiddenSection();
+        }
+        model.addAttribute( "hiddenSection", hiddenSection);
+        
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
@@ -496,6 +502,7 @@ public class DashboardController
         try {
             String startIndexStr = request.getParameter( "startIndex" );
             String batchSizeStr = request.getParameter( "batchSize" );
+            boolean hiddenSection = Boolean.parseBoolean( request.getParameter( "hiddenSection" ) );
             int startIndex = Integer.parseInt( startIndexStr );
             int batchSize = Integer.parseInt( batchSizeStr );
 
@@ -533,6 +540,7 @@ public class DashboardController
                 throw e;
             }
             model.addAttribute( "reviews", surveyDetails );
+            model.addAttribute( "hiddenSection", hiddenSection );
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
             model.addAttribute( "message", e.getMessage() );
