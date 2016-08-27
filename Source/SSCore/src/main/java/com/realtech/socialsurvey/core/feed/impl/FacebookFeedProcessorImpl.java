@@ -34,11 +34,13 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FacebookSocialPost;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 import facebook4j.Facebook;
@@ -84,6 +86,9 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
     @Autowired
     private EmailServices emailServices;
+    
+    @Autowired
+    private SocialMediaExceptionHandler socialMediaExceptionHandler;
 
     @Value ( "${SOCIAL_CONNECT_RETRY_THRESHOLD}")
     private long socialConnectRetryThreshold;
@@ -228,8 +233,16 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
             }
             status.setRetries( RETRIES_INITIAL );
         } catch ( FacebookException e ) {
+            
             LOG.error( "Exception in Facebook feed extration. Reason: " + e.getMessage() );
 
+            OrganizationUnitSettings settings = settingsDao
+                .fetchOrganizationUnitSettingsById( iden, collection );
+          //call social media error handler for facebook exception
+            socialMediaExceptionHandler.handleFacebookException( e  , settings ,collection);
+            
+           
+            
             if ( lastFetchedPostId == null || lastFetchedPostId.isEmpty() ) {
                 lastFetchedPostId = "0";
             }
@@ -246,8 +259,8 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
             // sending reminder mail and increasing counter
             if ( status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval
                 && status.getRetries() >= socialConnectRetryThreshold ) {
-                ContactDetailsSettings contactDetailsSettings = settingsDao
-                    .fetchOrganizationUnitSettingsById( iden, collection ).getContact_details();
+                
+                ContactDetailsSettings contactDetailsSettings = settings.getContact_details();
                 String userEmail = contactDetailsSettings.getMail_ids().getWork();
 
                 emailServices.sendSocialConnectMail( userEmail, contactDetailsSettings.getName(), userEmail, FEED_SOURCE );
@@ -257,6 +270,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
             }
 
             feedStatusDao.saveOrUpdate( status );
+         
         }
 
         return posts;

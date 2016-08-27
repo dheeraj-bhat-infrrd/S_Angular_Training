@@ -661,7 +661,7 @@ function validateEncompassUserName(elementId) {
 			$('#' + elementId).next('.hm-item-err-2').hide();
 			return true;
 		} else {
-			$('#' + elementId).next('.hm-item-err-2').html('Please enter user name');
+			$('#' + elementId).next('.hm-item-err-2').html('Please enter user name.');
 			$('#' + elementId).next('.hm-item-err-2').show();
 			return false;
 		}
@@ -684,7 +684,7 @@ function validateEncompassPassword(elementId) {
 			$('#' + elementId).next('.hm-item-err-2').hide();
 			return true;
 		} else {
-			$('#' + elementId).next('.hm-item-err-2').html('Please enter password');
+			$('#' + elementId).next('.hm-item-err-2').html('Please enter password.');
 			$('#' + elementId).next('.hm-item-err-2').show();
 			return false;
 		}
@@ -707,7 +707,34 @@ function validateURL(elementId) {
 			$('#' + elementId).next('.hm-item-err-2').hide();
 			return true;
 		} else {
-			$('#' + elementId).next('.hm-item-err-2').html('Please enter url');
+			$('#' + elementId).next('.hm-item-err-2').html('Please enter url.');
+			$('#' + elementId).next('.hm-item-err-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate Lone Wolf Input
+function validateLoneWolf(elementId) {
+	var msg;
+	if(elementId=='lone-client'){
+		msg="Please enter Client Code.";
+	}
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).val() != "") {
+			$('#' + elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#overlay-toast').html(msg);
+			showToast();
+			return false;
+		}
+	} else {
+		if ($('#' + elementId).val() != "") {
+			$('#' + elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#' + elementId).next('.hm-item-err-2').html(msg);
 			$('#' + elementId).next('.hm-item-err-2').show();
 			return false;
 		}
@@ -1460,12 +1487,13 @@ function bindEventForCorruptRecordPage() {
 		}
 		var totalPage = parseInt($('#corrupt-total-pages').text());
 		var prevPageNoVal = parseInt($('#sel-page-corrupt-list').val());
-		if (prevPageNoVal == NaN) {
-			prevPageNoVal = 0;
+		if (isNaN(prevPageNoVal)) {
+			prevPageNoVal = 1;
 		}
 		var pageNo = prevPageNoVal + String.fromCharCode(e.which);
 		pageNo = parseInt(pageNo);
-		if (pageNo >= totalPage || pageNo <= 0) {
+		if (pageNo > totalPage || pageNo <= 0) {
+			$('#sel-page-corrupt-list').val('1');
 			return false;
 		}
 	});
@@ -1479,9 +1507,12 @@ function bindEventForCorruptRecordPage() {
 	$('#corrupt-paginate-btn').on('blur', '#sel-page-corrupt-list', function(e) {
 		var batch = parseInt($('#corrupt-paginate-btn').attr("data-batch"));
 		var pageNoVal = parseInt($('#sel-page-corrupt-list').val());
+		if(isNaN(pageNoVal)){
+			pageNoVal=1;
+		}
 		UnmatchedUserStartIndex = (pageNoVal - 1) * batch;
 		$('#corrupt-paginate-btn').attr("data-start", UnmatchedUserStartIndex);
-		fetchUnmatchedUsers(UnmatchedUserStartIndex);
+		fetchCorruptRecords(UnmatchedUserStartIndex);
 	});
 }
 
@@ -1512,12 +1543,13 @@ function bindEventForMappedUserPage() {
 		}
 		var totalPage = parseInt($('#mapped-total-pages').text());
 		var prevPageNoVal = parseInt($('#sel-page-mapped-list').val());
-		if (prevPageNoVal == NaN) {
-			prevPageNoVal = 0;
+		if (isNaN(prevPageNoVal)) {
+			prevPageNoVal = 1;
 		}
 		var pageNo = prevPageNoVal + String.fromCharCode(e.which);
 		pageNo = parseInt(pageNo);
-		if (pageNo >= totalPage || pageNo <= 0) {
+		if (pageNo > totalPage || pageNo <= 0) {
+			$('#sel-page-mapped-list').val('1');
 			return false;
 		}
 	});
@@ -1531,6 +1563,9 @@ function bindEventForMappedUserPage() {
 	$('#mapped-paginate-btn').on('blur', '#sel-page-mapped-list', function(e) {
 		var batch = parseInt($('#mapped-paginate-btn').attr("data-batch"));
 		var pageNoVal = parseInt($('#sel-page-mapped-list').val());
+		if(isNaN(pageNoVal)){
+			pageNoVal=1;
+		}
 		MappedUserStartIndex = (pageNoVal - 1) * batch;
 		$('#mapped-paginate-btn').attr("data-start", MappedUserStartIndex);
 		fetchMappedUsers(MappedUserStartIndex);
@@ -1564,12 +1599,13 @@ function bindEventForUnmatchedUserPage() {
 		}
 		var totalPage = parseInt($('#un-new-total-pages').text());
 		var prevPageNoVal = parseInt($('#sel-page-un-new-list').val());
-		if (prevPageNoVal == NaN) {
-			prevPageNoVal = 0;
+		if (isNaN(prevPageNoVal)) {
+			prevPageNoVal = 1;
 		}
 		var pageNo = prevPageNoVal + String.fromCharCode(e.which);
 		pageNo = parseInt(pageNo);
-		if (pageNo >= totalPage || pageNo <= 0) {
+		if (pageNo > totalPage || pageNo <= 0) {
+			$('#sel-page-un-new-list').val('1');
 			return false;
 		}
 	});
@@ -1583,6 +1619,9 @@ function bindEventForUnmatchedUserPage() {
 	$('#un-new-paginate-btn').on('blur', '#sel-page-un-new-list', function(e) {
 		var batch = parseInt($('#un-new-paginate-btn').attr("data-batch"));
 		var pageNoVal = parseInt($('#sel-page-un-new-list').val());
+		if(isNaN(pageNoVal)){
+			pageNoVal=1;
+		}
 		UnmatchedUserStartIndex = (pageNoVal - 1) * batch;
 		$('#un-new-paginate-btn').attr("data-start", UnmatchedUserStartIndex);
 		fetchUnmatchedUsers(UnmatchedUserStartIndex);
@@ -1624,12 +1663,13 @@ function bindEventsForProcessUserPage() {
 		}
 		var totalPage = parseInt($('#un-processed-total-pages').text());
 		var prevPageNoVal = parseInt($('#sel-page-un-processed-list').val());
-		if (prevPageNoVal == NaN) {
-			prevPageNoVal = 0;
+		if (isNaN(prevPageNoVal)) {
+			prevPageNoVal = 1;
 		}
 		var pageNo = prevPageNoVal + String.fromCharCode(e.which);
 		pageNo = parseInt(pageNo);
-		if (pageNo >= totalPage || pageNo <= 0) {
+		if (pageNo > totalPage || pageNo <= 0) {
+			$('#sel-page-un-processed-list').val('1');
 			return false;
 		}
 	});
@@ -1643,6 +1683,9 @@ function bindEventsForProcessUserPage() {
 	$('#un-processed-paginate-btn').on('blur', '#sel-page-un-processed-list', function(e) {
 		var batch = parseInt($('#un-processed-paginate-btn').attr("data-batch"));
 		var pageNoVal = parseInt($('#sel-page-un-processed-list').val());
+		if(isNaN(pageNoVal)){
+			pageNoVal=1;
+		}
 		ProcessedUserStartIndex = (pageNoVal - 1) * batch;
 		$('#un-processed-paginate-btn').attr("data-start", ProcessedUserStartIndex);
 		fetchProcessedUsers(ProcessedUserStartIndex);
@@ -1805,6 +1848,9 @@ function updatePaginationBtnsForMappedUser() {
 		$('#mapped-prev').removeClass('paginate-button');
 		pageNo = 1;
 	}
+	if(pageNo==0){
+		pageNo=1;
+	}
 	$('#sel-page-mapped-list').val(pageNo);
 }
 function updatePaginationBtnsForUnmatchedUser() {
@@ -1838,6 +1884,9 @@ function updatePaginationBtnsForUnmatchedUser() {
 		$('#un-new-paginate-btn').attr("data-start", 0);
 		$('#un-new-prev').removeClass('paginate-button');
 		pageNo = 1;
+	}
+	if(pageNo==0){
+		pageNo=1;
 	}
 	$('#sel-page-un-new-list').val(pageNo);
 }
@@ -1873,6 +1922,9 @@ function updatePaginationBtnsForCorruptRecords() {
 		$('#corrupt-prev').removeClass('paginate-button');
 		pageNo = 1;
 	}
+	if(pageNo==0){
+		pageNo=1;
+	}
 	$('#sel-page-corrupt-list').val(pageNo);
 }
 function updatePaginationBtnsForProcessedUser() {
@@ -1906,6 +1958,9 @@ function updatePaginationBtnsForProcessedUser() {
 		$('#un-processed-paginate-btn').attr("data-start", 0);
 		$('#un-processed-prev').removeClass('paginate-button');
 		pageNoProcess = 1;
+	}
+	if(pageNoProcess==0){
+		pageNoProcess=1;
 	}
 	$('#sel-page-un-processed-list').val(pageNoProcess);
 }

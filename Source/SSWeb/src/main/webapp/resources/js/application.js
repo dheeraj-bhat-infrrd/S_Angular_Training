@@ -3796,6 +3796,12 @@ function saveEncompassDetails(formid) {
 		callAjaxFormSubmit(url, testConnectionSaveCallBack, formid);
 	}
 }
+function saveLoneWolfDetails(formid) {
+	if (validateLoneWolfInput(formid)) {
+		var url = "./savelonewolfdetails.do";
+		callAjaxFormSubmit(url, testConnectionLoneSaveCallBack, formid);
+	}
+}
 
 function saveEncompassDetailsCallBack(response) {
 
@@ -3810,6 +3816,20 @@ function saveEncompassDetailsCallBack(response) {
 	 */
 
 }
+function saveLoneDetailsCallBack(response) {
+
+	var map = $.parseJSON(response);
+	if (map.status == true) {
+		saveLoneWolfDetails("lone-wolf-form");
+	} else {
+		showError(map.message);
+	}
+	/*
+	 * $("#overlay-toast").html(response); showToast();
+	 */
+
+}
+
 function testConnectionSaveCallBack(response) {
 	var map = $.parseJSON(response);
 	if (map.status == true) {
@@ -3825,8 +3845,32 @@ function testConnectionSaveCallBack(response) {
 		showError(map.message);
 	}
 };
+function testConnectionLoneSaveCallBack(response) {
+	var map = $.parseJSON(response);
+	if (map.status == true) {
+		// If state = prod/ state = dryrun, don't make any changes
+		// else state = dryrun
+		var state = $("#lone-state").val();
+		if (state != 'dryrun' && state != 'prod') {
+			$("#lone-state").val('dryrun');
+			showLoneWolfButtons();
+		}
+		showInfo(map.message);
+	} else {
+		showError(map.message);
+	}
+};
 
 function testEncompassConnectionCallBack(response) {
+	var map = $.parseJSON(response);
+	if (map.status == true) {
+		showInfo(map.message);
+	} else {
+		showError(map.message);
+	}
+
+}
+function testLoneConnectionCallBack(response) {
 	var map = $.parseJSON(response);
 	if (map.status == true) {
 		showInfo(map.message);
@@ -3865,6 +3909,7 @@ function validateEncompassInput(elementId) {
 
 	return isEncompassValid;
 }
+
 // Check for encompass input fields for testConnection (except fieldid)
 function validateEncompassTestInput(elementId) {
 	isEncompassValid = true;
@@ -3894,6 +3939,21 @@ function validateEncompassTestInput(elementId) {
 
 	return isEncompassValid;
 }
+var isLoneValid;
+function validateLoneWolfInput(elementId) {
+	isLoneValid = true;
+	var isFocussed = false;
+
+	if (!validateLoneWolf('lone-client')) {
+		isLoneValid = false;
+		if (!isFocussed) {
+			$('#lone-client').focus();
+			isFocussed = true;
+		}
+	}
+
+	return isLoneValid;
+}
 
 // validate dotloop form
 function validateDotloopInput() {
@@ -3918,6 +3978,7 @@ $('body').on('click', '.crm-settings-dropdown-item', function(e) {
 	var crmType = $(this).attr('data-crm-type');
 	$('#crm-settings-dropdown-sel-text').text(crmType);
 	$('.crm-setting-cont').hide();
+	$('.hm-item-err-2').hide();
 	$('.crm-setting-cont[data-crm-type="' + crmType + '"]').show();
 });
 
@@ -3929,6 +3990,11 @@ $('body').on('blur', '#encompass-password', function() {
 });
 $('body').on('blur', '#encompass-url', function() {
 	validateURL(this.id);
+});
+// Lone Wolf input
+
+$('body').on('blur', '#lone-client', function() {
+	validateLoneWolf(this.id);
 });
 
 $('#dotloop-apikey').blur(function() {
@@ -5326,6 +5392,7 @@ function initSurveyWithUrl(q) {
 				firstName = data.responseJSON.customerFirstName;
 				lastName = data.responseJSON.customerLastName;
 				surveyId = data.responseJSON.surveyId;
+				hiddenSection=data.responseJSON.hiddenSection;
 				paintSurveyPage(data);
 				var message = $("#pst-srvy-div .bd-check-txt").html();
 				$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
@@ -5438,9 +5505,9 @@ function paintSurveyPage(jsonData) {
 	}
 
 	if (googleBusinessEnabled) {
-	    $('#google-business-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.googleBusinessLink));
+		$('#google-business-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.googleBusinessLink));
 	} else {
-	    $('#google-business-btn').remove();
+		$('#google-business-btn').remove();
 	}
 
 	companyLogo = jsonData.responseJSON.companyLogo;
@@ -5819,7 +5886,10 @@ function showMasterQuestionPage() {
 		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
-		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
+		if(!hiddenSection){
+			$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
+		}
+		
 		var fmt_rating = Number(rating).toFixed(1);
 		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
@@ -7251,7 +7321,8 @@ function callBackUpdateHobbies(data) {
  */
 
 // Update Social links - yelp
-$('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
+$('body').on('click', '#prof-edit-social-link .icn-yelp', function(e) {
+	e.stopPropagation();
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -7260,7 +7331,13 @@ $('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
 	});
 	$('#social-token-text').val(link);
 });
-
+$(document).on('click',function(){
+	$('#social-token-text').hide();
+});
+//hide input textbox for link
+$(document).on('click','#social-token-text',function(e){
+	e.stopPropagation();
+});
 function updateYelpLink(link) {
 	var payload = {
 		"yelplink" : link
@@ -7284,7 +7361,8 @@ function updateYelpLink(link) {
  */
 
 // Update Social links - lendingTree
-$('body').on('click', '#prof-edit-social-link .icn-lendingtree', function() {
+$('body').on('click', '#prof-edit-social-link .icn-lendingtree', function(e) {
+	e.stopPropagation();
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -7307,7 +7385,8 @@ function updateLendingTreeLink(link) {
 	}
 }
 
-$('body').on('click', '#prof-edit-social-link .icn-realtor', function() {
+$('body').on('click', '#prof-edit-social-link .icn-realtor', function(e) {
+	e.stopPropagation();
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -7317,7 +7396,8 @@ $('body').on('click', '#prof-edit-social-link .icn-realtor', function() {
 	$('#social-token-text').val(link);
 });
 
-$('body').on('click', '#prof-edit-social-link .icn-google-business', function() {
+$('body').on('click', '#prof-edit-social-link .icn-google-business', function(e) {
+	e.stopPropagation();
     $('#social-token-text').show();
     var link = $(this).attr("data-link");
     $('#social-token-text').attr({
@@ -7325,6 +7405,7 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function() 
         "onblur" : "updateGoogleBusinessLink(this.value);$('#social-token-text').hide();"
     });
     $('#social-token-text').val(link);
+
 });
 
 function updateRealtorLink(link) {
@@ -7341,16 +7422,16 @@ function updateRealtorLink(link) {
 }
 
 function updateGoogleBusinessLink(link) {
-    var payload = {
-        "googleBusinessLink" : link
-    };
-    if (isValidUrl(link)) {
-        callAjaxPostWithPayloadData("./updateGoogleBusinessLink.do", callBackUpdateSocialLink, payload, true);
-        showProfileLinkInEditProfilePage("googleBusiness", link);
-    } else {
-        $('#overlay-toast').html("Enter a valid url");
-        showToast();
-    }
+	var payload = {
+		"googleBusinessLink" : link
+	};
+	if (isValidUrl(link)) {
+		callAjaxPostWithPayloadData("./updateGoogleBusinessLink.do", callBackUpdateSocialLink, payload, true);
+		showProfileLinkInEditProfilePage("googleBusiness", link);
+	} else {
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
 }
 
 function callBackUpdateSocialLink(data) {
@@ -7569,7 +7650,7 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 
 	if (isReviewsRequestRunningEditProfile)
 		return; // Return if ajax request is still running
-	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore=" + minScore + "&startIndex=" + startIndex + "&numOfRows=" + numOfRows;
+	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore=" + minScore + "&startIndex=" + startIndex + "&numOfRows=" + numOfRows+ "&hiddenSection=" +hiddenSection;
 
 	isReviewsRequestRunningEditProfile = true;
 	if (!isNextBatch) {
@@ -8959,6 +9040,7 @@ $(document).on('input', '#wc-review-table-inner[data-role="agent"] input', funct
 		if ($('#wc-review-table-inner').children().length > 2) {
 			$('.wc-review-rmv-icn').show();
 		}
+		$('#wc-review-table-inner').find(':nth-child(3)').find('.wc-review-rmv-icn').hide();
 
 		// setting up perfect scrollbar
 		setTimeout(function() {
@@ -8982,6 +9064,7 @@ $(document).on('input', '#wc-review-table-inner[data-role="admin"] input', funct
 		if ($('#wc-review-table-inner').children().length > 2) {
 			$('.wc-review-rmv-icn').show();
 		}
+		$('#wc-review-table-inner').find(':nth-child(3)').find('.wc-review-rmv-icn').hide();
 
 		// setting up perfect scrollbar
 		setTimeout(function() {
@@ -9008,7 +9091,8 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 		$('#wc-review-table').perfectScrollbar('update');
 	}, 1000);
 });
-
+var surveysent=false;
+var alreadysentsurvey=false;
 $(document).on('click', '#wc-send-survey', function() {
 	var allowrequest = true;
 	var receiversList = [];
@@ -9020,6 +9104,9 @@ $(document).on('click', '#wc-send-survey', function() {
 	var agentname = "";
 	var myself = false;
 	var end = false;
+	if(surveysent || alreadysentsurvey){
+		return;
+	}
 	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
 			$(this).children().each(function() {
@@ -9184,12 +9271,9 @@ $(document).on('click', '#wc-send-survey', function() {
 	});
 
 	// Check if recievers list empty
-	/*if (receiversList.length == 0) {
-		$('#overlay-toast').html('Add customers to send survey request!');
-		showToast();
-		allowrequest = false;
-		return false;
-	}*/
+	/*
+	 * if (receiversList.length == 0) { $('#overlay-toast').html('Add customers to send survey request!'); showToast(); allowrequest = false; return false; }
+	 */
 
 	// check if there is no duplicate entries
 	var receiversListLength = receiversList.length;
@@ -9232,22 +9316,26 @@ $(document).on('click', '#wc-send-survey', function() {
 			"columnName" : columnName,
 		};
 	}
-	var surveyed=[];
-	var alreadysureyed=false;
+	var surveyed = [];
+	var alreadysureyed = false;
 	if (allowrequest) {
+		if(alreadysentsurvey){
+			return;
+		}
+		alreadysentsurvey=true;
 		callAjaxPostWithPayloadData("./getalreadysurveyedemailids.do", function(data) {
 			var alreadySurveyedEmails = $.parseJSON(data);
-			//To check if the email had already surveyed
+			// To check if the email had already surveyed
 			if (alreadySurveyedEmails.length != 0) {
 				for (var i = 0; i < receiversListLength; i++) {
 					for (var j = 0; j < alreadySurveyedEmails.length; j++) {
 						if (receiversList[i].value.emailId == alreadySurveyedEmails[j]) {
-							alreadysureyed=true;
+							alreadysureyed = true;
 							surveyed.push(i);
 						}
 					}
 				}
-				
+
 				if (surveyed.length != 0) {
 					for (var k = 0; k < surveyed.length; k++) {
 						$("#" + receiversList[surveyed[k]].key).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
@@ -9255,31 +9343,44 @@ $(document).on('click', '#wc-send-survey', function() {
 					}
 
 				}
-				if(alreadysureyed){
+				if (alreadysureyed) {
 					allowrequest = false;
 					return false;
 				}
-				
+
 			} else {
 				$('#send-survey-dash').removeClass("hide");
+				alreadysentsurvey=false;
+				if(surveysent){
+					return;
+				}
+				surveysent=true;
+				$('.ps-container').scrollTop(0).perfectScrollbar('update');
 				callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
+					
 					$('#send-survey-dash').addClass("hide");
 					$('.overlay-login').hide();
 					// Update the incomplete survey on dashboard
 					getIncompleteSurveyCount(colName, colValue);
 					if (data == "error") {
-						showError("Error while sending survey request!")
+						showError("Error while sending survey request!");
+						surveysent=false;
 					} else if (data.indexOf("Success") > -1) {
 						var response = $.parseJSON(data);
-						if (response.surveySentCount == 1)
+						if (response.surveySentCount == 1){
 							showInfo(response.surveySentCount + ' Survey Request Sent Successfully!');
-						else
+						    surveysent=false;
+						}
+							
+						else{
 							showInfo(response.surveySentCount + ' Survey Requests Sent Successfully!');
+							surveysent=false;
+						}
+							
 					} else {
 						$('#overlay-toast').html(data);
 					}
 
-					showToast();
 					enableBodyScroll();
 				}, payload, true);
 			}
@@ -10551,6 +10652,22 @@ $(document).on('click', '#en-dry-save', function(e) {
 	}
 
 });
+$(document).on('click', '#lone-dry-save', function(e) {
+	e.stopPropagation();
+	if (validateLoneWolfInput('lone-wolf-form-div')) {
+		var state = $("#lone-state").val();
+		var warn = true;
+		if (state != 'prod') {
+			warn = false;
+		}
+		if (warn) {
+			confirmLoneEdit();
+		} else {
+			initiateLoneWolfSaveConnection(false);
+		}
+	}
+
+});
 
 function confirmEncompassEdit() {
 
@@ -10561,6 +10678,20 @@ function confirmEncompassEdit() {
 	$('#overlay-continue').off();
 	$('#overlay-continue').click(function() {
 		initiateEncompassSaveConnection(true);
+	});
+
+	$('#overlay-main').show();
+	disableBodyScroll();
+}
+function confirmLoneEdit() {
+
+	$('#overlay-header').html("Confirm Edit");
+	$('#overlay-text').html("This action can affect the way we fetch your Lone Wolf records");
+	$('#overlay-continue').html("Edit");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-continue').off();
+	$('#overlay-continue').click(function() {
+		initiateLoneWolfSaveConnection(true);
 	});
 
 	$('#overlay-main').show();
@@ -10583,9 +10714,26 @@ function initiateEncompassSaveConnection(warn) {
 	}
 }
 
+function initiateLoneWolfSaveConnection(warn) {
+	var client = document.getElementById('lone-client').value;
+	var payload = {
+		"clientCode" : client
+	};
+	showOverlay();
+	callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/lonewolf/testcredentials.do", saveLoneDetailsCallBack, payload, true, '#lone-dry-save');
+	if (warn) {
+		$('#overlay-cancel').click();
+	}
+}
+
 $(document).on('click', '#en-dry-enable', function() {
 
 	callAjaxPOST("/enableencompassdetails.do", testEnableCompassCallBack, true, '#en-dry-enable');
+
+});
+$(document).on('click', '#lone-dry-enable', function() {
+
+	callAjaxPOST("/enablelonewolfdetails.do", testEnableLoneCallBack, true, '#lone-dry-enable');
 
 });
 function testEnableCompassCallBack(response) {
@@ -10599,6 +10747,18 @@ function testEnableCompassCallBack(response) {
 	}
 
 };
+function testEnableLoneCallBack(response) {
+	var map = response;
+	if (map == "Successfully enabled lone wolf connection") {
+		showInfo(map);
+		$("#lone-state").val('prod');
+		showLoneWolfButtons();
+	} else {
+		showError(map);
+	}
+
+};
+// encompass button state
 function showEncompassButtons() {
 	var state = $("#encompass-state").val();
 	if (state == 'dryrun') {
@@ -10613,6 +10773,23 @@ function showEncompassButtons() {
 		$('#en-disconnect').hide();
 		$('#en-dry-enable').hide();
 		$('#en-generate-report').hide();
+	}
+}
+// lone wolf button state
+function showLoneWolfButtons() {
+	var state = $("#lone-state").val();
+	if (state == 'dryrun') {
+		$('#lone-dry-enable').show();
+		$('#lone-generate-report').show();
+		$('#lone-disconnect').hide();
+	} else if (state == 'prod') {
+		$('#lone-disconnect').show();
+		$('#lone-dry-enable').hide();
+		$('#lone-generate-report').hide();
+	} else {
+		$('#lone-disconnect').hide();
+		$('#lone-dry-enable').hide();
+		$('#lone-generate-report').hide();
 	}
 }
 $(document).on('click', '#en-disconnect', function() {
@@ -10635,29 +10812,66 @@ function testDisconnectCompassCallBack(response) {
 	}
 
 };
+$(document).on('click', '#lone-disconnect', function() {
+	if (isRealTechOrSSAdmin) {
+		callAjaxPOST("/disablelonewolfdetails.do", testDisconnectLoneWolfCallBack, true, '#lone-disconnect');
+	} else {
+		$('#overlay-toast').html('Please contact SuccessTeam@SocialSurvey.com or call 1-888-701-4512.');
+		showToast();
+	}
+});
+function testDisconnectLoneWolfCallBack(response) {
+	var map = response;
+	if (map == "Successfully disabled lone wolf connection") {
+		$("#lone-state").val('dryrun');
+		showLoneWolfButtons();
+		showInfo(map);
+	} else {
+		showError(map);
+	}
+
+};
 
 $(document).on('click', '#en-generate-report', function() {
 	disableBodyScroll();
 	callAjaxGET("./dryrun.do", function(data) {
-		$('#overlay-text').html(data);
-		$('#overlay-continue').show();
-		$('#overlay-continue').html("Submit");
-		$('#overlay-cancel').html("Cancel");
-		$('#overlay-header').html("Send Report");
-		$('#overlay-main').show();
-		$('#overlay-continue').off();
-		$('#overlay-continue').click(function() {
-			var encompassNoOfdays = document.getElementById('encompass-no-of-days').value;
-			var encompassReportEmail = document.getElementById('encompass-report-email').value;
-			var payload = {
-				"encompassNoOfdays" : encompassNoOfdays,
-				"encompassReportEmail" : encompassReportEmail
-			};
-			callAjaxPostWithPayloadData("/enableencompassreportgeneration.do", testGenerateReportCallBack, payload, true, '#en-generate-report');
-		});
+		enableReportGeneration(data, "/enableencompassreportgeneration.do", testGenerateReportCallBack, '#en-generate-report');
+	}, true);
+});
+$(document).on('click', '#lone-generate-report', function() {
+	disableBodyScroll();
+	callAjaxGET("./lonedryrun.do", function(data) {
+		enableReportGeneration(data, "/enablelonewolfreportgeneration.do", testLoneGenerateReportCallBack, '#lone-generate-report');
 	}, true);
 });
 
+function enableReportGeneration(data, url, successCallback, reportGenerateButtonId) {
+	$('#overlay-text').html(data);
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Submit");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Send Report");
+	$('#overlay-main').show();
+	$('#overlay-continue').off();
+	$('#overlay-continue').click(function() {
+		var noOfdays = document.getElementById('no-of-days').value;
+		var reportEmail = document.getElementById('report-email').value;
+		var payload = {
+			"noOfdays" : noOfdays,
+			"reportEmail" : reportEmail
+		};
+		callAjaxPostWithPayloadData(url, successCallback, payload, true, reportGenerateButtonId);
+	});
+}
+function testLoneGenerateReportCallBack(response) {
+	$('#overlay-cancel').click();
+	var map = response;
+	if (map == "Successfully enabled lone wolf report generation ") {
+		showInfo(map);
+	} else {
+		showError(map);
+	}
+}
 function testGenerateReportCallBack(response) {
 	$('#overlay-cancel').click();
 	var map = response;
@@ -10666,7 +10880,6 @@ function testGenerateReportCallBack(response) {
 	} else {
 		showError(map);
 	}
-
 };
 
 function encompassCretentials() {
@@ -10682,6 +10895,19 @@ function encompassCretentials() {
 	if (validateEncompassTestInput('encompass-form-div')) {
 		showOverlay();
 		callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/encompass/testcredentials.do", testEncompassConnectionCallBack, payload, true, '#en-test-connection');
+	}
+	;
+
+};
+function loneWolfCretentials() {
+	var client = document.getElementById('lone-client').value;
+	var payload = {
+		"clientCode" : client
+	};
+
+	if (validateLoneWolfInput('lone-wolf-form-div')) {
+		showOverlay();
+		callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/lonewolf/testcredentials.do", testLoneConnectionCallBack, payload, true, '#lone-test-connection');
 	}
 	;
 

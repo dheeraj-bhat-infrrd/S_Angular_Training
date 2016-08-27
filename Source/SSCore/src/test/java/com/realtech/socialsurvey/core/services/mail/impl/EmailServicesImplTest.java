@@ -83,6 +83,7 @@ public class EmailServicesImplTest
         emailServicesImpl.sendRegistrationInviteMail( "test", "test", "", "test" );
     }
 
+
     // Tests for sendInvitationToSocialSurveyAdmin
     @Test ( expected = InvalidInputException.class)
     public void sendInvitationToSocialSurveyAdminTestUrlNull() throws InvalidInputException, UndeliveredEmailException
@@ -99,14 +100,16 @@ public class EmailServicesImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendInvitationToSocialSurveyAdminTestRecipientMailIdNull() throws InvalidInputException, UndeliveredEmailException
+    public void sendInvitationToSocialSurveyAdminTestRecipientMailIdNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendInvitationToSocialSurveyAdmin( "test", null, "test", "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendInvitationToSocialSurveyAdminTestRecipientMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
+    public void sendInvitationToSocialSurveyAdminTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendInvitationToSocialSurveyAdmin( "test", "", "test", "test" );
     }
@@ -186,16 +189,16 @@ public class EmailServicesImplTest
 
     //Tests for sendSubscriptionChargeUnsuccessfulEmail
     @Test ( expected = InvalidInputException.class)
-    public void sendSubscriptionChargeUnsuccessfulEmailTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendSubscriptionChargeUnsuccessfulEmailTestRecipientMailIdNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendSubscriptionChargeUnsuccessfulEmail( null, "test", "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendSubscriptionChargeUnsuccessfulEmailTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendSubscriptionChargeUnsuccessfulEmailTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendSubscriptionChargeUnsuccessfulEmail( "", "test", "test" );
     }
@@ -261,42 +264,42 @@ public class EmailServicesImplTest
     @Test ( expected = InvalidInputException.class)
     public void sendVerificationMailTestUrlNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendVerificationMail( null, "test", "test", null, null );
+        emailServicesImpl.sendVerificationMail( null, "test", "test", null, null, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendVerificationMailTestUrlEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendVerificationMail( "", "test", "test", null, null );
+        emailServicesImpl.sendVerificationMail( "", "test", "test", null, null, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendVerificationMailTestRecipientMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendVerificationMail( "test", null, "test", null, null );
+        emailServicesImpl.sendVerificationMail( "test", null, "test", null, null, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendVerificationMailTestRecipientMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendVerificationMail( "test", "", "test", null, null );
+        emailServicesImpl.sendVerificationMail( "test", "", "test", null, null, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendVerificationMailTestNameNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendVerificationMail( "test", "test", null, null, null );
+        emailServicesImpl.sendVerificationMail( "test", "test", null, null, null, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendVerificationMailTestNameEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendVerificationMail( "test", "test", "", null, null );
+        emailServicesImpl.sendVerificationMail( "test", "test", "", null, null, false );
     }
 
 
@@ -304,44 +307,43 @@ public class EmailServicesImplTest
     @Test ( expected = InvalidInputException.class)
     public void sendRegistrationCompletionEmailTestUrlNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendRegistrationCompletionEmail( null, "test", "test", null, null, false );
+        emailServicesImpl.sendRegistrationCompletionEmail( null, "test", "test", null, null, false, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendRegistrationCompletionEmailTestUrlEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendRegistrationCompletionEmail( "", "test", "test", null, null, false );
+        emailServicesImpl.sendRegistrationCompletionEmail( "", "test", "test", null, null, false, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendRegistrationCompletionEmailTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendRegistrationCompletionEmailTestRecipientMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendRegistrationCompletionEmail( "test", null, "test", null, null, false );
+        emailServicesImpl.sendRegistrationCompletionEmail( "test", null, "test", null, null, false, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendRegistrationCompletionEmailTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendRegistrationCompletionEmailTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendRegistrationCompletionEmail( "test", "", "test", null, null, false );
+        emailServicesImpl.sendRegistrationCompletionEmail( "test", "", "test", null, null, false, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendRegistrationCompletionEmailTestNameNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendRegistrationCompletionEmail( "test", "test", null, null, null, false );
+        emailServicesImpl.sendRegistrationCompletionEmail( "test", "test", null, null, null, false, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendRegistrationCompletionEmailTestNameEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendRegistrationCompletionEmail( "test", "test", "", null, null, false );
+        emailServicesImpl.sendRegistrationCompletionEmail( "test", "test", "", null, null, false, false );
     }
 
 
@@ -564,16 +566,15 @@ public class EmailServicesImplTest
 
     //Tests for sendDefaultSurveyCompletionMail
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyCompletionMailTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyCompletionMailTestRecipientMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyCompletionMail( null, "test", "test", null, null, null, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyCompletionMailTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyCompletionMailTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyCompletionMail( "", "test", "test", null, null, null, 0 );
     }
@@ -595,32 +596,32 @@ public class EmailServicesImplTest
 
     //Tests for sendDefaultSurveyCompletionUnpleasantMail
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyCompletionUnpleasantMailTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyCompletionUnpleasantMailTestRecipientMailIdNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyCompletionUnpleasantMail( null, "test", "test", null, null, null, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyCompletionUnpleasantMailTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyCompletionUnpleasantMailTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyCompletionUnpleasantMail( "", "test", "test", null, null, null, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyCompletionUnpleasantMailTestfirstNameNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyCompletionUnpleasantMailTestfirstNameNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyCompletionUnpleasantMail( "test", null, "test", null, null, null, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyCompletionUnpleasantMailTestfirstNameEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyCompletionUnpleasantMailTestfirstNameEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyCompletionUnpleasantMail( "test", "", "test", null, null, null, 0 );
     }
@@ -686,49 +687,48 @@ public class EmailServicesImplTest
 
     //Tests for sendSurveyCompletionMailToAdminsAndAgent
     @Test ( expected = InvalidInputException.class)
-    public void sendSurveyCompletionMailToAdminsAndAgentTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendSurveyCompletionMailToAdminsAndAgentTestRecipientMailIdNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( null, null, "test", null, null , null );
+        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( null, null, "test", null, null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendSurveyCompletionMailToAdminsAndAgentTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendSurveyCompletionMailToAdminsAndAgentTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( null, "", "test", null, null , null );
+        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( null, "", "test", null, null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendSurveyCompletionMailToAdminsAndAgentTestSurveyNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendSurveyCompletionMailToAdminsAndAgentTestSurveyNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( "test", "test", null, null, null , null );
+        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( "test", "test", null, null, null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendSurveyCompletionMailToAdminsAndAgentTestSurveyEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendSurveyCompletionMailToAdminsAndAgentTestSurveyEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( "test", "test", "", null, null , null );
+        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( "test", "test", "", null, null, null );
     }
 
 
     //Tests for sendDefaultSocialPostReminderMail
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSocialPostReminderMailTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSocialPostReminderMailTestRecipientMailIdNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSocialPostReminderMail( null, "test", "test", null, null, null, null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSocialPostReminderMailTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSocialPostReminderMailTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSocialPostReminderMail( "", "test", "test", null, null, null, null, null );
     }
@@ -821,17 +821,16 @@ public class EmailServicesImplTest
 
     //Tests for sendDefaultSurveyInvitationMail
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyInvitationMailTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyInvitationMailTestRecipientMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendDefaultSurveyInvitationMail( null, "test", "test", null, null, null, null, null, null, null,
-            null, 0 );
+        emailServicesImpl.sendDefaultSurveyInvitationMail( null, "test", "test", null, null, null, null, null, null, null, null,
+            0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyInvitationMailTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyInvitationMailTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyInvitationMail( "", "test", "test", null, null, null, null, null, null, null, null,
             0 );
@@ -841,8 +840,8 @@ public class EmailServicesImplTest
     @Test ( expected = InvalidInputException.class)
     public void sendDefaultSurveyInvitationMailTestDisplayNameNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendDefaultSurveyInvitationMail( "test", "test", null, null, null, null, null, null, null, null,
-            null, 0 );
+        emailServicesImpl.sendDefaultSurveyInvitationMail( "test", "test", null, null, null, null, null, null, null, null, null,
+            0 );
     }
 
 
@@ -1057,32 +1056,32 @@ public class EmailServicesImplTest
 
     //Test for sendDefaultSurveyInvitationMailByCustomer
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyInvitationMailByCustomerTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyInvitationMailByCustomerTestRecipientMailIdNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyInvitationMailByCustomer( null, "test", "test", null, null, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyInvitationMailByCustomerTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyInvitationMailByCustomerTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyInvitationMailByCustomer( "", "test", "test", null, null, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyInvitationMailByCustomerTestFirstNameNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyInvitationMailByCustomerTestFirstNameNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyInvitationMailByCustomer( "test", null, "test", null, null, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyInvitationMailByCustomerTestFirstNameEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendDefaultSurveyInvitationMailByCustomerTestFirstNameEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyInvitationMailByCustomer( "test", "", "test", null, null, 0 );
     }
@@ -1090,16 +1089,16 @@ public class EmailServicesImplTest
 
     //Tests for sendSurveyInvitationMailByCustomer
     @Test ( expected = InvalidInputException.class)
-    public void sendSurveyInvitationMailByCustomerTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendSurveyInvitationMailByCustomerTestRecipientMailIdNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendSurveyInvitationMailByCustomer( null, "test", "test", null, null, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendSurveyInvitationMailByCustomerTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendSurveyInvitationMailByCustomerTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendSurveyInvitationMailByCustomer( "", "test", "test", null, null, 0 );
     }
@@ -1237,16 +1236,16 @@ public class EmailServicesImplTest
 
     //Tests for sendCorruptDataFromCrmNotificationMail
     @Test ( expected = InvalidInputException.class)
-    public void sendCorruptDataFromCrmNotificationMailTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendCorruptDataFromCrmNotificationMailTestRecipientMailIdNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendCorruptDataFromCrmNotificationMail( null, null, null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendCorruptDataFromCrmNotificationMailTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendCorruptDataFromCrmNotificationMailTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendCorruptDataFromCrmNotificationMail( null, null, "", null );
     }
@@ -1254,16 +1253,16 @@ public class EmailServicesImplTest
 
     //Tests for sendInvalidEmailsNotificationMail
     @Test ( expected = InvalidInputException.class)
-    public void sendInvalidEmailsNotificationMailTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendInvalidEmailsNotificationMailTestRecipientMailIdNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendInvalidEmailsNotificationMail( null, null, null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendInvalidEmailsNotificationMailTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendInvalidEmailsNotificationMailTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendInvalidEmailsNotificationMail( null, null, "", null );
     }
@@ -1271,16 +1270,16 @@ public class EmailServicesImplTest
 
     //Tests for sendRecordsNotUploadedCrmNotificationMail
     @Test ( expected = InvalidInputException.class)
-    public void sendRecordsNotUploadedCrmNotificationMailTestRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendRecordsNotUploadedCrmNotificationMailTestRecipientMailIdNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendRecordsNotUploadedCrmNotificationMail( null, null, null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendRecordsNotUploadedCrmNotificationMailTestRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendRecordsNotUploadedCrmNotificationMailTestRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendRecordsNotUploadedCrmNotificationMail( null, null, "", null );
     }
@@ -1343,14 +1342,16 @@ public class EmailServicesImplTest
     {
         emailServicesImpl.sendComplaintHandleMail( "test", null, "", null, null, "test" );
     }
-    
+
+
     //SS-1435: Test for survey details    
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestSurveyDetailNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendComplaintHandleMail( "test", null, "test", null, null, null );
     }
-    
+
+
     //SS-1435: Test for survey details
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestSurveyDetailEmpty() throws InvalidInputException, UndeliveredEmailException
@@ -1424,8 +1425,7 @@ public class EmailServicesImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void forwardCustomerReplyMailTestMailSenderEmailAddressNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void forwardCustomerReplyMailTestMailSenderEmailAddressNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING, null, TestConstants.TEST_STRING );
@@ -1454,15 +1454,15 @@ public class EmailServicesImplTest
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
-    
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testSendBillingReportMailForMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendBillingReportMail( "abc", "xyz", null, new HashMap<String, String>() );
     }
-    
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testSendBillingReportMailForMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
@@ -1471,16 +1471,16 @@ public class EmailServicesImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testSendZillowReviewComplaintHandleMailWithRecipientMailIdNull() throws InvalidInputException,
-        UndeliveredEmailException
+    public void testSendZillowReviewComplaintHandleMailWithRecipientMailIdNull()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendZillowReviewComplaintHandleMail( null, null, "" + 0, "http://www.test.com" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testSendZillowReviewComplaintHandleMailWithRecipientMailIdEmpty() throws InvalidInputException,
-        UndeliveredEmailException
+    public void testSendZillowReviewComplaintHandleMailWithRecipientMailIdEmpty()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendZillowReviewComplaintHandleMail( "", null, "" + 0, "http://www.test.com" );
     }
@@ -1498,110 +1498,129 @@ public class EmailServicesImplTest
     {
         emailServicesImpl.sendZillowReviewComplaintHandleMail( "test", "", "" + 0, "http://www.test.com" );
     }
-    
-    
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void sendEmailVerificationRequestMailToAdminNullUrl() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendEmailVerificationRequestMailToAdmin( null, "test", "test", "test", "test" );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void sendEmailVerificationRequestMailToAdminEmptyUrl() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendEmailVerificationRequestMailToAdmin( "", "test", "test", "test", "test" );
     }
-    
-    
+
+
     @Test ( expected = InvalidInputException.class)
-    public void sendEmailVerificationRequestMailToAdminNullRcepientMail() throws InvalidInputException, UndeliveredEmailException
+    public void sendEmailVerificationRequestMailToAdminNullRcepientMail()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendEmailVerificationRequestMailToAdmin( "test", null, "test", "test", "test" );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
-    public void sendEmailVerificationRequestMailToAdminEmptyRcepientMail() throws InvalidInputException, UndeliveredEmailException
+    public void sendEmailVerificationRequestMailToAdminEmptyRcepientMail()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendEmailVerificationRequestMailToAdmin( "test", "", "test", "test", "test" );
     }
-    
-    
+
+
     @Test ( expected = InvalidInputException.class)
-    public void sendEmailVerificationRequestMailToAdminNullRcepientName() throws InvalidInputException, UndeliveredEmailException
+    public void sendEmailVerificationRequestMailToAdminNullRcepientName()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendEmailVerificationRequestMailToAdmin( "test", "test", null, "test", "test" );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
-    public void sendEmailVerificationRequestMailToAdminEmptyRcepientName() throws InvalidInputException, UndeliveredEmailException
+    public void sendEmailVerificationRequestMailToAdminEmptyRcepientName()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendEmailVerificationRequestMailToAdmin( "test", "test", "", "test", "test" );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void sendEmailVerifiedNotificationMailNullRcepientMail() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendEmailVerifiedNotificationMail( null, "test" );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void sendEmailVerifiedNotificationMailEmptyRcepientMail() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendEmailVerifiedNotificationMail(  "", "test");
+        emailServicesImpl.sendEmailVerifiedNotificationMail( "", "test" );
     }
-    
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void sendEmailVerifiedNotificationMailNullRcepientName() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendEmailVerifiedNotificationMail(  "test", null );
+        emailServicesImpl.sendEmailVerifiedNotificationMail( "test", null );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void sendEmailVerifiedNotificationMailEmptyRcepientName() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendEmailVerifiedNotificationMail(  "test", "" );
+        emailServicesImpl.sendEmailVerifiedNotificationMail( "test", "" );
     }
-    
+
     ///////
-    
+
 
     @Test ( expected = InvalidInputException.class)
-    public void ssendEmailVerifiedNotificationMailToAdminNullRcepientMail() throws InvalidInputException, UndeliveredEmailException
+    public void ssendEmailVerifiedNotificationMailToAdminNullRcepientMail()
+        throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin(  null, "test", "test", "test" );
+        emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin( null, "test", "test", "test" );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
-    public void sendEmailVerifiedNotificationMailToAdminEmptyRcepientMail() throws InvalidInputException, UndeliveredEmailException
+    public void sendEmailVerifiedNotificationMailToAdminEmptyRcepientMail()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin( "", "test", "test", "test" );
     }
-    
-    
+
+
     @Test ( expected = InvalidInputException.class)
-    public void sendEmailVerifiedNotificationMailToAdminNullRcepientName() throws InvalidInputException, UndeliveredEmailException
+    public void sendEmailVerifiedNotificationMailToAdminNullRcepientName()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin( "test", null, "test", "test" );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
-    public void sendEmailVerifiedNotificationMailToAdminEmptyRcepientName() throws InvalidInputException, UndeliveredEmailException
+    public void sendEmailVerifiedNotificationMailToAdminEmptyRcepientName()
+        throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin(  "test", "", "test", "test" );
+        emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin( "test", "", "test", "test" );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
-    public void sendEmailVerifiedNotificationMailToAdminNullVerifiedEmail() throws InvalidInputException, UndeliveredEmailException
+    public void sendEmailVerifiedNotificationMailToAdminNullVerifiedEmail()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin( "test", "test", null, "test" );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
-    public void sendEmailVerifiedNotificationMailToAdminEmptyVerifiedEmaill() throws InvalidInputException, UndeliveredEmailException
+    public void sendEmailVerifiedNotificationMailToAdminEmptyVerifiedEmaill()
+        throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin( "test", "test", "", "test" );
     }
-    
+
 }

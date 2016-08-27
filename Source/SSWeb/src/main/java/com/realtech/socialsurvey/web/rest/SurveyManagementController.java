@@ -49,7 +49,6 @@ import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -1021,136 +1020,6 @@ public class SurveyManagementController
     }
 
 
-    @RequestMapping ( value = "/posttolinkedin", method = RequestMethod.GET)
-    public String postToLinkedin( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to post feedback of customer to linkedin started." );
-        try {
-            String urlParam = request.getParameter( "q" );
-            Map<String, String> linkedinDetails = urlGenerator.decryptParameters( urlParam );
-            String agentName = linkedinDetails.get( "agentName" );
-            String custFirstName = linkedinDetails.get( "firstName" );
-            String custLastName = linkedinDetails.get( "lastName" );
-            String agentIdStr = linkedinDetails.get( "agentId" );
-            String ratingStr = linkedinDetails.get( "rating" );
-            String customerEmail = linkedinDetails.get( "customerEmail" );
-            String agentProfileLink = linkedinDetails.get( "agentProfileLink" );
-            String feedback = linkedinDetails.get( "feedback" );
-
-            String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName );
-            long agentId = 0;
-            double rating = 0;
-            try {
-                agentId = Long.parseLong( agentIdStr );
-                rating = Double.parseDouble( ratingStr );
-            } catch ( NumberFormatException e ) {
-                LOG.error(
-                    "Number format exception caught in postToLinkedin() while trying to convert agent Id. Nested exception is ",
-                    e );
-                return e.getMessage();
-            }
-
-            Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
-                .getSettingsForBranchesAndRegionsInHierarchy( agentId );
-            List<OrganizationUnitSettings> companySettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-            List<OrganizationUnitSettings> regionSettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-            List<OrganizationUnitSettings> branchSettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-            AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
-
-            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
-            SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
-                companySettings.get( 0 ), regionSettings, branchSettings );
-
-            if ( socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null ) {
-                socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( new ArrayList<String>() );
-            }
-            if ( socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn() == null ) {
-                socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( new ArrayList<String>() );
-            }
-
-            List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
-            List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
-
-            for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
-                if ( branchMediaPostDetails.getSharedOn() == null ) {
-                    branchMediaPostDetails.setSharedOn( new ArrayList<String>() );
-                }
-            }
-            for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
-                if ( regionMediaPostDetails.getSharedOn() == null ) {
-                    regionMediaPostDetails.setSharedOn( new ArrayList<String>() );
-                }
-            }
-
-
-            String message = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from "
-                + customerDisplayName + " for " + agentName + " on SocialSurvey ";
-
-            String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-            String linkedinMessageFeedback = "From : " + customerDisplayName + " " + feedback;
-            if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
-                if ( !socialManagementService.updateLinkedin( agentSettings, message, linkedinProfileUrl,
-                    linkedinMessageFeedback, companySettings.get( 0 ), false, agentSettings, new SocialMediaPostResponse() ) ) {
-                    if ( !agentSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                        agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                }
-            }
-            for ( OrganizationUnitSettings setting : companySettings ) {
-                if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                    if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
-                        linkedinMessageFeedback, companySettings.get( 0 ), false, agentSettings, new SocialMediaPostResponse() ) ) {
-                        if ( !companySocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                            companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                    }
-                }
-
-            }
-            for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
-                OrganizationUnitSettings setting = organizationManagementService.getRegionSettings( regionMediaPostDetails
-                    .getRegionId() );
-                if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                    if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
-                        linkedinMessageFeedback, companySettings.get( 0 ), false, agentSettings, new SocialMediaPostResponse() ) ) {
-                        List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                        if ( !regionSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                            regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                        regionMediaPostDetails.setSharedOn( regionSocialList );
-                    }
-                }
-            }
-            for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
-                OrganizationUnitSettings setting = organizationManagementService
-                    .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                if ( setting != null ) {
-
-                    if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                        if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
-                            linkedinMessageFeedback, companySettings.get( 0 ), false, agentSettings,
-                            new SocialMediaPostResponse() ) ) {
-                            List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                            if ( !branchSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                                branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                            branchMediaPostDetails.setSharedOn( branchSocialList );
-                        }
-                    }
-                }
-            }
-            socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( agentSocialList );
-            socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( companySocialList );
-            surveyDetails.setSocialMediaPostDetails( socialMediaPostDetails );
-            surveyHandler.updateSurveyDetails( surveyDetails );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException caught in postToLinkedin(). Nested exception is ", e );
-        }
-        LOG.info( "Method to post feedback of customer to Linkedin finished." );
-        model.addAttribute( "socialMedia", CommonConstants.LINKEDIN_SOCIAL_SITE );
-        return JspResolver.POST_ON_SOCIAL_MEDIA_SUCCESS;
-    }
-
-
     @ResponseBody
     @RequestMapping ( value = "/displaypiclocationofagent", method = RequestMethod.GET)
     public String getDisplayPicLocationOfAgent( HttpServletRequest request )
@@ -1586,7 +1455,6 @@ public class SurveyManagementController
 
             survey = surveyHandler.storeInitialSurveyDetails( user, surveyPreInitiation, url, isOldRecord, retakeSurvey );
 
-
             if ( survey != null ) {
 
                 surveyHandler.updateSurveyAsClicked( survey.get_id() );
@@ -1793,6 +1661,8 @@ public class SurveyManagementController
         surveyAndStage.put( "agentId", user.getUserId() );
         surveyAndStage.put( "editable", editable );
         surveyAndStage.put( "source", surveyPreInitiation.getSurveySource() );
+        surveyAndStage.put("hiddenSection", companySettings.isHiddenSection() );
+
 
         LOG.info( "Method getSurvey finished." );
         return surveyAndStage;

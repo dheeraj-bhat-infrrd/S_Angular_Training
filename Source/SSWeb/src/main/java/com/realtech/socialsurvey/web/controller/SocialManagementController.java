@@ -1,66 +1,19 @@
 package com.realtech.socialsurvey.web.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
-import com.realtech.socialsurvey.core.dao.SocialPostDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
-import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
-import com.realtech.socialsurvey.core.entities.FacebookPage;
-import com.realtech.socialsurvey.core.entities.FacebookToken;
-import com.realtech.socialsurvey.core.entities.GoogleToken;
-import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfileStage;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SocialMonitorData;
-import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
-import com.realtech.socialsurvey.core.entities.SocialPost;
-import com.realtech.socialsurvey.core.entities.TwitterToken;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserSettings;
-import com.realtech.socialsurvey.core.entities.ZillowToken;
-import com.realtech.socialsurvey.core.enums.AccountType;
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
-import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
-import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
-import com.realtech.socialsurvey.core.services.social.SocialManagementService;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.web.common.ErrorResponse;
-import com.realtech.socialsurvey.web.common.JspResolver;
-import com.realtech.socialsurvey.web.common.TokenHandler;
-import com.realtech.socialsurvey.web.util.RequestUtils;
-import facebook4j.Account;
-import facebook4j.Facebook;
-import facebook4j.FacebookException;
-import facebook4j.FacebookFactory;
-import facebook4j.ResponseList;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -82,23 +35,71 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import retrofit.mime.TypedByteArray;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
+import com.realtech.socialsurvey.core.dao.SocialPostDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
+import com.realtech.socialsurvey.core.entities.FacebookPage;
+import com.realtech.socialsurvey.core.entities.GoogleToken;
+import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialMonitorData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
+import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.TwitterToken;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.ZillowToken;
+import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.common.ErrorResponse;
+import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.common.TokenHandler;
+import com.realtech.socialsurvey.web.util.RequestUtils;
+
+import facebook4j.Facebook;
+import facebook4j.FacebookException;
 
 
 /**
@@ -221,6 +222,9 @@ public class SocialManagementController
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
 
+    @Autowired
+    private URLGenerator urlGenerator;
+
 
     /**
      * Returns the social authorization page
@@ -288,16 +292,10 @@ public class SocialManagementController
                 if ( socialFlow != null && !socialFlow.isEmpty() ) {
                     session.setAttribute( CommonConstants.SOCIAL_FLOW, socialFlow );
                 }
+                String linkedInAuth = socialManagementService.getLinkedinAuthUrl( serverBaseUrl + linkedinRedirectUri );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuth );
 
-                StringBuilder linkedInAuth = new StringBuilder( linkedinAuthUri ).append( "?response_type=" ).append( "code" );
-                linkedInAuth.append( "&client_id=" ).append( linkedInApiKey );
-                linkedInAuth.append( "&redirect_uri=" ).append( serverBaseUrl ).append( linkedinRedirectUri );
-                linkedInAuth.append( "&state=" ).append( "SOCIALSURVEY" );
-                linkedInAuth.append( "&scope=" ).append( linkedinScope );
-
-                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuth.toString() );
-
-                LOG.info( "Returning the linkedin authorizationurl : " + linkedInAuth.toString() );
+                LOG.info( "Returning the linkedin authorizationurl : " + linkedInAuth );
                 break;
 
             // Building Google authUrl
@@ -414,7 +412,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 /*mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );*/
@@ -436,7 +434,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 /*mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );*/
@@ -458,7 +456,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 /*mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );*/
@@ -482,7 +480,7 @@ public class SocialManagementController
                 }
 
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 //mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
@@ -560,7 +558,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens(
@@ -586,7 +584,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
@@ -612,7 +610,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
@@ -640,7 +638,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
@@ -669,59 +667,6 @@ public class SocialManagementController
 
         model.addAttribute( "socialNetwork", "facebook" );
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
-    }
-
-
-    private SocialMediaTokens updateFacebookToken( facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens,
-        String profileLink )
-    {
-        LOG.debug( "Method updateFacebookToken() called from SocialManagementController" );
-        if ( mediaTokens == null ) {
-            LOG.debug( "Media tokens do not exist. Creating them and adding the facebook access token" );
-            mediaTokens = new SocialMediaTokens();
-            mediaTokens.setFacebookToken( new FacebookToken() );
-        } else {
-            LOG.debug( "Updating the existing media tokens for facebook" );
-            if ( mediaTokens.getFacebookToken() == null ) {
-                mediaTokens.setFacebookToken( new FacebookToken() );
-            }
-        }
-
-        if ( profileLink != null )
-            mediaTokens.getFacebookToken().setFacebookPageLink( profileLink );
-
-        mediaTokens.getFacebookToken().setFacebookAccessToken( accessToken.getToken() );
-        mediaTokens.getFacebookToken().setFacebookAccessTokenCreatedOn( System.currentTimeMillis() );
-        if ( accessToken.getExpires() != null )
-            mediaTokens.getFacebookToken().setFacebookAccessTokenExpiresOn( accessToken.getExpires() );
-
-        mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( accessToken.getToken() );
-
-        Facebook facebook = new FacebookFactory().getInstance();
-        facebook.setOAuthAppId( facebookClientId, facebookClientSecret );
-        facebook.setOAuthAccessToken( new facebook4j.auth.AccessToken( accessToken.getToken() ) );
-
-        ResponseList<Account> accounts;
-        List<FacebookPage> facebookPages = new ArrayList<FacebookPage>();
-        try {
-            accounts = facebook.getAccounts();
-            FacebookPage facebookPage = null;
-            for ( Account account : accounts ) {
-                facebookPage = new FacebookPage();
-                facebookPage.setId( account.getId() );
-                facebookPage.setName( account.getName() );
-                facebookPage.setAccessToken( account.getAccessToken() );
-                facebookPage.setCategory( account.getCategory() );
-                facebookPage.setProfileUrl( facebookUri.concat( account.getId() ) );
-                facebookPages.add( facebookPage );
-            }
-        } catch ( FacebookException e ) {
-            LOG.error( "Error while creating access token for facebook: " + e.getLocalizedMessage(), e );
-        }
-        mediaTokens.getFacebookToken().setFacebookPages( facebookPages );
-
-        LOG.debug( "Method updateFacebookToken() finished from SocialManagementController" );
-        return mediaTokens;
     }
 
 
@@ -998,6 +943,10 @@ public class SocialManagementController
             String accessTokenStr = httpclient.execute( httpPost, new BasicResponseHandler() );
             Map<String, Object> map = new Gson().fromJson( accessTokenStr, new TypeToken<Map<String, String>>() {}.getType() );
             String accessToken = (String) map.get( "access_token" );
+            String expiresInStr = (String) map.get( "expires_in" );
+            long expiresIn = 0;
+            if(StringUtils.isNotBlank( expiresInStr ))
+                expiresIn = Long.valueOf( expiresInStr ).longValue();
 
             // fetching linkedin profile url
             HttpGet httpGet = new HttpGet( linkedinProfileUri + accessToken );
@@ -1014,7 +963,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                 companySettings.setSocialMediaTokens( mediaTokens );
@@ -1041,7 +990,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                 regionSettings.setSocialMediaTokens( mediaTokens );
@@ -1068,7 +1017,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                 branchSettings.setSocialMediaTokens( mediaTokens );
@@ -1096,7 +1045,7 @@ public class SocialManagementController
                 }
 
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
 
@@ -1195,15 +1144,15 @@ public class SocialManagementController
 
             String accessToken = "";
             String refreshToken = "";
+            String expiresIn = "";
             Map<String, Object> tokenData = new Gson().fromJson( tokenResponse.getBody(),
                 new TypeToken<Map<String, String>>() {}.getType() );
             if ( tokenData != null ) {
-                LOG.debug( "Google access token: " + tokenData.get( "access_token" ) + ", Refresh Token: "
-                    + tokenData.get( "refresh_token" ) );
-                accessToken = tokenData.get( "access_token" ).toString();
-                refreshToken = tokenData.get( "refresh_token" ).toString();
+                accessToken = (String) tokenData.get( "access_token" );
+                refreshToken = (String) tokenData.get( "refresh_token" );
+                expiresIn = (String) tokenData.get( "expires_in" );                
             }
-            LOG.info( "Access Token: " + accessToken + ", Refresh Token: " + refreshToken );
+            LOG.debug( "Google access token: " + accessToken + ", Refresh Token: " + refreshToken + ", Expires In: " + expiresIn );
 
             HttpClient httpclient = HttpClientBuilder.create().build();
             HttpGet httpGet = new HttpGet( googleProfileUri + accessToken );
@@ -1225,7 +1174,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink );
+                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                 companySettings.setSocialMediaTokens( mediaTokens );
@@ -1251,7 +1200,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink );
+                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                 regionSettings.setSocialMediaTokens( mediaTokens );
@@ -1278,7 +1227,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink );
+                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                 branchSettings.setSocialMediaTokens( mediaTokens );
@@ -1306,7 +1255,7 @@ public class SocialManagementController
                 }
 
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink );
+                mediaTokens = updateGoogleToken( accessToken, refreshToken, mediaTokens, profileLink, expiresIn );
                 mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
                 for ( ProfileStage stage : agentSettings.getProfileStages() ) {
@@ -1343,7 +1292,7 @@ public class SocialManagementController
 
 
     private SocialMediaTokens updateGoogleToken( String accessToken, String refreshToken, SocialMediaTokens mediaTokens,
-        String profileLink )
+        String profileLink, String expiresIn )
     {
         LOG.debug( "Method updateGoogleToken() called from SocialManagementController" );
         if ( mediaTokens == null ) {
@@ -1361,6 +1310,8 @@ public class SocialManagementController
         mediaTokens.getGoogleToken().setGoogleAccessToken( accessToken );
         mediaTokens.getGoogleToken().setGoogleRefreshToken( refreshToken );
         mediaTokens.getGoogleToken().setGoogleAccessTokenCreatedOn( System.currentTimeMillis() );
+        if(StringUtils.isNotBlank( expiresIn ))
+            mediaTokens.getGoogleToken().setGoogleAccessTokenExpiresIn( Long.valueOf( expiresIn ).longValue() );
 
         LOG.debug( "Method updateGoogleToken() finished from SocialManagementController" );
         return mediaTokens;
@@ -1530,74 +1481,7 @@ public class SocialManagementController
     }
 
 
-    @ResponseBody
-    @RequestMapping ( value = "/postonlinkedin", method = RequestMethod.GET)
-    public String postToLinkedin( HttpServletRequest request )
-    {
-        LOG.info( "Method to post feedback of customer on twitter started." );
-        String agentName = request.getParameter( "agentName" );
-        String custFirstName = request.getParameter( "firstName" );
-        String custLastName = request.getParameter( "lastName" );
-        String agentIdStr = request.getParameter( "agentId" );
-        String feedback = request.getParameter( "review" );
-        boolean linkedinNotSetup = true;
-
-        double rating = 0;
-        long agentId = 0;
-        try {
-            agentId = Long.parseLong( agentIdStr );
-            String ratingStr = request.getParameter( "score" );
-            rating = Double.parseDouble( ratingStr );
-        } catch ( NumberFormatException e ) {
-            LOG.error(
-                "Number format exception caught in postToLinkedin() while trying to convert agent Id. Nested exception is ",
-                e );
-            return e.getMessage();
-        }
-        String agentProfileLink = "";
-        String custDisplayName = null;
-        AgentSettings agentSettings = new AgentSettings();
-        try {
-            custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName );
-            agentSettings = userManagementService.getUserSettings( agentId );
-            if ( agentSettings != null && agentSettings.getProfileUrl() != null ) {
-                agentProfileLink = agentSettings.getProfileUrl();
-            }
-        } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException caught in postToFacebook(). Nested exception is ", e );
-        }
-
-        try {
-            User user = sessionHelper.getCurrentUser();
-            OrganizationUnitSettings companySettings = organizationManagementService
-                .getCompanySettings( user.getCompany().getCompanyId() );
-            List<OrganizationUnitSettings> settings = socialManagementService
-                .getBranchAndRegionSettingsForUser( user.getUserId() );
-            String message = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + custDisplayName
-                + " for " + agentName + " on SocialSurvey ";
-            String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-            message += linkedinProfileUrl;
-            message = message.replaceAll( "null", "" );
-            String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " " + feedback;
-            for ( OrganizationUnitSettings setting : settings ) {
-                try {
-                    if ( setting != null )
-                        if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
-                            linkedinMessageFeedback, companySettings, false, agentSettings, new SocialMediaPostResponse() ) )
-                            linkedinNotSetup = false;
-                } catch ( NonFatalException e ) {
-                    LOG.error(
-                        "NonFatalException caught in postToLinkedin() while trying to post to twitter. Nested excption is ",
-                        e );
-                }
-            }
-        } catch ( Exception e ) {
-            LOG.error( "Exception caught in postToLinkedin() while trying to post to twitter. Nested excption is ", e );
-        }
-        LOG.info( "Method to post feedback of customer to various pages of twitter finished." );
-        return linkedinNotSetup + "";
-    }
-
+   
 
     @ResponseBody
     @RequestMapping ( value = "/getyelplink", method = RequestMethod.GET)
@@ -2644,4 +2528,6 @@ public class SocialManagementController
         }
         return false;
     }
+    
+   
 }

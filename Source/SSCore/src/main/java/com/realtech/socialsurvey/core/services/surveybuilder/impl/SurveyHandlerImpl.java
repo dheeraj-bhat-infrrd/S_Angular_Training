@@ -193,6 +193,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     String paramOrderTakeSurveyReminder;
     @Value ( "${PARAM_ORDER_SURVEY_COPLETION_MAIL}")
     String paramOrderSurveyCompletionMail;
+    @Value ( "${PARAM_ORDER_SURVEY_COPLETION_MAIL_CUSTOM}")
+    String paramOrderSurveyCompletionMailCustom;
     @Value ( "${PARAM_ORDER_SOCIAL_POST_REMINDER}")
     String paramOrderSocialPostReminder;
     @Value ( "${PARAM_ORDER_INCOMPLETE_SURVEY_REMINDER}")
@@ -282,6 +284,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         surveyDetails.setRetakeSurvey( retakeSurvey );
         surveyDetails.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
+        surveyDetails.setState( surveyPreInitiation.getState() );
+        surveyDetails.setCity( surveyPreInitiation.getCity() );
 
         SurveyDetails survey = null;
         //if survey request is old get survey by agent id and customer email
@@ -784,8 +788,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
             }
         } catch ( InvalidSettingsStateException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error( "Error: " + e );
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
         //JIRA SS-1363 begin
@@ -868,8 +871,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
             }
         } catch ( InvalidSettingsStateException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error( "Error: " + e );
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
         //JIRA SS-1363 begin
@@ -884,8 +886,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             try {
                 branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
             } catch ( NoRecordsFetchedException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error( "Error: " + e );
             }
             if ( branchSettings != null ) {
                 logoUrl = branchSettings.getLogoThumbnail();
@@ -904,8 +905,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             try {
                 branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
             } catch ( NoRecordsFetchedException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error( "Error: " + e );
             }
             if ( branchSettings != null ) {
                 logoUrl = branchSettings.getLogo();
@@ -1053,31 +1053,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
             }
         } catch ( InvalidSettingsStateException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error( "Error: " + e );
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-        //JIRA SS-1363 begin
-        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-            logoUrl = companySettings.getLogoThumbnail();
-        } else if ( organizationUnit == OrganizationUnit.REGION ) {
-            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-            logoUrl = regionSettings.getLogoThumbnail();
-        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
-            OrganizationUnitSettings branchSettings = null;
-            try {
-                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-            } catch ( NoRecordsFetchedException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            if ( branchSettings != null ) {
-                logoUrl = branchSettings.getLogoThumbnail();
-            }
-        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-            logoUrl = agentSettings.getLogoThumbnail();
-        }*/
         if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
             logoUrl = companySettings.getLogo();
@@ -1089,8 +1067,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             try {
                 branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
             } catch ( NoRecordsFetchedException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error( "Error: " + e );
             }
             if ( branchSettings != null ) {
                 logoUrl = branchSettings.getLogo();
@@ -1102,7 +1079,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
             logoUrl = appLogoUrl;
         }
-        //JIRA SS-1363 end
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
@@ -1122,13 +1098,20 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
             }
         } else {
-            mailSubject = fileOperations.getContentFromFile( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-                + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_SUBJECT );
+            mailSubject = fileOperations.getContentFromFile(
+                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_SUBJECT );
+            if ( companySettings != null && companySettings.isHiddenSection() ) {
+                mailBody = fileOperations.getContentFromFile(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY_CUSTOM );
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
+                    new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMailCustom.split( "," ) ) ) );
+            } else {
+                mailBody = fileOperations.getContentFromFile(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY );
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
+                    new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) ) );
+            }
 
-            mailBody = fileOperations.getContentFromFile( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-                + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY );
-            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
-                new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) ) );
         }
         //JIRA SS-473 begin
         String agentDisclaimer = "";
@@ -1211,8 +1194,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
             }
         } catch ( InvalidSettingsStateException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error( "Error: " + e );
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
         //JIRA SS-1363 begin
@@ -1227,8 +1209,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             try {
                 branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
             } catch ( NoRecordsFetchedException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error( "Error: " + e );
             }
             if ( branchSettings != null ) {
                 logoUrl = branchSettings.getLogoThumbnail();
@@ -1247,8 +1228,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             try {
                 branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
             } catch ( NoRecordsFetchedException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error( "Error: " + e );
             }
             if ( branchSettings != null ) {
                 logoUrl = branchSettings.getLogo();
@@ -1364,8 +1344,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
             }
         } catch ( InvalidSettingsStateException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error( "Error: " + e );
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
         //JIRA SS-1363 begin
@@ -1380,8 +1359,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             try {
                 branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
             } catch ( NoRecordsFetchedException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error( "Error: " + e );
             }
             if ( branchSettings != null ) {
                 logoUrl = branchSettings.getLogoThumbnail();
@@ -1400,8 +1378,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             try {
                 branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
             } catch ( NoRecordsFetchedException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error( "Error: " + e );
             }
             if ( branchSettings != null ) {
                 logoUrl = branchSettings.getLogo();
@@ -2820,6 +2797,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         survey.setCreatedOn( currentTimestamp );
         survey.setModifiedOn( currentTimestamp );
         survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+        survey.setCity( surveyImportVO.getCity() );
+        survey.setState( surveyImportVO.getState() );
         surveyPreInitiationDao.save( survey );
         LOG.info( "Method BulkSurveyImporter.importSurveyVOToSurveyPreInitiation finished" );
         return survey;
@@ -2860,6 +2839,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setEditable( false );
         surveyDetails.setSource( source );
         surveyDetails.setShowSurveyOnUI( true );
+        surveyDetails.setCity( surveyImportVO.getCity() );
+        surveyDetails.setState( surveyImportVO.getState() );
 
         surveyDetails.setRetakeSurvey( false );
         surveyDetails.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
@@ -3215,6 +3196,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 && unitSettings.getSocialMediaTokens().getRealtorToken() != null
                 && unitSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null ) {
                 surveyAndStage.put( "realtorEnabled", true );
+
                 surveyAndStage.put( "realtorLink", unitSettings.getSocialMediaTokens().getRealtorToken()
                     .getRealtorProfileLink() );
             } else {

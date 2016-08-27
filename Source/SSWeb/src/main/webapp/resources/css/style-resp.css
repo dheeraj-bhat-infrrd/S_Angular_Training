@@ -263,6 +263,9 @@
     .en-form-align-left{
     padding-left:70px !important;
     }
+    .lone-space{
+      display:none;
+    }
     .hm-dd-wrapper{
         width: 100%;
         border-left: 0;
@@ -1776,6 +1779,9 @@
     }
     .overflow-hidden {
         overflow: hidden;
+    }
+    .lone-space{
+     display:none;
     }
     .hm-item-row-left{
         width: 90px;

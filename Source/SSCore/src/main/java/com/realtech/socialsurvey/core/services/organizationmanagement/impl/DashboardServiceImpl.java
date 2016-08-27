@@ -857,17 +857,17 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     }
 	
 	
-	long get3rdPartyImportCount( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
-	    boolean filterAbusive ) throws InvalidInputException
-	{
-	    return surveyDetailsDao.get3rdPartyImportCount( columnName, columnValue, startDate, endDate, filterAbusive );
-	}
-	
 
     long getZillowImportCount( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
         boolean filterAbusive ) throws InvalidInputException
     {
         return surveyDetailsDao.getZillowImportCount( columnName, columnValue, startDate, endDate, filterAbusive );
+    }
+
+    long get3rdPartyImportCount( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
+        boolean filterAbusive ) throws InvalidInputException
+    {
+        return surveyDetailsDao.get3rdPartyImportCount( columnName, columnValue, startDate, endDate, filterAbusive );
     }
 
 

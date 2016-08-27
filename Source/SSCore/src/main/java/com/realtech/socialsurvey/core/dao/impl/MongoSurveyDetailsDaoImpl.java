@@ -367,7 +367,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
         query.addCriteria( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ).lte( endDate ) );
-        LOG.info( "Method to get count of total number of surveys clicked so far, getClickedSurveyCount() finished." );
+	    //SS-670
+	    /*query.addCriteria(
+		    Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_3RD_PARTY ) );*/
+	    LOG.info( "Method to get count of total number of surveys clicked so far, getClickedSurveyCount() finished." );
         return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
     }
 
@@ -1289,13 +1292,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         return count;
     }
 	
-	
+
 	@Override
 	public long get3rdPartyImportCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
 		Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
 	{
-		LOG.info(
-			"Getting get3rdPartyImportCount for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
+		LOG.info( "Getting get3rdPartyImportCount for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
 		if ( organizationUnitColumn == null || organizationUnitColumn.isEmpty() ) {
 			LOG.warn( "organizationUnitColumn is empty" );
 			throw new InvalidInputException( "organizationUnitColumn is empty" );
@@ -1307,6 +1309,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 		Query query = new Query();
 		query.addCriteria( Criteria.where( organizationUnitColumn ).is( organizationUnitColumnValue ) );
 		query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+
 		// Do not show zillow review in statistics completed count, SS-307
 		query.addCriteria(
 			Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is( CommonConstants.SURVEY_SOURCE_3RD_PARTY ) );
@@ -1331,6 +1334,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 		LOG.info( "Found " + count + " get3rdParty surveys" );
 		return count;
 	}
+
 
     @SuppressWarnings ( "unchecked")
     @Override
@@ -1768,52 +1772,82 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         TypedAggregation<SurveyDetails> aggregation;
         if ( startDate != null && endDate != null ) {
-	        if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
-		        aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-			        Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-			        .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
-			        .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-				        Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-			        Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
-	        } else {
-		        aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-			        Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-			        .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
-			        .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-				        Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-			        Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
-	        }
-        } else if ( startDate != null && endDate == null ) {
             if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
 	            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
 		            Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
 		            .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
 		            Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
 		            Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-		            Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ), Aggregation
+		            Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+		            Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
 		            .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
 		            Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
 			            Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
 		            Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
             } else {
-	            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-		            Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-		            .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-		            Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-		            Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ), Aggregation
-		            .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-		            Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-			            Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-		            Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match(
+	                Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
+		                Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            }
+        } else if ( startDate != null && endDate == null ) {
+            if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.CREATED_ON ).gte( startDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match(
+	                Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
+		                Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            } else {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.CREATED_ON ).gte( startDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match(
+	                Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
+		                Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            }
+        }
+
+        else if ( startDate == null && endDate != null ) {
+            if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match(
+	                Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
+		                Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            } else {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match(
+	                Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
+		                Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
             }
         } else if ( startDate == null && endDate != null ) {
 	        if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
@@ -1839,26 +1873,28 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 			        Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
 	        }
         } else {
-	        if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
-		        aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-			        Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-			        .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
-			        .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-				        Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-			        Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
-	        } else {
-		        aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-			        Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-			        .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
-			        .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-			        Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-				        Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-			        Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
-	        }
+            if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match(
+	                Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
+		                Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            } else {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match(
+	                Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
+		                Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            }
         }
 
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
@@ -1899,100 +1935,108 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public void getCompletedSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
         String columnName, long columnValue, boolean fetchAbusive )
     {
-	    TypedAggregation<SurveyDetails> aggregation;
-	    if ( startDate != null && endDate != null ) {
-		    if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
-			    aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-				    Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-					    Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-				    Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-		    } else {
-			    aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-				    Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-					    Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-				    Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-		    }
-	    } else if ( startDate != null && endDate == null ) {
-		    if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
-			    aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-				    Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-					    Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-				    Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-		    } else {
-			    aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-				    Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-					    Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-				    Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-		    }
-	    } else if ( startDate == null && endDate != null ) {
-		    if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
-			    aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-				    Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-					    Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-				    Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-		    } else {
-			    aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-				    Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-					    Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-				    Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-		    }
-	    } else {
-		    if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
-			    aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-				    Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-					    Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-				    Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-		    } else {
-			    aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-				    Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
-				    .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
-				    Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
-					    Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
-				    Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-		    }
-	    }
+        TypedAggregation<SurveyDetails> aggregation;
+        if ( startDate != null && endDate != null ) {
+            if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match( Criteria
+	                .where( CommonConstants.SOURCE_COLUMN )
+	                .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            } else {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match( Criteria
+	                .where( CommonConstants.SOURCE_COLUMN )
+	                .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            }
+        } else if ( startDate != null && endDate == null ) {
+            if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match( Criteria
+	                .where( CommonConstants.SOURCE_COLUMN )
+	                .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            } else {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match( Criteria
+	                .where( CommonConstants.SOURCE_COLUMN )
+	                .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            }
+        } else if ( startDate == null && endDate != null ) {
+            if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match( Criteria
+	                .where( CommonConstants.SOURCE_COLUMN )
+	                .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            } else {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match( Criteria
+	                .where( CommonConstants.SOURCE_COLUMN )
+	                .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            }
+        } else {
+            if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match( Criteria
+	                .where( CommonConstants.SOURCE_COLUMN )
+	                .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            } else {
+                aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                    columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                    CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where(
+                    CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ), Aggregation.match( Criteria
+	                .where( CommonConstants.SOURCE_COLUMN )
+	                .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+	                Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            }
+        }
 
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
             SurveyDetails.class );

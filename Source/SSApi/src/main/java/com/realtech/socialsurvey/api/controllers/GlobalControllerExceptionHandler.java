@@ -12,18 +12,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.realtech.socialsurvey.api.exceptions.BadRequestException;
+import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.exceptions.ValidationException;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 
 @ControllerAdvice
 public class GlobalControllerExceptionHandler
 {
-
     private final static String ERRORS = "errors";
 
 
@@ -31,17 +26,8 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<Map<String, Object>> handleValidationException( ValidationException validationException )
     {
-
         Map<String, Object> result = createErrorResponse( validationException.getErrors() );
         return new ResponseEntity<Map<String, Object>>( result, HttpStatus.OK );
-    }
-
-
-    @ExceptionHandler ( InvalidInputException.class)
-    @ResponseBody
-    public ResponseEntity<String> handleInvalidInputException( InvalidInputException ie )
-    {
-        return new ResponseEntity<String>( ie.getMessage(), HttpStatus.BAD_REQUEST );
     }
 
 
@@ -49,41 +35,16 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<Map<String, Object>> handleBadRequestException( BadRequestException badRequestException )
     {
-
         Map<String, Object> result = createErrorResponse( badRequestException.getErrors() );
         return new ResponseEntity<Map<String, Object>>( result, HttpStatus.BAD_REQUEST );
     }
 
 
-    @ExceptionHandler ( SolrException.class)
+    @ExceptionHandler ( SSApiException.class)
     @ResponseBody
-    public ResponseEntity<String> handleSolrException( SolrException ie )
+    public ResponseEntity<String> handleSSApiException( SSApiException ssapiException )
     {
-        return new ResponseEntity<String>( ie.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR );
-    }
-
-
-    @ExceptionHandler ( NoRecordsFetchedException.class)
-    @ResponseBody
-    public ResponseEntity<String> handleNoRecordsFetchedException( NoRecordsFetchedException ie )
-    {
-        return new ResponseEntity<String>( ie.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR );
-    }
-
-
-    @ExceptionHandler ( NonFatalException.class)
-    @ResponseBody
-    public ResponseEntity<String> handleNonFatalException( NonFatalException ie )
-    {
-        return new ResponseEntity<String>( ie.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR );
-    }
-
-
-    @ExceptionHandler ( UserAlreadyExistsException.class)
-    @ResponseBody
-    public ResponseEntity<String> handleUserAlreadyExistsException( UserAlreadyExistsException ie )
-    {
-        return new ResponseEntity<String>( ie.getMessage(), HttpStatus.BAD_REQUEST );
+        return new ResponseEntity<String>( ssapiException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR );
     }
 
 
@@ -99,11 +60,9 @@ public class GlobalControllerExceptionHandler
     {
         Map<String, Object> result = new HashMap<String, Object>();
         Map<String, String> errorResults = new HashMap<String, String>();
-
         for ( ObjectError error : errors.getAllErrors() ) {
             errorResults.put( error.getCode(), error.getDefaultMessage() );
         }
-
         result.put( ERRORS, errorResults );
         return result;
     }

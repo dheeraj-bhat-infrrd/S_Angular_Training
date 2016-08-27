@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestOperations;
 
+import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.models.PersonalProfile;
 import com.realtech.socialsurvey.api.models.request.LoginRequest;
 import com.realtech.socialsurvey.api.models.response.AuthResponse;
@@ -33,9 +34,9 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.api.UserService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -97,32 +98,26 @@ public class UserController
     @ApiOperation ( value = "User login")
     public ResponseEntity<?> login( @Valid @RequestBody LoginRequest loginRequest )
     {
-
         String endPoint = authUrl + "/oauth/token";
         String clientCredential = clientId + ":" + clientSecret;
         String authData = Base64Utils.encodeToString( clientCredential.getBytes() );
         String data = String.format( "grant_type=password&username=%s&password=%s", loginRequest.getEmail(),
             loginRequest.getPassword() );
-
         HttpHeaders headers = new HttpHeaders();
         headers.add( "Authorization", "Basic " + authData );
         headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
-
         HttpEntity<String> httpEntity = new HttpEntity<String>( data, headers );
-
         try {
             ResponseEntity<AuthResponse> authResponse = restTemplate.postForEntity( endPoint, httpEntity, AuthResponse.class );
 
             if ( LOGGER.isDebugEnabled() ) {
                 LOGGER.debug( "Response from Auth Service is: " + authResponse );
             }
-
             return authResponse;
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
                 LOGGER.debug( "Exception thrown while login: " + ex.getMessage() );
             }
-
             return new ResponseEntity<Void>( HttpStatus.UNAUTHORIZED );
         }
     }
@@ -142,61 +137,81 @@ public class UserController
     @RequestMapping ( value = "/profile/update/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update user profile")
     public ResponseEntity<?> updateUserProfile( @Valid @RequestBody PersonalProfile personalProfile,
-        @PathVariable ( "userId") String userId ) throws InvalidInputException, SolrException
+        @PathVariable ( "userId") String userId ) throws SSApiException
     {
-        LOGGER.info( "UserController.updateUserProfile started" );
-        long userIdLong = Long.parseLong( userId );
-        User user = userManagementService.getUserByUserId( userIdLong );
-        AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userIdLong );
-        UserCompositeEntity userProfile = personalProfileTransformer.transformApiRequestToDomainObject( personalProfile, user,
-            agentSettings );
-        userService.updateUserProfile( userIdLong, userProfile );
-        LOGGER.info( "UserController.updateUserProfile completed successfully" );
-        return new ResponseEntity<Void>( HttpStatus.OK );
+        try {
+            LOGGER.info( "UserController.updateUserProfile started" );
+            long userIdLong = Long.parseLong( userId );
+            User user = userManagementService.getUserByUserId( userIdLong );
+            AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userIdLong );
+            UserCompositeEntity userProfile = personalProfileTransformer.transformApiRequestToDomainObject( personalProfile,
+                user, agentSettings );
+            userService.updateUserProfile( userIdLong, userProfile );
+            LOGGER.info( "UserController.updateUserProfile completed successfully" );
+            return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
     @RequestMapping ( value = "/profile/details/{userId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Get user profile")
-    public ResponseEntity<?> getUserProfile( @PathVariable ( "userId") String userId ) throws InvalidInputException
+    public ResponseEntity<?> getUserProfile( @PathVariable ( "userId") String userId ) throws SSApiException
     {
-        LOGGER.info( "UserController.getUserProfile started" );
-        UserCompositeEntity userProfile = userService.getUserProfileDetails( Long.parseLong( userId ) );
-        PersonalProfile userProfileResponse = personalProfileTransformer.transformDomainObjectToApiResponse( userProfile );
-        LOGGER.info( "UserController.getUserProfile completed successfully" );
-        return new ResponseEntity<PersonalProfile>( userProfileResponse, HttpStatus.OK );
+        try {
+            LOGGER.info( "UserController.getUserProfile started" );
+            UserCompositeEntity userProfile = userService.getUserProfileDetails( Long.parseLong( userId ) );
+            PersonalProfile userProfileResponse = personalProfileTransformer.transformDomainObjectToApiResponse( userProfile );
+            LOGGER.info( "UserController.getUserProfile completed successfully" );
+            return new ResponseEntity<PersonalProfile>( userProfileResponse, HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
     @RequestMapping ( value = "/profile/profileimage/remove/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Delete user profile image")
-    public ResponseEntity<?> deleteUserProfileImage( @PathVariable ( "userId") String userId ) throws InvalidInputException
+    public ResponseEntity<?> deleteUserProfileImage( @PathVariable ( "userId") String userId ) throws SSApiException
     {
-        LOGGER.info( "UserController.deleteUserProfileImage started" );
-        userService.deleteUserProfileImage( Long.parseLong( userId ) );
-        LOGGER.info( "UserController.deleteUserProfileImage completed successfully" );
-        return new ResponseEntity<Void>( HttpStatus.OK );
+        try {
+            LOGGER.info( "UserController.deleteUserProfileImage started" );
+            userService.deleteUserProfileImage( Long.parseLong( userId ) );
+            LOGGER.info( "UserController.deleteUserProfileImage completed successfully" );
+            return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
     @RequestMapping ( value = "/profile/profileimage/update/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update user profile image")
     public ResponseEntity<?> updateUserProfileImage( @PathVariable ( "userId") String userId, @RequestBody String imageUrl )
-        throws InvalidInputException
+        throws SSApiException
     {
-        LOGGER.info( "UserController.updateUserProfileImage started" );
-        userService.updateUserProfileImage( Long.parseLong( userId ), imageUrl );
-        LOGGER.info( "UserController.updateUserProfileImage completed successfully" );
-        return new ResponseEntity<String>( imageUrl, HttpStatus.OK );
+        try {
+            LOGGER.info( "UserController.updateUserProfileImage started" );
+            userService.updateUserProfileImage( Long.parseLong( userId ), imageUrl );
+            LOGGER.info( "UserController.updateUserProfileImage completed successfully" );
+            return new ResponseEntity<String>( imageUrl, HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
     @RequestMapping ( value = "/profile/stage/{userId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Get user profile stage")
-    public ResponseEntity<?> getUserStage( @PathVariable ( "userId") String userId ) throws InvalidInputException
+    public ResponseEntity<?> getUserStage( @PathVariable ( "userId") String userId ) throws SSApiException
     {
-        User user = userManagementService.getUserByUserId( Long.parseLong( userId ) );
-        return new ResponseEntity<String>( user.getRegistrationStage(), HttpStatus.OK );
+        try {
+            User user = userManagementService.getUserByUserId( Long.parseLong( userId ) );
+            return new ResponseEntity<String>( user.getRegistrationStage(), HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
@@ -212,15 +227,19 @@ public class UserController
 
     @RequestMapping ( value = "/profile/webaddress/validate", method = RequestMethod.POST)
     @ApiOperation ( value = "Validates the provided web address")
-    public ResponseEntity<?> validateWebAddress( @RequestBody String webAddress ) throws InvalidInputException
+    public ResponseEntity<?> validateWebAddress( @RequestBody String webAddress ) throws SSApiException
     {
-        LOGGER.info( "Validating web address " + webAddress );
         try {
-            urlValidationHelper.validateUrl( webAddress );
-        } catch ( IOException e ) {
-            LOGGER.error( "Error reaching " + webAddress, e );
-            throw new InvalidInputException( "Web address passed was invalid", DisplayMessageConstants.GENERAL_ERROR, e );
+            LOGGER.info( "Validating web address " + webAddress );
+            try {
+                urlValidationHelper.validateUrl( webAddress );
+            } catch ( IOException e ) {
+                LOGGER.error( "Error reaching " + webAddress, e );
+                throw new InvalidInputException( "Web address passed was invalid", DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
         }
-        return new ResponseEntity<Void>( HttpStatus.OK );
     }
 }

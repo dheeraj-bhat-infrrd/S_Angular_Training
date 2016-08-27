@@ -11,7 +11,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.realtech.socialsurvey.core.entities.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +29,16 @@ import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
@@ -44,9 +53,8 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
-import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -73,13 +81,10 @@ public class ProfileViewController
     private OrganizationManagementService organizationManagementService;
 
     @Autowired
-    private SolrSearchService solrSearchService;
+    private UserManagementService userManagementService;
 
     @Autowired
     private BotRequestUtils botRequestUtils;
-
-    @Autowired
-    private SocialManagementService socialManagementService;
 
     @Value ( "${VALIDATE_CAPTCHA}")
     private String validateCaptcha;
@@ -106,8 +111,9 @@ public class ProfileViewController
         boolean isBotRequest = botRequestUtils.checkBotRequest( request );
 
         if ( profileName == null || profileName.isEmpty() ) {
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
-                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage();
             model.addAttribute( "message", message );
             return JspResolver.MESSAGE_HEADER;
         }
@@ -118,45 +124,30 @@ public class ProfileViewController
         OrganizationUnitSettings companyProfile = null;
         try {
             companyProfile = profileManagementService.getCompanyProfileByProfileName( profileName );
-            if ( companyProfile == null || ( companyProfile.getStatus() != null && (
-                companyProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) || companyProfile
-                    .getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
+            if ( companyProfile == null || ( companyProfile.getStatus() != null
+                && ( companyProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO )
+                    || companyProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
                 throw new ProfileNotFoundException( "No settings found for company while fetching company profile" );
             }
 
-            /*if ( companyProfile.getSocialMediaTokens() != null
-                && companyProfile.getSocialMediaTokens().getZillowToken() != null )
-                profileManagementService.updateZillowFeed( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );*/
-
             //remove sensitive info frm profile json
-            profileManagementService.removeTokensFromProfile(companyProfile);
-            
+            profileManagementService.removeTokensFromProfile( companyProfile );
+
             String json = new Gson().toJson( companyProfile );
             model.addAttribute( "profileJson", json );
 
             Long companyId = companyProfile.getIden();
-            // Commented as now Zillow reviews are saved in Social Survey, SS-307
-            /*Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
-                .getZillowTotalScoreAndReviewCountForProfileLevel( CommonConstants.PROFILE_LEVEL_COMPANY, companyId );
-            long zillowReviewCount = 0;
-            long zillowTotalScore = 0;
-
-            if ( zillowTotalScoreAndAverage != null && !zillowTotalScoreAndAverage.isEmpty() ) {
-                zillowReviewCount = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN );
-                zillowTotalScore = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_TOTAL_SCORE );
-            }*/
-            double averageRating = profileManagementService.getAverageRatings( companyId,
-                CommonConstants.PROFILE_LEVEL_COMPANY, false, false, 0, 0 );
+            double averageRating = profileManagementService.getAverageRatings( companyId, CommonConstants.PROFILE_LEVEL_COMPANY,
+                false, false, 0, 0 );
             model.addAttribute( "averageRating", averageRating );
 
             // should show all review count
-            long reviewsCount = profileManagementService.getReviewsCount( companyId, -1,
-                -1, CommonConstants.PROFILE_LEVEL_COMPANY, false, false, false, 0 );
-            
+            long reviewsCount = profileManagementService.getReviewsCount( companyId, -1, -1,
+                CommonConstants.PROFILE_LEVEL_COMPANY, false, false, false, 0 );
+
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
-                // TODO:remove hardcoding of start,end,minScore etc
                 List<SurveyDetails> reviews = profileManagementService.getReviews( companyId, -1, -1, -1,
                     CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null,
                     CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
@@ -167,9 +158,10 @@ public class ProfileViewController
                 model.addAttribute( "posts", posts );
             }
         } catch ( InvalidInputException e ) {
-            throw new InternalServerException( new ProfileServiceErrorCode(
-                CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_PROFILE,
-                "Error occured while fetching company profile" ), e.getMessage() );
+            throw new InternalServerException(
+                new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE,
+                    CommonConstants.SERVICE_CODE_COMPANY_PROFILE, "Error occured while fetching company profile" ),
+                e.getMessage() );
         } catch ( ProfileNotFoundException e ) {
             LOG.error( "Excpetion caught " + e.getMessage() );
             Map<String, String> nameMap = profileManagementService.findNamesfromProfileName( profileName );
@@ -209,14 +201,16 @@ public class ProfileViewController
         Map<SettingsForApplication, OrganizationUnit> map = null;
         boolean isBotRequest = botRequestUtils.checkBotRequest( request );
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
-                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage();
             model.addAttribute( "message", message );
             return JspResolver.MESSAGE_HEADER;
         }
         if ( regionProfileName == null || regionProfileName.isEmpty() ) {
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_REGION_PROFILENAME,
-                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_REGION_PROFILENAME, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage();
             model.addAttribute( "message", message );
             return JspResolver.MESSAGE_HEADER;
         }
@@ -229,31 +223,33 @@ public class ProfileViewController
         OrganizationUnitSettings companyProfile = null;
         try {
             regionProfile = profileManagementService.getRegionSettingsByProfileName( companyProfileName, regionProfileName );
-            if ( regionProfile == null || ( regionProfile.getStatus() != null && (
-                regionProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) || regionProfile
-                    .getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
+            if ( regionProfile == null || ( regionProfile.getStatus() != null
+                && ( regionProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO )
+                    || regionProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
                 throw new ProfileNotFoundException( "No settings found for region while fetching region profile" );
             }
 
             companyProfile = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
-            if ( companyProfile == null
-                || ( companyProfile.getStatus() != null && companyProfile.getStatus().equalsIgnoreCase(
-                    CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+            if ( companyProfile == null || ( companyProfile.getStatus() != null
+                && companyProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) {
                 throw new ProfileNotFoundException( "No settings found for company while fetching region profile" );
             }
             // 	migrating the hideSectionsFromProfilePage value from company to region
-            regionProfile.setHideSectionsFromProfilePage(companyProfile.getHideSectionsFromProfilePage());
+            regionProfile.setHideSectionsFromProfilePage( companyProfile.getHideSectionsFromProfilePage() );
+            regionProfile.setHiddenSection( companyProfile.isHiddenSection() );
 
             try {
-                map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID, regionProfile.getIden() );
+                map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID,
+                    regionProfile.getIden() );
                 if ( map == null ) {
                     LOG.error( "Unable to fetch primary profile for this user " );
                     throw new FatalException( "Unable to fetch primary profile this user " + regionProfile.getIden() );
                 }
             } catch ( InvalidSettingsStateException e ) {
-                throw new InternalServerException( new ProfileServiceErrorCode(
-                    CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
-                    "Error occured while fetching region profile" ), e.getMessage() );
+                throw new InternalServerException(
+                    new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
+                        CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile" ),
+                    e.getMessage() );
             }
 
             regionProfile = profileManagementService.fillUnitSettings( regionProfile,
@@ -261,16 +257,7 @@ public class ProfileViewController
                 true );
 
             //remove sensitive info frm profile json
-            profileManagementService.removeTokensFromProfile(regionProfile);
-            
-
-            /*if ( regionProfile.getSocialMediaTokens() != null && regionProfile.getSocialMediaTokens().getZillowToken() != null )
-                profileManagementService.updateZillowFeed( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );*/
-            // aggregated social profile urls
-            /*SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles( regionProfile,
-                CommonConstants.REGION_ID );
-            regionProfile.setSocialMediaTokens( regionTokens );*/
-
+            profileManagementService.removeTokensFromProfile( regionProfile );
 
             // aggregated disclaimer
             String disclaimer = profileManagementService.aggregateDisclaimer( regionProfile, CommonConstants.REGION_ID );
@@ -280,26 +267,15 @@ public class ProfileViewController
             model.addAttribute( "profileJson", json );
 
             Long regionId = regionProfile.getIden();
-            // Commented as Zillow reviews are stored in Social Survey, SS-307
-            /*Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
-                .getZillowTotalScoreAndReviewCountForProfileLevel( CommonConstants.PROFILE_LEVEL_REGION, regionId );
-            long zillowReviewCount = 0;
-            long zillowTotalScore = 0;
-
-            if ( zillowTotalScoreAndAverage != null && !zillowTotalScoreAndAverage.isEmpty() ) {
-                zillowReviewCount = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN );
-                zillowTotalScore = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_TOTAL_SCORE );
-            }*/
             double averageRating = profileManagementService.getAverageRatings( regionId, CommonConstants.PROFILE_LEVEL_REGION,
                 false, false, 0, 0 );
             model.addAttribute( "averageRating", averageRating );
 
-            long reviewsCount = profileManagementService.getReviewsCount( regionId, -1,
-                -1, CommonConstants.PROFILE_LEVEL_REGION, false, false, false, 0 );
+            long reviewsCount = profileManagementService.getReviewsCount( regionId, -1, -1,
+                CommonConstants.PROFILE_LEVEL_REGION, false, false, false, 0 );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
-                // TODO:remove hardcoding of start,end,minScore etc
                 List<SurveyDetails> reviews = profileManagementService.getReviews( regionId, -1, -1, -1,
                     CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_REGION, false, null, null,
                     CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
@@ -316,9 +292,10 @@ public class ProfileViewController
             redirectAttributes.addFlashAttribute( "patternLast", nameMap.get( CommonConstants.PATTERN_LAST ) );
             return "redirect:/" + JspResolver.FINDAPRO + ".do";
         } catch ( InvalidInputException e ) {
-            throw new InternalServerException( new ProfileServiceErrorCode(
-                CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
-                "Error occured while fetching region profile" ), e.getMessage() );
+            throw new InternalServerException(
+                new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
+                    CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile" ),
+                e.getMessage() );
         }
 
         model.addAttribute( "profile", regionProfile );
@@ -353,14 +330,16 @@ public class ProfileViewController
         Map<SettingsForApplication, OrganizationUnit> map = null;
         boolean isBotRequest = botRequestUtils.checkBotRequest( request );
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
-                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage();
             model.addAttribute( "message", message );
             return JspResolver.MESSAGE_HEADER;
         }
         if ( branchProfileName == null || branchProfileName.isEmpty() ) {
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_BRANCH_PROFILENAME,
-                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_BRANCH_PROFILENAME, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage();
             model.addAttribute( "message", message );
             return JspResolver.MESSAGE_HEADER;
         }
@@ -374,25 +353,24 @@ public class ProfileViewController
         OrganizationUnitSettings regionProfile = null;
         try {
             branchProfile = profileManagementService.getBranchSettingsByProfileName( companyProfileName, branchProfileName );
-            if ( branchProfile == null || ( branchProfile.getStatus() != null && (
-                branchProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) || branchProfile
-                    .getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
+            if ( branchProfile == null || ( branchProfile.getStatus() != null
+                && ( branchProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO )
+                    || branchProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
                 throw new ProfileNotFoundException( "No settings found for branch while fetching branch profile" );
             }
 
             companyProfile = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
-            if ( companyProfile == null
-                || ( companyProfile.getStatus() != null && companyProfile.getStatus().equalsIgnoreCase(
-                    CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+            if ( companyProfile == null || ( companyProfile.getStatus() != null
+                && companyProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) {
                 throw new ProfileNotFoundException( "No settings found for company while fetching office profile" );
             }
             // migrating the hideSectionsFromProfilePage value from company to branch
-            branchProfile.setHideSectionsFromProfilePage(companyProfile.getHideSectionsFromProfilePage());
+            branchProfile.setHideSectionsFromProfilePage( companyProfile.getHideSectionsFromProfilePage() );
+            branchProfile.setHiddenSection( companyProfile.isHiddenSection() );
 
             regionProfile = profileManagementService.getRegionProfileByBranch( branchProfile );
-            if ( regionProfile == null
-                || ( regionProfile.getStatus() != null && regionProfile.getStatus().equalsIgnoreCase(
-                    CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+            if ( regionProfile == null || ( regionProfile.getStatus() != null
+                && regionProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) {
                 throw new ProfileNotFoundException( "No settings found for region while fetching office profile" );
             }
             try {
@@ -404,23 +382,17 @@ public class ProfileViewController
                 }
 
             } catch ( InvalidSettingsStateException e ) {
-                throw new InternalServerException( new ProfileServiceErrorCode(
-                    CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
-                    "Error occured while fetching branch profile" ), e.getMessage() );
+                throw new InternalServerException(
+                    new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
+                        CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile" ),
+                    e.getMessage() );
             }
             branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                 MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
                 null, map, true );
-            
-            //remove sensitive info frm profile json
-            profileManagementService.removeTokensFromProfile(branchProfile);
 
-            /*if ( branchProfile.getSocialMediaTokens() != null && branchProfile.getSocialMediaTokens().getZillowToken() != null )
-                profileManagementService.updateZillowFeed( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );*/
-            // aggregated social profile urls
-            /*    SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
-                    CommonConstants.BRANCH_ID );
-                branchProfile.setSocialMediaTokens( branchTokens );*/
+            //remove sensitive info frm profile json
+            profileManagementService.removeTokensFromProfile( branchProfile );
 
             // aggregated disclaimer
             String disclaimer = profileManagementService.aggregateDisclaimer( branchProfile, CommonConstants.BRANCH_ID );
@@ -430,28 +402,15 @@ public class ProfileViewController
             model.addAttribute( "profileJson", json );
 
             Long branchId = branchProfile.getIden();
-
-            // Commented as Zillow reviews are stored in Social Survey, SS-307
-            /*Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
-                .getZillowTotalScoreAndReviewCountForProfileLevel( CommonConstants.PROFILE_LEVEL_BRANCH, branchId );
-            long zillowReviewCount = 0;
-            long zillowTotalScore = 0;
-
-            if ( zillowTotalScoreAndAverage != null && !zillowTotalScoreAndAverage.isEmpty() ) {
-                zillowReviewCount = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN );
-                zillowTotalScore = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_TOTAL_SCORE );
-            }*/
-
             double averageRating = profileManagementService.getAverageRatings( branchId, CommonConstants.PROFILE_LEVEL_BRANCH,
                 false, false, 0, 0 );
             model.addAttribute( "averageRating", averageRating );
 
-            long reviewsCount = profileManagementService.getReviewsCount( branchId, -1,
-                -1, CommonConstants.PROFILE_LEVEL_BRANCH, false, false, false, 0 );
+            long reviewsCount = profileManagementService.getReviewsCount( branchId, -1, -1,
+                CommonConstants.PROFILE_LEVEL_BRANCH, false, false, false, 0 );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
-                // TODO:remove hardcoding of start,end,minScore etc
                 List<SurveyDetails> reviews = profileManagementService.getReviews( branchId, -1, -1, -1,
                     CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null,
                     CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
@@ -468,9 +427,10 @@ public class ProfileViewController
             redirectAttributes.addFlashAttribute( "patternLast", nameMap.get( CommonConstants.PATTERN_LAST ) );
             return "redirect:/" + JspResolver.FINDAPRO + ".do";
         } catch ( InvalidInputException e ) {
-            throw new InternalServerException( new ProfileServiceErrorCode(
-                CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
-                "Error occured while fetching branch profile" ), e.getMessage() );
+            throw new InternalServerException(
+                new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
+                    CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile" ),
+                e.getMessage() );
         }
 
         model.addAttribute( "profile", branchProfile );
@@ -509,10 +469,9 @@ public class ProfileViewController
         OrganizationUnitSettings branchProfile = null;
         Map<SettingsForApplication, OrganizationUnit> settingsByOrganizationUnitMap = null;
         if ( agentProfileName == null || agentProfileName.isEmpty() ) {
-            model.addAttribute(
-                "message",
-                messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME,
-                    DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+            model.addAttribute( "message", messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage() );
             return JspResolver.MESSAGE_HEADER;
         }
 
@@ -540,8 +499,8 @@ public class ProfileViewController
 
             // redirect to company profile page
             if ( !hasAgentProfile ) {
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                    .getCompanyId() );
+                OrganizationUnitSettings companySettings = organizationManagementService
+                    .getCompanySettings( user.getCompany().getCompanyId() );
                 String companyProfileUrl = companySettings.getCompleteProfileUrl();
 
                 try {
@@ -549,8 +508,7 @@ public class ProfileViewController
                     response.sendRedirect( companyProfileUrl );
                 } catch ( IOException e ) {
                     LOG.error( "IOException : message : " + e.getMessage(), e );
-                    model.addAttribute(
-                        "message",
+                    model.addAttribute( "message",
                         messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
                             DisplayMessageType.ERROR_MESSAGE ).getMessage() );
                     return JspResolver.MESSAGE_HEADER;
@@ -559,15 +517,14 @@ public class ProfileViewController
 
             AgentSettings individualProfile = null;
             try {
-
                 individualProfile = userCompositeObject.getAgentSettings();
 
-
-                if ( individualProfile == null || ( individualProfile.getStatus() != null && (
-                    individualProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) ) {
+                if ( individualProfile == null || ( individualProfile.getStatus() != null
+                    && ( individualProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) ) {
                     throw new ProfileNotFoundException( "Unable to find agent profile for profile name " + agentProfileName );
                 }
-                Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( individualProfile );
+                Map<String, Long> hierarchyMap = profileManagementService
+                    .getPrimaryHierarchyByAgentProfile( individualProfile );
                 LOG.debug( "Got the primary hierarchy." );
                 if ( hierarchyMap == null ) {
                     LOG.error( "Unable to fetch primary profile for this user " );
@@ -579,27 +536,66 @@ public class ProfileViewController
                 LOG.debug( "Company ID : " + companyId + " Region ID : " + regionId + " Branch ID : " + branchId );
 
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
-                if ( companyProfile == null
-                    || ( companyProfile.getStatus() != null && companyProfile.getStatus().equalsIgnoreCase(
-                        CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+                if ( companyProfile == null || ( companyProfile.getStatus() != null
+                    && companyProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) {
                     throw new ProfileNotFoundException( "Unable to find company profile for profile name " + agentProfileName );
                 }
+
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
-                if ( regionProfile == null
-                    || ( regionProfile.getStatus() != null && regionProfile.getStatus().equalsIgnoreCase(
-                        CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+                if ( regionProfile == null || ( regionProfile.getStatus() != null
+                    && regionProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) {
                     throw new ProfileNotFoundException( "Unable to find region profile for profile name " + agentProfileName );
                 }
                 branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
-                if ( branchProfile == null
-                    || ( branchProfile.getStatus() != null && branchProfile.getStatus().equalsIgnoreCase(
-                        CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+                if ( branchProfile == null || ( branchProfile.getStatus() != null
+                    && branchProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) {
                     throw new ProfileNotFoundException( "Unable to find branch profile for profile name " + agentProfileName );
                 }
 
+                if ( companyProfile.isHiddenSection() ) {
+                    Branch branch = userManagementService.getBranchById( branchId );
+                    if ( branch.getIsDefaultBySystem() == 1 ) {
+                        Region region = userManagementService.getRegionById( regionId );
+                        if ( region.getIsDefaultBySystem() == 1 ) {
+                            try {
+                                LOG.info( "Service to redirect to company profile page executed successfully" );
+                                response.sendRedirect( companyProfile.getCompleteProfileUrl() );
+                            } catch ( IOException e ) {
+                                LOG.error( "IOException : message : " + e.getMessage(), e );
+                                model.addAttribute( "message",
+                                    messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
+                                        DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                                return JspResolver.MESSAGE_HEADER;
+                            }
+                        } else {
+                            try {
+                                LOG.info( "Service to redirect to region profile page executed successfully" );
+                                response.sendRedirect( regionProfile.getCompleteProfileUrl() );
+                            } catch ( IOException e ) {
+                                LOG.error( "IOException : message : " + e.getMessage(), e );
+                                model.addAttribute( "message",
+                                    messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_REGION_PROFILENAME,
+                                        DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                                return JspResolver.MESSAGE_HEADER;
+                            }
+                        }
+                    } else {
+                        try {
+                            LOG.info( "Service to redirect to branch profile page executed successfully" );
+                            response.sendRedirect( branchProfile.getCompleteProfileUrl() );
+                        } catch ( IOException e ) {
+                            LOG.error( "IOException : message : " + e.getMessage(), e );
+                            model.addAttribute( "message",
+                                messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_BRANCH_PROFILENAME,
+                                    DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                            return JspResolver.MESSAGE_HEADER;
+                        }
+                    }
+                }
+
                 LOG.debug( "Getting settings by organization unit map" );
-                settingsByOrganizationUnitMap = profileManagementService.getPrimaryHierarchyByEntity(
-                    CommonConstants.AGENT_ID_COLUMN, individualProfile.getIden() );
+                settingsByOrganizationUnitMap = profileManagementService
+                    .getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, individualProfile.getIden() );
                 LOG.debug( "Extracted settings by organization unit map" );
                 if ( settingsByOrganizationUnitMap == null ) {
                     LOG.error( "Unable to fetch primary profile for this user " );
@@ -608,32 +604,17 @@ public class ProfileViewController
 
                 LOG.debug( "Filling the unit settings in the profile" );
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, individualProfile, settingsByOrganizationUnitMap, true );
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
+                    individualProfile, settingsByOrganizationUnitMap, true );
 
                 //remove sensitive info frm profile json
-                profileManagementService.removeTokensFromProfile(individualProfile);
+                profileManagementService.removeTokensFromProfile( individualProfile );
                 LOG.debug( "Finished filling the unit settings in the profile" );
-                //TODO: delink the zillow call from here
-                /**LOG.debug("Getting zillow feed");
-                if ( individualProfile.getSocialMediaTokens() != null
-                    && individualProfile.getSocialMediaTokens().getZillowToken() != null )
-                	profileManagementService.updateZillowFeed(
-                			individualProfile,
-                			CommonConstants.AGENT_SETTINGS_COLLECTION);
-                LOG.debug("Fetched zillow feed");*/
                 //set vertical name from the company
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
                 // migrating the hideSectionsFromProfilePage value from company to branch
-                individualProfile.setHideSectionsFromProfilePage(companyProfile.getHideSectionsFromProfilePage());
-                // aggregated social profile urls
-                /*                SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles( individualProfile,
-                                    CommonConstants.AGENT_ID );
-                                individualProfile.setSocialMediaTokens( agentTokens );
-                */
-                // aggregated disclaimer
-                //String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
-                //individualProfile.setDisclaimer( disclaimer );
+                individualProfile.setHideSectionsFromProfilePage( companyProfile.getHideSectionsFromProfilePage() );
+                individualProfile.setHiddenSection( companyProfile.isHiddenSection() );
 
                 //set survey settings in individual profile
                 if ( individualProfile.getSurvey_settings() == null )
@@ -643,32 +624,21 @@ public class ProfileViewController
                 LockSettings lockSettings = individualProfile.getLockSettings();
                 if ( lockSettings == null )
                     lockSettings = new LockSettings();
-                individualProfile = (AgentSettings) profileManagementService
-                    .aggregateAgentDetails( user, individualProfile, lockSettings );
+                individualProfile = (AgentSettings) profileManagementService.aggregateAgentDetails( user, individualProfile,
+                    lockSettings );
                 String json = new Gson().toJson( individualProfile );
                 model.addAttribute( "profileJson", json );
 
-                // Commented as Zillow reviews are stored in Social Survey, SS-307
                 long agentId = user.getUserId();
-                /*Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
-                    .getZillowTotalScoreAndReviewCountForProfileLevel( CommonConstants.PROFILE_LEVEL_INDIVIDUAL, agentId );
-                long zillowReviewCount = 0;
-                long zillowTotalScore = 0;
-
-                if ( zillowTotalScoreAndAverage != null && !zillowTotalScoreAndAverage.isEmpty() ) {
-                    zillowReviewCount = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN );
-                    zillowTotalScore = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_TOTAL_SCORE );
-                }*/
                 double averageRating = profileManagementService.getAverageRatings( agentId,
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, 0, 0 );
                 model.addAttribute( "averageRating", averageRating );
 
-                long reviewsCount = profileManagementService.getReviewsCount( agentId, -1,
-                    -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, false, 0 );
+                long reviewsCount = profileManagementService.getReviewsCount( agentId, -1, -1,
+                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, false, 0 );
                 model.addAttribute( "reviewsCount", reviewsCount );
 
                 if ( isBotRequest ) {
-                    // TODO:remove hardcoding of start, end, minScore etc
                     List<SurveyDetails> reviews = profileManagementService.getReviews( agentId, -1, -1, -1,
                         CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null,
                         CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
@@ -680,20 +650,6 @@ public class ProfileViewController
                 }
 
                 model.addAttribute( "agentFirstName", individualProfile.getContact_details().getFirstName() );
-                /*SolrDocument solrDocument;
-                try {
-                    solrDocument = solrSearchService.getUserByUniqueId( individualProfile.getIden() );
-                    if ( solrDocument == null || solrDocument.isEmpty() ) {
-                        throw new NoRecordsFetchedException( "No document found in solr for userId:"
-                            + individualProfile.getIden() );
-                    }
-                    String firstName = solrDocument.get( CommonConstants.USER_FIRST_NAME_SOLR ).toString();
-                    model.addAttribute( "agentFirstName", firstName );
-                } catch ( SolrException e ) {
-                    LOG.error( "SolrException while searching for user id. Reason : " + e.getMessage(), e );
-                    throw new NonFatalException( "SolrException while searching for user id.",
-                        DisplayMessageConstants.GENERAL_ERROR, e );
-                }*/
                 model.addAttribute( "profile", individualProfile );
             } catch ( ProfileNotFoundException e ) {
                 LOG.error( "Excpetion caught " + e.getMessage() );
@@ -702,9 +658,10 @@ public class ProfileViewController
                 redirectAttributes.addFlashAttribute( "patternLast", nameMap.get( CommonConstants.PATTERN_LAST ) );
                 return "redirect:/" + JspResolver.FINDAPRO + ".do";
             } catch ( InvalidInputException e ) {
-                throw new InternalServerException( new ProfileServiceErrorCode(
-                    CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
-                    CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid" ), e.getMessage() );
+                throw new InternalServerException(
+                    new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
+                        CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid" ),
+                    e.getMessage() );
             }
         } catch ( ProfileNotFoundException e ) {
             LOG.error( "Excpetion caught " + e.getMessage() );
@@ -714,19 +671,17 @@ public class ProfileViewController
             return "redirect:/" + JspResolver.FINDAPRO + ".do";
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
-            model.addAttribute(
-                "message",
-                messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME,
-                    DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+            model.addAttribute( "message", messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage() );
             return JspResolver.NOT_FOUND_PAGE;
         } catch ( NoRecordsFetchedException e ) {
             LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
             throw e;
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException: message : " + e.getMessage(), e );
-            model.addAttribute( "message",
-                messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE )
-                    .getMessage() );
+            model.addAttribute( "message", messageUtils
+                .getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ).getMessage() );
             return JspResolver.MESSAGE_HEADER;
         }
 
@@ -791,41 +746,49 @@ public class ProfileViewController
                     if ( !captchaValidation.isCaptchaValid( request.getRemoteAddr(), captchaSecretKey,
                         request.getParameter( "g-recaptcha-response" ) ) ) {
                         LOG.error( "Captcha Validation failed!" );
-                        throw new InvalidInputException( "Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA );
+                        throw new InvalidInputException( "Captcha Validation failed!",
+                            DisplayMessageConstants.INVALID_CAPTCHA );
 
                     }
                 } catch ( InvalidInputException e ) {
-                    returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
-                        DisplayMessageType.SUCCESS_MESSAGE ).toString();
+                    returnMessage = messageUtils
+                        .getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.SUCCESS_MESSAGE )
+                        .toString();
                     return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
                 }
             }
 
             LOG.debug( "Sending mail to :  " + profileName + " from : " + senderMailId );
 
-            profileManagementService.findProfileMailIdAndSendMail( profileName, message, senderName, senderMailId, profileType );
+            profileManagementService.findProfileMailIdAndSendMail( profileName, message, senderName, senderMailId,
+                profileType );
             LOG.debug( "Mail sent!" );
-            returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_SENT,
-                DisplayMessageType.SUCCESS_MESSAGE ).toString();
+            returnMessage = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_SENT, DisplayMessageType.SUCCESS_MESSAGE )
+                .toString();
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException : message : " + e.getMessage(), e );
-            returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL,
-                DisplayMessageType.ERROR_MESSAGE ).toString();
+            returnMessage = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )
+                .toString();
             return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
         } catch ( NoRecordsFetchedException e ) {
             LOG.error( "NoRecordsFetchedException : message : " + e.getMessage(), e );
-            returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL,
-                DisplayMessageType.ERROR_MESSAGE ).toString();
+            returnMessage = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )
+                .toString();
             return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
         } catch ( UndeliveredEmailException e ) {
             LOG.error( "UndeliveredEmailException : message : " + e.getMessage(), e );
-            returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL,
-                DisplayMessageType.ERROR_MESSAGE ).toString();
+            returnMessage = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )
+                .toString();
             return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
         } catch ( Exception e ) {
             LOG.error( "Exception : message : " + e.getMessage(), e );
-            returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL,
-                DisplayMessageType.ERROR_MESSAGE ).toString();
+            returnMessage = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )
+                .toString();
             return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
         }
 

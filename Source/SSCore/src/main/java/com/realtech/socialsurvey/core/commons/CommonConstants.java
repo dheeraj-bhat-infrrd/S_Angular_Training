@@ -80,6 +80,8 @@ public interface CommonConstants
     public static final String SHOW_SURVEY_PAGE_FOR_URL = "rest/survey/showsurveypageforurl";
     public static final String SHOW_SURVEY_PAGE = "rest/survey/showsurveypage";
     public static final String SET_REGISTRATION_PASSWORD = "/registeraccount/setregistrationpassword.do";
+    
+    public static final String LOGIN_URL = "login.do";
 
     /**
      * Status constants
@@ -861,6 +863,8 @@ public interface CommonConstants
     // dotloop db keys
     public static final String KEY_DOTLOOP_PROFILE_ID_COLUMN = "profileId";
     public static final String KEY_DOTLOOP_PROFILE_LOOP_ID_COLUMN = "loopId";
+    public static final String KEY_DOTLOOP_PROPERTY_ADDRESS = "Property Address";
+	public static final String KEY_DOTLOOP_STATE = "stateOrProvince";
 
     // Social media message template constants
     public static final DecimalFormat RANKING_FORMAT_TWITTER = new DecimalFormat( "#.#" );
@@ -1173,6 +1177,7 @@ public interface CommonConstants
     public static final String COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING = "The registration has been initiated, but no payment has been made";
 
     public static final String ENCOMPASS_CONNECTION = "ENCOMPASS_CONNECTION";
+    public static final String LONEWOLF_CONNECTION = "LONEWOLF_CONNECTION";
     public static final String ACTION_ENABLED = "ENABLED";
     public static final String ACTION_DISABLED = "DISABLED";
 
@@ -1185,5 +1190,32 @@ public interface CommonConstants
     public static final int ENTERPRISE_PLAN_ID = 3;
 
     public static final String PLAN_ID = "planId";
+
+    public static final String BATCH_TYPE_LONE_WOLF_REVIEW_PROCESSOR = "loneWolfReviewProcessor";
+    public static final String BATCH_NAME_LONE_WOLF_REVIEW_PROCESSOR = "Lone Wolf Review Processor";
+    public static final String CRM_SOURCE_LONEWOLF = "LONEWOLF";
+
+    // loan wol crm info
+    public static final String LONEWOLF_DRY_RUN_STATE = "dryrun";
+    public static final String LONEWOLF_PRODUCTION_STATE = "prod";
+
+    public static final String BATCH_TYPE_SOCIAL_MEDIA_TOKEN_EXPIRY_SCHEDULER = "socialMediaTokenExpiryScheduler";
+    public static final String BATCH_NAME_SOCIAL_MEDIA_TOKEN_EXPIRY_SCHEDULER = "Social Media Token Expiry Scheduler";
+
+    //loan wolf api parameter
+    public static final String LONEWOLF_QUERY_PARAM_$TOP = "$top";
+    public static final String LONEWOLF_QUERY_PARAM_$FILTER = "$filter";
+    public static final String LONEWOLF_QUERY_PARAM_$ORDERBY = "$OrderBy";
+    public static final String LONEWOLF_QUERY_PARAM_$SKIP = "$skip";
+
+    public static final String LONEWOLF_QUERY_PARAM_ORDERBY_VALUE =  "CloseDate+desc";
+    public static final int  LONEWOLF_TRANSACTION_API_BATCH_SIZE = 1000;
+    
+    //Update Social Media From Email
+    public static final String SOCIAL_AUTH_FROM_EMAIL_URL = "rest/socialauthfromemail.do";
+    public static final String URL_PARAM_SOCIAL_MEDIA_TYPE = "social"; //Defile Social Media
+    public static final String URL_PARAM_COLUMN_NAME = "columnName"; //Entity Type
+    public static final String URL_PARAM_COLUMN_VALUE = "columnValue"; //Entity ID
+    public static final String URL_PARAM_ACCOUNT_MASTER_ID = "accountMasterId"; //For Account Type
 
 }

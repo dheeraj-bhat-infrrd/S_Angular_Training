@@ -233,7 +233,10 @@
 							<c:otherwise> ${profName}</c:otherwise>
 						</c:choose>
 						</div>
+						<c:if test="${!profile.hiddenSection }">
 						<div class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</div>
+						</c:if>
+						
 					</div>
             	</div>
             </div>
@@ -398,7 +401,7 @@
 				                    </div>
 				               </div>
                   		 	</c:when>
-    		 	            <c:when test="${not empty companyProfileName}">
+    		 	            <c:when test="${not empty companyProfileName && !profile.hiddenSection}">
                                 <div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
                   					<div class="left-assoc-wrapper">
 	                   		 			<input type="hidden" id="regionid-hidden"/>
@@ -668,21 +671,6 @@
 								<div itemprop="review" itemscope itemtype="http://schema.org/Review" class="ppl-review-item" data-cust-first-name="${reviewItem.customerFirstName }"
 									data-cust-last-name="${reviewItem.customerLastName }" data-agent-name="${reviewItem.agentName }"
 									data-rating="${reviewItem.score }" data-review="${reviewItem.review}">
-									<%-- <div itemprop="itemReviewed" itemscope itemtype="http://schema.org/ProfilePage">
-										<meta itemprop="name" content="${reviewItem.agentName}">
-									</div> --%>
-									<%-- <div class="ppl-header-wrapper clearfix">
-										<div class="float-left ppl-header-left">
-											<div itemprop="author" itemscope itemtype="http://schema.org/Person" class="ppl-head-1"><span itemprop="name">${reviewItem.customerFirstName } ${reviewItem.customerLastName }</span></div>
-											<div class="ppl-head-2"><fmt:formatDate value="${reviewItem.modifiedOn}" pattern="d MMM yyyy"/></div>
-										</div>
-										<div class="float-right ppl-header-right">
-											<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="${reviewItem.score}">
-												<div class="rating-image float-left smiley-rat-${integerRating}"></div>
-												<div itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating" class="rating-rounded float-left"><span itemprop="ratingValue"><fmt:formatNumber maxFractionDigits="2" minFractionDigits="2" value="${reviewItem.score}"/></span></div>
-											</div>
-										</div>
-									</div> --%>
 									<div class="ppl-header-wrapper clearfix">
 			<div class="float-left ppl-header-right">
 					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
@@ -769,23 +757,19 @@
 								${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
 						</c:otherwise>
 					</c:choose>
-					<%-- <c:if test="${profilemasterid !=4}">
-					<c:if test="${not empty reviewItem.agentName }">
-						<span class="float-left " style="margin-left: 5px;">for<a
-							style="color: #236CAF; font-weight: 600 !important;"
-							href="${reviewItem.completeProfileUrl}" target="_blank">
-								${reviewItem.agentName}</a></span>
-					</c:if>
-					</c:if> --%>
-					
 					
 					<c:if test="${profilemasterid !=4}">
 							<c:if test="${not empty reviewItem.agentName}">
-								<span class="float-left" style="margin-left: 5px;">for<a
-									class="cursor-pointer"
-									style="color: #236CAF; font-weight: 600 !important;"
+								<span class="float-left" style="margin-left: 5px;">for
+								<c:if test="${profile.hiddenSection}">
+							 ${reviewItem.agentName}
+							 </c:if>
+							 <c:if test="${!profile.hiddenSection}">
+								<a class="cursor-pointer" style="color: #236CAF; font-weight: 600 !important;"
 									href="${reviewItem.completeProfileUrl}" target="_blank">
-										${reviewItem.agentName}</a></span>
+										${reviewItem.agentName}</a>
+							</c:if>
+								</span>
 							</c:if>
 						</c:if>
 					

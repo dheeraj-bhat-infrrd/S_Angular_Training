@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.models.CompanyProfile;
 import com.realtech.socialsurvey.api.models.request.AccountRegistrationRequest;
 import com.realtech.socialsurvey.api.models.request.PaymentRequest;
@@ -32,15 +33,9 @@ import com.realtech.socialsurvey.core.entities.PaymentPlan;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
-import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.api.AccountService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 
@@ -55,14 +50,13 @@ public class AccountController
     private CompanyProfileTransformer companyProfileTransformer;
     private CompanyProfileValidator companyProfileValidator;
     private OrganizationManagementService organizationManagementService;
-    private UserManagementService userManagementService;
 
 
     @Autowired
     public AccountController( AccountRegistrationValidator accountRegistrationValidator,
         PaymentRequestValidator paymentRequestValidator, AccountService accountService,
         CompanyProfileTransformer companyProfileTransformer, CompanyProfileValidator companyProfileValidator,
-        OrganizationManagementService organizationManagementService, UserManagementService userManagementService )
+        OrganizationManagementService organizationManagementService )
     {
         this.accountRegistrationValidator = accountRegistrationValidator;
         this.paymentRequestValidator = paymentRequestValidator;
@@ -70,7 +64,6 @@ public class AccountController
         this.companyProfileTransformer = companyProfileTransformer;
         this.companyProfileValidator = companyProfileValidator;
         this.organizationManagementService = organizationManagementService;
-        this.userManagementService = userManagementService;
     }
 
 
@@ -98,73 +91,92 @@ public class AccountController
     @RequestMapping ( value = "/register/init", method = RequestMethod.POST)
     @ApiOperation ( value = "Initiate account registration")
     public ResponseEntity<?> initAccountRegsitration(
-        @Valid @RequestBody AccountRegistrationRequest accountRegistrationRequest )
-        throws InvalidInputException, UserAlreadyExistsException, SolrException, NoRecordsFetchedException, NonFatalException
+        @Valid @RequestBody AccountRegistrationRequest accountRegistrationRequest ) throws SSApiException
     {
-        LOGGER.info( "AccountController.initAccountRegsitration started" );
-        User user = new User();
-        user.setFirstName( accountRegistrationRequest.getFirstName() );
-        user.setLastName( accountRegistrationRequest.getLastName() );
-        user.setEmailId( accountRegistrationRequest.getEmail() );
-        Map<String, Long> ids = accountService.saveAccountRegistrationDetailsAndGetIdsInMap( user,
-            accountRegistrationRequest.getCompanyName(), accountRegistrationRequest.getPhone(),
-            accountRegistrationRequest.getPlanId() );
-        LOGGER.info( "AccountController.initAccountRegsitration completed successfully" );
-        return new ResponseEntity<Map<String, Long>>( ids, HttpStatus.OK );
+        try {
+            LOGGER.info( "AccountController.initAccountRegsitration started" );
+            User user = new User();
+            user.setFirstName( accountRegistrationRequest.getFirstName() );
+            user.setLastName( accountRegistrationRequest.getLastName() );
+            user.setEmailId( accountRegistrationRequest.getEmail() );
+            Map<String, Long> ids = accountService.saveAccountRegistrationDetailsAndGetIdsInMap( user,
+                accountRegistrationRequest.getCompanyName(), accountRegistrationRequest.getPhone(),
+                accountRegistrationRequest.getPlanId() );
+            LOGGER.info( "AccountController.initAccountRegsitration completed successfully" );
+            return new ResponseEntity<Map<String, Long>>( ids, HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
     @RequestMapping ( value = "/company/profile/details/{companyId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Get company profile details")
-    public ResponseEntity<?> getCompanyProfile( @PathVariable ( "companyId") String companyId ) throws InvalidInputException
+    public ResponseEntity<?> getCompanyProfile( @PathVariable ( "companyId") String companyId ) throws SSApiException
     {
-        LOGGER.info( "AccountController.getCompanyProfile started" );
-        CompanyCompositeEntity companyProfile = accountService.getCompanyProfileDetails( Long.parseLong( companyId ) );
-        CompanyProfile response = companyProfileTransformer.transformDomainObjectToApiResponse( companyProfile );
-        LOGGER.info( "AccountController.getCompanyProfile completed successfully" );
-        return new ResponseEntity<CompanyProfile>( response, HttpStatus.OK );
+        try {
+            LOGGER.info( "AccountController.getCompanyProfile started" );
+            CompanyCompositeEntity companyProfile = accountService.getCompanyProfileDetails( Long.parseLong( companyId ) );
+            CompanyProfile response = companyProfileTransformer.transformDomainObjectToApiResponse( companyProfile );
+            LOGGER.info( "AccountController.getCompanyProfile completed successfully" );
+            return new ResponseEntity<CompanyProfile>( response, HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
     @RequestMapping ( value = "/company/profile/update/{companyId}/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update company profile details")
     public ResponseEntity<?> updateCompanyProfile( @Valid @RequestBody CompanyProfile companyProfile,
-        @PathVariable ( "companyId") String companyId, @PathVariable ( "userId") String userId ) throws InvalidInputException
+        @PathVariable ( "companyId") String companyId, @PathVariable ( "userId") String userId ) throws SSApiException
     {
-        LOGGER.info( "AccountController.updateCompanyProfile started" );
-        long compId = Long.parseLong( companyId );
-        long userIdLong = Long.parseLong( userId );
-        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( compId );
-        Company company = organizationManagementService.getCompanyById( compId );
-        CompanyCompositeEntity companyProfileDetails = companyProfileTransformer
-            .transformApiRequestToDomainObject( companyProfile, company, unitSettings );
-        accountService.updateCompanyProfile( compId, userIdLong, companyProfileDetails );
-        LOGGER.info( "AccountController.updateCompanyProfile completed successfully" );
-        return new ResponseEntity<Void>( HttpStatus.OK );
+        try {
+            LOGGER.info( "AccountController.updateCompanyProfile started" );
+            long compId = Long.parseLong( companyId );
+            long userIdLong = Long.parseLong( userId );
+            OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( compId );
+            Company company = organizationManagementService.getCompanyById( compId );
+            CompanyCompositeEntity companyProfileDetails = companyProfileTransformer
+                .transformApiRequestToDomainObject( companyProfile, company, unitSettings );
+            accountService.updateCompanyProfile( compId, userIdLong, companyProfileDetails );
+            LOGGER.info( "AccountController.updateCompanyProfile completed successfully" );
+            return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
     @RequestMapping ( value = "/company/profile/profileimage/remove/{companyId}/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Delete company profile image")
     public ResponseEntity<?> deleteCompanyProfileImage( @PathVariable ( "companyId") String companyId,
-        @PathVariable ( "userId") String userId ) throws InvalidInputException
+        @PathVariable ( "userId") String userId ) throws SSApiException
     {
-        LOGGER.info( "AccountController.deleteCompanyProfileImage started" );
-        accountService.deleteCompanyProfileImage( Long.parseLong( companyId ), Long.parseLong( userId ) );
-        LOGGER.info( "AccountController.deleteCompanyProfileImage completed successfully" );
-        return new ResponseEntity<Void>( HttpStatus.OK );
+        try {
+            LOGGER.info( "AccountController.deleteCompanyProfileImage started" );
+            accountService.deleteCompanyProfileImage( Long.parseLong( companyId ), Long.parseLong( userId ) );
+            LOGGER.info( "AccountController.deleteCompanyProfileImage completed successfully" );
+            return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
     @RequestMapping ( value = "/company/profile/profileimage/update/{companyId}/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update company profile image")
     public ResponseEntity<?> updateCompanyProfileImage( @PathVariable ( "companyId") String companyId,
-        @PathVariable ( "userId") String userId, @RequestBody String logoUrl ) throws InvalidInputException
+        @PathVariable ( "userId") String userId, @RequestBody String logoUrl ) throws SSApiException
     {
-        LOGGER.info( "AccountController.updateCompanyProfileImage started" );
-        accountService.updateCompanyProfileImage( Long.parseLong( companyId ), Long.parseLong( userId ), logoUrl );
-        LOGGER.info( "AccountController.updateCompanyProfileImage completed successfully" );
-        return new ResponseEntity<String>( logoUrl, HttpStatus.OK );
+        try {
+            LOGGER.info( "AccountController.updateCompanyProfileImage started" );
+            accountService.updateCompanyProfileImage( Long.parseLong( companyId ), Long.parseLong( userId ), logoUrl );
+            LOGGER.info( "AccountController.updateCompanyProfileImage completed successfully" );
+            return new ResponseEntity<String>( logoUrl, HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
@@ -213,25 +225,33 @@ public class AccountController
     @RequestMapping ( value = "/payment/company/{companyId}/plan/{planId}", method = RequestMethod.POST)
     @ApiOperation ( value = "Payment for company for a particular plan")
     public ResponseEntity<?> payForPlan( @Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long companyId,
-        @PathVariable int planId ) throws NonFatalException
+        @PathVariable int planId ) throws SSApiException
     {
-        LOGGER.info( "Payment initiated for company id " + companyId + " for plan id: " + planId );
-        accountService.payForPlan( companyId, planId, paymentRequest.getNonce(), paymentRequest.getCardHolderName(),
-            paymentRequest.getName(), paymentRequest.getEmail(), paymentRequest.getMessage() );
-        return new ResponseEntity<Void>( HttpStatus.OK );
+        try {
+            LOGGER.info( "Payment initiated for company id " + companyId + " for plan id: " + planId );
+            accountService.payForPlan( companyId, planId, paymentRequest.getNonce(), paymentRequest.getCardHolderName(),
+                paymentRequest.getName(), paymentRequest.getEmail(), paymentRequest.getMessage() );
+            return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
     @RequestMapping ( value = "/company/generate/hierarchy/{companyId}", method = RequestMethod.POST)
     @ApiOperation ( value = "Generate default company heirarchy")
     public ResponseEntity<?> generateDefaultHierarchyForCompany( @PathVariable ( "companyId") String companyId )
-        throws InvalidInputException, SolrException, HierarchyAlreadyExistsException
+        throws SSApiException
     {
-        //Generate default company hierarchy for company
-        LOGGER.info( "AccountController.generateDefaultHierarchyForCompany started" );
-        accountService.generateDefaultHierarchy( Long.parseLong( companyId ) );
-        LOGGER.info( "AccountController.generateDefaultHierarchyForCompany completed successfully" );
-        return new ResponseEntity<Void>( HttpStatus.OK );
+        try {
+            //Generate default company hierarchy for company
+            LOGGER.info( "AccountController.generateDefaultHierarchyForCompany started" );
+            accountService.generateDefaultHierarchy( Long.parseLong( companyId ) );
+            LOGGER.info( "AccountController.generateDefaultHierarchyForCompany completed successfully" );
+            return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
     }
 
 
