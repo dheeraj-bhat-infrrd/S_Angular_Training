@@ -158,13 +158,7 @@ public class DashboardController
         if ( user == null ) {
             throw new NonFatalException( "NonFatalException while logging in. " );
         }
-        boolean hiddenSection = false;
-        OrganizationUnitSettings settings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
-        if(settings != null){
-            hiddenSection = settings.isHiddenSection();
-        }
-        model.addAttribute( "hiddenSection", hiddenSection);
-        
+
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
@@ -213,6 +207,25 @@ public class DashboardController
         model.addAttribute( "profileName", profileName );
 
         return JspResolver.DASHBOARD;
+    }
+
+
+    @RequestMapping ( value = "/ishiddensection")
+    @ResponseBody
+    public String isHiddenSection()
+    {
+        User user = sessionHelper.getCurrentUser();
+        boolean hiddenSection = false;
+        try {
+            OrganizationUnitSettings settings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
+            if ( settings != null ) {
+                hiddenSection = settings.isHiddenSection();
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.error( "fetching hiddensction varibale value failed." + e );
+        }
+        return String.valueOf( hiddenSection );
     }
 
 
@@ -307,7 +320,7 @@ public class DashboardController
             }
             model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
             model.addAttribute( "hiddenSection", hiddenSection );
-            
+
             // calculating details for circles
             int numberOfDays = -1;
             try {
@@ -502,7 +515,6 @@ public class DashboardController
         try {
             String startIndexStr = request.getParameter( "startIndex" );
             String batchSizeStr = request.getParameter( "batchSize" );
-            boolean hiddenSection = Boolean.parseBoolean( request.getParameter( "hiddenSection" ) );
             int startIndex = Integer.parseInt( startIndexStr );
             int batchSize = Integer.parseInt( batchSizeStr );
 
@@ -531,10 +543,17 @@ public class DashboardController
                 }
             }
 
+            boolean hiddenSection = false;
             try {
                 surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false,
                     null, null, "date" );
                 profileManagementService.setAgentProfileUrlForReview( surveyDetails );
+
+                OrganizationUnitSettings settings = organizationManagementService
+                    .getCompanySettings( user.getCompany().getCompanyId() );
+                if ( settings != null ) {
+                    hiddenSection = settings.isHiddenSection();
+                }
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
                 throw e;

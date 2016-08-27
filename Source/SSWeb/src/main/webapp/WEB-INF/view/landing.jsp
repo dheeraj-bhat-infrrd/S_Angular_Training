@@ -1,6 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<c:set var="hiddenSectionDashboard" value="${hiddenSection}"/>
 <jsp:include page="header.jsp" />
 <div id="main-content"></div>
 <jsp:include page="scripts.jsp"/>
@@ -8,9 +6,12 @@
 <script type="text/javascript" async src="//platform.twitter.com/widgets.js" async="async"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery.cookie.js"></script>
 <script type="text/javascript">
+var hiddenSection = false;
 $(document).ready(function() {
+	callAjaxGetWithPayloadData("/ishiddensection.do", function(data) {
+		hiddenSection = data;
+	});
 	
-	console.log("this is landing ${hiddenSectionDashboard}");
 	// Show popup if any active session found
 	var activeSessionFound = "${activeSessionFound}";
 	if (activeSessionFound == "true") {
@@ -21,12 +22,10 @@ $(document).ready(function() {
 });
 
 function landingFlow() {
-	var hiddenSection ="${hiddenSection}";
 	var popupStatus = "${popupStatus}";
 	var showLinkedInPopup = "${showLinkedInPopup}";
 	var showSendSurveyPopup = "${showSendSurveyPopup}";
 	var disableCookie="false";
-	 console.log("this is wwwwww "+hiddenSection);
 	var cookieValue= $.cookie("doNotShowPopup");
 	
 	if(!navigator.cookieEnabled){
