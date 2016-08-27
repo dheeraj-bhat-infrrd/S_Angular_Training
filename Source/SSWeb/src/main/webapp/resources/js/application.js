@@ -1092,7 +1092,8 @@ function fetchReviewsOnDashboard(isNextBatch) {
 		showLoaderOnPagination($('#review-details'));
 	}
 	isAjaxInProgress = true;
-	callAjaxGetWithPayloadData("./fetchdashboardreviews.do", function(data) {
+	 var urlreview="./fetchdashboardreviews.do?hiddenSection="+hiddenSection;
+	callAjaxGetWithPayloadData(urlreview, function(data) {
 		isAjaxInProgress = false;
 		var tempDiv = $('<div>').html(data);
 		var reviewsCount = tempDiv.children('div.dsh-review-cont').length;
