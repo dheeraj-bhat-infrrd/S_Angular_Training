@@ -210,6 +210,25 @@ public class DashboardController
     }
 
 
+    @RequestMapping ( value = "/ishiddensection")
+    @ResponseBody
+    public String isHiddenSection()
+    {
+        User user = sessionHelper.getCurrentUser();
+        boolean hiddenSection = false;
+        try {
+            OrganizationUnitSettings settings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
+            if ( settings != null ) {
+                hiddenSection = settings.isHiddenSection();
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.error( "fetching hiddensction varibale value failed." + e );
+        }
+        return String.valueOf( hiddenSection );
+    }
+
+
     /*
      * Method to get profile details for displaying
      */
@@ -301,7 +320,7 @@ public class DashboardController
             }
             model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
             model.addAttribute( "hiddenSection", hiddenSection );
-            
+
             // calculating details for circles
             int numberOfDays = -1;
             try {
@@ -524,15 +543,23 @@ public class DashboardController
                 }
             }
 
+            boolean hiddenSection = false;
             try {
                 surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false,
                     null, null, "date" );
                 profileManagementService.setAgentProfileUrlForReview( surveyDetails );
+
+                OrganizationUnitSettings settings = organizationManagementService
+                    .getCompanySettings( user.getCompany().getCompanyId() );
+                if ( settings != null ) {
+                    hiddenSection = settings.isHiddenSection();
+                }
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
                 throw e;
             }
             model.addAttribute( "reviews", surveyDetails );
+            model.addAttribute( "hiddenSection", hiddenSection );
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
             model.addAttribute( "message", e.getMessage() );
