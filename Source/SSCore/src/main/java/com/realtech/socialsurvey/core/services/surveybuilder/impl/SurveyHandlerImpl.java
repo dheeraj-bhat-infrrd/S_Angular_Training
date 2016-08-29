@@ -1003,7 +1003,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         
         //For Company with hidden agents
         String senderName;
-        if(companySettings.isHiddenSection()){
+        if(companySettings.isHiddenAgentName()){
             senderName = companyName;
         }else{
             senderName = agentName;
@@ -1153,7 +1153,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         
         //For Company with hidden agents
         String senderName;
-        if(companySettings.isHiddenSection()){
+        if(companySettings.isHiddenAgentName()){
             senderName = companyName;
         }else{
             senderName = agentName;
@@ -1306,9 +1306,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
                 agentDisclaimer, agentLicenses );
             //JIRA SS-473 end
+            
+          //For Company with hidden agents
+            String senderName;
+            if(companySettings.isHiddenAgentName()){
+                senderName = companyName;
+            }else{
+                senderName = agentName;
+            }
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
+                    senderName, user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
@@ -1466,7 +1474,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         
       //For Company with hidden agents
         String senderName;
-        if(companySettings.isHiddenSection()){
+        if(companySettings.isHiddenAgentName()){
             senderName = companyName;
         }else{
             senderName = agentName;
@@ -1946,7 +1954,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         
         //For Company with hidden agents
         String senderName;
-        if(companySettings.isHiddenSection()){
+        if(companySettings.isHiddenAgentName()){
             senderName = companyName;
         }else{
             senderName = agentName;

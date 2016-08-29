@@ -4668,7 +4668,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         
         //For Company with hidden agents
         String senderName;
-        if(companySettings.isHiddenSection()){
+        if(companySettings.isHiddenAgentName()){
             senderName = companyName;
         }else{
             senderName = agentName;
@@ -4890,26 +4890,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
         //JIRA SS-473 end
+        
+      //For Company with hidden agents
+        String senderName;
+        if(companySettings.isHiddenAgentName()){
+            senderName = companyName;
+        }else{
+            senderName = agentName;
+        }
 
         //send the mail
         try {
-            emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
-                user.getEmailId() );
+            emailServices.sendSurveyInvitationMail( survey.getCustomerEmailId(), mailSubject, mailBody, user.getEmailId(), senderName, user.getUserId() );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
     }
-
-
-    private void sendMailToAgent( SurveyPreInitiation survey )
-    {
-        try {
-            emailServices.sendAgentSurveyReminderMail( survey.getCustomerEmailId(), survey );
-        } catch ( InvalidInputException | UndeliveredEmailException e ) {
-            LOG.error( "Exception caught " + e.getMessage() );
-        }
-    }
-
 
     /**
      * Method to check if agent is deleted and mark the corresponding survey as corrupted, if it is.
