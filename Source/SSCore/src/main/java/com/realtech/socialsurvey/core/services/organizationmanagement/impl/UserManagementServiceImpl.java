@@ -4690,6 +4690,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         if ( user != null ) {
             agentName = user.getFirstName();
+            if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
+                agentName = user.getFirstName() + " " + user.getLastName();
+            }
         }
 
         String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
@@ -4948,7 +4951,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         List<Long> userIds = new ArrayList<Long>();
         List<Long> companyIdsWithHiddenAttribute = organizationUnitSettingsDao
             .fetchEntityIdsWithHiddenAttribute( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        List<User> users = userDao.findByColumnForMultipleValues( User.class, "company.companyId", companyIdsWithHiddenAttribute );
+        List<User> users = userDao.findByColumnForMultipleValues( User.class, "company.companyId",
+            companyIdsWithHiddenAttribute );
         if ( users != null && !users.isEmpty() ) {
             for ( User user : users ) {
                 userIds.add( user.getUserId() );
