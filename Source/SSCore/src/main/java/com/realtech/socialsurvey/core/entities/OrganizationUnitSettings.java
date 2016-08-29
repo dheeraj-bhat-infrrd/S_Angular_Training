@@ -56,6 +56,19 @@ public class OrganizationUnitSettings
     // status of the record, A for active and D for deleted
     private String status;
     private boolean hiddenSection;
+    private boolean hiddenAgentName;
+
+
+    public boolean isHiddenAgentName()
+    {
+        return hiddenAgentName;
+    }
+
+
+    public void setHiddenAgentName( boolean hiddenAgentName )
+    {
+        this.hiddenAgentName = hiddenAgentName;
+    }
 
 
     public boolean isHiddenSection()
