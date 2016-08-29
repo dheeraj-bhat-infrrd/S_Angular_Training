@@ -180,6 +180,17 @@ public class LoginController
         LOG.info( "Login Page started" );
 
         User user = sessionHelper.getCurrentUser();
+        boolean hiddenSection = false;
+        try {
+            OrganizationUnitSettings settings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
+            if ( settings != null ) {
+                hiddenSection = settings.isHiddenSection();
+                model.addAttribute( "hiddenSection", hiddenSection );
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.error( "fetching hiddensction varibale value failed." + e );
+        }
 
         if ( user.isSuperAdmin() ) {
             return JspResolver.ADMIN_LANDING;

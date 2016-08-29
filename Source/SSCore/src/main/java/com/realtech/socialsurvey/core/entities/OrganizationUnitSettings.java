@@ -56,6 +56,19 @@ public class OrganizationUnitSettings
     // status of the record, A for active and D for deleted
     private String status;
     private boolean hiddenSection;
+    private boolean sendEmailFromCompany;
+
+
+    public boolean isSendEmailFromCompany()
+    {
+        return sendEmailFromCompany;
+    }
+
+
+    public void setSendEmailFromCompany( boolean sendEmailFromCompany )
+    {
+        this.sendEmailFromCompany = sendEmailFromCompany;
+    }
 
 
     public boolean isHiddenSection()
