@@ -723,6 +723,22 @@
     .nav-tabs>li{
     float:none;
     }
-	
+    .st-header-txt-rt{
+	 float:none;
+	}
+	.st-subject-input-cont {
+	  width:70%;
+	}
+	.content-edit{
+	  margin-top:10px;
+	  width: 145px;
+    margin-left: auto;
+    margin-right: auto;
+	}
+	.edit-text{
+	 width: 145px;
+    margin-left: auto;
+    margin-right: auto;
+	}
 	
 }
