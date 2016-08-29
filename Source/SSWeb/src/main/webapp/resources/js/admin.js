@@ -216,6 +216,7 @@ function searchAdminCompanies (element) {
 }
 
 function showSelectedCompanyHierarchy(companyId) {
+	$('#tr-spinner-'+companyId).show();
 	callAjaxGET("/companyhierarchy.do?companyId="+companyId, function(data) {
 		$('.comp-hr-cont[data-iden="'+companyId+'"]').html(data).show();
 		bindAdminRegionListClicks();
@@ -224,6 +225,7 @@ function showSelectedCompanyHierarchy(companyId) {
 	    });*/
 	    bindAdminBranchListClicks();
 	    bindUserEditClicks();
+	    $('#tr-spinner-'+companyId).hide();
 	}, true);
 }
 
@@ -324,7 +326,7 @@ function paintAdminUsersFromBranch(data,branchId,regionId) {
 }
 
 $(document).on('click', '.comp-row', function(e) {
-	var element = this;
+	var element = this; 
 	var companyId = $(element).attr('data-iden');
 	$('.comp-hr-cont').html('').hide();
 	if ($(element).attr('clicked') == "false") {
