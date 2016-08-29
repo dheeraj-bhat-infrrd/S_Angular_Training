@@ -4668,7 +4668,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         
         //For Company with hidden agents
         String senderName;
-        if(companySettings.isHiddenAgentName()){
+        if(companySettings.isSendEmailFromCompany()){
             senderName = companyName;
         }else{
             senderName = agentName;
@@ -4893,7 +4893,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         
       //For Company with hidden agents
         String senderName;
-        if(companySettings.isHiddenAgentName()){
+        if(companySettings.isSendEmailFromCompany()){
             senderName = companyName;
         }else{
             senderName = agentName;
