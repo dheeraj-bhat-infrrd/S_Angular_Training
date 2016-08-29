@@ -999,9 +999,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             agentDisclaimer, agentLicenses );
 
         //JIRA SS-473 end
+        
+        
+        //For Company with hidden agents
+        String senderName;
+        if(companySettings.isHiddenSection()){
+            senderName = companyName;
+        }else{
+            senderName = agentName;
+        }
+        
         //send mail
         try {
-            emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(), agentName,
+            emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(), senderName,
                 user.getUserId() );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
@@ -1140,10 +1150,18 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         //JIRA SS-473 end
 
+        
+        //For Company with hidden agents
+        String senderName;
+        if(companySettings.isHiddenSection()){
+            senderName = companyName;
+        }else{
+            senderName = agentName;
+        }
+        
         //send mail
         try {
-            emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
-                + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
+            emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(), senderName, user.getUserId() );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
         }
@@ -1445,9 +1463,18 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             agentDisclaimer, agentLicenses );
         //JIRA SS-473 end
 
+        
+      //For Company with hidden agents
+        String senderName;
+        if(companySettings.isHiddenSection()){
+            senderName = companyName;
+        }else{
+            senderName = agentName;
+        }
+        
         //send mail
         try {
-            emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName(),
+            emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(), senderName,
                 user.getUserId() );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
@@ -1915,10 +1942,20 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             agentDisclaimer, agentLicenses );
 
         //JIRA SS-473 end
+        
+        
+        //For Company with hidden agents
+        String senderName;
+        if(companySettings.isHiddenSection()){
+            senderName = companyName;
+        }else{
+            senderName = agentName;
+        }
+        
 
         //send the mail
         try {
-            emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(), agentName,
+            emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(), senderName,
                 user.getUserId() );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );

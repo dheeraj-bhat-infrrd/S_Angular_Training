@@ -4665,10 +4665,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //JIRA SS-473 end
 
+        
+        //For Company with hidden agents
+        String senderName;
+        if(companySettings.isHiddenSection()){
+            senderName = companyName;
+        }else{
+            senderName = agentName;
+        }
+        
         //send mail
         try {
-            emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
-                user.getEmailId() );
+            emailServices.sendSurveyInvitationMail( survey.getCustomerEmailId(), mailSubject, mailBody, user.getEmailId(), senderName, user.getUserId() );
+            /*emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, senderName,
+                user.getEmailId() );*/
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
