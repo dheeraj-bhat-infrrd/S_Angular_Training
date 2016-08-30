@@ -791,4 +791,27 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
         }
     }
+    
+    
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Long, SurveyPreInitiation> getPreInitiatedSurveyForIds( List<Long> surveyPreinitiationIds )
+    {
+        LOG.info( "Method getPreInitiatedSurveyForIds() started." );
+        Map<Long, SurveyPreInitiation> surveyPreinitiationMap = new HashMap<Long, SurveyPreInitiation>();
+        
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class, "surveyPreInitiation" );
+
+        criteria.add( Restrictions.in( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, surveyPreinitiationIds ) );
+        LOG.info( "Method getUnmatchedPreInitiatedSurveyCount() finished." );
+        List<SurveyPreInitiation> surveyPreInitiationList = criteria.list();
+
+        for(SurveyPreInitiation surveyPreInitiation : surveyPreInitiationList){
+            surveyPreinitiationMap.put( surveyPreInitiation.getSurveyPreIntitiationId(), surveyPreInitiation );
+        }
+
+        return surveyPreinitiationMap;
+    }
+
 }

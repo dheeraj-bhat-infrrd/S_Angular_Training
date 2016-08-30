@@ -95,6 +95,7 @@ import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
+import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
 
 
 // JIRA SS-119 by RM-05:BOC
@@ -1551,10 +1552,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public SurveyPreInitiation getPreInitiatedSurvey( long surveyPreInitiationId )
     {
-        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() started. " );
+        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() started for id " + surveyPreInitiationId );
         SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById( SurveyPreInitiation.class,
             surveyPreInitiationId );
-        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() finished. " );
+        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() finished for id " + surveyPreInitiationId );
         return surveyPreInitiation;
     }
 
@@ -3479,5 +3480,38 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             LOG.error( "An error occurred while uploading the surveys. Reason: ", e );
         }
         LOG.info( "3rd party Survey Importer finished" );
+    }
+    
+    
+    /*
+     * 
+     */
+    @Override
+    public SurveysAndReviewsVO getSurveysByStatus(String status , int startIndex , int count)
+    {
+        
+        SurveysAndReviewsVO surveyAndReviews = new SurveysAndReviewsVO();
+        
+        List<SurveyDetails> surveyDetails = null;
+        Map<SurveyDetails , SurveyPreInitiation> surveyReviewMap = new HashMap<SurveyDetails , SurveyPreInitiation>();
+        List<Long> surveyPreinitiationIds = new ArrayList<Long>();
+        
+        if(status.equals( "complete" )){
+            surveyDetails = surveyDetailsDao.getCompletedSurveyByStartIndexAndBatchSize( startIndex, count );
+        }else if (status.equals( "all" )){
+            surveyDetails = surveyDetailsDao.getAllSurveyByStartIndex( startIndex, count ); 
+        }
+        
+        for(SurveyDetails surveyDetail : surveyDetails){
+            surveyPreinitiationIds.add( surveyDetail.getSurveyPreIntitiationId() );
+        }
+        
+        Map<Long , SurveyPreInitiation> surveyPreinitiations = surveyPreInitiationDao.getPreInitiatedSurveyForIds( surveyPreinitiationIds );
+        
+        for(SurveyDetails surveyDetail : surveyDetails){
+            surveyReviewMap.put( surveyDetail, surveyPreinitiations.get( surveyDetail.getSurveyPreIntitiationId() ) );
+        }
+        
+        return surveyAndReviews;
     }
 }

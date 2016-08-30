@@ -2797,4 +2797,75 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateModifiedDateForSurvey() finished" );
     }
+    
+    
+    
+    /*
+     * Method to fetch survey details on the basis of agentId and customer email.
+     */
+    @Override
+    public List<SurveyDetails> getCompletedSurveyByStartIndexAndBatchSize( int start, int batchSize)
+    {
+        LOG.info( "Method getSurveyByStartIndexAndStatus() started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN  ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
+        //get the oldest record
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
+        
+        if(start > 0)
+            query.skip( start );
+        
+        if(batchSize > 0)
+            query.limit( batchSize );
+        
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+   
+        LOG.info( "Method getSurveyByStartIndexAndStage() " );
+        return surveys;
+    }
+    
+    
+    @Override
+    public List<SurveyDetails> getIncompleteSurveyByStartIndexAndBatchSize( int start, int batchSize)
+    {
+        LOG.info( "Method getSurveyByStartIndexAndStatus() started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN  ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
+        //get the oldest record
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
+        
+        if(start > 0)
+            query.skip( start );
+        
+        if(batchSize > 0)
+            query.limit( batchSize );
+        
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+   
+        LOG.info( "Method getSurveyByStartIndexAndStage() " );
+        return surveys;
+    }
+    
+    @Override
+    public List<SurveyDetails> getAllSurveyByStartIndex( int start, int batchSize)
+    {
+        LOG.info( "Method getSurveyByStartIndexAndStatus() started." );
+        Query query = new Query();
+        
+        //get the oldest record
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
+        
+        if(start > 0)
+            query.skip( start );
+        
+        if(batchSize > 0)
+            query.limit( batchSize );
+        
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+   
+        LOG.info( "Method getSurveyByStartIndexAndStage() " );
+        return surveys;
+    }
 }

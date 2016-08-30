@@ -268,4 +268,19 @@ public interface SurveyDetailsDao
     void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
 
     public void updateModifiedDateForSurvey( String surveyId, Date date );
+
+    /**
+     * 
+     * @param start
+     * @param batchSize
+     * @param stage
+     * @return
+     */
+    public List<SurveyDetails> getCompletedSurveyByStartIndexAndBatchSize( int start, int batchSize );
+
+
+    public List<SurveyDetails> getAllSurveyByStartIndex( int start, int batchSize );
+
+
+    public List<SurveyDetails> getIncompleteSurveyByStartIndexAndBatchSize( int start, int batchSize );
 }
