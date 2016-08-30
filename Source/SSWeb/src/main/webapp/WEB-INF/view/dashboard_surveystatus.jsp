@@ -20,7 +20,7 @@
 			</c:choose>
 		</div>
 	</div>
-	
+
 	<div class="clearfix stat-icns-wrapper">
 		<div class="float-left stat-icn-lbl"><spring:message code="label.surveysclicked.key" /></div>
 		<div id="clicked-surv-icn" class="float-left stat-icns-item clearfix">
@@ -39,7 +39,7 @@
 			</c:choose>
 		</div>
 	</div>
-	
+
 	<div class="clearfix stat-icns-wrapper">
 		<div class="float-left stat-icn-lbl"><spring:message code="label.surveyscompleted.key" /></div>
 		<div id="completed-surv-icn" class="float-left stat-icns-item clearfix">
@@ -58,7 +58,7 @@
 			</c:choose>
 		</div>
 	</div>
-	
+
 	<div class="clearfix stat-icns-wrapper">
 		<div class="float-left stat-icn-lbl"><spring:message code="label.surveyssocialposts.key" /></div>
 		<div id="social-post-icn" class="float-left stat-icns-item clearfix">
@@ -89,7 +89,7 @@
 			</div>
 		</div>
 	</c:if>
-<c:if test="${not empty importedFromZillow && importedFrom3rdParty > 0 }">
+   <c:if test="${not empty importedFrom3rdParty && importedFrom3rdParty > 0 }">
 	<div class="clearfix stat-icns-wrapper">
 		<div class="float-left stat-icn-lbl"><spring:message code="label.thirdpartyreviews.key" /></div>
 		<div id="thirdparty-icn" class="float-left stat-icns-item clearfix">

@@ -829,39 +829,34 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     }
 
 
-	@Override
-	public long get3rdPartyImportCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
-	{
-
-		LOG.info( "Get get3rdPartyImportCount for " + columnName + " and value " + columnValue + " with number of days: "
-			+ numberOfDays );
-
-		if ( columnName == null || columnName.isEmpty() ) {
-			throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
-		}
-		if ( columnValue <= 0l ) {
-			throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
-		}
-
-
-		Calendar startTime = Calendar.getInstance();
-		startTime.add( Calendar.DATE, -1 * numberOfDays );
-		// strip the time component of start time
-		startTime.set( Calendar.HOUR_OF_DAY, 0 );
-		startTime.set( Calendar.MINUTE, 0 );
-		startTime.set( Calendar.SECOND, 0 );
-		startTime.set( Calendar.MILLISECOND, 0 );
-
-		Timestamp startDate = null;
-		Timestamp endDate = null;
-		if ( numberOfDays >= 0 ) {
-			startDate = new Timestamp( startTime.getTimeInMillis() );
-			endDate = new Timestamp( System.currentTimeMillis() );
-		}
-		return get3rdPartyImportCount( columnName, columnValue, startDate, endDate, true );
-
-	}
-
+    @Override
+    public long get3rdPartyImportCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
+    {
+        LOG.info( "Get get3rdPartyImportCount for " + columnName + " and value " + columnValue + " with number of days: "
+            + numberOfDays );
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
+        }
+        if ( columnValue <= 0l ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
+        }
+        Calendar startTime = Calendar.getInstance();
+        startTime.add( Calendar.DATE, -1 * numberOfDays );
+        // strip the time component of start time
+        startTime.set( Calendar.HOUR_OF_DAY, 0 );
+        startTime.set( Calendar.MINUTE, 0 );
+        startTime.set( Calendar.SECOND, 0 );
+        startTime.set( Calendar.MILLISECOND, 0 );
+        Timestamp startDate = null;
+        Timestamp endDate = null;
+        if ( numberOfDays >= 0 ) {
+            startDate = new Timestamp( startTime.getTimeInMillis() );
+            endDate = new Timestamp( System.currentTimeMillis() );
+        }
+        return get3rdPartyImportCount( columnName, columnValue, startDate, endDate, true );
+    }
+	
+	
 
     long getZillowImportCount( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
         boolean filterAbusive ) throws InvalidInputException

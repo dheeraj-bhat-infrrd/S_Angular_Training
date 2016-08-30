@@ -4715,10 +4715,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //JIRA SS-473 end
 
+        
+        //For Company with hidden agents
+        String senderName;
+        if(companySettings.isSendEmailFromCompany()){
+            senderName = companyName;
+        }else{
+            senderName = agentName;
+        }
+        
         //send mail
         try {
-            emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
-                user.getEmailId() );
+            emailServices.sendSurveyInvitationMail( survey.getCustomerEmailId(), mailSubject, mailBody, user.getEmailId(), senderName, user.getUserId() );
+            /*emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, senderName,
+                user.getEmailId() );*/
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
@@ -4740,6 +4750,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         if ( user != null ) {
             agentName = user.getFirstName();
+            if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
+                agentName = user.getFirstName() + " " + user.getLastName();
+            }
         }
 
         String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
@@ -4927,26 +4940,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
         //JIRA SS-473 end
+        
+      //For Company with hidden agents
+        String senderName;
+        if(companySettings.isSendEmailFromCompany()){
+            senderName = companyName;
+        }else{
+            senderName = agentName;
+        }
 
         //send the mail
         try {
-            emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
-                user.getEmailId() );
+            emailServices.sendSurveyInvitationMail( survey.getCustomerEmailId(), mailSubject, mailBody, user.getEmailId(), senderName, user.getUserId() );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
     }
-
-
-    private void sendMailToAgent( SurveyPreInitiation survey )
-    {
-        try {
-            emailServices.sendAgentSurveyReminderMail( survey.getCustomerEmailId(), survey );
-        } catch ( InvalidInputException | UndeliveredEmailException e ) {
-            LOG.error( "Exception caught " + e.getMessage() );
-        }
-    }
-
 
     /**
      * Method to check if agent is deleted and mark the corresponding survey as corrupted, if it is.
@@ -4998,7 +5007,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         List<Long> userIds = new ArrayList<Long>();
         List<Long> companyIdsWithHiddenAttribute = organizationUnitSettingsDao
             .fetchEntityIdsWithHiddenAttribute( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        List<User> users = userDao.findByColumnForMultipleValues( User.class, "COMPANY_ID", companyIdsWithHiddenAttribute );
+        List<User> users = userDao.findByColumnForMultipleValues( User.class, "company.companyId",
+            companyIdsWithHiddenAttribute );
         if ( users != null && !users.isEmpty() ) {
             for ( User user : users ) {
                 userIds.add( user.getUserId() );

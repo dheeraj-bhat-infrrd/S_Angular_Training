@@ -972,14 +972,18 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public List<Long> fetchEntityIdsWithHiddenAttribute( String collection )
     {
-        List<Long> entityIds = null;
+        List<Long> entityIds = new ArrayList<Long>();
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.addCriteria( Criteria.where( KEY_HIDDEN_SECTION ).is( true ) );
-        query.fields().include( KEY_IDENTIFIER );
-        entityIds = mongoTemplate.find( query, Long.class, collection );
+        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collection );
+        if ( settings != null && !settings.isEmpty() ) {
+            for ( OrganizationUnitSettings setting : settings ) {
+                entityIds.add( setting.getIden() );
+            }
+        }
         return entityIds;
     }
 }

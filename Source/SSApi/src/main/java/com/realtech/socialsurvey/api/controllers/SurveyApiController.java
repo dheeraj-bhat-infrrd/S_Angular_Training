@@ -104,7 +104,7 @@ public class SurveyApiController {
     @ApiOperation ( value = "Post Survey Transaction")
     public ResponseEntity<?> getSurveyTransaction( @PathVariable ( "surveyId") String surveyId , HttpServletRequest request ) throws SSApiException
     {
-        try {
+        
             LOGGER.info( "SurveyApiController.getSurveyTransaction started" );
             
             String authorizationHeader = request.getHeader( "Authorization" );
@@ -118,7 +118,7 @@ public class SurveyApiController {
             try{
             	 surveyPreInitiationId = Long.parseLong(surveyId);
             }catch(NumberFormatException e){
-            	throw new NonFatalException("Passed parameter surveyId is invalid");
+            	return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter surveyId is invalid", null, null);
             }
             
             SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(surveyPreInitiationId);
@@ -129,9 +129,7 @@ public class SurveyApiController {
             LOGGER.info( "SurveyApiController.getSurveyTransaction completed successfully" );
             
             return restUtils.getRestResponseEntity(HttpStatus.OK, "Request Successfully processed", "survey", surveyVO);
-        } catch ( NonFatalException e ) {
-            throw new SSApiException( e.getMessage(), e.getErrorCode() );
-        }
+        
     }
 
 
