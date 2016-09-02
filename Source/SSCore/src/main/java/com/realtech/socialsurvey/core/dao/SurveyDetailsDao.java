@@ -276,11 +276,21 @@ public interface SurveyDetailsDao
      * @param stage
      * @return
      */
-    public List<SurveyDetails> getCompletedSurveyByStartIndexAndBatchSize( int start, int batchSize );
+    public List<SurveyDetails> getCompletedSurveyByStartIndexAndBatchSize( int start, int batchSize , long companyId);
 
 
-    public List<SurveyDetails> getAllSurveyByStartIndex( int start, int batchSize );
+    public List<SurveyDetails> getSurveysForCompanyByStartIndex( int start, int batchSize , long companyId );
 
 
-    public List<SurveyDetails> getIncompleteSurveyByStartIndexAndBatchSize( int start, int batchSize );
+    public List<SurveyDetails> getIncompleteSurveyByStartIndexAndBatchSize( int start, int batchSize , long companyId);
+    
+    
+    
+    public Long getCompletedSurveyCount( long companyId);
+
+
+    public Long getSurveysCountForCompany(long companyId );
+
+
+    public Long getIncompleteSurveyCount( long companyId);
 }

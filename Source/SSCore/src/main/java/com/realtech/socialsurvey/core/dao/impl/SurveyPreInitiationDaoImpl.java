@@ -814,4 +814,23 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         return surveyPreinitiationMap;
     }
 
+    
+    @Override
+    public List<SurveyPreInitiation> getPreInitiatedSurveyForCompany( int start, int row, long companyId )
+    {
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+
+
+        if ( row > 0 )
+            criteria.setMaxResults( row );
+        if ( start > 0 )
+            criteria.setFirstResult( start );
+
+        criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED ) );
+        criteria.addOrder( Order.desc( CommonConstants.MODIFIED_ON_COLUMN ) );
+        return criteria.list();
+
+    }
+
 }

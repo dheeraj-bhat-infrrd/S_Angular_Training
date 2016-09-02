@@ -3487,31 +3487,137 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * 
      */
     @Override
-    public SurveysAndReviewsVO getSurveysByStatus(String status , int startIndex , int count)
+    @Transactional
+    public SurveysAndReviewsVO getSurveysByStatus(String status , int startIndex , int count,  long companyId)
     {
+        LOG.info( "method getSurveysByStatus started for companyId " + companyId );
+        
+        //get mongo survey count
+        int mongoSurveyCount = getSurveyCountForCompanyBySurveyStatus( companyId, status );
+        int endIndex = startIndex + count;
+        
+        //get start index and batch size for mongo and sql get survey query
+        Map<String , Integer> startindexBatchSizeMap =  getStartIndexAndBatchForMonogAndSqlQuery( startIndex , endIndex , mongoSurveyCount);
+        int monogStartIndex = startindexBatchSizeMap.get( "monogStartIndex" );
+        int mongoBatch = startindexBatchSizeMap.get( "mongoBatch" );
+        int sqlStartIndex = startindexBatchSizeMap.get( "sqlStartIndex" );
+        int sqlBatch = startindexBatchSizeMap.get( "sqlBatch" );
+        
+         //get survey from mongo
+        List<SurveyDetails>surveyDetails = null;
+        if(mongoBatch > 0)
+            surveyDetails = getSurveysForCompanyBySurveyStatus( companyId, status , monogStartIndex, mongoBatch );
+        else
+            surveyDetails = new ArrayList<SurveyDetails>();
+        
+        //get corresponding pre initiated record from my sql
+        Map<SurveyDetails , SurveyPreInitiation> surveyReviewMap = getPreinititatedSurveyForMongoSurveyDetail( surveyDetails );
+        
+        //get pre initiated survey from sql
+        List<SurveyPreInitiation> preInitiatedSurveys = null;
+        if(sqlBatch > 0)
+            preInitiatedSurveys = surveyPreInitiationDao.getPreInitiatedSurveyForCompany( sqlStartIndex, sqlBatch, companyId );
+        else
+            preInitiatedSurveys = new ArrayList<SurveyPreInitiation>();
+        
         
         SurveysAndReviewsVO surveyAndReviews = new SurveysAndReviewsVO();
+        surveyAndReviews.setInitiatedSurveys( surveyReviewMap );
+        surveyAndReviews.setPreInitiatedSurveys( preInitiatedSurveys );
+        LOG.info( "method getSurveysByStatus ended for companyId " + companyId );
+        return surveyAndReviews;
+    }
+    
+    
+    private int getSurveyCountForCompanyBySurveyStatus(long companyId , String status)
+    {
+        LOG.info( "method getSurveyCountForCompanyBySurveyStatus started for companyId %s , status %s " , companyId , status );
+
+        long  mongoSurveyCount = 0;
+        if(status.equals( "complete" )){
+             mongoSurveyCount = surveyDetailsDao.getCompletedSurveyCount( companyId );           
+        }else if(status.equals( "incomplete" )){
+            mongoSurveyCount = surveyDetailsDao.getIncompleteSurveyCount( companyId );         
+        }else if(status.equals( "all" )){
+            mongoSurveyCount = surveyDetailsDao.getSurveysCountForCompany( companyId );
+        }
         
+        LOG.info( "method getSurveyCountForCompanyBySurveyStatus ended for companyId %s , status %s " , companyId , status );
+
+        return (int) mongoSurveyCount;
+    }
+    
+    
+    private List<SurveyDetails> getSurveysForCompanyBySurveyStatus(long companyId , String status, int start , int batchSize)
+    {
+        LOG.info( "method getSurveysForCompanyBySurveyStatus started for companyId %s , startIndex %s , batchSiz %s , status %s " , companyId , start , batchSize , status );
         List<SurveyDetails> surveyDetails = null;
+        if(status.equals( "complete" )){
+            surveyDetails = surveyDetailsDao.getCompletedSurveyByStartIndexAndBatchSize( start, batchSize, companyId );       
+        }else if(status.equals( "incomplete" )){
+            surveyDetails = surveyDetailsDao.getIncompleteSurveyByStartIndexAndBatchSize( start, batchSize, companyId );      
+        }else if(status.equals( "all" )){
+            surveyDetails = surveyDetailsDao.getSurveysForCompanyByStartIndex( start, batchSize, companyId );
+        }
+        
+        LOG.info( "method getSurveysForCompanyBySurveyStatus ended for companyId %s , startIndex %s , batchSiz %s , status %s " , companyId , start , batchSize , status );
+        return surveyDetails;
+    }
+    
+    private Map<SurveyDetails , SurveyPreInitiation> getPreinititatedSurveyForMongoSurveyDetail(List<SurveyDetails> surveyDetails )
+    {
+        LOG.info( "method getPreinititatedSurveyForMongoSurveyDetail started" );
         Map<SurveyDetails , SurveyPreInitiation> surveyReviewMap = new HashMap<SurveyDetails , SurveyPreInitiation>();
         List<Long> surveyPreinitiationIds = new ArrayList<Long>();
-        
-        if(status.equals( "complete" )){
-            surveyDetails = surveyDetailsDao.getCompletedSurveyByStartIndexAndBatchSize( startIndex, count );
-        }else if (status.equals( "all" )){
-            surveyDetails = surveyDetailsDao.getAllSurveyByStartIndex( startIndex, count ); 
-        }
         
         for(SurveyDetails surveyDetail : surveyDetails){
             surveyPreinitiationIds.add( surveyDetail.getSurveyPreIntitiationId() );
         }
         
-        Map<Long , SurveyPreInitiation> surveyPreinitiations = surveyPreInitiationDao.getPreInitiatedSurveyForIds( surveyPreinitiationIds );
-        
-        for(SurveyDetails surveyDetail : surveyDetails){
-            surveyReviewMap.put( surveyDetail, surveyPreinitiations.get( surveyDetail.getSurveyPreIntitiationId() ) );
+        if(surveyPreinitiationIds.size() > 0){
+            Map<Long , SurveyPreInitiation> surveyPreinitiations = surveyPreInitiationDao.getPreInitiatedSurveyForIds( surveyPreinitiationIds );
+            for(SurveyDetails surveyDetail : surveyDetails){
+                surveyReviewMap.put( surveyDetail, surveyPreinitiations.get( surveyDetail.getSurveyPreIntitiationId() ) );
+            }
         }
         
-        return surveyAndReviews;
+        
+        LOG.info( "method getPreinititatedSurveyForMongoSurveyDetail ended" );
+        return surveyReviewMap;
+    }
+    
+    
+    private Map<String , Integer> getStartIndexAndBatchForMonogAndSqlQuery(int startIndex , int endIndex , int mongoSurveyCount)
+    {
+        LOG.info( "method getStartIndexAndBatchForMonogAndSqlQuery started " );
+        Map<String , Integer> startindexBatchSizeMap = new HashMap<String , Integer>();
+        int monogStartIndex = 0;
+        int mongoBatch = 0;
+        int sqlStartIndex = 0;
+        int sqlBatch = 0;
+
+        if(mongoSurveyCount <= startIndex){
+            //get data from mysql only
+            sqlStartIndex = startIndex - mongoSurveyCount;
+            sqlBatch = endIndex - mongoSurveyCount;
+        }else if(mongoSurveyCount > startIndex && mongoSurveyCount < endIndex){
+            //get data from mongo and my sql
+            monogStartIndex = startIndex;
+            mongoBatch = mongoSurveyCount - startIndex;
+            sqlStartIndex = 0;
+            sqlBatch = endIndex - mongoSurveyCount;
+        }else{
+            //get data from mongo only
+            monogStartIndex = startIndex;
+            mongoBatch = endIndex - startIndex;
+        }
+        
+        startindexBatchSizeMap.put( "monogStartIndex", monogStartIndex );
+        startindexBatchSizeMap.put( "mongoBatch", mongoBatch );
+        startindexBatchSizeMap.put( "sqlStartIndex", sqlStartIndex );
+        startindexBatchSizeMap.put( "sqlBatch", sqlBatch );
+        
+        LOG.info( "method getStartIndexAndBatchForMonogAndSqlQuery ended " );
+        return startindexBatchSizeMap;
     }
 }

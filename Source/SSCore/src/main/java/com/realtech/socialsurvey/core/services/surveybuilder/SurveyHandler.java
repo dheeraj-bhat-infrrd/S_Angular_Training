@@ -347,5 +347,5 @@ public interface SurveyHandler
     SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
 
 
-    SurveysAndReviewsVO getSurveysByStatus( String status, int startIndex, int count );
+    SurveysAndReviewsVO getSurveysByStatus( String status, int startIndex, int count , long companyId);
 }

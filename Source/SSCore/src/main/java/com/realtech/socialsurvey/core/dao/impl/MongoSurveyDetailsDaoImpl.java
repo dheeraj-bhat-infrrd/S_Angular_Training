@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
+
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2804,7 +2805,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * Method to fetch survey details on the basis of agentId and customer email.
      */
     @Override
-    public List<SurveyDetails> getCompletedSurveyByStartIndexAndBatchSize( int start, int batchSize)
+    public List<SurveyDetails> getCompletedSurveyByStartIndexAndBatchSize( int start, int batchSize, long companyId)
     {
         LOG.info( "Method getSurveyByStartIndexAndStatus() started." );
         Query query = new Query();
@@ -2812,7 +2813,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         
         //get the oldest record
         query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
-        
+        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+
         if(start > 0)
             query.skip( start );
         
@@ -2827,12 +2829,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     
     
     @Override
-    public List<SurveyDetails> getIncompleteSurveyByStartIndexAndBatchSize( int start, int batchSize)
+    public List<SurveyDetails> getIncompleteSurveyByStartIndexAndBatchSize( int start, int batchSize, long companyId)
     {
         LOG.info( "Method getSurveyByStartIndexAndStatus() started." );
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN  ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-        
+        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+
         //get the oldest record
         query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
         
@@ -2849,11 +2852,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
     
     @Override
-    public List<SurveyDetails> getAllSurveyByStartIndex( int start, int batchSize)
+    public List<SurveyDetails> getSurveysForCompanyByStartIndex( int start, int batchSize, long companyId)
     {
         LOG.info( "Method getSurveyByStartIndexAndStatus() started." );
         Query query = new Query();
-        
+        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+
         //get the oldest record
         query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
         
@@ -2867,5 +2871,56 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
    
         LOG.info( "Method getSurveyByStartIndexAndStage() " );
         return surveys;
+    }
+
+
+
+    @Override
+    public Long getCompletedSurveyCount( long companyId )
+    {
+        LOG.info( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );        
+
+        Query query = new Query( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
+       query.addCriteria( Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is( companyId ) );
+        
+        
+        LOG.info( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished." );
+        return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
+    
+    }
+
+
+
+    @Override
+    public Long getSurveysCountForCompany( long companyId )
+    {
+        LOG.info( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );        
+
+        Query query = new Query();
+        
+       query.addCriteria( Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is( companyId ) );
+        
+        
+        LOG.info( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished." );
+        return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
+    
+    }
+
+
+
+    @Override
+    public Long getIncompleteSurveyCount( long companyId )
+    {
+        LOG.info( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );        
+
+        Query query = new Query( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
+       query.addCriteria( Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is( companyId ) );
+        
+        
+        LOG.info( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished." );
+        return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
+    
     }
 }

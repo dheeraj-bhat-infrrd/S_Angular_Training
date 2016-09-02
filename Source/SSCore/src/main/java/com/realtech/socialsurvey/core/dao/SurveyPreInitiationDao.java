@@ -143,4 +143,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 
     Map<Long, SurveyPreInitiation> getPreInitiatedSurveyForIds( List<Long> surveyPreinitiationIds );
+
+
+    List<SurveyPreInitiation> getPreInitiatedSurveyForCompany( int start, int row, long companyId );
 }

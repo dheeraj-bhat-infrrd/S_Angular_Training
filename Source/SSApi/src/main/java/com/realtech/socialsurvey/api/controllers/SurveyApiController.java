@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.api.controllers;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -22,6 +21,7 @@ import com.realtech.socialsurvey.api.models.SurveyVO;
 import com.realtech.socialsurvey.api.models.TransactionInfo;
 import com.realtech.socialsurvey.api.transformers.SurveyPreinitiationTransformer;
 import com.realtech.socialsurvey.api.transformers.SurveyTransformer;
+import com.realtech.socialsurvey.api.transformers.SurveysAndReviewsVOTransformer;
 import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 /**
@@ -49,6 +50,8 @@ public class SurveyApiController {
 	
 	private SurveyTransformer surveyTransformer;
 	
+	private SurveysAndReviewsVOTransformer surveysAndReviewsVOTransformer;
+	
 	private SurveyHandler surveyHandler;
 	
 	private AdminAuthenticationService adminAuthenticationService;
@@ -57,11 +60,12 @@ public class SurveyApiController {
 	
 	@Autowired
     public SurveyApiController( SurveyPreinitiationTransformer surveyPreinitiationTransformer , SurveyHandler surveyHandler  ,
-    		SurveyTransformer surveyTransformer , AdminAuthenticationService adminAuthenticationService ,  RestUtils restUtils)
+    		SurveyTransformer surveyTransformer , SurveysAndReviewsVOTransformer surveysAndReviewsVOTransformer, AdminAuthenticationService adminAuthenticationService ,  RestUtils restUtils)
     {
         this.surveyPreinitiationTransformer = surveyPreinitiationTransformer;
         this.surveyHandler = surveyHandler;
         this.surveyTransformer = surveyTransformer;
+        this.surveysAndReviewsVOTransformer = surveysAndReviewsVOTransformer;
         this.adminAuthenticationService = adminAuthenticationService;
         this.restUtils = restUtils;
     }
@@ -153,8 +157,9 @@ public class SurveyApiController {
             
         	//authorize request
             String authorizationHeader = request.getHeader( "Authorization" );
+            long companyId;
     		try {
-    			adminAuthenticationService.validateAuthHeader( authorizationHeader );
+    			companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
     		} catch (AuthorizationException e1) {
     			return restUtils.getRestResponseEntity(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null);
     		}
@@ -163,8 +168,9 @@ public class SurveyApiController {
     		//parse request parameters from request
     		String countStr = request.getParameter("count");
     		String startStr = request.getParameter("start");
-            int count;
-            int start;
+    		String status = request.getParameter("status"); 
+            int count = 1000;
+            int start = 0;
             if(countStr != null){
             	try{
             		count = Integer.parseInt(countStr);
@@ -181,14 +187,17 @@ public class SurveyApiController {
                }
             }
             
+            if(status == null)
+            	status = "all";
+            	
             //get data from database
-            List<SurveyDetails> surveyDetails = surveyHandler.getSurveysByStatus("complete", start, count);           
+            SurveysAndReviewsVO surveysAndReviewsVO = surveyHandler.getSurveysByStatus(status, start, count, companyId);          
             
             
             //create vo object
-            SurveyVO surveyVO = surveyTransformer.transformDomainObjectToApiResponse(review, surveyPreInitiation);
+            List<SurveyVO> surveyVOs = surveysAndReviewsVOTransformer.transformDomainObjectToApiResponse(surveysAndReviewsVO, null);
             LOGGER.info( "SurveyApiController.getSurveyTransaction completed successfully" );
-            return restUtils.getRestResponseEntity(HttpStatus.OK, "Request Successfully processed", "survey", surveyVO);        
+            return restUtils.getRestResponseEntity(HttpStatus.OK, "Request Successfully processed", "surveys", surveyVOs);        
     }
 
 
