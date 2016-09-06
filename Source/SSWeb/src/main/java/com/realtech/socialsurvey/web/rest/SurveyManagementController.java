@@ -1662,7 +1662,7 @@ public class SurveyManagementController
         surveyAndStage.put( "editable", editable );
         surveyAndStage.put( "source", surveyPreInitiation.getSurveySource() );
         surveyAndStage.put("hiddenSection", companySettings.isHiddenSection() );
-
+        surveyAndStage.put( "companyName", user.getCompany().getCompany() );
 
         LOG.info( "Method getSurvey finished." );
         return surveyAndStage;
