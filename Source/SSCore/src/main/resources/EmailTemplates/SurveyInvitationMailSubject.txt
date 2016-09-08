@@ -1,1 +1,1 @@
-Transaction with %s
+Transaction with %s from %s
