@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.api.transformers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.api.models.ReviewVO;
@@ -7,10 +8,15 @@ import com.realtech.socialsurvey.api.models.SurveyVO;
 import com.realtech.socialsurvey.api.models.TransactionInfo;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 @Component
 public class SurveyTransformer implements Transformer<SurveyVO, SurveyDetails, SurveyVO>{
 
+	@Autowired
+	UserManagementService userManagementService; 
+	
 	@Override
 	public SurveyDetails transformApiRequestToDomainObject(SurveyVO a,
 			Object... objects) {
@@ -48,6 +54,24 @@ public class SurveyTransformer implements Transformer<SurveyVO, SurveyDetails, S
 		}
 
 		if( d != null ){
+			if(objects[0] == null){
+				transactionInfo.setCustomer1Email(d.getCustomerEmail());
+				transactionInfo.setCustomer1FirstName(d.getCustomerFirstName());
+				transactionInfo.setCustomer1LastName(d.getCustomerLastName());
+				transactionInfo.setServiceProviderName(d.getAgentName());
+				transactionInfo.setTransactionCity(d.getCity());
+				transactionInfo.setTransactionState(d.getState());
+				transactionInfo.setTransactionDate(String.valueOf(d.getSurveyTransactionDate()));
+				
+				try{
+				User user = userManagementService.getUserObjByUserId(d.getAgentId());
+				transactionInfo.setServiceProviderEmail(user.getEmailId());
+				}catch(Exception e){
+					
+				}
+				
+			}
+			
 			review.setSummary(d.getSummary());
 			review.setDescription(d.getReview());
 			review.setRating(String.valueOf(d.getScore()));

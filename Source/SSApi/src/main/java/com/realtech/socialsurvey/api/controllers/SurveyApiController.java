@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.api.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -78,12 +79,14 @@ public class SurveyApiController {
     {
 		
 		LOGGER.info( "SurveyApiController.postSurveyTransaction started" );
+        request.setAttribute( "input" , transactionInfo );
+
 		String authorizationHeader = request.getHeader( "Authorization" );
 		//authorize request
 		try {
 			adminAuthenticationService.validateAuthHeader( authorizationHeader );
 		} catch (AuthorizationException e) {
-			return restUtils.getRestResponseEntity(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null);
+			return restUtils.getRestResponseEntity(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request);
 		}
 		
 		//parse input object
@@ -91,7 +94,7 @@ public class SurveyApiController {
 		try {
 			surveyPreInitiation = surveyPreinitiationTransformer.transformApiRequestToDomainObject(transactionInfo);
 		} catch (InvalidInputException e) {
-			return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, e.getMessage(), null, null);
+			return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request);
 		}
 
 		
@@ -99,7 +102,8 @@ public class SurveyApiController {
         try {
             surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
             LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
-            return restUtils.getRestResponseEntity(HttpStatus.CREATED, "inserted", "surveyId", surveyPreInitiation.getSurveyPreIntitiationId());
+            
+            return restUtils.getRestResponseEntity(HttpStatus.CREATED, "inserted", "surveyId", surveyPreInitiation.getSurveyPreIntitiationId(), request);
         } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e.getErrorCode() );
         }
@@ -119,7 +123,7 @@ public class SurveyApiController {
     		try {
     			adminAuthenticationService.validateAuthHeader( authorizationHeader );
     		} catch (AuthorizationException e1) {
-    			return restUtils.getRestResponseEntity(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null);
+    			return restUtils.getRestResponseEntity(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request);
     		}
             
     		
@@ -128,7 +132,7 @@ public class SurveyApiController {
             try{
             	 surveyPreInitiationId = Long.parseLong(surveyId);
             }catch(NumberFormatException e){
-            	return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter surveyId is invalid", null, null);
+            	return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter surveyId is invalid", null, null, request);
             }
             
             
@@ -136,14 +140,15 @@ public class SurveyApiController {
             SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(surveyPreInitiationId);
             SurveyDetails review =  surveyHandler.getSurveyBySurveyPreIntitiationId(surveyPreInitiationId);
             if(surveyPreInitiation == null){
-            	return restUtils.getRestResponseEntity(HttpStatus.NOT_FOUND, "No record found for id", null, null);
+            	return restUtils.getRestResponseEntity(HttpStatus.NOT_FOUND, "No record found for id", null, null, request);
             }
             
             
             //create vo object
             SurveyVO surveyVO = surveyTransformer.transformDomainObjectToApiResponse(review, surveyPreInitiation);
             LOGGER.info( "SurveyApiController.getSurveyTransaction completed successfully" );
-            return restUtils.getRestResponseEntity(HttpStatus.OK, "Request Successfully processed", "survey", surveyVO);        
+            
+            return restUtils.getRestResponseEntity(HttpStatus.OK, "Request Successfully processed", "survey", surveyVO, request);        
     }
 	
 	
@@ -161,7 +166,7 @@ public class SurveyApiController {
     		try {
     			companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
     		} catch (AuthorizationException e1) {
-    			return restUtils.getRestResponseEntity(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null);
+    			return restUtils.getRestResponseEntity(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request);
     		}
             
     		
@@ -175,7 +180,7 @@ public class SurveyApiController {
             	try{
             		count = Integer.parseInt(countStr);
                }catch(NumberFormatException e){
-               	return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter count is invalid", null, null);
+               	return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter count is invalid", null, null, request);
                }
             }
             
@@ -183,21 +188,26 @@ public class SurveyApiController {
             	try{
             		start = Integer.parseInt(startStr);
                }catch(NumberFormatException e){
-               	return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter start is invalid", null, null);
+               	return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter start is invalid", null, null, request);
                }
             }
             
-            if(status == null)
+            if(status == null){
             	status = "all";
+            }else if( !status.equalsIgnoreCase("complete") && !status.equalsIgnoreCase("incomplete")){
+               	return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter status is invalid", null, null, request);
+            }
             	
             //get data from database
             SurveysAndReviewsVO surveysAndReviewsVO = surveyHandler.getSurveysByStatus(status, start, count, companyId);          
             
             
             //create vo object
-            List<SurveyVO> surveyVOs = surveysAndReviewsVOTransformer.transformDomainObjectToApiResponse(surveysAndReviewsVO, null);
+            List<SurveyVO> surveyVOs = surveysAndReviewsVOTransformer.transformDomainObjectToApiResponse(surveysAndReviewsVO);
             LOGGER.info( "SurveyApiController.getSurveyTransaction completed successfully" );
-            return restUtils.getRestResponseEntity(HttpStatus.OK, "Request Successfully processed", "surveys", surveyVOs);        
+            
+            return restUtils.getRestResponseEntity(HttpStatus.OK, "Request Successfully processed", "surveys", surveyVOs , request);
+
     }
 
 

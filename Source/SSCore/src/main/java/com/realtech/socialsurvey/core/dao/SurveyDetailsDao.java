@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.ApiRequestDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -293,4 +294,7 @@ public interface SurveyDetailsDao
 
 
     public Long getIncompleteSurveyCount( long companyId);
+
+
+    void insertApiRequestDetails( ApiRequestDetails apiRequestDetails );
 }

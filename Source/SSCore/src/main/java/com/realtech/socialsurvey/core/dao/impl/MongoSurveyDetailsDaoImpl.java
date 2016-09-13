@@ -11,6 +11,7 @@ import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.ApiRequestDetails;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -66,6 +67,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public static final String ABS_REPORTER_DETAILS_COLLECTION = "ABUSE_REPORTER_DETAILS";
 
     public static final String ZILLOW_CALL_COUNT = "ZILLOW_CALL_COUNT";
+    public static final String API_REQUEST_DETAILS = "API_REQUEST_DETAILS";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -2922,5 +2924,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished." );
         return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
     
+    }
+    
+    
+    @Override
+    public void insertApiRequestDetails(ApiRequestDetails apiRequestDetails){
+        LOG.info( "Method started insertApiRequestDetails started." );
+        mongoTemplate.insert( apiRequestDetails, API_REQUEST_DETAILS );
+        LOG.info( "Method started insertApiRequestDetails finished." );       
     }
 }
