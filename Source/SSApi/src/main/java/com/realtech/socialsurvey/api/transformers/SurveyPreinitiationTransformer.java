@@ -10,6 +10,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.realtech.socialsurvey.api.models.ServiceProviderInfo;
+import com.realtech.socialsurvey.api.models.SurveyPutVO;
 import com.realtech.socialsurvey.api.models.TransactionInfo;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
@@ -18,7 +20,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
 @Component
-public class SurveyPreinitiationTransformer implements Transformer<TransactionInfo, SurveyPreInitiation, TransactionInfo> {
+public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, SurveyPreInitiation, SurveyPutVO> {
 
 	
 	 private static final DateFormat df = new SimpleDateFormat("YYYY-MM-dd HH:MM:SS");
@@ -28,20 +30,30 @@ public class SurveyPreinitiationTransformer implements Transformer<TransactionIn
 	
 	@Override
 	public SurveyPreInitiation transformApiRequestToDomainObject(
-			TransactionInfo a, Object... objects) throws InvalidInputException {
+			SurveyPutVO a, Object... objects) throws InvalidInputException {
 
 		SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
 
-		TransactionInfo transactionInfo = a;
-		Date date = null;
 		
 		if(a == null)
+			throw new InvalidInputException("Invalid input passed. surveyDetail milssing");
+		
+		
+		TransactionInfo transactionInfo = a.getTransactionInfo();
+		ServiceProviderInfo serviceProviderInfo = a.getServiceProviderInfo();
+		Date date = null;
+		
+		if(transactionInfo == null)
 			throw new InvalidInputException("Invalid input passed. TransactionInfo milssing");
+		
+		if(serviceProviderInfo == null)
+			throw new InvalidInputException("Invalid input passed. serviceProviderInfo milssing");
+		
 		if(StringUtils.isBlank(transactionInfo.getCustomer1Email()))
 			throw new InvalidInputException("Invalid input passed. Customer1Email can't be null or empty");
 		if(StringUtils.isBlank(transactionInfo.getCustomer1FirstName()))
 			throw new InvalidInputException("Invalid input passed. Customer1FirstName can't be null or empty");
-		if(StringUtils.isBlank(transactionInfo.getServiceProviderEmail()))
+		if(StringUtils.isBlank(serviceProviderInfo.getServiceProviderEmail()))
 			throw new InvalidInputException("Invalid input passed. ServiceProviderEmail can't be null or empty");
 			
 		try {
@@ -50,8 +62,8 @@ public class SurveyPreinitiationTransformer implements Transformer<TransactionIn
 			throw new InvalidInputException("Transaction Date with invalid format");
 		}
 		
-		 surveyPreInitiation.setAgentEmailId(transactionInfo.getServiceProviderEmail());
-		 surveyPreInitiation.setAgentName(transactionInfo.getServiceProviderName());
+		 surveyPreInitiation.setAgentEmailId(serviceProviderInfo.getServiceProviderEmail());
+		 surveyPreInitiation.setAgentName(serviceProviderInfo.getServiceProviderName());
 		 
 		 surveyPreInitiation.setCustomerEmailId(transactionInfo.getCustomer1Email());
 		 surveyPreInitiation.setCustomerFirstName(transactionInfo.getCustomer1FirstName());
@@ -72,24 +84,30 @@ public class SurveyPreinitiationTransformer implements Transformer<TransactionIn
 	}
 
 	@Override
-	public TransactionInfo transformDomainObjectToApiResponse(
+	public SurveyPutVO transformDomainObjectToApiResponse(
 			SurveyPreInitiation d , Object... objects ) {
 		
+		SurveyPutVO surveyModel = new SurveyPutVO();
 		TransactionInfo transactionInfo = new TransactionInfo();
+		ServiceProviderInfo serviceProviderInfo = new ServiceProviderInfo();
 		
 		transactionInfo.setCustomer1Email(d.getCustomerEmailId());
 		transactionInfo.setCustomer1FirstName(d.getCustomerFirstName());
 		transactionInfo.setCustomer1LastName(d.getCustomerLastName());
 		
-		transactionInfo.setServiceProviderEmail(d.getAgentEmailId());
-		transactionInfo.setServiceProviderName(d.getAgentName());
+		serviceProviderInfo.setServiceProviderEmail(d.getAgentEmailId());
+		serviceProviderInfo.setServiceProviderName(d.getAgentName());
 		
 		transactionInfo.setTransactionCity(d.getCity());
 		transactionInfo.setTransactionState(d.getState());
 		
 		transactionInfo.setTransactionDate(String.valueOf(d.getEngagementClosedTime()));
 		transactionInfo.setTransactionRef(d.getSurveySourceId());
-		return transactionInfo;
+		
+		surveyModel.setServiceProviderInfo(serviceProviderInfo);
+		surveyModel.setTransactionInfo(transactionInfo);
+		
+		return surveyModel;
 	}
 
 }

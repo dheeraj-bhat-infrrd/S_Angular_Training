@@ -17,8 +17,6 @@ public class TransactionInfo {
  	private String customer2LastName;
  	private String customer2Email;
 
- 	private String serviceProviderName;
- 	private String serviceProviderEmail;
  	
  	
 	public String getTransactionRef() {
@@ -87,18 +85,5 @@ public class TransactionInfo {
 	public void setCustomer2Email(String customer2Email) {
 		this.customer2Email = customer2Email;
 	}
-	public String getServiceProviderName() {
-		return serviceProviderName;
-	}
-	public void setServiceProviderName(String serviceProviderName) {
-		this.serviceProviderName = serviceProviderName;
-	}
-	public String getServiceProviderEmail() {
-		return serviceProviderEmail;
-	}
-	public void setServiceProviderEmail(String serviceProviderEmail) {
-		this.serviceProviderEmail = serviceProviderEmail;
-	}
-
- 	
+	 	
 }

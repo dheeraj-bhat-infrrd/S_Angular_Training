@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.api.controllers;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -18,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
-import com.realtech.socialsurvey.api.models.SurveyVO;
-import com.realtech.socialsurvey.api.models.TransactionInfo;
+import com.realtech.socialsurvey.api.models.SurveyPutVO;
+import com.realtech.socialsurvey.api.models.SurveyGetVO;
 import com.realtech.socialsurvey.api.transformers.SurveyPreinitiationTransformer;
 import com.realtech.socialsurvey.api.transformers.SurveyTransformer;
 import com.realtech.socialsurvey.api.transformers.SurveysAndReviewsVOTransformer;
@@ -74,12 +73,12 @@ public class SurveyApiController {
 	
 	@RequestMapping ( value = "/survey", method = RequestMethod.PUT)
     @ApiOperation ( value = "Post Survey Transaction")
-    public ResponseEntity<?> postSurveyTransaction( @Valid @RequestBody TransactionInfo transactionInfo , HttpServletRequest request
+    public ResponseEntity<?> postSurveyTransaction( @Valid @RequestBody SurveyPutVO surveyModel , HttpServletRequest request
         ) throws SSApiException
     {
 		
 		LOGGER.info( "SurveyApiController.postSurveyTransaction started" );
-        request.setAttribute( "input" , transactionInfo );
+        request.setAttribute( "input" , surveyModel );
 
 		String authorizationHeader = request.getHeader( "Authorization" );
 		//authorize request
@@ -92,7 +91,7 @@ public class SurveyApiController {
 		//parse input object
         SurveyPreInitiation surveyPreInitiation;
 		try {
-			surveyPreInitiation = surveyPreinitiationTransformer.transformApiRequestToDomainObject(transactionInfo);
+			surveyPreInitiation = surveyPreinitiationTransformer.transformApiRequestToDomainObject(surveyModel);
 		} catch (InvalidInputException e) {
 			return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request);
 		}
@@ -103,7 +102,7 @@ public class SurveyApiController {
             surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
             LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
             
-            return restUtils.getRestResponseEntity(HttpStatus.CREATED, "inserted", "surveyId", surveyPreInitiation.getSurveyPreIntitiationId(), request);
+            return restUtils.getRestResponseEntity(HttpStatus.CREATED, "Survey successfully created", "surveyId", surveyPreInitiation.getSurveyPreIntitiationId(), request);
         } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e.getErrorCode() );
         }
@@ -145,7 +144,7 @@ public class SurveyApiController {
             
             
             //create vo object
-            SurveyVO surveyVO = surveyTransformer.transformDomainObjectToApiResponse(review, surveyPreInitiation);
+            SurveyGetVO surveyVO = surveyTransformer.transformDomainObjectToApiResponse(review, surveyPreInitiation);
             LOGGER.info( "SurveyApiController.getSurveyTransaction completed successfully" );
             
             return restUtils.getRestResponseEntity(HttpStatus.OK, "Request Successfully processed", "survey", surveyVO, request);        
@@ -203,7 +202,7 @@ public class SurveyApiController {
             
             
             //create vo object
-            List<SurveyVO> surveyVOs = surveysAndReviewsVOTransformer.transformDomainObjectToApiResponse(surveysAndReviewsVO);
+            List<SurveyGetVO> surveyVOs = surveysAndReviewsVOTransformer.transformDomainObjectToApiResponse(surveysAndReviewsVO);
             LOGGER.info( "SurveyApiController.getSurveyTransaction completed successfully" );
             
             return restUtils.getRestResponseEntity(HttpStatus.OK, "Request Successfully processed", "surveys", surveyVOs , request);

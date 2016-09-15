@@ -7,38 +7,38 @@ import java.util.Map.Entry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.realtech.socialsurvey.api.models.SurveyVO;
+import com.realtech.socialsurvey.api.models.SurveyGetVO;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
 
 @Component
-public class SurveysAndReviewsVOTransformer implements Transformer<List<SurveyVO>, SurveysAndReviewsVO, List<SurveyVO>>{
+public class SurveysAndReviewsVOTransformer implements Transformer<List<SurveyGetVO>, SurveysAndReviewsVO, List<SurveyGetVO>>{
 
 	@Autowired
 	SurveyTransformer surveyTransformer;
 	
 	@Override
-	public SurveysAndReviewsVO transformApiRequestToDomainObject(List<SurveyVO> a,
+	public SurveysAndReviewsVO transformApiRequestToDomainObject(List<SurveyGetVO> a,
 			Object... objects) throws InvalidInputException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<SurveyVO> transformDomainObjectToApiResponse(SurveysAndReviewsVO d,
+	public List<SurveyGetVO> transformDomainObjectToApiResponse(SurveysAndReviewsVO d,
 			Object... objects) {
 		
-		List<SurveyVO> surveyVOs = new ArrayList<SurveyVO>();
+		List<SurveyGetVO> surveyVOs = new ArrayList<SurveyGetVO>();
 		
 		for(Entry<SurveyDetails, SurveyPreInitiation> entry : d.getInitiatedSurveys().entrySet()){
-			SurveyVO surveyVO =  surveyTransformer.transformDomainObjectToApiResponse(entry.getKey(), entry.getValue());
+			SurveyGetVO surveyVO =  surveyTransformer.transformDomainObjectToApiResponse(entry.getKey(), entry.getValue());
 			surveyVOs.add(surveyVO);
 		}
 		
 		for(SurveyPreInitiation surveyPreInitiation : d.getPreInitiatedSurveys()){
-			SurveyVO surveyVO =  surveyTransformer.transformDomainObjectToApiResponse(null,surveyPreInitiation);
+			SurveyGetVO surveyVO =  surveyTransformer.transformDomainObjectToApiResponse(null,surveyPreInitiation);
 			surveyVOs.add(surveyVO);
 		}
 		
