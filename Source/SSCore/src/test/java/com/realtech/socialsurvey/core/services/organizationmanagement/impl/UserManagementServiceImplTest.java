@@ -22,6 +22,7 @@ import org.mockito.Spy;
 
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -63,7 +64,7 @@ public class UserManagementServiceImplTest
     private UserDao userDao;
 
     @Mock
-    private GenericDao<Company, Long> companyDao;
+    private CompanyDao companyDao;
 
     @Mock
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -888,33 +889,6 @@ public class UserManagementServiceImplTest
         userManagementServiceImpl.updateUserCountModificationNotification( null );
     }
 
-
-    @Test ( expected = InvalidInputException.class)
-    public void testIsValidApiKeyForNullApiKey() throws InvalidInputException, NoRecordsFetchedException, SolrException
-    {
-        userManagementServiceImpl.isValidApiKey( null, "test" );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testIsValidApiKeyForEmptyApiKey() throws InvalidInputException, NoRecordsFetchedException, SolrException
-    {
-        userManagementServiceImpl.isValidApiKey( "", "test" );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testIsValidApiKeyForNullApiScret() throws InvalidInputException, NoRecordsFetchedException, SolrException
-    {
-        userManagementServiceImpl.isValidApiKey( "test", null );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testIsValidApiKeyForEmptyApiScret() throws InvalidInputException, NoRecordsFetchedException, SolrException
-    {
-        userManagementServiceImpl.isValidApiKey( "test", "" );
-    }
 
 
     @Test ( expected = InvalidInputException.class)
