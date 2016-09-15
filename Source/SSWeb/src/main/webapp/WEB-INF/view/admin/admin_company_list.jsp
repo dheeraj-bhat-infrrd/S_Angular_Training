@@ -10,7 +10,7 @@
 			data-iden="${companyItem.iden}">
 			<div class="v-tbl-line">
 				<div class="v-line-comp"></div>
-				<i id="tr-spinner-${companyItem.iden}"  class="fa fa-spinner fa-pulse fa-2x fa-fw" aria-hidden="true" style="display:none;margin:5px 30px;"></i> 
+				<i id="tr-spinner-${companyItem.iden}"  class="fa fa-spinner fa-pulse fa-2x fa-fw" aria-hidden="true" style="display:none;margin:7px 0px;"></i> 
 			</div>
 			<%-- <div class="v-tbl-img">
            		<c:choose>

@@ -297,8 +297,10 @@ function bindAdminBranchListClicks(){
 }
 
 function fetchAdminHierarchyViewBranches(regionId) {
+	$('#tr-spinner-'+regionId).show();
 	var url = "./fetchhierarchyviewbranchesforadmin.do?regionId="+regionId;
 	callAjaxGET(url, function(data) {
+		$('#tr-spinner-'+regionId).hide();
 		paintAdminHierarchyViewBranches(data,regionId);
 	}, true);
 }
@@ -312,9 +314,11 @@ function paintAdminHierarchyViewBranches(data,regionId) {
 }
 
 function fetchAdminUsersForBranch(branchId,regionId, companyId) {
+	$('#tr-spinner-'+branchId).show();
 	var url="./fetchbranchusersforadmin.do?branchId="+branchId+"&regionId="+regionId;
 	callAjaxGET(url, function(data) {
 		paintAdminUsersFromBranch(data,branchId);
+		$('#tr-spinner-'+branchId).hide();
 	}, true);
 }
 
