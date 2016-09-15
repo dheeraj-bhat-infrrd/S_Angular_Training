@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="hiddenSection" value="${hiddenSection}"></c:set>
 <c:choose>
 	<c:when test="${entityType == 'companyId'}">
 		<c:set value="1" var="profilemasterid"></c:set>
@@ -95,10 +96,16 @@
 					</c:choose>
 					<c:if test="${profilemasterid !=4}">
 					<c:if test="${not empty feedback.agentName }">
-						<span class="float-left " style="margin-left: 5px;">for<a
-							style="color: #236CAF; font-weight: 600 !important;"
+						<span class="float-left " style="margin-left: 5px;">for
+						<c:if test="${hiddenSection}">
+							 ${feedback.agentName}
+						</c:if>
+					  <c:if test="${!hiddenSection}">
+						<a style="color: #236CAF; font-weight: 600 !important;"
 							href="${feedback.completeProfileUrl}" target="_blank">
-								${feedback.agentName}</a></span>
+								${feedback.agentName}</a>
+				     </c:if>
+								</span>
 					</c:if>
 					</c:if>
 

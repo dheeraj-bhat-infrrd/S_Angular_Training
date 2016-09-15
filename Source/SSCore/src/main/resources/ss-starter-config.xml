@@ -480,7 +480,7 @@
 	
 	<bean id="socialmediatokenexpirycron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialMediaTokenExpiryJobDetail" />
-		<property name="cronExpression" value="0 0/1 * 1/1 * ? *" />
+		<property name="cronExpression" value="0 01 11 * * ?" />
 	</bean>
 
 	<bean id="imageprocessingcron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -525,7 +525,7 @@
 				<ref bean="billingreportjobdetail" />
 				<ref bean="dotloopjobdetail" />
 				<ref bean="lonewolfjobdetail" />
-				<!-- <ref bean="socialMediaTokenExpiryJobDetail" /> -->
+				<ref bean="socialMediaTokenExpiryJobDetail" />
 				<ref bean="surveyfileuploadjobdetail" />
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
@@ -555,7 +555,7 @@
 				<ref bean="billingreportcron" />
 				<ref bean="dotloopcron" />
 				<ref bean="lonewolfcron" />
-				<!-- <ref bean="socialmediatokenexpirycron" /> -->
+				<ref bean="socialmediatokenexpirycron" />
 				<ref bean="surveyfileuploadcron" />
 				<ref bean="solrreviewcounterupdatercron" />
 				<!-- <ref bean="setcompanyidsinsocialpostscron" /> -->

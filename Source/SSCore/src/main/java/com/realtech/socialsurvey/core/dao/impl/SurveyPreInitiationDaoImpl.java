@@ -791,4 +791,46 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
         }
     }
+    
+    
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Long, SurveyPreInitiation> getPreInitiatedSurveyForIds( List<Long> surveyPreinitiationIds )
+    {
+        LOG.info( "Method getPreInitiatedSurveyForIds() started." );
+        Map<Long, SurveyPreInitiation> surveyPreinitiationMap = new HashMap<Long, SurveyPreInitiation>();
+        
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class, "surveyPreInitiation" );
+
+        criteria.add( Restrictions.in( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, surveyPreinitiationIds ) );
+        LOG.info( "Method getUnmatchedPreInitiatedSurveyCount() finished." );
+        List<SurveyPreInitiation> surveyPreInitiationList = criteria.list();
+
+        for(SurveyPreInitiation surveyPreInitiation : surveyPreInitiationList){
+            surveyPreinitiationMap.put( surveyPreInitiation.getSurveyPreIntitiationId(), surveyPreInitiation );
+        }
+
+        return surveyPreinitiationMap;
+    }
+
+    
+    @Override
+    public List<SurveyPreInitiation> getPreInitiatedSurveyForCompany( int start, int row, long companyId )
+    {
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+
+
+        if ( row > 0 )
+            criteria.setMaxResults( row );
+        if ( start > 0 )
+            criteria.setFirstResult( start );
+
+        criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED ) );
+        criteria.addOrder( Order.desc( CommonConstants.MODIFIED_ON_COLUMN ) );
+        return criteria.list();
+
+    }
+
 }

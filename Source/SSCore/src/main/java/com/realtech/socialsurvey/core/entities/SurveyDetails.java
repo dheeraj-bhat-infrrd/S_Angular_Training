@@ -62,7 +62,7 @@ public class SurveyDetails
     private String surveyType;
     private String city;
     private String state;
-    
+        
     public SocialMediaPostResponseDetails getSocialMediaPostResponseDetails()
     {
         return socialMediaPostResponseDetails;

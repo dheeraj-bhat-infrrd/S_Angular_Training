@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 
 /**
@@ -43,6 +45,21 @@ public class UserApiKey implements Serializable
 
     @Column ( name = "MODIFIED_ON")
     private Timestamp modifiedOn;
+    
+    @Transient
+    private String companyName;
+
+
+    public String getCompanyName()
+    {
+        return companyName;
+    }
+
+
+    public void setCompanyName( String companyName )
+    {
+        this.companyName = companyName;
+    }
 
 
     public long getUserApiKeyId()

@@ -65,7 +65,7 @@ public class PersonalProfileTransformer implements Transformer<PersonalProfile, 
     }
 
 
-    public PersonalProfile transformDomainObjectToApiResponse( UserCompositeEntity userProfile )
+    public PersonalProfile transformDomainObjectToApiResponse( UserCompositeEntity userProfile , Object... objects )
     {
         PersonalProfile response = new PersonalProfile();
         if ( userProfile != null ) {
