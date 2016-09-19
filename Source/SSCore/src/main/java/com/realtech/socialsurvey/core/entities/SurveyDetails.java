@@ -60,7 +60,9 @@ public class SurveyDetails
     private Date surveyTransactionDate;
     private String surveyGeoLocation;
     private String surveyType;
-    
+    private String city;
+    private String state;
+        
     public SocialMediaPostResponseDetails getSocialMediaPostResponseDetails()
     {
         return socialMediaPostResponseDetails;
@@ -680,4 +682,28 @@ public class SurveyDetails
     {
         this.googleBusinessProfileUrl = googleBusinessProfileUrl;
     }
+
+
+	public String getCity()
+	{
+		return city;
+	}
+
+
+	public void setCity( String city )
+	{
+		this.city = city;
+	}
+
+
+	public String getState()
+	{
+		return state;
+	}
+
+
+	public void setState( String state )
+	{
+		this.state = state;
+	}
 }

@@ -2,10 +2,6 @@ package com.realtech.socialsurvey.core.entities;
 
 public class LoneWolfCrmInfo extends CRMInfo
 {
-
-    private String apiToken;
-    private String consumerKey;
-    private String secretKey;
     private String clientCode;
     private long regionId;
     private long branchId;
@@ -15,36 +11,6 @@ public class LoneWolfCrmInfo extends CRMInfo
     private int numberOfDays;
     private String emailAddressForReport;
     private boolean generateReport;
-    
-    public String getApiToken() {
-		return apiToken;
-	}
-
-
-	public void setApiToken(String apiToken) {
-		this.apiToken = apiToken;
-	}
-
-
-	public String getConsumerKey() {
-		return consumerKey;
-	}
-
-
-	public void setConsumerKey(String consumerKey) {
-		this.consumerKey = consumerKey;
-	}
-
-
-	public String getSecretKey() {
-		return secretKey;
-	}
-
-
-	public void setSecretKey(String secretKey) {
-		this.secretKey = secretKey;
-	}
-
 
 	public String getHost() {
 		return host;

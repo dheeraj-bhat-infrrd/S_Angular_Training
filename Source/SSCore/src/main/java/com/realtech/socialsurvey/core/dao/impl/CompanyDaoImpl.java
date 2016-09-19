@@ -3,7 +3,10 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -12,6 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,9 +96,15 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
     }
 
 
+    /**
+     * 
+     * This method will return the list of company ids
+     * 
+     */
+    
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<Company> searchCompaniesByNameAndKeyValue( String namePattern, int accountType, int status,
+    public List<Long> searchCompaniesByNameAndKeyValue( String namePattern, int accountType, int status,
         boolean inCompleteCompany , Timestamp startDate )
     {
         Criteria criteria = getSession().createCriteria( Company.class );
@@ -120,7 +130,8 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
                         + accountType + ")" ) );
             }
         }
-        criteria.addOrder( Order.asc( "company" ) );
+        criteria.setProjection(Projections.property("companyId"));
+        //criteria.addOrder( Order.asc( "company" ) );
         return criteria.list();
     }
 
@@ -369,6 +380,28 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         }
 
         return companies;
+    }
+    
+    
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Long , Company> getCompaniesByIds(Set<Long> ids)
+    {
+        LOG.debug( "method getCompaniesById started " );
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria( Company.class, "company" );
+        criteria.add( Restrictions.in( "companyId", ids ) );
+        List<Company> companies = criteria.list();
+        
+        Map<Long , Company> cpmanyiesById = new HashMap<Long , Company>();
+        for(Company company : companies){
+            cpmanyiesById.put( company.getCompanyId(), company );
+        }
+        
+        LOG.debug( "method getAllInvoicedActiveCompanies started ended" );
+        return cpmanyiesById;
+
     }
 }
 // JIRA SS-42 By RM-05 EOC

@@ -6,7 +6,12 @@
 <script type="text/javascript" async src="//platform.twitter.com/widgets.js" async="async"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery.cookie.js"></script>
 <script type="text/javascript">
+var hiddenSection = false;
 $(document).ready(function() {
+	callAjaxGetWithPayloadData("/ishiddensection.do", function(data) {
+		hiddenSection = data;
+	});
+	
 	// Show popup if any active session found
 	var activeSessionFound = "${activeSessionFound}";
 	if (activeSessionFound == "true") {
@@ -21,14 +26,13 @@ function landingFlow() {
 	var showLinkedInPopup = "${showLinkedInPopup}";
 	var showSendSurveyPopup = "${showSendSurveyPopup}";
 	var disableCookie="false";
-	
 	var cookieValue= $.cookie("doNotShowPopup");
 	
 	if(!navigator.cookieEnabled){
 		var disableCookie="true";
 	}
 	
-	if (showLinkedInPopup == "true" && popupStatus == "Y") {
+	if (showLinkedInPopup == "true" && popupStatus == "Y" && hiddenSection== "false") {
 		linkedInDataImport();
 	}
 	else if (cookieValue !="true" && showSendSurveyPopup == "true" && popupStatus == "Y") {

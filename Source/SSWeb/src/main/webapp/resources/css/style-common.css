@@ -529,7 +529,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	width: 100%;
 	height: 100%;
 	z-index: 9999999;
-	background: url(../images/dashloader.gif) no-repeat center;
+	background: url(../images/dashloader.gif) no-repeat 50% 100px;
 	background-size: 50px 50px;
 	background-color: #fff;
 }
@@ -7920,16 +7920,17 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 }
 
 .st-subject-label {
-	width: 30%;
 	font-size: 15px;
+    font-weight: 600 !important;
 }
 
 .st-subject-input-cont {
-	width: 70%;
+	width: 74%; 
+	margin-left:10px;
 }
 
 .st-subject-input {
-	width: 250px;
+	width: 100%;
 	max-width: 100%;
 	height: 40px;
 	line-height: 20px;
@@ -8947,3 +8948,74 @@ label.url-change-input-label {
 	width: 75%;
 	margin-left: -7px;
 }
+/* accordion */
+ul.accordion li {
+    margin: 0;
+    background: #FFF;
+    margin-bottom: 5px!important;
+    padding: 13px 20px 0 20px;
+    -webkit-box-shadow: 0 1px 2px #CCCCCC;
+    -moz-box-shadow: 0 1px 2px #CCCCCC;
+    box-shadow: 0 1px 2px #CCCCCC;
+    list-style: none;
+}
+ul.accordion li>a {
+    display: block;
+    padding: 0 0 13px 0;
+    color: #444444;
+    font: 600 1.333em 'Open Sans', Helvetca, Arial, sans-serif;
+    outline: none;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600 !important;
+}
+ul.accordion li>div {
+    display: none;
+    padding: 0 0 18px 0;
+    width: 100%;
+    transition: height 2s;
+    -moz-transition: height 2s; /* Firefox 4 */
+    -webkit-transition: height 2s; /* Safari and Chrome */
+    -o-transition: height 2s; /* Opera */
+}
+ul.accordion li p {
+    margin-top: 10px;
+    font-size: 13px;
+    margin-bottom: 0;
+    padding-bottom: 5px;
+    
+}
+ul.accordion li > a.expanded:before, ul.accordion li > a:hover:before {
+    color: #000 !important;
+}
+ul.accordion li>a.expanded:before {
+    color: #aeaeae;
+    content: "\2796";
+}
+ul.accordion li>a:before {
+    float: right;
+    position: relative;
+    margin: -3px -7px 0 0;
+    color: #c8c8c8;
+    /* font: 600 1.308em 'Open Sans', Helvetca, Arial, sans-serif; */
+    content: '\02795';
+}
+.legend{
+	background-color: #009FE0;
+    color: #fff;
+    text-align: center;
+    background-origin: 50px;
+    border: 1px solid #009FE0;
+    border-radius: 3px;
+}
+.legend-header{
+	color: #444;
+    font-weight: 600 !important;
+}
+.legend-wrapper{
+	margin-top:5px;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+

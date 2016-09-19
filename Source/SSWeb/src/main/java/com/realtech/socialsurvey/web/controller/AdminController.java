@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -747,69 +749,7 @@ public class AdminController
     }
 
 
-    @RequestMapping ( value = "/generateApiKey", method = RequestMethod.POST)
-    public @ResponseBody String generateApiKey( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to get generateApiKey() started." );
-        String message = "";
-        Map<String, String> map = new HashMap<String, String>();
-        boolean error = false;
-        String companyId = request.getParameter( "companyId" );
-        String apiKey = request.getParameter( "apiKey" );
-        String apiSecret = request.getParameter( "apiSecret" );
-        if ( companyId == null || companyId.isEmpty() ) {
-            message = DisplayMessageConstants.INVALID_COMPANY_ID;
-            error = true;
-        }
-        if ( apiKey == null || apiKey.isEmpty() ) {
-            message = DisplayMessageConstants.INVALID_API_KEY;
-            error = true;
-        }
-        if ( apiSecret == null || apiSecret.isEmpty() ) {
-            message = DisplayMessageConstants.INVALID_API_SECRET;
-            error = true;
-        }
-        if ( !error ) {
-            map.put( CommonConstants.COMPANY_ID_COLUMN, companyId );
-            map.put( CommonConstants.API_KEY_COLUMN, apiKey );
-            map.put( CommonConstants.API_SECRET_COLUMN, apiSecret );
-            try {
-                userManagementService.validateUserApiKey( apiKey, apiSecret, Long.valueOf( companyId ) );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "Invalid Company Id " );
-                message = DisplayMessageConstants.INVALID_COMPANY_ID;
-                error = true;
-            } catch ( InvalidInputException e ) {
-                message = DisplayMessageConstants.INVALID_DETAILS_PROVIDED;
-                error = true;
-            }
-        }
-
-        if ( !error ) {
-            LOG.debug( "All values provided are valid, hence generating api key for this company " + companyId );
-
-            StringBuilder plainText = new StringBuilder();
-
-            // The parameters are arranged in format key=value separated by &.      
-            for ( String key : map.keySet() ) {
-                plainText.append( key );
-                plainText.append( "=" );
-                plainText.append( map.get( key ) );
-                plainText.append( "&" );
-            }
-
-
-            try {
-                message = encryptionHelper.encryptAES( plainText.toString(), "" );
-            } catch ( InvalidInputException e ) {
-                message = DisplayMessageConstants.TRY_AGAIN;
-            }
-        }
-
-        return message;
-
-    }
-
+    
 
     @ResponseBody
     @RequestMapping ( value = "/createsocialsurveyadmin", method = RequestMethod.POST)
@@ -925,6 +865,84 @@ public class AdminController
 
         LOG.info( "Method to delete SocialSurveyAdmin finished." );
         model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.SS_ADMIN_DELETE_SUCCESSFUL,
+            DisplayMessageType.SUCCESS_MESSAGE ) );
+        return JspResolver.MESSAGE_HEADER;
+    }
+    
+    
+    
+    @RequestMapping ( value = "/generateaccesstoken", method = RequestMethod.GET)
+    public @ResponseBody String generateAccessToken( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to get generateAccessToken() started." );
+        String accessToken;
+        String companyIdStr = request.getParameter( "companyId" );
+        long companyId;
+
+        if ( companyIdStr == null || companyIdStr.isEmpty() ) {
+            return DisplayMessageConstants.INVALID_COMPANY_ID;
+        }
+
+
+        try {
+            companyId = Long.valueOf( companyIdStr );
+        } catch ( NumberFormatException e ) {
+            LOG.error( "Invalid Company Id " );
+            return DisplayMessageConstants.INVALID_COMPANY_ID;
+        }
+
+        try {
+            UserApiKey userApiKey = userManagementService.getUserApiKeyForCompany( companyId );
+            if ( userApiKey == null ) {
+                userApiKey = userManagementService.generateAndSaveUserApiKey( companyId );
+            }
+
+            accessToken =  encryptionHelper.encryptAES( userApiKey.getApiKey() + ":" + userApiKey.getApiSecret(), "" );
+        } catch ( InvalidInputException e ) {
+            return DisplayMessageConstants.TRY_AGAIN;
+        }
+
+        return accessToken;
+    }
+
+    
+    @RequestMapping ( value = "/getallcompanieswithapikeys", method = RequestMethod.GET)
+    public @ResponseBody String getAllCompaniesWithApiKeys( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to get getAllCompaniesWithApiKeys() started." );
+      
+        List<UserApiKey> userApiKeys = userManagementService.getActiveUserApiKeys();
+        LOG.info( "Method to get getAllCompaniesWithApiKeys() ended." );  
+        return new Gson().toJson( userApiKeys );
+    }
+    
+    
+
+    @RequestMapping ( value = "/updateuserapikeystatus", method = RequestMethod.GET)
+    public  String updateUserApiKeyStatus( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to get updateUserApiKeyStatus() started." );
+
+        try {
+            String userApiKeyIdStr = request.getParameter( "apiKeyId" );
+            String statusStr = request.getParameter( "status" );
+
+            Long userApiKeyId = Long.parseLong( userApiKeyIdStr );
+            int status = Integer.parseInt( statusStr );
+
+            userManagementService.updateStatusOfUserApiKey( userApiKeyId, status );
+
+            LOG.info( "Method to get updateUserApiKeyStatus() ended." );
+
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while updateUserApiKeyStatus. Reason : " + nonFatalException.getStackTrace(),
+                nonFatalException );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+        
+        model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.API_STATUS_UPDATE_SUCCESSFUL,
             DisplayMessageType.SUCCESS_MESSAGE ) );
         return JspResolver.MESSAGE_HEADER;
     }

@@ -41,7 +41,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
     private static final String proceesedCurruptedSurvey = "select SURVEY_PRE_INITIATION_ID ,  SURVEY_SOURCE_ID  , COMPANY_ID , AGENT_EMAILID , "
         + "CUSTOMER_FIRST_NAME  , CUSTOMER_LAST_NAME , CUSTOMER_EMAIL_ID , AGENT_ID , STATUS , CREATED_ON , ENGAGEMENT_CLOSED_TIME, AGENT_NAME  from "
-        + "SURVEY_PRE_INITIATION " + " where COMPANY_ID= :companyId AND ( (AGENT_EMAILID IN "
+        + "SURVEY_PRE_INITIATION "
+        + " where COMPANY_ID= :companyId AND ( (AGENT_EMAILID IN "
         + " (select EMAIL_ID from USER_EMAIL_MAPPING where COMPANY_ID=:companyId) ) OR  ( AGENT_EMAILID IN "
         + " (select EMAIL_ID from COMPANY_IGNORED_EMAIL_MAPPING where COMPANY_ID=:companyId) ) )";
 
@@ -153,8 +154,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add( Restrictions.le( "lastReminderTime",
-                new Timestamp( new Date().getTime() - surveyReminderInterval * 24 * 60 * 60 * 1000 ) ) );
+            criteria.add( Restrictions.le( "lastReminderTime", new Timestamp( new Date().getTime() - surveyReminderInterval
+                * 24 * 60 * 60 * 1000 ) ) );
             criteria.add( Restrictions.and(
                 Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ),
                 Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_DELETED ) ) );
@@ -178,9 +179,9 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
 
-        criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN, Arrays
-            .asList( CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_PRE_INITIATED,
-                CommonConstants.STATUS_SURVEYPREINITIATION_DELETED ) ) );
+        criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN, Arrays.asList(
+            CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_PRE_INITIATED,
+            CommonConstants.STATUS_SURVEYPREINITIATION_DELETED ) ) );
 
         criteria.add( Restrictions.in( CommonConstants.AGENT_ID, agentReportData.keySet() ) );
 
@@ -224,8 +225,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         Query query = getSession().createQuery( deleteQuery );
         query.setParameter( "modifiedOnTime", new Timestamp( System.currentTimeMillis() ) );
         query.setParameterList( "incompleteSurveyIds", incompleteSurveyIds );
-        query.setParameterList( "statuses",
-            new Integer[] { CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED } );
+        query.setParameterList( "statuses", new Integer[] { CommonConstants.SURVEY_STATUS_PRE_INITIATED,
+            CommonConstants.SURVEY_STATUS_INITIATED } );
         query.executeUpdate();
     }
 
@@ -340,14 +341,14 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
         boolean whereFlag = false; // used if where is 
         if ( aggregateBy.equals( CommonConstants.AGGREGATE_BY_WEEK ) ) {
-            queryBuilder.append(
-                "SELECT YEARWEEK(CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE " );
+            queryBuilder
+                .append( "SELECT YEARWEEK(CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE " );
         } else if ( aggregateBy.equals( CommonConstants.AGGREGATE_BY_DAY ) ) {
-            queryBuilder.append(
-                "SELECT DATE(CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE " );
+            queryBuilder
+                .append( "SELECT DATE(CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE " );
         } else if ( aggregateBy.equals( CommonConstants.AGGREGATE_BY_MONTH ) ) {
-            queryBuilder.append(
-                "SELECT EXTRACT(YEAR_MONTH FROM CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE " );
+            queryBuilder
+                .append( "SELECT EXTRACT(YEAR_MONTH FROM CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE " );
         }
         if ( companyId > 0l ) {
             queryBuilder.append( " COMPANY_ID = :companyId" );
@@ -444,8 +445,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         query.setParameter( "modifiedOnTime", new Timestamp( System.currentTimeMillis() ) );
         query.setParameter( "deletedAgentId", agentId );
         query.setParameter( "status", status );
-        query.setParameterList( "statuses",
-            new Integer[] { CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED } );
+        query.setParameterList( "statuses", new Integer[] { CommonConstants.SURVEY_STATUS_PRE_INITIATED,
+            CommonConstants.SURVEY_STATUS_INITIATED } );
         query.executeUpdate();
         LOG.info( "Method to delete SurveyPreInitiation records for agent ID : " + agentId + " finished." );
     }
@@ -466,8 +467,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         if ( toUser == null ) {
             throw new InvalidInputException( "To agent passed cannot be null" );
         }
-        LOG.info(
-            "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId() + " started." );
+        LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
+            + " started." );
         String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=? WHERE AGENT_ID = ?";
         Query query = getSession().createSQLQuery( queryStr );
         query.setParameter( 0, toUser.getUserId() );
@@ -475,8 +476,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         query.setParameter( 2, toUser.getEmailId() );
         query.setParameter( 3, fromUserId );
         query.executeUpdate();
-        LOG.info(
-            "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId() + " ended." );
+        LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
+            + " ended." );
     }
 
 
@@ -490,8 +491,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
-            criteria.add(
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN,
+                CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD ) );
             criteria.addOrder( Order.desc( CommonConstants.ENGAGEMENT_CLOSED_TIME ) );
             if ( start > -1 )
                 criteria.setFirstResult( start );
@@ -515,8 +516,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
-            criteria.add(
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN,
+                CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD ) );
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
             LOG.info( "Method getUnmatchedPreInitiatedSurveyCount() finished." );
@@ -664,9 +665,9 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN, statusList ) );
 
-            criteria
-                .setProjection( Projections.projectionList().add( Projections.groupProperty( CommonConstants.AGENT_ID_COLUMN ) )
-                    .add( Projections.max( CommonConstants.CREATED_ON ) ) );
+            criteria.setProjection( Projections.projectionList()
+                .add( Projections.groupProperty( CommonConstants.AGENT_ID_COLUMN ) )
+                .add( Projections.max( CommonConstants.CREATED_ON ) ) );
 
             List<Object[]> result = criteria.list();
             for ( Object[] obj : result ) {
@@ -684,25 +685,26 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
         return latestSurveySentForAgent;
     }
-    
-    
- // Method to get list of incomplete surveys to display in Dash board and profile page.
+
+
+    // Method to get list of incomplete surveys to display in Dash board and profile page.
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmailForPastNDays(long agentId , String customerEmail , int noOfDays ) throws DatabaseException
+    public List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmailForPastNDays( long agentId, String customerEmail,
+        int noOfDays ) throws DatabaseException
     {
         LOG.info( "Method getSurveyByAgentIdAndCustomeEmailForPastNDays() started." );
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
         try {
             //agent id
             criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId ) );
-          //customer Email
+            //customer Email
             criteria.add( Restrictions.eq( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, customerEmail ) );
-            
-                        
+
+
             //days criteria
-            if ( noOfDays > 0 ){
-                
+            if ( noOfDays > 0 ) {
+
                 Calendar startTime = Calendar.getInstance();
                 startTime.add( Calendar.DATE, -1 * noOfDays );
                 // strip the time component of start time
@@ -712,37 +714,37 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
                 startTime.set( Calendar.MILLISECOND, 0 );
 
                 Timestamp startDate = new Timestamp( startTime.getTimeInMillis() );
-               
-                criteria.add(Restrictions.ge( CommonConstants.CREATED_ON, startDate )  );
+
+                criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, startDate ) );
             }
-            
+            LOG.info( "Method getSurveyByAgentIdAndCustomeEmailForPastNDays() finished." );
             return criteria.list();
         } catch ( HibernateException e ) {
             LOG.error( "Exception caught in getSurveyByAgentIdAndCustomeEmailForPastNDays() ", e );
             throw new DatabaseException( "Exception caught in getSurveyByAgentIdAndCustomeEmailForPastNDays() ", e );
         }
-        
+
     }
 
-    
+
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmail(long agentId , String customerEmail ) throws DatabaseException
+    public List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmail( long agentId, String customerEmail )
+        throws DatabaseException
     {
-        LOG.info( "Method getSurveyByAgentIdAndCustomeEmailForPastNDays() started." );
+        LOG.info( "Method getSurveyByAgentIdAndCustomeEmail() started." );
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
         try {
             //agent id
             criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId ) );
-          //customer Email
+            //customer Email
             criteria.add( Restrictions.eq( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, customerEmail ) );
-          
+            LOG.info( "Method getSurveyByAgentIdAndCustomeEmail() finihed." );
             return criteria.list();
         } catch ( HibernateException e ) {
             LOG.error( "Exception caught in getSurveyByAgentIdAndCustomeEmailForPastNDays() ", e );
             throw new DatabaseException( "Exception caught in getSurveyByAgentIdAndCustomeEmailForPastNDays() ", e );
         }
-        
     }
 
 
@@ -754,8 +756,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class, "surveyPreInitiation" );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add(
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN,
+                CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) );
             criteria.addOrder( Order.desc( CommonConstants.ENGAGEMENT_CLOSED_TIME ) );
             if ( start > -1 )
                 criteria.setFirstResult( start );
@@ -777,8 +779,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class, "surveyPreInitiation" );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add(
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN,
+                CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) );
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
             LOG.info( "Method getCorruptPreInitiatedSurveyCount() finished." );
@@ -789,4 +791,46 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
         }
     }
+    
+    
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Long, SurveyPreInitiation> getPreInitiatedSurveyForIds( List<Long> surveyPreinitiationIds )
+    {
+        LOG.info( "Method getPreInitiatedSurveyForIds() started." );
+        Map<Long, SurveyPreInitiation> surveyPreinitiationMap = new HashMap<Long, SurveyPreInitiation>();
+        
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class, "surveyPreInitiation" );
+
+        criteria.add( Restrictions.in( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, surveyPreinitiationIds ) );
+        LOG.info( "Method getUnmatchedPreInitiatedSurveyCount() finished." );
+        List<SurveyPreInitiation> surveyPreInitiationList = criteria.list();
+
+        for(SurveyPreInitiation surveyPreInitiation : surveyPreInitiationList){
+            surveyPreinitiationMap.put( surveyPreInitiation.getSurveyPreIntitiationId(), surveyPreInitiation );
+        }
+
+        return surveyPreinitiationMap;
+    }
+
+    
+    @Override
+    public List<SurveyPreInitiation> getPreInitiatedSurveyForCompany( int start, int row, long companyId )
+    {
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+
+
+        if ( row > 0 )
+            criteria.setMaxResults( row );
+        if ( start > 0 )
+            criteria.setFirstResult( start );
+
+        criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED ) );
+        criteria.addOrder( Order.desc( CommonConstants.MODIFIED_ON_COLUMN ) );
+        return criteria.list();
+
+    }
+
 }

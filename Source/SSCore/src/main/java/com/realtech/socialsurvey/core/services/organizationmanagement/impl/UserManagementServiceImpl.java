@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,7 @@ import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SettingsSetterDao;
@@ -157,7 +159,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private GenericDao<LicenseDetail, Long> licenseDetailsDao;
 
     @Autowired
-    private GenericDao<Company, Long> companyDao;
+    private CompanyDao companyDao;
 
     @Autowired
     private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
@@ -1796,8 +1798,24 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             name = name + " " + lastName;
         }
 
+        OrganizationUnitSettings companySettings = null;
+        boolean hiddenSection = false;
+        User user = null;
+        try {
+            user = this.getUserByEmail( emailId );
+            if ( user != null ) {
+                companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+                if ( companySettings != null ) {
+                    hiddenSection = companySettings.isHiddenSection();
+                }
+            }
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.error( "No record fetched for user with email id: " + emailId );
+        }
+
         // Send reset password link to the user email ID
-        emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName, holdSendingMail );
+        emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName, holdSendingMail,
+            hiddenSection );
     }
 
 
@@ -1895,9 +1913,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.debug( "Calling email services to send verification mail for user " + user.getEmailId() );
             String profileName = getUserSettings( user.getUserId() ).getProfileName();
 
+            OrganizationUnitSettings companySettings = null;
+            boolean hiddenSection = false;
+            if ( user != null ) {
+                companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+                if ( companySettings != null ) {
+                    hiddenSection = companySettings.isHiddenSection();
+                }
+            }
+
             emailServices.sendVerificationMail( verificationUrl, user.getEmailId(),
                 user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ), profileName,
-                user.getLoginName() );
+                user.getLoginName(), hiddenSection );
         } catch ( InvalidInputException e ) {
             throw new InvalidInputException( "Could not send mail for verification.Reason : " + e.getMessage(), e );
         }
@@ -3061,54 +3088,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             "Finished adding a record in user count modification notification table for company " + company.getCompany() );
     }
 
-
-    @Transactional
-    @Override
-    public boolean isValidApiKey( String apiSecret, String apiKey ) throws InvalidInputException, NoRecordsFetchedException
-    {
-        LOG.info( "Validation api key for secret : " + apiSecret + " and key : " + apiKey );
-        if ( apiSecret == null || apiSecret.isEmpty() ) {
-            LOG.warn( "Api Secret is null" );
-            throw new InvalidInputException( "Invalid api secret" );
-        }
-        if ( apiKey == null || apiKey.isEmpty() ) {
-            LOG.warn( "Api key is null" );
-            throw new InvalidInputException( "Invalid api key" );
-        }
-        boolean isApiKeyValid = false;
-        Map<String, Object> queryMap = new HashMap<String, Object>();
-        queryMap.put( CommonConstants.API_SECRET_COLUMN, apiSecret.trim() );
-        queryMap.put( CommonConstants.API_KEY_COLUMN, apiKey.trim() );
-        queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-        long count = apiKeyDao.findNumberOfRowsByKeyValue( UserApiKey.class, queryMap );
-        LOG.debug( "Found " + count + " records from the api keys" );
-        if ( count > 0l ) {
-            LOG.info( "API key is valid" );
-            isApiKeyValid = true;
-        }
-        return isApiKeyValid;
-    }
-
-
-    /**
-     * Method to get user api key
-     * @return
-     */
-    @Transactional
-    @Override
-    public UserApiKey getApiKey()
-    {
-        LOG.info( "Method to get user api key started" );
-        List<UserApiKey> keys = apiKeyDao.findByColumn( UserApiKey.class, CommonConstants.STATUS_COLUMN,
-            CommonConstants.STATUS_ACTIVE );
-        if ( keys == null || keys.isEmpty() ) {
-            return null;
-        }
-        LOG.info( "Method to get user api key finished" );
-        return keys.get( 0 );
-    }
-
-
     /*
      * Method to get company admin for the company given.
      */
@@ -3555,6 +3534,102 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             valid = true;
         }
         return valid;
+    }
+    
+    /**
+     * 
+     */
+    @Override
+    @Transactional
+    public UserApiKey getUserApiKeyForCompany(  long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "method getUserApiKeyForCompany started for companyId " + companyId );
+
+        Map<String, Object> queryMap = new HashMap<String, Object>();
+        queryMap.put( CommonConstants.COMPANY_ID_COLUMN, companyId );
+        queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<UserApiKey> apiKeys = apiKeyDao.findByKeyValue( UserApiKey.class, queryMap );
+        
+        LOG.debug( "method getUserApiKeyForCompany ended for companyId " + companyId );
+        
+        if(apiKeys != null && apiKeys.size() > 0)
+            return apiKeys.get( CommonConstants.INITIAL_INDEX );
+        else 
+            return null;        
+    }
+    
+    /**
+     * 
+     * @param apiKey
+     * @param apiSecret
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public UserApiKey generateAndSaveUserApiKey( long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "method saveUserApiKey started " );
+
+        UserApiKey userApiKey = new UserApiKey();
+        
+        OrganizationUnitSettings settings = organizationManagementService.getCompanySettings( companyId );
+        String apiKey =  settings.getProfileName();
+        String apiSecret = String.valueOf( companyId ) + "_" + String.valueOf(System.currentTimeMillis() );
+        
+        userApiKey.setApiKey( apiKey );
+        userApiKey.setApiSecret( apiSecret );
+        userApiKey.setCompanyId( companyId );
+        userApiKey.setStatus( CommonConstants.STATUS_ACTIVE );
+        userApiKey.setCreatedOn( new Timestamp( System.currentTimeMillis()) );
+
+        userApiKey = apiKeyDao.save( userApiKey );
+        LOG.debug( "method saveUserApiKey ended");
+        
+        return userApiKey;        
+    }
+    
+    
+    @Override
+    @Transactional
+    public void updateStatusOfUserApiKey( long userApiKeyId , int status ) throws NoRecordsFetchedException  
+    {
+        LOG.debug( "method updateStatusOfUserApiKey started " );
+
+        UserApiKey userApiKey = apiKeyDao.findById( UserApiKey.class, userApiKeyId );
+        if(userApiKey == null){
+            throw new NoRecordsFetchedException("No Api key found with id " + userApiKeyId );
+        }
+      
+        userApiKey.setStatus( status );
+        apiKeyDao.update( userApiKey );
+        LOG.debug( "method updateStatusOfUserApiKey ended");
+              
+    }
+    
+    @Override
+    @Transactional
+    public List<UserApiKey> getActiveUserApiKeys(){
+        LOG.debug( "method getActiveUserApiKeys started " );
+        Map<String, Object> queryMap = new HashMap<String, Object>();
+        queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<UserApiKey> apiKeys = apiKeyDao.findByKeyValue( UserApiKey.class, queryMap );
+        
+        Set<Long> companyIds = new HashSet<Long>();
+        for(UserApiKey apiKey : apiKeys){
+            companyIds.add( apiKey.getCompanyId() );
+        }
+        
+        Map<Long , Company> companiesById = companyDao.getCompaniesByIds( companyIds );
+        for(UserApiKey apiKey : apiKeys){
+            Company currCompany = companiesById.get( apiKey.getCompanyId() );
+            if(currCompany != null)
+                apiKey.setCompanyName( currCompany.getCompany() );
+        }
+        
+        LOG.debug( "method getActiveUserApiKeys ended " );
+        return apiKeys;
     }
 
 
@@ -4640,10 +4715,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //JIRA SS-473 end
 
+        
+        //For Company with hidden agents
+        String senderName;
+        if(companySettings.isSendEmailFromCompany()){
+            senderName = companyName;
+        }else{
+            senderName = agentName;
+        }
+        
         //send mail
         try {
-            emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
-                user.getEmailId() );
+            emailServices.sendSurveyInvitationMail( survey.getCustomerEmailId(), mailSubject, mailBody, user.getEmailId(), senderName, user.getUserId() );
+            /*emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, senderName,
+                user.getEmailId() );*/
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
@@ -4665,6 +4750,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         if ( user != null ) {
             agentName = user.getFirstName();
+            if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
+                agentName = user.getFirstName() + " " + user.getLastName();
+            }
         }
 
         String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
@@ -4852,26 +4940,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
         //JIRA SS-473 end
+        
+      //For Company with hidden agents
+        String senderName;
+        if(companySettings.isSendEmailFromCompany()){
+            senderName = companyName;
+        }else{
+            senderName = agentName;
+        }
 
         //send the mail
         try {
-            emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
-                user.getEmailId() );
+            emailServices.sendSurveyInvitationMail( survey.getCustomerEmailId(), mailSubject, mailBody, user.getEmailId(), senderName, user.getUserId() );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
     }
-
-
-    private void sendMailToAgent( SurveyPreInitiation survey )
-    {
-        try {
-            emailServices.sendAgentSurveyReminderMail( survey.getCustomerEmailId(), survey );
-        } catch ( InvalidInputException | UndeliveredEmailException e ) {
-            LOG.error( "Exception caught " + e.getMessage() );
-        }
-    }
-
 
     /**
      * Method to check if agent is deleted and mark the corresponding survey as corrupted, if it is.
@@ -4914,5 +4998,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Calling email services to send registration invitation mail" );
         //emailServices.sendRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName() );
         emailServices.sendNewRegistrationInviteMail( url, user.getEmailId(), user.getFirstName(), user.getLastName(), planId );
+    }
+
+
+    @Override
+    public List<Long> getExcludedUserIds()
+    {
+        List<Long> userIds = new ArrayList<Long>();
+        List<Long> companyIdsWithHiddenAttribute = organizationUnitSettingsDao
+            .fetchEntityIdsWithHiddenAttribute( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        List<User> users = userDao.findByColumnForMultipleValues( User.class, "company.companyId",
+            companyIdsWithHiddenAttribute );
+        if ( users != null && !users.isEmpty() ) {
+            for ( User user : users ) {
+                userIds.add( user.getUserId() );
+            }
+        }
+        return userIds;
     }
 }

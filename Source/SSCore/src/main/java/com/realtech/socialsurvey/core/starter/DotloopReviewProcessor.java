@@ -166,7 +166,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                     if ( dotLoopCrmInfo.getApi() != null && !dotLoopCrmInfo.getApi().isEmpty() ) {
                         entityId = organizationUnitSettings.getIden();
                         //make an entry in crm batch tracker and update last run start time
-                        crmBatchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType,
+                        crmBatchTrackerService.getRecentRecordFetchedAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType,
                             entityId, CommonConstants.CRM_SOURCE_DOTLOOP );
                         LOG.debug( "API key is " + dotLoopCrmInfo.getApi() );
                         try {
@@ -181,7 +181,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                                 CommonConstants.CRM_SOURCE_DOTLOOP );
                             if ( crmBatchTracker != null )
                                 crmBatchTrackerHistoryService.insertCrmBatchTrackerHistory( newRecordFoundCount,
-                                    crmBatchTracker.getCrmBatchTrackerId() );
+                                    crmBatchTracker.getCrmBatchTrackerId(), CommonConstants.CRM_SOURCE_DOTLOOP );
                             // update  last run end time and count of new records found in crm batch tracker
                             crmBatchTrackerService.updateLastRunEndTimeByEntityTypeAndSourceType( entityType, entityId,
                                 CommonConstants.CRM_SOURCE_DOTLOOP, newRecordFoundCount );

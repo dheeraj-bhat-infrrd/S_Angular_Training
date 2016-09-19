@@ -2010,6 +2010,15 @@ public class OrganizationManagementController
         User user = sessionHelper.getCurrentUser();
 
         try {
+            try {
+                OrganizationUnitSettings companySettings = organizationManagementService
+                    .getCompanySettings( user.getCompany().getCompanyId() );
+                redirectAttributes.addFlashAttribute( "hiddenSection", companySettings.isHiddenSection() );
+            } catch ( InvalidInputException e ) {
+                throw new InvalidInputException( "Invalid Input exception occured in method getCompanySettings()",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+
             LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX );
             HttpSession session = request.getSession( false );
             AccountType accountType = null;

@@ -312,7 +312,15 @@ $(document).on('click', '#welcome-popup-invite', function(e) {
 $(document).on('click', '#overlay-pop-up', function(e) {
 	e.stopPropagation();
 });
-
+$(document).on('click', '.datepicker-months', function(e) {
+	e.stopPropagation();
+});
+$(document).on('click', '.month', function(e) {
+	e.stopPropagation();
+});
+$(document).on('click', '.year', function(e) {
+	e.stopPropagation();
+});
 $(document).on('click', '#report-abuse-pop-up', function(e) {
 	e.stopPropagation();
 });
@@ -3936,34 +3944,6 @@ function validateLoneWolfInput(elementId) {
 	isLoneValid = true;
 	var isFocussed = false;
 
-	if (!validateLoneWolf('lone-api')) {
-		isLoneValid = false;
-		if (!isFocussed) {
-			$('#lone-api').focus();
-			isFocussed = true;
-		}
-	}
-	if (!validateLoneWolf('lone-consumer-key')) {
-		isLoneValid = false;
-		if (!isFocussed) {
-			$('#lone-consumer-key').focus();
-			isFocussed = true;
-		}
-	}
-	if (!validateLoneWolf('lone-secret-key')) {
-		isLoneValid = false;
-		if (!isFocussed) {
-			$('#lone-secret-key').focus();
-			isFocussed = true;
-		}
-	}
-	if (!validateLoneWolf('lone-host')) {
-		isLoneValid = false;
-		if (!isFocussed) {
-			$('#lone-host').focus();
-			isFocussed = true;
-		}
-	}
 	if (!validateLoneWolf('lone-client')) {
 		isLoneValid = false;
 		if (!isFocussed) {
@@ -4012,18 +3992,7 @@ $('body').on('blur', '#encompass-url', function() {
 	validateURL(this.id);
 });
 // Lone Wolf input
-$('body').on('blur', '#lone-api', function() {
-	validateLoneWolf(this.id);
-});
-$('body').on('blur', '#lone-consumer-key', function() {
-	validateLoneWolf(this.id);
-});
-$('body').on('blur', '#lone-secret-key', function() {
-	validateLoneWolf(this.id);
-});
-$('body').on('blur', '#lone-host', function() {
-	validateLoneWolf(this.id);
-});
+
 $('body').on('blur', '#lone-client', function() {
 	validateLoneWolf(this.id);
 });
@@ -5423,6 +5392,7 @@ function initSurveyWithUrl(q) {
 				firstName = data.responseJSON.customerFirstName;
 				lastName = data.responseJSON.customerLastName;
 				surveyId = data.responseJSON.surveyId;
+				hiddenSection=data.responseJSON.hiddenSection;
 				paintSurveyPage(data);
 				var message = $("#pst-srvy-div .bd-check-txt").html();
 				$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
@@ -5916,7 +5886,10 @@ function showMasterQuestionPage() {
 		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
-		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
+		if(!hiddenSection){
+			$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
+		}
+		
 		var fmt_rating = Number(rating).toFixed(1);
 		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
@@ -7361,6 +7334,7 @@ $('body').on('click', '#prof-edit-social-link .icn-yelp', function(e) {
 $(document).on('click',function(){
 	$('#social-token-text').hide();
 });
+//hide input textbox for link
 $(document).on('click','#social-token-text',function(e){
 	e.stopPropagation();
 });
@@ -7676,7 +7650,7 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 
 	if (isReviewsRequestRunningEditProfile)
 		return; // Return if ajax request is still running
-	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore=" + minScore + "&startIndex=" + startIndex + "&numOfRows=" + numOfRows;
+	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore=" + minScore + "&startIndex=" + startIndex + "&numOfRows=" + numOfRows+ "&hiddenSection=" +hiddenSection;
 
 	isReviewsRequestRunningEditProfile = true;
 	if (!isNextBatch) {
@@ -8710,6 +8684,7 @@ $(document).on('click', '.checkbox-iscurrent', function(e) {
 });
 
 $(document).on('click', '.pos-remove-icn', function(e) {
+	e.stopPropagation();
 	$(this).parent().remove();
 	updatePositions();
 });
@@ -8859,7 +8834,7 @@ function updatePositions() {
 		showToast();
 	}
 
-	callAjaxPOSTWithTextData("/updatepositions.do?positions=" + positions, function(data) {
+	callAjaxPOSTWithTextData("/updatepositions.do?positions=" + encodeURIComponent(positions), function(data) {
 		if (data == "success") {
 			$('#overlay-toast').html("Positions updated successfully");
 			showToast();
@@ -9065,6 +9040,7 @@ $(document).on('input', '#wc-review-table-inner[data-role="agent"] input', funct
 		if ($('#wc-review-table-inner').children().length > 2) {
 			$('.wc-review-rmv-icn').show();
 		}
+		$('#wc-review-table-inner').find(':nth-child(3)').find('.wc-review-rmv-icn').hide();
 
 		// setting up perfect scrollbar
 		setTimeout(function() {
@@ -9088,6 +9064,7 @@ $(document).on('input', '#wc-review-table-inner[data-role="admin"] input', funct
 		if ($('#wc-review-table-inner').children().length > 2) {
 			$('.wc-review-rmv-icn').show();
 		}
+		$('#wc-review-table-inner').find(':nth-child(3)').find('.wc-review-rmv-icn').hide();
 
 		// setting up perfect scrollbar
 		setTimeout(function() {
@@ -9114,7 +9091,8 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 		$('#wc-review-table').perfectScrollbar('update');
 	}, 1000);
 });
-
+var surveysent=false;
+var alreadysentsurvey=false;
 $(document).on('click', '#wc-send-survey', function() {
 	var allowrequest = true;
 	var receiversList = [];
@@ -9126,6 +9104,9 @@ $(document).on('click', '#wc-send-survey', function() {
 	var agentname = "";
 	var myself = false;
 	var end = false;
+	if(surveysent || alreadysentsurvey){
+		return;
+	}
 	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
 			$(this).children().each(function() {
@@ -9338,6 +9319,10 @@ $(document).on('click', '#wc-send-survey', function() {
 	var surveyed = [];
 	var alreadysureyed = false;
 	if (allowrequest) {
+		if(alreadysentsurvey){
+			return;
+		}
+		alreadysentsurvey=true;
 		callAjaxPostWithPayloadData("./getalreadysurveyedemailids.do", function(data) {
 			var alreadySurveyedEmails = $.parseJSON(data);
 			// To check if the email had already surveyed
@@ -9365,24 +9350,37 @@ $(document).on('click', '#wc-send-survey', function() {
 
 			} else {
 				$('#send-survey-dash').removeClass("hide");
+				alreadysentsurvey=false;
+				if(surveysent){
+					return;
+				}
+				surveysent=true;
+				$('.ps-container').scrollTop(0).perfectScrollbar('update');
 				callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
+					
 					$('#send-survey-dash').addClass("hide");
 					$('.overlay-login').hide();
 					// Update the incomplete survey on dashboard
 					getIncompleteSurveyCount(colName, colValue);
 					if (data == "error") {
-						showError("Error while sending survey request!")
+						showError("Error while sending survey request!");
+						surveysent=false;
 					} else if (data.indexOf("Success") > -1) {
 						var response = $.parseJSON(data);
-						if (response.surveySentCount == 1)
+						if (response.surveySentCount == 1){
 							showInfo(response.surveySentCount + ' Survey Request Sent Successfully!');
-						else
+						    surveysent=false;
+						}
+							
+						else{
 							showInfo(response.surveySentCount + ' Survey Requests Sent Successfully!');
+							surveysent=false;
+						}
+							
 					} else {
 						$('#overlay-toast').html(data);
 					}
 
-					showToast();
 					enableBodyScroll();
 				}, payload, true);
 			}
@@ -10717,16 +10715,8 @@ function initiateEncompassSaveConnection(warn) {
 }
 
 function initiateLoneWolfSaveConnection(warn) {
-	var api = document.getElementById('lone-api').value;
-	var consumer = document.getElementById('lone-consumer-key').value;
-	var secret = document.getElementById('lone-secret-key').value;
-	var host = document.getElementById('lone-host').value;
 	var client = document.getElementById('lone-client').value;
 	var payload = {
-		"apiToken" : api,
-		"consumerKey" : consumer,
-		"secretKey" : secret,
-		"host" : host,
 		"clientCode" : client
 	};
 	showOverlay();
@@ -10910,16 +10900,8 @@ function encompassCretentials() {
 
 };
 function loneWolfCretentials() {
-	var api = document.getElementById('lone-api').value;
-	var consumer = document.getElementById('lone-consumer-key').value;
-	var secret = document.getElementById('lone-secret-key').value;
-	var host = document.getElementById('lone-host').value;
 	var client = document.getElementById('lone-client').value;
 	var payload = {
-		"apiToken" : api,
-		"consumerKey" : consumer,
-		"secretKey" : secret,
-		"host" : host,
 		"clientCode" : client
 	};
 
@@ -11057,4 +11039,20 @@ $(document).on('click', '.review-more-button', function() {
 	$(this).parent().find('.review-complete-txt').show();
 	$(this).parent().find('.view-zillow-link').show();
 	$(this).hide();
+});
+$(document).on('click','ul.accordion li',function(){
+	if($(this).find(".email-category").hasClass('expanded')){
+		$(this).find(".email-category").removeClass('expanded');
+		$(this).find(".email-content").css('display','none');
+		return false;
+	}else{
+		$(this).find(".email-category").addClass('expanded');
+		$(this).find(".email-content").css('display','block');
+		return false;
+		
+	}
+	
+});
+$(document).on('click','.email-content',function(event){
+	event.stopPropagation();
 });

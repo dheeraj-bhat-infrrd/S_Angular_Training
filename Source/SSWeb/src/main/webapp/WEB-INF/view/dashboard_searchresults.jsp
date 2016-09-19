@@ -14,7 +14,14 @@
 				<div class="dsh-res-display" data-attr="${result.userId}">${result.displayName}</div>
 			</c:when>
 			<c:when test="${searchColumn == 'company'}">
-				<div class="dsh-res-display" data-attr="${result.companyId}">${result.company}</div>
+			    <c:choose>
+                    <c:when test="${result.status == 0 || result.status == 11}">
+				        <div class="dsh-res-display" data-attr="${result.companyId}">${result.company} - inactive</div>
+                     </c:when>
+                    <c:otherwise>
+                        <div class="dsh-res-display" data-attr="${result.companyId}">${result.company}</div>
+                    </c:otherwise>
+			    </c:choose>
 			</c:when>
 		</c:choose>
 	</c:forEach>

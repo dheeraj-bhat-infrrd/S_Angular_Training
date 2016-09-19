@@ -16,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import retrofit.mime.TypedByteArray;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -23,28 +25,23 @@ import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.LoneWolfErrorCode;
-import com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntegrationApi;
-import com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntergrationApiBuilder;
-import com.realtech.socialsurvey.core.utils.LoneWolfRestUtils;
-
-import retrofit.mime.TypedByteArray;
+import com.realtech.socialsurvey.core.services.lonewolf.LoneWolfIntegrationService;
 
 
 @Controller
 @RequestMapping ( value = "/lonewolf")
 public class LoneWolfController extends AbstractController
 {
-
     private static final Logger LOG = LoggerFactory.getLogger( LoneWolfController.class );
 
-    @Value ( "${LONEWOLF_APP_CONNECTION_URL}")
-    private String loneWolfAppConnectionURL;
-
     @Autowired
-    private LoneWolfRestUtils loneWolfRestUtils;
+    private LoneWolfIntegrationService loneWolfIntegrationService;
 
-    @Autowired
-    private LoneWolfIntergrationApiBuilder loneWolfIntegrationApiBuilder;
+    @Value ( "${LONEWOLF_API_TOKEN}")
+    private String apiToken;
+
+    @Value ( "${LONEWOLF_SECRET_KEY}")
+    private String secretKey;
 
 
     /**
@@ -58,11 +55,9 @@ public class LoneWolfController extends AbstractController
      */
     @ResponseBody
     @RequestMapping ( value = "/testcredentials")
-    public String testCompanyCredentials( @QueryParam ( value = "apiToken") String apiToken,
-        @QueryParam ( value = "secretKey") String secretKey, @QueryParam ( value = "clientCode") String clientCode )
+    public String testCompanyCredentials( @QueryParam ( value = "clientCode") String clientCode )
     {
-        LOG.info( "Method to test lonewolf credentials started for apiToken : " + apiToken + " secretKey : " + secretKey
-            + " clientCode : " + clientCode + " started." );
+        LOG.info( "Method to test lonewolf credentials started for clientCode : " + clientCode + " started." );
         Response response = null;
         boolean status = false;
         String message = null;
@@ -79,27 +74,16 @@ public class LoneWolfController extends AbstractController
                     throw new InvalidInputException( "Client Code cannot be empty" );
                 }
 
-                //generating authorization header
-                String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( loneWolfAppConnectionURL, secretKey,
-                    apiToken, clientCode );
-
-                LOG.debug( "Test connection authHeader: " + authHeader );
-                
-                LoneWolfIntegrationApi loneWolfIntegrationApi = loneWolfIntegrationApiBuilder.getLoneWolfIntegrationApi();
-
-                //calling get test transaction for id = test
-                retrofit.client.Response transactionResponse = loneWolfIntegrationApi.testConnection( authHeader,
-                    loneWolfRestUtils.MD5_EMPTY );
-
-                LOG.debug( "Test connection response: " + transactionResponse );
+                retrofit.client.Response res = loneWolfIntegrationService.testLoneWolfCompanyCredentials( secretKey, apiToken,
+                    clientCode );
 
                 //processing retrofit response and building rest response
-                if ( transactionResponse != null ) {
-                    if ( transactionResponse.getStatus() == HttpStatus.SC_OK ) {
+                if ( res != null ) {
+                    if ( res.getStatus() == HttpStatus.SC_OK ) {
                         status = true;
                         message = "Lone Wolf Test Connection Successful.";
                     } else {
-                        String responseString = new String( ( (TypedByteArray) transactionResponse.getBody() ).getBytes() );
+                        String responseString = new String( ( (TypedByteArray) res.getBody() ).getBytes() );
                         Map<String, String> responseMap = new Gson().fromJson( responseString,
                             new TypeToken<Map<String, String>>() {}.getType() );
                         message = responseMap.get( "Message" );

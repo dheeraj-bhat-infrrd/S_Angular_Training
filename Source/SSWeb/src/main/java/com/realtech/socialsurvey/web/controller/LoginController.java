@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -179,6 +180,17 @@ public class LoginController
         LOG.info( "Login Page started" );
 
         User user = sessionHelper.getCurrentUser();
+        boolean hiddenSection = false;
+        try {
+            OrganizationUnitSettings settings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
+            if ( settings != null ) {
+                hiddenSection = settings.isHiddenSection();
+                model.addAttribute( "hiddenSection", hiddenSection );
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.error( "fetching hiddensction varibale value failed." + e );
+        }
 
         if ( user.isSuperAdmin() ) {
             return JspResolver.ADMIN_LANDING;
@@ -225,6 +237,7 @@ public class LoginController
         String isDirectRegistration = null;
 
         try {
+
             // Setting the direct registration flag
             isDirectRegistration = request.getParameter( "isDirectRegistration" );
             // handle direct registration, if the user has incomplete
@@ -238,6 +251,16 @@ public class LoginController
             if ( user.getIsForcePassword() == 1
                 && !user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
                 return "redirect:/registeraccount/newloginas.do?userId=" + user.getUserId();
+            }
+
+            try {
+                OrganizationUnitSettings companySettings = organizationManagementService
+                    .getCompanySettings( user.getCompany().getCompanyId() );
+                if ( companySettings != null )
+                    redirectAttributes.addFlashAttribute( "hiddenSection", companySettings.isHiddenSection() );
+            } catch ( InvalidInputException e ) {
+                throw new InvalidInputException( "Invalid Input exception occured in method getCompanySettings()",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
             // code to hide the overlay during registration

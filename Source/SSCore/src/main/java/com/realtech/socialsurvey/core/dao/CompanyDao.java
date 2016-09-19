@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.core.dao;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.BillingReportData;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -16,7 +18,7 @@ public interface CompanyDao extends GenericDao<Company, Long> {
 	
 	public List<Company> searchCompaniesByName(String namePattern);
 
-	public List<Company> searchCompaniesByNameAndKeyValue(String namePattern, int accountType, int status , boolean inCompleteCompany , Timestamp startDate);
+	public List<Long> searchCompaniesByNameAndKeyValue(String namePattern, int accountType, int status , boolean inCompleteCompany , Timestamp startDate);
 
 	public List<Company> getCompaniesByDateRange(Timestamp startTime, Timestamp endTime);
 
@@ -33,5 +35,7 @@ public interface CompanyDao extends GenericDao<Company, Long> {
     List<Company> getAllInvoicedActiveCompanies();
 
     List<Company> getCompaniesByBillingModeAuto();
+
+    Map<Long , Company> getCompaniesByIds( Set<Long> ids );
 
 }

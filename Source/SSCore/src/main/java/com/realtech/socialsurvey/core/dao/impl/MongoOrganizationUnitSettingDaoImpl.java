@@ -16,6 +16,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.BasicQuery;
@@ -81,6 +82,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_FACEBOOK_TOKEN_TO_POST = "facebookAccessTokenToPost";
     public static final String KEY_COMPANY_POSITIONS = "positions";
     public static final String KEY_IDENTIFIER = "iden";
+    public static final String KEY_HIDDEN_SECTION = "hiddenSection";
     public static final String KEY_VERTICAL = "vertical";
     public static final String KEY_PROFILE_STAGES = "profileStages";
     public static final String KEY_MODIFIED_ON = "modifiedOn";
@@ -397,17 +399,17 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
     @Override
     public List<ProfileUrlEntity> fetchSEOOptimizedOrganizationUnitSettings( String collectionName, int skipCount,
-        int numOfRecords )
+        int numOfRecords, List<Long> excludedEntityIds )
     {
         LOG.info( "Getting SEO related data for " + collectionName );
         List<ProfileUrlEntity> profileUrls = null;
         // only get profile name
-        // Query query = new BasicQuery(new BasicDBObject(KEY_DEFAULT_BY_SYSTEM, false));
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
         // query records which are not deleted or incomplete
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        query.addCriteria( Criteria.where( KEY_IDENTIFIER ).nin( excludedEntityIds ) );
         query.fields().include( KEY_PROFILE_URL ).include( KEY_MODIFIED_ON ).exclude( "_id" );
         query.with( new Sort( Sort.Direction.DESC, KEY_MODIFIED_ON ) );
         if ( skipCount > 0 ) {
@@ -422,10 +424,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 
     @Override
-    public long fetchSEOOptimizedOrganizationUnitCount( String collectionName )
+    public long fetchSEOOptimizedOrganizationUnitCount( String collectionName, List<Long> excludedEntityIds )
     {
         LOG.info( "Getting SEO Optimized count for collection " + collectionName );
-        Query query = new BasicQuery( new BasicDBObject( KEY_DEFAULT_BY_SYSTEM, false ) );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
+        query.addCriteria( Criteria.where( KEY_IDENTIFIER ).nin( excludedEntityIds ) );
         long count = mongoTemplate.count( query, collectionName );
         LOG.info( "Returning count " + count );
         return count;
@@ -552,7 +556,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public List<OrganizationUnitSettings> getCompanyList()
     {
-        LOG.debug( "Method getCompanyList() called" );
+        LOG.info( "Method getCompanyList() started." );
 
         List<OrganizationUnitSettings> unitSettings = null;
         Query query = new Query();
@@ -560,8 +564,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             .exclude( "_id" );
         query.with( new Sort( Sort.Direction.DESC, KEY_MODIFIED_ON ) );
 
-        unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "query: " + query.toString() );
 
+        unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        LOG.info( "Method getCompanyList() finished." );
         return unitSettings;
     }
 
@@ -572,7 +578,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public List<OrganizationUnitSettings> getCompanyListByIds( Set<Long> companyIds )
     {
-        LOG.debug( "Method getCompanyList() called" );
+        LOG.debug( "Method getCompanyList() started." );
 
         List<OrganizationUnitSettings> unitSettings = null;
         Query query = new Query();
@@ -580,8 +586,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.fields().include( KEY_CONTACT_DETAILS ).include( KEY_PROFILE_NAME ).include( KEY_VERTICAL ).include( KEY_IDEN )
             .include( KEY_PROFILE_IMAGE ).exclude( "_id" );
 
+        query.with( new Sort( Direction.ASC, KEY_CONTACT_NAME ) );
+        LOG.info( "Query: " + query.toString() );
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
-
+        LOG.debug( "Method getCompanyList() finished." );
         return unitSettings;
     }
 
@@ -929,5 +937,53 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).exclude( "_id" );
         SocialMediaTokens tokens = mongoTemplate.findOne( query, SocialMediaTokens.class, collectionName );
         return tokens;
+    }
+
+
+    @Override
+    public List<OrganizationUnitSettings> fetchUnitSettingsForSocialMediaTokens( String collectionName )
+    {
+        LOG.info( "Fetching unit settings for social media token expiry from " + collectionName );
+        List<OrganizationUnitSettings> settings = null;
+
+        List<Criteria> cList = new ArrayList<>();
+
+        cList.add( Criteria.where( KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+        //cList.add( Criteria.where( KEY_TWITTER_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+        cList.add( Criteria.where( KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+        //cList.add( Criteria.where( KEY_GOOGLE_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+
+        Criteria criteria = new Criteria().orOperator( cList.toArray( new Criteria[cList.size()] ) );
+
+        Query query = new Query();
+        query.addCriteria( criteria );
+
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( KEY_CONTACT_DETAILS )
+            .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
+
+        settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
+        LOG.info( "Fetched " + ( settings != null ? settings.size() : "none" ) + " unit settings with social media tokens from "
+            + collectionName );
+
+        return settings;
+    }
+
+
+    @Override
+    public List<Long> fetchEntityIdsWithHiddenAttribute( String collection )
+    {
+        List<Long> entityIds = new ArrayList<Long>();
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        query.addCriteria( Criteria.where( KEY_HIDDEN_SECTION ).is( true ) );
+        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collection );
+        if ( settings != null && !settings.isEmpty() ) {
+            for ( OrganizationUnitSettings setting : settings ) {
+                entityIds.add( setting.getIden() );
+            }
+        }
+        return entityIds;
     }
 }

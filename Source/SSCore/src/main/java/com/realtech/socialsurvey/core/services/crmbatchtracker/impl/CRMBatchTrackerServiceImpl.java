@@ -34,7 +34,7 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
 
     @Override
     @Transactional
-    public long getLastRunEndTimeAndUpdateLastStartTimeByEntityTypeAndSourceType( String entityType, long entityId,
+    public long getRecentRecordFetchedAndUpdateLastStartTimeByEntityTypeAndSourceType( String entityType, long entityId,
         String source ) throws InvalidInputException
     {
         LOG.debug( "method getLastRunEndTimeAndUpdateLastStartTimeByEntityTypeAndSourceType started" );
@@ -51,6 +51,7 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
         CrmBatchTracker crmBatchTracker=getCrmBatchTracker(entityType,entityId,source);
         
         long lastEndTime;
+        long recentRecordFetchedTime;
         long currentTime = System.currentTimeMillis();
         if ( crmBatchTracker == null) {
             LOG.debug( "No entry found in crm batch tracker for entity type : " + entityType + " with id : " + entityId );
@@ -70,9 +71,11 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
             crmBatchTracker.setCreatedOn( new Timestamp( currentTime ) );
             crmBatchTracker.setRecentRecordFetchedDate( new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS ) );
             lastEndTime = CommonConstants.EPOCH_TIME_IN_MILLIS;
+            recentRecordFetchedTime = CommonConstants.EPOCH_TIME_IN_MILLIS;
         } else {
             
             lastEndTime = crmBatchTracker.getLastRunEndDate().getTime();
+            recentRecordFetchedTime = crmBatchTracker.getRecentRecordFetchedDate().getTime();
         }
 
 
@@ -80,7 +83,7 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
         crmBatchTracker.setModifiedOn( new Timestamp( currentTime ) );
         crmBatchTrackerDao.saveOrUpdate( crmBatchTracker );
         LOG.debug( "method getLastRunEndTimeAndUpdateLastStartTimeByEntityTypeAndSourceType ended" );
-        return lastEndTime;
+        return recentRecordFetchedTime;
     }
 
     @Override
@@ -137,6 +140,7 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
                      + entityId );	
         }
         crmBatchTracker.setLastRunEndDate( new Timestamp( System.currentTimeMillis() ) );
+        crmBatchTracker.setRecentRecordFetchedDate( new Timestamp( System.currentTimeMillis() ) );
         crmBatchTracker.setLastRunRecordFetchedCount(lastRunRecordFetchedCount);
         crmBatchTracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         crmBatchTracker.setError( null );

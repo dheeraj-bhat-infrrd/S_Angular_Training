@@ -1,5 +1,48 @@
 package com.realtech.socialsurvey.core.services.social.impl;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import twitter4j.StatusUpdate;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.RequestToken;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.ExternalSurveyTrackerDao;
@@ -23,6 +66,9 @@ import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.EntityMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
+import com.realtech.socialsurvey.core.entities.FacebookPage;
+import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.MediaPostDetails;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
@@ -46,6 +92,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -56,57 +103,21 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.core.vo.UserList;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
+
+import facebook4j.Account;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
 import facebook4j.PostUpdate;
+import facebook4j.ResponseList;
 import facebook4j.auth.AccessToken;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import twitter4j.StatusUpdate;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.RequestToken;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.ConfigurationBuilder;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -166,6 +177,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private SettingsSetter settingsSetter;
+    
+    @Autowired
+    private SocialMediaExceptionHandler socialMediaExceptionHandler; 
+    
+    @Autowired
+    private URLGenerator urlGenerator;
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
@@ -178,10 +195,15 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     private String facebookClientId;
     @Value ( "${FB_CLIENT_SECRET}")
     private String facebookAppSecret;
+    @Value ( "${FB_URI}")
+    private String facebookUri;
     @Value ( "${FB_SCOPE}")
     private String facebookScope;
     @Value ( "${FB_REDIRECT_URI}")
     private String facebookRedirectUri;
+    @Value ( "${FB_REDIRECT_URI_FOR_MAIL}")
+    private String facebookRedirectUriForMail;
+    
 
     // Twitter
     @Value ( "${TWITTER_CONSUMER_KEY}")
@@ -194,9 +216,22 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     // Linkedin
     @Value ( "${LINKED_IN_REST_API_URI}")
     private String linkedInRestApiUri;
-
+    @Value ( "${LINKED_IN_API_KEY}")
+    private String linkedInApiKey;
+    @Value ( "${LINKED_IN_API_SECRET}")
+    private String linkedInApiSecret;
+    @Value ( "${LINKED_IN_REDIRECT_URI}")
+    private String linkedinRedirectUri;
+    @Value ( "${LINKED_IN_AUTH_URI}")
+    private String linkedinAuthUri;
+    @Value ( "${LINKED_IN_SCOPE}")
+    private String linkedinScope;
+    
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
+    
+    @Value ( "${LINKED_IN_REDIRECT_URI_FOR_MAIL}")
+    private String linkedinREdirectUriForMail;
 
     @Value ( "${APPLICATION_LOGO_URL}")
     private String applicationLogoUrl;
@@ -278,6 +313,19 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         return new FacebookFactory( configuration ).getInstance();
     }
 
+    
+    @Override
+    public Facebook getFacebookInstanceByCallBackUrl( String callBackUrl )
+    {
+        facebook4j.conf.ConfigurationBuilder confBuilder = new facebook4j.conf.ConfigurationBuilder();
+        confBuilder.setOAuthAppId( facebookClientId );
+        confBuilder.setOAuthAppSecret( facebookAppSecret );
+        confBuilder.setOAuthCallbackURL( callBackUrl );
+        confBuilder.setOAuthPermissions( facebookScope );
+        facebook4j.conf.Configuration configuration = confBuilder.build();
+
+        return new FacebookFactory( configuration ).getInstance();
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception
@@ -438,7 +486,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     @Override
-    public boolean updateLinkedin( OrganizationUnitSettings settings, String message, String linkedinProfileUrl,
+    public boolean updateLinkedin( OrganizationUnitSettings settings, String collectionName, String message, String linkedinProfileUrl,
         String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow, AgentSettings agentSettings,
         SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException
     {
@@ -519,6 +567,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             String responseString = response.toString();
                             LOG.info( "Server response while posting on linkedin : " + responseString );
                             JSONObject entityUpdateResponseObj = new JSONObject( EntityUtils.toString( response.getEntity() ) );
+                            
+                            if(response.getStatusLine()!= null && response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+                              //call social media error handler for linkedin exception
+                                socialMediaExceptionHandler.handleLinkedinException(settings, collectionName);
+                            }
+                            
                             if ( responseString.contains( "201 Created" ) ) {
                                 String updateUrl = (String) entityUpdateResponseObj.get( "updateUrl" );
                                 linkedinPostResponse.setReferenceUrl( updateUrl );
@@ -1020,7 +1074,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
                 if ( agent != null && agent.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                     postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
-                        serverBaseUrl, agentSettings, socialMediaPostDetails.getAgentMediaPostDetails(),
+                        serverBaseUrl, agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION , socialMediaPostDetails.getAgentMediaPostDetails(),
                         agentMediaPostResponseDetails, isZillow );
                 }
             }
@@ -1037,7 +1091,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     Company company = organizationManagementService.getCompanyById( companySetting.getIden() );
                     if ( company != null && company.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                         postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
-                            serverBaseUrl, companySetting, socialMediaPostDetails.getCompanyMediaPostDetails(),
+                            serverBaseUrl, companySetting, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION , socialMediaPostDetails.getCompanyMediaPostDetails(),
                             companyMediaPostResponseDetails, isZillow );
                     }
                 }
@@ -1056,7 +1110,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                                 regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
                             postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage,
-                                rating, serverBaseUrl, setting, regionMediaPostDetails, regionMediaPostResponseDetails, isZillow );
+                                rating, serverBaseUrl, setting, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,  regionMediaPostDetails, regionMediaPostResponseDetails, isZillow );
                         }
                     }
 
@@ -1075,7 +1129,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( branch != null && branch.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                         if ( setting != null ) {
                             postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage,
-                                rating, serverBaseUrl, setting, branchMediaPostDetails, branchMediaPostResponseDetails, isZillow );
+                                rating, serverBaseUrl, setting, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ,  branchMediaPostDetails, branchMediaPostResponseDetails, isZillow );
                         }
                     }
                 }
@@ -1088,7 +1142,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     void postToFacebookForAHierarchy( long companyId, AgentSettings agentSettings, String facebookMessage,
-        String updatedFacebookMessage, double rating, String serverBaseUrl, OrganizationUnitSettings setting,
+        String updatedFacebookMessage, double rating, String serverBaseUrl, OrganizationUnitSettings setting, String collectionType,
         MediaPostDetails mediaPostDetails, EntityMediaPostResponseDetails mediaPostResponseDetails, boolean isZillow )
         throws InvalidInputException
     {
@@ -1119,6 +1173,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         } catch ( FacebookException e ) {
             LOG.error( "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
                 e );
+            //call social media error handler for facebook exception
+            socialMediaExceptionHandler.handleFacebookException( e , setting , collectionType);
+            //update Social Media Post Response
             SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
             facebookPostResponse
                 .setAccessToken( setting.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() );
@@ -1178,7 +1235,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             if ( agentSettings != null ) {
                 User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
                 if ( agent != null && agent.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                    postToLinkedInForAHierarchy( agentSettings, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                    postToLinkedInForAHierarchy( agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
                         linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
                         socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails );
                 }
@@ -1194,7 +1251,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( companySetting != null ) {
                     Company company = userManagementService.getCompanyById( companySetting.getIden() );
                     if ( company != null && company.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                        postToLinkedInForAHierarchy( companySetting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                        postToLinkedInForAHierarchy( companySetting,MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
                             linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
                             socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails );
                     }
@@ -1213,7 +1270,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
                         Region region = userManagementService.getRegionById( setting.getIden() );
                         if ( region != null && region.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                            postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                            postToLinkedInForAHierarchy( setting,MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
                                 linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
                                 regionMediaPostDetails, regionMediaPostResponseDetails );
                         }
@@ -1231,7 +1288,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
                         Branch branch = userManagementService.getBranchById( setting.getIden() );
                         if ( branch != null && branch.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                            postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                            postToLinkedInForAHierarchy( setting, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
                                 linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
                                 branchMediaPostDetails, branchMediaPostResponseDetails );
                         }
@@ -1244,8 +1301,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
-    void
-	postToLinkedInForAHierarchy( OrganizationUnitSettings setting, Double rating, boolean isZillow,
+    void postToLinkedInForAHierarchy( OrganizationUnitSettings setting, String collectionName ,  Double rating, boolean isZillow,
         String updatedLinkedInMessage, String linkedinMessage, String linkedinProfileUrl, String linkedinMessageFeedback,
         OrganizationUnitSettings companySettings, AgentSettings agentSettings, MediaPostDetails mediaPostDetails,
         EntityMediaPostResponseDetails mediaPostResponseDetails )
@@ -1259,7 +1315,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
                 linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
 
-                if ( !updateLinkedin( setting, updatedLinkedInMessage, linkedinProfileUrl, linkedinMessageFeedback,
+                if ( !updateLinkedin( setting, collectionName, updatedLinkedInMessage, linkedinProfileUrl, linkedinMessageFeedback,
                     companySettings, isZillow, agentSettings, linkedinPostResponse ) ) {
                     List<String> socialList = mediaPostDetails.getSharedOn();
                     if ( !socialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
@@ -1273,6 +1329,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 }
             }
         } catch ( Exception e ) {
+            //update SocialMediaPostResponse object
             SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
             linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
             linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
@@ -3125,5 +3182,158 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
         LOG.info( "Method to trigger complaint resolution workflow for a review, triggerComplaintResolutionWorkflowForZillowReview finished." );
         return false;
+    }
+    
+    /**
+     * 
+     * @param collectionName
+     * @param iden
+     * @param facebookToken
+     */
+    public void updateFacebookToken( String collectionName , long iden ,  FacebookToken facebookToken)
+    {
+        LOG.info( "Method updateFacebookToken() started" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( MongoOrganizationUnitSettingDaoImpl.KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN, facebookToken, iden, collectionName );
+        LOG.info( "Method updateFacebookToken() ended" );
+    }
+    
+    /**
+     * 
+     * @param collectionName
+     * @param iden
+     * @param linkedInToken
+     */
+    public void updateLinkedinToken( String collectionName , long iden ,  LinkedInToken linkedInToken)
+    {
+        LOG.info( "Method updateLinkedinToken() started" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN, linkedInToken, iden, collectionName );
+        LOG.info( "Method updateLinkedinToken() ended" );
+    }
+    
+    
+    /**
+     * 
+     * @param accessToken
+     * @param mediaTokens
+     * @param profileLink
+     * @return
+     */
+    @Override
+    public SocialMediaTokens updateFacebookToken( facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens,
+        String profileLink )
+    {
+        LOG.debug( "Method updateFacebookToken() called from SocialManagementController" );
+        if ( mediaTokens == null ) {
+            LOG.debug( "Media tokens do not exist. Creating them and adding the facebook access token" );
+            mediaTokens = new SocialMediaTokens();
+        }
+        
+        //check for facebook token
+        FacebookToken facebookToken = mediaTokens.getFacebookToken();
+        if(facebookToken == null){
+            facebookToken = new FacebookToken();
+        }
+
+        //update profile link
+        if ( profileLink != null )
+            facebookToken.setFacebookPageLink( profileLink );
+
+        //update access tokem
+        facebookToken.setFacebookAccessToken( accessToken.getToken() );
+        facebookToken.setFacebookAccessTokenCreatedOn( System.currentTimeMillis() );
+        if ( accessToken.getExpires() != null )
+            facebookToken.setFacebookAccessTokenExpiresOn( accessToken.getExpires() );
+
+        facebookToken.setFacebookAccessTokenToPost( accessToken.getToken() );
+
+        Facebook facebook = new FacebookFactory().getInstance();
+        facebook.setOAuthAppId( facebookClientId, facebookAppSecret );
+        facebook.setOAuthAccessToken( new facebook4j.auth.AccessToken( accessToken.getToken() ) );
+
+        //update facebook pages
+        ResponseList<Account> accounts;
+        List<FacebookPage> facebookPages = new ArrayList<FacebookPage>();
+        try {
+            accounts = facebook.getAccounts();
+            FacebookPage facebookPage = null;
+            for ( Account account : accounts ) {
+                facebookPage = new FacebookPage();
+                facebookPage.setId( account.getId() );
+                facebookPage.setName( account.getName() );
+                facebookPage.setAccessToken( account.getAccessToken() );
+                facebookPage.setCategory( account.getCategory() );
+                facebookPage.setProfileUrl( facebookUri.concat( account.getId() ) );
+                facebookPages.add( facebookPage );
+            }
+        } catch ( FacebookException e ) {
+            LOG.error( "Error while creating access token for facebook: " + e.getLocalizedMessage(), e );
+        }
+        facebookToken.setFacebookPages( facebookPages );
+        
+        //update expiry email alert detail
+        facebookToken.setTokenExpiryAlertSent( false );
+        facebookToken.setTokenExpiryAlertEmail( null );
+        facebookToken.setTokenExpiryAlertTime( null );
+        
+
+        //update facebook token in media token
+        mediaTokens.setFacebookToken( facebookToken );
+        
+        LOG.debug( "Method updateFacebookToken() finished from SocialManagementController" );
+        return mediaTokens;
+    }
+    
+    @Override
+    public String getFbRedirectUrIForEmailRequest( String columnName , String columnValue , String baseUrl) throws InvalidInputException
+    {
+        LOG.info( "method getFbRedirectUrIForEmailRequest started " );
+        Map<String, String> urlParams = new HashMap<String , String>();
+        urlParams.put( "columnName" , columnName );
+        urlParams.put( "columnValue" , columnValue );
+        urlParams.put( "serverBaseUrl" , baseUrl );
+        
+        String facebookOauthRedirectUrl = urlGenerator.generateUrl( urlParams,  baseUrl + facebookRedirectUriForMail );
+        LOG.debug( "generated fb redirect url is : " + facebookOauthRedirectUrl );
+        
+        LOG.info( "method getFbRedirectUrIForEmailRequest ended " );
+        return facebookOauthRedirectUrl;
+    }
+    
+    @Override
+    public String getLinkedinRedirectUrIForEmailRequest( String columnName , String columnValue , String baseUrl) throws InvalidInputException
+    {
+        LOG.info( "method getLinkedinRedirectUrIForEmailRequest started " );
+
+        Map<String, String> urlParams = new HashMap<String , String>();
+        urlParams.put( "columnName" , columnName );
+        urlParams.put( "columnValue" , columnValue );
+        urlParams.put( "serverBaseUrl" , baseUrl );
+        
+        String linkedinOauthRedirectUrl = urlGenerator.generateUrl( urlParams,  baseUrl + linkedinREdirectUriForMail );
+        LOG.debug( "generated linkedin redirect url is : " + linkedinOauthRedirectUrl );
+
+        LOG.info( "method getLinkedinRedirectUrIForEmailRequest ended " );
+        return linkedinOauthRedirectUrl;
+    }
+    
+    /**
+     * 
+     * @param redirectUri
+     * @return
+     */
+    @Override
+    public String getLinkedinAuthUrl(String redirectUri){
+        
+        LOG.info( "Method getLinkedinAuthUrl started" );
+        
+        StringBuilder linkedInAuth = new StringBuilder( linkedinAuthUri ).append( "?response_type=" ).append(
+            "code" );
+        linkedInAuth.append( "&client_id=" ).append( linkedInApiKey );
+        linkedInAuth.append( "&redirect_uri=" ).append( redirectUri );
+        linkedInAuth.append( "&state=" ).append( "SOCIALSURVEY" );
+        linkedInAuth.append( "&scope=" ).append( linkedinScope );
+        
+        LOG.info( "Method getLinkedinAuthUrl ended" );
+        return linkedInAuth.toString();
     }
 }

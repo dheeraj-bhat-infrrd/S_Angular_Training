@@ -210,6 +210,25 @@ public class DashboardController
     }
 
 
+    @RequestMapping ( value = "/ishiddensection")
+    @ResponseBody
+    public String isHiddenSection()
+    {
+        User user = sessionHelper.getCurrentUser();
+        boolean hiddenSection = false;
+        try {
+            OrganizationUnitSettings settings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
+            if ( settings != null ) {
+                hiddenSection = settings.isHiddenSection();
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.error( "fetching hiddensction varibale value failed." + e );
+        }
+        return String.valueOf( hiddenSection );
+    }
+
+
     /*
      * Method to get profile details for displaying
      */
@@ -288,15 +307,19 @@ public class DashboardController
             }
 
             boolean allowOverrideForSocialMedia = false;
+            boolean hiddenSection = false;
             //Code to determine if social media can be overridden during autologin
             if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 allowOverrideForSocialMedia = unitSettings.isAllowOverrideForSocialMedia();
+                hiddenSection = unitSettings.isHiddenSection();
             } else {
                 OrganizationUnitSettings companySettings = organizationManagementService
                     .getCompanySettings( user.getCompany().getCompanyId() );
                 allowOverrideForSocialMedia = companySettings.isAllowOverrideForSocialMedia();
+                hiddenSection = companySettings.isHiddenSection();
             }
             model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
+            model.addAttribute( "hiddenSection", hiddenSection );
 
             // calculating details for circles
             int numberOfDays = -1;
@@ -313,7 +336,6 @@ public class DashboardController
                 columnName = null;
             }
             LOG.debug( "Getting the survey score." );
-            ;
             double surveyScore = dashboardService.getSurveyScore( columnName, columnValue, numberOfDays, realtechAdmin );
             //get formatted survey score using rating format  
             surveyScore = surveyHandler.getFormattedSurveyScore( surveyScore );
@@ -408,6 +430,8 @@ public class DashboardController
                 .getSocialPostsForPastNdaysWithHierarchyForStatistics( columnName, columnValue, numberOfDays ) );
             model.addAttribute( "importedFromZillow",
                 dashboardService.getZillowImportCount( columnName, columnValue, numberOfDays ) );
+            model.addAttribute( "importedFrom3rdParty",
+                dashboardService.get3rdPartyImportCount( columnName, columnValue, numberOfDays ) );
         } catch ( InvalidInputException e ) {
             LOG.error( "Error: " + e.getMessage(), e );
 
@@ -519,15 +543,23 @@ public class DashboardController
                 }
             }
 
+            boolean hiddenSection = false;
             try {
                 surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false,
                     null, null, "date" );
                 profileManagementService.setAgentProfileUrlForReview( surveyDetails );
+
+                OrganizationUnitSettings settings = organizationManagementService
+                    .getCompanySettings( user.getCompany().getCompanyId() );
+                if ( settings != null ) {
+                    hiddenSection = settings.isHiddenSection();
+                }
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
                 throw e;
             }
             model.addAttribute( "reviews", surveyDetails );
+            model.addAttribute( "hiddenSection", hiddenSection );
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
             model.addAttribute( "message", e.getMessage() );

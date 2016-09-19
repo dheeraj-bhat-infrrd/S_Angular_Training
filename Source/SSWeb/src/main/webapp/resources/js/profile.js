@@ -756,8 +756,11 @@ function paintReviews(result){
 		
 		
 		reviewsHtml += '			<div class="ppl-head-1 float-left " style="clear:both"><span class="float-left"> Reviewed by<span style="font-weight:600 !important;"> '+custDispName+'</span></span>';
-		if(profileLevel!= 'INDIVIDUAL' && reviewItem.agentName!=null){
+		if(profileLevel!= 'INDIVIDUAL' && reviewItem.agentName!=null && hiddenSection=="false"){
 			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
+		}
+		if(profileLevel!= 'INDIVIDUAL' && reviewItem.agentName!=null && hiddenSection=="true"){
+			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for '+reviewItem.agentName+'</span>';
 		}
 		if (date != null) {
 			date = convertUserDateToLocale(date);
@@ -775,10 +778,17 @@ function paintReviews(result){
 			    if(reviewItem.source != "customer") {
                     reviewsHtml +='<div style="clear:both">Completed transaction in';
                     if(reviewsHtml.surveyTransactionDate !=null){
-                        reviewsHtml +=' <span>'+ new Date(reviewItem.surveyTransactionDate).toString("MMMM  yyyy")+'</span></div>';
+                        reviewsHtml +=' <span>'+ new Date(reviewItem.surveyTransactionDate).toString("MMMM  yyyy")+'</span>';
+                        if(reviewItem.city !=null && reviewItem.state!=null){
+                        reviewsHtml +='<span> in '+reviewItem.city+','+reviewItem.state+'.</span>';
+                        }
+                        reviewsHtml +='</div>';
                     }else{
-                        reviewsHtml +=' <span>'+new Date(reviewItem.modifiedOn).toString("MMMM  yyyy")+'</span></div>';
-                    }
+                        reviewsHtml +=' <span>'+new Date(reviewItem.modifiedOn).toString("MMMM  yyyy")+'</span>';
+                        if(reviewItem.city !=null && reviewItem.state!=null){
+                            reviewsHtml +='<span> in '+reviewItem.city+','+reviewItem.state+'.</span>';
+                            }
+                            reviewsHtml +='</div>';                    }
 				}
 			}
 			
