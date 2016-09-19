@@ -2,14 +2,14 @@ package com.realtech.socialsurvey.api.models;
 
 public class SurveyPutVO {
 
-	private TransactionInfo transactionInfo;
+	private TransactionInfoPutVO transactionInfo;
 	private ServiceProviderInfo serviceProviderInfo;
 	
 	
-	public TransactionInfo getTransactionInfo() {
+	public TransactionInfoPutVO getTransactionInfo() {
 		return transactionInfo;
 	}
-	public void setTransactionInfo(TransactionInfo transactionInfo) {
+	public void setTransactionInfo(TransactionInfoPutVO transactionInfo) {
 		this.transactionInfo = transactionInfo;
 	}
 	public ServiceProviderInfo getServiceProviderInfo() {
