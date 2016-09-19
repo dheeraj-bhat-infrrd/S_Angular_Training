@@ -169,7 +169,13 @@ namespace EncompassSocialSurvey
                 Logger.Info("Company Id  " + runningCompanyId);
 
                 //fieldIds[8] is the loan closed date
+
+
                 LoanIdentityList loanIdentityList = encompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(noOfDays, fieldIds[8]));
+                
+                LoanIdentity[] loanIdentityArray = loanIdentityList.ToArray();
+                int loanIdSize = loanIdentityArray.GetLength(0);
+                Logger.Info("No of loan ids received from encomass : " + loanIdSize);
 
                 #region Load the list
 
