@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.api.models.ReviewVO;
 import com.realtech.socialsurvey.api.models.ServiceProviderInfo;
 import com.realtech.socialsurvey.api.models.SurveyGetVO;
-import com.realtech.socialsurvey.api.models.TransactionInfo;
+import com.realtech.socialsurvey.api.models.TransactionInfoGetVO;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -30,17 +30,17 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
 			Object... objects) {
 		
 		SurveyPreInitiation surveyPreInitiation;
-		TransactionInfo transactionInfo = new TransactionInfo();
+		TransactionInfoGetVO transactionInfo = new TransactionInfoGetVO();
 		ServiceProviderInfo serviceProviderInfo = new ServiceProviderInfo();
 		ReviewVO review = new ReviewVO();
 		SurveyGetVO survey = new SurveyGetVO();
 		
 		if (objects[0] != null && objects[0] instanceof SurveyPreInitiation) {
 			surveyPreInitiation = (SurveyPreInitiation) objects[0];
-			transactionInfo.setCustomer1Email(surveyPreInitiation.getCustomerEmailId());
+			transactionInfo.setCustomerEmail(surveyPreInitiation.getCustomerEmailId());
 			
-			transactionInfo.setCustomer1FirstName(surveyPreInitiation.getCustomerFirstName());
-			transactionInfo.setCustomer1LastName(surveyPreInitiation.getCustomerLastName());
+			transactionInfo.setCustomerFirstName(surveyPreInitiation.getCustomerFirstName());
+			transactionInfo.setCustomerLastName(surveyPreInitiation.getCustomerLastName());
 
 			serviceProviderInfo.setServiceProviderEmail(surveyPreInitiation.getAgentEmailId());
 			serviceProviderInfo.setServiceProviderName(surveyPreInitiation.getAgentName());
@@ -57,14 +57,14 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
 
 		if( d != null ){
 			if(objects[0] == null){
-				transactionInfo.setCustomer1Email(d.getCustomerEmail());
-				transactionInfo.setCustomer1FirstName(d.getCustomerFirstName());
-				transactionInfo.setCustomer1LastName(d.getCustomerLastName());
+				transactionInfo.setCustomerEmail(d.getCustomerEmail());
+				transactionInfo.setCustomerFirstName(d.getCustomerFirstName());
+				transactionInfo.setCustomerLastName(d.getCustomerLastName());
 				serviceProviderInfo.setServiceProviderName(d.getAgentName());
 				transactionInfo.setTransactionCity(d.getCity());
 				transactionInfo.setTransactionState(d.getState());
 				transactionInfo.setTransactionDate(String.valueOf(d.getSurveyTransactionDate()));
-				survey.setReviewId(d.get_id());
+				transactionInfo.setTransactionRef(d.getSourceId());				
 				
 				try{
 				User user = userManagementService.getUserObjByUserId(d.getAgentId());
@@ -74,15 +74,20 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
 				}
 				
 			}
-			
+			survey.setReviewId(d.get_id());
 			review.setSummary(d.getSummary());
 			review.setDescription(d.getReview());
 			review.setRating(String.valueOf(d.getScore()));
 			review.setReviewDate(d.getModifiedOn().toString());
 			review.setSource(d.getSource());
-			//TODO Fix CRM verified
-			//review.setIsCRMVerified(surveyPreInitiation.);
 			review.setIsReportedAbusive(d.isAbusive());
+			
+			//review.setIsCRMVerified(surveyPreInitiation);
+			boolean isCRMVerified = false;
+			if(d.getSource().equals("encompass") || d.getSource().equals("DOTLOOP"))
+				isCRMVerified = true;
+			review.setIsCRMVerified(isCRMVerified);
+
 		}
 		
 		

@@ -3583,6 +3583,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userApiKey.setCompanyId( companyId );
         userApiKey.setStatus( CommonConstants.STATUS_ACTIVE );
         userApiKey.setCreatedOn( new Timestamp( System.currentTimeMillis()) );
+        userApiKey.setModifiedOn( new Timestamp( System.currentTimeMillis()) );
 
         userApiKey = apiKeyDao.save( userApiKey );
         LOG.debug( "method saveUserApiKey ended");

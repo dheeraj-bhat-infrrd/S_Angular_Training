@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.api.controllers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -89,20 +92,24 @@ public class SurveyApiController {
 		}
 		
 		//parse input object
-        SurveyPreInitiation surveyPreInitiation;
+        List<SurveyPreInitiation> surveyPreInitiations;
 		try {
-			surveyPreInitiation = surveyPreinitiationTransformer.transformApiRequestToDomainObject(surveyModel);
+			surveyPreInitiations = surveyPreinitiationTransformer.transformApiRequestToDomainObject(surveyModel);
 		} catch (InvalidInputException e) {
 			return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request);
 		}
 
 		
 		//save the object to database
+		Map<String,Long> surveyIds = new HashMap<String, Long>();
         try {
-            surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
+        	for(SurveyPreInitiation surveyPreInitiation : surveyPreInitiations){
+                surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
+                surveyIds.put(surveyPreInitiation.getCustomerEmailId() , surveyPreInitiation.getSurveyPreIntitiationId());
+        	}
             LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
             
-            return restUtils.getRestResponseEntity(HttpStatus.CREATED, "Survey successfully created", "surveyId", surveyPreInitiation.getSurveyPreIntitiationId(), request);
+            return restUtils.getRestResponseEntity(HttpStatus.CREATED, "Survey successfully created", "surveyId", surveyIds, request);
         } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e.getErrorCode() );
         }

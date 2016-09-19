@@ -4,7 +4,7 @@ public class SurveyGetVO {
 
 	private long surveyId;
 	private String reviewId;
-	private TransactionInfo transactionInfo;
+	private TransactionInfoGetVO transactionInfo;
 	private ServiceProviderInfo serviceProviderInfo;
 	private ReviewVO review;
 
@@ -24,11 +24,11 @@ public class SurveyGetVO {
 		this.surveyId = surveyId;
 	}
 
-	public TransactionInfo getTransactionInfo() {
+	public TransactionInfoGetVO getTransactionInfo() {
 		return transactionInfo;
 	}
 
-	public void setTransactionInfo(TransactionInfo transactionInfo) {
+	public void setTransactionInfo(TransactionInfoGetVO transactionInfo) {
 		this.transactionInfo = transactionInfo;
 	}
 

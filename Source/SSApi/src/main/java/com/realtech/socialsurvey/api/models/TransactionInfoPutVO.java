@@ -1,6 +1,6 @@
 package com.realtech.socialsurvey.api.models;
 
-public class TransactionInfo {
+public class TransactionInfoPutVO {
 
 	
  	private String transactionRef;
