@@ -63,7 +63,7 @@ public class CompanyProfileTransformer implements Transformer<CompanyProfile, Co
     }
 
 
-    public CompanyProfile transformDomainObjectToApiResponse( CompanyCompositeEntity companyProfile )
+    public CompanyProfile transformDomainObjectToApiResponse( CompanyCompositeEntity companyProfile  , Object... objects)
     {
         CompanyProfile response = new CompanyProfile();
         if ( companyProfile != null ) {

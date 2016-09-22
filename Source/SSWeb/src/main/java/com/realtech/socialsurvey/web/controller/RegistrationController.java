@@ -589,8 +589,15 @@ public class RegistrationController
 				throw new InvalidInputException("Creator email id is not present");
 			}
 
+			
+			 long companyId;
+			try{
+			     companyId = Long.parseLong( urlParams.get(CommonConstants.COMPANY_ID) );
+			}catch(NumberFormatException e){
+			    throw new InvalidInputException("Wrong parameter");
+			}
 			if (urlParams.containsKey(CommonConstants.API_KEY_FROM_URL)) {
-				if (!userManagementService.isValidApiKey(creatorEmailId, urlParams.get(CommonConstants.API_KEY_FROM_URL))) {
+			    if (!userManagementService.validateUserApiKey(urlParams.get(CommonConstants.API_KEY_FROM_URL) , creatorEmailId , companyId)){
 					throw new InvalidInputException("Could not authenticate the API key");
 				}
 			} else {
@@ -606,7 +613,7 @@ public class RegistrationController
 				return "redirect:/" + JspResolver.LOGIN + ".do";
 			}
 		}
-		catch (InvalidInputException | UnsupportedEncodingException | NoRecordsFetchedException e) {
+		catch (InvalidInputException | UnsupportedEncodingException e) {
 			LOG.error("Exception while inviting user for manual registration", e);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
@@ -627,7 +634,7 @@ public class RegistrationController
         String result = null;
 
         try {
-            UserApiKey key = userManagementService.getApiKey();
+            UserApiKey key = userManagementService.getUserApiKeyForCompany( CommonConstants.DEFAULT_COMPANY_ID );
             if ( key == null ) {
                 throw new InvalidInputException( "No active API key exists in the database!" );
             }
@@ -645,17 +652,13 @@ public class RegistrationController
             params.put( CommonConstants.EMAIL_ID, URLEncoder.encode( emailId, "UTF-8" ) );
             params.put( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID, URLEncoder.encode( creatorEmailId, "UTF-8" ) );
             params.put( CommonConstants.API_KEY_FROM_URL, apiKey );
+            params.put( CommonConstants.COMPANY_ID, String.valueOf(key.getCompanyId() ));
 
-            LOG.debug( "Validating api key" );
-            if ( !userManagementService.isValidApiKey( creatorEmailId, apiKey ) ) {
-                LOG.warn( "Invalid api key" );
-                throw new InvalidInputException( "Could not authenticate the API key." );
-            }
 
             String url = urlGenerator.generateUrl( params, applicationBaseUrl + CommonConstants.MANUAL_REGISTRATION );
             emailServices.sendManualRegistrationLink( emailId, firstName, lastName, url );
             result = "Invitation sent successfully";
-        } catch ( InvalidInputException | UndeliveredEmailException | UnsupportedEncodingException | NoRecordsFetchedException e ) {
+        } catch ( InvalidInputException | UndeliveredEmailException | UnsupportedEncodingException e ) {
             LOG.error( "Exception caught while sending mail to generating registration url", e );
             result = "Something went wrong. " + e.getMessage();
         }

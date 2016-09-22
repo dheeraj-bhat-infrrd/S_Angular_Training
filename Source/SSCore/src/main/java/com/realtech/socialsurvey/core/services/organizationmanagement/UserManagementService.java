@@ -391,19 +391,6 @@ public interface UserManagementService
 
     public void sendVerificationLink( User user ) throws InvalidInputException, UndeliveredEmailException;
 
-
-    /**
-     * Checks if the api secret and api key is a valid combination
-     * 
-     * @param apiSecret
-     * @param apiKey
-     * @return
-     * @throws InvalidInputException
-     * @throws NoRecordsFetchedException
-     */
-    public boolean isValidApiKey( String apiSecret, String apiKey ) throws InvalidInputException, NoRecordsFetchedException;
-
-
     public User getCompanyAdmin( long companyId ) throws InvalidInputException;
 
 
@@ -588,13 +575,6 @@ public interface UserManagementService
     void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException;
 
 
-    /**
-     * Method to get user api key
-     * @return
-     */
-    public UserApiKey getApiKey();
-
-
     public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
         throws InvalidInputException, SolrException;
 
@@ -623,6 +603,17 @@ public interface UserManagementService
     public User activateCompanyAdmin( User companyAdmin )
         throws InvalidInputException, HierarchyAlreadyExistsException, SolrException;
 
+
+    public UserApiKey getUserApiKeyForCompany( long companyId ) throws InvalidInputException;
+
+
+    public UserApiKey generateAndSaveUserApiKey( long companyId ) throws InvalidInputException;
+
+
+    public List<UserApiKey> getActiveUserApiKeys();
+
+
+    public void updateStatusOfUserApiKey( long userApiKeyId, int status ) throws NoRecordsFetchedException;
 
     public List<Long> getExcludedUserIds();
 }
