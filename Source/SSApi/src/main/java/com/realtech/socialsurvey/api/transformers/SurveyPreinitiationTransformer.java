@@ -37,6 +37,9 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
 		if(a == null)
 			throw new InvalidInputException("Invalid input passed. surveyDetail milssing");
 		
+		
+		long companyId = (Long) objects[0];
+		
 		TransactionInfoPutVO transactionInfo = a.getTransactionInfo();
 		ServiceProviderInfo serviceProviderInfo = a.getServiceProviderInfo();
 		Date date = null;
@@ -65,6 +68,7 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
 
 		surveyPreInitiation.setAgentEmailId(serviceProviderInfo.getServiceProviderEmail());
 		surveyPreInitiation.setAgentName(serviceProviderInfo.getServiceProviderName());
+		surveyPreInitiation.setCompanyId(companyId);
 		 
 		surveyPreInitiation.setCustomerEmailId(transactionInfo.getCustomer1Email());
 		surveyPreInitiation.setCustomerFirstName(transactionInfo.getCustomer1FirstName());
@@ -87,6 +91,8 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
         	SurveyPreInitiation surveyPreInitiation2 = new SurveyPreInitiation();
         	surveyPreInitiation2.setAgentEmailId(serviceProviderInfo.getServiceProviderEmail());
         	surveyPreInitiation2.setAgentName(serviceProviderInfo.getServiceProviderName());
+    		surveyPreInitiation2.setCompanyId(companyId);
+
     		 
         	surveyPreInitiation2.setCustomerEmailId(transactionInfo.getCustomer2Email());
         	surveyPreInitiation2.setCustomerFirstName(transactionInfo.getCustomer2FirstName());

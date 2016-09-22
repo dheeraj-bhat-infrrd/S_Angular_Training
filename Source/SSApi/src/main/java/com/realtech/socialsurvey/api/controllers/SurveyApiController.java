@@ -84,9 +84,10 @@ public class SurveyApiController {
         request.setAttribute( "input" , surveyModel );
 
 		String authorizationHeader = request.getHeader( "Authorization" );
+		long companyId = 0;
 		//authorize request
 		try {
-			adminAuthenticationService.validateAuthHeader( authorizationHeader );
+			companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
 		} catch (AuthorizationException e) {
 			return restUtils.getRestResponseEntity(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request);
 		}
@@ -94,7 +95,7 @@ public class SurveyApiController {
 		//parse input object
         List<SurveyPreInitiation> surveyPreInitiations;
 		try {
-			surveyPreInitiations = surveyPreinitiationTransformer.transformApiRequestToDomainObject(surveyModel);
+			surveyPreInitiations = surveyPreinitiationTransformer.transformApiRequestToDomainObject(surveyModel , companyId);
 		} catch (InvalidInputException e) {
 			return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request);
 		}
