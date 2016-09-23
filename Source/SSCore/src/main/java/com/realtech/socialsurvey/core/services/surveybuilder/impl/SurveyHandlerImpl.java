@@ -3513,6 +3513,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         //get corresponding pre initiated record from my sql
         Map<SurveyDetails , SurveyPreInitiation> surveyReviewMap = getPreinititatedSurveyForMongoSurveyDetail( surveyDetails );
         
+        //get corresponding users
+        getUsersForMongoSurveyDetail( surveyDetails );
+        
         //get pre initiated survey from sql
         List<SurveyPreInitiation> preInitiatedSurveys = null;
         if(sqlBatch > 0)
@@ -3619,5 +3622,40 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         
         LOG.info( "method getStartIndexAndBatchForMonogAndSqlQuery ended " );
         return startindexBatchSizeMap;
+    }
+    
+    
+    
+    private void getUsersForMongoSurveyDetail(List<SurveyDetails> surveyDetails )
+    {
+        LOG.info( "method getUsersForMongoSurveyDetail started" );
+        List<Long> userIds = new ArrayList<Long>();
+        
+        for(SurveyDetails surveyDetail : surveyDetails){
+            userIds.add( surveyDetail.getAgentId());
+        }
+        
+        List<User> users = new ArrayList<User>();
+        try {
+            users = userDao.getUsersForUserIds( userIds );
+        } catch ( InvalidInputException e ) {
+
+        }
+        
+        //create map
+        Map<Long , String> userIdsAndEmails = new HashMap<Long , String>();
+        for(User user : users){
+            userIdsAndEmails.put( user.getUserId(), user.getEmailId() );
+        }
+        
+        int i = 0;
+        for(SurveyDetails surveyDetail : surveyDetails){
+            surveyDetail.setAgentEmailId( userIdsAndEmails.get( surveyDetail.getAgentId() ) );
+            surveyDetails.set( i, surveyDetail );
+            i++;
+        }
+        
+        LOG.info( "method getUsersForMongoSurveyDetail ended" );
+        
     }
 }
