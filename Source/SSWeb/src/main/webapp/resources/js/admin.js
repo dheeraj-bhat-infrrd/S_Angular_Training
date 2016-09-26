@@ -216,6 +216,7 @@ function searchAdminCompanies (element) {
 }
 
 function showSelectedCompanyHierarchy(companyId) {
+	$('#tr-spinner-'+companyId).show();
 	callAjaxGET("/companyhierarchy.do?companyId="+companyId, function(data) {
 		$('.comp-hr-cont[data-iden="'+companyId+'"]').html(data).show();
 		bindAdminRegionListClicks();
@@ -224,6 +225,7 @@ function showSelectedCompanyHierarchy(companyId) {
 	    });*/
 	    bindAdminBranchListClicks();
 	    bindUserEditClicks();
+	    $('#tr-spinner-'+companyId).hide();
 	}, true);
 }
 
@@ -295,8 +297,10 @@ function bindAdminBranchListClicks(){
 }
 
 function fetchAdminHierarchyViewBranches(regionId) {
+	$('#tr-spinner-'+regionId).show();
 	var url = "./fetchhierarchyviewbranchesforadmin.do?regionId="+regionId;
 	callAjaxGET(url, function(data) {
+		$('#tr-spinner-'+regionId).hide();
 		paintAdminHierarchyViewBranches(data,regionId);
 	}, true);
 }
@@ -310,9 +314,11 @@ function paintAdminHierarchyViewBranches(data,regionId) {
 }
 
 function fetchAdminUsersForBranch(branchId,regionId, companyId) {
+	$('#tr-spinner-'+branchId).show();
 	var url="./fetchbranchusersforadmin.do?branchId="+branchId+"&regionId="+regionId;
 	callAjaxGET(url, function(data) {
 		paintAdminUsersFromBranch(data,branchId);
+		$('#tr-spinner-'+branchId).hide();
 	}, true);
 }
 
@@ -324,7 +330,7 @@ function paintAdminUsersFromBranch(data,branchId,regionId) {
 }
 
 $(document).on('click', '.comp-row', function(e) {
-	var element = this;
+	var element = this; 
 	var companyId = $(element).attr('data-iden');
 	$('.comp-hr-cont').html('').hide();
 	if ($(element).attr('clicked') == "false") {
