@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -70,6 +71,9 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
     private String secretKey;
     private LoneWolfIntegrationService loneWolfIntegrationService;
     private LoneWolfRestUtils loneWolfRestUtils;
+    
+    SimpleDateFormat transactionDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
 
 
     @Override
@@ -241,6 +245,10 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                     if ( !isTransactionValid( transaction ) )
                         continue;
 
+                    
+                    //get closedDate
+                    Date closeDate = transactionDateFormat.parse( transaction.getCloseDate() );
+                    
                     //get seller agent and client detail
                     Map<String, LoneWolfClientContact> clientContactsForTransaction = getClientContactForTransaction( transaction );
                     LoneWolfClientContact sellerClientContact = clientContactsForTransaction.get( LoanWolfContactType.SELLER
@@ -261,23 +269,23 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                     //generate survey pre initiation entry based on classification code
                     if ( classificationCode.equals( LoanWolfTransactionClassificationMode.SELLING.getMode() ) ) {
                         generateSurveyPreinitiaionAndSave( sellerClientContact, sellerMember, collectionName,
-                            organizationUnitId, transaction.getNumber() );
+                            organizationUnitId, transaction.getNumber() , closeDate );
                     }
                     if ( classificationCode.equals( LoanWolfTransactionClassificationMode.LISTING.getMode() ) ) {
                         generateSurveyPreinitiaionAndSave( buyerClientContact, buyerMember, collectionName, organizationUnitId,
-                            transaction.getNumber() );
+                            transaction.getNumber() , closeDate );
                     }
                     if ( classificationCode.equals( LoanWolfTransactionClassificationMode.OFFICEAGENTS.getMode() ) ) {
                         generateSurveyPreinitiaionAndSave( sellerClientContact, sellerMember, collectionName,
-                            organizationUnitId, transaction.getNumber() );
+                            organizationUnitId, transaction.getNumber() , closeDate );
                         generateSurveyPreinitiaionAndSave( buyerClientContact, buyerMember, collectionName, organizationUnitId,
-                            transaction.getNumber() );
+                            transaction.getNumber() , closeDate);
                     }
                     if ( classificationCode.equals( LoanWolfTransactionClassificationMode.DOUBLEAGENT.getMode() ) ) {
                         generateSurveyPreinitiaionAndSave( sellerClientContact, sellerMember, collectionName,
-                            organizationUnitId, transaction.getNumber() );
+                            organizationUnitId, transaction.getNumber() , closeDate);
                         generateSurveyPreinitiaionAndSave( buyerClientContact, buyerMember, collectionName, organizationUnitId,
-                            transaction.getNumber() );
+                            transaction.getNumber() , closeDate );
                     }
 
                 } catch ( Exception e ) {
@@ -381,7 +389,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
      * @throws InvalidInputException 
      */
     private void generateSurveyPreinitiaionAndSave( LoneWolfClientContact client, LoneWolfMember member, String collectionName,
-        long organizationUnitId, String transactionNumber )
+        long organizationUnitId, String transactionNumber , Date closedDate )
     {
 
         LOG.debug( "Inside method generateSurveyPreinitiaionAndSave for transaction number : " + transactionNumber);
@@ -421,7 +429,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
             }
             surveyPreInitiation.setAgentEmailId( agentEmailId );
             surveyPreInitiation.setAgentName( member.getFirstName() + " " + member.getLastName() );
-            surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
+            surveyPreInitiation.setEngagementClosedTime(new Timestamp( closedDate.getTime() ));
             surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
             surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_LONEWOLF );
             surveyPreInitiation.setSurveySourceId( transactionNumber );

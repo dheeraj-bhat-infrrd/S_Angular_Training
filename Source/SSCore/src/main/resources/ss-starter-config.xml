@@ -237,6 +237,18 @@
 		<property name="durability" value="true" />
 	</bean>
 
+
+
+	<bean id="remaxEntitiesTransfer" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.ReMaxPartitonBatch" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
 	<!-- Setting dotloop job detail -->
 	<bean id="dotloopjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.DotloopReviewProcessor" />
@@ -363,7 +375,7 @@
 	<!-- setting cron for incomplete survey reminder -->
 	<bean id="incompletesurveycron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="incompletesurveyjobdetail" />
-		<property name="cronExpression" value="0 08 * * * ?" />
+		<property name="cronExpression" value="0 0/15 * * * ?" />
 	</bean>
 
 	<!-- setting cron for update subscription price -->
@@ -411,6 +423,14 @@
 		<property name="startDelay" value="1000" />
 	</bean>
 
+
+
+	<bean id="remaxEntitiesTransfercron" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="remaxEntitiesTransfer" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="1000" />
+	</bean>
+	
 	<!-- setting cron for account deactivator -->
 	<bean id="accountdeactivatorcron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="accountdeactivatorjobdetail" />
@@ -426,7 +446,7 @@
 	<!-- setting cron for mapping crm data agent id -->
 	<bean id="crmdataagentidmappercron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="crmdataagentidmapperjobdetail" />
-		<property name="cronExpression" value="0 6 * * * ?" />
+		<property name="cronExpression" value="0 0/15 * * * ?" />
 	</bean>
 
 	<!-- setting cron for loading image from linkedin to amazon server -->
@@ -534,6 +554,7 @@
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<ref bean="zillowreviewprocessandautopostjobdetail" />
 				<ref bean="surveyimporterjobdetail" />
+				<!-- <ref bean="remaxEntitiesTransfer" /> -->
 			</list>
 		</property>
 
@@ -564,6 +585,7 @@
 				<!-- <ref bean="hierarchysettingscron" /> -->
 				<ref bean="zillowreviewprocessandautopostcron" />
 				<ref bean="surveyimportercron" />
+				<!-- <ref bean="remaxEntitiesTransfercron" /> -->
 			</list>
 		</property>
 		<property name="quartzProperties">

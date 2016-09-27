@@ -26,6 +26,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
+import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
 
 
 public interface SurveyHandler
@@ -170,7 +171,7 @@ public interface SurveyHandler
     /**
      * @param surveyPreInitiation
      */
-    public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
+    public SurveyPreInitiation saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
 
 
     void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName );
@@ -341,4 +342,10 @@ public interface SurveyHandler
 
     public void updateSurveyStageForGoogleBusinessToken( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
+
+
+    SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
+
+
+    SurveysAndReviewsVO getSurveysByStatus( String status, int startIndex, int count , long companyId);
 }

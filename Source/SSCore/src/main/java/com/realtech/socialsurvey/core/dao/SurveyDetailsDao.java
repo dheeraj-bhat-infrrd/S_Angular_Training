@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.ApiRequestDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -268,4 +269,32 @@ public interface SurveyDetailsDao
     void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
 
     public void updateModifiedDateForSurvey( String surveyId, Date date );
+
+    /**
+     * 
+     * @param start
+     * @param batchSize
+     * @param stage
+     * @return
+     */
+    public List<SurveyDetails> getCompletedSurveyByStartIndexAndBatchSize( int start, int batchSize , long companyId);
+
+
+    public List<SurveyDetails> getSurveysForCompanyByStartIndex( int start, int batchSize , long companyId );
+
+
+    public List<SurveyDetails> getIncompleteSurveyByStartIndexAndBatchSize( int start, int batchSize , long companyId);
+    
+    
+    
+    public Long getCompletedSurveyCount( long companyId);
+
+
+    public Long getSurveysCountForCompany(long companyId );
+
+
+    public Long getIncompleteSurveyCount( long companyId);
+
+
+    void insertApiRequestDetails( ApiRequestDetails apiRequestDetails );
 }

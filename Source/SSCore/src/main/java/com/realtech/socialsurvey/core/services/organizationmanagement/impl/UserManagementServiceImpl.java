@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,7 @@ import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SettingsSetterDao;
@@ -160,7 +162,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private GenericDao<LicenseDetail, Long> licenseDetailsDao;
 
     @Autowired
-    private GenericDao<Company, Long> companyDao;
+    private CompanyDao companyDao;
 
     @Autowired
     private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
@@ -3089,54 +3091,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             "Finished adding a record in user count modification notification table for company " + company.getCompany() );
     }
 
-
-    @Transactional
-    @Override
-    public boolean isValidApiKey( String apiSecret, String apiKey ) throws InvalidInputException, NoRecordsFetchedException
-    {
-        LOG.info( "Validation api key for secret : " + apiSecret + " and key : " + apiKey );
-        if ( apiSecret == null || apiSecret.isEmpty() ) {
-            LOG.warn( "Api Secret is null" );
-            throw new InvalidInputException( "Invalid api secret" );
-        }
-        if ( apiKey == null || apiKey.isEmpty() ) {
-            LOG.warn( "Api key is null" );
-            throw new InvalidInputException( "Invalid api key" );
-        }
-        boolean isApiKeyValid = false;
-        Map<String, Object> queryMap = new HashMap<String, Object>();
-        queryMap.put( CommonConstants.API_SECRET_COLUMN, apiSecret.trim() );
-        queryMap.put( CommonConstants.API_KEY_COLUMN, apiKey.trim() );
-        queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-        long count = apiKeyDao.findNumberOfRowsByKeyValue( UserApiKey.class, queryMap );
-        LOG.debug( "Found " + count + " records from the api keys" );
-        if ( count > 0l ) {
-            LOG.info( "API key is valid" );
-            isApiKeyValid = true;
-        }
-        return isApiKeyValid;
-    }
-
-
-    /**
-     * Method to get user api key
-     * @return
-     */
-    @Transactional
-    @Override
-    public UserApiKey getApiKey()
-    {
-        LOG.info( "Method to get user api key started" );
-        List<UserApiKey> keys = apiKeyDao.findByColumn( UserApiKey.class, CommonConstants.STATUS_COLUMN,
-            CommonConstants.STATUS_ACTIVE );
-        if ( keys == null || keys.isEmpty() ) {
-            return null;
-        }
-        LOG.info( "Method to get user api key finished" );
-        return keys.get( 0 );
-    }
-
-
     /*
      * Method to get company admin for the company given.
      */
@@ -3583,6 +3537,103 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             valid = true;
         }
         return valid;
+    }
+    
+    /**
+     * 
+     */
+    @Override
+    @Transactional
+    public UserApiKey getUserApiKeyForCompany(  long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "method getUserApiKeyForCompany started for companyId " + companyId );
+
+        Map<String, Object> queryMap = new HashMap<String, Object>();
+        queryMap.put( CommonConstants.COMPANY_ID_COLUMN, companyId );
+        queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<UserApiKey> apiKeys = apiKeyDao.findByKeyValue( UserApiKey.class, queryMap );
+        
+        LOG.debug( "method getUserApiKeyForCompany ended for companyId " + companyId );
+        
+        if(apiKeys != null && apiKeys.size() > 0)
+            return apiKeys.get( CommonConstants.INITIAL_INDEX );
+        else 
+            return null;        
+    }
+    
+    /**
+     * 
+     * @param apiKey
+     * @param apiSecret
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public UserApiKey generateAndSaveUserApiKey( long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "method saveUserApiKey started " );
+
+        UserApiKey userApiKey = new UserApiKey();
+        
+        OrganizationUnitSettings settings = organizationManagementService.getCompanySettings( companyId );
+        String apiKey =  settings.getProfileName();
+        String apiSecret = String.valueOf( companyId ) + "_" + String.valueOf(System.currentTimeMillis() );
+        
+        userApiKey.setApiKey( apiKey );
+        userApiKey.setApiSecret( apiSecret );
+        userApiKey.setCompanyId( companyId );
+        userApiKey.setStatus( CommonConstants.STATUS_ACTIVE );
+        userApiKey.setCreatedOn( new Timestamp( System.currentTimeMillis()) );
+        userApiKey.setModifiedOn( new Timestamp( System.currentTimeMillis()) );
+
+        userApiKey = apiKeyDao.save( userApiKey );
+        LOG.debug( "method saveUserApiKey ended");
+        
+        return userApiKey;        
+    }
+    
+    
+    @Override
+    @Transactional
+    public void updateStatusOfUserApiKey( long userApiKeyId , int status ) throws NoRecordsFetchedException  
+    {
+        LOG.debug( "method updateStatusOfUserApiKey started " );
+
+        UserApiKey userApiKey = apiKeyDao.findById( UserApiKey.class, userApiKeyId );
+        if(userApiKey == null){
+            throw new NoRecordsFetchedException("No Api key found with id " + userApiKeyId );
+        }
+      
+        userApiKey.setStatus( status );
+        apiKeyDao.update( userApiKey );
+        LOG.debug( "method updateStatusOfUserApiKey ended");
+              
+    }
+    
+    @Override
+    @Transactional
+    public List<UserApiKey> getActiveUserApiKeys(){
+        LOG.debug( "method getActiveUserApiKeys started " );
+        Map<String, Object> queryMap = new HashMap<String, Object>();
+        queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<UserApiKey> apiKeys = apiKeyDao.findByKeyValue( UserApiKey.class, queryMap );
+        
+        Set<Long> companyIds = new HashSet<Long>();
+        for(UserApiKey apiKey : apiKeys){
+            companyIds.add( apiKey.getCompanyId() );
+        }
+        
+        Map<Long , Company> companiesById = companyDao.getCompaniesByIds( companyIds );
+        for(UserApiKey apiKey : apiKeys){
+            Company currCompany = companiesById.get( apiKey.getCompanyId() );
+            if(currCompany != null)
+                apiKey.setCompanyName( currCompany.getCompany() );
+        }
+        
+        LOG.debug( "method getActiveUserApiKeys ended " );
+        return apiKeys;
     }
 
 

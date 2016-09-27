@@ -63,6 +63,20 @@ public class SurveyDetails
     private String city;
     private String state;
     
+    private String agentEmailId;
+        
+    public String getAgentEmailId()
+    {
+        return agentEmailId;
+    }
+
+
+    public void setAgentEmailId( String agentEmailId )
+    {
+        this.agentEmailId = agentEmailId;
+    }
+
+
     public SocialMediaPostResponseDetails getSocialMediaPostResponseDetails()
     {
         return socialMediaPostResponseDetails;
