@@ -59,8 +59,9 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
 			
 			//review.setIsCRMVerified(surveyPreInitiation);
 			boolean isCRMVerified = false;
-			if(d.getSource().equals("encompass") || d.getSource().equals("DOTLOOP"))
-				isCRMVerified = true;
+			if(d.getSource()!= null)
+				if(d.getSource().equals("encompass") || d.getSource().equals("DOTLOOP"))
+					isCRMVerified = true;
 			review.setIsCRMVerified(isCRMVerified);
 
 		}
