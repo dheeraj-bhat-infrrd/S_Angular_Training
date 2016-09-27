@@ -74,6 +74,7 @@ var agentId;
 var agentName;
 var customerResponse;
 var customerEmail;
+var companyName;
 var surveyId;
 var mood;
 var stage;
@@ -5393,9 +5394,14 @@ function initSurveyWithUrl(q) {
 				lastName = data.responseJSON.customerLastName;
 				surveyId = data.responseJSON.surveyId;
 				hiddenSection=data.responseJSON.hiddenSection;
+				companyName = data.responseJSON.companyName;
 				paintSurveyPage(data);
 				var message = $("#pst-srvy-div .bd-check-txt").html();
-				$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
+				if(hiddenSection){
+					$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", companyName));
+				}else{
+					$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
+				}
 			}
 		},
 		error : function(e) {
@@ -5615,7 +5621,11 @@ function paintSurveyPageFromJson() {
 		$("#next-textarea-smiley").addClass("btn-com-disabled");
 		$("#skip-ques-mcq").hide();
 	}
-	$(".sq-main-txt").html("Survey for " + agentName);
+	if(hiddenSection){
+		$(".sq-main-txt").html("Survey for " + companyName);
+	}else{
+		$(".sq-main-txt").html("Survey for " + agentName);
+	}
 
 	if (companyLogo != undefined && companyLogo != "") {
 		var companylogoHtml = '<div class="float-left user-info-seperator"></div>';

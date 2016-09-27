@@ -128,6 +128,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private String companyAdminEnabled;
     private String adminEmailId;
     private String adminName;
+    
+    
+    @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
 
     @Autowired
@@ -4304,7 +4307,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 excelCreated = false;
             } finally {
                 try {
-                    fileOutput.close();
+                    if(fileOutput != null){
+                        fileOutput.close();
+                    }
                     if ( inputStream != null ) {
                         inputStream.close();
                     }
