@@ -244,7 +244,7 @@ function paintProfilePage(result) {
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
 		
 		// paint public  posts
-		fetchPublicPosts(false);
+		//fetchPublicPosts(false);
 		
 		var breadCrumUrl = '/rest/breadcrumb/';
 		
