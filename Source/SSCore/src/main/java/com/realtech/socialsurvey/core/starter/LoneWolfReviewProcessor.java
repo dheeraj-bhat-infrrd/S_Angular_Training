@@ -35,6 +35,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.LoanWolfContactType;
+import com.realtech.socialsurvey.core.enums.LoanWolfMemberType;
 import com.realtech.socialsurvey.core.enums.LoanWolfTransactionClassificationMode;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -258,9 +259,9 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
 
                     //get buyer seller member detail
                     Map<String, LoneWolfMember> membersForTransaction = getMembersForTransaction( transaction, membersByName );
-                    LoneWolfMember sellerMember = membersForTransaction.get( LoanWolfTransactionClassificationMode.SELLING
+                    LoneWolfMember sellerMember = membersForTransaction.get( LoanWolfMemberType.SELLING
                         .getMode() );
-                    LoneWolfMember buyerMember = membersForTransaction.get( LoanWolfTransactionClassificationMode.LISTING
+                    LoneWolfMember buyerMember = membersForTransaction.get( LoanWolfMemberType.LISTING
                         .getMode() );
 
                     //get classification code
@@ -364,16 +365,16 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
         Map<String, LoneWolfMember> membersForTransaction = new HashMap<String, LoneWolfMember>();
 
         for ( LoneWolfAgentCommission agentCommission : transaction.getTiers().get( 0 ).getAgentCommissions() ) {
-            if ( agentCommission.getEndCode().equals( LoanWolfTransactionClassificationMode.SELLING.getMode() ) ) {
+            if ( agentCommission.getEndCode().equals( LoanWolfMemberType.SELLING.getMode() ) ) {
                 LOG.info( "Found a seller for transaction with id : " + transaction.getId() );
                 member = membersByName.get( getKeyForMembersDataMap( agentCommission.getAgent().getFirstName(), agentCommission
                     .getAgent().getLastName() ) );
-                membersForTransaction.put( LoanWolfTransactionClassificationMode.SELLING.getMode(), member );
-            } else if ( agentCommission.getEndCode().equals( LoanWolfTransactionClassificationMode.LISTING.getMode() ) ) {
+                membersForTransaction.put( LoanWolfMemberType.SELLING.getMode(), member );
+            } else if ( agentCommission.getEndCode().equals( LoanWolfMemberType.LISTING.getMode() ) ) {
                 LOG.info( "Found a buyer for transaction with id : " + transaction.getId() );
                 member = membersByName.get( getKeyForMembersDataMap( agentCommission.getAgent().getFirstName(), agentCommission
                     .getAgent().getLastName() ) );
-                membersForTransaction.put( LoanWolfTransactionClassificationMode.LISTING.getMode(), member );
+                membersForTransaction.put( LoanWolfMemberType.LISTING.getMode(), member );
             }
         }
         return membersForTransaction;
@@ -408,7 +409,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
             surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName, organizationUnitId );
             surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-            String customerEmailId = null;
+            String customerEmailId = "";
             if ( client.getEmailAddresses() != null && !client.getEmailAddresses().isEmpty() ) {
                 customerEmailId = client.getEmailAddresses().get( 0 ).getAddress();
                 if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
