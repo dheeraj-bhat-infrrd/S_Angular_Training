@@ -430,7 +430,7 @@
 					<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc main-rt-adj">
 						<jsp:include page="profile_aboutme.jsp"></jsp:include>
 					</div>
-					<div id="ppl-post-cont" class="rt-content-main bord-bot-dc clearfix">
+					<%-- <div id="ppl-post-cont" class="rt-content-main bord-bot-dc clearfix">
 						<div class="float-left panel-tweet-wrapper">
 							<textarea class="pe-whitespace sb-txtarea" id="status-body-text-edit" placeholder="<spring:message code="label.sspost.key"/>"></textarea>
 							<div id="prof-post-btn" class="pe-btn-post">
@@ -446,7 +446,7 @@
 								<!--  latest posts get populated here -->
 							</div>
 						</div>
-					</div>
+					</div> --%>
 					<div id="reviews-container" class="people-say-wrapper rt-content-main pos-relative">
 						<div class="main-con-header" style="display: block; border-bottom: 1px solid #dcdcdc; padding: 15px 0;">
 							<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key" /></span>${contactdetail.name}
@@ -485,7 +485,7 @@ $(document).ready(function() {
 	proPostStartIndex = 0;
 	
 	//Fetch public posts
-	fetchPublicPostEditProfile();
+	//fetchPublicPostEditProfile();
 	
 	if ($('#aboutme-status').val() != 'new') {
 		$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
