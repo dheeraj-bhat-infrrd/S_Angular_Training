@@ -532,14 +532,14 @@
                     	</c:otherwise>
                     </c:choose>
                 </div>
-                <div class="rt-content-main bord-bot-dc clearfix" id="recent-post-container" style="display: none;">
+                <%-- <div class="rt-content-main bord-bot-dc clearfix" id="recent-post-container" style="display: none;">
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header"><spring:message code="label.publicprofile.recentpost.key"/></div>
                         <div class="tweet-panel tweet-panel-left tweet-panel-left-adj" id="prof-posts">
                             <!--  latest posts get populated here -->
                         </div>
                     </div>
-                </div>
+                </div> --%>
                 <div class="people-say-wrapper rt-content-main" id="reviews-container" style="display: none;">
                 	<div class="clearfix hide" style="display: block;border-bottom: 1px solid #dcdcdc;padding: 15px 0;">
 	                    <div class="main-con-header float-left" id="prof-reviews-header">

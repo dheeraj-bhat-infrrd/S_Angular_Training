@@ -602,7 +602,7 @@
                     	</c:otherwise>
                     </c:choose>
                 </div>
-                <c:set var="postsHidden" value="no" />
+                <!--<c:set var="postsHidden" value="no" />
                 <c:if test="${not empty profile.hideSectionsFromProfilePage}">
 					<c:forEach var="item" items="${profile.hideSectionsFromProfilePage}">
 					  <c:if test="${item == 'recent_posts'}">
@@ -647,7 +647,7 @@
                         </div>
                     </div>
                 </div>
-                </c:if>
+                </c:if>-->
                 <c:if test="${not empty reviews}">
                 <div class="people-say-wrapper rt-content-main" id="reviews-container">
                 	<div class="clearfix" style="display: block;border-bottom: 1px solid #dcdcdc;padding: 15px 0;">
