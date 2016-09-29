@@ -8,6 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -23,6 +24,7 @@ import com.realtech.socialsurvey.core.services.crmbatchtracker.CRMBatchTrackerSe
  * @author rohit
  *
  */
+@Component
 public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
 {
 

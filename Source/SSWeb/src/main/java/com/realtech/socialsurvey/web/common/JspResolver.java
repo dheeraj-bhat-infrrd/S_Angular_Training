@@ -167,5 +167,6 @@ public interface JspResolver {
     //social media token update 
     public static final String FACEBOOK_TOKEN_EMAIL_UPDATE = "FacebookTokenUpdateEmail";
     public static final String SOCIAL_AUTH_MSG_FOR_EMAIL = "socialauthmessageformail";
+    public static final String BATCH_UTILITY = "batchUtility";
     
 }
