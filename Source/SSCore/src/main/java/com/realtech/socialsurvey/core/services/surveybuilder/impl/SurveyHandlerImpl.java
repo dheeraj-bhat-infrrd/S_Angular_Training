@@ -219,6 +219,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
 
     private static final int USER_EMAIL_ID_INDEX = 3;
+    private static final int SURVEY_SOURCE_ID_INDEX = 2;
     private static final int CUSTOMER_FIRSTNAME_INDEX = 4;
     private static final int CUSTOMER_LASTNAME_INDEX = 5;
     private static final int CUSTOMER_EMAIL_INDEX = 8;
@@ -227,6 +228,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     private static final int COMMENT_INDEX = 7;
     private static final int CITY_INDEX = 9;
     private static final int STATE_INDEX = 10;
+    private static final String DEFAULT_CUSTOMER_EMAIL_ID_FOR_3RD_PARTY = "none@socialsurvey.com";
 
 
     /**
@@ -2827,6 +2829,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "Method BulkSurveyImporter.importSurveyVOToSurveyPreInitiation started" );
         SurveyPreInitiation survey = new SurveyPreInitiation();
         survey.setSurveySource( source );
+        survey.setSurveySourceId( surveyImportVO.getSurveySourceId() );
         survey.setCompanyId( user.getCompany().getCompanyId() );
         survey.setAgentId( user.getUserId() );
         survey.setAgentEmailId( user.getEmailId() );
@@ -2884,6 +2887,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 surveyImportVO.getCustomerLastName(), surveyPreInitiation.getSurveyPreIntitiationId(), false ) );
         surveyDetails.setEditable( false );
         surveyDetails.setSource( source );
+        surveyDetails.setSourceId( surveyImportVO.getSurveySourceId() );
         surveyDetails.setShowSurveyOnUI( true );
         surveyDetails.setCity( surveyImportVO.getCity() );
         surveyDetails.setState( surveyImportVO.getState() );
@@ -3374,9 +3378,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     } else if ( cell.getColumnIndex() == CUSTOMER_LASTNAME_INDEX
                         && !cell.getStringCellValue().trim().isEmpty() ) {
                         survey.setCustomerLastName( cell.getStringCellValue().trim() );
-                    } else if ( cell.getColumnIndex() == CUSTOMER_EMAIL_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
+                    } else if ( cell.getColumnIndex() == CUSTOMER_EMAIL_INDEX ) {
+                        String emailId = DEFAULT_CUSTOMER_EMAIL_ID_FOR_3RD_PARTY;
+                        if(!cell.getStringCellValue().trim().isEmpty()){
+                             emailId = cell.getStringCellValue().trim();
+                        }
                         //Mask email address if required
-                        String emailId = cell.getStringCellValue().trim();
                         if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
                             emailId = utils.maskEmailAddress( emailId );
                         }
@@ -3385,6 +3392,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         survey.setSurveyDate( cell.getDateCellValue() );
                     } else if ( cell.getColumnIndex() == SCORE_INDEX ) {
                         survey.setScore( cell.getNumericCellValue() );
+                    } else if ( cell.getColumnIndex() == SURVEY_SOURCE_ID_INDEX ) {
+                        survey.setSurveySourceId( cell.getStringCellValue().trim() );
                     } else if ( cell.getColumnIndex() == COMMENT_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                         survey.setReview( cell.getStringCellValue() );
                     } /* else if ( cell.getColumnIndex() == CITY_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
@@ -3513,6 +3522,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         //get corresponding pre initiated record from my sql
         Map<SurveyDetails , SurveyPreInitiation> surveyReviewMap = getPreinititatedSurveyForMongoSurveyDetail( surveyDetails );
         
+        //get corresponding users
+        getUsersForMongoSurveyDetail( surveyDetails );
+        
         //get pre initiated survey from sql
         List<SurveyPreInitiation> preInitiatedSurveys = null;
         if(sqlBatch > 0)
@@ -3619,5 +3631,40 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         
         LOG.info( "method getStartIndexAndBatchForMonogAndSqlQuery ended " );
         return startindexBatchSizeMap;
+    }
+    
+    
+    
+    private void getUsersForMongoSurveyDetail(List<SurveyDetails> surveyDetails )
+    {
+        LOG.info( "method getUsersForMongoSurveyDetail started" );
+        List<Long> userIds = new ArrayList<Long>();
+        
+        for(SurveyDetails surveyDetail : surveyDetails){
+            userIds.add( surveyDetail.getAgentId());
+        }
+        
+        List<User> users = new ArrayList<User>();
+        try {
+            users = userDao.getUsersForUserIds( userIds );
+        } catch ( InvalidInputException e ) {
+
+        }
+        
+        //create map
+        Map<Long , String> userIdsAndEmails = new HashMap<Long , String>();
+        for(User user : users){
+            userIdsAndEmails.put( user.getUserId(), user.getEmailId() );
+        }
+        
+        int i = 0;
+        for(SurveyDetails surveyDetail : surveyDetails){
+            surveyDetail.setAgentEmailId( userIdsAndEmails.get( surveyDetail.getAgentId() ) );
+            surveyDetails.set( i, surveyDetail );
+            i++;
+        }
+        
+        LOG.info( "method getUsersForMongoSurveyDetail ended" );
+        
     }
 }

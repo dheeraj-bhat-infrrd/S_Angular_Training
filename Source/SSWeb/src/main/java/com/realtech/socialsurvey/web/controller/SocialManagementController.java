@@ -1700,6 +1700,12 @@ public class SocialManagementController
                 if ( userSettings == null || entityType == null || profileSettings == null ) {
                     throw new InvalidInputException( "No user settings found in session" );
                 }
+                
+                
+                //decode the zillow url
+                zillowScreenName = java.net.URLDecoder.decode(zillowScreenName, "UTF-8");
+
+                
                 // if user has changed his Zillow account, then delete existing Zillow reviews
                 if ( checkZillowAccountChanged( profileSettings, zillowScreenName ) ) {
                     LOG.debug( "Deleting zillow feed for agent ID : " + profileSettings.getIden() );

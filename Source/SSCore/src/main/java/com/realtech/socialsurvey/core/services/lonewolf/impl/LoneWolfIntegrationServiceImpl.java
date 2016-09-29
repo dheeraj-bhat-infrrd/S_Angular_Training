@@ -58,7 +58,7 @@ public class LoneWolfIntegrationServiceImpl implements LoneWolfIntegrationServic
         String responseString = transactionResponse != null ? new String(
             ( (TypedByteArray) transactionResponse.getBody() ).getBytes() ) : null;
             
-        LOG.info( "Response string is" + responseString );    
+      //  LOG.info( "Response string is" + responseString );    
 
         List<LoneWolfTransaction> loneWolfTransactions = responseString != null ? (List<LoneWolfTransaction>) new Gson()
             .fromJson( responseString, new TypeToken<List<LoneWolfTransaction>>() {}.getType() ) : null;
