@@ -4569,6 +4569,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         if ( user != null ) {
             agentName = user.getFirstName();
+            if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
+                agentName = user.getFirstName() + " " + user.getLastName();
+            }
         }
 
         String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
