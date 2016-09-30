@@ -89,7 +89,13 @@
 							<c:if test="${not empty reviewItem.agentName}">
 							 <span class="float-left" style="margin-left: 5px;">for
 							 <c:if test="${hiddenSection}">
-							 ${reviewItem.agentName}
+								 <c:set var="agentName" value="${reviewItem.agentName}" />
+								 <c:set var="agentNameTokens" value="${fn:split(agentName, ' ')}" />
+								 <c:set var="agentName" value="${agentNameTokens[0]}" />
+								 <c:if test="${not empty agentNameTokens[1]}">
+								 	<c:set var="agentName" value="${agentName } ${fn:substring(agentNameTokens[1], 0, 1)}" />
+								 </c:if>
+								${agentName}
 							 </c:if>
 							 <c:if test="${!hiddenSection}">
 							   <a class="cursor-pointer" style="color: #236CAF; font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank">
