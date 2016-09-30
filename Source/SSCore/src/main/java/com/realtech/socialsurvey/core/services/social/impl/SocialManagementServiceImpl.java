@@ -105,6 +105,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.CommonUtils;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.core.vo.UserList;
@@ -259,6 +260,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private WorkbookData workbookData;
+    
+    @Autowired
+    private CommonUtils commonUtils;
 
     private final int batchSize = 50;
 
@@ -1635,6 +1639,14 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( !branchSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
                     branchSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
                 branchMediaPostDetails.setSharedOn( branchSocialList );
+            }
+            
+            
+            
+            OrganizationUnitSettings companySetting = companySettings.get( 0 );
+            boolean isCompanyAgentHidden = companySetting.isHiddenSection();
+            if(isCompanyAgentHidden){
+                agentName =  commonUtils.getAgentNameForHiddenAgentCompany( agent.getFirstName(), agent.getLastName() );
             }
 
             //if onlyPostToSocialSurvey is false than only post on the social media otherwise just add social survey channel in social media post list

@@ -244,7 +244,7 @@ function paintProfilePage(result) {
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
 		
 		// paint public  posts
-		fetchPublicPosts(false);
+		//fetchPublicPosts(false);
 		
 		var breadCrumUrl = '/rest/breadcrumb/';
 		
@@ -760,7 +760,12 @@ function paintReviews(result){
 			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
 		}
 		if(profileLevel!= 'INDIVIDUAL' && reviewItem.agentName!=null && hiddenSection=="true"){
-			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for '+reviewItem.agentName+'</span>';
+			var agentNameTokens = reviewItem.agentName.split(" "); 
+			var agentName =  agentNameTokens[0];
+			if(agentNameTokens[1] != null ){
+				agentName = agentName + " " +(agentNameTokens[1]).substring(0,1);
+			}
+			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for '+ agentName +'</span>';
 		}
 		if (date != null) {
 			date = convertUserDateToLocale(date);

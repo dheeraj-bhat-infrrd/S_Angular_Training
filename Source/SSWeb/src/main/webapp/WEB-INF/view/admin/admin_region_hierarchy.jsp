@@ -19,6 +19,7 @@
 			class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-r${regionIdVal}-b${branch.branchId}">
 			<td class="v-tbl-line">
 				<div class="v-line-brnch"></div>
+				<i id="tr-spinner-${branch.branchId}"  class="fa fa-spinner fa-pulse fa-2x fa-fw" aria-hidden="true" style="display:none;margin:6px 15px;"></i> 
 			</td>
 			<%-- <td class="v-tbl-img">
            		<c:choose>

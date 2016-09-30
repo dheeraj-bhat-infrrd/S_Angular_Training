@@ -13,7 +13,20 @@ public class SurveyImportVO
     private String customerLastName;
     private String customerEmailAddress;
     private Date surveyDate;
+    private String surveySourceId;
     private double score;
+
+
+    public String getSurveySourceId()
+    {
+        return surveySourceId;
+    }
+
+
+    public void setSurveySourceId( String surveySourceId )
+    {
+        this.surveySourceId = surveySourceId;
+    }
 
 
     public long getUserId()

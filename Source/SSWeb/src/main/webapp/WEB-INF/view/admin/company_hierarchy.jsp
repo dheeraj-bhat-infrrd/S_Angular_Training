@@ -12,6 +12,7 @@
 					data-regionid="${region.regionId}">
 					<td class="v-tbl-line">
 						<div class="v-line-rgn"></div>
+						<i id="tr-spinner-${region.regionId}"  class="fa fa-spinner fa-pulse fa-2x fa-fw" aria-hidden="true" style="display:none;margin:7px 0px;"></i>
 					</td>
 					<%-- <td class="v-tbl-img">
            				<c:choose>
