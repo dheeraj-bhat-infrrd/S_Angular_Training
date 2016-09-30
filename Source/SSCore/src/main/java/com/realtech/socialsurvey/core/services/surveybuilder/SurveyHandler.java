@@ -120,7 +120,7 @@ public interface SurveyHandler
     public void changeStatusOfSurvey( String surveyId, boolean editable );
 
 
-    public void sendSurveyInvitationMail( String custFirstName, String custLastName, String custEmail,
+    public void storeSPIandSendSurveyInvitationMail( String custFirstName, String custLastName, String custEmail,
         String custRelationWithAgent, User user, boolean isAgent, String source ) throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException;
 
@@ -348,4 +348,10 @@ public interface SurveyHandler
 
 
     SurveysAndReviewsVO getSurveysByStatus( String status, int startIndex, int count , long companyId);
+
+
+    public void prepareAndSendInvitationMail( SurveyPreInitiation survey ) throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+
+
+    void sendSurveyReminderEmail( SurveyPreInitiation survey ) throws InvalidInputException, ProfileNotFoundException;
 }
