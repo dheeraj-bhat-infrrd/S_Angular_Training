@@ -1075,10 +1075,7 @@ public class DashboardController
                 LOG.error( "Invalid value (null/empty) passed for surveyPreInitiationIdStr." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for surveyPreInitiationIdStr." );
             }
-            Map<String, Long> hierarchyMap = null;
-            Map<SettingsForApplication, OrganizationUnit> map = null;
-            String logoUrl = null;
-            String surveyLink = "";
+
             long surveyPreInitiationId;
             try {
                 surveyPreInitiationId = Integer.parseInt( surveyPreInitiationIdStr );
@@ -1086,145 +1083,11 @@ public class DashboardController
                 throw new InvalidInputException( "Invalid surveyPreInitiationIdStr passed", e.getMessage(), e );
             }
             SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurveyById( surveyPreInitiationId );
-            long agentId = survey.getAgentId();
-            String customerEmail = survey.getCustomerEmailId();
-            String custFirstName = survey.getCustomerFirstName();
-            String custLastName = survey.getCustomerLastName();
-            if ( survey != null ) {
-                //                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
-                //                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
-                surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName,
-                    survey.getSurveyPreIntitiationId(), false );
-            }
-
-            try {
-                AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
-                String agentTitle = "";
-                if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
-                    agentTitle = agentSettings.getContact_details().getTitle();
-                }
-
-                String agentPhone = "";
-                if ( agentSettings.getContact_details() != null
-                    && agentSettings.getContact_details().getContact_numbers() != null
-                    && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
-                    agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
-                }
-
-                String agentEmailId = "";
-                if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getMail_ids() != null
-                    && agentSettings.getContact_details().getMail_ids().getWork() != null ) {
-                    agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
-                }
-
-                hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
-
-                long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
-                long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
-                long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
-
-
-                try {
-                    try {
-                        map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
-                            agentSettings.getIden() );
-                        if ( map == null ) {
-                            LOG.error( "Unable to fetch primary profile for this user " );
-                            throw new FatalException( "Unable to fetch primary profile this user " + agentSettings.getIden() );
-                        }
-                    } catch ( InvalidInputException e ) {
-                        LOG.error( "Exception caught " + e.getMessage() );
-                    }
-                } catch ( InvalidSettingsStateException e ) {
-                    LOG.error( "Exception caught " + e.getMessage() );
-                }
-
-
-                User user = userManagementService.getUserByUserId( agentId );
-                String companyName = user.getCompany().getCompany();
-                String agentName = "";
-
-                if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getName() != null ) {
-                    agentName = agentSettings.getContact_details().getName();
-                }
-
-                OrganizationUnitSettings companySettings = null;
-                try {
-                    companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
-                } catch ( InvalidInputException e ) {
-                    LOG.error( "InvalidInputException occured while trying to fetch company settings." );
-                }
-
-                OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-                //JIRA SS-1363 begin
-                /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                    logoUrl = companySettings.getLogoThumbnail();
-                } else if ( organizationUnit == OrganizationUnit.REGION ) {
-                    OrganizationUnitSettings regionSettings = null;
-                    try {
-                        regionSettings = organizationManagementService.getRegionSettings( regionId );
-                    } catch ( InvalidInputException e ) {
-                        e.printStackTrace();
-                    }
-                    if ( regionSettings != null )
-                        logoUrl = regionSettings.getLogoThumbnail();
-                } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
-                    OrganizationUnitSettings branchSettings = null;
-                    try {
-                        branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-                    } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-                        e.printStackTrace();
-                    }
-                    if ( branchSettings != null ) {
-                        logoUrl = branchSettings.getLogoThumbnail();
-                    }
-                } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                    logoUrl = agentSettings.getLogoThumbnail();
-                }*/
-                if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                    logoUrl = companySettings.getLogo();
-                } else if ( organizationUnit == OrganizationUnit.REGION ) {
-                    OrganizationUnitSettings regionSettings = null;
-                    try {
-                        regionSettings = organizationManagementService.getRegionSettings( regionId );
-                    } catch ( InvalidInputException e ) {
-                        e.printStackTrace();
-                    }
-                    if ( regionSettings != null )
-                        logoUrl = regionSettings.getLogo();
-                } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
-                    OrganizationUnitSettings branchSettings = null;
-                    try {
-                        branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-                    } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-                        e.printStackTrace();
-                    }
-                    if ( branchSettings != null ) {
-                        logoUrl = branchSettings.getLogo();
-                    }
-                } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                    logoUrl = agentSettings.getLogo();
-                }
-                //JIRA SS-1363 end
-
-                //JIRA SS-473 begin
-                String agentDisclaimer = "";
-                String agentLicenses = "";
-
-                if ( agentSettings.getDisclaimer() != null )
-                    agentDisclaimer = agentSettings.getDisclaimer();
-
-                if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
-                    agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
-                }
-
-                emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
-                    agentTitle, companyName, survey, surveyLink, logoUrl, agentDisclaimer, agentLicenses );
-
-                //JIRA SS-473 end
-            } catch ( InvalidInputException e ) {
-                LOG.error( "Exception occurred while trying to send survey reminder mail to : " + customerEmail );
-                throw e;
+          
+          if ( survey != null ) {
+                surveyHandler.sendSurveyReminderEmail( survey );
+            }else{
+                new InvalidInputException( "Invalid surveyPreInitiationIdStr passed");
             }
 
             // Increasing value of reminder count by 1.

@@ -156,7 +156,7 @@ public class SurveyHandlerImplTest
     public void sendSurveyInvitationMailTestFirstNameNull() throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.sendSurveyInvitationMail( null, "test", "test", "test", null, false, "test" );
+        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( null, "test", "test", "test", null, false, "test" );
     }
 
 
@@ -164,7 +164,7 @@ public class SurveyHandlerImplTest
     public void sendSurveyInvitationMailTestFirstNameEmpty() throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.sendSurveyInvitationMail( "", "test", "test", "test", null, false, "test" );
+        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( "", "test", "test", "test", null, false, "test" );
     }
 
 
@@ -172,7 +172,7 @@ public class SurveyHandlerImplTest
     public void sendSurveyInvitationMailTestEmailNull() throws InvalidInputException, SolrException, NoRecordsFetchedException,
         UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.sendSurveyInvitationMail( "test", "test", null, "test", null, false, "test" );
+        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( "test", "test", null, "test", null, false, "test" );
     }
 
 
@@ -180,7 +180,7 @@ public class SurveyHandlerImplTest
     public void sendSurveyInvitationMailTestEmailEmpty() throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.sendSurveyInvitationMail( "test", "test", "", "test", null, false, "test" );
+        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( "test", "test", "", "test", null, false, "test" );
     }
 
 
