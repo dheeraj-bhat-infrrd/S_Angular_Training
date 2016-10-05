@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
@@ -45,8 +49,10 @@ import twitter4j.conf.ConfigurationBuilder;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.ExternalSurveyTrackerDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
@@ -158,6 +164,14 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Autowired
     private UserDao userDao;
 
+    
+    @Resource
+    @Qualifier ( "branch")
+    private BranchDao branchDao;
+    
+    @Autowired
+    private RegionDao regionDao;
+    
     @Autowired
     private SurveyHandler surveyHandler;
 
@@ -1030,6 +1044,45 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         return null;
     }
 
+    
+    /**
+     * 
+     * @param agentId
+     * @return
+     */
+    private String getProfileUrlOfPrimaryEntityOfAgent(long agentId){
+        
+        LOG.info( "method getProfileUrlOfPrimaryEntityOfAgent started for agent with id " + agentId);
+        String profileurl = null;
+        OrganizationUnitSettings primaryProfileSetting = null;
+        Map<String, Long> profile = null;
+        try {
+            profile = userManagementService.getPrimaryUserProfileByAgentId( agentId );
+       
+        if(profile != null){
+            Branch branch = branchDao.findById( Branch.class, profile.get( CommonConstants.BRANCH_ID_COLUMN ) );
+            if(branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO){
+                primaryProfileSetting = organizationManagementService.getBranchSettingsDefault(branch.getBranchId() );
+              
+            }else{
+                Region region = regionDao.findById( Region.class, profile.get( CommonConstants.REGION_ID_COLUMN ) );
+                if(region.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO){
+                    primaryProfileSetting = organizationManagementService.getRegionSettings( region.getRegionId() );
+                }else{
+                    primaryProfileSetting = organizationManagementService.getCompanySettings( profile.get( CommonConstants.COMPANY_ID_COLUMN ) );
+                }
+            }
+        }  
+        if(primaryProfileSetting != null)
+            profileurl = primaryProfileSetting.getCompleteProfileUrl();
+
+        } catch ( ProfileNotFoundException | InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( "No profile found for user with id " + agentId );
+        }
+        LOG.info( "method getProfileUrlOfPrimaryEntityOfAgent completed for agent with id " + agentId);
+        return profileurl;
+
+    }
 
     /**
      * 
@@ -1071,7 +1124,18 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         AgentSettings agentSettings = userManagementService
             .getUserSettings( socialMediaPostDetails.getAgentMediaPostDetails().getAgentId() );
-
+        
+        
+        //get profile url
+        String profileurl = agentSettings.getCompleteProfileUrl();
+        //if company is hidden than show the url of the entity where user is assigned
+        if(isAgentsHidden){
+            String priamryProfileUrl = getProfileUrlOfPrimaryEntityOfAgent(  socialMediaPostDetails.getAgentMediaPostDetails().getAgentId()  );
+            if(! StringUtils.isBlank( priamryProfileUrl ))
+                profileurl = priamryProfileUrl;
+        }
+        
+        
         //Post for agent
         //do not post for agents if agents are hiiden
         if( !isAgentsHidden){
@@ -1079,9 +1143,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( agentSettings != null ) {
                     User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
                     if ( agent != null && agent.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                        postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
+                        postToFacebookForAHierarchy( companyId, profileurl, facebookMessage, updatedFacebookMessage, rating,
                             serverBaseUrl, agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION , socialMediaPostDetails.getAgentMediaPostDetails(),
-                            agentMediaPostResponseDetails, isZillow );
+                            agentMediaPostResponseDetails, isZillow, isAgentsHidden );
                     }
                 }
             }
@@ -1098,9 +1162,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( companySetting != null ) {
                     Company company = organizationManagementService.getCompanyById( companySetting.getIden() );
                     if ( company != null && company.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                        postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
+                        postToFacebookForAHierarchy( companyId, profileurl, facebookMessage, updatedFacebookMessage, rating,
                             serverBaseUrl, companySetting, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION , socialMediaPostDetails.getCompanyMediaPostDetails(),
-                            companyMediaPostResponseDetails, isZillow );
+                            companyMediaPostResponseDetails, isZillow, isAgentsHidden );
                     }
                 }
             }
@@ -1117,8 +1181,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         if ( region != null && region.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                             RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                                 regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
-                            postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage,
-                                rating, serverBaseUrl, setting, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,  regionMediaPostDetails, regionMediaPostResponseDetails, isZillow );
+                            postToFacebookForAHierarchy( companyId, profileurl, facebookMessage, updatedFacebookMessage,
+                                rating, serverBaseUrl, setting, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,  regionMediaPostDetails, regionMediaPostResponseDetails, isZillow, isAgentsHidden );
                         }
                     }
 
@@ -1136,8 +1200,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     Branch branch = userManagementService.getBranchById( setting.getIden() );
                     if ( branch != null && branch.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                         if ( setting != null ) {
-                            postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage,
-                                rating, serverBaseUrl, setting, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ,  branchMediaPostDetails, branchMediaPostResponseDetails, isZillow );
+                            postToFacebookForAHierarchy( companyId, profileurl, facebookMessage, updatedFacebookMessage,
+                                rating, serverBaseUrl, setting, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ,  branchMediaPostDetails, branchMediaPostResponseDetails, isZillow, isAgentsHidden );
                         }
                     }
                 }
@@ -1148,19 +1212,36 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         LOG.debug( "Method postToFacebookForHierarchy() ended" );
     }
 
-
-    void postToFacebookForAHierarchy( long companyId, AgentSettings agentSettings, String facebookMessage,
+    
+    /**
+     * 
+     * @param companyId
+     * @param profileUrl
+     * @param facebookMessage
+     * @param updatedFacebookMessage
+     * @param rating
+     * @param serverBaseUrl
+     * @param setting
+     * @param collectionType
+     * @param mediaPostDetails
+     * @param mediaPostResponseDetails
+     * @param isZillow
+     * @param isAgentsHidden
+     * @throws InvalidInputException
+     */
+    void postToFacebookForAHierarchy( long companyId, String  profileUrl, String facebookMessage,
         String updatedFacebookMessage, double rating, String serverBaseUrl, OrganizationUnitSettings setting, String collectionType,
-        MediaPostDetails mediaPostDetails, EntityMediaPostResponseDetails mediaPostResponseDetails, boolean isZillow )
+        MediaPostDetails mediaPostDetails, EntityMediaPostResponseDetails mediaPostResponseDetails, boolean isZillow , boolean isAgentsHidden  )
         throws InvalidInputException
     {
         try {
+            
             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                 if ( !isZillow ) {
                     updatedFacebookMessage = facebookMessage + setting.getCompleteProfileUrl() + "/";
                 }
                 if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId,
-                    agentSettings.getCompleteProfileUrl() ) ) {
+                    profileUrl ) ) {
                     List<String> socialList = mediaPostDetails.getSharedOn();
                     if ( !socialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
                         socialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
