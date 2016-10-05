@@ -30,6 +30,9 @@
 		<c:if test="${not empty contact_details.city }">
 			<c:set var="city" value="${contact_details.city}"></c:set>
 		</c:if>
+		<c:if test="${not empty contact_details.mail_ids }">
+			<c:set var="workEmail" value="${contact_details.mail_ids.work}"></c:set>
+		</c:if>
 	</c:if>
 	<c:if test="${not empty profile.vertical}">
 		<c:set var="vertical" value="${profile.vertical}"></c:set>
@@ -433,6 +436,7 @@
 	              		</c:choose>
               		</c:if>
               		
+              		<c:if test="${not empty workEmail }">
                     <div class="prof-left-row prof-left-assoc bord-bot-dc">
                     	<div class="left-contact-wrapper">
                     		<div id="prof-contact-hdr" class="left-panel-header prof-contact-hdr">Contact ${profName}</div>
@@ -493,6 +497,7 @@
 							</c:if>
 						</div>
                     </div>  
+                    </c:if>
                 </div>
             </div>
             
