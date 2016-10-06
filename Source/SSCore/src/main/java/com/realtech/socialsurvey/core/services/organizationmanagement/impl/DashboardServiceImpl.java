@@ -653,8 +653,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         if ( companyId <= 0l ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter company id is invalid" );
         }
-
-        Collections.sort( surveyDetails, new SurveyResultsComparator() );
+        
+        //do not use Collections.sort because of the performance issue
+        //Collections.sort( surveyDetails, new SurveyResultsComparator() );
         Map<Integer, List<Object>> data = workbookData.getCustomerSurveyResultDataToBeWrittenInSheet( surveyDetails,
             companyId );
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
