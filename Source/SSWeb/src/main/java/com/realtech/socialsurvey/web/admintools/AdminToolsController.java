@@ -10,6 +10,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SearchedUser;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.AdminToolsErrorCode;
+import com.realtech.socialsurvey.core.exception.AuthorizationException;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.InputValidationException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
@@ -323,27 +325,41 @@ public class AdminToolsController
 
     private void validateAuthHeader( String authorizationHeader ) throws InvalidInputException
     {
-        Map<String, String> params = new HashMap<String, String>();
-        if ( authorizationHeader == null || authorizationHeader.isEmpty() ) {
-            throw new InvalidInputException( "Authorization failure" );
+        LOG.debug( " method validateAuthHeader started" );
+
+        if (StringUtils.isBlank( authorizationHeader )) {
+            throw new InvalidInputException( "Authorization header is null" );
         }
 
-        LOG.debug( "Validating authroization header " );
+        String encodedUserPassword = authorizationHeader.replaceFirst("Basic" + " ", "");
+        
+        String plainText = null;
         try {
-            String plainText = encryptionHelper.decryptAES( authorizationHeader, "" );
-            String keyValuePairs[] = plainText.split( "&" );
-
-            for ( int counter = 0; counter < keyValuePairs.length; counter += 1 ) {
-                String[] keyValuePair = keyValuePairs[counter].split( "=" );
-                params.put( keyValuePair[0], keyValuePair[1] );
-            }
-        } catch ( InvalidInputException e ) {
+             plainText = encryptionHelper.decryptAES( encodedUserPassword, "" );
+        } catch ( Exception e ) {
             throw new InvalidInputException( "Authorization failure" );
         }
-
-        if ( !surveyHandler.validateDecryptedApiParams( params ) ) {
+        
+        long comapnyId;
+       
+        boolean isValid;
+        try {
+            String[] keyValuePair = plainText.split( ":" );
+            String apiKey = keyValuePair[0];
+            String apiSecret = keyValuePair[1];
+            String comapnyIdStr = apiSecret.split( "_" )[0];
+            comapnyId = Long.valueOf( comapnyIdStr ) ;
+            isValid = userManagementService.validateUserApiKey( apiKey, apiSecret, comapnyId );
+        } catch ( NumberFormatException | InvalidInputException e ) {
             throw new InvalidInputException( "Authorization failure" );
         }
+        
+        if(!isValid){
+            throw new InvalidInputException( "Authorization failure" );
+        }
+       
+        LOG.debug( " method validateAuthHeader ended" );
+        
     }
 
 

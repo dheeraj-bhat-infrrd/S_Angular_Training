@@ -107,8 +107,8 @@ public class EmailServicesImpl implements EmailServices
     @Autowired
     private ForwardMailDetailsDao forwardMailDetailsDao;
 
-	@Autowired
-	private UserManagementService userManagementService;
+    @Autowired
+    private UserManagementService userManagementService;
 
 
     /**
@@ -527,6 +527,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Successfully sendEmailVerifiedNotificationMail" );
     }
 
+
     @Override
     public void sendEmailVerifiedNotificationMailToAdmin( String recipientMailId, String recipientName, String verifiedEmail,
         String entityName ) throws InvalidInputException, UndeliveredEmailException
@@ -561,6 +562,7 @@ public class EmailServicesImpl implements EmailServices
             fileContentReplacements, false, false );
         LOG.info( "Successfully sent EmailVerifiedNotificationMailToAdmin" );
     }
+
 
     /**
      * Method to send mail with verification link to verify the account
@@ -1071,7 +1073,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements subjectReplacements = new FileContentReplacements();
         subjectReplacements.setFileName(
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_SUBJECT );
-        subjectReplacements.setReplacementArgs( Arrays.asList( rating, customerName ) );
+        subjectReplacements.setReplacementArgs( Arrays.asList( rating, customerName, recipientName ) );
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName(
@@ -1804,7 +1806,7 @@ public class EmailServicesImpl implements EmailServices
 
     // creating email entity with senders email id as U<userid>@socialsurvey.me
     private EmailEntity prepareEmailEntityForSendingEmail( String recipientMailId, long userId, String name )
-	    throws InvalidInputException
+        throws InvalidInputException
     {
         LOG.debug( "Preparing email entity with recipent " + recipientMailId + " user id " + userId + " and name " + name );
         List<String> recipients = new ArrayList<String>();
@@ -1815,14 +1817,13 @@ public class EmailServicesImpl implements EmailServices
         emailEntity.setSenderName( name );
 
         AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
-	    //JIRA SS-700 begin
-	    if ( agentSettings.getUserEncryptedId() == null ) {
-		    agentSettings.setUserEncryptedId( userManagementService.generateUserEncryptedId( agentSettings.getIden() ) );
-		    organizationUnitSettingsDao
-			    .updateParticularKeyAgentSettings( CommonConstants.USER_ENCRYPTED_ID, agentSettings.getUserEncryptedId(),
-				    agentSettings );
-	    }
-	    //JIRA SS-700 end
+        //JIRA SS-700 begin
+        if ( agentSettings.getUserEncryptedId() == null ) {
+            agentSettings.setUserEncryptedId( userManagementService.generateUserEncryptedId( agentSettings.getIden() ) );
+            organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.USER_ENCRYPTED_ID,
+                agentSettings.getUserEncryptedId(), agentSettings );
+        }
+        //JIRA SS-700 end
         //JIRA SS-60 //pass stored encrypted id in mongo for the user
         emailEntity.setSenderEmailId( "u-" + agentSettings.getUserEncryptedId() + "@" + defaultEmailDomain );
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );
