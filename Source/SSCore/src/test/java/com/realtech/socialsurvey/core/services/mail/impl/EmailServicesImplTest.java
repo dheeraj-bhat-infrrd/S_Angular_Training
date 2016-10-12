@@ -690,7 +690,7 @@ public class EmailServicesImplTest
     public void sendSurveyCompletionMailToAdminsAndAgentTestRecipientMailIdNull()
         throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( null, null, "test", null, null, null );
+        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( null, null, null, "test", null, null, null );
     }
 
 
@@ -698,14 +698,14 @@ public class EmailServicesImplTest
     public void sendSurveyCompletionMailToAdminsAndAgentTestRecipientMailIdEmpty()
         throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( null, "", "test", null, null, null );
+        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( null, null, "", "test", null, null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendSurveyCompletionMailToAdminsAndAgentTestSurveyNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( "test", "test", null, null, null, null );
+        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( "test", "test", "test", null, null, null, null );
     }
 
 
@@ -713,7 +713,7 @@ public class EmailServicesImplTest
     public void sendSurveyCompletionMailToAdminsAndAgentTestSurveyEmpty()
         throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( "test", "test", "", null, null, null );
+        emailServicesImpl.sendSurveyCompletionMailToAdminsAndAgent( "test", "test", "test", "", null, null, null );
     }
 
 

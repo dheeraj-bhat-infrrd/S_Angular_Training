@@ -1055,8 +1055,9 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendSurveyCompletionMailToAdminsAndAgent( String recipientName, String recipientMailId, String surveyDetail,
-        String customerName, String rating, String logoUrl ) throws InvalidInputException, UndeliveredEmailException
+    public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
+        String surveyDetail, String customerName, String rating, String logoUrl )
+        throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1073,7 +1074,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements subjectReplacements = new FileContentReplacements();
         subjectReplacements.setFileName(
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_SUBJECT );
-        subjectReplacements.setReplacementArgs( Arrays.asList( rating, customerName, recipientName ) );
+        subjectReplacements.setReplacementArgs( Arrays.asList( rating, customerName, agentName ) );
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName(
