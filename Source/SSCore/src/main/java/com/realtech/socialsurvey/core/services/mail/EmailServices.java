@@ -173,8 +173,9 @@ public interface EmailServices
      * @param agentName
      * @throws InvalidInputException
      */
-    public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientMailId, String surveyDetail,
-        String customerName, String rating, String logoUrl ) throws InvalidInputException, UndeliveredEmailException;
+    public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
+        String surveyDetail, String customerName, String rating, String logoUrl )
+        throws InvalidInputException, UndeliveredEmailException;
 
 
     /**
