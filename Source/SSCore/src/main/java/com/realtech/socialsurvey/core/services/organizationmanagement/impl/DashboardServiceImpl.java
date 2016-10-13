@@ -36,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.SocialPostsComparator;
-import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
@@ -653,7 +652,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         if ( companyId <= 0l ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter company id is invalid" );
         }
-        
+
         //do not use Collections.sort because of the performance issue
         //Collections.sort( surveyDetails, new SurveyResultsComparator() );
         Map<Integer, List<Object>> data = workbookData.getCustomerSurveyResultDataToBeWrittenInSheet( surveyDetails,
@@ -856,14 +855,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         return get3rdPartyImportCount( columnName, columnValue, startDate, endDate, true );
     }
-	
-	
+
 
     long getZillowImportCount( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
         boolean filterAbusive ) throws InvalidInputException
     {
         return surveyDetailsDao.getZillowImportCount( columnName, columnValue, startDate, endDate, filterAbusive );
     }
+
 
     long get3rdPartyImportCount( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
         boolean filterAbusive ) throws InvalidInputException
@@ -972,6 +971,12 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         Map<Long, List<SocialUpdateAction>> socialMediaActionMap = new HashMap<Long, List<SocialUpdateAction>>();
         Map<Long, Date> latestSurveySentForAgent = new HashMap<Long, Date>();
         Map<Long, Date> latestSurveyCompletedForAgent = new HashMap<Long, Date>();
+        Map<Long, Long> totalReviewsCountForAgent = new HashMap<Long, Long>();
+        Map<Long, Long> socialSurveyReviewsCountForAgent = new HashMap<Long, Long>();
+        Map<Long, Long> zillowReviewsCountForAgent = new HashMap<Long, Long>();
+        Map<Long, Long> abusiveReviewsCountForAgent = new HashMap<Long, Long>();
+        Map<Long, Long> thirdPartyReviewsCountForAgent = new HashMap<Long, Long>();
+
         User companyAdmin = null;
         if ( userList != null && userList.size() > 0 ) {
             for ( User user : userList ) {
@@ -1077,14 +1082,22 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 .getSocialConnectionsHistoryForEntities( CommonConstants.AGENT_ID_COLUMN, userIdList );
         }
 
-
         latestSurveyCompletedForAgent = surveyDetailsDao.getLatestCompletedSurveyDateForAgents( companyId );
         latestSurveySentForAgent = surveyPreInitiationDao.getLatestSurveySentForAgent( companyId );
+
+        // get all types of reviews counts
+        totalReviewsCountForAgent = surveyDetailsDao.getTotalReviewsCountForAllUsersOfCompany( companyId );
+        socialSurveyReviewsCountForAgent = surveyDetailsDao.getSocialSurveyReviewsCountForAllUsersOfCompany( companyId );
+        zillowReviewsCountForAgent = surveyDetailsDao.getZillowReviewsCountForAllUsersOfCompany( companyId );
+        abusiveReviewsCountForAgent = surveyDetailsDao.getAbusiveReviewsCountForAllUsersOfCompany( companyId );
+        thirdPartyReviewsCountForAgent = surveyDetailsDao.getThirdPartyReviewsCountForAllUsersOfCompany( companyId );
 
         //get user data map to craete excel from available users details
         Map<Integer, List<Object>> usersData = createUserDataForCompnyUserReport( userList, agentIds, companyAdmin,
             userIdSettingsMap, userIdRegionIdsMap, userIdBranchIdsMap, userIdRegionAsAdminIdsMap, userIdBranchAsAdminIdsMap,
-            socialMediaActionMap, userAndFeedStatusMap, latestSurveyCompletedForAgent, latestSurveySentForAgent );
+            socialMediaActionMap, userAndFeedStatusMap, latestSurveyCompletedForAgent, latestSurveySentForAgent,
+            totalReviewsCountForAgent, socialSurveyReviewsCountForAgent, zillowReviewsCountForAgent,
+            abusiveReviewsCountForAgent, thirdPartyReviewsCountForAgent );
 
         return usersData;
     }
@@ -1104,6 +1117,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      * @param userAndFeedStatusMap
      * @param latestSurveyCompletedForAgent
      * @param latestSurveySentForAgent
+     * @param thirdPartyReviewsCountForAgent 
+     * @param abusiveReviewsCountForAgent 
+     * @param zillowReviewsCountForAgent 
+     * @param socialSurveyReviewsCountForAgent 
+     * @param totalReviewsCountForAgent 
      * @return
      */
     @SuppressWarnings ( "deprecation")
@@ -1112,7 +1130,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         Map<Long, String> userIdBranchIdsMap, Map<Long, String> userIdRegionAsAdminIdsMap,
         Map<Long, String> userIdBranchAsAdminIdsMap, Map<Long, List<SocialUpdateAction>> socialMediaActionMap,
         Map<Long, List<FeedStatus>> userAndFeedStatusMap, Map<Long, Date> latestSurveyCompletedForAgent,
-        Map<Long, Date> latestSurveySentForAgent )
+        Map<Long, Date> latestSurveySentForAgent, Map<Long, Long> totalReviewsCountForAgent,
+        Map<Long, Long> socialSurveyReviewsCountForAgent, Map<Long, Long> zillowReviewsCountForAgent,
+        Map<Long, Long> abusiveReviewsCountForAgent, Map<Long, Long> thirdPartyReviewsCountForAgent )
     {
 
         Integer usersCounter = 2;
@@ -1137,9 +1157,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 // col 10 - PROFILE_VERIFIED
                 // col 11 - DATE_OF_LAST_LOGIN
                 // col 12 - PROFILE_COMPLETE
-
                 // col 13 - photo - profile image url
-                // col 15 - about me
+                // col 14 - about me
+                // col 15 - SocialSurvey Profile Url
+                // col 16 - Total Reviews
+                // col 17 - SocialSuvrey Reviews
+                // col 18 - Zillow reviews
+                // col 19 - Abusive reviews
+                // col 20 - 3rd Party reviews
+
                 AgentSettings userSettings = userIdSettingsMap.get( user.getUserId() );
                 //social media action
                 List<SocialUpdateAction> userSocialMediaAction = socialMediaActionMap.get( user.getUserId() );
@@ -1488,20 +1514,46 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 else
                     userReportToPopulate.add( "" );
 
-	            String userAddress = "";
-	            if ( userSettings != null && userSettings.getContact_details() != null ) {
-		            if ( userSettings.getContact_details().getAddress1() != null ) {
-			            userAddress = userSettings.getContact_details().getAddress1();
-		            }
-		            if ( userSettings.getContact_details().getAddress2() != null ) {
-			            if ( userAddress.isEmpty() )
-				            userAddress = userSettings.getContact_details().getAddress2();
-			            else
-				            userAddress += " " + userSettings.getContact_details().getAddress2();
-		            }
-	            }
-	            userReportToPopulate.add( userAddress );
+                String userAddress = "";
+                if ( userSettings != null && userSettings.getContact_details() != null ) {
+                    if ( userSettings.getContact_details().getAddress1() != null ) {
+                        userAddress = userSettings.getContact_details().getAddress1();
+                    }
+                    if ( userSettings.getContact_details().getAddress2() != null ) {
+                        if ( userAddress.isEmpty() )
+                            userAddress = userSettings.getContact_details().getAddress2();
+                        else
+                            userAddress += " " + userSettings.getContact_details().getAddress2();
+                    }
+                }
+                userReportToPopulate.add( userAddress );
 
+                // Social survey profile url
+                String profileUrl = "";
+                if ( userSettings != null && userSettings.getProfileUrl() != null ) {
+                    profileUrl = userSettings.getProfileUrl();
+                }
+                userReportToPopulate.add( profileUrl );
+
+                // Total Reviews (SS + Zillow + 3rd Party Reviews)
+                userReportToPopulate
+                    .add( totalReviewsCountForAgent != null ? totalReviewsCountForAgent.get( user.getUserId() ) : 0 );
+
+                // SocialSurvey Reviews
+                userReportToPopulate.add(
+                    socialSurveyReviewsCountForAgent != null ? socialSurveyReviewsCountForAgent.get( user.getUserId() ) : 0 );
+
+                // Zillow Reviews
+                userReportToPopulate
+                    .add( zillowReviewsCountForAgent != null ? zillowReviewsCountForAgent.get( user.getUserId() ) : 0 );
+
+                // Abusive Reviews
+                userReportToPopulate
+                    .add( abusiveReviewsCountForAgent != null ? abusiveReviewsCountForAgent.get( user.getUserId() ) : 0 );
+
+                // 3rd Party Reviews
+                userReportToPopulate
+                    .add( thirdPartyReviewsCountForAgent != null ? thirdPartyReviewsCountForAgent.get( user.getUserId() ) : 0 );
 
                 usersData.put( ( ++usersCounter ), userReportToPopulate );
                 userReportToPopulate = new ArrayList<>();
@@ -1548,7 +1600,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         userReportToPopulate.add( CommonConstants.DATE_ADOPTION_COMPLETED );
         userReportToPopulate.add( CommonConstants.DATE_LAST_SURVEY_SENT );
         userReportToPopulate.add( CommonConstants.DATE_LAST_SURVEY_POSTED );
-	    userReportToPopulate.add( CommonConstants.USER_ADDRESS );
+        userReportToPopulate.add( CommonConstants.USER_ADDRESS );
+        userReportToPopulate.add( CommonConstants.SOCIAL_SURVEY_PROFILE_URL );
+        userReportToPopulate.add( CommonConstants.TOTAL_REVIEWS );
+        userReportToPopulate.add( CommonConstants.SOCIAL_SURVEY_REVIEWS );
+        userReportToPopulate.add( CommonConstants.ZILLOW_REVIEWS );
+        userReportToPopulate.add( CommonConstants.ABUSIVE_REVIEWS );
+        userReportToPopulate.add( CommonConstants.THIRD_PARTY_REVIEWS );
 
         usersData.put( 1, userReportToPopulate );
 
@@ -1594,7 +1652,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         userReportToPopulate.add( "" );
         userReportToPopulate.add( "" );
         userReportToPopulate.add( "" );
-	    userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "SS + Zillow + 3rd Party Reviews" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
 
         usersData.put( 2, userReportToPopulate );
 
