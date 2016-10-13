@@ -333,13 +333,13 @@ public class SocialManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testPostToTwitterForHierarchyForNullSMPRD() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.postToTwitterForHierarchy( "test", 5.0, "test2", 2, null, new SocialMediaPostResponseDetails() );
+        socialManagementServiceImpl.postToTwitterForHierarchy( "test", 5.0, "test2", 2, null, new SocialMediaPostResponseDetails() , false);
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testPostToTwitterForHierarchyForNullSMPD() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.postToTwitterForHierarchy( "test", 5.0, "test2", 2, new SocialMediaPostDetails() , null );
+        socialManagementServiceImpl.postToTwitterForHierarchy( "test", 5.0, "test2", 2, new SocialMediaPostDetails() , null , false);
     }
     
     
@@ -347,7 +347,7 @@ public class SocialManagementServiceImplTest
     public void testPostToLinkedInForHierarchyForNullSMPRD() throws InvalidInputException, NoRecordsFetchedException
     {
         socialManagementServiceImpl.postToLinkedInForHierarchy( "test", 5.0, "test2", "test3", 2, null,
-            new SocialMediaPostResponseDetails(), new OrganizationUnitSettings(), false );
+            new SocialMediaPostResponseDetails(), new OrganizationUnitSettings(), false , false );
     }
 
 
@@ -355,20 +355,20 @@ public class SocialManagementServiceImplTest
     public void testPostToLinkedInForHierarchyForNullSMPD() throws InvalidInputException, NoRecordsFetchedException
     {
         socialManagementServiceImpl.postToLinkedInForHierarchy( "test", 5.0, "test2", "test3", 2, new SocialMediaPostDetails(),
-            null, new OrganizationUnitSettings(), false );
+            null, new OrganizationUnitSettings(), false , false);
     }
 
     
     @Test ( expected = InvalidInputException.class)
     public void testPostToFacebookForHierarchyForNullSMPRD() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.postToFacebookForHierarchy( "test", 5.0, "test2", 2, null, new SocialMediaPostResponseDetails(), false );
+        socialManagementServiceImpl.postToFacebookForHierarchy( "test", 5.0, "test2", 2, null, new SocialMediaPostResponseDetails(), false , false);
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testPostToFacebookForHierarchyForNullSMPD() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.postToFacebookForHierarchy( "test", 5.0, "test2", 2, new SocialMediaPostDetails() , null, false );
+        socialManagementServiceImpl.postToFacebookForHierarchy( "test", 5.0, "test2", 2, new SocialMediaPostDetails() , null, false , false);
     }
     
     @Test ( expected = InvalidInputException.class)
