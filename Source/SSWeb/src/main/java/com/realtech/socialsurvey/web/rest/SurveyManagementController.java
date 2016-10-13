@@ -236,8 +236,8 @@ public class SurveyManagementController
             surveyHandler.updateGatewayQuestionResponseAndScore( surveyId, mood, feedback, isAbusive, agreedToShare );
             surveyHandler.increaseSurveyCountForAgent( agentId );
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyId );
-            SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey( surveyDetails
-                .getSurveyPreIntitiationId() );
+            SurveyPreInitiation surveyPreInitiation = surveyHandler
+                .getPreInitiatedSurvey( surveyDetails.getSurveyPreIntitiationId() );
             surveyHandler.deleteSurveyPreInitiationDetailsPermanently( surveyPreInitiation );
 
             // update the modified time of hierarchy for seo
@@ -305,13 +305,15 @@ public class SurveyManagementController
                 // Generate the text as in mail
                 String surveyDetail = generateSurveyTextForMail( customerName, mood, survey, isAbusive, allowCheckBox );
                 String surveyScore = String.valueOf( surveyHandler.getFormattedSurveyScore( survey.getScore() ) );
+                String agentName = ( agent.getLastName() != null && !agent.getLastName().isEmpty() )
+                    ? ( agent.getFirstName() + " " + agent.getLastName() ) : agent.getFirstName();
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
-                    emailServices.sendSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(), surveyDetail,
-                        customerName, surveyScore, logoUrl );
+                    emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
+                        surveyDetail, customerName, surveyScore, logoUrl );
                 }
 
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey
-                    .getCompanyId() );
+                OrganizationUnitSettings companySettings = organizationManagementService
+                    .getCompanySettings( survey.getCompanyId() );
 
                 if ( companySettings == null )
                     throw new NonFatalException( "Company settings cannot be found for id : " + survey.getCompanyId() );
@@ -322,16 +324,17 @@ public class SurveyManagementController
                         .getComplaint_res_settings();
 
                     if ( complaintRegistrationSettings.isEnabled()
-                        && ( ( survey.getScore() > 0d && complaintRegistrationSettings.getRating() > 0d && survey.getScore() < complaintRegistrationSettings
-                            .getRating() ) || ( !complaintRegistrationSettings.getMood().trim().isEmpty() && complaintRegistrationSettings
-                            .getMoodList().contains( mood.toLowerCase() ) ) ) ) {
+                        && ( ( survey.getScore() > 0d && complaintRegistrationSettings.getRating() > 0d
+                            && survey.getScore() < complaintRegistrationSettings.getRating() )
+                            || ( !complaintRegistrationSettings.getMood().trim().isEmpty()
+                                && complaintRegistrationSettings.getMoodList().contains( mood.toLowerCase() ) ) ) ) {
                         survey.setUnderResolution( true );
                         surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
 
                         //SS-1435: Send survey details too.
                         //SS-715: Full customer name
                         String displayName = survey.getCustomerFirstName();
-                        if(survey.getCustomerLastName() != null)
+                        if ( survey.getCustomerLastName() != null )
                             displayName = displayName + " " + survey.getCustomerLastName();
                         emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), displayName,
                             customerEmail, mood, surveyScore, surveyDetail );
@@ -356,8 +359,8 @@ public class SurveyManagementController
     private String generateSurveyTextForMail( String customerName, String mood, SurveyDetails survey, boolean isAbusive,
         boolean allowCheckBox )
     {
-        StringBuilder surveyDetail = new StringBuilder( customerName ).append( " Complete Survey Response for " ).append(
-            survey.getAgentName() );
+        StringBuilder surveyDetail = new StringBuilder( customerName ).append( " Complete Survey Response for " )
+            .append( survey.getAgentName() );
         surveyDetail.append( "<br />" ).append( "Date Sent: " ).append( survey.getCreatedOn().toString() );
         surveyDetail.append( "<br />" ).append( "Date Completed: " ).append( survey.getModifiedOn().toString() );
         surveyDetail.append( "<br />" ).append( "Average Score: " ).append( String.valueOf( survey.getScore() ) );
@@ -380,7 +383,8 @@ public class SurveyManagementController
             && survey.getAgreedToShare().equalsIgnoreCase( "true" ) ) {
             surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "Yes" );
             if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
-                surveyDetail.append( "<br />" ).append( "Shared on: " ).append( StringUtils.join( survey.getSharedOn(), ", " ) );
+                surveyDetail.append( "<br />" ).append( "Shared on: " )
+                    .append( StringUtils.join( survey.getSharedOn(), ", " ) );
             }
         } else {
             surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "No" );
@@ -438,8 +442,8 @@ public class SurveyManagementController
             if ( agentSettings != null ) {
                 agentName = agentSettings.getContact_details().getName();
                 agentEmail = agentSettings.getContact_details().getMail_ids().getWork();
-                profileImageUrl = ( agentSettings.getProfileImageUrlThumbnail() != null ? agentSettings
-                    .getProfileImageUrlThumbnail() : agentSettings.getProfileImageUrl() );
+                profileImageUrl = ( agentSettings.getProfileImageUrlThumbnail() != null
+                    ? agentSettings.getProfileImageUrlThumbnail() : agentSettings.getProfileImageUrl() );
                 // get the proper logo url based on settings for the organization
                 logoUrl = getLogoBasedOnSettingsForUser( agentId, agentSettings );
             }
@@ -475,7 +479,8 @@ public class SurveyManagementController
     @RequestMapping ( value = "/triggersurvey")
     public String triggerSurvey( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started." );
+        LOG.info(
+            "Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started." );
 
         long agentId = 0;
         String customerEmail;
@@ -506,8 +511,9 @@ public class SurveyManagementController
                 if ( !captchaValidation.isCaptchaValid( request.getRemoteAddr(), captchaSecretKey,
                     request.getParameter( "g-recaptcha-response" ) ) ) {
                     LOG.error( "Captcha Validation failed!" );
-                    errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
-                        DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                    errorMsg = messageUtils
+                        .getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE )
+                        .getMessage();
                     throw new InvalidInputException( errorMsg, DisplayMessageConstants.INVALID_CAPTCHA );
                 }
             }
@@ -524,12 +530,14 @@ public class SurveyManagementController
             try {
                 surveyHandler.initiateSurveyRequest( user.getUserId(), customerEmail, firstName, lastName, source );
             } catch ( SelfSurveyInitiationException e ) {
-                errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
-                    DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                errorMsg = messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION, DisplayMessageType.ERROR_MESSAGE )
+                    .getMessage();
                 throw new NonFatalException( e.getMessage(), e.getErrorCode() );
             } catch ( DuplicateSurveyRequestException e ) {
-                errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
-                    DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                errorMsg = messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST, DisplayMessageType.ERROR_MESSAGE )
+                    .getMessage();
                 throw new NonFatalException( e.getMessage(), e.getErrorCode() );
             }
 
@@ -539,9 +547,8 @@ public class SurveyManagementController
             if ( errorMsg != null )
                 model.addAttribute( "message", errorMsg );
             else
-                model
-                    .addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
-                        DisplayMessageType.ERROR_MESSAGE ) );
+                model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
+                    DisplayMessageType.ERROR_MESSAGE ) );
             model.addAttribute( "agentId", agentId );
             model.addAttribute( "agentName", agentName );
             model.addAttribute( "firstName", firstName );
@@ -550,7 +557,8 @@ public class SurveyManagementController
             model.addAttribute( "relation", custRelationWithAgent );
             return JspResolver.SHOW_SURVEY_FORM;
         }
-        LOG.info( "Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started." );
+        LOG.info(
+            "Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started." );
         return JspResolver.SURVEY_INVITE_SUCCESSFUL;
     }
 
@@ -800,7 +808,8 @@ public class SurveyManagementController
                 }
             } catch ( FacebookException e ) {
                 LOG.error(
-                    "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e );
+                    "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
+                    e );
             }
             for ( OrganizationUnitSettings setting : companySettings ) {
                 try {
@@ -819,8 +828,8 @@ public class SurveyManagementController
             }
             for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
                 try {
-                    OrganizationUnitSettings setting = organizationManagementService.getRegionSettings( regionMediaPostDetails
-                        .getRegionId() );
+                    OrganizationUnitSettings setting = organizationManagementService
+                        .getRegionSettings( regionMediaPostDetails.getRegionId() );
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl,
                             user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl() ) ) {
@@ -844,8 +853,8 @@ public class SurveyManagementController
 
 
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                            if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
-                                serverBaseUrl, user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl() ) ) {
+                            if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl,
+                                user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl() ) ) {
                                 List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
                                 if ( !branchSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
                                     branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
@@ -954,7 +963,8 @@ public class SurveyManagementController
                     }
                 }
             } catch ( TwitterException e ) {
-                LOG.error( "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e );
+                LOG.error( "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ",
+                    e );
             }
             for ( OrganizationUnitSettings setting : companySettings ) {
                 try {
@@ -972,8 +982,8 @@ public class SurveyManagementController
             for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
                 try {
 
-                    OrganizationUnitSettings setting = organizationManagementService.getRegionSettings( regionMediaPostDetails
-                        .getRegionId() );
+                    OrganizationUnitSettings setting = organizationManagementService
+                        .getRegionSettings( regionMediaPostDetails.getRegionId() );
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() ) ) {
                             List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
@@ -1383,8 +1393,8 @@ public class SurveyManagementController
             User user = userManagementService.getUserByUserId( agentId );
             Map<String, String> urlParams = urlGenerator.decryptUrl( survey.getUrl() );
             urlParams.put( CommonConstants.URL_PARAM_RETAKE_SURVEY, "true" );
-            String updatedUrl = urlGenerator.generateUrl( urlParams, getApplicationBaseUrl()
-                + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
+            String updatedUrl = urlGenerator.generateUrl( urlParams,
+                getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
             surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,
                 updatedUrl );
         } catch ( NonFatalException e ) {
@@ -1415,8 +1425,8 @@ public class SurveyManagementController
             User user = userManagementService.getUserByUserId( agentId );
             Map<String, String> urlParams = urlGenerator.decryptUrl( survey.getUrl() );
             urlParams.put( CommonConstants.URL_PARAM_RETAKE_SURVEY, "true" );
-            String updatedUrl = urlGenerator.generateUrl( urlParams, getApplicationBaseUrl()
-                + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
+            String updatedUrl = urlGenerator.generateUrl( urlParams,
+                getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
             surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,
                 updatedUrl );
         } catch ( NonFatalException e ) {
@@ -1505,18 +1515,19 @@ public class SurveyManagementController
         OrganizationUnitSettings bSetting = null;
         if ( branchSettings != null )
             bSetting = branchSettings.getOrganizationUnitSettings();
-        
+
         Map<SettingsForApplication, OrganizationUnit> mapPrimaryHierarchy = null;
         try {
-            mapPrimaryHierarchy = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+            mapPrimaryHierarchy = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
+                user.getUserId() );
         } catch ( InvalidSettingsStateException e1 ) {
             LOG.error( "An Exception occurred while fetching logo url. Reason : ", e1 );
         } catch ( ProfileNotFoundException e1 ) {
             LOG.error( "An Exception occurred while fetching logo url. Reason : ", e1 );
         }
-        
-        String logo = surveyHandler.getLogoUrlWithSettings( user, (AgentSettings) unitSettings, companySettings,
-            regionSettings, bSetting, mapPrimaryHierarchy );
+
+        String logo = surveyHandler.getLogoUrlWithSettings( user, (AgentSettings) unitSettings, companySettings, regionSettings,
+            bSetting, mapPrimaryHierarchy );
         LOG.info( "Logo to be displayed: " + logo );
         surveyAndStage.put( "companyLogo", logo );
 
@@ -1539,7 +1550,8 @@ public class SurveyManagementController
         }
 
         //Flags to check if any particular text is not set in the companySettings
-        boolean isHappyTextSet = false, isNeutralTextSet = false, isSadTextSet = false, isHappyTextCompleteSet = false, isNeutralTextCompleteSet = false, isSadTextCompleteSet = false;
+        boolean isHappyTextSet = false, isNeutralTextSet = false, isSadTextSet = false, isHappyTextCompleteSet = false,
+            isNeutralTextCompleteSet = false, isSadTextCompleteSet = false;
 
         if ( unitSettings != null && unitSettings.getSurvey_settings() != null ) {
             SurveySettings surveySettings = unitSettings.getSurvey_settings();
@@ -1547,73 +1559,86 @@ public class SurveyManagementController
             surveyAndStage.put( "autopostScore", surveySettings.getShow_survey_above_score() );
             surveyAndStage.put( "autopostEnabled", surveySettings.isAutoPostEnabled() );
         }
-        
+
         DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
         Map<String, String> surveyMap = emailFormatHelper.fetchSurveySourceId( user.getUserId(), survey.getCustomerEmail(),
-            dateFormat.format( new Date()) );
+            dateFormat.format( new Date() ) );
         if ( companySettings != null && companySettings.getSurvey_settings() != null ) {
             LOG.info( "Setting company specific values for surveyAndStage started" );
             SurveySettings surveySettings = companySettings.getSurvey_settings();
             if ( StringUtils.isNotEmpty( surveySettings.getHappyText() ) ) {
-                surveyAndStage.put( "happyText", surveyHandler.replaceGatewayQuestionText( surveySettings.getHappyText(),
-                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+                surveyAndStage.put( "happyText",
+                    surveyHandler.replaceGatewayQuestionText( surveySettings.getHappyText(), unitSettings, user,
+                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isHappyTextSet = true;
             }
-            if ( StringUtils.isNotEmpty( surveySettings.getNeutralText() )) {
-                surveyAndStage.put( "neutralText", surveyHandler.replaceGatewayQuestionText( surveySettings.getNeutralText(),
-                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+            if ( StringUtils.isNotEmpty( surveySettings.getNeutralText() ) ) {
+                surveyAndStage.put( "neutralText",
+                    surveyHandler.replaceGatewayQuestionText( surveySettings.getNeutralText(), unitSettings, user,
+                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isNeutralTextSet = true;
             }
-            if ( StringUtils.isNotEmpty( surveySettings.getSadText() )) {
-                surveyAndStage.put( "sadText", surveyHandler.replaceGatewayQuestionText( surveySettings.getSadText(),
-                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+            if ( StringUtils.isNotEmpty( surveySettings.getSadText() ) ) {
+                surveyAndStage.put( "sadText",
+                    surveyHandler.replaceGatewayQuestionText( surveySettings.getSadText(), unitSettings, user, companySettings,
+                        survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isSadTextSet = true;
             }
-            if ( StringUtils.isNotEmpty( surveySettings.getHappyTextComplete())) {
-                surveyAndStage.put( "happyTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    surveySettings.getHappyTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+            if ( StringUtils.isNotEmpty( surveySettings.getHappyTextComplete() ) ) {
+                surveyAndStage.put( "happyTextComplete",
+                    surveyHandler.replaceGatewayQuestionText( surveySettings.getHappyTextComplete(), unitSettings, user,
+                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isHappyTextCompleteSet = true;
             }
-            if ( StringUtils.isNotEmpty( surveySettings.getNeutralTextComplete() )) {
-                surveyAndStage.put( "neutralTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    surveySettings.getNeutralTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+            if ( StringUtils.isNotEmpty( surveySettings.getNeutralTextComplete() ) ) {
+                surveyAndStage.put( "neutralTextComplete",
+                    surveyHandler.replaceGatewayQuestionText( surveySettings.getNeutralTextComplete(), unitSettings, user,
+                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isNeutralTextCompleteSet = true;
             }
-            if ( StringUtils.isNotEmpty( surveySettings.getSadTextComplete() )) {
-                surveyAndStage.put( "sadTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    surveySettings.getSadTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+            if ( StringUtils.isNotEmpty( surveySettings.getSadTextComplete() ) ) {
+                surveyAndStage.put( "sadTextComplete",
+                    surveyHandler.replaceGatewayQuestionText( surveySettings.getSadTextComplete(), unitSettings, user,
+                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
                 isSadTextCompleteSet = true;
             }
             LOG.info( "Setting company specific values for surveyAndStage finished" );
         }
 
         //If any of the texts are not set by the company, store default values for them.
-        if ( !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet ) ) {
+        if ( !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet
+            && isSadTextCompleteSet ) ) {
             LOG.info( "Setting default values for surveyAndStage started" );
             SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
             if ( !isHappyTextSet ) {
-                surveyAndStage.put( "happyText", surveyHandler.replaceGatewayQuestionText(
-                    defaultSurveySettings.getHappyText(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+                surveyAndStage.put( "happyText",
+                    surveyHandler.replaceGatewayQuestionText( defaultSurveySettings.getHappyText(), unitSettings, user,
+                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             if ( !isNeutralTextSet ) {
-                surveyAndStage.put( "neutralText", surveyHandler.replaceGatewayQuestionText(
-                    defaultSurveySettings.getNeutralText(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+                surveyAndStage.put( "neutralText",
+                    surveyHandler.replaceGatewayQuestionText( defaultSurveySettings.getNeutralText(), unitSettings, user,
+                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             if ( !isSadTextSet ) {
-                surveyAndStage.put( "sadText", surveyHandler.replaceGatewayQuestionText( defaultSurveySettings.getSadText(),
-                    unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+                surveyAndStage.put( "sadText",
+                    surveyHandler.replaceGatewayQuestionText( defaultSurveySettings.getSadText(), unitSettings, user,
+                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             if ( !isHappyTextCompleteSet ) {
-                surveyAndStage.put( "happyTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    defaultSurveySettings.getHappyTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+                surveyAndStage.put( "happyTextComplete",
+                    surveyHandler.replaceGatewayQuestionText( defaultSurveySettings.getHappyTextComplete(), unitSettings, user,
+                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             if ( isNeutralTextCompleteSet ) {
-                surveyAndStage.put( "neutralTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    defaultSurveySettings.getNeutralTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+                surveyAndStage.put( "neutralTextComplete",
+                    surveyHandler.replaceGatewayQuestionText( defaultSurveySettings.getNeutralTextComplete(), unitSettings,
+                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             if ( isSadTextCompleteSet ) {
-                surveyAndStage.put( "sadTextComplete", surveyHandler.replaceGatewayQuestionText(
-                    defaultSurveySettings.getSadTextComplete(), unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
+                surveyAndStage.put( "sadTextComplete",
+                    surveyHandler.replaceGatewayQuestionText( defaultSurveySettings.getSadTextComplete(), unitSettings, user,
+                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap ) );
             }
             LOG.info( "Setting default values for surveyAndStage finished" );
         }
@@ -1633,8 +1658,8 @@ public class SurveyManagementController
         }
 
         //zillow
-        surveyHandler
-            .updateSurveyStageForZillow( unitSettings, branchSettings, regionSettings, companySettings, surveyAndStage );
+        surveyHandler.updateSurveyStageForZillow( unitSettings, branchSettings, regionSettings, companySettings,
+            surveyAndStage );
 
         // Fetching LendingTree Url
         surveyHandler.updateSurveyStageForLendingTree( unitSettings, branchSettings, regionSettings, companySettings,
@@ -1653,23 +1678,22 @@ public class SurveyManagementController
         surveyAndStage.put( "fbAppId", facebookAppId );
         surveyAndStage.put( "googlePlusAppId", googlePlusId );
 
-        surveyAndStage.put( "agentFullProfileLink", getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-            + unitSettings.getProfileUrl() );
+        surveyAndStage.put( "agentFullProfileLink",
+            getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + unitSettings.getProfileUrl() );
         surveyAndStage.put( "agentProfileLink", unitSettings.getProfileUrl() );
         surveyAndStage.put( "stage", stage );
         surveyAndStage.put( "survey", surveyQuestionDetails );
         surveyAndStage.put( "agentId", user.getUserId() );
         surveyAndStage.put( "editable", editable );
         surveyAndStage.put( "source", surveyPreInitiation.getSurveySource() );
-        surveyAndStage.put("hiddenSection", companySettings.isHiddenSection() );
+        surveyAndStage.put( "hiddenSection", companySettings.isHiddenSection() );
         surveyAndStage.put( "companyName", user.getCompany().getCompany() );
 
         LOG.info( "Method getSurvey finished." );
         return surveyAndStage;
     }
 
-    
-    
+
     private void reportBug( String socAppName, String name, Exception e )
     {
         try {
@@ -1776,8 +1800,8 @@ public class SurveyManagementController
         String logoUrl = null;
         try {
             Map<String, Long> hierarchyMap = null;
-            Map<SettingsForApplication, OrganizationUnit> map = profileManagementService.getPrimaryHierarchyByEntity(
-                CommonConstants.AGENT_ID_COLUMN, agentId );
+            Map<SettingsForApplication, OrganizationUnit> map = profileManagementService
+                .getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, agentId );
             hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
 
             long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
@@ -1792,13 +1816,15 @@ public class SurveyManagementController
                     OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
                     logoUrl = regionSettings.getLogo();
                 } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
-                    OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                    OrganizationUnitSettings branchSettings = organizationManagementService
+                        .getBranchSettingsDefault( branchId );
                     logoUrl = branchSettings.getLogo();
                 } else if ( organizationUnit == OrganizationUnit.AGENT ) {
                     logoUrl = agentSettings.getLogo();
                 }
             }
-        } catch ( InvalidInputException | InvalidSettingsStateException | ProfileNotFoundException | NoRecordsFetchedException e ) {
+        } catch ( InvalidInputException | InvalidSettingsStateException | ProfileNotFoundException
+            | NoRecordsFetchedException e ) {
             LOG.warn( "Error while fetching logo url " + e.getMessage() );
         }
         LOG.debug( "Returning logo url: " + logoUrl );

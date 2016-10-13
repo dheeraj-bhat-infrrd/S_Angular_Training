@@ -773,11 +773,8 @@
 				$('#social-token-container').show();
 			}
 
-			profileJson = $
-			{
-				profileJson
-			}
-			;
+			profileJson = ${profileJson};
+			
 			var gaLabel;
 			var gaName;
 			/**

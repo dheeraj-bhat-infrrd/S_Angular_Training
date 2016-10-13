@@ -746,7 +746,7 @@ function paintReviews(result){
 		reviewsHtml += '    	<div class="float-left ppl-header-right">';
 		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
 		reviewsHtml += '		</div>';
-		if(reviewItem.source=="encompass"||reviewItem.source=="DOTLOOP"){
+		if(reviewItem.source=="encompass"||reviewItem.source=="DOTLOOP" || reviewItem.source == "FTP"){
 			reviewsHtml +=' <div class="verified-badge  verify-image float-right" title="Click here to know more"></div>';
 			}
 		else if(reviewItem.source=="Zillow"){
