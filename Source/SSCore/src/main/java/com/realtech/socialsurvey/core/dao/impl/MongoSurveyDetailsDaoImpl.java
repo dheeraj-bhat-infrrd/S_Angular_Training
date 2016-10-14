@@ -36,7 +36,6 @@ import com.mongodb.CommandResult;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CustomAggregationOperation;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
@@ -49,7 +48,6 @@ import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 
 
 /*
@@ -69,12 +67,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Autowired
     private MongoTemplate mongoTemplate;
-
-    @Autowired
-    private SurveyPreInitiationService surveyPreInitiationService;
-
-    @Autowired
-    private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
     @Value ( "${MAX_SOCIAL_POST_REMINDER_INTERVAL}")
     private int maxSocialPostReminderInterval;
@@ -878,7 +870,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 SurveyDetails.class );
 
             if ( result != null ) {
-                List<BasicDBObject> initiatorCount = (List<BasicDBObject>) result.getRawResults().get( "result" );
+                @SuppressWarnings ( "unchecked") List<BasicDBObject> initiatorCount = (List<BasicDBObject>) result
+                    .getRawResults().get( "result" );
                 if ( initiatorCount != null && !initiatorCount.isEmpty() ) {
                     Map<String, Object> resultObj = (Map<String, Object>) initiatorCount.get( 0 );
                     String countStr = resultObj.get( "count" ).toString();
@@ -2972,39 +2965,128 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Override
     public Map<Long, Long> getTotalReviewsCountForAllUsersOfCompany( long companyId )
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<Long, Long> totalReviewsByAgentId = new HashMap<Long, Long>();
+        TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
+            Aggregation.match( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ) ),
+            Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            Aggregation.match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
+            Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+
+        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
+            SurveyDetails.class );
+        if ( result != null ) {
+            @SuppressWarnings ( "unchecked") List<BasicDBObject> reviewsCount = (List<BasicDBObject>) result.getRawResults()
+                .get( "result" );
+            for ( BasicDBObject reviewCount : reviewsCount ) {
+                totalReviewsByAgentId.put(
+                    Long.parseLong( reviewCount.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ),
+                    Long.parseLong( reviewCount.get( "count" ).toString() ) );
+            }
+        }
+        return totalReviewsByAgentId;
     }
 
 
     @Override
     public Map<Long, Long> getSocialSurveyReviewsCountForAllUsersOfCompany( long companyId )
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<Long, Long> ssReviewsByAgentId = new HashMap<Long, Long>();
+        TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
+            Aggregation.match( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ) ),
+            Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            Aggregation.match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
+            Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN )
+                .nin( Arrays.asList( CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ) ),
+            Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+
+        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
+            SurveyDetails.class );
+        if ( result != null ) {
+            @SuppressWarnings ( "unchecked") List<BasicDBObject> reviewsCount = (List<BasicDBObject>) result.getRawResults()
+                .get( "result" );
+            for ( BasicDBObject reviewCount : reviewsCount ) {
+                ssReviewsByAgentId.put( Long.parseLong( reviewCount.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ),
+                    Long.parseLong( reviewCount.get( "count" ).toString() ) );
+            }
+        }
+        return ssReviewsByAgentId;
     }
 
 
     @Override
     public Map<Long, Long> getZillowReviewsCountForAllUsersOfCompany( long companyId )
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<Long, Long> zillowReviewsByAgentId = new HashMap<Long, Long>();
+        TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
+            Aggregation.match( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ) ),
+            Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            Aggregation.match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
+            Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).is( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+
+        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
+            SurveyDetails.class );
+        if ( result != null ) {
+            @SuppressWarnings ( "unchecked") List<BasicDBObject> reviewsCount = (List<BasicDBObject>) result.getRawResults()
+                .get( "result" );
+            for ( BasicDBObject reviewCount : reviewsCount ) {
+                zillowReviewsByAgentId.put(
+                    Long.parseLong( reviewCount.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ),
+                    Long.parseLong( reviewCount.get( "count" ).toString() ) );
+            }
+        }
+        return zillowReviewsByAgentId;
     }
 
 
     @Override
     public Map<Long, Long> getAbusiveReviewsCountForAllUsersOfCompany( long companyId )
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<Long, Long> abusiveReviewsByAgentId = new HashMap<Long, Long>();
+        TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
+            Aggregation.match( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ) ),
+            Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            Aggregation.match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
+            Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( true ) ),
+            Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+
+        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
+            SurveyDetails.class );
+        if ( result != null ) {
+            @SuppressWarnings ( "unchecked") List<BasicDBObject> reviewsCount = (List<BasicDBObject>) result.getRawResults()
+                .get( "result" );
+            for ( BasicDBObject reviewCount : reviewsCount ) {
+                abusiveReviewsByAgentId.put(
+                    Long.parseLong( reviewCount.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ),
+                    Long.parseLong( reviewCount.get( "count" ).toString() ) );
+            }
+        }
+        return abusiveReviewsByAgentId;
     }
 
 
     @Override
     public Map<Long, Long> getThirdPartyReviewsCountForAllUsersOfCompany( long companyId )
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<Long, Long> thirdPartyReviewsByAgentId = new HashMap<Long, Long>();
+        TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
+            Aggregation.match( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ) ),
+            Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            Aggregation.match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
+            Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).is( CommonConstants.SURVEY_SOURCE_3RD_PARTY ) ),
+            Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+
+        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
+            SurveyDetails.class );
+        if ( result != null ) {
+            @SuppressWarnings ( "unchecked") List<BasicDBObject> reviewsCount = (List<BasicDBObject>) result.getRawResults()
+                .get( "result" );
+            for ( BasicDBObject reviewCount : reviewsCount ) {
+                thirdPartyReviewsByAgentId.put(
+                    Long.parseLong( reviewCount.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ),
+                    Long.parseLong( reviewCount.get( "count" ).toString() ) );
+            }
+        }
+        return thirdPartyReviewsByAgentId;
     }
 }

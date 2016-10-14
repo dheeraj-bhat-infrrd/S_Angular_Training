@@ -133,6 +133,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Value ( "${APPLICATION_ADMIN_NAME}")
     private String adminName;
 
+    @Value ( "${APPLICATION_BASE_URL}")
+    private String applicationBaseUrl;
+
     @Autowired
     private WorkbookOperations workbookOperations;
 
@@ -1531,29 +1534,35 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 // Social survey profile url
                 String profileUrl = "";
                 if ( userSettings != null && userSettings.getProfileUrl() != null ) {
-                    profileUrl = userSettings.getProfileUrl();
+                    profileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + userSettings.getProfileUrl();
                 }
                 userReportToPopulate.add( profileUrl );
 
                 // Total Reviews (SS + Zillow + 3rd Party Reviews)
-                userReportToPopulate
-                    .add( totalReviewsCountForAgent != null ? totalReviewsCountForAgent.get( user.getUserId() ) : 0 );
+                userReportToPopulate.add( totalReviewsCountForAgent != null && !totalReviewsCountForAgent.isEmpty()
+                    && totalReviewsCountForAgent.get( user.getUserId() ) != null
+                        ? totalReviewsCountForAgent.get( user.getUserId() ) : 0 );
 
                 // SocialSurvey Reviews
-                userReportToPopulate.add(
-                    socialSurveyReviewsCountForAgent != null ? socialSurveyReviewsCountForAgent.get( user.getUserId() ) : 0 );
+                userReportToPopulate
+                    .add( socialSurveyReviewsCountForAgent != null && !socialSurveyReviewsCountForAgent.isEmpty()
+                        && socialSurveyReviewsCountForAgent.get( user.getUserId() ) != null
+                            ? socialSurveyReviewsCountForAgent.get( user.getUserId() ) : 0 );
 
                 // Zillow Reviews
-                userReportToPopulate
-                    .add( zillowReviewsCountForAgent != null ? zillowReviewsCountForAgent.get( user.getUserId() ) : 0 );
+                userReportToPopulate.add( zillowReviewsCountForAgent != null && !zillowReviewsCountForAgent.isEmpty()
+                    && zillowReviewsCountForAgent.get( user.getUserId() ) != null
+                        ? zillowReviewsCountForAgent.get( user.getUserId() ) : 0 );
 
                 // Abusive Reviews
-                userReportToPopulate
-                    .add( abusiveReviewsCountForAgent != null ? abusiveReviewsCountForAgent.get( user.getUserId() ) : 0 );
+                userReportToPopulate.add( abusiveReviewsCountForAgent != null && !abusiveReviewsCountForAgent.isEmpty()
+                    && abusiveReviewsCountForAgent.get( user.getUserId() ) != null
+                        ? abusiveReviewsCountForAgent.get( user.getUserId() ) : 0 );
 
                 // 3rd Party Reviews
-                userReportToPopulate
-                    .add( thirdPartyReviewsCountForAgent != null ? thirdPartyReviewsCountForAgent.get( user.getUserId() ) : 0 );
+                userReportToPopulate.add( thirdPartyReviewsCountForAgent != null && !thirdPartyReviewsCountForAgent.isEmpty()
+                    && thirdPartyReviewsCountForAgent.get( user.getUserId() ) != null
+                        ? thirdPartyReviewsCountForAgent.get( user.getUserId() ) : 0 );
 
                 usersData.put( ( ++usersCounter ), userReportToPopulate );
                 userReportToPopulate = new ArrayList<>();
