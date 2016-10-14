@@ -1664,6 +1664,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         userReportToPopulate.add( "" );
 
         userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
         userReportToPopulate.add( "SS + Zillow + 3rd Party Reviews" );
         userReportToPopulate.add( "" );
         userReportToPopulate.add( "" );
