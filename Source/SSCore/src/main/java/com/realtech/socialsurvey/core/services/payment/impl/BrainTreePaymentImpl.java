@@ -1888,6 +1888,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
             Map<String, Object> queryMap = new HashMap<String, Object>();
             queryMap.put( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
             queryMap.put( CommonConstants.PROFILE_MASTER_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
+            queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
             numOfUsers = userProfileDao.findNumberOfRowsByKeyValue( UserProfile.class, queryMap );
         } else {
             Map<String, Object> queryMap = new HashMap<String, Object>();
