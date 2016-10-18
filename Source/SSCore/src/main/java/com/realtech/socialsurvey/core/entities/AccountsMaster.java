@@ -22,172 +22,185 @@ import javax.persistence.Table;
 @Table(name="ACCOUNTS_MASTER")
 @NamedQuery(name="AccountsMaster.findAll", query="SELECT a FROM AccountsMaster a")
 public class AccountsMaster implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="ACCOUNTS_MASTER_ID")
-	private int accountsMasterId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="ACCOUNTS_MASTER_ID")
+    private int accountsMasterId;
 
-	@Column(name="ACCOUNT_NAME")
-	private String accountName;
+    @Column(name="ACCOUNT_NAME")
+    private String accountName;
 
-	@Column(name="CREATED_BY")
-	private String createdBy;
+    @Column(name="CREATED_BY")
+    private String createdBy;
 
-	@Column(name="CREATED_ON")
-	private Timestamp createdOn;
+    @Column(name="CREATED_ON")
+    private Timestamp createdOn;
 
-	@Column(name="MAX_TIME_VALIDITY_ALLOWED_IN_DAYS")
-	private int maxTimeValidityAllowedInDays;
+    @Column(name="MAX_TIME_VALIDITY_ALLOWED_IN_DAYS")
+    private int maxTimeValidityAllowedInDays;
 
-	@Column(name="MAX_USERS_ALLOWED")
-	private int maxUsersAllowed;
-	
-	@Column(name="AMOUNT")
-	private float amount;
+    @Column(name="MAX_USERS_ALLOWED")
+    private int maxUsersAllowed;
+    
+    @Column(name="MIN_USERS_ALLOWED")
+    private int minUsersAllowed;
 
-	@Column(name="MODIFIED_BY")
-	private String modifiedBy;
+    @Column(name="AMOUNT")
+    private float amount;
 
-	@Column(name="MODIFIED_ON")
-	private Timestamp modifiedOn;
+    @Column(name="MODIFIED_BY")
+    private String modifiedBy;
 
-	private int status;
+    @Column(name="MODIFIED_ON")
+    private Timestamp modifiedOn;
 
-	//bi-directional many-to-one association to CompanyInvitationLicenseKey
-	@OneToMany(mappedBy="accountsMaster",fetch = FetchType.LAZY)
-	private List<CompanyInvitationLicenseKey> companyInvitationLicenseKeys;
+    private int status;
 
-	//bi-directional many-to-one association to LicenseDetail
-	@OneToMany(mappedBy="accountsMaster",fetch = FetchType.LAZY)
-	private List<LicenseDetail> licenseDetails;
+    //bi-directional many-to-one association to CompanyInvitationLicenseKey
+    @OneToMany(mappedBy="accountsMaster",fetch = FetchType.LAZY)
+    private List<CompanyInvitationLicenseKey> companyInvitationLicenseKeys;
 
-	public AccountsMaster() {
-	}
+    //bi-directional many-to-one association to LicenseDetail
+    @OneToMany(mappedBy="accountsMaster",fetch = FetchType.LAZY)
+    private List<LicenseDetail> licenseDetails;
 
-	public int getAccountsMasterId() {
-		return this.accountsMasterId;
-	}
+    public AccountsMaster() {
+    }
 
-	public void setAccountsMasterId(int accountsMasterId) {
-		this.accountsMasterId = accountsMasterId;
-	}
+    public int getAccountsMasterId() {
+        return this.accountsMasterId;
+    }
 
-	public String getAccountName() {
-		return this.accountName;
-	}
+    public void setAccountsMasterId(int accountsMasterId) {
+        this.accountsMasterId = accountsMasterId;
+    }
 
-	public void setAccountName(String accountName) {
-		this.accountName = accountName;
-	}
+    public String getAccountName() {
+        return this.accountName;
+    }
 
-	public String getCreatedBy() {
-		return this.createdBy;
-	}
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
 
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
+    public String getCreatedBy() {
+        return this.createdBy;
+    }
 
-	public Timestamp getCreatedOn() {
-		return this.createdOn;
-	}
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-	public void setCreatedOn(Timestamp createdOn) {
-		this.createdOn = createdOn;
-	}
+    public Timestamp getCreatedOn() {
+        return this.createdOn;
+    }
 
-	public int getMaxTimeValidityAllowedInDays() {
-		return this.maxTimeValidityAllowedInDays;
-	}
+    public void setCreatedOn(Timestamp createdOn) {
+        this.createdOn = createdOn;
+    }
 
-	public void setMaxTimeValidityAllowedInDays(int maxTimeValidityAllowedInDays) {
-		this.maxTimeValidityAllowedInDays = maxTimeValidityAllowedInDays;
-	}
+    public int getMaxTimeValidityAllowedInDays() {
+        return this.maxTimeValidityAllowedInDays;
+    }
 
-	public int getMaxUsersAllowed() {
-		return this.maxUsersAllowed;
-	}
+    public void setMaxTimeValidityAllowedInDays(int maxTimeValidityAllowedInDays) {
+        this.maxTimeValidityAllowedInDays = maxTimeValidityAllowedInDays;
+    }
 
-	public void setMaxUsersAllowed(int maxUsersAllowed) {
-		this.maxUsersAllowed = maxUsersAllowed;
-	}
+    public int getMaxUsersAllowed() {
+        return this.maxUsersAllowed;
+    }
 
-	public String getModifiedBy() {
-		return this.modifiedBy;
-	}
+    public void setMaxUsersAllowed(int maxUsersAllowed) {
+        this.maxUsersAllowed = maxUsersAllowed;
+    }
+    
+    public int getMinUsersAllowed()
+    {
+        return this.minUsersAllowed;
+    }
 
-	public void setModifiedBy(String modifiedBy) {
-		this.modifiedBy = modifiedBy;
-	}
+    public void setMinUsersAllowed( int minUsersAllowed )
+    {
+        this.minUsersAllowed = minUsersAllowed;
+    }
+    
+    public String getModifiedBy() {
+        return this.modifiedBy;
+    }
 
-	public Timestamp getModifiedOn() {
-		return this.modifiedOn;
-	}
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
 
-	public void setModifiedOn(Timestamp modifiedOn) {
-		this.modifiedOn = modifiedOn;
-	}
+    public Timestamp getModifiedOn() {
+        return this.modifiedOn;
+    }
 
-	public int getStatus() {
-		return this.status;
-	}
+    public void setModifiedOn(Timestamp modifiedOn) {
+        this.modifiedOn = modifiedOn;
+    }
 
-	public void setStatus(int status) {
-		this.status = status;
-	}
-	
-	public float getAmount() {
-		return amount;
-	}
+    public int getStatus() {
+        return this.status;
+    }
 
-	public void setAmount(float amount) {
-		this.amount = amount;
-	}
+    public void setStatus(int status) {
+        this.status = status;
+    }
+    
+    public float getAmount() {
+        return amount;
+    }
 
-	public List<CompanyInvitationLicenseKey> getCompanyInvitationLicenseKeys() {
-		return this.companyInvitationLicenseKeys;
-	}
+    public void setAmount(float amount) {
+        this.amount = amount;
+    }
 
-	public void setCompanyInvitationLicenseKeys(List<CompanyInvitationLicenseKey> companyInvitationLicenseKeys) {
-		this.companyInvitationLicenseKeys = companyInvitationLicenseKeys;
-	}
+    public List<CompanyInvitationLicenseKey> getCompanyInvitationLicenseKeys() {
+        return this.companyInvitationLicenseKeys;
+    }
 
-	public CompanyInvitationLicenseKey addCompanyInvitationLicenseKey(CompanyInvitationLicenseKey companyInvitationLicenseKey) {
-		getCompanyInvitationLicenseKeys().add(companyInvitationLicenseKey);
-		companyInvitationLicenseKey.setAccountsMaster(this);
+    public void setCompanyInvitationLicenseKeys(List<CompanyInvitationLicenseKey> companyInvitationLicenseKeys) {
+        this.companyInvitationLicenseKeys = companyInvitationLicenseKeys;
+    }
 
-		return companyInvitationLicenseKey;
-	}
+    public CompanyInvitationLicenseKey addCompanyInvitationLicenseKey(CompanyInvitationLicenseKey companyInvitationLicenseKey) {
+        getCompanyInvitationLicenseKeys().add(companyInvitationLicenseKey);
+        companyInvitationLicenseKey.setAccountsMaster(this);
 
-	public CompanyInvitationLicenseKey removeCompanyInvitationLicenseKey(CompanyInvitationLicenseKey companyInvitationLicenseKey) {
-		getCompanyInvitationLicenseKeys().remove(companyInvitationLicenseKey);
-		companyInvitationLicenseKey.setAccountsMaster(null);
+        return companyInvitationLicenseKey;
+    }
 
-		return companyInvitationLicenseKey;
-	}
+    public CompanyInvitationLicenseKey removeCompanyInvitationLicenseKey(CompanyInvitationLicenseKey companyInvitationLicenseKey) {
+        getCompanyInvitationLicenseKeys().remove(companyInvitationLicenseKey);
+        companyInvitationLicenseKey.setAccountsMaster(null);
 
-	public List<LicenseDetail> getLicenseDetails() {
-		return this.licenseDetails;
-	}
+        return companyInvitationLicenseKey;
+    }
 
-	public void setLicenseDetails(List<LicenseDetail> licenseDetails) {
-		this.licenseDetails = licenseDetails;
-	}
+    public List<LicenseDetail> getLicenseDetails() {
+        return this.licenseDetails;
+    }
 
-	public LicenseDetail addLicenseDetail(LicenseDetail licenseDetail) {
-		getLicenseDetails().add(licenseDetail);
-		licenseDetail.setAccountsMaster(this);
+    public void setLicenseDetails(List<LicenseDetail> licenseDetails) {
+        this.licenseDetails = licenseDetails;
+    }
 
-		return licenseDetail;
-	}
+    public LicenseDetail addLicenseDetail(LicenseDetail licenseDetail) {
+        getLicenseDetails().add(licenseDetail);
+        licenseDetail.setAccountsMaster(this);
 
-	public LicenseDetail removeLicenseDetail(LicenseDetail licenseDetail) {
-		getLicenseDetails().remove(licenseDetail);
-		licenseDetail.setAccountsMaster(null);
+        return licenseDetail;
+    }
 
-		return licenseDetail;
-	}
+    public LicenseDetail removeLicenseDetail(LicenseDetail licenseDetail) {
+        getLicenseDetails().remove(licenseDetail);
+        licenseDetail.setAccountsMaster(null);
+
+        return licenseDetail;
+    }
 
 }
