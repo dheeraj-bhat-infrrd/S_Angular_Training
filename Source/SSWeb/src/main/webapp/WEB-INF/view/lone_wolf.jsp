@@ -24,6 +24,14 @@
 							</div>
 						</div>
 					</div>
+					
+					<div class=" col-sm-12 clearfix um-panel-item en-botttom-padding margin-left-20">
+						<div id="classification-list-wrapper" class="hm-item-row item-row-OR clearfix float-left">
+							
+						</div>
+					</div>
+					
+					
 					<div class="encompass-btn clearfix">
 						<div>
 							<div id="lone-dry-save" class="float-left enc-state-icon cursor-pointer">Save</div>

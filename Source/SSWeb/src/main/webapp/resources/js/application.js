@@ -120,6 +120,7 @@ var google_plus_app_id;
 var isZillowReviewsCallRunning = false;
 var zillowCallBreak = false;
 var existingCall;
+var classificationsList = [];
 
 /**
  * js functions for landing page
@@ -3797,10 +3798,19 @@ function saveEncompassDetails(formid) {
 		callAjaxFormSubmit(url, testConnectionSaveCallBack, formid);
 	}
 }
+
 function saveLoneWolfDetails(formid) {
 	if (validateLoneWolfInput(formid)) {
-		var url = "./savelonewolfdetails.do";
-		callAjaxFormSubmit(url, testConnectionLoneSaveCallBack, formid);
+		var lonewolfClientId = $("#lone-client").val();
+		var loeWolfState = $("#lone-state").val();
+		
+		disableIcon = false;
+		var formData = new FormData();
+		formData.append("lonewolfClient", lonewolfClientId);
+		formData.append("lonewolfState", loeWolfState);
+		formData.append("classifications", JSON.stringify(classificationsList));
+		callAjaxPOSTWithTextDataUpload("./savelonewolfdetails.do" , testConnectionLoneSaveCallBack, true, formData);
+		//callAjaxFormSubmit(url, testConnectionLoneSaveCallBack, formid);
 	}
 }
 
@@ -3817,10 +3827,32 @@ function saveEncompassDetailsCallBack(response) {
 	 */
 
 }
-function saveLoneDetailsCallBack(response) {
+function saveTestLoneDetailsCallBack(response) {
 
 	var map = $.parseJSON(response);
+	classificationsList = map.classifications;
+	
+		
+	var $classificationTypeUnknown = ' <div class="float-left bd-cust-rad-item clearfix"><div data-type="single" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">Unknown</div></div>';
+	var $classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="multiple" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
+	var $classificationTypeSeller = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="multiple" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Seller</div></div>';
+	var $classificationTypeBoth = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="multiple" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Both</div></div>';
+	var $classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="multiple" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
+
 	if (map.status == true) {
+		//show classification list
+		for (var i = 0; i < classificationsList.length; i++) {
+		    var classification = classificationsList[i];
+		    
+			var $classificationCode = '<div class="float-left opacity-red sq-smile-icn-text clasfction-code-txt compl-sq-smile-sad-text-disabled">' + classification.Code + '</div>';
+
+		    
+		    var $classificationRow = $("<div>", {id: "classification_" + i , "class": "bd-frm-rad-wrapper clearfix"});
+		    $classificationRow.html($classificationCode + $classificationTypeUnknown + $classificationTypeBuyer + $classificationTypeSeller + $classificationTypeBoth + $classificationTypeNone );
+		    
+		    $("#classification-list-wrapper").append($classificationRow);
+		}
+		
 		saveLoneWolfDetails("lone-wolf-form");
 	} else {
 		showError(map.message);
@@ -10730,7 +10762,7 @@ function initiateLoneWolfSaveConnection(warn) {
 		"clientCode" : client
 	};
 	showOverlay();
-	callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/lonewolf/testcredentials.do", saveLoneDetailsCallBack, payload, true, '#lone-dry-save');
+	callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/lonewolf/testcredentials.do", saveTestLoneDetailsCallBack, payload, true, '#lone-dry-save');
 	if (warn) {
 		$('#overlay-cancel').click();
 	}

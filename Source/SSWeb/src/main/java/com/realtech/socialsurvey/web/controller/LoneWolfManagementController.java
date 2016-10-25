@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,13 +14,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.LoneWolfClassificationCode;
 import com.realtech.socialsurvey.core.entities.LoneWolfCrmInfo;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
@@ -39,6 +46,8 @@ public class LoneWolfManagementController
     private SessionHelper sessionHelper;
     private OrganizationManagementService organizationManagementService;
     private MessageUtils messageUtils;
+    
+
 
 
     @Autowired
@@ -186,7 +195,7 @@ public class LoneWolfManagementController
      */
     @RequestMapping ( value = "/savelonewolfdetails", method = RequestMethod.POST)
     @ResponseBody
-    public String saveLoneWolfDetails( Model model, HttpServletRequest request )
+    public String saveLoneWolfDetails( HttpServletRequest request)
     {
         LOG.info( "Inside method saveLoneWolfDetails " );
         HttpSession session = request.getSession( false );
@@ -195,8 +204,8 @@ public class LoneWolfManagementController
         boolean status = false;
         String message = null;
         try {
-            String clientCode = request.getParameter( "lone-client" );
-            String state = request.getParameter( "lone-state" );
+            String clientCode = request.getParameter( "lonewolfClient" );
+            String state = request.getParameter( "lonewolfState" );
             if ( StringUtils.isEmpty( clientCode ) ) {
                 throw new InvalidInputException( "Client code cannot be empty" );
             }
@@ -206,10 +215,18 @@ public class LoneWolfManagementController
                 state = CommonConstants.LONEWOLF_PRODUCTION_STATE;
             }
 
+            
+            String classificationsJson = request.getParameter( "classifications" );
+                     
+            TypeToken<List<LoneWolfClassificationCode>> token = new TypeToken<List<LoneWolfClassificationCode>>(){};
+            List<LoneWolfClassificationCode> classifications = new Gson().fromJson( classificationsJson, token.getType());
+
+            
             LoneWolfCrmInfo loneWolfCrmInfo = new LoneWolfCrmInfo();
             loneWolfCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_LONEWOLF );
             loneWolfCrmInfo.setClientCode( clientCode );
             loneWolfCrmInfo.setState( state );
+            loneWolfCrmInfo.setClassificationCodes( classifications );
             OrganizationUnitSettings unitSettings = null;
             String collectionName = "";
             if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
@@ -239,6 +256,7 @@ public class LoneWolfManagementController
             }
             organizationManagementService.updateCRMDetailsForAnyUnitSettings( unitSettings, collectionName, loneWolfCrmInfo,
                 "com.realtech.socialsurvey.core.entities.LoneWolfCrmInfo" );
+            
             unitSettings.setCrm_info( loneWolfCrmInfo );
             status = true;
             message = messageUtils
