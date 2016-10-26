@@ -8704,6 +8704,11 @@ label.url-change-input-label {
 	width: 215px !important;
 }
 
+.classification-text{
+	width: inherit;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
 
 .margin-right-o {
 	margin-right: 0px !important;

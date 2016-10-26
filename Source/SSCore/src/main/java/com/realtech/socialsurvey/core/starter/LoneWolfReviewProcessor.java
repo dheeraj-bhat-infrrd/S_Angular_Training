@@ -295,15 +295,15 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                     LoneWolfClassificationCode curClassificationCode = classificationsAndCode.get( classificationCode );
                     
                     //generate survey pre initiation entry based on classification code
-                    if ( curClassificationCode.getLoneWolfTransactionParticipantsType().getParticipantsType().equals( LoneWolfTransactionParticipantsType.SELLER.getParticipantsType() ) ) {
+                    if ( curClassificationCode.getLoneWolfTransactionParticipantsType().equals( LoneWolfTransactionParticipantsType.SELLER.getParticipantsType() ) ) {
                         generateSurveyPreinitiaionAndSave( sellerClientContact, sellerMember, collectionName,
                             organizationUnitId, transaction.getNumber(), closeDate );
                     }
-                    if ( curClassificationCode.getLoneWolfTransactionParticipantsType().getParticipantsType().equals( LoneWolfTransactionParticipantsType.BUYER.getParticipantsType() ) ) {
+                    if ( curClassificationCode.getLoneWolfTransactionParticipantsType().equals( LoneWolfTransactionParticipantsType.BUYER.getParticipantsType() ) ) {
                         generateSurveyPreinitiaionAndSave( buyerClientContact, buyerMember, collectionName, organizationUnitId,
                             transaction.getNumber(), closeDate );
                     }
-                    if ( curClassificationCode.getLoneWolfTransactionParticipantsType().getParticipantsType().equals( LoneWolfTransactionParticipantsType.SELLERBUYERBOTH.getParticipantsType() ) ) {
+                    if ( curClassificationCode.getLoneWolfTransactionParticipantsType().equals( LoneWolfTransactionParticipantsType.SELLERBUYERBOTH.getParticipantsType() ) ) {
                         generateSurveyPreinitiaionAndSave( sellerClientContact, sellerMember, collectionName,
                             organizationUnitId, transaction.getNumber(), closeDate );
                         generateSurveyPreinitiaionAndSave( buyerClientContact, buyerMember, collectionName, organizationUnitId,

@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -206,6 +209,17 @@ public class LoneWolfManagementController
         try {
             String clientCode = request.getParameter( "lonewolfClient" );
             String state = request.getParameter( "lonewolfState" );
+            String transactionStartDateStr = request.getParameter( "transactionStartDate" ); 
+            
+            Date transactionStartDate = null;
+            if ( transactionStartDateStr != null && !transactionStartDateStr.isEmpty() ) {
+                try {
+                    transactionStartDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( transactionStartDateStr );
+                } catch ( ParseException e ) {
+                    throw new InvalidInputException(
+                        "ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e );
+                }
+            }
             if ( StringUtils.isEmpty( clientCode ) ) {
                 throw new InvalidInputException( "Client code cannot be empty" );
             }
@@ -227,6 +241,7 @@ public class LoneWolfManagementController
             loneWolfCrmInfo.setClientCode( clientCode );
             loneWolfCrmInfo.setState( state );
             loneWolfCrmInfo.setClassificationCodes( classifications );
+            loneWolfCrmInfo.setTransactionStartDate( transactionStartDate );
             OrganizationUnitSettings unitSettings = null;
             String collectionName = "";
             if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
@@ -260,7 +275,7 @@ public class LoneWolfManagementController
             unitSettings.setCrm_info( loneWolfCrmInfo );
             status = true;
             message = messageUtils
-                .getDisplayMessage( DisplayMessageConstants.LONEWOLF_CONNECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                .getDisplayMessage( DisplayMessageConstants.LONEWOLF_DETAIL_SAVED_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while testing lonewolf detials. Reason : " + e.getMessage(), e );

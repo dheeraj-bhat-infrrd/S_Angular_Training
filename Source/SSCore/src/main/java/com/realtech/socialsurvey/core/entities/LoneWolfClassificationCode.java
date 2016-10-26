@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.entities;
 
-import com.realtech.socialsurvey.core.enums.LoneWolfTransactionParticipantsType;
 
 public class LoneWolfClassificationCode
 {
@@ -9,7 +8,7 @@ public class LoneWolfClassificationCode
     private String Code;
     private String Name;
     private String InactiveDate;
-    private LoneWolfTransactionParticipantsType loneWolfTransactionParticipantsType;
+    private String loneWolfTransactionParticipantsType;
     
     
     public String getId()
@@ -52,11 +51,11 @@ public class LoneWolfClassificationCode
     {
         InactiveDate = inactiveDate;
     }
-    public LoneWolfTransactionParticipantsType getLoneWolfTransactionParticipantsType()
+    public String getLoneWolfTransactionParticipantsType()
     {
         return loneWolfTransactionParticipantsType;
     }
-    public void setLoneWolfTransactionParticipantsType( LoneWolfTransactionParticipantsType loneWolfTransactionParticipantsType )
+    public void setLoneWolfTransactionParticipantsType( String loneWolfTransactionParticipantsType )
     {
         this.loneWolfTransactionParticipantsType = loneWolfTransactionParticipantsType;
     }
