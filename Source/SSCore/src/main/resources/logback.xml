@@ -72,7 +72,7 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
 	
     <!-- <logger name="org.hibernate" level="debug"/> -->
    <!-- Uncomment and add your logger here: -->
-    <logger name="com.realtech.socialsurvey" level="DEBUG">
+    <logger name="com.realtech.socialsurvey" level="INFO">
         <appender-ref ref="logfile"/>        
     </logger>
     <logger name="org.hibernate.SQL">
