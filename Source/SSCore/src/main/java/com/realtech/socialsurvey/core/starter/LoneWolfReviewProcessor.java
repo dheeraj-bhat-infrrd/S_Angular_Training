@@ -162,6 +162,12 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                         long recentRecordFetchedTime = crmBatchTrackerService
                             .getRecentRecordFetchedAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType, entityId,
                                 CommonConstants.CRM_SOURCE_LONEWOLF );
+                        if(loneWolfCrmInfo.getTransactionStartDate() != null){
+                            if(recentRecordFetchedTime <= CommonConstants.EPOCH_TIME_IN_MILLIS){
+                                recentRecordFetchedTime = loneWolfCrmInfo.getTransactionStartDate().getTime();
+                            }
+                        }
+                        
                         try {
                             
                             //Fetch transactions data from lone wolf.
@@ -285,9 +291,9 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
 
                     //get buyer seller member detail
                     Map<String, LoneWolfMember> membersForTransaction = getMembersForTransaction( transaction, membersByName );
-                    LoneWolfMember sellerMember = membersForTransaction.get( LoanWolfMemberType.SELLING
+                    LoneWolfMember sellerMember = membersForTransaction.get( LoanWolfMemberType.LISTING
                         .getMode() );
-                    LoneWolfMember buyerMember = membersForTransaction.get( LoanWolfMemberType.LISTING
+                    LoneWolfMember buyerMember = membersForTransaction.get( LoanWolfMemberType.SELLING
                         .getMode() );
 
                     
