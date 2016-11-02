@@ -376,6 +376,7 @@ public interface CommonConstants
     public static final String FLOW_REGISTRATION = "registration";
     public static final String POPUP_FLAG_IN_SESSION = "popupStatus";
     public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
+    public static final String NO_GOOGLE_PLUS_FOUND = "nogoogleplusfound";
 
     public static final String BILLING_MODE_ATTRIBUTE_IN_SESSION = "billingMode";
 

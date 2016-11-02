@@ -1161,7 +1161,14 @@ public class SocialManagementController
                 new TypeToken<Map<String, String>>() {}.getType() );
             String profileLink = null;
             if ( profileData != null ) {
-                profileLink = profileData.get( "link" ).toString();
+                if(profileData.get( "link" ) == null){
+                    LOG.debug( "Google Plus account is not exist for the entity " + entityType + " with id : " + entityId );
+                    session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+                    model.addAttribute( CommonConstants.NO_GOOGLE_PLUS_FOUND, CommonConstants.YES );
+                    return JspResolver.SOCIAL_AUTH_MESSAGE;
+                }else{
+                    profileLink = profileData.get( "link" ).toString();                    
+                }
             }
             boolean updated = false;
 
