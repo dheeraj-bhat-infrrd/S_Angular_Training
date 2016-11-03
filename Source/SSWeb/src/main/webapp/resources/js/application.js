@@ -3859,8 +3859,8 @@ function saveTestLoneDetailsCallBack(response) {
 		}
 		
 		bindClickToClassificationTypeButton();
-		$("#lone-classification-save").show();
-		$("#lone-dry-save").hide();
+		$("#lone-data-save").show();
+		$("#lone-get-classification").hide();
 		$("#classification-div").show();
 		$("#transaction-start-div").show();
 		
@@ -3910,8 +3910,8 @@ function saveLoneWolfCallBack(response) {
 			$("#lone-state").val('dryrun');
 			showLoneWolfButtons();
 		}
-		$("#lone-classification-save").hide();
-		$("#lone-dry-save").show();
+		$("#lone-data-save").hide();
+		$("#lone-get-classification").show();
 		$("#classification-list-wrapper").html('');
 		$("#classification-div").hide();
 		$("#transaction-start-div").hide();
@@ -10721,7 +10721,7 @@ $(document).on('click', '#en-dry-save', function(e) {
 	}
 
 });
-$(document).on('click', '#lone-dry-save', function(e) {
+$(document).on('click', '#lone-get-classification', function(e) {
 	e.stopPropagation();
 	if (validateLoneWolfInput('lone-wolf-form-div')) {
 		var state = $("#lone-state").val();
@@ -10739,7 +10739,7 @@ $(document).on('click', '#lone-dry-save', function(e) {
 });
 
 
-$(document).on('click', '#lone-classification-save', function(e) {
+$(document).on('click', '#lone-data-save', function(e) {
 	e.stopPropagation();
 	if (validateLoneWolfInput('lone-wolf-form-div')) {
 		var state = $("#lone-state").val();
@@ -10802,7 +10802,7 @@ function initiateLoneWolfSaveConnection(warn) {
 		"clientCode" : client
 	};
 	showOverlay();
-	callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/lonewolf/testcredentials.do", saveTestLoneDetailsCallBack, payload, true, '#lone-dry-save');
+	callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/lonewolf/testcredentials.do", saveTestLoneDetailsCallBack, payload, true, '#lone-get-classification');
 	if (warn) {
 		$('#overlay-cancel').click();
 	}
