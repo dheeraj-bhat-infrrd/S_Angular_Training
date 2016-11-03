@@ -52,16 +52,16 @@
 								test="${mapping.crmMaster.crmName == 'Encompass' && profilemasterid != 1}">
 									<%-- Skip if crm mapping encompass and not company admin --%>
 								</c:when>
-								<%-- <c:when
+								 <c:when
 								test="${mapping.crmMaster.crmName == 'Lone Wolf' && profilemasterid == 4}">
 									Skip if crm mapping Loan Wolf and myself
-								</c:when>  --%>
+								</c:when> 
 								
 								
 								<%-- Commenting lone wolf --%>
-								<c:when
+								<%-- <c:when
 								test="${mapping.crmMaster.crmName == 'Lone Wolf'}">
-								</c:when>
+								</c:when> --%>
 								
 							<c:otherwise>
 								<div class="crm-settings-dropdown-item" data-crm-type="${mapping.crmMaster.crmName }">${mapping.crmMaster.crmName }</div>
@@ -84,12 +84,12 @@
 							</div>
 						</c:when>
 						
-						<%-- <c:when test="${mapping.crmMaster.crmName == 'Lone Wolf' && profilemasterid != 4}">
+						 <c:when test="${mapping.crmMaster.crmName == 'Lone Wolf' && profilemasterid != 4}">
 							<div class="crm-setting-cont hide"
 								data-crm-type="${mapping.crmMaster.crmName }">
 									<jsp:include page="lone_wolf.jsp"></jsp:include>
 							</div>
-						</c:when>  --%>
+						</c:when>
 					</c:choose>
 				</c:forEach>
 			</div>

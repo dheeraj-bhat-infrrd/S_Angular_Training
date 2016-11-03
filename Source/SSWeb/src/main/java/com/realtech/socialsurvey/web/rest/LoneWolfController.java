@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.web.rest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.QueryParam;
@@ -21,6 +23,7 @@ import retrofit.mime.TypedByteArray;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.LoneWolfClassificationCode;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -61,6 +64,7 @@ public class LoneWolfController extends AbstractController
         Response response = null;
         boolean status = false;
         String message = null;
+        List<LoneWolfClassificationCode> classificationCodes = new ArrayList<LoneWolfClassificationCode>();
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
             try {
@@ -89,8 +93,13 @@ public class LoneWolfController extends AbstractController
                         message = responseMap.get( "Message" );
                     }
                 }
+                
+                classificationCodes = loneWolfIntegrationService.fetchLoneWolfClassificationCodes(secretKey, apiToken, clientCode);
+
+                
                 resultMap.put( CommonConstants.STATUS_COLUMN, status );
                 resultMap.put( CommonConstants.MESSAGE, message );
+                resultMap.put( "classifications", classificationCodes );
                 response = Response.ok( new Gson().toJson( resultMap ) ).build();
             } catch ( Exception e ) {
                 throw new InternalServerException( new LoneWolfErrorCode( CommonConstants.ERROR_CODE_GENERAL,

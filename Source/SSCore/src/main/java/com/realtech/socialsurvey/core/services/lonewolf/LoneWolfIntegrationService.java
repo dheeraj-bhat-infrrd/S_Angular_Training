@@ -5,6 +5,7 @@ import java.util.Map;
 
 import retrofit.client.Response;
 
+import com.realtech.socialsurvey.core.entities.LoneWolfClassificationCode;
 import com.realtech.socialsurvey.core.entities.LoneWolfMember;
 import com.realtech.socialsurvey.core.entities.LoneWolfTransaction;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -17,5 +18,7 @@ public interface LoneWolfIntegrationService
     List<LoneWolfMember> fetchLoneWolfMembersData( String secretKey, String apiToken, String clientCode );
     
     Response testLoneWolfCompanyCredentials( String secretKey, String apiToken, String clientCode );
+
+    List<LoneWolfClassificationCode> fetchLoneWolfClassificationCodes( String secretKey, String apiToken, String clientCode ) throws InvalidInputException;
 
 }
