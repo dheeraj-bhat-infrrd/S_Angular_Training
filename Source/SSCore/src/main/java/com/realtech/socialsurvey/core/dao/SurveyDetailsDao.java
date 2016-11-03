@@ -33,14 +33,13 @@ public interface SurveyDetailsDao
     public void updateCustomerResponse( String surveyId, SurveyResponse surveyResponse, int stage );
 
 
-    public void updateGatewayAnswer(String surveyId, String mood, String review, boolean isAbusive,
-        String agreedToShare );
+    public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare );
 
 
     public void updateFinalScore( String surveyId );
 
 
-    public void updateSurveyAsClicked( String surveyMongoId);
+    public void updateSurveyAsClicked( String surveyMongoId );
 
 
     public Map<String, Long> getCountOfCustomersByMood( String columnName, long columnValue );
@@ -70,6 +69,7 @@ public interface SurveyDetailsDao
 
     public long getCompletedSurveyCount( String columnName, long columnValue, int noOfDays );
 
+
     public long getClickedSurveyCount( String columnName, long columnValue, int noOfDays, boolean filterAbusive );
 
 
@@ -81,11 +81,12 @@ public interface SurveyDetailsDao
         boolean fetchAbusive, boolean notRecommended, boolean includeZillow, long zillowReviewCount );
 
 
-    public List<SurveyDetails> getIncompleteSurvey( String columnName, long columNValue, int start, int rows,
-        double startScore, double limitScore, Date startDate, Date endDate );
+    public List<SurveyDetails> getIncompleteSurvey( String columnName, long columNValue, int start, int rows, double startScore,
+        double limitScore, Date startDate, Date endDate );
 
 
     public void updateReminderCount( long agentId, String customerEmail );
+
 
     /**
      * Get count for completed survey
@@ -97,11 +98,14 @@ public interface SurveyDetailsDao
      * @return
      * @throws InvalidInputException
      */
-    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive, boolean filterZillowReviews ) throws InvalidInputException;
+    public long getCompletedSurveyCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
+        Timestamp endDate, boolean filterAbusive, boolean filterZillowReviews ) throws InvalidInputException;
 
 
     long get3rdPartyImportCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
         Timestamp endDate, boolean filterAbusive ) throws InvalidInputException;
+
+
     /**
      * Gets an aggregated count for completed survey
      * @param organizationUnitColumn
@@ -112,8 +116,11 @@ public interface SurveyDetailsDao
      * @return
      * @throws InvalidInputException
      */
-    public Map<Integer, Integer> getCompletedSurveyAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException;
-    
+    public Map<Integer, Integer> getCompletedSurveyAggregationCount( String organizationUnitColumn,
+        long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy )
+        throws InvalidInputException;
+
+
     /**
      * Get the aggregation of clicked surveys
      * @param organizationUnitColumn
@@ -124,8 +131,11 @@ public interface SurveyDetailsDao
      * @return
      * @throws InvalidInputException
      */
-    public Map<Integer, Integer> getClickedSurveyAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException;
-    
+    public Map<Integer, Integer> getClickedSurveyAggregationCount( String organizationUnitColumn,
+        long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy )
+        throws InvalidInputException;
+
+
     /**
      * Get social posts aggregation
      * @param organizationUnitColumn
@@ -136,8 +146,11 @@ public interface SurveyDetailsDao
      * @return
      * @throws InvalidInputException
      */
-    public Map<Integer, Integer> getSocialPostsAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException;
-    
+    public Map<Integer, Integer> getSocialPostsAggregationCount( String organizationUnitColumn,
+        long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy )
+        throws InvalidInputException;
+
+
     public List<SurveyDetails> getIncompleteSurveyCustomers( long companyId, int surveyReminderInterval, int maxReminders );
 
 
@@ -154,8 +167,8 @@ public interface SurveyDetailsDao
     public void updateReminderCountForSocialPost( Long agentId, String customerEmail );
 
 
-    public void getAverageScore( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
-        String columnName, long columnValue, boolean fetchAbusive );
+    public void getAverageScore( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String columnName,
+        long columnValue, boolean fetchAbusive );
 
 
     public void getCompletedSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
@@ -189,7 +202,8 @@ public interface SurveyDetailsDao
     public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
 
 
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId  , boolean fetchAbusive, boolean forStatistics );
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId,
+        boolean fetchAbusive, boolean forStatistics );
 
 
     public void updateSurveyAsUnderResolution( String surveyId );
@@ -229,7 +243,8 @@ public interface SurveyDetailsDao
     public void deleteIncompleteSurveysForAgent( long agentId ) throws InvalidInputException;
 
 
-    public void updateAgentInfoInSurveys( long fromUserId, User toUser, UserProfile toUserProfile ) throws InvalidInputException;
+    public void updateAgentInfoInSurveys( long fromUserId, User toUser, UserProfile toUserProfile )
+        throws InvalidInputException;
 
 
     public void removeExistingZillowSurveysByEntity( String entityType, long entityId );
@@ -249,8 +264,8 @@ public interface SurveyDetailsDao
         Timestamp endDate, boolean filterAbusive ) throws InvalidInputException;
 
 
-    public List<SurveyDetails> getFeedbacksForReports( String columnName, long columnValue, int start, int rows, double startScore,
-        double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria );
+    public List<SurveyDetails> getFeedbacksForReports( String columnName, long columnValue, int start, int rows,
+        double startScore, double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria );
 
 
     public void updateZillowSummaryInExistingSurveyDetails( SurveyDetails surveyDetails );
@@ -268,7 +283,9 @@ public interface SurveyDetailsDao
 
     void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
 
+
     public void updateModifiedDateForSurvey( String surveyId, Date date );
+
 
     /**
      * 
@@ -277,24 +294,39 @@ public interface SurveyDetailsDao
      * @param stage
      * @return
      */
-    public List<SurveyDetails> getCompletedSurveyByStartIndexAndBatchSize( int start, int batchSize , long companyId);
+    public List<SurveyDetails> getCompletedSurveyByStartIndexAndBatchSize( int start, int batchSize, long companyId );
 
 
-    public List<SurveyDetails> getSurveysForCompanyByStartIndex( int start, int batchSize , long companyId );
+    public List<SurveyDetails> getSurveysForCompanyByStartIndex( int start, int batchSize, long companyId );
 
 
-    public List<SurveyDetails> getIncompleteSurveyByStartIndexAndBatchSize( int start, int batchSize , long companyId);
-    
-    
-    
-    public Long getCompletedSurveyCount( long companyId);
+    public List<SurveyDetails> getIncompleteSurveyByStartIndexAndBatchSize( int start, int batchSize, long companyId );
 
 
-    public Long getSurveysCountForCompany(long companyId );
+    public Long getCompletedSurveyCount( long companyId );
 
 
-    public Long getIncompleteSurveyCount( long companyId);
+    public Long getSurveysCountForCompany( long companyId );
+
+
+    public Long getIncompleteSurveyCount( long companyId );
 
 
     void insertApiRequestDetails( ApiRequestDetails apiRequestDetails );
+
+
+    public Map<Long, Long> getTotalReviewsCountForAllUsersOfCompany( long companyId );
+
+
+    public Map<Long, Long> getSocialSurveyReviewsCountForAllUsersOfCompany( long companyId );
+
+
+    public Map<Long, Long> getZillowReviewsCountForAllUsersOfCompany( long companyId );
+
+
+    public Map<Long, Long> getAbusiveReviewsCountForAllUsersOfCompany( long companyId );
+
+
+    public Map<Long, Long> getThirdPartyReviewsCountForAllUsersOfCompany( long companyId );
+
 }

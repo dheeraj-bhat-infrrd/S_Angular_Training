@@ -3546,6 +3546,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     continue;
                 }
                 SurveyImportVO survey = new SurveyImportVO();
+                survey.setCustomerEmailAddress( DEFAULT_CUSTOMER_EMAIL_ID_FOR_3RD_PARTY );
                 LOG.info( "Processing row " + row.getRowNum() + " from the file." );
                 cells = row.cellIterator();
                 while ( cells.hasNext() ) {
@@ -3578,11 +3579,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         survey.setSurveySourceId( cell.getStringCellValue().trim() );
                     } else if ( cell.getColumnIndex() == COMMENT_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                         survey.setReview( cell.getStringCellValue() );
-                    } /* else if ( cell.getColumnIndex() == CITY_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
+                    }  else if ( cell.getColumnIndex() == CITY_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                          survey.setCity( cell.getStringCellValue() );
                       } else if ( cell.getColumnIndex() == STATE_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                          survey.setState( cell.getStringCellValue() );
-                      }*/
+                      }
                 }
                 try {
                     //If object empty, get out of loop;

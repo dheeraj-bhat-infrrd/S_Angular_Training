@@ -80,7 +80,7 @@ public interface CommonConstants
     public static final String SHOW_SURVEY_PAGE_FOR_URL = "rest/survey/showsurveypageforurl";
     public static final String SHOW_SURVEY_PAGE = "rest/survey/showsurveypage";
     public static final String SET_REGISTRATION_PASSWORD = "/registeraccount/setregistrationpassword.do";
-    
+
     public static final String LOGIN_URL = "login.do";
 
     /**
@@ -283,7 +283,7 @@ public interface CommonConstants
     public static final String SUMMARY_COLUMN = "summary";
     public static final String REVIEW_COLUMN = "review";
     public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
-	public static final String USER_ENCRYPTED_ID = "userEncryptedId";
+    public static final String USER_ENCRYPTED_ID = "userEncryptedId";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -376,6 +376,7 @@ public interface CommonConstants
     public static final String FLOW_REGISTRATION = "registration";
     public static final String POPUP_FLAG_IN_SESSION = "popupStatus";
     public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
+    public static final String NO_GOOGLE_PLUS_FOUND = "nogoogleplusfound";
 
     public static final String BILLING_MODE_ATTRIBUTE_IN_SESSION = "billingMode";
 
@@ -864,7 +865,7 @@ public interface CommonConstants
     public static final String KEY_DOTLOOP_PROFILE_ID_COLUMN = "profileId";
     public static final String KEY_DOTLOOP_PROFILE_LOOP_ID_COLUMN = "loopId";
     public static final String KEY_DOTLOOP_PROPERTY_ADDRESS = "Property Address";
-	public static final String KEY_DOTLOOP_STATE = "stateOrProvince";
+    public static final String KEY_DOTLOOP_STATE = "stateOrProvince";
 
     // Social media message template constants
     public static final DecimalFormat RANKING_FORMAT_TWITTER = new DecimalFormat( "#.#" );
@@ -1208,14 +1209,21 @@ public interface CommonConstants
     public static final String LONEWOLF_QUERY_PARAM_$ORDERBY = "$OrderBy";
     public static final String LONEWOLF_QUERY_PARAM_$SKIP = "$skip";
 
-    public static final String LONEWOLF_QUERY_PARAM_ORDERBY_VALUE =  "CloseDate+desc";
-    public static final int  LONEWOLF_TRANSACTION_API_BATCH_SIZE = 300;
-    
+    public static final String LONEWOLF_QUERY_PARAM_ORDERBY_VALUE = "CloseDate+desc";
+    public static final int LONEWOLF_TRANSACTION_API_BATCH_SIZE = 300;
+
     //Update Social Media From Email
     public static final String SOCIAL_AUTH_FROM_EMAIL_URL = "rest/socialauthfromemail.do";
     public static final String URL_PARAM_SOCIAL_MEDIA_TYPE = "social"; //Defile Social Media
     public static final String URL_PARAM_COLUMN_NAME = "columnName"; //Entity Type
     public static final String URL_PARAM_COLUMN_VALUE = "columnValue"; //Entity ID
     public static final String URL_PARAM_ACCOUNT_MASTER_ID = "accountMasterId"; //For Account Type
+
+    public static final Object SOCIAL_SURVEY_PROFILE_URL = "SocialSurvey Profile";
+    public static final Object TOTAL_REVIEWS = "Total Reviews";
+    public static final Object SOCIAL_SURVEY_REVIEWS = "SocialSurvey Reviews";
+    public static final Object ZILLOW_REVIEWS = "Zillow Reviews";
+    public static final Object ABUSIVE_REVIEWS = "Abusive Reviews";
+    public static final Object THIRD_PARTY_REVIEWS = "3rd Party Reviews";
 
 }
