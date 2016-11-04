@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.starter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -433,37 +434,54 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                 throw new InvalidInputException( "Passed parameter member is null" );
             }
 
-            SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
-            surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName, organizationUnitId );
-            surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-            surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-            String customerEmailId = "";
-            if ( client.getEmailAddresses() != null && !client.getEmailAddresses().isEmpty() ) {
-                customerEmailId = client.getEmailAddresses().get( 0 ).getAddress();
-                if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
-                    customerEmailId = utils.maskEmailAddress( customerEmailId );
+            if(client.getEmailAddresses() == null || client.getEmailAddresses().isEmpty() || client.getEmailAddresses().get( 0 ).getAddress().isEmpty()){
+                throw new InvalidInputException( "No Client Email id found for the transaction" );
+            }
+            
+            if(member.getEmailAddresses() == null || member.getEmailAddresses().isEmpty() || member.getEmailAddresses().get( 0 ).getAddress().isEmpty()){
+                throw new InvalidInputException( "No member Email id found for the transaction" );
+            }
+            
+            String customerIdStr = client.getEmailAddresses().get( 0 ).getAddress();
+            List<String> customerEmailIds = Arrays.asList( customerIdStr.split( "[,;:\\/ ]" ) );
+            
+            String memeberIdString = member.getEmailAddresses().get( 0 ).getAddress();
+            List<String> memeberEmailIds = Arrays.asList( memeberIdString.split( "[,;:\\/ ]" ) );
+           
+           
+            for(String customerEmailId : customerEmailIds){
+                for(String agentEmailId : memeberEmailIds){
+                    
+                    SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+                    surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName, organizationUnitId );
+                    surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+                    surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                    if ( client.getEmailAddresses() != null && !client.getEmailAddresses().isEmpty() ) {
+                        if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
+                            customerEmailId = utils.maskEmailAddress( customerEmailId );
+                        }
+                    }
+                    surveyPreInitiation.setCustomerEmailId( customerEmailId );
+                    surveyPreInitiation.setCustomerFirstName( client.getFirstName() );
+                    surveyPreInitiation.setCustomerLastName( client.getLastName() );
+                    surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
+                    if ( member.getEmailAddresses() != null && !member.getEmailAddresses().isEmpty() ) {
+                        agentEmailId = member.getEmailAddresses().get( 0 ).getAddress();
+                        if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
+                            agentEmailId = utils.maskEmailAddress( agentEmailId );
+                        }
+                    }
+                    surveyPreInitiation.setAgentEmailId( agentEmailId );
+                    surveyPreInitiation.setAgentName( member.getFirstName() + " " + member.getLastName() );
+                    surveyPreInitiation.setEngagementClosedTime( new Timestamp( closedDate.getTime() ) );
+                    surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+                    surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_LONEWOLF );
+                    surveyPreInitiation.setSurveySourceId( transactionNumber );
+                    surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
+                    newRecordFoundCount++;
                 }
             }
-            surveyPreInitiation.setCustomerEmailId( customerEmailId );
-            surveyPreInitiation.setCustomerFirstName( client.getFirstName() );
-            surveyPreInitiation.setCustomerLastName( client.getLastName() );
-            surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
-            String agentEmailId = null;
-
-            if ( member.getEmailAddresses() != null && !member.getEmailAddresses().isEmpty() ) {
-                agentEmailId = member.getEmailAddresses().get( 0 ).getAddress();
-                if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
-                    agentEmailId = utils.maskEmailAddress( agentEmailId );
-                }
-            }
-            surveyPreInitiation.setAgentEmailId( agentEmailId );
-            surveyPreInitiation.setAgentName( member.getFirstName() + " " + member.getLastName() );
-            surveyPreInitiation.setEngagementClosedTime( new Timestamp( closedDate.getTime() ) );
-            surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
-            surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_LONEWOLF );
-            surveyPreInitiation.setSurveySourceId( transactionNumber );
-            surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
-            newRecordFoundCount++;
+            
         } catch ( InvalidInputException e ) {
             LOG.error( "Error while inserting survey preinitiation ", e );
         }
