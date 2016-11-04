@@ -1886,13 +1886,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
         LOG.debug( "Finding number of active users for company " + company.toString() );
         if ( checkCRMInfo( company ) ) {
             Map<String, Object> queryMap = new HashMap<String, Object>();
-            queryMap.put( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
+            queryMap.put( CommonConstants.COMPANY_COLUMN, company );
             queryMap.put( CommonConstants.PROFILE_MASTER_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
             queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
             numOfUsers = userProfileDao.findNumberOfRowsByKeyValue( UserProfile.class, queryMap );
         } else {
             Map<String, Object> queryMap = new HashMap<String, Object>();
-            queryMap.put( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
+            queryMap.put( CommonConstants.COMPANY_COLUMN, company );
             queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
             numOfUsers = userDao.findNumberOfRowsByKeyValue( User.class, queryMap );
         }
