@@ -2894,6 +2894,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         assigneeUser.setProfileName( agentSettings.getProfileName() );
         assigneeUser.setProfileUrl( agentSettings.getProfileUrl() );
         solrSearchService.addUserToSolr( assigneeUser );
+        
+        userManagementService.updateUserCountModificationNotification( assigneeUser.getCompany() );
 
         LOG.info( "Method to assignRegionToUser finished for regionId : " + regionId + " and userId : "
             + assigneeUser.getUserId() );
@@ -3057,6 +3059,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         assigneeUser.setProfileName( agentSettings.getProfileName() );
         assigneeUser.setProfileUrl( agentSettings.getProfileUrl() );
         solrSearchService.addUserToSolr( assigneeUser );
+        
+        userManagementService.updateUserCountModificationNotification( assigneeUser.getCompany() );
 
         LOG.info( "Method assignBranchToUser executed successfully" );
     }
