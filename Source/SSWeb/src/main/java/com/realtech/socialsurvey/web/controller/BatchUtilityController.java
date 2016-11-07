@@ -19,7 +19,7 @@ public class BatchUtilityController
     private LoneWolfReviewProcessorUtility loneWolfReviewProcessorUtility;
 
 
-    //@RequestMapping ( value = "/loadBatchUtility")
+    @RequestMapping ( value = "/loadBatchUtility")
     public String loadBatchUtility()
     {
         System.out.println( "In loadBatchUtility" );
@@ -28,7 +28,7 @@ public class BatchUtilityController
     }
 
 
-    //@RequestMapping ( value = "/startLoneWolfJobDetail")
+    @RequestMapping ( value = "/startLoneWolfJobDetail")
     @ResponseBody
     public String startLoneWolfJobDetail()
     {
