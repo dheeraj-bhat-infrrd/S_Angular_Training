@@ -14,6 +14,8 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -25,12 +27,14 @@ public class SolrUserSchemaManipulation extends QuartzJobBean
     private static final Logger LOG = LoggerFactory.getLogger( SolrUserSchemaManipulation.class );
     private SolrSearchService solrSearchService;
     private OrganizationManagementService organizationManagementService;
+    private BatchTrackerService batchTrackerService;
 
 
     private void initializeDependencies( JobDataMap jobMap )
     {
         solrSearchService = (SolrSearchService) jobMap.get( "solrSearchService" );
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
+        batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
     }
 
 
@@ -43,7 +47,9 @@ public class SolrUserSchemaManipulation extends QuartzJobBean
         int batchSize = 500;
         SolrDocumentList solrDocumentList;
         initializeDependencies( context.getMergedJobDataMap() );
-        
+        batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+            CommonConstants.BATCH_TYPE_SOLR_SCHEMA_MANIPULATION, CommonConstants.BATCH_NAME_SOLR_SCHEMA_MANIPULATION );
+
         //getting the list of company Ids with Hidden Section as True
         List<Long> hiddenCompanyList = organizationManagementService
             .fetchEntityIdsWithHiddenAttribute( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -74,5 +80,10 @@ public class SolrUserSchemaManipulation extends QuartzJobBean
         }
         LOG.info( "Added Hidden boolean for users in solr" );
         LOG.debug( "Solr Schema Job Detail finished" );
+        try {
+            batchTrackerService.getLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_SOLR_SCHEMA_MANIPULATION );
+        } catch ( NoRecordsFetchedException | InvalidInputException e ) {
+            e.printStackTrace();
+        }
     }
 }

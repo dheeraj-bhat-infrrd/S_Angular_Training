@@ -255,6 +255,7 @@
 			<map>
 				<entry key="solrSearchService" value-ref="solrSearchService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
