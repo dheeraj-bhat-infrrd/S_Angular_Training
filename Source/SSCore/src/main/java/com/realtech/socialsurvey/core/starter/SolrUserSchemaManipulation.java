@@ -16,6 +16,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -47,6 +48,8 @@ public class SolrUserSchemaManipulation extends QuartzJobBean
         int batchSize = 500;
         SolrDocumentList solrDocumentList;
         initializeDependencies( context.getMergedJobDataMap() );
+        
+        //update last run start time
         batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
             CommonConstants.BATCH_TYPE_SOLR_SCHEMA_MANIPULATION, CommonConstants.BATCH_NAME_SOLR_SCHEMA_MANIPULATION );
 
@@ -81,8 +84,19 @@ public class SolrUserSchemaManipulation extends QuartzJobBean
         LOG.info( "Added Hidden boolean for users in solr" );
         LOG.debug( "Solr Schema Job Detail finished" );
         try {
+            //Update last build time in batch tracker table
             batchTrackerService.getLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_SOLR_SCHEMA_MANIPULATION );
         } catch ( NoRecordsFetchedException | InvalidInputException e ) {
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_SOLR_SCHEMA_MANIPULATION,
+                    e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_SOLR_SCHEMA_MANIPULATION,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException | UndeliveredEmailException e1 ) {
+                e1.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
