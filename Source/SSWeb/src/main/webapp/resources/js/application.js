@@ -834,7 +834,57 @@ function updateDashboardProfileEvents() {
 		var task = $('#dsh-btn3').data('social');
 		dashboardButtonAction(buttonId, task, colName, colValue);
 	});
+	
+	
+	
+	$('#pro-cmplt-stars').on('click', '#dsh-btn0', function(e) {
+		e.stopPropagation();
+		var buttonId = 'dsh-btn0';
+		//getSocialMediaToFix
+		var payload = {
+				"columnName" : colName,
+				"columnValue" : colValue
+			};
+			callAjaxGetWithPayloadData('./socialmediatofix.do', paintFixSocialMedia, payload, true);
+	});
 }
+
+
+function paintFixSocialMedia(data){
+	
+	var popup = "";
+	var parsedData = JSON.parse(data);
+	var columnName = parsedData.columnName;
+	var columnValue = parsedData.columnValue;
+	var socialMedias = parsedData.socialMedias;
+	
+	for (var i = 0; i < socialMedias.length; i++){
+		var socialMedia = socialMedias[i];
+		if(socialMedia == "facebook"){
+			var facebookDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj " onclick="openAuthPageFixSocialMedia('+ "'facebook'" +', '+ "'" + columnName + "'" +', '+columnValue+');"></div></div>';
+			popup += facebookDiv;
+		}else if(socialMedia == "linkedin"){
+			var linkedinDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj " onclick="openAuthPageFixSocialMedia(' + "'linkedin'" + ',' + "'" + columnName + "'" + ', '+columnValue+');" data-link=""></div></div>';
+			popup += linkedinDiv;
+		}
+	}
+	
+	if(socialMedias.length == 0){
+		var noSMDiv = '<div class="clearfix"><div></div class="float-left bd-frm-left-un">No more social media to fix.</div>';
+		popup += noSMDiv;
+		$('#dsh-btn0').addClass("hide");
+	}
+	
+//	e.stopPropagation();
+	$('#overlay-continue').html("");
+	$('#overlay-cancel').html("");
+	$('#overlay-header').html("Fix Social Media");
+	$('#overlay-text').html(popup);
+
+	$('#overlay-main').show();
+}
+
+
 
 function bindSelectButtons(newProfileValue) {
 	$("#selection-list").unbind('change');
@@ -8069,6 +8119,16 @@ function paintPosts(posts) {
 	}
 }
 
+
+function fixSocialMediaResponse(columnName, columnValue){
+	var payload = {
+			"columnName" : columnName,
+			"columnValue" : columnValue
+		};
+		callAjaxGetWithPayloadData('./socialmediatofix.do', paintFixSocialMedia, payload, true);
+}
+
+
 function showDashboardButtons(columnName, columnValue) {
 	var payload = {
 		"columnName" : columnName,
@@ -8113,11 +8173,15 @@ function paintDashboardButtons(data) {
 				$('#dsh-btn2').html(contentToDisplay);
 				$('#dsh-btn2').removeClass('hide');
 			}
-			if (i == 1) {
-				$('#dsh-btn3').data('social', stages[i].profileStageKey);
-				$('#dsh-btn3').html(contentToDisplay);
-				$('#dsh-btn3').removeClass('hide');
+			
+			if($('#dsh-btn0').hasClass('hide')){
+				if (i == 1) {
+					$('#dsh-btn3').data('social', stages[i].profileStageKey);
+					$('#dsh-btn3').html(contentToDisplay);
+					$('#dsh-btn3').removeClass('hide');
+				}
 			}
+			
 		}
 	}
 }

@@ -4304,6 +4304,12 @@ img.prof-image {
 	background: rgb(233, 127, 48);
 }
 
+
+.dsh-btn-red {
+	background: rgb(128, 0, 0);
+}
+
+
 .dsh-btn-green {
 	background: rgb(122, 180, 0);
 }
