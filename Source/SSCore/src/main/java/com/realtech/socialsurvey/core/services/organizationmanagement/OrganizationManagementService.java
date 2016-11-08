@@ -1384,4 +1384,7 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      */
     public Company activateCompany( Company company ) throws InvalidInputException;
+
+
+    public List<Long> fetchEntityIdsWithHiddenAttribute( String CollectionName );
 }

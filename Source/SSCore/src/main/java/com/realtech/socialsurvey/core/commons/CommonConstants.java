@@ -192,6 +192,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER = "IncompleteSocialPostReminderSender";
     public static final String BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER = "IncompleteSurveyReminderSender";
     public static final String BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER = "updateSubscriptionPriceStarter";
+    public static final String BATCH_TYPE_SOLR_SCHEMA_MANIPULATION = "solrSchemaManipulation";
     public static final String BATCH_TYPE_SOCIAL_FEED_INGESTER = "socialfeedingester";
     public static final String BATCH_TYPE_ACCOUNT_DEACTIVATOR = "AccountDeactivator";
     public static final String BATCH_TYPE_DEACTIVATED_ACCOUNT_PURGER = "DeactivatedAccountPurger";
@@ -214,6 +215,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER = "incomplete Social Post Reminder Sender";
     public static final String BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER = "Incomplete Survey Reminder Sender";
     public static final String BATCH_NAME_UPDATE_SUBSCRIPTION_PRICE_STARTER = "Update Subscription Price For Accounts";
+    public static final String BATCH_NAME_SOLR_SCHEMA_MANIPULATION = "hide Users From Search By Adding a field in user schema";
     public static final String BATCH_NAME_SOCIAL_FEED_INGESTER = "Social Feed Ingester";
     public static final String BATCH_NAME_ACCOUNT_DEACTIVATOR = "Account Deactivator For Disabled Account Batch";
     public static final String BATCH_NAME_DEACTIVATED_ACCOUNT_PURGER = "Purge Deactivated Company";
@@ -548,6 +550,7 @@ public interface CommonConstants
     public static final String USER_LOGIN_NAME_SOLR = "loginName";
     public static final String USER_EMAIL_ID_SOLR = "emailId";
     public static final String USER_IS_OWNER_SOLR = "isOwner";
+    public static final String USER_IS_HIDDEN_FROM_SEARCH_SOLR = "hiddenFromSearchResults";
     public static final String BRANCHES_SOLR = "branches";
     public static final String REGIONS_SOLR = "regions";
     public static final String ADDRESS1 = "address1";

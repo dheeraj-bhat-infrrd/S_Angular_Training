@@ -7719,6 +7719,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, true, true );
         LOG.info( "Method updateImage finished" );
     }
+    
+    public List<Long> fetchEntityIdsWithHiddenAttribute(String CollectionName){
+        return organizationUnitSettingsDao.fetchEntityIdsWithHiddenAttribute( CollectionName );
+    }
 
 }
 // JIRA: SS-27: By RM05: EOC
