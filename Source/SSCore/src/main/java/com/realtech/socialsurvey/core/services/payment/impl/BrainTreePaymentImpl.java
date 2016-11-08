@@ -1911,7 +1911,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
         try {
             OrganizationUnitSettings companySettings = organizationManagementService
                 .getCompanySettings( company.getCompanyId() );
-            if ( companySettings.getCrm_info() != null ) {
+            if ( companySettings != null && companySettings.getCrm_info() != null ) {
                 return true;
             }
             List<Long> batchRegionIdList = new ArrayList<Long>();
@@ -1920,7 +1920,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
                     batchSize );
                 if ( batchRegionIdList != null && batchRegionIdList.size() > 0 ) {
                     for ( long Id : batchRegionIdList ) {
-                        if ( organizationManagementService.getRegionSettings( Id ).getCrm_info() != null ) {
+                        OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( Id );
+                        if ( regionSettings != null && regionSettings.getCrm_info() != null ) {
                             return true;
                         }
                     }
@@ -1934,8 +1935,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
                 batchBranchIdList = organizationManagementService.getBranchIdsUnderCompany( companyId, start, batchSize );
                 if ( batchBranchIdList != null && batchBranchIdList.size() > 0 ) {
                     for ( long Id : batchBranchIdList ) {
-                        if ( organizationManagementService.getBranchSettings( Id ).getOrganizationUnitSettings()
-                            .getCrm_info() != null ) {
+                       OrganizationUnitSettings branchSettings =  organizationManagementService.getBranchSettings( Id ).getOrganizationUnitSettings();                       
+                        if ( branchSettings != null && branchSettings.getCrm_info() != null ) {
                             return true;
                         }
                     }
@@ -1949,7 +1950,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
                 batchAgentIdList = organizationManagementService.getAgentIdsUnderCompany( companyId, start, batchSize );
                 if ( batchAgentIdList != null && batchAgentIdList.size() > 0 ) {
                     for ( long Id : batchAgentIdList ) {
-                        if ( organizationManagementService.getAgentSettings( Id ).getCrm_info() != null ) {
+                        OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings( Id );
+                        if ( agentSettings != null && agentSettings.getCrm_info() != null ) {
                             return true;
                         }
                     }
