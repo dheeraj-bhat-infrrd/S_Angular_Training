@@ -102,9 +102,17 @@ $(window).on('unload', function(){
 	var fromDashboard = "${fromDashboard}";
 	var restful = "${restful}";
 	var flow = "${socialFlow}";
+	var isFixSocialMedia ="${isFixSocialMedia}";
+	var waitMessage = "${message}";
+	
 	if(fromDashboard == 1){
 		var columnName = "${columnName}";
 		var columnValue = "${columnValue}";
+		
+		if(isFixSocialMedia != undefined && isFixSocialMedia == 1 && parseInt(waitMessage) != 1){
+			parentWindow.fixSocialMediaResponse(columnName, columnValue);
+		}
+		
 		parentWindow.showDashboardButtons(columnName, columnValue);
 	}
 	else if(restful != "1"){
@@ -127,7 +135,7 @@ $(window).on('unload', function(){
 					parentWindow.loadSocialMediaUrlInPopup();
 					parentWindow.loadSocialMediaUrlInSettingsPage();
 
-					parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);					
+					parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);
 				}
 			});
 		}

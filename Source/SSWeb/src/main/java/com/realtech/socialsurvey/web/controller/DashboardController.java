@@ -24,6 +24,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
+import org.omg.CORBA.OMGVMCID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -205,6 +206,13 @@ public class DashboardController
         model.addAttribute( "userId", user.getUserId() );
         model.addAttribute( "emailId", user.getEmailId() );
         model.addAttribute( "profileName", profileName );
+        
+        //get detail of expire social media
+        boolean isSocialMediaExpired = false;
+        if(organizationManagementService.getExpiredSocailMedia( entityType, entityId ).size() > 0){
+            isSocialMediaExpired = true;                            
+        }
+        session.setAttribute( "isSocialMediaExpired" , isSocialMediaExpired );
 
         return JspResolver.DASHBOARD;
     }
@@ -1960,6 +1968,53 @@ public class DashboardController
         return new Gson().toJson( stagesAndColumn );
     }
 
+    
+    
+    @ResponseBody
+    @RequestMapping ( value = "/socialmediatofix", method = RequestMethod.GET)
+    public String socialMediaTofFix( HttpServletRequest request )
+    {
+        LOG.info( "Method socialMediaTofFix() called from DashboardController." );
+        User user = sessionHelper.getCurrentUser();
+        String columnName = request.getParameter( "columnName" );
+        String columnValueStr = request.getParameter( "columnValue" );
+        long columnValue = Long.parseLong( columnValueStr );
+
+        OrganizationUnitSettings settings = null;
+        try {
+            if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                settings = organizationManagementService.getCompanySettings( user );
+            } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+                settings =  organizationManagementService.getRegionSettings( columnValue );
+            } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                settings = organizationManagementService.getBranchSettingsDefault( columnValue );
+            } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+                settings = userManagementService.getUserSettings( columnValue );
+            }
+        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( "NonFatalException while fetching badge details. Reason :" + e.getMessage(), e );
+        }
+       
+        
+        List<String> socialMedias = new ArrayList<String>();
+        try {
+            socialMedias = organizationManagementService.getExpiredSocailMedia( columnName, columnValue );
+        }catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( "NonFatalException while fetching badge details. Reason :" + e.getMessage(), e );
+        }
+        
+        
+        Map<String, Object> stagesAndColumn = new HashMap<>();
+        stagesAndColumn.put( "columnName", columnName );
+        stagesAndColumn.put( "columnValue", columnValue );
+        stagesAndColumn.put( "socialMedias", socialMedias );
+
+        LOG.info( "Method sendMultipleSurveyInvitations() finished from DashboardController." );
+        return new Gson().toJson( stagesAndColumn );
+    }
+    
+    
+    
 
     private String getProfileLevel( String columnName )
     {

@@ -77,6 +77,7 @@ import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
@@ -7722,6 +7723,79 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method updateImage started" );
         updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, true, true );
         LOG.info( "Method updateImage finished" );
+    }
+    
+    
+    /**
+     * 
+     */
+    @Override
+    public List<String> getExpiredSocailMedia(String columnName , long columnValue) throws InvalidInputException, NoRecordsFetchedException{
+        LOG.debug( "method getExpiredSocailMedia started" );
+        List<String> socialMedias = new ArrayList<String>();
+        OrganizationUnitSettings settings = null;
+        if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            settings = getCompanySettings( columnValue );
+        } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+            settings = getRegionSettings( columnValue ) ;
+        } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            settings = getBranchSettingsDefault( columnValue  );
+        } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+            settings =  userManagementService.getUserSettings( columnValue  );
+        }
+        
+        //facebook token
+        if(settings!= null && settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getFacebookToken() != null){
+            FacebookToken facebookToken =  settings.getSocialMediaTokens().getFacebookToken();
+            long tokenCreatedOn = facebookToken.getFacebookAccessTokenCreatedOn();
+            long expirySeconds = facebookToken.getFacebookAccessTokenExpiresOn();
+            if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ) {
+                socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+            }
+        }
+        
+        //linkedin token
+        if(settings!= null && settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getLinkedInToken() != null  ){
+            LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInToken();
+            long tokenCreatedOn = linkedInToken.getLinkedInAccessTokenCreatedOn();
+            long expirySeconds = linkedInToken.getLinkedInAccessTokenExpiresIn();
+            if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ){
+                socialMedias.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+            }
+        }
+        
+        LOG.debug( "method getExpiredSocailMedia ended" );
+        return socialMedias;
+    }
+    
+    
+    /**
+     * 
+     * @param tokenCreatedOn
+     * @param expirySeconds
+     * @return
+     */
+    private boolean checkTokenExpiry( long tokenCreatedOn, long expirySeconds )
+    {
+        long expiryHours = expirySeconds / 3600;
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis( tokenCreatedOn );
+        Date createdOn = cal.getTime();
+
+        // adding 7 days to created on time
+        cal.add( Calendar.HOUR, 168 );
+        Date createdOnPlusSeven = cal.getTime();
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTimeInMillis( createdOn.getTime() );
+
+        cal2.add( Calendar.HOUR, (int) expiryHours );
+        Date expiresOn = cal2.getTime();
+
+        if ( createdOnPlusSeven.after( expiresOn ) )
+            return true;
+
+        return false;
     }
 
 }

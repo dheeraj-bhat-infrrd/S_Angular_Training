@@ -1384,4 +1384,7 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      */
     public Company activateCompany( Company company ) throws InvalidInputException;
+
+
+    List<String> getExpiredSocailMedia( String columnName, long columnValue ) throws InvalidInputException, NoRecordsFetchedException;
 }
