@@ -192,6 +192,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER = "IncompleteSocialPostReminderSender";
     public static final String BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER = "IncompleteSurveyReminderSender";
     public static final String BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER = "updateSubscriptionPriceStarter";
+    public static final String BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES = "updateSubscriptionPriceStarterForAllCompanies";
     public static final String BATCH_TYPE_SOCIAL_FEED_INGESTER = "socialfeedingester";
     public static final String BATCH_TYPE_ACCOUNT_DEACTIVATOR = "AccountDeactivator";
     public static final String BATCH_TYPE_DEACTIVATED_ACCOUNT_PURGER = "DeactivatedAccountPurger";
@@ -214,6 +215,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER = "incomplete Social Post Reminder Sender";
     public static final String BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER = "Incomplete Survey Reminder Sender";
     public static final String BATCH_NAME_UPDATE_SUBSCRIPTION_PRICE_STARTER = "Update Subscription Price For Accounts";
+    public static final String BATCH_NAME_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES = "Update Subscription Price For All Companies";
     public static final String BATCH_NAME_SOCIAL_FEED_INGESTER = "Social Feed Ingester";
     public static final String BATCH_NAME_ACCOUNT_DEACTIVATOR = "Account Deactivator For Disabled Account Batch";
     public static final String BATCH_NAME_DEACTIVATED_ACCOUNT_PURGER = "Purge Deactivated Company";
