@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.core.services.lonewolf.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +17,7 @@ import retrofit.mime.TypedByteArray;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.LoneWolfClassificationCode;
 import com.realtech.socialsurvey.core.entities.LoneWolfMember;
 import com.realtech.socialsurvey.core.entities.LoneWolfTransaction;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -87,6 +91,40 @@ public class LoneWolfIntegrationServiceImpl implements LoneWolfIntegrationServic
 
             LOG.info( "Method fetchLoneWolfMembersData ended " );
         return members;
+    }
+    
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<LoneWolfClassificationCode> fetchLoneWolfClassificationCodes( String secretKey, String apiToken, String clientCode ) throws InvalidInputException
+    {
+        LOG.info( "Method fetchLoneWolfMembersData started " );
+        loneWolfIntegrationApi = loneWolfIntegrationApiBuilder.getLoneWolfIntegrationApi();
+        //generating authorization header
+        String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor(
+            LoneWolfIntegrationApi.loneWolfClassificationCodesUrl, secretKey, apiToken, clientCode );
+
+        //fetching lone wolf members data
+        retrofit.client.Response response = loneWolfIntegrationApi.fetchClassificationCodes( authHeader,
+            loneWolfRestUtils.MD5_EMPTY );
+
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+
+
+        List<LoneWolfClassificationCode> classificationCodes = null;
+        classificationCodes = responseString != null ? (List<LoneWolfClassificationCode>) new Gson().fromJson( responseString,
+            new TypeToken<List<LoneWolfClassificationCode>>() {}.getType() ) : null;
+
+        //select classification by LWclientcode and InactiveDate
+        Iterator<LoneWolfClassificationCode> iterator = classificationCodes.iterator();
+        while ( iterator.hasNext() ) {
+            LoneWolfClassificationCode classificationCode = iterator.next();
+            if ( ! classificationCode.getLWCompanyCode().equals( clientCode ) || classificationCode.getInactiveDate() != null )
+                iterator.remove();
+        }
+        LOG.info( "Method fetchLoneWolfMembersData ended " );
+
+        return classificationCodes;
     }
 
 

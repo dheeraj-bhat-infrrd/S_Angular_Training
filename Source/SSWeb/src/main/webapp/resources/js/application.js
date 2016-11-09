@@ -120,6 +120,7 @@ var google_plus_app_id;
 var isZillowReviewsCallRunning = false;
 var zillowCallBreak = false;
 var existingCall;
+var classificationsList = [];
 
 /**
  * js functions for landing page
@@ -833,7 +834,57 @@ function updateDashboardProfileEvents() {
 		var task = $('#dsh-btn3').data('social');
 		dashboardButtonAction(buttonId, task, colName, colValue);
 	});
+	
+	
+	
+	$('#pro-cmplt-stars').on('click', '#dsh-btn0', function(e) {
+		e.stopPropagation();
+		var buttonId = 'dsh-btn0';
+		//getSocialMediaToFix
+		var payload = {
+				"columnName" : colName,
+				"columnValue" : colValue
+			};
+			callAjaxGetWithPayloadData('./socialmediatofix.do', paintFixSocialMedia, payload, true);
+	});
 }
+
+
+function paintFixSocialMedia(data){
+	
+	var popup = "";
+	var parsedData = JSON.parse(data);
+	var columnName = parsedData.columnName;
+	var columnValue = parsedData.columnValue;
+	var socialMedias = parsedData.socialMedias;
+	
+	for (var i = 0; i < socialMedias.length; i++){
+		var socialMedia = socialMedias[i];
+		if(socialMedia == "facebook"){
+			var facebookDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj " onclick="openAuthPageFixSocialMedia('+ "'facebook'" +', '+ "'" + columnName + "'" +', '+columnValue+');"></div></div>';
+			popup += facebookDiv;
+		}else if(socialMedia == "linkedin"){
+			var linkedinDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj " onclick="openAuthPageFixSocialMedia(' + "'linkedin'" + ',' + "'" + columnName + "'" + ', '+columnValue+');" data-link=""></div></div>';
+			popup += linkedinDiv;
+		}
+	}
+	
+	if(socialMedias.length == 0){
+		var noSMDiv = '<div class="clearfix"><div></div class="float-left bd-frm-left-un">No more social media to fix.</div>';
+		popup += noSMDiv;
+		$('#dsh-btn0').addClass("hide");
+	}
+	
+//	e.stopPropagation();
+	$('#overlay-continue').html("");
+	$('#overlay-cancel').html("");
+	$('#overlay-header').html("Fix Social Media");
+	$('#overlay-text').html(popup);
+
+	$('#overlay-main').show();
+}
+
+
 
 function bindSelectButtons(newProfileValue) {
 	$("#selection-list").unbind('change');
@@ -3797,10 +3848,22 @@ function saveEncompassDetails(formid) {
 		callAjaxFormSubmit(url, testConnectionSaveCallBack, formid);
 	}
 }
+
 function saveLoneWolfDetails(formid) {
 	if (validateLoneWolfInput(formid)) {
-		var url = "./savelonewolfdetails.do";
-		callAjaxFormSubmit(url, testConnectionLoneSaveCallBack, formid);
+		var lonewolfClientId = $("#lone-client").val();
+		var loeWolfState = $("#lone-state").val();
+		var transactionStartDate = $("#lone-transaction-start-date").val();
+		
+		disableIcon = false;
+		var formData = new FormData();
+		formData.append("lonewolfClient", lonewolfClientId);
+		formData.append("lonewolfState", loeWolfState); 
+		formData.append("transactionStartDate", transactionStartDate); 
+		formData.append("classifications", JSON.stringify(classificationsList));
+		
+		showOverlay();
+		callAjaxPOSTWithTextDataUpload("./savelonewolfdetails.do" , saveLoneWolfCallBack, true, formData);
 	}
 }
 
@@ -3817,18 +3880,59 @@ function saveEncompassDetailsCallBack(response) {
 	 */
 
 }
-function saveLoneDetailsCallBack(response) {
+function saveTestLoneDetailsCallBack(response) {
 
 	var map = $.parseJSON(response);
+	classificationsList = map.classifications;
+	
+		
+	var $classificationTypeUnknown = ' <div class="float-left bd-cust-rad-item clearfix"><div data-type="U" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">Unknown</div></div>';
+	var $classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="B" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
+	var $classificationTypeSeller = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="S" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Seller</div></div>';
+	var $classificationTypeBoth = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="SB" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Both</div></div>';
+	var $classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
+
 	if (map.status == true) {
-		saveLoneWolfDetails("lone-wolf-form");
+		//show classification list
+		for (var i = 0; i < classificationsList.length; i++) {
+		    var classification = classificationsList[i];
+		    classification.loneWolfTransactionParticipantsType = "U";
+		    classificationsList[i] = classification;
+		    
+			var $classificationCode = '<div class="float-left opacity-red sq-smile-icn-text clasfction-code-txt compl-sq-smile-sad-text-disabled">' + classification.Code + '</div>';
+
+		    
+		    var $classificationRow = $("<div>", {id: "classification_" + i  , "class": "bd-frm-rad-wrapper clearfix"}).attr( "index" , i);
+		    $classificationRow.html($classificationCode + $classificationTypeUnknown + $classificationTypeBuyer + $classificationTypeSeller + $classificationTypeBoth + $classificationTypeNone );
+		    
+		    $("#classification-list-wrapper").append($classificationRow);
+		}
+		
+		bindClickToClassificationTypeButton();
+		$("#lone-data-save").show();
+		$("#lone-get-classification").hide();
+		$("#classification-div").show();
+		$("#transaction-start-div").show();
+		
+		showInfo("Successfully Connected to Lone Wolf. Please select classifications");
 	} else {
 		showError(map.message);
 	}
-	/*
-	 * $("#overlay-toast").html(response); showToast();
-	 */
+}
 
+
+function bindClickToClassificationTypeButton(){
+	$('.bd-cust-rad-img').click(function(e) {
+		$(this).parent().parent().find('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
+		$(this).toggleClass('bd-cust-rad-img-checked');
+		//update type in row
+		$(this).parent().parent().attr('data-type', $(this).data('type'));
+		var curIndex = $(this).parent().parent().attr('index');
+		//update classification list
+		( classificationsList[curIndex]).loneWolfTransactionParticipantsType = $(this).data('type');
+	});
+
+	
 }
 
 function testConnectionSaveCallBack(response) {
@@ -3846,7 +3950,7 @@ function testConnectionSaveCallBack(response) {
 		showError(map.message);
 	}
 };
-function testConnectionLoneSaveCallBack(response) {
+function saveLoneWolfCallBack(response) {
 	var map = $.parseJSON(response);
 	if (map.status == true) {
 		// If state = prod/ state = dryrun, don't make any changes
@@ -3856,6 +3960,11 @@ function testConnectionLoneSaveCallBack(response) {
 			$("#lone-state").val('dryrun');
 			showLoneWolfButtons();
 		}
+		$("#lone-data-save").hide();
+		$("#lone-get-classification").show();
+		$("#classification-list-wrapper").html('');
+		$("#classification-div").hide();
+		$("#transaction-start-div").hide();
 		showInfo(map.message);
 	} else {
 		showError(map.message);
@@ -8010,6 +8119,16 @@ function paintPosts(posts) {
 	}
 }
 
+
+function fixSocialMediaResponse(columnName, columnValue){
+	var payload = {
+			"columnName" : columnName,
+			"columnValue" : columnValue
+		};
+		callAjaxGetWithPayloadData('./socialmediatofix.do', paintFixSocialMedia, payload, true);
+}
+
+
 function showDashboardButtons(columnName, columnValue) {
 	var payload = {
 		"columnName" : columnName,
@@ -8054,11 +8173,15 @@ function paintDashboardButtons(data) {
 				$('#dsh-btn2').html(contentToDisplay);
 				$('#dsh-btn2').removeClass('hide');
 			}
-			if (i == 1) {
-				$('#dsh-btn3').data('social', stages[i].profileStageKey);
-				$('#dsh-btn3').html(contentToDisplay);
-				$('#dsh-btn3').removeClass('hide');
+			
+			if($('#dsh-btn0').hasClass('hide')){
+				if (i == 1) {
+					$('#dsh-btn3').data('social', stages[i].profileStageKey);
+					$('#dsh-btn3').html(contentToDisplay);
+					$('#dsh-btn3').removeClass('hide');
+				}
 			}
+			
 		}
 	}
 }
@@ -10662,7 +10785,7 @@ $(document).on('click', '#en-dry-save', function(e) {
 	}
 
 });
-$(document).on('click', '#lone-dry-save', function(e) {
+$(document).on('click', '#lone-get-classification', function(e) {
 	e.stopPropagation();
 	if (validateLoneWolfInput('lone-wolf-form-div')) {
 		var state = $("#lone-state").val();
@@ -10677,6 +10800,19 @@ $(document).on('click', '#lone-dry-save', function(e) {
 		}
 	}
 
+});
+
+
+$(document).on('click', '#lone-data-save', function(e) {
+	e.stopPropagation();
+	if (validateLoneWolfInput('lone-wolf-form-div')) {
+		var state = $("#lone-state").val();
+		var warn = true;
+		if (state != 'prod') {
+			warn = false;
+		}
+		saveLoneWolfDetails("lone-wolf-form");	
+	}
 });
 
 function confirmEncompassEdit() {
@@ -10730,7 +10866,7 @@ function initiateLoneWolfSaveConnection(warn) {
 		"clientCode" : client
 	};
 	showOverlay();
-	callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/lonewolf/testcredentials.do", saveLoneDetailsCallBack, payload, true, '#lone-dry-save');
+	callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/lonewolf/testcredentials.do", saveTestLoneDetailsCallBack, payload, true, '#lone-get-classification');
 	if (warn) {
 		$('#overlay-cancel').click();
 	}

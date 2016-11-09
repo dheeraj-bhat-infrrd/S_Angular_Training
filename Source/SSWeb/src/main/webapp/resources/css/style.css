@@ -962,4 +962,8 @@ font-size: 40px;
 .reg-bold{
 	font-weight:600 !important;
 }
+
+.display-inline-block{
+display: inline-block;
+}
     

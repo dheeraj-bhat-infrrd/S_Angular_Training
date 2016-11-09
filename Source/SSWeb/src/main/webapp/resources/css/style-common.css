@@ -4304,6 +4304,12 @@ img.prof-image {
 	background: rgb(233, 127, 48);
 }
 
+
+.dsh-btn-red {
+	background: rgb(128, 0, 0);
+}
+
+
 .dsh-btn-green {
 	background: rgb(122, 180, 0);
 }
@@ -8689,8 +8695,29 @@ label.url-change-input-label {
 	background: #333;
 }
 
+.clasfction-code-txt {
+	width: 25px;
+    padding: 0 7px;
+    height: 22px;
+    line-height: 23px;
+    font-size: 13px;
+    margin-left: 5px;
+    margin-top: 3px;
+    margin-right: 45px;
+}
+
 .social-monitor-autocomplete {
 	width: 215px !important;
+}
+
+.classification-text{
+	width: inherit;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.margin-right-o {
+	margin-right: 0px !important;
 }
 
 .ui-hdr-agent-dropdown li {
