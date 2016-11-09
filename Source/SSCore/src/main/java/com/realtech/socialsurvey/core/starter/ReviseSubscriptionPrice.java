@@ -39,9 +39,6 @@ public class ReviseSubscriptionPrice
     public static final Logger LOG = LoggerFactory.getLogger( ReviseSubscriptionPrice.class );
 
     @Autowired
-    private GenericDao<Company, Long> companyDao;
-
-    @Autowired
     private GenericDao<UserProfile, Long> userProfileDao;
 
     @Autowired
@@ -207,6 +204,34 @@ public class ReviseSubscriptionPrice
                 LOG.error( "Error while sending report excption mail to admin " );
             }
         }
+    }
+
+
+    @Transactional
+    public void updateSubscriptionPriceStarterForAllCompanies()
+    {
+        LOG.info( "Calling price updator" );
+        try {
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES,
+                CommonConstants.BATCH_NAME_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES );
+            this.processChargeForAllcompanies();
+            batchTrackerService
+                .getLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES );
+        } catch ( Exception e ) {
+            try {
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES, e.getMessage() );
+                batchTrackerService.sendMailToAdminRegardingBatchError(
+                    CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES, System.currentTimeMillis(),
+                    e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in UpdateSubscriptionPriceStarter " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+        LOG.info( "Price updator finished" );
     }
 
 
