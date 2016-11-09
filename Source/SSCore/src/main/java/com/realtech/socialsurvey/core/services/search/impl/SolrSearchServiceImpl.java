@@ -660,6 +660,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             solrQuery.setQuery( query );
             solrQuery.addFilterQuery( CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR );
             solrQuery.addFilterQuery( "-" + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_INACTIVE );
+            solrQuery.addFilterQuery( "-" + CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR + ":" + true );
             solrQuery.setStart( startIndex );
             solrQuery.setRows( noOfRows );
 
@@ -875,9 +876,16 @@ public class SolrSearchServiceImpl implements SolrSearchService
         if ( user.getProfileUrl() != null && !user.getProfileUrl().isEmpty() ) {
             document.addField( CommonConstants.PROFILE_URL_SOLR, user.getProfileUrl() );
         }
-
+        Long companyId = user.getCompany().getCompanyId();
         if ( user.getCompany() != null ) {
-            document.addField( CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId() );
+            document.addField( CommonConstants.COMPANY_ID_SOLR, companyId );
+            if ( organizationUnitSettingsDao
+                .fetchOrganizationUnitSettingsById( companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION )
+                .isHiddenSection() ) {
+                document.addField( CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, true );
+            } else {
+                document.addField( CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, false );
+            }
         }
         document.addField( CommonConstants.STATUS_SOLR, user.getStatus() );
         Set<Long> branches = new HashSet<Long>();
