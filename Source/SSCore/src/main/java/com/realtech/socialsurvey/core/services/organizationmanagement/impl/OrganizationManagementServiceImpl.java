@@ -7829,7 +7829,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public void deleteCompanyHiddenNotificationRecord( CompanyHiddenNotification record )
     {
         LOG.info( "updating the record for company hidden notification: " + record.getCompanyHiddenNotificationId() );
-        companyHiddenNotificationDao.processByIdAndStatus( record, CommonConstants.STATUS_PROCESSED );
+        companyHiddenNotificationDao.processByIdAndStatus( record, CommonConstants.STATUS_INACTIVE );
         LOG.info( "updated the company hidden notification record." );
     }
 

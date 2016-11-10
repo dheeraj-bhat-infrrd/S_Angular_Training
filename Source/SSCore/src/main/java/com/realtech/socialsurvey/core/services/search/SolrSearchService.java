@@ -381,9 +381,6 @@ public interface SolrSearchService
     public void solrReviewCountUpdater();
 
 
-    public void updateVisibilityOfAllUsersInSolr();
-
-
     public void showOrHideUsersOfCompanyInSolr(Long companyId, Boolean showOrHide );
 
 
