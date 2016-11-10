@@ -11,8 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 
@@ -22,10 +20,6 @@ import javax.persistence.Table;
  */
 @Entity
 @Table ( name = "COMPANY_HIDDEN_NOTIFICATION")
-@NamedQueries ( {
-    @NamedQuery ( name = "CompanyHiddenNotification.findAll", query = "SELECT u FROM CompanyHiddenNotification u"),
-    @NamedQuery ( name = "CompanyHiddenNotification.ProcessByIdAndStatus", query = "UPDATE CompanyHiddenNotification SET status = ? WHERE CompanyHiddenNotificationId = ?") })
-
 public class CompanyHiddenNotification implements Serializable
 {
     private static final long serialVersionUID = 1L;
