@@ -7724,15 +7724,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, true, true );
         LOG.info( "Method updateImage finished" );
     }
-    
-    
+        
     /**
      * 
      */
     @Override
     public List<String> getExpiredSocailMedia(String columnName , long columnValue) throws InvalidInputException, NoRecordsFetchedException{
         LOG.debug( "method getExpiredSocailMedia started" );
-        List<String> socialMedias = new ArrayList<String>();
+        Set<String> socialMedias = new HashSet<String>();
         OrganizationUnitSettings settings = null;
         if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
             settings = getCompanySettings( columnValue );
@@ -7749,9 +7748,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             FacebookToken facebookToken =  settings.getSocialMediaTokens().getFacebookToken();
             long tokenCreatedOn = facebookToken.getFacebookAccessTokenCreatedOn();
             long expirySeconds = facebookToken.getFacebookAccessTokenExpiresOn();
-            if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ) {
-                socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+            if(facebookToken.getFacebookAccessTokenExpiresOn() != 0L){
+                if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ) {
+                    socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                }
             }
+            if(facebookToken.isTokenExpiryAlertSent())
+                socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
         }
         
         //linkedin token
@@ -7765,7 +7768,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         
         LOG.debug( "method getExpiredSocailMedia ended" );
-        return socialMedias;
+        return new ArrayList<String>( socialMedias );
     }
     
     
@@ -7796,6 +7799,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             return true;
 
         return false;
+    
+    }
+    
+    
+    public List<Long> fetchEntityIdsWithHiddenAttribute(String CollectionName){
+        return organizationUnitSettingsDao.fetchEntityIdsWithHiddenAttribute( CollectionName );
     }
 
 }
