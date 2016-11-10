@@ -320,6 +320,7 @@ public interface SolrSearchService
 
     public void removeSocialPostsFromSolr( String entityType, long entityId, String source ) throws SolrException;
 
+
     Collection<SocialPost> getSocialPostsFromSolrDocuments( SolrDocumentList documentList ) throws InvalidInputException;
 
 
@@ -376,6 +377,13 @@ public interface SolrSearchService
 
     public void removeBranchFromSolr( long branchIdToRemove ) throws SolrException, InvalidInputException;
 
+
     public void solrReviewCountUpdater();
+
+
+    public void showOrHideUsersOfCompanyInSolr(Long companyId, Boolean showOrHide );
+
+
+    void editUsersInSolr( List<Long> userIds, String key, String value ) throws SolrException, InvalidInputException;
 }
 // JIRA:SS-62 BY RM 02 EOC
