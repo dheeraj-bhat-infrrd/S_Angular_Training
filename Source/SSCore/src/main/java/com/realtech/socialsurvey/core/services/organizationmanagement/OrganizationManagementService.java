@@ -1401,4 +1401,10 @@ public interface OrganizationManagementService
      * @return
      */
     public List<Long> fetchEntityIdsWithHiddenAttribute( String CollectionName );
+    
+    
+    public List<CompanyHiddenNotification> getCompaniesWithHiddenSectionEnabled();
+
+
+    public void deleteCompanyHiddenNotificationRecord( CompanyHiddenNotification record );
 }

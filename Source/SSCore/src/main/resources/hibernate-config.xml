@@ -85,6 +85,7 @@
 				<value>com.realtech.socialsurvey.core.entities.UserReferralMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.CrmBatchTrackerHistory</value>
 				<value>com.realtech.socialsurvey.core.entities.Event</value>
+				<value>com.realtech.socialsurvey.core.entities.CompanyHiddenNotification</value>
 			</list>
 		</property>
 	</bean>
