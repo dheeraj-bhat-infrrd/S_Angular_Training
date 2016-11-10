@@ -1057,6 +1057,15 @@ public class SolrSearchServiceImpl implements SolrSearchService
         }
         LOG.info( "Method to edit user in solr finished for user : " + userId );
     }
+    
+
+    @Override
+    public void editUsersInSolr( List<Long> userIds, String key, String value ) throws SolrException, InvalidInputException
+    {
+        for ( Long userId : userIds ) {
+            editUserInSolr( userId, key, value );
+        }
+    }
 
 
     @Override
@@ -2982,7 +2991,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     @Override
     @Transactional
-    public void updateSolrToHideAgentsFromSearchResults()
+    public void updateVisibilityOfAllUsersInSolr()
     {
         LOG.info( "Adding Hidden boolean for users in solr" );
         int startIndex = 0;
@@ -2991,7 +3000,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
         //update last run start time
         batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
-            CommonConstants.BATCH_TYPE_SOLR_SCHEMA_MANIPULATION, CommonConstants.BATCH_NAME_SOLR_SCHEMA_MANIPULATION );
+            CommonConstants.BATCH_TYPE_UPDATE_VISIBILITY_OF_ALL_USERS_IN_SOLR,
+            CommonConstants.BATCH_NAME_UPDATE_VISIBILITY_OF_ALL_USERS_IN_SOLR );
 
         //getting the list of company Ids with Hidden Section as True
         List<Long> hiddenCompanyList = organizationManagementService
@@ -3015,16 +3025,18 @@ public class SolrSearchServiceImpl implements SolrSearchService
                     }
                     startIndex += batchSize;
                 } while ( solrDocumentList != null && solrDocumentList.size() == batchSize );
-                batchTrackerService.getLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_SOLR_SCHEMA_MANIPULATION );
+                batchTrackerService
+                    .getLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_UPDATE_VISIBILITY_OF_ALL_USERS_IN_SOLR );
             } catch ( Exception exception ) {
                 try {
-                    LOG.error( "Error in updateSolrToHideAgentsFromSearchResults", exception );
+                    LOG.error( "Error in updateVisibilityOfAllUsersInSolr", exception );
                     //update batch tracker with error message
                     batchTrackerService.updateErrorForBatchTrackerByBatchType(
-                        CommonConstants.BATCH_TYPE_SOLR_SCHEMA_MANIPULATION, exception.getMessage() );
+                        CommonConstants.BATCH_TYPE_UPDATE_VISIBILITY_OF_ALL_USERS_IN_SOLR, exception.getMessage() );
                     //send report bug mail to admin
-                    batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_SOLR_SCHEMA_MANIPULATION,
-                        System.currentTimeMillis(), exception );
+                    batchTrackerService.sendMailToAdminRegardingBatchError(
+                        CommonConstants.BATCH_NAME_UPDATE_VISIBILITY_OF_ALL_USERS_IN_SOLR, System.currentTimeMillis(),
+                        exception );
                 } catch ( NoRecordsFetchedException | InvalidInputException except ) {
                     LOG.error( "Error while saving error message in db." );
                 } catch ( UndeliveredEmailException except ) {
@@ -3033,5 +3045,40 @@ public class SolrSearchServiceImpl implements SolrSearchService
             }
         }
         LOG.info( "Added Hidden boolean for users in solr" );
+    }
+
+
+    @Override
+    @Transactional
+    public void showOrHideUsersOfCompanyInSolr( Long companyId , Boolean hidden)
+    {
+        LOG.info( "Adding Hidden boolean for users in solr for hidden company" );
+        int startIndex = 0;
+        int batchSize = 500;
+        List<Long> userIds;
+
+        if ( companyId != null ) {
+            try {
+                do {
+
+                    userIds = organizationManagementService.getAgentIdsUnderCompany( companyId, startIndex, batchSize );
+
+
+                    // updating all users in the company in solr   
+                    if(hidden){
+                        this.editUsersInSolr( userIds, CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, "true" ); 
+                    }
+                    else{
+                        this.editUsersInSolr( userIds, CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, "false" );
+                    }
+
+                    startIndex += batchSize;
+                } while ( userIds != null && userIds.size() == batchSize );
+            } catch ( Exception exception ) {
+                LOG.error( "error while hiding users of the company: " + companyId + exception.getMessage() );
+            }
+
+        }
+        LOG.info( "Added Hidden boolean for users in solr for hidden company" );
     }
 }

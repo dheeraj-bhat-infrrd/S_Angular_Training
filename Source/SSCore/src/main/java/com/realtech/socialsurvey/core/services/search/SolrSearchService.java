@@ -381,6 +381,12 @@ public interface SolrSearchService
     public void solrReviewCountUpdater();
 
 
-    public void updateSolrToHideAgentsFromSearchResults();
+    public void updateVisibilityOfAllUsersInSolr();
+
+
+    public void showOrHideUsersOfCompanyInSolr(Long companyId, Boolean showOrHide );
+
+
+    void editUsersInSolr( List<Long> userIds, String key, String value ) throws SolrException, InvalidInputException;
 }
 // JIRA:SS-62 BY RM 02 EOC

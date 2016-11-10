@@ -48,6 +48,7 @@ import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.CompanyHiddenNotificationDao;
 import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -66,6 +67,7 @@ import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
@@ -239,6 +241,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private GenericDao<RetriedTransaction, Long> retriedTransactionDao;
+    
+    @Autowired
+    private CompanyHiddenNotificationDao companyHiddenNotificationDao;
 
     @Autowired
     GenericDao<UploadStatus, Long> uploadStatusDao;
@@ -7805,6 +7810,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     public List<Long> fetchEntityIdsWithHiddenAttribute(String CollectionName){
         return organizationUnitSettingsDao.fetchEntityIdsWithHiddenAttribute( CollectionName );
+    }
+    
+    @Override
+    @Transactional
+    public List<CompanyHiddenNotification> getCompaniesWithHiddenSectionEnabled()
+    {
+        LOG.info( "Getting the list of companies whose hidden section is set" );
+        Map<String, Object> queryMap = new HashMap<String, Object>();
+        queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<CompanyHiddenNotification> hiddenCompanyRecords = companyHiddenNotificationDao
+            .findByKeyValue( CompanyHiddenNotification.class, queryMap );
+        return hiddenCompanyRecords;
+    }
+
+
+    @Transactional
+    public void deleteCompanyHiddenNotificationRecord( CompanyHiddenNotification record )
+    {
+        LOG.info( "updating the record for company hidden notification: " + record.getCompanyHiddenNotificationId() );
+        companyHiddenNotificationDao.processByIdAndStatus( record, CommonConstants.STATUS_PROCESSED );
+        LOG.info( "updated the company hidden notification record." );
     }
 
 }

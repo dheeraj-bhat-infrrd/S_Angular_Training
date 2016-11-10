@@ -265,14 +265,16 @@
 		<property name="durability" value="true" />
 	</bean>
 	
-	<bean id="hideUsersFromSearch" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.SolrUserSchemaManipulation" />
+	<bean id="hideUsersFromSearch"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" 
+			value="com.realtech.socialsurvey.core.starter.SolrAgentSearchCriteriaUpdator"/>
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="solrSearchService" value-ref="solrSearchService" />
-			</map>
+				<entry value-ref="solrUserSearchCriteriaProcessor" key="solrUserSearchCriteriaProcessor"/>
+		    </map>
 		</property>
-		<property name="durability" value="true" />
+        <property name="durability" value="true"/>
 	</bean>
 
 	<bean id="updateExistingCompanyPrice"
@@ -496,7 +498,8 @@
 		<property name="startDelay" value="1000" />
 	</bean>
 	
-	<bean id="hideUsersFromSearchcron" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+	<bean id="hideUsersFromSearchcron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="hideUsersFromSearch" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="10000" />
@@ -651,6 +654,7 @@
 				<!-- <ref bean="remaxEntitiesTransfer" /> -->
 				<ref bean="hideUsersFromSearch" />
 				<ref bean="updateExistingCompanyPrice" />
+				<ref bean="hideUsersFromSearch" />				
 			</list>
 		</property>
 
@@ -684,6 +688,7 @@
 				<!-- <ref bean="remaxEntitiesTransfercron" /> -->
 				<ref bean="hideUsersFromSearchcron" />
 				<ref bean="updateExistingCompanyPricecron" />
+				<ref bean="hideUsersFromSearchcron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
