@@ -5,18 +5,15 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 
-
-public class SolrUserSchemaManipulation extends QuartzJobBean
+public class SolrAgentSearchCriteriaUpdator extends QuartzJobBean
 {
-
-    private SolrSearchService solrSearchService;
+    private SolrUserSearchCriteriaProcessor solrUserSearchCriteriaProcessor;
 
 
     private void initializeDependencies( JobDataMap jobMap )
     {
-        solrSearchService = (SolrSearchService) jobMap.get( "solrSearchService" );
+        solrUserSearchCriteriaProcessor = (SolrUserSearchCriteriaProcessor) jobMap.get( "solrUserSearchCriteriaProcessor" );
     }
 
 
@@ -24,6 +21,6 @@ public class SolrUserSchemaManipulation extends QuartzJobBean
     protected void executeInternal( JobExecutionContext context ) throws JobExecutionException
     {
         initializeDependencies( context.getMergedJobDataMap() );
-        solrSearchService.updateSolrToHideAgentsFromSearchResults();
+        solrUserSearchCriteriaProcessor.solrAgentSearchCriteriaUpdator();
     }
 }

@@ -66,6 +66,7 @@ import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
@@ -241,6 +242,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private GenericDao<RetriedTransaction, Long> retriedTransactionDao;
 
     @Autowired
+    private GenericDao<CompanyHiddenNotification, Long> companyHiddenNotificationDao;
+
+    @Autowired
     GenericDao<UploadStatus, Long> uploadStatusDao;
 
     @Value ( "${HAPPY_TEXT}")
@@ -332,8 +336,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public User addCompanyInformation( User user, Map<String, String> organizationalDetails ) throws SolrException,
-        InvalidInputException
+    public User addCompanyInformation( User user, Map<String, String> organizationalDetails )
+        throws SolrException, InvalidInputException
     {
         LOG.info( "Method addCompanyInformation started for user " + user.getLoginName() );
         Company company = addCompany( user, organizationalDetails.get( CommonConstants.COMPANY_NAME ),
@@ -506,8 +510,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         company.setStatus( CommonConstants.STATUS_ACTIVE );
         company.setBillingMode( billingMode );
         // We fetch the vertical and set it
-        VerticalsMaster verticalsMaster = verticalMastersDao.findByColumn( VerticalsMaster.class,
-            CommonConstants.VERTICALS_MASTER_NAME_COLUMN, vertical ).get( CommonConstants.INITIAL_INDEX );
+        VerticalsMaster verticalsMaster = verticalMastersDao
+            .findByColumn( VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, vertical )
+            .get( CommonConstants.INITIAL_INDEX );
         company.setVerticalsMaster( verticalsMaster );
         //remove this code or remove hard coded status
         company.setSettingsLockStatus( "0" );
@@ -698,7 +703,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             incompleteSurveyReminderMailSubj = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
         } catch ( IOException e ) {
             LOG.error(
-                "IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ", e );
+                "IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ",
+                e );
         }
 
         MailContentSettings mailContentSettings = new MailContentSettings();
@@ -849,8 +855,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // Filter profile stages.
         if ( companySettings != null && companySettings.getProfileStages() != null ) {
-            companySettings.setProfileStages( profileCompletionList.getProfileCompletionList( companySettings
-                .getProfileStages() ) );
+            companySettings
+                .setProfileStages( profileCompletionList.getProfileCompletionList( companySettings.getProfileStages() ) );
         }
 
         // Decrypting the encompass password
@@ -879,8 +885,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // Filter profile stages.
         if ( companySettings != null && companySettings.getProfileStages() != null ) {
-            companySettings.setProfileStages( profileCompletionList.getProfileCompletionList( companySettings
-                .getProfileStages() ) );
+            companySettings
+                .setProfileStages( profileCompletionList.getProfileCompletionList( companySettings.getProfileStages() ) );
         }
 
         return companySettings;
@@ -899,7 +905,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             // get the region profiles and get the settings for each of them.
             for ( UserProfile userProfile : userProfiles ) {
                 regionSetting = new OrganizationUnitSettings();
-                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                if ( userProfile.getProfilesMaster()
+                    .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                     LOG.debug( "Getting settings for " + userProfile );
                     // get the region id and get the profile
                     if ( userProfile.getRegionId() > 0l ) {
@@ -932,7 +939,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             // get the branch profiles and get the settings for each of them.
             for ( UserProfile userProfile : userProfiles ) {
                 branchSetting = new BranchSettings();
-                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                if ( userProfile.getProfilesMaster()
+                    .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
                     LOG.debug( "Getting settings for " + userProfile );
                     // get the branch id and get the profile
                     if ( userProfile.getBranchId() > 0l ) {
@@ -993,8 +1001,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // Filter profile stages.
         if ( organizationUnitSettings != null && organizationUnitSettings.getProfileStages() != null ) {
-            organizationUnitSettings.setProfileStages( profileCompletionList.getProfileCompletionList( organizationUnitSettings
-                .getProfileStages() ) );
+            organizationUnitSettings.setProfileStages(
+                profileCompletionList.getProfileCompletionList( organizationUnitSettings.getProfileStages() ) );
         }
 
         branchSettings = new BranchSettings();
@@ -1023,8 +1031,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Transactional
     @Override
-    public OrganizationUnitSettings getBranchSettingsDefault( long branchId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public OrganizationUnitSettings getBranchSettingsDefault( long branchId )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         OrganizationUnitSettings organizationUnitSettings = null;
         BranchSettings branchSettings = null;
@@ -1037,8 +1045,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // Filter profile stages.
         if ( organizationUnitSettings != null && organizationUnitSettings.getProfileStages() != null ) {
-            organizationUnitSettings.setProfileStages( profileCompletionList.getProfileCompletionList( organizationUnitSettings
-                .getProfileStages() ) );
+            organizationUnitSettings.setProfileStages(
+                profileCompletionList.getProfileCompletionList( organizationUnitSettings.getProfileStages() ) );
         }
 
         LOG.info( "Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings );
@@ -1188,7 +1196,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( mailCategory == null ) {
             throw new InvalidInputException( "Invalid mail category." );
         }
-        LOG.debug( "Updating " + mailCategory + " for settings: " + companySettings.toString() + " with mail body: " + mailBody );
+        LOG.debug(
+            "Updating " + mailCategory + " for settings: " + companySettings.toString() + " with mail body: " + mailBody );
 
         // updating mail details
         List<String> paramOrder = new ArrayList<String>();
@@ -1356,8 +1365,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public MailContentSettings revertSurveyParticipationMailBody( OrganizationUnitSettings companySettings, String mailCategory )
-        throws NonFatalException
+    public MailContentSettings revertSurveyParticipationMailBody( OrganizationUnitSettings companySettings,
+        String mailCategory ) throws NonFatalException
     {
         if ( companySettings == null ) {
             throw new InvalidInputException( "Company settings cannot be null." );
@@ -1490,8 +1499,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public void addDisabledAccount( long companyId, boolean forceDisable, long userId ) throws InvalidInputException,
-        NoRecordsFetchedException, PaymentException
+    public void addDisabledAccount( long companyId, boolean forceDisable, long userId )
+        throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
         LOG.info( "Adding the disabled account to the database for company id : " + companyId );
         if ( companyId <= 0 ) {
@@ -1528,11 +1537,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             disabledAccount.setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
             disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
         }
-        disabledAccount.setCreatedBy( userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String
-            .valueOf( userId ) );
+        disabledAccount.setCreatedBy(
+            userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
         disabledAccount.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        disabledAccount.setModifiedBy( userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String
-            .valueOf( userId ) );
+        disabledAccount.setModifiedBy(
+            userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
         disabledAccount.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
         LOG.info( "Adding the Disabled Account entity to the database" );
@@ -1793,8 +1802,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @throws SolrException
      * @throws NoRecordsFetchedException
      */
-    void upgradeToEnterprise( Company company, int fromAccountsMasterId ) throws InvalidInputException, SolrException,
-        NoRecordsFetchedException
+    void upgradeToEnterprise( Company company, int fromAccountsMasterId )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
 
         LOG.info( "Upgrading to Enterprise" );
@@ -1831,7 +1840,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             Region defaultRegion = fetchDefaultRegion( company );
             if ( defaultRegion == null ) {
                 LOG.error( "No default region found for company with id : " + company.getCompanyId() );
-                throw new NoRecordsFetchedException( "No default region found for company with id : " + company.getCompanyId() );
+                throw new NoRecordsFetchedException(
+                    "No default region found for company with id : " + company.getCompanyId() );
             }
             LOG.debug( "Default region exists, upgrading it" );
             Region upgradedRegion = upgradeDefaultRegion( defaultRegion );
@@ -1845,13 +1855,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         } else {
             if ( fromAccountsMasterId != 3 ) {
                 LOG.error( "No default branch found for company with id : " + company.getCompanyId() );
-                throw new NoRecordsFetchedException( "No default branch found for company with id : " + company.getCompanyId() );
+                throw new NoRecordsFetchedException(
+                    "No default branch found for company with id : " + company.getCompanyId() );
             }
             LOG.debug( "Fetching the default region" );
             Region defaultRegion = fetchDefaultRegion( company );
             if ( defaultRegion == null ) {
                 LOG.error( "No default region found for company with id : " + company.getCompanyId() );
-                throw new NoRecordsFetchedException( "No default region found for company with id : " + company.getCompanyId() );
+                throw new NoRecordsFetchedException(
+                    "No default region found for company with id : " + company.getCompanyId() );
             }
             LOG.debug( "Default region exists, upgrading it" );
             Region upgradedRegion = upgradeDefaultRegion( defaultRegion );
@@ -1879,8 +1891,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public void upgradeAccount( Company company, int newAccountsMasterPlanId ) throws NoRecordsFetchedException,
-        InvalidInputException, SolrException
+    public void upgradeAccount( Company company, int newAccountsMasterPlanId )
+        throws NoRecordsFetchedException, InvalidInputException, SolrException
     {
 
         if ( company == null ) {
@@ -1906,8 +1918,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         // Check if license details exist
         if ( licenseDetails == null || licenseDetails.isEmpty() ) {
             LOG.error( "No license details records found for company with id : " + company.getCompanyId() );
-            throw new NoRecordsFetchedException( "No license details records found for company with id : "
-                + company.getCompanyId() );
+            throw new NoRecordsFetchedException(
+                "No license details records found for company with id : " + company.getCompanyId() );
         }
 
         currentLicenseDetail = licenseDetails.get( CommonConstants.INITIAL_INDEX );
@@ -1920,10 +1932,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         switch ( newAccountsMasterPlanId ) {
             case CommonConstants.ACCOUNTS_MASTER_TEAM:
                 if ( currentAccountsMasterId <= 0 || currentAccountsMasterId > 1 ) {
-                    LOG.error( " upgradeAccount : fromAccountsMaster parameter is invalid : value is : "
-                        + currentAccountsMasterId );
-                    throw new InvalidInputException( " upgradeAccount : fromAccountsMaster parameter is invalid: value is : "
-                        + currentAccountsMasterId );
+                    LOG.error(
+                        " upgradeAccount : fromAccountsMaster parameter is invalid : value is : " + currentAccountsMasterId );
+                    throw new InvalidInputException(
+                        " upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId );
                 }
                 /**
                  * In case of upgrading to the team account we need to change only the license
@@ -1937,8 +1949,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     LOG.debug( "Solr update successful" );
                 } else {
                     LOG.error( "No default branch found for company with id : " + company.getCompanyId() );
-                    throw new NoRecordsFetchedException( "No default branch found for company with id : "
-                        + company.getCompanyId() );
+                    throw new NoRecordsFetchedException(
+                        "No default branch found for company with id : " + company.getCompanyId() );
                 }
                 LOG.info( "Databases updated to Team plan" );
                 break;
@@ -1947,10 +1959,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 // We check if the plan we are changing from and the plan we are changing to are
                 // correct
                 if ( currentAccountsMasterId <= 0 || currentAccountsMasterId > 2 ) {
-                    LOG.error( " upgradeAccount : fromAccountsMaster parameter is invalid: value is : "
-                        + currentAccountsMasterId );
-                    throw new InvalidInputException( " upgradeAccount : fromAccountsMaster parameter is invalid: value is : "
-                        + currentAccountsMasterId );
+                    LOG.error(
+                        " upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId );
+                    throw new InvalidInputException(
+                        " upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId );
                 }
                 LOG.info( "Calling the database update method for Company plan" );
                 upgradeToCompany( company );
@@ -1961,10 +1973,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 // We check if the plan we are changing from and the plan we are changing to are
                 // correct
                 if ( currentAccountsMasterId <= 0 || currentAccountsMasterId > 3 ) {
-                    LOG.error( " upgradeAccount : fromAccountsMaster parameter is invalid: value is : "
-                        + currentAccountsMasterId );
-                    throw new InvalidInputException( " upgradeAccount : fromAccountsMaster parameter is invalid: value is : "
-                        + currentAccountsMasterId );
+                    LOG.error(
+                        " upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId );
+                    throw new InvalidInputException(
+                        " upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId );
                 }
                 LOG.info( "Calling the database update method for Enterprise plan" );
                 upgradeToEnterprise( company, currentAccountsMasterId );
@@ -1988,11 +2000,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public List<Region> getRegionsForCompany( String companyProfileName ) throws InvalidInputException,
-        ProfileNotFoundException
+    public List<Region> getRegionsForCompany( String companyProfileName ) throws InvalidInputException, ProfileNotFoundException
     {
         LOG.info( "Method getRegionsForCompany called for companyProfileName:" + companyProfileName );
-        OrganizationUnitSettings companySettings = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
+        OrganizationUnitSettings companySettings = profileManagementService
+            .getCompanyProfileByProfileName( companyProfileName );
         List<Region> regions = null;
         if ( companySettings != null ) {
             long companyId = companySettings.getIden();
@@ -2068,16 +2080,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 }
             }
         } catch ( SolrException e ) {
-            LOG.error(
-                "SolrException while searching for region for company ID: " + companyId + ". Reason : " + e.getMessage(), e );
+            LOG.error( "SolrException while searching for region for company ID: " + companyId + ". Reason : " + e.getMessage(),
+                e );
         } catch ( MalformedURLException e ) {
-            LOG.error(
-                "MalformedURLException while searching for region for company ID: " + companyId + ". Reason : "
-                    + e.getMessage(), e );
+            LOG.error( "MalformedURLException while searching for region for company ID: " + companyId + ". Reason : "
+                + e.getMessage(), e );
         } catch ( InvalidInputException e ) {
-            LOG.error(
-                "InvalidInputException while searching for region for company ID: " + companyId + ". Reason : "
-                    + e.getMessage(), e );
+            LOG.error( "InvalidInputException while searching for region for company ID: " + companyId + ". Reason : "
+                + e.getMessage(), e );
         }
     }
 
@@ -2098,8 +2108,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( searchKey == null )
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<Region> regions = new ArrayList<Region>();
-        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
-            CommonConstants.REGION_NAME_SOLR, searchKey );
+        List<SolrDocument> solrDocumentList = solrSearchService
+            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.REGION_NAME_SOLR, searchKey );
 
         for ( SolrDocument document : solrDocumentList ) {
             Region region = new Region();
@@ -2125,8 +2135,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( searchKey == null )
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<Branch> branches = new ArrayList<Branch>();
-        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
-            CommonConstants.BRANCH_NAME_SOLR, searchKey );
+        List<SolrDocument> solrDocumentList = solrSearchService
+            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.BRANCH_NAME_SOLR, searchKey );
 
         for ( SolrDocument document : solrDocumentList ) {
             Branch branch = new Branch();
@@ -2153,8 +2163,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( searchKey == null )
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<UserFromSearch> users = new ArrayList<UserFromSearch>();
-        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
-            CommonConstants.USER_DISPLAY_NAME_SOLR, searchKey );
+        List<SolrDocument> solrDocumentList = solrSearchService
+            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.USER_DISPLAY_NAME_SOLR, searchKey );
 
         for ( SolrDocument document : solrDocumentList ) {
             UserFromSearch user = new UserFromSearch();
@@ -2213,15 +2223,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public List<Branch> getBranchesUnderCompany( String companyProfileName ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException
+    public List<Branch> getBranchesUnderCompany( String companyProfileName )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         LOG.info( "Method getBranchesUnderCompany called for companyProfileName : " + companyProfileName );
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
             throw new InvalidInputException( "companyProfileName is null or empty in getBranchesUnderCompany" );
         }
         List<Branch> branches = null;
-        OrganizationUnitSettings companySettings = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
+        OrganizationUnitSettings companySettings = profileManagementService
+            .getCompanyProfileByProfileName( companyProfileName );
         if ( companySettings != null ) {
             branches = getBranchesUnderCompany( companySettings.getIden() );
         } else {
@@ -2240,8 +2251,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public List<Branch> getBranchesUnderCompany( long companyId ) throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException
+    public List<Branch> getBranchesUnderCompany( long companyId )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         if ( companyId < 0l )
             throw new InvalidInputException( "Invalid company id passed as argument " );
@@ -2262,7 +2273,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO );
 
-        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries, CommonConstants.BRANCH_NAME_COLUMN );
+        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries,
+            CommonConstants.BRANCH_NAME_COLUMN );
 
         //SS-1421: populate the address of the branches from Solr before sending this list back
         populateAddressOfBranchFromSolr( branches, defaultRegion.getRegionId(), null, null );
@@ -2309,13 +2321,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } catch ( SolrException e ) {
             //Just log the exception in case there's some error fetching the branches from Solr. No need to propagate.
-            LOG.error(
-                "SolrException while searching for branches for region ID: " + regionId + ". Reason : " + e.getMessage(), e );
+            LOG.error( "SolrException while searching for branches for region ID: " + regionId + ". Reason : " + e.getMessage(),
+                e );
         } catch ( InvalidInputException e ) {
             //Just log the exception in case there's some error fetching the branches from Solr. No need to propagate.
-            LOG.error(
-                "InvalidInputException while searching for branches for region ID: " + regionId + ". Reason : "
-                    + e.getMessage(), e );
+            LOG.error( "InvalidInputException while searching for branches for region ID: " + regionId + ". Reason : "
+                + e.getMessage(), e );
         }
     }
 
@@ -2429,7 +2440,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
 
-        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries, CommonConstants.BRANCH_NAME_COLUMN );
+        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries,
+            CommonConstants.BRANCH_NAME_COLUMN );
 
         //SS-1421: populate the address of the branches from Solr before sending this list back
         populateAddressOfBranchFromSolr( branches, regionId, null, null );
@@ -2449,8 +2461,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> addNewRegionWithUser( User user, String regionName, int isDefaultBySystem, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException,
-        NoRecordsFetchedException, UserAssignmentException
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         LOG.info( "Method addNewRegionWithUser called for user:" + user + " regionName:" + regionName + " isDefaultBySystem:"
             + isDefaultBySystem + " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:"
@@ -2646,7 +2658,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         user = userManagementService.inviteUserToRegister( adminUser, firstName, lastName, emailId,
                             holdSendingMail, sendMail );
                     } catch ( UserAlreadyExistsException | UndeliveredEmailException e1 ) {
-                        LOG.debug( "Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(), e1 );
+                        LOG.debug( "Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(),
+                            e1 );
                     }
                 }
             } else {
@@ -2749,7 +2762,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         //if new profile's branch is default than new profile will not be primary
                         if ( newProfileBranch != null
                             && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES
-                            && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                            && userProfileNew.getProfilesMaster()
+                                .getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
 
                             Region newProfileRegion = regionDao.findById( Region.class, userProfileNew.getRegionId() );
 
@@ -2768,10 +2782,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         }
 
                     } else if ( isOldProfileAdmin ) {
-                        LOG.debug( "Old primary profile is an admin profile of type "
-                            + profile.getProfilesMaster().getProfile() );
+                        LOG.debug(
+                            "Old primary profile is an admin profile of type " + profile.getProfilesMaster().getProfile() );
                         //if old profile is for admin and new is for agent than remove primary from old and mark new profile as primary
-                        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                        if ( userProfileNew.getProfilesMaster()
+                            .getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
                             profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
                             userProfileDao.update( profile );
                             isPrimary = CommonConstants.IS_PRIMARY_TRUE;
@@ -2852,8 +2867,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     && profile.getBranchId() == userProfileNew.getBranchId()
                     && profile.getProfilesMaster() == userProfileNew.getProfilesMaster()
                     && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                    throw new InvalidInputException( messageUtils.getDisplayMessage(
-                        DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS, DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                    throw new InvalidInputException(
+                        messageUtils.getDisplayMessage( DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS,
+                            DisplayMessageType.ERROR_MESSAGE ).getMessage() );
                 }
 
                 // Updating existing assignment
@@ -2895,11 +2911,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         assigneeUser.setProfileName( agentSettings.getProfileName() );
         assigneeUser.setProfileUrl( agentSettings.getProfileUrl() );
         solrSearchService.addUserToSolr( assigneeUser );
-        
+
         userManagementService.updateUserCountModificationNotification( assigneeUser.getCompany() );
 
-        LOG.info( "Method to assignRegionToUser finished for regionId : " + regionId + " and userId : "
-            + assigneeUser.getUserId() );
+        LOG.info(
+            "Method to assignRegionToUser finished for regionId : " + regionId + " and userId : " + assigneeUser.getUserId() );
     }
 
 
@@ -2913,8 +2929,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> addNewBranchWithUser( User user, String branchName, long regionId, int isDefaultBySystem,
         String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
-        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException,
-        SolrException, NoRecordsFetchedException, UserAssignmentException
+        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, List<User>> userMap = new HashMap<String, List<User>>();
@@ -2953,7 +2969,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         continue;
                     }
                     try {
-                        assignBranchToUser( user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin );
+                        assignBranchToUser( user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser,
+                            isAdmin );
                     } catch ( InvalidInputException | NoRecordsFetchedException | SolrException e ) {
                         LOG.error( "Exception while assigning branch to a user. Reason:" + e.getMessage(), e );
                         throw new UserAssignmentException( e.getMessage(), e );
@@ -3018,8 +3035,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 if ( profile.getBranchId() == userProfileNew.getBranchId()
                     && profile.getProfilesMaster() == userProfileNew.getProfilesMaster()
                     && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                    throw new InvalidInputException( messageUtils.getDisplayMessage(
-                        DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS, DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                    throw new InvalidInputException(
+                        messageUtils.getDisplayMessage( DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS,
+                            DisplayMessageType.ERROR_MESSAGE ).getMessage() );
                 }
 
                 // Updating existing assignment
@@ -3060,7 +3078,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         assigneeUser.setProfileName( agentSettings.getProfileName() );
         assigneeUser.setProfileUrl( agentSettings.getProfileUrl() );
         solrSearchService.addUserToSolr( assigneeUser );
-        
+
         userManagementService.updateUserCountModificationNotification( assigneeUser.getCompany() );
 
         LOG.info( "Method assignBranchToUser executed successfully" );
@@ -3075,8 +3093,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail ) throws InvalidInputException,
-        NoRecordsFetchedException, SolrException, UserAssignmentException
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException
     {
         LOG.info( "Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId
             + " isAdmin:" + isAdmin );
@@ -3666,7 +3684,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         branch.setCountryCode( branchCountryCode );
         branch.setBranchName( branchName );
 
-        if ( ( branchAddress1 != null && !branchAddress1.isEmpty() ) || ( branchAddress2 != null && !branchAddress2.isEmpty() ) ) {
+        if ( ( branchAddress1 != null && !branchAddress1.isEmpty() )
+            || ( branchAddress2 != null && !branchAddress2.isEmpty() ) ) {
             try {
                 settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ADDRESS, true );
             } catch ( NonFatalException nonFatalException ) {
@@ -3758,8 +3777,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         // branchProfileName = branchName.trim().replaceAll(" ", "-").toLowerCase();
         branchProfileName = utils.prepareProfileName( branchName );
 
-        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branch
-            .getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+            branch.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         if ( companySettings != null ) {
             String companyProfileName = companySettings.getProfileName();
             String branchProfileUrl = utils.generateBranchProfileUrl( companyProfileName, branchProfileName );
@@ -3900,8 +3919,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public Region addNewRegion( User user, String regionName, int isDefaultBySystem, String address1, String address2,
-        String country, String countryCode, String state, String city, String zipcode ) throws InvalidInputException,
-        SolrException
+        String country, String countryCode, String state, String city, String zipcode )
+        throws InvalidInputException, SolrException
     {
         if ( user == null ) {
             throw new InvalidInputException( "User is null in addNewRegion" );
@@ -3987,8 +4006,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Checking if profileName:" + regionProfileName + " is already taken by a region in the company :"
             + region.getCompany() );
 
-        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( region
-            .getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+            region.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         if ( companySettings != null ) {
             String companyProfileName = companySettings.getProfileName();
             String regionProfileUrl = utils.generateRegionProfileUrl( companyProfileName, regionProfileName );
@@ -4175,8 +4194,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public Set<Long> getRegionIdsForUser( User user, int profileMasterId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public Set<Long> getRegionIdsForUser( User user, int profileMasterId )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         if ( profileMasterId <= 0l ) {
             throw new InvalidInputException( "Profile master id is not specified in getRegionIdsForUser" );
@@ -4207,8 +4226,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /**
      * Method to get the list of branch ids for a user and profile master id specified
      */
-    public Set<Long> getBranchIdsForUser( User user, int profileMasterId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public Set<Long> getBranchIdsForUser( User user, int profileMasterId )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         if ( profileMasterId <= 0l ) {
             throw new InvalidInputException( "Profile master id is not specified in getBranchIdsForUser" );
@@ -4321,8 +4340,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public Map<Long, BranchFromSearch> fetchBranchesMapByCompany( long companyId ) throws InvalidInputException, SolrException,
-        MalformedURLException
+    public Map<Long, BranchFromSearch> fetchBranchesMapByCompany( long companyId )
+        throws InvalidInputException, SolrException, MalformedURLException
     {
 
         long branchCount = solrSearchService.fetchBranchCountByCompany( companyId );
@@ -4338,9 +4357,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         // Fetch all the branches' settings from Mongo
-        List<OrganizationUnitSettings> branchSettings = organizationUnitSettingsDao
-            .fetchOrganizationUnitSettingsForMultipleIds( branches.keySet(),
-                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds(
+            branches.keySet(), MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
         for ( OrganizationUnitSettings setting : branchSettings ) {
             if ( branches.containsKey( setting.getIden() ) ) {
                 BranchFromSearch branchFromSearch = branches.get( setting.getIden() );
@@ -4370,8 +4388,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public Map<Long, RegionFromSearch> fetchRegionsMapByCompany( long companyId ) throws InvalidInputException, SolrException,
-        MalformedURLException
+    public Map<Long, RegionFromSearch> fetchRegionsMapByCompany( long companyId )
+        throws InvalidInputException, SolrException, MalformedURLException
     {
         long regionsCount = solrSearchService.fetchRegionCountByCompany( companyId );
         String regionsResult = solrSearchService.fetchRegionsByCompany( companyId, (int) regionsCount );
@@ -4408,8 +4426,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public List<BranchFromSearch> getBranchesUnderCompanyFromSolr( Company company, int start ) throws InvalidInputException,
-        NoRecordsFetchedException, SolrException
+    public List<BranchFromSearch> getBranchesUnderCompanyFromSolr( Company company, int start )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         if ( company == null ) {
             throw new InvalidInputException( "company is null in getBranchesUnderCompanyFromSolr" );
@@ -4434,8 +4452,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public List<UserFromSearch> getUsersUnderCompanyFromSolr( Company company, int start ) throws InvalidInputException,
-        NoRecordsFetchedException, SolrException
+    public List<UserFromSearch> getUsersUnderCompanyFromSolr( Company company, int start )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         if ( company == null ) {
             throw new InvalidInputException( "company is null in getUsersUnderCompanyFromSolr" );
@@ -4471,8 +4489,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public String getAllUsersUnderCompanyFromSolr( Company company ) throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public String getAllUsersUnderCompanyFromSolr( Company company )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         if ( company == null ) {
             throw new InvalidInputException( "company is null in getUsersUnderCompanyFromSolr" );
@@ -4496,8 +4514,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( regionIds == null || regionIds.isEmpty() ) {
             throw new InvalidInputException( "region ids are null in getUsersUnderRegionFromSolr" );
         }
-        LOG.info( "Method getUsersUnderRegionFromSolr called for regionIds:" + regionIds + " and start:" + start + " rows:"
-            + rows );
+        LOG.info(
+            "Method getUsersUnderRegionFromSolr called for regionIds:" + regionIds + " and start:" + start + " rows:" + rows );
         List<UserFromSearch> users = null;
         Set<Long> branchIds = new HashSet<Long>();
         for ( long regionId : regionIds ) {
@@ -4528,8 +4546,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> updateRegion( User user, long regionId, String regionName, String address1, String address2,
         String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException,
-        NoRecordsFetchedException, UserAssignmentException
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, List<User>> userMap = new HashMap<String, List<User>>();
@@ -4542,8 +4560,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( regionId <= 0l ) {
             throw new InvalidInputException( "Region id is invalid in update region" );
         }
-        LOG.info( "Method update region called for regionId:" + regionId + " regionName : " + regionName + " ,address1:"
-            + address1 );
+        LOG.info(
+            "Method update region called for regionId:" + regionId + " regionName : " + regionName + " ,address1:" + address1 );
         Region region = regionDao.findById( Region.class, regionId );
         if ( region == null ) {
             throw new NoRecordsFetchedException( "No region present for the required id in database while updating region" );
@@ -4680,12 +4698,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> updateBranch( User user, long branchId, long regionId, String branchName, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException,
-        NoRecordsFetchedException, UserAssignmentException
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, List<User>> userMap = new HashMap<String, List<User>>();
-        LOG.info( "Method updateBranch called for branchId:" + branchId + " regionId:" + regionId + " branchName:" + branchName );
+        LOG.info(
+            "Method updateBranch called for branchId:" + branchId + " regionId:" + regionId + " branchName:" + branchName );
         if ( user == null ) {
             throw new InvalidInputException( "User is null in update branch" );
         }
@@ -4721,7 +4740,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
 
             if ( region == null ) {
-                throw new NoRecordsFetchedException( "No region present for the required id in database while updating branch" );
+                throw new NoRecordsFetchedException(
+                    "No region present for the required id in database while updating branch" );
             } else {
                 //Update user profiles here.
                 userProfileDao.updateRegionIdForBranch( branchId, region.getRegionId() );
@@ -4731,8 +4751,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 int pageNo = 1;
                 do {
                     users = solrSearchService.findUsersInBranch( branchId, pageSize * ( pageNo - 1 ), pageSize );
-                    Map<Long, List<Long>> userRegionsMap = updateRegionIdForUsers( users, region.getRegionId(), branch
-                        .getRegion().getRegionId(), branchId );
+                    Map<Long, List<Long>> userRegionsMap = updateRegionIdForUsers( users, region.getRegionId(),
+                        branch.getRegion().getRegionId(), branchId );
                     solrSearchService.updateRegionsForMultipleUsers( userRegionsMap );
                     pageNo++;
                 } while ( !( users == null || users.isEmpty() ) );
@@ -4786,7 +4806,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
                 for ( User assigneeUser : assigneeUsers ) {
                     try {
-                        assignBranchToUser( user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin );
+                        assignBranchToUser( user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser,
+                            isAdmin );
                     } catch ( InvalidInputException | NoRecordsFetchedException | SolrException e ) {
                         LOG.error( "Exception while assigning branch to a user. Reason:" + e.getMessage(), e );
                         throw new UserAssignmentException( e.getMessage(), e );
@@ -4808,8 +4829,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public String readMailContentFromFile( String fileName ) throws IOException
     {
         LOG.debug( "readSurveyReminderMailContentFromFile() started" );
-        BufferedReader reader = new BufferedReader( new InputStreamReader( this.getClass().getClassLoader()
-            .getResourceAsStream( fileName ) ) );
+        BufferedReader reader = new BufferedReader(
+            new InputStreamReader( this.getClass().getClassLoader().getResourceAsStream( fileName ) ) );
         StringBuilder content = new StringBuilder();
         String line = reader.readLine();
         try {
@@ -5005,7 +5026,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 if ( agentIds == null || agentIds.isEmpty() ) {
                     break;
                 }
-                organizationUnitSettingsDao.removeOganizationUnitSettings( agentIds, CommonConstants.AGENT_SETTINGS_COLLECTION );
+                organizationUnitSettingsDao.removeOganizationUnitSettings( agentIds,
+                    CommonConstants.AGENT_SETTINGS_COLLECTION );
                 solrSearchService.removeUsersFromSolr( agentIds );
             } while ( true );
 
@@ -5048,7 +5070,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             List<Long> companyIds = new ArrayList<>();
             companyIds.add( company.getCompanyId() );
 
-            organizationUnitSettingsDao.removeOganizationUnitSettings( companyIds, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+            organizationUnitSettingsDao.removeOganizationUnitSettings( companyIds,
+                CommonConstants.COMPANY_SETTINGS_COLLECTION );
 
             // Delete all the details from tables which are related to current company.
             performPreCompanyDeletions( company.getCompanyId() );
@@ -5238,8 +5261,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.COMPANY_ID_COLUMN, companyId );
-        List<LicenseDetail> licenseDetails = licenseDetailDao
-            .findByColumn( LicenseDetail.class, "company.companyId", companyId );
+        List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn( LicenseDetail.class, "company.companyId",
+            companyId );
         // Delete from PaymentRetry table
         List<String> conditions = new ArrayList<>();
         if ( licenseDetails != null && !licenseDetails.isEmpty() ) {
@@ -5584,9 +5607,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public void updateMailContentForOrganizationUnit( MailContentSettings mailContentSettings,
         OrganizationUnitSettings organizationUnitSettings, String collectionName )
     {
-        organizationUnitSettingsDao
-            .updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
-                mailContentSettings, organizationUnitSettings, collectionName );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT, mailContentSettings, organizationUnitSettings,
+            collectionName );
     }
 
 
@@ -5782,8 +5805,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Getting list of encompass crm info for state : " + state );
         List<OrganizationUnitSettings> organizationUnitSettingsList = null;
@@ -5846,8 +5869,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         LOG.info( "Method updateImageForOrganizationUnitSetting called" );
         LOG.debug( "updating mongodb" );
-        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType,
-            flagValue, isThumbnail );
+        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, flagValue,
+            isThumbnail );
         LOG.debug( "updated mongodb" );
         if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
             LOG.debug( "updating solr" );
@@ -5956,8 +5979,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 throw new InvalidInputException( "Invalid entity type : " + entityType );
         }
         if ( unitSettings == null ) {
-            throw new InvalidInputException( "No unit setting with the entity type : " + entityType + " ID : " + entityId
-                + " found." );
+            throw new InvalidInputException(
+                "No unit setting with the entity type : " + entityType + " ID : " + entityId + " found." );
         }
 
         //Get the contact details
@@ -5998,8 +6021,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         }
         // update the isActive status to false
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_STATUS, CommonConstants.STATUS_DELETED_MONGO, unitSettings, collectionName );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_STATUS,
+            CommonConstants.STATUS_DELETED_MONGO, unitSettings, collectionName );
 
         LOG.info( "Finished updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
     }
@@ -6397,7 +6420,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 return zillowHierarchyDao.getUserIdsUnderBranchConnectedToZillow( iden, start_index, batch_size );
 
             default:
-                throw new InvalidInputException( "Invalid profile type passed in getAllUsersUnderProfileTypeConnectedToZillow" );
+                throw new InvalidInputException(
+                    "Invalid profile type passed in getAllUsersUnderProfileTypeConnectedToZillow" );
         }
     }
 
@@ -6720,7 +6744,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             return false;
         }
         if ( adminUser.getCompany().getCompanyId() != assigneeUser.getCompany().getCompanyId() ) {
-            LOG.error( assigneeUser.getEmailId() + " already exist and belongs to a different company than the user in session" );
+            LOG.error(
+                assigneeUser.getEmailId() + " already exist and belongs to a different company than the user in session" );
             success = false;
         }
 
@@ -6808,8 +6833,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     public List<OrganizationUnitSettings> fetchUnitSettingsConnectedToZillow( String collectionName, List<Long> ids )
     {
-        List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.fetchUnitSettingsConnectedToZillow(
-            collectionName, ids );
+        List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao
+            .fetchUnitSettingsConnectedToZillow( collectionName, ids );
         return unitSettings;
     }
 
@@ -6897,15 +6922,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         try {
             companyAdmin = solrSearchService.getCompanyAdmin( company.getCompanyId() );
         } catch ( SolrException e1 ) {
-            LOG.error( "SolrException caught in sendAccountDisabledNotificationMail() while trying to send mail to the company admin ." );
+            LOG.error(
+                "SolrException caught in sendAccountDisabledNotificationMail() while trying to send mail to the company admin ." );
         }
         try {
             if ( companyAdmin != null && companyAdmin.get( "emailId" ) != null )
                 emailServices.sendAccountDisabledMail( companyAdmin.get( "emailId" ), companyAdmin.get( "displayName" ),
                     companyAdmin.get( "loginName" ) );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
-            LOG.error(
-                "Exception caught while sending mail to " + companyAdmin.get( "displayName" ) + " .Nested exception is ", e );
+            LOG.error( "Exception caught while sending mail to " + companyAdmin.get( "displayName" ) + " .Nested exception is ",
+                e );
         }
     }
 
@@ -6940,8 +6966,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( accounts != null && !accounts.isEmpty() ) {
             DisabledAccount account = accounts.get( 0 );
             account.setForceDelete( true );
-            account.setModifiedBy( userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String
-                .valueOf( userId ) );
+            account.setModifiedBy(
+                userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
             disabledAccountDao.update( account );
         }
     }
@@ -6951,8 +6977,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public void updateUserEncryptedIdOfSetting( AgentSettings agentSettings, String userEncryptedId )
     {
         LOG.info( "Inside method updateUserEncryptedIdOfSetting for userEncryptedId : " + userEncryptedId );
-        organizationUnitSettingsDao.updateParticularKeyAgentSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_USER_ENCRYPTED_ID, userEncryptedId, agentSettings );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_USER_ENCRYPTED_ID,
+            userEncryptedId, agentSettings );
     }
 
 
@@ -7027,15 +7053,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         try {
             companyAdmin = solrSearchService.getCompanyAdmin( company.getCompanyId() );
         } catch ( SolrException e1 ) {
-            LOG.error( "SolrException caught in sendAccountDeletedNotificationMail() while trying to send mail to the company admin ." );
+            LOG.error(
+                "SolrException caught in sendAccountDeletedNotificationMail() while trying to send mail to the company admin ." );
         }
         try {
             if ( companyAdmin != null && companyAdmin.get( "emailId" ) != null )
                 emailServices.sendAccountDeletionMail( companyAdmin.get( "emailId" ), companyAdmin.get( "displayName" ),
                     companyAdmin.get( "loginName" ) );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
-            LOG.error(
-                "Exception caught while sending mail to " + companyAdmin.get( "displayName" ) + " .Nested exception is ", e );
+            LOG.error( "Exception caught while sending mail to " + companyAdmin.get( "displayName" ) + " .Nested exception is ",
+                e );
         }
     }
 
@@ -7082,8 +7109,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 batchTrackerService.updateErrorForBatchTrackerByBatchType(
                     CommonConstants.BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR, e.getMessage() );
                 //send report bug mail to admin
-                batchTrackerService.sendMailToAdminRegardingBatchError(
-                    CommonConstants.BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR, System.currentTimeMillis(), e );
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR,
+                    System.currentTimeMillis(), e );
             } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
                 LOG.error( "Error while updating error message in HierarchySettingsCorrector " );
             } catch ( UndeliveredEmailException e1 ) {
@@ -7544,7 +7571,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION,
+                            CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7565,7 +7593,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION,
+                            CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7586,7 +7615,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION,
+                            CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7717,61 +7747,65 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    private void updateImage( long iden, String fileName, String collectionName, String imageType )
-        throws InvalidInputException
+    private void updateImage( long iden, String fileName, String collectionName, String imageType ) throws InvalidInputException
     {
         LOG.info( "Method updateImage started" );
         updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, true, true );
         LOG.info( "Method updateImage finished" );
     }
-        
+
+
     /**
      * 
      */
     @Override
-    public List<String> getExpiredSocailMedia(String columnName , long columnValue) throws InvalidInputException, NoRecordsFetchedException{
+    public List<String> getExpiredSocailMedia( String columnName, long columnValue )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
         LOG.debug( "method getExpiredSocailMedia started" );
         Set<String> socialMedias = new HashSet<String>();
         OrganizationUnitSettings settings = null;
         if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
             settings = getCompanySettings( columnValue );
         } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
-            settings = getRegionSettings( columnValue ) ;
+            settings = getRegionSettings( columnValue );
         } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            settings = getBranchSettingsDefault( columnValue  );
+            settings = getBranchSettingsDefault( columnValue );
         } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
-            settings =  userManagementService.getUserSettings( columnValue  );
+            settings = userManagementService.getUserSettings( columnValue );
         }
-        
+
         //facebook token
-        if(settings!= null && settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getFacebookToken() != null){
-            FacebookToken facebookToken =  settings.getSocialMediaTokens().getFacebookToken();
+        if ( settings != null && settings.getSocialMediaTokens() != null
+            && settings.getSocialMediaTokens().getFacebookToken() != null ) {
+            FacebookToken facebookToken = settings.getSocialMediaTokens().getFacebookToken();
             long tokenCreatedOn = facebookToken.getFacebookAccessTokenCreatedOn();
             long expirySeconds = facebookToken.getFacebookAccessTokenExpiresOn();
-            if(facebookToken.getFacebookAccessTokenExpiresOn() != 0L){
+            if ( facebookToken.getFacebookAccessTokenExpiresOn() != 0L ) {
                 if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ) {
                     socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                 }
             }
-            if(facebookToken.isTokenExpiryAlertSent())
+            if ( facebookToken.isTokenExpiryAlertSent() )
                 socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
         }
-        
+
         //linkedin token
-        if(settings!= null && settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getLinkedInToken() != null  ){
+        if ( settings != null && settings.getSocialMediaTokens() != null
+            && settings.getSocialMediaTokens().getLinkedInToken() != null ) {
             LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInToken();
             long tokenCreatedOn = linkedInToken.getLinkedInAccessTokenCreatedOn();
             long expirySeconds = linkedInToken.getLinkedInAccessTokenExpiresIn();
-            if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ){
+            if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ) {
                 socialMedias.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
             }
         }
-        
+
         LOG.debug( "method getExpiredSocailMedia ended" );
         return new ArrayList<String>( socialMedias );
     }
-    
-    
+
+
     /**
      * 
      * @param tokenCreatedOn
@@ -7799,12 +7833,37 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             return true;
 
         return false;
-    
+
     }
-    
-    
-    public List<Long> fetchEntityIdsWithHiddenAttribute(String CollectionName){
+
+
+    public List<Long> fetchEntityIdsWithHiddenAttribute( String CollectionName )
+    {
         return organizationUnitSettingsDao.fetchEntityIdsWithHiddenAttribute( CollectionName );
+    }
+
+
+    @Override
+    @Transactional
+    public List<CompanyHiddenNotification> getCompaniesWithHiddenSectionEnabled()
+    {
+        LOG.info( "Getting the list of companies whose hidden section is set" );
+        Map<String, Object> queryMap = new HashMap<String, Object>();
+        queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<CompanyHiddenNotification> hiddenCompanyRecords = companyHiddenNotificationDao
+            .findByKeyValue( CompanyHiddenNotification.class, queryMap );
+        return hiddenCompanyRecords;
+    }
+
+
+    @Transactional
+    public void deleteCompanyHiddenNotificationRecord( CompanyHiddenNotification record )
+    {
+        LOG.info( "updating the record for company hidden notification: " + record.getCompanyHiddenNotificationId() );
+        record.setStatus( CommonConstants.STATUS_INACTIVE );
+        record.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        companyHiddenNotificationDao.saveOrUpdate( record );
+        LOG.info( "updated the company hidden notification record." );
     }
 
 }

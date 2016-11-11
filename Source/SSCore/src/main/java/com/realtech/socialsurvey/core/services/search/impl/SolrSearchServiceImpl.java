@@ -1057,6 +1057,15 @@ public class SolrSearchServiceImpl implements SolrSearchService
         }
         LOG.info( "Method to edit user in solr finished for user : " + userId );
     }
+    
+
+    @Override
+    public void editUsersInSolr( List<Long> userIds, String key, String value ) throws SolrException, InvalidInputException
+    {
+        for ( Long userId : userIds ) {
+            editUserInSolr( userId, key, value );
+        }
+    }
 
 
     @Override
@@ -2982,56 +2991,30 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     @Override
     @Transactional
-    public void updateSolrToHideAgentsFromSearchResults()
+    public void showOrHideUsersOfCompanyInSolr( Long companyId , Boolean hidden)
     {
-        LOG.info( "Adding Hidden boolean for users in solr" );
+        LOG.info( "Adding Hidden boolean for users in solr for hidden company" );
         int startIndex = 0;
         int batchSize = 500;
-        SolrDocumentList solrDocumentList;
+        List<Long> userIds;
 
-        //update last run start time
-        batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
-            CommonConstants.BATCH_TYPE_SOLR_SCHEMA_MANIPULATION, CommonConstants.BATCH_NAME_SOLR_SCHEMA_MANIPULATION );
-
-        //getting the list of company Ids with Hidden Section as True
-        List<Long> hiddenCompanyList = organizationManagementService
-            .fetchEntityIdsWithHiddenAttribute( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        if ( hiddenCompanyList != null ) {
-            //setting boolean in solr for each user
+        if ( companyId != null ) {
             try {
                 do {
-                    solrDocumentList = this.getAllUsers( startIndex, batchSize );
-                    if ( solrDocumentList != null ) {
-                        for ( SolrDocument document : solrDocumentList ) {
-                            Long userId = (Long) document.getFieldValue( CommonConstants.USER_ID_SOLR );
-                            Long CompanyId = (Long) document.getFieldValue( CommonConstants.COMPANY_ID_SOLR );
-                            // Adding fields to be updated                            
-                            if ( hiddenCompanyList.contains( CompanyId ) ) {
-                                this.editUserInSolr( userId, CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, "true" );
-                            } else {
-                                this.editUserInSolr( userId, CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, "false" );
-                            }
-                        }
+                    userIds = organizationManagementService.getAgentIdsUnderCompany( companyId, startIndex, batchSize );
+                    // updating all users in the company in solr   
+                    if(hidden){
+                        this.editUsersInSolr( userIds, CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, "true" ); 
+                    }
+                    else{
+                        this.editUsersInSolr( userIds, CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, "false" );
                     }
                     startIndex += batchSize;
-                } while ( solrDocumentList != null && solrDocumentList.size() == batchSize );
-                batchTrackerService.getLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_SOLR_SCHEMA_MANIPULATION );
+                } while ( userIds != null && userIds.size() == batchSize );
             } catch ( Exception exception ) {
-                try {
-                    LOG.error( "Error in updateSolrToHideAgentsFromSearchResults", exception );
-                    //update batch tracker with error message
-                    batchTrackerService.updateErrorForBatchTrackerByBatchType(
-                        CommonConstants.BATCH_TYPE_SOLR_SCHEMA_MANIPULATION, exception.getMessage() );
-                    //send report bug mail to admin
-                    batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_SOLR_SCHEMA_MANIPULATION,
-                        System.currentTimeMillis(), exception );
-                } catch ( NoRecordsFetchedException | InvalidInputException except ) {
-                    LOG.error( "Error while saving error message in db." );
-                } catch ( UndeliveredEmailException except ) {
-                    LOG.error( "Error while sending report excption mail to admin." );
-                }
+                LOG.error( "error while hiding users of the company: " + companyId + exception.getMessage() );
             }
         }
-        LOG.info( "Added Hidden boolean for users in solr" );
+        LOG.info( "Added Hidden boolean for users in solr for hidden company" );
     }
 }
