@@ -41,6 +41,8 @@
 </div>
 <div class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="container">
+	<!-- Check if user is realtech or ss admin -->
+	<c:if test="${isRealTechOrSSAdmin}">
 		<!-- Select which CRM jsp to include -->
 		<c:if test="${not empty crmMappings }">
 			<div class="st-crm-container">
@@ -94,6 +96,7 @@
 					</c:choose>
 				</c:forEach>
 			</div>
+		</c:if>
 		</c:if>
 		<c:if test="${user.isOwner == 1}">
 			<jsp:include page="untracked_user.jsp"></jsp:include>
