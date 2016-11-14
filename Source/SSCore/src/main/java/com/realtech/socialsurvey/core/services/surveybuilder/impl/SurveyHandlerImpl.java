@@ -280,6 +280,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setUrl( surveyUrl );
         surveyDetails.setEditable( true );
         surveyDetails.setSource( surveyPreInitiation.getSurveySource() );
+        surveyDetails.setSourceId( surveyPreInitiation.getSurveySourceId() );
         surveyDetails.setShowSurveyOnUI( true );
 
         surveyDetails.setRetakeSurvey( retakeSurvey );
@@ -415,7 +416,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     @Transactional
-    public SurveyPreInitiation saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException
+    public SurveyPreInitiation saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation )
+        throws InvalidInputException
     {
         if ( surveyPreInitiation == null ) {
             LOG.info( "SurveyPreInitiation object passed null for insert" );
@@ -774,11 +776,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         LOG.debug( "Method storeSPIandSendSurveyInvitationMail() finished ." );
     }
-    
-    
+
+
     @Override
-    public void sendSurveyReminderEmail( SurveyPreInitiation survey )
-        throws InvalidInputException, ProfileNotFoundException
+    public void sendSurveyReminderEmail( SurveyPreInitiation survey ) throws InvalidInputException, ProfileNotFoundException
     {
         // Send email to complete survey to each customer.
         OrganizationUnitSettings companySettings = null;
@@ -796,10 +797,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         }
 
-        String surveyLink = composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
-            survey.getCustomerFirstName(), survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
-        
-        
+        String surveyLink = composeLink( survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(),
+            survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
+
+
         // Fetching agent settings.
         AgentSettings agentSettings = userManagementService.getUserSettings( survey.getAgentId() );
         hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
@@ -809,12 +810,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "Unable to fetch primary profile for this user " );
                 throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
             }
-        } catch ( InvalidSettingsStateException e ) {}
-        
+        } catch ( InvalidSettingsStateException e ) {
+        }
+
         long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
         long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
         long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
-        
+
         companySettings = organizationManagementService.getCompanySettings( companyId );
 
         String agentTitle = "";
@@ -835,9 +837,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
         String fullAddress = "";
 
-        
+
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-       
+
         if ( organizationUnit == OrganizationUnit.COMPANY ) {
             logoUrl = companySettings.getLogo();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
@@ -847,7 +849,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             OrganizationUnitSettings branchSettings = null;
             try {
                 branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-            } catch ( NoRecordsFetchedException e ) {}
+            } catch ( NoRecordsFetchedException e ) {
+            }
             if ( branchSettings != null ) {
                 logoUrl = branchSettings.getLogo();
             }
@@ -915,18 +918,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         //JIRA SS-473 end
 
-        
+
         //For Company with hidden agents
         String senderName;
-        if(companySettings.isSendEmailFromCompany()){
+        if ( companySettings.isSendEmailFromCompany() ) {
             senderName = companyName;
-        }else{
+        } else {
             senderName = agentName;
         }
-        
+
         //send mail
         try {
-            emailServices.sendSurveyInvitationMail( survey.getCustomerEmailId(), mailSubject, mailBody, user.getEmailId(), senderName, user.getUserId() );
+            emailServices.sendSurveyInvitationMail( survey.getCustomerEmailId(), mailSubject, mailBody, user.getEmailId(),
+                senderName, user.getUserId() );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
@@ -1961,7 +1965,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * Method to send email by agent to initiate survey.
      */
     @Override
-    public void prepareAndSendInvitationMail( SurveyPreInitiation survey ) throws InvalidInputException, UndeliveredEmailException , ProfileNotFoundException
+    public void prepareAndSendInvitationMail( SurveyPreInitiation survey )
+        throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
     {
         // Send email to complete survey to each customer.
         String agentName = "";
@@ -1978,9 +1983,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         }
 
-        String surveyLink = composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
-            survey.getCustomerFirstName(), survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
-       
+        String surveyLink = composeLink( survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(),
+            survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
+
         // Fetching agent settings.
         AgentSettings agentSettings = userManagementService.getUserSettings( survey.getAgentId() );
         hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
@@ -2000,7 +2005,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
 
-        
+
         String agentTitle = "";
         if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
             agentTitle = agentSettings.getContact_details().getTitle();
@@ -2035,7 +2040,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             OrganizationUnitSettings branchSettings = null;
             try {
                 branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-            } catch ( NoRecordsFetchedException e ) {}
+            } catch ( NoRecordsFetchedException e ) {
+            }
             if ( branchSettings != null ) {
                 logoUrl = branchSettings.getLogo();
             }
@@ -2137,18 +2143,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
 
         //JIRA SS-473 end
-        
-      //For Company with hidden agents
+
+        //For Company with hidden agents
         String senderName;
-        if(companySettings.isSendEmailFromCompany()){
+        if ( companySettings.isSendEmailFromCompany() ) {
             senderName = companyName;
-        }else{
+        } else {
             senderName = agentName;
         }
 
         //send the mail
         try {
-            emailServices.sendSurveyInvitationMail( survey.getCustomerEmailId(), mailSubject, mailBody, user.getEmailId(), senderName, user.getUserId() );
+            emailServices.sendSurveyInvitationMail( survey.getCustomerEmailId(), mailSubject, mailBody, user.getEmailId(),
+                senderName, user.getUserId() );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
@@ -2368,7 +2375,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             throw new DuplicateSurveyRequestException( "Survey request already sent and completed" );
         }
         LOG.debug( "Sending survey request mail." );
-        storeSPIandSendSurveyInvitationMail( recipientFirstname, recipientLastname, recipientEmailId, null, agent, true, source );
+        storeSPIandSendSurveyInvitationMail( recipientFirstname, recipientLastname, recipientEmailId, null, agent, true,
+            source );
     }
 
 
@@ -3501,7 +3509,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             surveyAndStage.put( "googleBusinessEnabled", false );
         }
     }
-    
+
+
     /**
      * 
      * @param surveyPreIntitiationId
@@ -3516,7 +3525,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "method getSurveyBySurveyPreIntitiationId ended for surveyPreIntitiationId : " + surveyPreIntitiationId );
         return survey;
     }
-
 
 
     /**
@@ -3563,8 +3571,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         survey.setCustomerLastName( cell.getStringCellValue().trim() );
                     } else if ( cell.getColumnIndex() == CUSTOMER_EMAIL_INDEX ) {
                         String emailId = DEFAULT_CUSTOMER_EMAIL_ID_FOR_3RD_PARTY;
-                        if(!cell.getStringCellValue().trim().isEmpty()){
-                             emailId = cell.getStringCellValue().trim();
+                        if ( !cell.getStringCellValue().trim().isEmpty() ) {
+                            emailId = cell.getStringCellValue().trim();
                         }
                         //Mask email address if required
                         if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
@@ -3579,11 +3587,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         survey.setSurveySourceId( cell.getStringCellValue().trim() );
                     } else if ( cell.getColumnIndex() == COMMENT_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                         survey.setReview( cell.getStringCellValue() );
-                    }  else if ( cell.getColumnIndex() == CITY_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
-                         survey.setCity( cell.getStringCellValue() );
-                      } else if ( cell.getColumnIndex() == STATE_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
-                         survey.setState( cell.getStringCellValue() );
-                      }
+                    } else if ( cell.getColumnIndex() == CITY_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
+                        survey.setCity( cell.getStringCellValue() );
+                    } else if ( cell.getColumnIndex() == STATE_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
+                        survey.setState( cell.getStringCellValue() );
+                    }
                 }
                 try {
                     //If object empty, get out of loop;
@@ -3673,181 +3681,209 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.info( "3rd party Survey Importer finished" );
     }
-    
-    
+
+
     /*
      * 
      */
     @Override
     @Transactional
-    public SurveysAndReviewsVO getSurveysByStatus(String status , int startIndex , int count,  long companyId)
+    public SurveysAndReviewsVO getSurveysByStatus( String status, int startIndex, int count, long companyId )
     {
         LOG.info( "method getSurveysByStatus started for companyId " + companyId );
-        
+
         //get mongo survey count
         int mongoSurveyCount = getSurveyCountForCompanyBySurveyStatus( companyId, status );
         int endIndex = startIndex + count;
-        
+
         //get start index and batch size for mongo and sql get survey query
-        Map<String , Integer> startindexBatchSizeMap =  getStartIndexAndBatchForMonogAndSqlQuery( startIndex , endIndex , mongoSurveyCount);
+        Map<String, Integer> startindexBatchSizeMap = getStartIndexAndBatchForMonogAndSqlQuery( startIndex, endIndex,
+            mongoSurveyCount );
         int monogStartIndex = startindexBatchSizeMap.get( "monogStartIndex" );
         int mongoBatch = startindexBatchSizeMap.get( "mongoBatch" );
         int sqlStartIndex = startindexBatchSizeMap.get( "sqlStartIndex" );
         int sqlBatch = startindexBatchSizeMap.get( "sqlBatch" );
-        
-         //get survey from mongo
-        List<SurveyDetails>surveyDetails = null;
-        if(mongoBatch > 0)
-            surveyDetails = getSurveysForCompanyBySurveyStatus( companyId, status , monogStartIndex, mongoBatch );
+
+        //get survey from mongo
+        List<SurveyDetails> surveyDetails = null;
+        if ( mongoBatch > 0 )
+            surveyDetails = getSurveysForCompanyBySurveyStatus( companyId, status, monogStartIndex, mongoBatch );
         else
             surveyDetails = new ArrayList<SurveyDetails>();
-        
+
         //get corresponding pre initiated record from my sql
-        Map<SurveyDetails , SurveyPreInitiation> surveyReviewMap = getPreinititatedSurveyForMongoSurveyDetail( surveyDetails );
-        
+        Map<SurveyDetails, SurveyPreInitiation> surveyReviewMap = getPreinititatedSurveyForMongoSurveyDetail( surveyDetails );
+
         //get corresponding users
         getUsersForMongoSurveyDetail( surveyDetails );
-        
+
         //get pre initiated survey from sql
         List<SurveyPreInitiation> preInitiatedSurveys = null;
-        if(sqlBatch > 0)
+        if ( sqlBatch > 0 )
             preInitiatedSurveys = surveyPreInitiationDao.getPreInitiatedSurveyForCompany( sqlStartIndex, sqlBatch, companyId );
         else
             preInitiatedSurveys = new ArrayList<SurveyPreInitiation>();
-        
-        
+
+
         SurveysAndReviewsVO surveyAndReviews = new SurveysAndReviewsVO();
         surveyAndReviews.setInitiatedSurveys( surveyReviewMap );
         surveyAndReviews.setPreInitiatedSurveys( preInitiatedSurveys );
         LOG.info( "method getSurveysByStatus ended for companyId " + companyId );
         return surveyAndReviews;
     }
-    
-    
-    private int getSurveyCountForCompanyBySurveyStatus(long companyId , String status)
-    {
-        LOG.info( "method getSurveyCountForCompanyBySurveyStatus started for companyId %s , status %s " , companyId , status );
 
-        long  mongoSurveyCount = 0;
-        if(status.equals( "complete" )){
-             mongoSurveyCount = surveyDetailsDao.getCompletedSurveyCount( companyId );           
-        }else if(status.equals( "incomplete" )){
-            mongoSurveyCount = surveyDetailsDao.getIncompleteSurveyCount( companyId );         
-        }else if(status.equals( "all" )){
+
+    private int getSurveyCountForCompanyBySurveyStatus( long companyId, String status )
+    {
+        LOG.info( "method getSurveyCountForCompanyBySurveyStatus started for companyId %s , status %s ", companyId, status );
+
+        long mongoSurveyCount = 0;
+        if ( status.equals( "complete" ) ) {
+            mongoSurveyCount = surveyDetailsDao.getCompletedSurveyCount( companyId );
+        } else if ( status.equals( "incomplete" ) ) {
+            mongoSurveyCount = surveyDetailsDao.getIncompleteSurveyCount( companyId );
+        } else if ( status.equals( "all" ) ) {
             mongoSurveyCount = surveyDetailsDao.getSurveysCountForCompany( companyId );
         }
-        
-        LOG.info( "method getSurveyCountForCompanyBySurveyStatus ended for companyId %s , status %s " , companyId , status );
+
+        LOG.info( "method getSurveyCountForCompanyBySurveyStatus ended for companyId %s , status %s ", companyId, status );
 
         return (int) mongoSurveyCount;
     }
-    
-    
-    private List<SurveyDetails> getSurveysForCompanyBySurveyStatus(long companyId , String status, int start , int batchSize)
+
+
+    private List<SurveyDetails> getSurveysForCompanyBySurveyStatus( long companyId, String status, int start, int batchSize )
     {
-        LOG.info( "method getSurveysForCompanyBySurveyStatus started for companyId %s , startIndex %s , batchSiz %s , status %s " , companyId , start , batchSize , status );
+        LOG.info(
+            "method getSurveysForCompanyBySurveyStatus started for companyId %s , startIndex %s , batchSiz %s , status %s ",
+            companyId, start, batchSize, status );
         List<SurveyDetails> surveyDetails = null;
-        if(status.equals( "complete" )){
-            surveyDetails = surveyDetailsDao.getCompletedSurveyByStartIndexAndBatchSize( start, batchSize, companyId );       
-        }else if(status.equals( "incomplete" )){
-            surveyDetails = surveyDetailsDao.getIncompleteSurveyByStartIndexAndBatchSize( start, batchSize, companyId );      
-        }else if(status.equals( "all" )){
+        if ( status.equals( "complete" ) ) {
+            surveyDetails = surveyDetailsDao.getCompletedSurveyByStartIndexAndBatchSize( start, batchSize, companyId );
+        } else if ( status.equals( "incomplete" ) ) {
+            surveyDetails = surveyDetailsDao.getIncompleteSurveyByStartIndexAndBatchSize( start, batchSize, companyId );
+        } else if ( status.equals( "all" ) ) {
             surveyDetails = surveyDetailsDao.getSurveysForCompanyByStartIndex( start, batchSize, companyId );
         }
-        
-        LOG.info( "method getSurveysForCompanyBySurveyStatus ended for companyId %s , startIndex %s , batchSiz %s , status %s " , companyId , start , batchSize , status );
+
+        LOG.info( "method getSurveysForCompanyBySurveyStatus ended for companyId %s , startIndex %s , batchSiz %s , status %s ",
+            companyId, start, batchSize, status );
         return surveyDetails;
     }
-    
-    private Map<SurveyDetails , SurveyPreInitiation> getPreinititatedSurveyForMongoSurveyDetail(List<SurveyDetails> surveyDetails )
+
+
+    private Map<SurveyDetails, SurveyPreInitiation> getPreinititatedSurveyForMongoSurveyDetail(
+        List<SurveyDetails> surveyDetails )
     {
         LOG.info( "method getPreinititatedSurveyForMongoSurveyDetail started" );
-        Map<SurveyDetails , SurveyPreInitiation> surveyReviewMap = new HashMap<SurveyDetails , SurveyPreInitiation>();
+        Map<SurveyDetails, SurveyPreInitiation> surveyReviewMap = new HashMap<SurveyDetails, SurveyPreInitiation>();
         List<Long> surveyPreinitiationIds = new ArrayList<Long>();
-        
-        for(SurveyDetails surveyDetail : surveyDetails){
+
+        for ( SurveyDetails surveyDetail : surveyDetails ) {
             surveyPreinitiationIds.add( surveyDetail.getSurveyPreIntitiationId() );
         }
-        
-        if(surveyPreinitiationIds.size() > 0){
-            Map<Long , SurveyPreInitiation> surveyPreinitiations = surveyPreInitiationDao.getPreInitiatedSurveyForIds( surveyPreinitiationIds );
-            for(SurveyDetails surveyDetail : surveyDetails){
+
+        if ( surveyPreinitiationIds.size() > 0 ) {
+            Map<Long, SurveyPreInitiation> surveyPreinitiations = surveyPreInitiationDao
+                .getPreInitiatedSurveyForIds( surveyPreinitiationIds );
+            for ( SurveyDetails surveyDetail : surveyDetails ) {
                 surveyReviewMap.put( surveyDetail, surveyPreinitiations.get( surveyDetail.getSurveyPreIntitiationId() ) );
             }
         }
-        
-        
+
+
         LOG.info( "method getPreinititatedSurveyForMongoSurveyDetail ended" );
         return surveyReviewMap;
     }
-    
-    
-    private Map<String , Integer> getStartIndexAndBatchForMonogAndSqlQuery(int startIndex , int endIndex , int mongoSurveyCount)
+
+
+    private Map<String, Integer> getStartIndexAndBatchForMonogAndSqlQuery( int startIndex, int endIndex, int mongoSurveyCount )
     {
         LOG.info( "method getStartIndexAndBatchForMonogAndSqlQuery started " );
-        Map<String , Integer> startindexBatchSizeMap = new HashMap<String , Integer>();
+        Map<String, Integer> startindexBatchSizeMap = new HashMap<String, Integer>();
         int monogStartIndex = 0;
         int mongoBatch = 0;
         int sqlStartIndex = 0;
         int sqlBatch = 0;
 
-        if(mongoSurveyCount <= startIndex){
+        if ( mongoSurveyCount <= startIndex ) {
             //get data from mysql only
             sqlStartIndex = startIndex - mongoSurveyCount;
             sqlBatch = endIndex - mongoSurveyCount;
-        }else if(mongoSurveyCount > startIndex && mongoSurveyCount < endIndex){
+        } else if ( mongoSurveyCount > startIndex && mongoSurveyCount < endIndex ) {
             //get data from mongo and my sql
             monogStartIndex = startIndex;
             mongoBatch = mongoSurveyCount - startIndex;
             sqlStartIndex = 0;
             sqlBatch = endIndex - mongoSurveyCount;
-        }else{
+        } else {
             //get data from mongo only
             monogStartIndex = startIndex;
             mongoBatch = endIndex - startIndex;
         }
-        
+
         startindexBatchSizeMap.put( "monogStartIndex", monogStartIndex );
         startindexBatchSizeMap.put( "mongoBatch", mongoBatch );
         startindexBatchSizeMap.put( "sqlStartIndex", sqlStartIndex );
         startindexBatchSizeMap.put( "sqlBatch", sqlBatch );
-        
+
         LOG.info( "method getStartIndexAndBatchForMonogAndSqlQuery ended " );
         return startindexBatchSizeMap;
     }
-    
-    
-    
-    private void getUsersForMongoSurveyDetail(List<SurveyDetails> surveyDetails )
+
+
+    private void getUsersForMongoSurveyDetail( List<SurveyDetails> surveyDetails )
     {
         LOG.info( "method getUsersForMongoSurveyDetail started" );
         List<Long> userIds = new ArrayList<Long>();
-        
-        for(SurveyDetails surveyDetail : surveyDetails){
-            userIds.add( surveyDetail.getAgentId());
+
+        for ( SurveyDetails surveyDetail : surveyDetails ) {
+            userIds.add( surveyDetail.getAgentId() );
         }
-        
+
         List<User> users = new ArrayList<User>();
         try {
             users = userDao.getUsersForUserIds( userIds );
         } catch ( InvalidInputException e ) {
 
         }
-        
+
         //create map
-        Map<Long , String> userIdsAndEmails = new HashMap<Long , String>();
-        for(User user : users){
+        Map<Long, String> userIdsAndEmails = new HashMap<Long, String>();
+        for ( User user : users ) {
             userIdsAndEmails.put( user.getUserId(), user.getEmailId() );
         }
-        
+
         int i = 0;
-        for(SurveyDetails surveyDetail : surveyDetails){
+        for ( SurveyDetails surveyDetail : surveyDetails ) {
             surveyDetail.setAgentEmailId( userIdsAndEmails.get( surveyDetail.getAgentId() ) );
             surveyDetails.set( i, surveyDetail );
             i++;
         }
-        
+
         LOG.info( "method getUsersForMongoSurveyDetail ended" );
-        
+
+    }
+
+
+    @Override
+    @Transactional
+    public void updateSurveySourceIdInMongo()
+    {
+        List<SurveyDetails> surveys = surveyDetailsDao.getAllSurveys();
+
+        List<Long> surveyPreInitiationIds = new ArrayList<Long>();
+        for ( SurveyDetails survey : surveys ) {
+            surveyPreInitiationIds.add( survey.getSurveyPreIntitiationId() );
+        }
+
+        Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
+            .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
+
+        for ( SurveyDetails survey : surveys ) {
+            survey.setSourceId( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null
+                ? surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId() : null );
+            surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+        }
     }
 }
