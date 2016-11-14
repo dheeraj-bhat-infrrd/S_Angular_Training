@@ -44,7 +44,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         + "SURVEY_PRE_INITIATION "
         + " where COMPANY_ID= :companyId AND ( (AGENT_EMAILID IN "
         + " (select EMAIL_ID from USER_EMAIL_MAPPING where COMPANY_ID=:companyId) ) OR  ( AGENT_EMAILID IN "
-        + " (select EMAIL_ID from COMPANY_IGNORED_EMAIL_MAPPING where COMPANY_ID=:companyId) ) )";
+        + " (select EMAIL_ID from COMPANY_IGNORED_EMAIL_MAPPING where COMPANY_ID=:companyId) ) ) ORDER BY ENGAGEMENT_CLOSED_TIME DESC";
 
     private static final String proceesedCurruptedSurveyCount = "select count(*)  from " + "SURVEY_PRE_INITIATION "
         + " where COMPANY_ID= :companyId AND ( (AGENT_EMAILID IN "

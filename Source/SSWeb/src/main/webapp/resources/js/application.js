@@ -3849,7 +3849,7 @@ function saveEncompassDetails(formid) {
 	}
 }
 
-function saveLoneWolfDetails(formid) {
+function saveLoneWolfDetails(formid , warn) {
 	if (validateLoneWolfInput(formid)) {
 		var lonewolfClientId = $("#lone-client").val();
 		var loeWolfState = $("#lone-state").val();
@@ -3864,6 +3864,9 @@ function saveLoneWolfDetails(formid) {
 		
 		showOverlay();
 		callAjaxPOSTWithTextDataUpload("./savelonewolfdetails.do" , saveLoneWolfCallBack, true, formData);
+		if (warn) {
+			$('#overlay-cancel').click();
+		}
 	}
 }
 
@@ -3885,12 +3888,10 @@ function saveTestLoneDetailsCallBack(response) {
 	var map = $.parseJSON(response);
 	classificationsList = map.classifications;
 	
-		
-	var $classificationTypeUnknown = ' <div class="float-left bd-cust-rad-item clearfix"><div data-type="U" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">Unknown</div></div>';
 	var $classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="B" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
 	var $classificationTypeSeller = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="S" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Seller</div></div>';
 	var $classificationTypeBoth = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="SB" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Both</div></div>';
-	var $classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
+	var $classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
 
 	if (map.status == true) {
 		//show classification list
@@ -3899,11 +3900,11 @@ function saveTestLoneDetailsCallBack(response) {
 		    classification.loneWolfTransactionParticipantsType = "U";
 		    classificationsList[i] = classification;
 		    
-			var $classificationCode = '<div class="float-left opacity-red sq-smile-icn-text clasfction-code-txt compl-sq-smile-sad-text-disabled">' + classification.Code + '</div>';
+			var $classificationCode = '<div class="float-left opacity-red sq-smile-icn-text clasfction-code-txt compl-sq-smile-sad-text-disabled">' + classification.Code + ' - ' + classification.Name + '</div>';
 
 		    
 		    var $classificationRow = $("<div>", {id: "classification_" + i  , "class": "bd-frm-rad-wrapper clearfix"}).attr( "index" , i);
-		    $classificationRow.html($classificationCode + $classificationTypeUnknown + $classificationTypeBuyer + $classificationTypeSeller + $classificationTypeBoth + $classificationTypeNone );
+		    $classificationRow.html($classificationCode + $classificationTypeBuyer + $classificationTypeSeller + $classificationTypeBoth + $classificationTypeNone );
 		    
 		    $("#classification-list-wrapper").append($classificationRow);
 		}
@@ -3911,8 +3912,16 @@ function saveTestLoneDetailsCallBack(response) {
 		bindClickToClassificationTypeButton();
 		$("#lone-data-save").show();
 		$("#lone-get-classification").hide();
+		$("#lone-disconnect").hide();
+		$("#lone-dry-enable").hide();
+		$("#lone-dry-cancel").show();
+		
+		$("#lone-test-connection").hide();
+		$("#lone-generate-report").hide();
+				
 		$("#classification-div").show();
 		$("#transaction-start-div").show();
+		
 		
 		showInfo("Successfully Connected to Lone Wolf. Please select classifications");
 	} else {
@@ -3958,9 +3967,13 @@ function saveLoneWolfCallBack(response) {
 		var state = $("#lone-state").val();
 		if (state != 'dryrun' && state != 'prod') {
 			$("#lone-state").val('dryrun');
-			showLoneWolfButtons();
 		}
+		
+		showLoneWolfButtons();
+		
+		$("#lone-test-connection").show();
 		$("#lone-data-save").hide();
+		$("#lone-dry-cancel").hide();
 		$("#lone-get-classification").show();
 		$("#classification-list-wrapper").html('');
 		$("#classification-div").hide();
@@ -10793,11 +10806,9 @@ $(document).on('click', '#lone-get-classification', function(e) {
 		if (state != 'prod') {
 			warn = false;
 		}
-		if (warn) {
-			confirmLoneEdit();
-		} else {
-			initiateLoneWolfSaveConnection(false);
-		}
+
+		initiateLoneWolfSaveConnection(false);
+
 	}
 
 });
@@ -10811,7 +10822,11 @@ $(document).on('click', '#lone-data-save', function(e) {
 		if (state != 'prod') {
 			warn = false;
 		}
-		saveLoneWolfDetails("lone-wolf-form");	
+		if (warn) {
+			confirmLoneEdit();
+		} else {
+			saveLoneWolfDetails("lone-wolf-form" , false);
+		}
 	}
 });
 
@@ -10837,7 +10852,7 @@ function confirmLoneEdit() {
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-continue').off();
 	$('#overlay-continue').click(function() {
-		initiateLoneWolfSaveConnection(true);
+		saveLoneWolfDetails("lone-wolf-form" , true);
 	});
 
 	$('#overlay-main').show();
@@ -10966,6 +10981,22 @@ $(document).on('click', '#lone-disconnect', function() {
 		showToast();
 	}
 });
+
+$(document).on('click', '#lone-dry-cancel', function() {
+	showLoneWolfButtons();
+	$('#lone-dry-cancel').hide();
+	$('#lone-data-save').hide();
+	
+	$('#classification-div').hide();
+	$('#transaction-start-div').hide();
+	
+	$('#lone-get-classification').show();
+	$("#lone-test-connection").show();
+	
+	
+
+});
+
 function testDisconnectLoneWolfCallBack(response) {
 	var map = response;
 	if (map == "Successfully disabled lone wolf connection") {

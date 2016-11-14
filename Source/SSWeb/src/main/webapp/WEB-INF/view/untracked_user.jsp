@@ -30,10 +30,10 @@
 				<div>
 					<div class="clearfix"
 						style="border: #d2dedf 1px solid;">
-						<div style="width:10%" class="float-left unmatchtab unhr-row">Agent Name</div>
+						<div style="width:15%" class="float-left unmatchtab unhr-row">Agent Name</div>
 						<div style="width:20%" class="float-left unmatchtab unhr-row">Transaction Email</div>
 						<div style="width:30%" class="float-left unmatchtab unhr-row">Customer</div>
-						<div style="width:20%" class="float-left unmatchtab unhr-row">Date</div>
+						<div style="width:15%" class="float-left unmatchtab unhr-row">Date</div>
 						<div style="width:20%" class="float-left unmatchtab unhr-row">Action</div>
 					</div>
 					<div id="new" ></div>
@@ -53,10 +53,10 @@
 				<div>
 					<div  class="clearfix"
 						style="border: #d2dedf 1px solid;">
-						<div style="width:10%" class="float-left unmatchtab unhr-row">Agent Name</div>
+						<div style="width:15%" class="float-left unmatchtab unhr-row">Agent Name</div>
 						<div style="width:20%" class="float-left unmatchtab unhr-row">Transaction Email</div>
 						<div style="width:30%" class="float-left unmatchtab unhr-row">Customer</div>
-						<div style="width:20%" class="float-left unmatchtab unhr-row">Date</div>
+						<div style="width:15%" class="float-left unmatchtab unhr-row">Date</div>
 						<div style="width:20%" class="float-left unmatchtab unhr-row">Action</div>
 					</div>
 					<div id="processed"></div>
@@ -99,10 +99,10 @@
 				<div>
 					<div class="clearfix"
 						style="border: #d2dedf 1px solid;">
-						<div style="width:10%" class="float-left unmatchtab unhr-row">Agent Name</div>
+						<div style="width:15%" class="float-left unmatchtab unhr-row">Agent Name</div>
 						<div style="width:20%" class="float-left unmatchtab unhr-row">Transaction Email</div>
 						<div style="width:30%" class="float-left unmatchtab unhr-row">Customer</div>
-						<div style="width:20%" class="float-left unmatchtab unhr-row">Date</div>
+						<div style="width:15%" class="float-left unmatchtab unhr-row">Date</div>
 						<div style="width:20%" class="float-left unmatchtab unhr-row">Reason</div>
 					</div>
 					<div id="corrupt" ></div>
