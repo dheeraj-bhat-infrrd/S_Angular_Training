@@ -33,8 +33,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import twitter4j.TwitterException;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -90,6 +88,7 @@ import com.realtech.socialsurvey.web.controller.SessionHelper;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 
 import facebook4j.FacebookException;
+import twitter4j.TwitterException;
 
 
 // JIRA SS-119 by RM-05 : BOC
@@ -395,6 +394,11 @@ public class SurveyManagementController
             surveyDetail.append( "<br />" ).append( "Contains abusive words : " ).append( "Yes" );
         } else {
             surveyDetail.append( "<br />" ).append( "Contains abusive words: " ).append( "No" );
+        }
+
+        surveyDetail.append( "<br />" );
+        if ( survey.getSourceId() != null && !survey.getSourceId().isEmpty() ) {
+            surveyDetail.append( "<br />" ).append( "Transaction ID: " ).append( survey.getSourceId() );
         }
 
         // update survey details with values
