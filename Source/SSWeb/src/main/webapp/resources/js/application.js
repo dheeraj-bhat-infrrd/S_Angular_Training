@@ -870,7 +870,7 @@ function paintFixSocialMedia(data){
 	}
 	
 	if(socialMedias.length == 0){
-		var noSMDiv = '<div class="clearfix"><div></div class="float-left bd-frm-left-un">No more social media to fix.</div>';
+		var noSMDiv = '<div class="clearfix"><div></div class="float-left bd-frm-left-un">Successfully connected!</div>';
 		popup += noSMDiv;
 		$('#dsh-btn0').addClass("hide");
 	}
@@ -878,7 +878,7 @@ function paintFixSocialMedia(data){
 //	e.stopPropagation();
 	$('#overlay-continue').html("");
 	$('#overlay-cancel').html("");
-	$('#overlay-header').html("Fix Social Media");
+	$('#overlay-header').html("Reconnect Social Media");
 	$('#overlay-text').html(popup);
 
 	$('#overlay-main').show();

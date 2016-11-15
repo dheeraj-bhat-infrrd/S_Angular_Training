@@ -398,7 +398,7 @@ public class SurveyManagementController
 
         surveyDetail.append( "<br />" );
         if ( survey.getSourceId() != null && !survey.getSourceId().isEmpty() ) {
-            surveyDetail.append( "<br />" ).append( "Transaction ID: " ).append( survey.getSourceId() );
+            surveyDetail.append( "<br />" ).append( "Transaction Ref Id: " ).append( survey.getSourceId() );
         }
 
         // update survey details with values
