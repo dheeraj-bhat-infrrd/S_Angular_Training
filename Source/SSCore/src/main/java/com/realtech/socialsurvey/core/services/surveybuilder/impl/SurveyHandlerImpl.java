@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -116,7 +117,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Autowired
     private UserDao userDao;
 
-
     @Autowired
     private UserProfileDao userProfileDao;
 
@@ -180,23 +180,30 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${MAX_SURVEY_REMINDER_INTERVAL}")
     private int maxSurveyReminderInterval;
 
-
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_SUBJECT}")
     String paramOrderTakeSurveySubject;
+
     @Value ( "${PARAM_ORDER_TAKE_SURVEY}")
     String paramOrderTakeSurvey;
+
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_CUSTOMER}")
     String paramOrderTakeSurveyCustomer;
+
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
+
     @Value ( "${PARAM_ORDER_SURVEY_COPLETION_MAIL}")
     String paramOrderSurveyCompletionMail;
+
     @Value ( "${PARAM_ORDER_SURVEY_COPLETION_MAIL_CUSTOM}")
     String paramOrderSurveyCompletionMailCustom;
+
     @Value ( "${PARAM_ORDER_SOCIAL_POST_REMINDER}")
     String paramOrderSocialPostReminder;
+
     @Value ( "${PARAM_ORDER_INCOMPLETE_SURVEY_REMINDER}")
     String paramOrderIncompleteSurveyReminder;
+
     @Value ( "${PARAM_ORDER_SURVEY_COMPLETION_UNPLEASANT_MAIL}")
     String paramOrderSurveyCompletionUnpleasantMail;
 
@@ -205,6 +212,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Value ( "${MASK_EMAIL_ADDRESS}")
     private String maskEmail;
+
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String applicationAdminEmail;
+
+    @Value ( "${APPLICATION_ADMIN_NAME}")
+    private String applicationAdminName;
 
     @Autowired
     private Utils utils;
@@ -3870,20 +3883,37 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public void updateSurveySourceIdInMongo()
     {
-        List<SurveyDetails> surveys = surveyDetailsDao.getAllSurveys();
+        try {
+            List<SurveyDetails> surveys = surveyDetailsDao.getAllSurveys();
 
-        List<Long> surveyPreInitiationIds = new ArrayList<Long>();
-        for ( SurveyDetails survey : surveys ) {
-            surveyPreInitiationIds.add( survey.getSurveyPreIntitiationId() );
-        }
+            List<Long> surveyPreInitiationIds = new ArrayList<Long>();
+            for ( SurveyDetails survey : surveys ) {
+                surveyPreInitiationIds.add( survey.getSurveyPreIntitiationId() );
+            }
 
-        Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
-            .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
+            Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
+                .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
 
-        for ( SurveyDetails survey : surveys ) {
-            survey.setSourceId( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null
-                ? surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId() : null );
-            surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+            for ( SurveyDetails survey : surveys ) {
+                survey.setSourceId( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null
+                    ? surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId() : null );
+                surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+            }
+            emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail,
+                "SurveySourceIdUpdater executed successfully.", "SurveySourceIdUpdater executed successfully.", null );
+        } catch ( Exception exception ) {
+            String stackTrace = ExceptionUtils.getStackTrace( exception );
+            if ( stackTrace != null )
+                stackTrace.replaceAll( "\n", "<br>" );
+            String errMsg = exception.getMessage();
+            try {
+                emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail, "SurveySourceIdUpdater failed",
+                    stackTrace + errMsg, null );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "Error in sending error mail for SurveySourceIdUpdater. " + e.getMessage() );
+            } catch ( UndeliveredEmailException e ) {
+                LOG.error( "Error in sending error mail for SurveySourceIdUpdater. " + e.getMessage() );
+            }
         }
     }
 }
