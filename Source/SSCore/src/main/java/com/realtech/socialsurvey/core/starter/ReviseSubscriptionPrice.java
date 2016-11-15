@@ -207,7 +207,6 @@ public class ReviseSubscriptionPrice
     }
 
 
-    @Transactional
     public void updateSubscriptionPriceStarterForAllCompanies()
     {
         LOG.info( "Calling price updator" );
@@ -216,8 +215,8 @@ public class ReviseSubscriptionPrice
                 CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES,
                 CommonConstants.BATCH_NAME_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES );
             this.processChargeForAllcompanies();
-            batchTrackerService
-                .updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES );
+            batchTrackerService.updateLastRunEndTimeByBatchType(
+                CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES );
         } catch ( Exception e ) {
             try {
                 batchTrackerService.updateErrorForBatchTrackerByBatchType(
@@ -235,13 +234,16 @@ public class ReviseSubscriptionPrice
     }
 
 
+    @Transactional
     public void processChargeForAllcompanies()
     {
         LOG.debug( " calling processChargeOnSubscriptionForAllcompanies() " );
         Set<Company> companies = organizationManagementService.getAllCompanies();
         for ( Company company : companies ) {
             try {
-                if ( company != null && company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty()
+                if ( company != null && company.getBillingMode() != null
+                    && company.getBillingMode().equals( CommonConstants.BILLING_MODE_AUTO )
+                    && company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty()
                     && company.getLicenseDetails().get( 0 ).getAccountsMaster()
                         .getAccountsMasterId() != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                     Map<String, Object> subscriptionResult = calculateSubscriptionAmountAndCharge( company );

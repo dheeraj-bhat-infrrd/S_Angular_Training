@@ -1407,4 +1407,7 @@ public interface OrganizationManagementService
 
 
     public void deleteCompanyHiddenNotificationRecord( CompanyHiddenNotification record );
+
+
+    public List<Company> getCompaniesByBillingModeAuto();
 }
