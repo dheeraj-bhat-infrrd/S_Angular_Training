@@ -217,7 +217,7 @@ public class ReviseSubscriptionPrice
                 CommonConstants.BATCH_NAME_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES );
             this.processChargeForAllcompanies();
             batchTrackerService
-                .getLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES );
+                .updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER_FOR_ALL_COMPANIES );
         } catch ( Exception e ) {
             try {
                 batchTrackerService.updateErrorForBatchTrackerByBatchType(
@@ -241,7 +241,9 @@ public class ReviseSubscriptionPrice
         Set<Company> companies = organizationManagementService.getAllCompanies();
         for ( Company company : companies ) {
             try {
-                if ( company != null && company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty() ) {
+                if ( company != null && company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty()
+                    && company.getLicenseDetails().get( 0 ).getAccountsMaster()
+                        .getAccountsMasterId() != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                     Map<String, Object> subscriptionResult = calculateSubscriptionAmountAndCharge( company );
                     if ( subscriptionResult != null ) {
                         boolean subscriptionStatus = (Boolean) subscriptionResult
