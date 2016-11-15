@@ -1935,7 +1935,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
                 batchBranchIdList = organizationManagementService.getBranchIdsUnderCompany( companyId, start, batchSize );
                 if ( batchBranchIdList != null && batchBranchIdList.size() > 0 ) {
                     for ( long Id : batchBranchIdList ) {
-                       OrganizationUnitSettings branchSettings =  organizationManagementService.getBranchSettings( Id ).getOrganizationUnitSettings();                       
+                        OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettings( Id )
+                            .getOrganizationUnitSettings();
                         if ( branchSettings != null && branchSettings.getCrm_info() != null ) {
                             return true;
                         }
@@ -1975,14 +1976,20 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
             LOG.error( "Company is null in getSubscriptionPriceFromBraintree." );
             throw new InvalidInputException( "Company is null in getSubscriptionPriceFromBraintree." );
         }
+
         LOG.debug( "Getting present subscription price for company: " + company.getCompany() );
         double price = 0.0;
-        String subscriptionId = company.getLicenseDetails().get( CommonConstants.INITIAL_INDEX ).getSubscriptionId();
-        Subscription subscription = gateway.subscription().find( subscriptionId );
-        if ( subscription != null ) {
-            price = subscription.getPrice().doubleValue();
+        try {
+            String subscriptionId = company.getLicenseDetails().get( CommonConstants.INITIAL_INDEX ).getSubscriptionId();
+            Subscription subscription = gateway.subscription().find( subscriptionId );
+            if ( subscription != null ) {
+                price = subscription.getPrice().doubleValue();
+            }
+            LOG.debug( "Returning price " + price + " for company " + company.getCompany() );
+        } catch ( Exception e ) {
+            throw new InvalidInputException(
+                "Error in fetching subscription from braintree for company id: " + company.getCompanyId() );
         }
-        LOG.debug( "Returning price " + price + " for company " + company.getCompany() );
         return price;
     }
 
