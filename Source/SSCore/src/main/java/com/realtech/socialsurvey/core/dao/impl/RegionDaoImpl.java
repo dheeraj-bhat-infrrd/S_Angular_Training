@@ -81,7 +81,7 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
     {
         if ( companyId <= 0 )
             throw new InvalidInputException( "Invalid company id passed in getRegionsForCompany method" );
-        LOG.info( "Method to get all regions for a company id : " + companyId + ",getRegionsForCompany() started." );
+        LOG.debug( "Method to get all regions for a company id : " + companyId + ",getRegionsForCompany() started." );
         Criteria criteria = getSession().createCriteria( Region.class );
         criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) ) );
         criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO ) );
@@ -104,11 +104,11 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
 
         List<Region> finalRegionList = new ArrayList<>();
         if ( regionIdList.size() > 0 ) {
-            LOG.info( "Fetching region settings for the fetched regions" );
+            LOG.debug( "Fetching region settings for the fetched regions" );
             List<OrganizationUnitSettings> regionSettingList = organizationUnitSettingsDao
                 .fetchOrganizationUnitSettingsForMultipleIds( regionIdList,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-            LOG.info( "Adding address, state city and zipcode info into regions" );
+            LOG.debug( "Adding address, state city and zipcode info into regions" );
             if ( regionSettingList != null && regionSettingList.size() > 0 ) {
                 for ( OrganizationUnitSettings regionSettings : regionSettingList ) {
                     if ( regionIdObjMap.get( regionSettings.getIden() ) != null ) {
@@ -124,7 +124,7 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
                 }
             }
         }
-        LOG.info( "Method to get all regions for a company id : " + companyId + ",getRegionsForCompany() finished." );
+        LOG.debug( "Method to get all regions for a company id : " + companyId + ",getRegionsForCompany() finished." );
         if ( finalRegionList.size() > 0 )
             return finalRegionList;
         else

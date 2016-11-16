@@ -96,7 +96,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     @Transactional
     public HierarchyUpload fetchUpdatedHierarchyStructure( Company company ) throws InvalidInputException
     {
-        LOG.info( "Method updateHierarchyStructure started for company : " + company.getCompany() );
+        LOG.debug( "Method updateHierarchyStructure started for company : " + company.getCompany() );
         /* 
          * 1. fetch from mongo (oldHierarchyStructure)
          * 2. If empty go to step 5
@@ -113,7 +113,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
             currentHierarchyUpload = setSourceIdsGeneratedToTrue( currentHierarchyUpload );
         }
         hierarchyUploadDao.saveHierarchyUploadObject( currentHierarchyUpload );
-        LOG.info( "Method updateHierarchyStructure finished for company : " + company.getCompany() );
+        LOG.debug( "Method updateHierarchyStructure finished for company : " + company.getCompany() );
         return currentHierarchyUpload;
     }
 
@@ -125,7 +125,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
      */
     HierarchyUpload setSourceIdsGeneratedToTrue( HierarchyUpload upload )
     {
-        LOG.info( "Method setSourceIdsGeneratedToTrue() started." );
+        LOG.debug( "Method setSourceIdsGeneratedToTrue() started." );
 
         // set region source ids generated to true
         List<RegionUploadVO> regions = upload.getRegions();
@@ -154,7 +154,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         }
         upload.setUsers( users );
 
-        LOG.info( "Method setSourceIdsGeneratedToTrue() finished." );
+        LOG.debug( "Method setSourceIdsGeneratedToTrue() finished." );
         return upload;
     }
 
@@ -169,7 +169,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     public HierarchyUpload aggregateHierarchyStructure( HierarchyUpload oldHierarchyUpload,
         HierarchyUpload currentHierarchyUpload ) throws InvalidInputException
     {
-        LOG.info( "Method to aggregate hierarchy structure started" );
+        LOG.debug( "Method to aggregate hierarchy structure started" );
         if ( oldHierarchyUpload == null ) {
             throw new InvalidInputException( "OldHierarchyUpload object is empty" );
         }
@@ -192,7 +192,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         //Compare and aggregate users
         aggregateUsersStructure( oldHierarchyUpload.getUsers(), currentHierarchyUpload.getUsers(), newHierarchyUpload );
 
-        LOG.info( "Method to aggregate hierarchy structure finished" );
+        LOG.debug( "Method to aggregate hierarchy structure finished" );
         return newHierarchyUpload;
     }
 
@@ -229,7 +229,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     public void aggregateUsersStructure( List<UserUploadVO> oldUsers, List<UserUploadVO> currentUsers,
         HierarchyUpload newHierarchyUpload )
     {
-        LOG.info( "Method to aggregate users structure started" );
+        LOG.debug( "Method to aggregate users structure started" );
         List<UserUploadVO> newUsers = new ArrayList<UserUploadVO>();
 
         Map<Long, UserUploadVO> oldUsersMap = new HashMap<Long, UserUploadVO>();
@@ -318,13 +318,13 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
             for ( UserUploadVO userUploadVO : oldUsers ) {
                 userMapping.remove( userUploadVO.getSourceUserId() );
             }
-            LOG.warn( "Some users have been deleted recently" );
+            LOG.debug( "Some users have been deleted recently" );
         }
 
         newHierarchyUpload.setUserSourceMapping( userMapping );
 
         newHierarchyUpload.setUsers( newUsers );
-        LOG.info( "Method to aggregate users structure finished" );
+        LOG.debug( "Method to aggregate users structure finished" );
     }
 
 
@@ -337,7 +337,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     public void aggregateBranchesStructure( List<BranchUploadVO> oldBranches, List<BranchUploadVO> currentBranches,
         HierarchyUpload newHierarchyUpload )
     {
-        LOG.info( "Method to aggregate branches structure started" );
+        LOG.debug( "Method to aggregate branches structure started" );
         List<BranchUploadVO> newBranches = new ArrayList<BranchUploadVO>();
 
         Map<Long, BranchUploadVO> oldBranchesMap = new HashMap<Long, BranchUploadVO>();
@@ -405,12 +405,12 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
             for ( BranchUploadVO branchUploadVO : oldBranches ) {
                 regionMapping.remove( branchUploadVO.getSourceBranchId() );
             }
-            LOG.warn( "Some branches have been deleted recently" );
+            LOG.debug( "Some branches have been deleted recently" );
         }
 
         newHierarchyUpload.setBranches( newBranches );
         newHierarchyUpload.setBranchSourceMapping( branchMapping );
-        LOG.info( "Method to aggregate branches structure finished" );
+        LOG.debug( "Method to aggregate branches structure finished" );
     }
 
 
@@ -423,7 +423,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     public void aggregateRegionsStructure( List<RegionUploadVO> oldRegions, List<RegionUploadVO> currentRegions,
         HierarchyUpload newHierarchyUpload )
     {
-        LOG.info( "Method to aggregate regions structure started" );
+        LOG.debug( "Method to aggregate regions structure started" );
         List<RegionUploadVO> newRegions = new ArrayList<RegionUploadVO>();
 
         Map<Long, RegionUploadVO> oldRegionsMap = new HashMap<Long, RegionUploadVO>();
@@ -480,12 +480,12 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
             for ( RegionUploadVO regionUploadVO : oldRegions ) {
                 regionMapping.remove( regionUploadVO.getSourceRegionId() );
             }
-            LOG.warn( "Some regions have been deleted recently" );
+            LOG.debug( "Some regions have been deleted recently" );
         }
 
         newHierarchyUpload.setRegions( newRegions );
         newHierarchyUpload.setRegionSourceMapping( regionMapping );
-        LOG.info( "Method to aggregate regions structure finished" );
+        LOG.debug( "Method to aggregate regions structure finished" );
     }
 
 
@@ -554,7 +554,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         Map<Long, BranchUploadVO> branchMap, HierarchyUpload oldHierarchyUpload, HierarchyUpload currentHierarchyUpload )
         throws InvalidInputException
     {
-        LOG.info( "Method to generate user upload VOs for company : " + company.getCompany() + " started" );
+        LOG.debug( "Method to generate user upload VOs for company : " + company.getCompany() + " started" );
         List<UserUploadVO> userVOs = new ArrayList<UserUploadVO>();
 
         Map<Long, String> oldSourceMap = null;
@@ -593,7 +593,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         } while ( batchUserList != null && batchUserList.size() == BATCH_SIZE );
         currentHierarchyUpload.setUserSourceMapping( newSourceMap );
 
-        LOG.info( "Method to generate user upload VOs for company : " + company.getCompany() + " finished" );
+        LOG.debug( "Method to generate user upload VOs for company : " + company.getCompany() + " finished" );
         return userVOs;
     }
 
@@ -611,7 +611,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         if ( user == null ) {
             throw new InvalidInputException( "User is null" );
         }
-        LOG.info( "Method to get user upload VO for user : " + user.getUsername() + " started" );
+        LOG.debug( "Method to get user upload VO for user : " + user.getUsername() + " started" );
 
         //Get userSettings
         AgentSettings agentSettings;
@@ -737,7 +737,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
             userUploadVO.setUserVerified( true );
         }
 
-        LOG.info( "Method to get user upload VO for user : " + user.getUsername() + " finished" );
+        LOG.debug( "Method to get user upload VO for user : " + user.getUsername() + " finished" );
         return userUploadVO;
     }
 
@@ -752,7 +752,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         HierarchyUpload currentHierarchyUpload, Map<Long, RegionUploadVO> regionMap ) throws InvalidInputException
     {
 
-        LOG.info( "Method to generate branch upload VOs for company : " + company.getCompany() + " started" );
+        LOG.debug( "Method to generate branch upload VOs for company : " + company.getCompany() + " started" );
         List<BranchUploadVO> branchVOs = new ArrayList<BranchUploadVO>();
 
         Map<Long, String> oldSourceMap = null;
@@ -785,7 +785,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         } while ( batchBranchList != null && batchBranchList.size() == BATCH_SIZE );
         currentHierarchyUpload.setBranchSourceMapping( newSourceMap );
 
-        LOG.info( "Method to generate branch upload VOs for company : " + company.getCompany() + " finished" );
+        LOG.debug( "Method to generate branch upload VOs for company : " + company.getCompany() + " finished" );
         return branchVOs;
     }
 
@@ -802,7 +802,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         if ( branch == null ) {
             throw new InvalidInputException( "Branch is null" );
         }
-        LOG.info( "Method to get branch upload VO for branch : " + branch.getBranch() + " started" );
+        LOG.debug( "Method to get branch upload VO for branch : " + branch.getBranch() + " started" );
 
         //Get branchSettings
         OrganizationUnitSettings branchSettings;
@@ -861,7 +861,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         }
 
 
-        LOG.info( "Method to get branch upload VO for branch : " + branch.getBranch() + " finished" );
+        LOG.debug( "Method to get branch upload VO for branch : " + branch.getBranch() + " finished" );
         return branchUploadVO;
     }
 
@@ -876,7 +876,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     public List<RegionUploadVO> generateRegionUploadVOsForCompany( Company company, HierarchyUpload oldHierarchyUpload,
         HierarchyUpload currentHierarchyUpload ) throws InvalidInputException
     {
-        LOG.info( "Method to generate region upload VOs for comapny : " + company.getCompany() + " started" );
+        LOG.debug( "Method to generate region upload VOs for comapny : " + company.getCompany() + " started" );
         List<RegionUploadVO> regionVOs = new ArrayList<RegionUploadVO>();
 
         //if oldHierarchyUpload is not null, generate a revMap and send it in getRegionUploadVOForRegion
@@ -908,7 +908,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         } while ( batchRegionList != null && batchRegionList.size() == BATCH_SIZE );
         currentHierarchyUpload.setRegionSourceMapping( newSourceMap );
 
-        LOG.info( "Method to generate region upload VOs for comapny : " + company.getCompany() + " finished" );
+        LOG.debug( "Method to generate region upload VOs for comapny : " + company.getCompany() + " finished" );
         return regionVOs;
     }
 
@@ -925,7 +925,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         if ( region == null ) {
             throw new InvalidInputException( "Region is null" );
         }
-        LOG.info( "Method to get region upload VO for region : " + region.getRegion() + " started" );
+        LOG.debug( "Method to get region upload VO for region : " + region.getRegion() + " started" );
 
         //Get regionSettings
         OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( region.getRegionId() );
@@ -988,7 +988,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
 
         }
 
-        LOG.info( "Method to get region upload VO for region : " + region.getRegion() + " finished" );
+        LOG.debug( "Method to get region upload VO for region : " + region.getRegion() + " finished" );
         return regionUploadVO;
     }
 
