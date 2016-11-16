@@ -1216,7 +1216,7 @@ public interface CommonConstants
     public static final String LONEWOLF_QUERY_PARAM_$SKIP = "$skip";
 
     public static final String LONEWOLF_QUERY_PARAM_ORDERBY_VALUE = "CloseDate+desc";
-    public static final int LONEWOLF_TRANSACTION_API_BATCH_SIZE = 200;
+    public static final int LONEWOLF_TRANSACTION_API_BATCH_SIZE = 50;
 
     //Update Social Media From Email
     public static final String SOCIAL_AUTH_FROM_EMAIL_URL = "rest/socialauthfromemail.do";
