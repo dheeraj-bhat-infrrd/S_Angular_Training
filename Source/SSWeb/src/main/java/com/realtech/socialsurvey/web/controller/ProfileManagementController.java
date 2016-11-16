@@ -43,7 +43,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
-import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -182,9 +181,6 @@ public class ProfileManagementController
 
     @Autowired
     private SettingsManager settingsManager;
-
-    @Autowired
-    private SocialPostDao socialPostDao;
 
 
     @Transactional
@@ -4285,6 +4281,9 @@ public class ProfileManagementController
 
         String patternFirst = request.getParameter( "find-pro-first-name" );
         String patternLast = request.getParameter( "find-pro-last-name" );
+        String companyProfileName = request.getParameter( "find-pro-profile-name" );
+
+        model.addAttribute( "findProCompanyProfileName", companyProfileName );
 
         if ( patternFirst == null && patternLast == null ) {
             LOG.error( "Invalid search key passed in method findAProfile()." );
@@ -4319,7 +4318,7 @@ public class ProfileManagementController
 
                 try {
                     SolrDocumentList results = solrSearchService.searchUsersByFirstOrLastName( patternFirst.trim(),
-                        patternLast.trim(), startIndex, batchSize );
+                        patternLast.trim(), startIndex, batchSize, companyProfileName );
                     for ( SolrDocument solrDocument : results ) {
                         userIds.add( (Long) solrDocument.getFieldValue( "userId" ) );
                     }
@@ -4358,6 +4357,7 @@ public class ProfileManagementController
         try {
             String patternFirst = request.getParameter( "find-pro-first-name" );
             String patternLast = request.getParameter( "find-pro-last-name" );
+            String companyProfileName = request.getParameter( "find-pro-profile-name" );
 
             if ( patternFirst == null && patternLast == null ) {
                 LOG.error( "Invalid search key passed in method findAProfileScroll()." );
@@ -4386,8 +4386,9 @@ public class ProfileManagementController
             }
 
             try {
-                SolrDocumentList results = solrSearchService.searchUsersByFirstOrLastName( patternFirst.trim(),
-                    patternLast.trim(), startIndex, batchSize );
+                SolrDocumentList results;
+                results = solrSearchService.searchUsersByFirstOrLastName( patternFirst.trim(), patternLast.trim(), startIndex,
+                    batchSize, companyProfileName );
                 for ( SolrDocument solrDocument : results ) {
                     userIds.add( (Long) solrDocument.getFieldValue( "userId" ) );
                 }

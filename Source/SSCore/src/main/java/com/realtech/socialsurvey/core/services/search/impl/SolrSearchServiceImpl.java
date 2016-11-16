@@ -57,6 +57,7 @@ import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -612,8 +613,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
      * Method to search for users given their first and/or last name
      */
     @Override
-    public SolrDocumentList searchUsersByFirstOrLastName( String patternFirst, String patternLast, int startIndex,
-        int noOfRows ) throws InvalidInputException, SolrException, MalformedURLException
+    public SolrDocumentList searchUsersByFirstOrLastName( String patternFirst, String patternLast, int startIndex, int noOfRows,
+        String companyProfileName ) throws InvalidInputException, SolrException, MalformedURLException
     {
         LOG.info( "Method searchUsersByFirstOrLastName() called for pattern :" + patternFirst + ", " + patternLast );
         if ( patternFirst == null && patternLast == null ) {
@@ -664,6 +665,18 @@ public class SolrSearchServiceImpl implements SolrSearchService
             solrQuery.addFilterQuery( "-" + CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR + ":" + true );
             solrQuery.setStart( startIndex );
             solrQuery.setRows( noOfRows );
+
+            if ( companyProfileName != null ) {
+                OrganizationUnitSettings companyProfile = null;
+                try {
+                    companyProfile = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.error( "Company profile not found with profile name: " + companyProfileName );
+                }
+                if ( companyProfile != null ) {
+                    solrQuery.addFilterQuery( CommonConstants.COMPANY_ID_SOLR + ":" + companyProfile.getIden() );
+                }
+            }
 
             LOG.debug( "Querying solr for searching users" );
             SolrServer solrServer = new HttpSolrServer( solrUserUrl );
