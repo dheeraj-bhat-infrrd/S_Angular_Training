@@ -3884,21 +3884,32 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void updateSurveySourceIdInMongo()
     {
         try {
-            List<SurveyDetails> surveys = surveyDetailsDao.getAllSurveys();
+            emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail,
+                "SurveySourceIdUpdater started successfully.", "SurveySourceIdUpdater started successfully.", null );
+            int batch = 500;
+            int count = 0;
+            List<SurveyDetails> surveys = null;
+            do {
+                surveys = surveyDetailsDao.getAllSurveys( count, batch );
 
-            List<Long> surveyPreInitiationIds = new ArrayList<Long>();
-            for ( SurveyDetails survey : surveys ) {
-                surveyPreInitiationIds.add( survey.getSurveyPreIntitiationId() );
-            }
+                List<Long> surveyPreInitiationIds = new ArrayList<Long>();
+                for ( SurveyDetails survey : surveys ) {
+                    surveyPreInitiationIds.add( survey.getSurveyPreIntitiationId() );
+                }
 
-            Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
-                .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
+                Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
+                    .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
 
-            for ( SurveyDetails survey : surveys ) {
-                survey.setSourceId( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null
-                    ? surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId() : null );
-                surveyDetailsDao.updateSurveySourceIdInMongo( survey );
-            }
+                for ( SurveyDetails survey : surveys ) {
+                    if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
+                        String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
+                        if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) )
+                            survey.setSourceId( sourceId );
+                        surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+                    }
+                }
+                count = count + surveys.size();
+            } while ( batch == surveys.size() );
             emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail,
                 "SurveySourceIdUpdater executed successfully.", "SurveySourceIdUpdater executed successfully.", null );
         } catch ( Exception exception ) {
