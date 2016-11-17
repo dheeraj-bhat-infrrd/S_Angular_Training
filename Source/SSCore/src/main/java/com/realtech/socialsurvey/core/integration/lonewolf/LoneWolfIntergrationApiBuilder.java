@@ -1,18 +1,14 @@
 package com.realtech.socialsurvey.core.integration.lonewolf;
 
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.realtech.socialsurvey.core.integration.pos.errorhandlers.LoneWolfHttpErrorHandler;
-import com.squareup.okhttp.OkHttpClient;
-
 import retrofit.RestAdapter;
-import retrofit.client.OkClient;
+
+import com.realtech.socialsurvey.core.integration.pos.errorhandlers.LoneWolfHttpErrorHandler;
 
 
 @Component
@@ -48,14 +44,9 @@ public class LoneWolfIntergrationApiBuilder implements InitializingBean
     @Override
     public void afterPropertiesSet() throws Exception
     {
-        
-        final OkHttpClient okHttpClient = new OkHttpClient();
-        okHttpClient.setReadTimeout(120, TimeUnit.SECONDS);
-        okHttpClient.setConnectTimeout(120, TimeUnit.SECONDS);
-        
-        LOG.info( "Initialising rest builder" );
+
         RestAdapter loneWolfAdapter = new RestAdapter.Builder().setLogLevel( RestAdapter.LogLevel.FULL )
-            .setClient(new OkClient(okHttpClient)).setEndpoint( loneWolfEndpoint ).setErrorHandler( new LoneWolfHttpErrorHandler() ).build();
+            .setEndpoint( loneWolfEndpoint ).setErrorHandler( new LoneWolfHttpErrorHandler() ).build();
         loneWolfIntegrationApi = loneWolfAdapter.create( LoneWolfIntegrationApi.class );
     }
 }

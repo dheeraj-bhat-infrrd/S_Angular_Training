@@ -495,8 +495,9 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
      * @param apiToken
      * @param clientCode
      * @return
+     * @throws InvalidInputException 
      */
-    private Map<String, LoneWolfMember> fetchLoneWolfMembersDataMap( String secretKey, String apiToken, String clientCode )
+    private Map<String, LoneWolfMember> fetchLoneWolfMembersDataMap( String secretKey, String apiToken, String clientCode ) throws InvalidInputException
     {
         LOG.info( "method fetchLoneWolfMembersDataMap started " );
         List<LoneWolfMember> members = loneWolfIntegrationService.fetchLoneWolfMembersData( secretKey, apiToken, clientCode );
