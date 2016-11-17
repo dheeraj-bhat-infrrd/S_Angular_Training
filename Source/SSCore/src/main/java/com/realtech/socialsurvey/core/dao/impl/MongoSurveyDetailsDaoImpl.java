@@ -3101,6 +3101,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( rows > -1 ) {
             query.limit( rows );
         }
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne(  "Zillow" ) );
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
 
         return surveys;

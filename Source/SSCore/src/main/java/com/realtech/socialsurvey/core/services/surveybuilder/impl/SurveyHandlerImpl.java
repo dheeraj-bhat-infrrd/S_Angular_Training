@@ -3886,7 +3886,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         try {
             emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail,
                 "SurveySourceIdUpdater started successfully.", "SurveySourceIdUpdater started successfully.", null );
-            int batch = 1000;
+            int batch = 500;
             int count = 0;
             List<SurveyDetails> surveys = null;
             do {
@@ -3901,9 +3901,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
 
                 for ( SurveyDetails survey : surveys ) {
-                    survey.setSourceId( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null
-                        ? surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId() : null );
-                    surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+                    if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
+                        String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
+                        if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) )
+                            survey.setSourceId( sourceId );
+                        surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+                    }
                 }
                 count = count + surveys.size();
             } while ( batch == surveys.size() );
