@@ -1825,6 +1825,8 @@ public class UserManagementController
                 userManagementService.updatePrimaryProfileOfUser( updatedUser );
                 updatedUser = userManagementService.getUserByUserId( updatedUser.getUserId() );
                 userManagementService.updateUserInSolr( updatedUser );
+                
+                userManagementService.updateUserCountModificationNotification( updatedUser.getCompany() );
 
                 if ( user.getUserId() == updatedUser.getUserId() ) {
                     try {

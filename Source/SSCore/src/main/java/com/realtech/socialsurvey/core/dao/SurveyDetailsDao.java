@@ -329,4 +329,9 @@ public interface SurveyDetailsDao
 
     public Map<Long, Long> getThirdPartyReviewsCountForAllUsersOfCompany( long companyId );
 
+
+    public List<SurveyDetails> getAllSurveys();
+
+
+    public void updateSurveySourceIdInMongo( SurveyDetails survey );
 }

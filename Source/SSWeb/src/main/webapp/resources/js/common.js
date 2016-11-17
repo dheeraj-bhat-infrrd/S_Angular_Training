@@ -721,6 +721,22 @@ function openAuthPageDashboard(socialNetwork, columnName, columnValue) {
 				"width=800,height=600,scrollbars=yes");
 	});
 }
+
+function openAuthPageFixSocialMedia(socialNetwork, columnName, columnValue) {
+	//check if user is autologged in
+	if($('#pro-cmplt-stars').attr('data-autologin') == 'true') {
+		$('#overlay-toast').html('Insufficient permission to connect to ' + socialNetwork);
+		showToast();
+		return;
+	}
+	
+		window.open("./socialauth.do?social=" + socialNetwork + "&columnName="
+				+ columnName + "&columnValue=" + columnValue + "&isFixSocialMedia=true" , "Authorization Page",
+				"width=800,height=600,scrollbars=yes");
+	
+}
+
+
 function openAuthPageDashboardZillow(disableEle){
 	callAjaxGET("/socialauth.do?social=zillow", function(data) {
 		createZillowProfileUrlPopup( data);

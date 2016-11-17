@@ -3089,4 +3089,26 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
         return thirdPartyReviewsByAgentId;
     }
+
+
+    @Override
+    public List<SurveyDetails> getAllSurveys()
+    {
+        List<SurveyDetails> surveys = mongoTemplate.findAll( SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        if ( surveys == null || surveys.size() == 0 )
+            return null;
+        return surveys;
+    }
+
+
+    @Override
+    public void updateSurveySourceIdInMongo( SurveyDetails survey )
+    {
+        Query query = new Query();
+        query.addCriteria(
+            Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN ).is( survey.getSurveyPreIntitiationId() ) );
+        Update update = new Update();
+        update.set( CommonConstants.SURVEY_SOURCE_ID_COLUMN, survey.getSourceId() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+    }
 }

@@ -285,26 +285,26 @@ public class WorkbookData
         }
         Integer counter = 1;
         Map<Integer, List<Object>> data = new TreeMap<>();
-        
-        
+
+
         //get the branches and regions for company
         Map<Long, Branch> branchesForCompany = new HashMap<Long, Branch>();
         Map<Long, Region> regionsForCompany = new HashMap<Long, Region>();
-        
+
         List<Region> regionList = regionDao.getRegionsForCompany( companyId, -1, -1 );
         List<Branch> branchList = branchDao.getBranchesForCompany( companyId, CommonConstants.IS_DEFAULT_BY_SYSTEM_NO, -1, -1 );
-        for(Region region : regionList){
-            if(region != null)
+        for ( Region region : regionList ) {
+            if ( region != null )
                 regionsForCompany.put( region.getRegionId(), region );
         }
-        for(Branch branch : branchList){
-            if(branch != null)
+        for ( Branch branch : branchList ) {
+            if ( branch != null )
                 branchesForCompany.put( branch.getBranchId(), branch );
         }
-        
+
         //create list of objects to populate
         List<Object> surveyDetailsToPopulate = new ArrayList<>();
-        
+
         for ( SurveyDetails survey : surveyDetails ) {
             if ( survey.getSurveyResponse() != null ) {
                 String agentName = survey.getAgentName();
@@ -323,6 +323,11 @@ public class WorkbookData
                         surveyDetailsToPopulate.add( survey.getSource() );
                 } else {
                     surveyDetailsToPopulate.add( MongoSocialPostDaoImpl.KEY_SOURCE_SS );
+                }
+                if ( survey.getSourceId() != null && !survey.getSourceId().isEmpty() ) {
+                    surveyDetailsToPopulate.add( survey.getSourceId() );
+                } else {
+                    surveyDetailsToPopulate.add( "" );
                 }
 
                 //add score
@@ -347,7 +352,7 @@ public class WorkbookData
                 } else {
                     surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
                 }
-                
+
                 if ( survey.getSocialMediaPostDetails() != null ) {
                     //for company
                     Set<String> companySocialMedia = new HashSet<>();
@@ -377,7 +382,9 @@ public class WorkbookData
                             //get region
                             Region region = regionsForCompany.get( regionMediaDetail.getRegionId() );
                             //get shared on for region
-                            if ( regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty() && region != null && region.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                            if ( regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty()
+                                && region != null
+                                && region.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
                                 regionShared += region.getRegion() + ": { "
                                     + StringUtils.join( regionMediaDetail.getSharedOn(), "," ) + " }, ";
                             }
@@ -396,7 +403,9 @@ public class WorkbookData
                             //get branch
                             Branch branch = branchesForCompany.get( branchMediaDetail.getBranchId() );
                             //get shared on for region
-                            if ( branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty() && branch != null && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO) {
+                            if ( branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty()
+                                && branch != null
+                                && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
                                 branchShared += branch.getBranch() + ": { "
                                     + StringUtils.join( branchMediaDetail.getSharedOn(), "," ) + "}, ";
                             }
@@ -440,6 +449,7 @@ public class WorkbookData
                         .add( Days.daysBetween( new DateTime( survey.getCreatedOn() ), new DateTime( survey.getModifiedOn() ) )
                             .getDays() );
                     surveyDetailsToPopulate.add( survey.getSource() );
+                    surveyDetailsToPopulate.add( survey.getSourceId() );
 
                     //add score
                     surveyDetailsToPopulate.add( surveyHandler.getFormattedSurveyScore( survey.getScore() ) );
@@ -507,6 +517,7 @@ public class WorkbookData
         surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_COMPLETED_DATE );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_TIME_INTERVAL );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_SOURCE );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_SOURCE_ID );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_SCORE );
         for ( counter = 1; counter <= max; counter++ ) {
             surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_QUESTION + counter );
