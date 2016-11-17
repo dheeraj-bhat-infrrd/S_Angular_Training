@@ -120,7 +120,7 @@ public interface SolrSearchService
      * @throws UnsupportedEncodingException
      */
     public SolrDocumentList searchUsersByFirstOrLastName( String patternFirst, String patternLast, int startIndex,
-        int noOfRows ) throws InvalidInputException, SolrException, MalformedURLException;
+        int noOfRows, String companyProfileName ) throws InvalidInputException, SolrException, MalformedURLException;
 
 
     public SolrDocumentList searchUsersByCompany( long companyId, int startIndex, int noOfRows )

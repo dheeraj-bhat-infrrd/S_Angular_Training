@@ -408,6 +408,18 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	<bean id="surveysourceidupdater"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.SurveySourceIdUpdater" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
@@ -622,6 +634,13 @@
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
 	</bean>
+	
+	<bean id="surveysourceidupdatercron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="surveysourceidupdater" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="2000" />
+	</bean>
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -654,7 +673,8 @@
 				<!-- <ref bean="remaxEntitiesTransfer" /> -->
 				<ref bean="hideUsersFromSearch" />
 				<ref bean="updateExistingCompanyPrice" />
-				<ref bean="hideUsersFromSearch" />				
+				<ref bean="hideUsersFromSearch" />	
+				<ref bean="surveysourceidupdater" />			
 			</list>
 		</property>
 
@@ -689,6 +709,7 @@
 				<ref bean="hideUsersFromSearchcron" />
 				<ref bean="updateExistingCompanyPricecron" />
 				<ref bean="hideUsersFromSearchcron" />
+				<ref bean="surveysourceidupdatercron" />
 			</list>
 		</property>
 		<property name="quartzProperties">

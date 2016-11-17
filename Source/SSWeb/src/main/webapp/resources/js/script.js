@@ -22,6 +22,7 @@ var stateList; // usStateList
 var cityLookupList; // cityLookupList
 var phoneFormat = '(ddd) ddd-dddd'; // defualt phone format
 var selectedCountryRegEx = "";
+var findProCompanyProfileName;
 
 function getPhoneNumber(phoneId) {
 	var countryData = $('#' + phoneId).intlTelInput("getSelectedCountryData");
@@ -1710,6 +1711,9 @@ function fetchUsers(newIndex) {
 		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
 		formData.append("find-pro-start-index", newIndex);
 		formData.append("find-pro-row-size", rowSize);
+		if(findProCompanyProfileName != undefined ){
+			formData.append("find-pro-profile-name", findProCompanyProfileName);
+		}
 
 		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
 			callAjaxPOSTWithTextData("./findaproscroll.do", paginateUsersProList, true, formData);
@@ -2429,7 +2433,9 @@ function paintUnmatchedUser(usersList) {
 		if (usersSize > 0) {
 			usersList.surveyPreInitiationList.forEach(function(arrayItem) {
 
-				untrack += '<div class="un-row">' + '						<div style="width:10%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:20%" class="float-left unmatchtab ss-date" title="' + undefinedval(arrayItem.engagementClosedTime) + '">' + undefinedval(arrayItem.engagementClosedTime) + '</div>' + '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>' + '						</div>';
+				var engagementClosedate = new Date(arrayItem.engagementClosedTime);
+				var engagementClosedatePart = engagementClosedate.toDateString();
+				untrack += '<div class="un-row">' + '						<div style="width:15%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:15%" class="float-left unmatchtab ss-date" title="' + undefinedval(engagementClosedatePart) + '">' + undefinedval(engagementClosedatePart) + '</div>' + '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>' + '						</div>';
 
 			});
 
@@ -2446,8 +2452,9 @@ function paintCorruptRecords(usersList) {
 		var untrack = "";
 		if (usersSize > 0) {
 			usersList.surveyPreInitiationList.forEach(function(arrayItem) {
-
-				untrack += '<div class="un-row">' + '						<div style="width:10%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:20%" class="float-left unmatchtab ss-date" title="' + undefinedval(arrayItem.engagementClosedTime) + '">' + undefinedval(arrayItem.engagementClosedTime) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-date" title="' + undefinedval(arrayItem.errorCodeDescription) + '">' + undefinedval(arrayItem.errorCodeDescription) + '</div></div>';
+				var engagementClosedate = new Date(arrayItem.engagementClosedTime);
+				var engagementClosedatePart = engagementClosedate.toDateString();
+				untrack += '<div class="un-row">' + '						<div style="width:15%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:15%" class="float-left unmatchtab ss-date" title="' + undefinedval(engagementClosedatePart) + '">' + undefinedval(engagementClosedatePart) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-date" title="' + undefinedval(arrayItem.errorCodeDescription) + '">' + undefinedval(arrayItem.errorCodeDescription) + '</div></div>';
 			});
 
 			$('#corrupt').html(untrack);
@@ -2469,7 +2476,10 @@ function paintProcessedUser(usersList) {
 					if (arrayItem.user != undefined && arrayItem.user.loginName != undefined && arrayItem.user.loginName != "")
 						action += "<br><span title=" + arrayItem.user.loginName + ">" + arrayItem.user.loginName + "</span> "
 				}
-				unprocess += '<div class="un-row">' + '						<div style="width:10%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:20%" class="float-left unmatchtab ss-date" title="' + undefinedval(arrayItem.engagementClosedTime) + '">' + undefinedval(arrayItem.engagementClosedTime) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab" >' + action + '</div>' + '						</div>';
+				
+				var engagementClosedate = new Date(arrayItem.engagementClosedTime);
+				var engagementClosedatePart = engagementClosedate.toDateString();
+				unprocess += '<div class="un-row">' + '						<div style="width:15%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:15%" class="float-left unmatchtab ss-date" title="' + undefinedval(engagementClosedatePart) + '">' + undefinedval(engagementClosedatePart) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab" >' + action + '</div>' + '						</div>';
 
 			});
 

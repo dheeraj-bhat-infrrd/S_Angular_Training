@@ -163,7 +163,7 @@ public class SolrSearchServiceImplTest
     public void testSearchUsersByLoginNameOrNameForNullFirstAndLastName() throws InvalidInputException, SolrException,
         MalformedURLException
     {
-        solrSearchServiceImpl.searchUsersByFirstOrLastName( null, null, 0, 5 );
+        solrSearchServiceImpl.searchUsersByFirstOrLastName( null, null, 0, 5, null );
     }
 
 

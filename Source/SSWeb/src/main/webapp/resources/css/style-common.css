@@ -8066,6 +8066,11 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	cursor: pointer;
 }
 
+
+.enc-state-text-blue {
+    color: #00669B !important;
+}
+
 .sq-btn-post-social-btn {
 	margin: 10px auto;
 	display: block;
@@ -8696,7 +8701,7 @@ label.url-change-input-label {
 }
 
 .clasfction-code-txt {
-	width: 25px;
+	width: 2oopx;
     padding: 0 7px;
     height: 22px;
     line-height: 23px;
@@ -9046,3 +9051,6 @@ ul.accordion li>a:before {
     white-space: nowrap;
 }
 
+.classification-code-wrapper {
+	width: 650px !important;
+}

@@ -173,6 +173,7 @@ public class ProfileViewController
         model.addAttribute( "profile", companyProfile );
         model.addAttribute( "companyProfileName", profileName );
         model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY );
+        model.addAttribute( "findProCompanyProfileName", companyProfile.getProfileName() );
 
         LOG.info( "Service to initiate company profile page executed successfully" );
         if ( isBotRequest ) {
@@ -302,6 +303,7 @@ public class ProfileViewController
         model.addAttribute( "companyProfileName", companyProfileName );
         model.addAttribute( "regionProfileName", regionProfileName );
         model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_REGION );
+        model.addAttribute( "findProCompanyProfileName", companyProfile.getProfileName() );
 
         LOG.info( "Service to initiate region profile page executed successfully" );
         if ( isBotRequest ) {
@@ -437,6 +439,7 @@ public class ProfileViewController
         model.addAttribute( "companyProfileName", companyProfileName );
         model.addAttribute( "branchProfileName", branchProfileName );
         model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH );
+        model.addAttribute( "findProCompanyProfileName", companyProfile.getProfileName() );
 
         LOG.info( "Service to initiate branch profile page executed successfully" );
         if ( isBotRequest ) {
@@ -540,6 +543,8 @@ public class ProfileViewController
                     && companyProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) {
                     throw new ProfileNotFoundException( "Unable to find company profile for profile name " + agentProfileName );
                 }
+
+                model.addAttribute( "findProCompanyProfileName", companyProfile.getProfileName() );
 
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
                 if ( regionProfile == null || ( regionProfile.getStatus() != null

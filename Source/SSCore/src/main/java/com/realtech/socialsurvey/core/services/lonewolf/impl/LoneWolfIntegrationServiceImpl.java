@@ -1,7 +1,5 @@
 package com.realtech.socialsurvey.core.services.lonewolf.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +60,6 @@ public class LoneWolfIntegrationServiceImpl implements LoneWolfIntegrationServic
         String responseString = transactionResponse != null ? new String(
             ( (TypedByteArray) transactionResponse.getBody() ).getBytes() ) : null;
             
-      //  LOG.info( "Response string is" + responseString );    
 
         List<LoneWolfTransaction> loneWolfTransactions = responseString != null ? (List<LoneWolfTransaction>) new Gson()
             .fromJson( responseString, new TypeToken<List<LoneWolfTransaction>>() {}.getType() ) : null;

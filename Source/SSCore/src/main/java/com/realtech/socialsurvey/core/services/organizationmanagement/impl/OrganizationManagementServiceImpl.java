@@ -7866,5 +7866,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "updated the company hidden notification record." );
     }
 
+    @Override
+    @Transactional
+    public List<Company> getCompaniesByBillingModeAuto()
+    {
+        List<Company> companyList = companyDao.getCompaniesByBillingModeAuto();
+        return companyList;
+    }
 }
 // JIRA: SS-27: By RM05: EOC

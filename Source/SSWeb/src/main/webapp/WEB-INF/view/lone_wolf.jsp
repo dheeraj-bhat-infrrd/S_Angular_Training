@@ -47,7 +47,7 @@
 					
 					<div id="classification-div" class="hide col-sm-12 clearfix um-panel-item en-botttom-padding margin-left-20">
 						<div class="classification-text"> Classification : Send survey to :</div>
-						<div id="classification-list-wrapper" class="hm-item-row item-row-OR clearfix float-left">
+						<div id="classification-list-wrapper" class="hm-item-row item-row-OR clearfix float-left classification-code-wrapper">
 							
 						</div>
 					</div>
@@ -55,6 +55,7 @@
 					
 					<div class="encompass-btn clearfix">
 						<div>
+							<div id="lone-dry-cancel" class="float-left enc-state-icon enc-state-text-blue cursor-pointer hide" style="display: none;">Cancel</div>
 							<div id="lone-get-classification" class="float-left enc-state-icon cursor-pointer">Get Classification</div>
 							<div id="lone-data-save" class="hide float-left enc-state-icon cursor-pointer">Save</div>
 							<div id="lone-dry-enable" class="float-left enc-state-icon cursor-pointer hide" style="display: none;">Enable</div>

@@ -62,6 +62,7 @@
 <meta http-equiv="cache-control" content="max-age=0" />
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />
+<meta property=”og:image” content=”${profile.profileImageUrlThumbnail}” />
 <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
 	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
@@ -222,7 +223,8 @@
 								type="text" placeholder="Last Name">
 						</div>
 						<!-- <input id="find-pro-start-index" name="find-pro-start-index" type="hidden" value="0">
-					<input id="find-pro-row-size" name="find-pro-row-size" type="hidden" value="10"> -->
+					<input id="find-pro-row-size" name="find-pro-row-size" type="hidden" value="10"> --> 
+					<input id="find-pro-profile-name" name="find-pro-profile-name" type="hidden" value="${findProCompanyProfileName}">
 						<input id="find-pro-submit" type="button"
 							class="float-left prof-submit-btn" value="Search">
 					</form>

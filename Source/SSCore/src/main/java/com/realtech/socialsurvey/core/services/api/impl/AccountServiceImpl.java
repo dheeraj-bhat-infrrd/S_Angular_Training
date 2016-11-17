@@ -537,7 +537,8 @@ public class AccountServiceImpl implements AccountService
         String additionalEmailBody = null;
         if ( planId < Plan.ENTERPRISE.getPlanId() ) {
             // pass the company and nonce to make a payment. Get the subscription id and insert into license table.
-            String subscriptionId = payment.subscribeForCompany( company, nonce, planId, cardHolderName );
+            String subscriptionId = payment.subscribeForCompany( company, nonce, getPlanById( planId ).getLevel(),
+                cardHolderName );
 
             // insert into License Details table
             payment.insertIntoLicenseTable( getPlanById( planId ).getLevel(), user, subscriptionId );
