@@ -2818,6 +2818,14 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         for ( ZillowTempPost zillowTempPost : zillowTempPostList ) {
                             try {
                                 if ( zillowTempPost != null ) {
+                                    
+                                    //TODO : remove this . Temporary fix for Zillow review URl
+                                    if(StringUtils.isEmpty( zillowTempPost.getZillowReviewUrl() ) ) {
+                                        zillowTempPost.setZillowReviewUrl( zillowTempPost.getZillowReviewSourceLink() );
+                                    }
+                                        
+                                    
+                                    
                                     // change this to support another units in hierarchy
                                     OrganizationUnitSettings agentSetting = agentIdSettingsMap.get( zillowTempPost
                                         .getEntityId() );
