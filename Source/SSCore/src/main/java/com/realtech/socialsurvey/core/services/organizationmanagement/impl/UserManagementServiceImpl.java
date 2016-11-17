@@ -1079,7 +1079,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public User getUserByUserId( long userId ) throws InvalidInputException
     {
-        LOG.info( "Method to find user on the basis of user id started for user id " + userId );
+        LOG.debug( "Method to find user on the basis of user id started for user id " + userId );
         User user = null;
         user = userDao.findById( User.class, userId );
         if ( user == null ) {
@@ -1092,7 +1092,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         user.setProfileName( agentSettings.getProfileName() );
         user.setProfileUrl( agentSettings.getProfileUrl() );
 
-        LOG.info( "Method to find user on the basis of user id finished for user id " + userId );
+        LOG.debug( "Method to find user on the basis of user id finished for user id " + userId );
         return user;
     }
 
