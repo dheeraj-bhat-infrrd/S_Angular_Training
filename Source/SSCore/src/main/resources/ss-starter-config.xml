@@ -671,8 +671,8 @@
 				<ref bean="zillowreviewprocessandautopostjobdetail" />
 				<ref bean="surveyimporterjobdetail" />
 				<!-- <ref bean="remaxEntitiesTransfer" /> -->
-				<ref bean="updateExistingCompanyPrice" />
-				<ref bean="hideUsersFromSearch" />	
+				<!-- <ref bean="updateExistingCompanyPrice" /> -->
+				<!-- <ref bean="hideUsersFromSearch" />	-->
 				<ref bean="surveysourceidupdater" />			
 			</list>
 		</property>
@@ -705,8 +705,8 @@
 				<ref bean="zillowreviewprocessandautopostcron" />
 				<ref bean="surveyimportercron" />
 				<!-- <ref bean="remaxEntitiesTransfercron" /> -->
-				<ref bean="updateExistingCompanyPricecron" />
-				<ref bean="hideUsersFromSearchcron" />
+				<!-- <ref bean="updateExistingCompanyPricecron" /> -->
+				<!-- <ref bean="hideUsersFromSearchcron" /> -->
 				<ref bean="surveysourceidupdatercron" />
 			</list>
 		</property>
