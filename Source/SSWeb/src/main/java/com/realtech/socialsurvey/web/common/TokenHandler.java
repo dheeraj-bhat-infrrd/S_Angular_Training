@@ -30,6 +30,10 @@ public class TokenHandler
         mediaTokens.getLinkedInToken().setLinkedInAccessToken( accessToken );
         mediaTokens.getLinkedInToken().setLinkedInAccessTokenExpiresIn( expiresIn );
         mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn( System.currentTimeMillis() );
+      //update expiry email alert detail
+        mediaTokens.getLinkedInToken().setTokenExpiryAlertSent( false );
+        mediaTokens.getLinkedInToken().setTokenExpiryAlertEmail( null );
+        mediaTokens.getLinkedInToken().setTokenExpiryAlertTime( null );
         if ( profileLink != null ) {
             profileLink = profileLink.split( "&" )[0];
             mediaTokens.getLinkedInToken().setLinkedInPageLink( profileLink );

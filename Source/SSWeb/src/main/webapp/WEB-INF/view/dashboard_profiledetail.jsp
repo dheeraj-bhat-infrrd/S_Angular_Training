@@ -89,6 +89,7 @@
 		</div>
 		<c:if test="${hiddenSection && profilemasterid!=4}">
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}">
+			<div id="dsh-btn0" class="dsh-btn-complete dsh-btn-red float-left <c:if test="${not isSocialMediaExpired}">hide</c:if> ">Fix Social Media</div>
 			<div id="dsh-btn1" class="dsh-btn-complete float-left"><spring:message code="label.sendsurvey.btn.key" /></div>
 			<div id="dsh-btn2" class="dsh-btn-complete dsh-btn-orange float-left hide"></div>
 			<div id="dsh-btn3" class="dsh-btn-complete dsh-btn-green float-left hide"></div>
@@ -96,6 +97,7 @@
 		</c:if>
 		<c:if test="${!hiddenSection}">
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}">
+			<div id="dsh-btn0" class="dsh-btn-complete dsh-btn-red float-left  <c:if test="${not isSocialMediaExpired}">hide</c:if> ">Fix Social Media</div>
 			<div id="dsh-btn1" class="dsh-btn-complete float-left"><spring:message code="label.sendsurvey.btn.key" /></div>
 			<div id="dsh-btn2" class="dsh-btn-complete dsh-btn-orange float-left hide"></div>
 			<div id="dsh-btn3" class="dsh-btn-complete dsh-btn-green float-left hide"></div>

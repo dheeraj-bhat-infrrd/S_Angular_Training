@@ -1384,4 +1384,30 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      */
     public Company activateCompany( Company company ) throws InvalidInputException;
+
+    /**
+     * 
+     * @param columnName
+     * @param columnValue
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    public List<String> getExpiredSocailMedia( String columnName, long columnValue ) throws InvalidInputException, NoRecordsFetchedException;
+    
+    /**
+     * 
+     * @param CollectionName
+     * @return
+     */
+    public List<Long> fetchEntityIdsWithHiddenAttribute( String CollectionName );
+    
+    
+    public List<CompanyHiddenNotification> getCompaniesWithHiddenSectionEnabled();
+
+
+    public void deleteCompanyHiddenNotificationRecord( CompanyHiddenNotification record );
+
+
+    public List<Company> getCompaniesByBillingModeAuto();
 }

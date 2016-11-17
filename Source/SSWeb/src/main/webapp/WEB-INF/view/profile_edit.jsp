@@ -463,7 +463,7 @@
 </div>
 <div class="mobile-tabs hide clearfix">
 	<div class="float-left mob-icn mob-icn-active icn-person"></div>
-	<div class="float-left mob-icn icn-ppl"></div>
+	<!-- <div class="float-left mob-icn icn-ppl"></div> -->
 	<div class="float-left mob-icn icn-star-smile"></div>
 	<div class="float-left mob-icn inc-more"></div>
 </div>
@@ -504,6 +504,6 @@ $(document).ready(function() {
 		fetchReviewsEditProfileScroll();
 	});
 	
-	attachPostsScrollEvent();
+	//attachPostsScrollEvent();
 });
 </script>

@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
@@ -36,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -54,11 +53,13 @@ import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-import com.realtech.socialsurvey.core.utils.SolrSearchUtils;
 
 
 // JIRA:SS-62 BY RM 02
@@ -85,9 +86,6 @@ public class SolrSearchServiceImpl implements SolrSearchService
     private String solrSocialPostUrl;
 
     @Autowired
-    private SolrSearchUtils solrSearchUtils;
-
-    @Autowired
     private UserManagementService userManagementService;
 
     @Autowired
@@ -98,6 +96,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     @Autowired
     private BatchTrackerService batchTrackerService;
+
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
 
 
     /**
@@ -660,6 +661,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             solrQuery.setQuery( query );
             solrQuery.addFilterQuery( CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR );
             solrQuery.addFilterQuery( "-" + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_INACTIVE );
+            solrQuery.addFilterQuery( "-" + CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR + ":" + true );
             solrQuery.setStart( startIndex );
             solrQuery.setRows( noOfRows );
 
@@ -875,9 +877,16 @@ public class SolrSearchServiceImpl implements SolrSearchService
         if ( user.getProfileUrl() != null && !user.getProfileUrl().isEmpty() ) {
             document.addField( CommonConstants.PROFILE_URL_SOLR, user.getProfileUrl() );
         }
-
+        Long companyId = user.getCompany().getCompanyId();
         if ( user.getCompany() != null ) {
-            document.addField( CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId() );
+            document.addField( CommonConstants.COMPANY_ID_SOLR, companyId );
+            if ( organizationUnitSettingsDao
+                .fetchOrganizationUnitSettingsById( companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION )
+                .isHiddenSection() ) {
+                document.addField( CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, true );
+            } else {
+                document.addField( CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, false );
+            }
         }
         document.addField( CommonConstants.STATUS_SOLR, user.getStatus() );
         Set<Long> branches = new HashSet<Long>();
@@ -1047,6 +1056,15 @@ public class SolrSearchServiceImpl implements SolrSearchService
             throw new SolrException( "Exception while adding regions to solr. Reason : " + e.getMessage(), e );
         }
         LOG.info( "Method to edit user in solr finished for user : " + userId );
+    }
+    
+
+    @Override
+    public void editUsersInSolr( List<Long> userIds, String key, String value ) throws SolrException, InvalidInputException
+    {
+        for ( Long userId : userIds ) {
+            editUserInSolr( userId, key, value );
+        }
     }
 
 
@@ -2281,12 +2299,12 @@ public class SolrSearchServiceImpl implements SolrSearchService
     public void removeSocialPostsFromSolr( String entityType, long entityId, String source ) throws SolrException
     {
         LOG.info( "Method to remove social posts from Solr started for entityType : " + entityType + " entityId : " + entityId
-			+ " and source : " + source );
-		if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) )
+            + " and source : " + source );
+        if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) )
             entityType = CommonConstants.USER_ID_SOLR;
         SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
         String solrQuery = entityType + ":" + entityId;
-		solrQuery += " AND " + CommonConstants.SOURCE_SOLR + ":" + source;
+        solrQuery += " AND " + CommonConstants.SOURCE_SOLR + ":" + source;
         switch ( entityType ) {
             case CommonConstants.COMPANY_ID_COLUMN:
                 solrQuery += " AND " + CommonConstants.REGION_ID_COLUMN + ":\"-1\"";
@@ -2931,11 +2949,12 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public void solrReviewCountUpdater() {
+    public void solrReviewCountUpdater()
+    {
         try {
             //getting last run end time of batch and update last start time
-            long lastRunEndTime = batchTrackerService
-                .getLastRunEndTimeAndUpdateLastStartTimeByBatchType( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER  , CommonConstants.BATCH_NAME_REVIEW_COUNT_UPDATER );
+            long lastRunEndTime = batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER, CommonConstants.BATCH_NAME_REVIEW_COUNT_UPDATER );
             //get user id list for them review count will be updated
             List<Long> userIdList = batchTrackerService.getUserIdListToBeUpdated( lastRunEndTime );
             //getting no of reviews for the agents
@@ -2967,5 +2986,35 @@ public class SolrSearchServiceImpl implements SolrSearchService
                 LOG.error( "Error while sending report excption mail to admin " );
             }
         }
+    }
+
+
+    @Override
+    @Transactional
+    public void showOrHideUsersOfCompanyInSolr( Long companyId , Boolean hidden)
+    {
+        LOG.info( "Adding Hidden boolean for users in solr for hidden company" );
+        int startIndex = 0;
+        int batchSize = 500;
+        List<Long> userIds;
+
+        if ( companyId != null ) {
+            try {
+                do {
+                    userIds = organizationManagementService.getAgentIdsUnderCompany( companyId, startIndex, batchSize );
+                    // updating all users in the company in solr   
+                    if(hidden){
+                        this.editUsersInSolr( userIds, CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, "true" ); 
+                    }
+                    else{
+                        this.editUsersInSolr( userIds, CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, "false" );
+                    }
+                    startIndex += batchSize;
+                } while ( userIds != null && userIds.size() == batchSize );
+            } catch ( Exception exception ) {
+                LOG.error( "error while hiding users of the company: " + companyId + exception.getMessage() );
+            }
+        }
+        LOG.info( "Added Hidden boolean for users in solr for hidden company" );
     }
 }

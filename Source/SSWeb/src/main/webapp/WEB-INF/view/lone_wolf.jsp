@@ -12,7 +12,7 @@
 				</c:if>
 				<form id="lone-wolf-form">
 					<input id="lone-state" name="lone-state" type="hidden" value="${lonestate}" />
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding">
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
 								<spring:message code="label.crm.client.key" />
@@ -24,9 +24,40 @@
 							</div>
 						</div>
 					</div>
+					
+					
+					<div id="transaction-start-div" class="hide col-sm-12 col-xs-12 um-panel-item">
+						<div class="hm-item-row item-row-OR clearfix float-left">
+							<div class="um-item-row-left text-right">Start Date</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-fname en-icn-fname"></div>
+								<input id="lone-transaction-start-date"  data-date-type="startDate" placeholder="Start Date" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left">
+							</div>
+						</div>
+					</div>
+					
+					<!-- <div id="transaction-start-div" class="hide clearfix dash-sel-wrapper">
+						<div class="float-left dash-sel-lbl">Choose</div>
+						<div class="dsh-inp-wrapper float-left">
+							<input id="comp-start-date" data-date-type="startDate" class="dash-sel-item picker-sm" placeholder="Start Date">
+						</div>
+					</div> -->
+					
+						
+					
+					<div id="classification-div" class="hide col-sm-12 clearfix um-panel-item en-botttom-padding margin-left-20">
+						<div class="classification-text"> Classification : Send survey to :</div>
+						<div id="classification-list-wrapper" class="hm-item-row item-row-OR clearfix float-left classification-code-wrapper">
+							
+						</div>
+					</div>
+					
+					
 					<div class="encompass-btn clearfix">
 						<div>
-							<div id="lone-dry-save" class="float-left enc-state-icon cursor-pointer">Save</div>
+							<div id="lone-dry-cancel" class="float-left enc-state-icon enc-state-text-blue cursor-pointer hide" style="display: none;">Cancel</div>
+							<div id="lone-get-classification" class="float-left enc-state-icon cursor-pointer">Get Classification</div>
+							<div id="lone-data-save" class="hide float-left enc-state-icon cursor-pointer">Save</div>
 							<div id="lone-dry-enable" class="float-left enc-state-icon cursor-pointer hide" style="display: none;">Enable</div>
 							<div id="lone-disconnect" class="float-left enc-state-icon cursor-pointer hide" style="display: none;">Disconnect</div>
 						</div>
@@ -49,7 +80,24 @@
 		isRealTechOrSSAdmin = $
 		{
 			isRealTechOrSSAdmin
-		}
-		;
+		};
+		
+		var startDate;
+		var fromEndDate = new Date();
+		var toEndDate = new Date();
+		$("input[data-date-type='startDate']").datepicker({
+			orientation: "auto",
+			format: 'mm/dd/yyyy',
+			endDate: fromEndDate,
+			todayHighlight: true,
+			clearBtn: true,
+			autoclose: true
+		})
+		.on('changeDate', function(selected){
+	        startDate = new Date(selected.date.valueOf());
+	        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+	        $("input[data-date-type='endDate']").datepicker('setStartDate', startDate);
+	    });
+		
 	});
 </script>

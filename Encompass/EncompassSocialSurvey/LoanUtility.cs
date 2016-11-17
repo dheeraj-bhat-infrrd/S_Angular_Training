@@ -206,7 +206,8 @@ namespace EncompassSocialSurvey
                         //Set loan number
                         forLoanVM_Borrower.LoanNumber = runningLoan.LoanNumber;
                         // remove the flower bracket from GUID
-                        forLoanVM_Borrower.SurveySourceId = id.Guid.ToString().Replace("{", "").Replace("}", "");
+                        //forLoanVM_Borrower.SurveySourceId = id.Guid.ToString().Replace("{", "").Replace("}", "");
+                        forLoanVM_Borrower.SurveySourceId = runningLoan.LoanNumber;
 
                         forLoanVM_Borrower.CompanyId = runningCompanyId;
                         forLoanVM_Borrower.AgentId = (loanOfficer != null) ? loanOfficer.ID : "";
@@ -244,7 +245,8 @@ namespace EncompassSocialSurvey
                             Logger.Debug("Found CoBorrower , fetching the required details");
                             LoanViewModel forLoanVM_Co_Borrower = new LoanViewModel();
                             forLoanVM_Co_Borrower.SurveySource = EncompassSocialSurveyConstant.SURVEY_SOURCE;
-                            forLoanVM_Co_Borrower.SurveySourceId = id.Guid.ToString().Replace("{", "").Replace("}", "");
+                            //forLoanVM_Co_Borrower.SurveySourceId = id.Guid.ToString().Replace("{", "").Replace("}", "");
+                            forLoanVM_Co_Borrower.SurveySourceId = runningLoan.LoanNumber;
                             forLoanVM_Co_Borrower.CompanyId = runningCompanyId;
 
 

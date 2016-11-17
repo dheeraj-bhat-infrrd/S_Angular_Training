@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.Date;
+import java.util.List;
+
 public class LoneWolfCrmInfo extends CRMInfo
 {
     private String clientCode;
@@ -11,8 +14,11 @@ public class LoneWolfCrmInfo extends CRMInfo
     private int numberOfDays;
     private String emailAddressForReport;
     private boolean generateReport;
-
-	public String getHost() {
+    private List<LoneWolfClassificationCode> classificationCodes;
+    private Date transactionStartDate;
+    
+	
+    public String getHost() {
 		return host;
 	}
 
@@ -110,5 +116,28 @@ public class LoneWolfCrmInfo extends CRMInfo
     public void setState( String state )
     {
         this.state = state;
+    }
+    
+    public List<LoneWolfClassificationCode> getClassificationCodes()
+    {
+        return classificationCodes;
+    }
+
+
+    public void setClassificationCodes( List<LoneWolfClassificationCode> classificationCodes )
+    {
+        this.classificationCodes = classificationCodes;
+    }
+
+
+    public Date getTransactionStartDate()
+    {
+        return transactionStartDate;
+    }
+
+
+    public void setTransactionStartDate( Date transactionStartDate )
+    {
+        this.transactionStartDate = transactionStartDate;
     }
 }

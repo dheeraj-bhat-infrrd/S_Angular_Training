@@ -253,6 +253,16 @@ public class SocialManagementController
             session.setAttribute( "columnName", columnName );
             session.setAttribute( "columnValue", columnValue );
         }
+        
+        String isFixSocialMedia = request.getParameter( "isFixSocialMedia" );
+        if ( isFixSocialMedia != null ) {
+            session.setAttribute( "isFixSocialMedia", 1 );
+            model.addAttribute( "isFixSocialMedia", 1 );
+
+        }else{
+            session.removeAttribute( "isFixSocialMedia" ); 
+        }
+        
 
         session.removeAttribute( CommonConstants.SOCIAL_FLOW );
         String serverBaseUrl = requestUtils.getRequestServerName( request );
@@ -503,6 +513,8 @@ public class SocialManagementController
             String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
             model.addAttribute( "pageNames", facebookPages );
             model.addAttribute( "fbAccessToken", fbAccessTokenStr );
+            
+            
         } catch ( Exception e ) {
             session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
             LOG.error( "Exception while getting facebook access token. Reason : " + e.getMessage(), e );
@@ -541,6 +553,11 @@ public class SocialManagementController
             model.addAttribute( "columnValue", columnValue );
             model.addAttribute( "fromDashboard", 1 );
         }
+        
+        if ( session.getAttribute( "isFixSocialMedia" ) != null ) {
+            model.addAttribute( "isFixSocialMedia", 1 );
+        }
+        
         boolean updated = false;
         SocialMediaTokens mediaTokens = null;
         String fbAccessTokenStr = request.getParameter( "fbAccessToken" );
@@ -656,6 +673,13 @@ public class SocialManagementController
                     DisplayMessageConstants.GENERAL_ERROR );
             }
 
+            
+          //get detail of expire social media
+            boolean isSocialMediaExpired = false;
+            if(organizationManagementService.getExpiredSocailMedia( entityType, entityId ).size() > 0)
+                isSocialMediaExpired = true;
+            session.setAttribute( "isSocialMediaExpired" , isSocialMediaExpired );
+            
             //Add action to social connection history
             socialManagementService.updateSocialConnectionsHistory( entityType, entityId, mediaTokens,
                 CommonConstants.FACEBOOK_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
@@ -908,6 +932,11 @@ public class SocialManagementController
             model.addAttribute( "columnValue", columnValue );
             model.addAttribute( "fromDashboard", 1 );
         }
+        if ( session.getAttribute( "isFixSocialMedia" ) != null ) {
+            model.addAttribute( "isFixSocialMedia", 1 );
+        }
+        
+        
         SocialMediaTokens mediaTokens = null;
         try {
             UserSettings userSettings = (UserSettings) session
@@ -1074,6 +1103,15 @@ public class SocialManagementController
                     DisplayMessageConstants.GENERAL_ERROR );
             }
 
+            
+            //get detail of expire social media
+            boolean isSocialMediaExpired = false;
+            if(organizationManagementService.getExpiredSocailMedia( entityType, entityId ).size() > 0){
+                isSocialMediaExpired = true;                            
+            }
+            
+            session.setAttribute( "isSocialMediaExpired" , isSocialMediaExpired );
+            
             //Add action to social connection history
             socialManagementService.updateSocialConnectionsHistory( entityType, entityId, mediaTokens,
                 CommonConstants.LINKEDIN_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );

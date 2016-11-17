@@ -150,9 +150,16 @@ $(window).on('unload', function(){
 		var fromDashboard = "${fromDashboard}";
 		var restful = "${restful}";
 		var flow = "${socialFlow}";
+		var isFixSocialMedia ="${isFixSocialMedia}";
+		
 		if(fromDashboard == 1){
 			var columnName = "${columnName}";
 			var columnValue = "${columnValue}";
+			alert(isFixSocialMedia);
+			if(isFixSocialMedia == 1){
+				parentWindow.fixSocialMediaResponse(columnName, columnValue);
+			}
+			
 			parentWindow.showDashboardButtons(columnName, columnValue);
 		}
 		else if(restful != "1"){

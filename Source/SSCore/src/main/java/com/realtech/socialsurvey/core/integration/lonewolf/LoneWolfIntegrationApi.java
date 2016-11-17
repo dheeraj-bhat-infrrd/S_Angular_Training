@@ -14,6 +14,7 @@ public interface LoneWolfIntegrationApi
     //public static final String loneWolfTransactionUrl = "/wolfconnect/transactions/v1?$skip=0&$filter=StatusCode+eq+'A'+and+CloseDate+ge+datetimeoffset'2015-03-17'+and+CloseDate+lt+datetimeoffset'2015-07-18'";
     public static final String loneWolfTransactionUrl = "/wolfconnect/transactions/v1";
     public static final String loneWolfMemberUrl = "/wolfconnect/members/v1";
+    public static final String loneWolfClassificationCodesUrl = "/wolfconnect/classifications/v1";
 
 
     @GET ( loneWolfTestConnectionUrl)
@@ -29,5 +30,11 @@ public interface LoneWolfIntegrationApi
     @GET ( loneWolfMemberUrl)
     public Response fetchMemberDetails( @Header ( "Authorization") String authorizationHeader,
         @Header ( "Content-MD5") String md5Content );
+
+    
+    @GET ( loneWolfClassificationCodesUrl)
+    public Response fetchClassificationCodes( @Header ( "Authorization") String authorizationHeader,
+        @Header ( "Content-MD5") String md5Content );
+
 
 }
