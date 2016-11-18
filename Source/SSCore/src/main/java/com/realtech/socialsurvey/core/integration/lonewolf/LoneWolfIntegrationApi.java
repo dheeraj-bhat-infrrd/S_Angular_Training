@@ -29,7 +29,7 @@ public interface LoneWolfIntegrationApi
 
     @GET ( loneWolfMemberUrl)
     public Response fetchMemberDetails( @Header ( "Authorization") String authorizationHeader,
-        @Header ( "Content-MD5") String md5Content );
+        @Header ( "Content-MD5") String md5Content , @EncodedQuery (CommonConstants.LONEWOLF_QUERY_PARAM_$TOP) String top , @EncodedQuery (CommonConstants.LONEWOLF_QUERY_PARAM_$ORDERBY) String OrderBy , @EncodedQuery (CommonConstants.LONEWOLF_QUERY_PARAM_$SKIP) String skip  );
 
     
     @GET ( loneWolfClassificationCodesUrl)

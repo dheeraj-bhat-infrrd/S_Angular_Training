@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.core.services.lonewolf.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,23 +74,40 @@ public class LoneWolfIntegrationServiceImpl implements LoneWolfIntegrationServic
 
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<LoneWolfMember> fetchLoneWolfMembersData( String secretKey, String apiToken, String clientCode )
+    public List<LoneWolfMember> fetchLoneWolfMembersData( String secretKey, String apiToken, String clientCode ) throws InvalidInputException
     {
+        
+        List<LoneWolfMember> members = new ArrayList<LoneWolfMember>();
+        List<LoneWolfMember> membersBatch = null;
+        int skip = 0;
+        do {
         LOG.info( "Method fetchLoneWolfMembersData started " );
         loneWolfIntegrationApi = loneWolfIntegrationApiBuilder.getLoneWolfIntegrationApi();
+        
+        Map<String, String> queryParam = new LinkedHashMap<String, String>();
+        queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$TOP, String.valueOf(CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE) );
+        queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$ORDERBY, "FirstName+desc" );
+        queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$SKIP, String.valueOf(skip) );
+
+        String completeURI = loneWolfRestUtils.addRequestParamInResourceURI( LoneWolfIntegrationApi.loneWolfMemberUrl,
+            queryParam );
         //generating authorization header
-        String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( LoneWolfIntegrationApi.loneWolfMemberUrl,
-            secretKey, apiToken, clientCode );
+        String authHeader = loneWolfRestUtils.generateAuthorizationHeaderFor( completeURI,secretKey, apiToken, clientCode );
 
         //fetching lone wolf members data
-        retrofit.client.Response response = loneWolfIntegrationApi.fetchMemberDetails( authHeader, loneWolfRestUtils.MD5_EMPTY );
+        retrofit.client.Response response = loneWolfIntegrationApi.fetchMemberDetails( authHeader, loneWolfRestUtils.MD5_EMPTY ,   String.valueOf(CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE) , "FirstName+desc" , String.valueOf(skip)  );
 
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        List<LoneWolfMember> members = responseString != null ? (List<LoneWolfMember>) new Gson().fromJson( responseString,
+        membersBatch = responseString != null ? (List<LoneWolfMember>) new Gson().fromJson( responseString,
             new TypeToken<List<LoneWolfMember>>() {}.getType() ) : null;
 
+            members.addAll( membersBatch );
+            skip += CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE;
+        } while ( membersBatch != null
+            && membersBatch.size() == CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE );
             LOG.info( "Method fetchLoneWolfMembersData ended " );
-        return members;
+        
+            return members;
     }
     
     

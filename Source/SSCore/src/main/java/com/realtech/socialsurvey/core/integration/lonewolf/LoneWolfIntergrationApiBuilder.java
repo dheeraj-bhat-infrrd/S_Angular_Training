@@ -44,8 +44,6 @@ public class LoneWolfIntergrationApiBuilder implements InitializingBean
     @Override
     public void afterPropertiesSet() throws Exception
     {
-
-
         LOG.info( "Initialising rest builder" );
         RestAdapter loneWolfAdapter = new RestAdapter.Builder().setLogLevel( RestAdapter.LogLevel.FULL )
             .setEndpoint( loneWolfEndpoint ).setErrorHandler( new LoneWolfHttpErrorHandler() ).build();

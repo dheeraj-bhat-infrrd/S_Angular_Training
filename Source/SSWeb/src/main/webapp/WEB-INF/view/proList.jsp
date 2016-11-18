@@ -57,6 +57,9 @@
 										class="fp-inp" placeholder="First Name">
 									<input id="find-pro-last-name" name="find-pro-last-name" value="${patternLast}"
 										class="fp-inp" placeholder="Last Name">
+									<c:if test = "${not empty findProCompanyProfileName}">
+										<input id="find-pro-profile-name" name="find-pro-profile-name" type="hidden" value="${findProCompanyProfileName}">
+									</c:if>
 									<input id="find-pro-submit" type="button" class="fp-inp pro-btn" value="Search">
 								</div>
 							</form>
@@ -117,6 +120,10 @@
 	<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 	<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 	<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+	<c:if test = "${not empty findProCompanyProfileName}">
+		<script>findProCompanyProfileName = '${findProCompanyProfileName}';
+		</script>
+	</c:if>
 	<script>
 	$(document).ready(function() {
 		initializeFindAProPage();
