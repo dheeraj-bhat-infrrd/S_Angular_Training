@@ -3880,7 +3880,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    @Transactional
     public void updateSurveySourceIdInMongo()
     {
         try {

@@ -59,14 +59,9 @@
 								<%-- Skip if crm mapping encompass and not company admin --%>
 							</c:when>
 
-							<%--<c:when
-								test="${mapping.crmMaster.crmName == 'Lone Wolf' && profilemasterid == 4}">
-							</c:when> --%>
-
-							<%-- Commenting lone wolf --%>
 							<c:when
-								test="${mapping.crmMaster.crmName == 'Lone Wolf'}">
-							</c:when>
+								test="${mapping.crmMaster.crmName == 'Lone Wolf' && profilemasterid == 4}">
+							</c:when> 
 							
 							<c:otherwise>
 								<div class="crm-settings-dropdown-item"
@@ -91,13 +86,13 @@
 							</div>
 						</c:when>
 
-						<%--<c:when
+						<c:when
 							test="${mapping.crmMaster.crmName == 'Lone Wolf' && profilemasterid != 4}">
 							<div class="crm-setting-cont hide"
 								data-crm-type="${mapping.crmMaster.crmName }">
 								<jsp:include page="lone_wolf.jsp"></jsp:include>
 							</div>
-						</c:when> --%>
+						</c:when> 
 					</c:choose>
 				</c:forEach>
 			</div>
