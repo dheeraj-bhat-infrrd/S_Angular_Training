@@ -317,7 +317,6 @@
 			<scope>compile</scope>
 		</dependency>
 		
-	
 		<!-- Quartz framework -->
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>

@@ -22,6 +22,7 @@ var stateList; // usStateList
 var cityLookupList; // cityLookupList
 var phoneFormat = '(ddd) ddd-dddd'; // defualt phone format
 var selectedCountryRegEx = "";
+var findProCompanyProfileName;
 
 function getPhoneNumber(phoneId) {
 	var countryData = $('#' + phoneId).intlTelInput("getSelectedCountryData");
@@ -1710,6 +1711,9 @@ function fetchUsers(newIndex) {
 		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
 		formData.append("find-pro-start-index", newIndex);
 		formData.append("find-pro-row-size", rowSize);
+		if(findProCompanyProfileName != undefined ){
+			formData.append("find-pro-profile-name", findProCompanyProfileName);
+		}
 
 		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
 			callAjaxPOSTWithTextData("./findaproscroll.do", paginateUsersProList, true, formData);

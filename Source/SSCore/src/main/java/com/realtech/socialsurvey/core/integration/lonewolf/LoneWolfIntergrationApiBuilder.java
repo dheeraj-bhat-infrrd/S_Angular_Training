@@ -6,9 +6,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import retrofit.RestAdapter;
-
 import com.realtech.socialsurvey.core.integration.pos.errorhandlers.LoneWolfHttpErrorHandler;
+
+import retrofit.RestAdapter;
 
 
 @Component
@@ -44,7 +44,7 @@ public class LoneWolfIntergrationApiBuilder implements InitializingBean
     @Override
     public void afterPropertiesSet() throws Exception
     {
-
+        LOG.info( "Initialising rest builder" );
         RestAdapter loneWolfAdapter = new RestAdapter.Builder().setLogLevel( RestAdapter.LogLevel.FULL )
             .setEndpoint( loneWolfEndpoint ).setErrorHandler( new LoneWolfHttpErrorHandler() ).build();
         loneWolfIntegrationApi = loneWolfAdapter.create( LoneWolfIntegrationApi.class );

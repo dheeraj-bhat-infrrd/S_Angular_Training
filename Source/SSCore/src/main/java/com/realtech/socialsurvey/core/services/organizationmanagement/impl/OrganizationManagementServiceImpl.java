@@ -1058,7 +1058,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     public AgentSettings getAgentSettings( long agentId ) throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Getting agent settings for id: " + agentId );
+        LOG.debug( "Getting agent settings for id: " + agentId );
         AgentSettings agentSettings = null;
         if ( agentId <= 0l ) {
             LOG.error( "Agent id is not passed to fetch the agent settings" );

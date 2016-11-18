@@ -201,9 +201,11 @@
 								type="text" placeholder="Last Name">
 						</div>
 						<input id="find-pro-start-index" name="find-pro-start-index"
-							type="hidden" value="0"> <input id="find-pro-row-size"
-							name="find-pro-row-size" type="hidden" value="10"> <input
-							id="find-pro-submit" type="button"
+							type="hidden" value="0"> 
+						<input id="find-pro-row-size"
+							name="find-pro-row-size" type="hidden" value="10"> 
+						<input id="find-pro-profile-name" name="find-pro-profile-name" type="hidden" value="${findProCompanyProfileName}">
+						<input id="find-pro-submit" type="button"
 							class="float-left prof-submit-btn" value="Search">
 					</form>
 				</div>

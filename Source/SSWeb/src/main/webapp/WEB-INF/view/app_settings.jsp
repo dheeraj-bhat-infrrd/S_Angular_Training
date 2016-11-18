@@ -61,8 +61,8 @@
 
 							<c:when
 								test="${mapping.crmMaster.crmName == 'Lone Wolf' && profilemasterid == 4}">
-							</c:when>
-
+							</c:when> 
+							
 							<c:otherwise>
 								<div class="crm-settings-dropdown-item"
 									data-crm-type="${mapping.crmMaster.crmName }">${mapping.crmMaster.crmName }</div>
@@ -92,7 +92,7 @@
 								data-crm-type="${mapping.crmMaster.crmName }">
 								<jsp:include page="lone_wolf.jsp"></jsp:include>
 							</div>
-						</c:when>
+						</c:when> 
 					</c:choose>
 				</c:forEach>
 			</div>

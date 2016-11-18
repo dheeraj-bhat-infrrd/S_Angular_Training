@@ -293,7 +293,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
     {
         if ( company == null )
             throw new InvalidInputException( "Company passed in getBranchesForCompany() cannot be null" );
-        LOG.info( "Method getUsersForCompany called to fetch list of users of company : " + company.getCompany() );
+        LOG.debug( "Method getUsersForCompany called to fetch list of users of company : " + company.getCompany() );
         Criteria criteria = getSession().createCriteria( User.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY, company ) );
@@ -313,7 +313,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         } catch ( HibernateException hibernateException ) {
             throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
         }
-        LOG.info( "Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany() );
+        LOG.debug( "Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany() );
         return (List<User>) criteria.list();
     }
 

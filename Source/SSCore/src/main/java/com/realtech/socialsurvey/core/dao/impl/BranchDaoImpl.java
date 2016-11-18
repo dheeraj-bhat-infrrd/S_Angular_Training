@@ -78,7 +78,7 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
     {
         if ( companyId <= 0 )
             throw new InvalidInputException( "Invalid company id is passed in getBranchesForCompany()" );
-        LOG.info( "Method to get all branches for company,getBranchesForCompany() started." );
+        LOG.debug( "Method to get all branches for company,getBranchesForCompany() started." );
         Criteria criteria = getSession().createCriteria( Branch.class );
         criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) ) );
         criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, isDefault ) );
@@ -102,11 +102,11 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
 
             List<Branch> finalBranchList = new ArrayList<>();
             if ( branchIdList.size() > 0 ) {
-                LOG.info( "Fetching branch settings for the fetched branches" );
+                LOG.debug( "Fetching branch settings for the fetched branches" );
                 List<OrganizationUnitSettings> branchSettingList = organizationUnitSettingsDao
                     .fetchOrganizationUnitSettingsForMultipleIds( branchIdList,
                         MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-                LOG.info( "Adding address, state city and zipcode info into branches" );
+                LOG.debug( "Adding address, state city and zipcode info into branches" );
                 if ( branchSettingList != null && branchSettingList.size() > 0 ) {
                     for ( OrganizationUnitSettings branchSettings : branchSettingList ) {
                         if ( branchIdObjMap.get( branchSettings.getIden() ) != null ) {
@@ -122,7 +122,7 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
                     }
                 }
             }
-            LOG.info( "Method to get all branches for company,getBranchesForCompany() ended." );
+            LOG.debug( "Method to get all branches for company,getBranchesForCompany() ended." );
             if ( finalBranchList.size() > 0 )
                 return finalBranchList;
             else
