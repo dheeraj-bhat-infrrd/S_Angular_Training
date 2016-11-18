@@ -673,7 +673,7 @@
 				<!-- <ref bean="remaxEntitiesTransfer" /> -->
 				<!-- <ref bean="updateExistingCompanyPrice" /> -->
 				<!-- <ref bean="hideUsersFromSearch" />	-->
-				<ref bean="surveysourceidupdater" />			
+				<!-- <ref bean="surveysourceidupdater" />-->			
 			</list>
 		</property>
 
@@ -707,7 +707,7 @@
 				<!-- <ref bean="remaxEntitiesTransfercron" /> -->
 				<!-- <ref bean="updateExistingCompanyPricecron" /> -->
 				<!-- <ref bean="hideUsersFromSearchcron" /> -->
-				<ref bean="surveysourceidupdatercron" />
+				<!-- <ref bean="surveysourceidupdatercron" /> -->
 			</list>
 		</property>
 		<property name="quartzProperties">
