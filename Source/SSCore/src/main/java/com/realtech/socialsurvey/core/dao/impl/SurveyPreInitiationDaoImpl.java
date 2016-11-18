@@ -732,14 +732,14 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     public List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmail( long agentId, String customerEmail )
         throws DatabaseException
     {
-        LOG.info( "Method getSurveyByAgentIdAndCustomeEmail() started." );
+        LOG.debug( "Method getSurveyByAgentIdAndCustomeEmail() started." );
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
         try {
             //agent id
             criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId ) );
             //customer Email
             criteria.add( Restrictions.eq( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, customerEmail ) );
-            LOG.info( "Method getSurveyByAgentIdAndCustomeEmail() finihed." );
+            LOG.debug( "Method getSurveyByAgentIdAndCustomeEmail() finihed." );
             return criteria.list();
         } catch ( HibernateException e ) {
             LOG.error( "Exception caught in getSurveyByAgentIdAndCustomeEmailForPastNDays() ", e );
