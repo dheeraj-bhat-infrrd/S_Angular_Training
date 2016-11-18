@@ -10941,7 +10941,8 @@ function showLoneWolfButtons() {
 	var state = $("#lone-state").val();
 	if (state == 'dryrun') {
 		$('#lone-dry-enable').show();
-		$('#lone-generate-report').show();
+		//TODO : uncooment the generate report show code when back end is ready
+	//	$('#lone-generate-report').show();
 		$('#lone-disconnect').hide();
 	} else if (state == 'prod') {
 		$('#lone-disconnect').show();
