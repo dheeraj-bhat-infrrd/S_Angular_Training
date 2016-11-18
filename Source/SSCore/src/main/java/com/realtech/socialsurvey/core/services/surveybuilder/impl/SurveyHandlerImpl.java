@@ -3880,11 +3880,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
+    @Transactional
     public void updateSurveySourceIdInMongo()
     {
         try {
-            emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail,
-                "SurveySourceIdUpdater started successfully.", "SurveySourceIdUpdater started successfully.", null );
             int batch = 500;
             int count = 0;
             List<SurveyDetails> surveys = null;
