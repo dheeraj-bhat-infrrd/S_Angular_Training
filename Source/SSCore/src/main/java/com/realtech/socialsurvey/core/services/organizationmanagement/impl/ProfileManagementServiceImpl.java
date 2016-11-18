@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.GoogleBusinessToken;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -1828,6 +1829,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         surveyDetails = surveyDetailsDao.getFeedbacks( idenColumnName, iden, startIndex, numOfRows, startScore, limitScore,
             fetchAbusive, startDate, endDate, sortCriteria );
 
+        //TODO : remove this . Temporary fix for Zillow review URl
+        for (SurveyDetails review : surveyDetails){
+            if(review.getSource().equals( "Zillow" )){
+                if(StringUtils.isEmpty( review.getSourceId() ) ) {
+                    review.setSourceId( review.getCompleteProfileUrl() );
+                }
+            }
+        }
+        
         // This is not needed. Commenting out
         /*for (SurveyDetails review : surveyDetails) {
             OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
@@ -1885,6 +1895,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         surveyDetails = surveyDetailsDao.getFeedbacksForReports( idenColumnName, iden, startIndex, numOfRows, startScore,
             limitScore, fetchAbusive, startDate, endDate, sortCriteria );
+        
+        //TODO : remove this . Temporary fix for Zillow review URl
+        for (SurveyDetails review : surveyDetails){
+            if(review.getSource().equals( "Zillow" )){
+                if(StringUtils.isEmpty( review.getSourceId() ) ) {
+                    review.setSourceId( review.getCompleteProfileUrl() );
+                }
+            }
+        }
 
         return surveyDetails;
     }

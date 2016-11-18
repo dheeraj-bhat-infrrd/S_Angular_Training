@@ -120,26 +120,26 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public void insertOrganizationUnitSettings( OrganizationUnitSettings organizationUnitSettings, String collectionName )
     {
-        LOG.info( "Creating " + collectionName + " document. Organiztion Unit id: " + organizationUnitSettings.getIden() );
+        LOG.debug( "Creating " + collectionName + " document. Organiztion Unit id: " + organizationUnitSettings.getIden() );
         LOG.debug( "Inserting into " + collectionName + ". Object: " + organizationUnitSettings.toString() );
         mongoTemplate.insert( organizationUnitSettings, collectionName );
-        LOG.info( "Inserted into " + collectionName );
+        LOG.debug( "Inserted into " + collectionName );
     }
 
 
     @Override
     public void insertAgentSettings( AgentSettings agentSettings )
     {
-        LOG.info( "Inserting agent settings: " + agentSettings.toString() );
+        LOG.debug( "Inserting agent settings: " + agentSettings.toString() );
         mongoTemplate.insert( agentSettings, AGENT_SETTINGS_COLLECTION );
-        LOG.info( "Inserted into agent settings" );
+        LOG.debug( "Inserted into agent settings" );
     }
 
 
     @Override
     public OrganizationUnitSettings fetchOrganizationUnitSettingsById( long identifier, String collectionName )
     {
-        LOG.info( "Fetch organization unit settings from " + collectionName + " for id: " + identifier );
+        LOG.debug( "Fetch organization unit settings from " + collectionName + " for id: " + identifier );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).is( identifier ) );
         query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );
@@ -153,7 +153,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public List<OrganizationUnitSettings> fetchOrganizationUnitSettingsForMultipleIds( Set<Long> identifiers,
         String collectionName )
     {
-        LOG.info( "Fetch organization unit settings from " + collectionName + " for multiple ids." );
+        LOG.debug( "Fetch organization unit settings from " + collectionName + " for multiple ids." );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).in( identifiers ) );
         query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );
@@ -165,7 +165,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public AgentSettings fetchAgentSettingsById( long identifier )
     {
-        LOG.info( "Fetch agent settings from for id: " + identifier );
+        LOG.debug( "Fetch agent settings from for id: " + identifier );
         AgentSettings settings = mongoTemplate.findOne( new BasicQuery( new BasicDBObject( KEY_IDENTIFIER, identifier ) ),
             AgentSettings.class, AGENT_SETTINGS_COLLECTION );
         setCompleteUrlForSettings( settings, CommonConstants.AGENT_SETTINGS_COLLECTION );
@@ -176,7 +176,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public ContactDetailsSettings fetchAgentContactDetailByEncryptedId( String userEncryptedId )
     {
-        LOG.info( "Fetch agent settings from for userEncruptedId: " + userEncryptedId );
+        LOG.debug( "Fetch agent settings from for userEncruptedId: " + userEncryptedId );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_USER_ENCRYPTED_ID ).is( userEncryptedId ) );
         query.fields().include( KEY_CONTACT_DETAILS );
@@ -191,7 +191,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public List<AgentSettings> fetchMultipleAgentSettingsById( List<Long> identifiers )
     {
-        LOG.info( "Fetch multiple agent settings from list of Ids: " + identifiers );
+        LOG.debug( "Fetch multiple agent settings from list of Ids: " + identifiers );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).in( identifiers ) );
         query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );
@@ -206,7 +206,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public List<AgentSettings> getAllAgentSettings()
     {
-        LOG.info( "Fetch multiple getAllAgentSettings: " );
+        LOG.debug( "Fetch multiple getAllAgentSettings: " );
         Query query = new Query();
         query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );
         List<AgentSettings> settingsList = mongoTemplate.find( query, AgentSettings.class, AGENT_SETTINGS_COLLECTION );
@@ -221,14 +221,14 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public void updateParticularKeyOrganizationUnitSettings( String keyToUpdate, Object updatedRecord,
         OrganizationUnitSettings unitSettings, String collectionName )
     {
-        LOG.info( "Updating unit setting in " + collectionName + " with " + unitSettings + " for key: " + keyToUpdate
+        LOG.debug( "Updating unit setting in " + collectionName + " with " + unitSettings + " for key: " + keyToUpdate
             + " wtih value: " + updatedRecord );
         Query query = new Query();
         query.addCriteria( Criteria.where( "_id" ).is( unitSettings.getId() ) );
         Update update = new Update().set( keyToUpdate, updatedRecord );
         LOG.debug( "Updating the unit settings" );
         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
-        LOG.info( "Updated the unit setting" );
+        LOG.debug( "Updated the unit setting" );
     }
 
 
@@ -237,28 +237,28 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public void updateParticularKeyOrganizationUnitSettingsByIden( String keyToUpdate, Object updatedRecord, long iden,
         String collectionName )
     {
-        LOG.info( "Updating unit setting in " + collectionName + " with identifier " + iden + " for key: " + keyToUpdate
+        LOG.debug( "Updating unit setting in " + collectionName + " with identifier " + iden + " for key: " + keyToUpdate
             + " wtih value: " + updatedRecord );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
         Update update = new Update().set( keyToUpdate, updatedRecord );
         LOG.debug( "Updating the unit settings" );
         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
-        LOG.info( "Updated the unit setting" );
+        LOG.debug( "Updated the unit setting" );
     }
 
 
     @Override
     public void updateParticularKeyAgentSettings( String keyToUpdate, Object updatedRecord, AgentSettings agentSettings )
     {
-        LOG.info( "Updating unit setting in AGENT_SETTINGS with " + agentSettings + " for key: " + keyToUpdate + " wtih value: "
+        LOG.debug( "Updating unit setting in AGENT_SETTINGS with " + agentSettings + " for key: " + keyToUpdate + " wtih value: "
             + updatedRecord );
         Query query = new Query();
         query.addCriteria( Criteria.where( "_id" ).is( agentSettings.getId() ) );
         Update update = new Update().set( keyToUpdate, updatedRecord );
         LOG.debug( "Updating the unit settings" );
         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
-        LOG.info( "Updated the unit setting" );
+        LOG.debug( "Updated the unit setting" );
     }
 
 
@@ -270,19 +270,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public List<String> fetchLogoList()
     {
-        LOG.info( "Fetching the list of logos being used" );
+        LOG.debug( "Fetching the list of logos being used" );
         List<OrganizationUnitSettings> settingsList = mongoTemplate.findAll( OrganizationUnitSettings.class,
             COMPANY_SETTINGS_COLLECTION );
         List<String> logoList = new ArrayList<>();
 
-        LOG.info( "Preparing the list of logo names" );
+        LOG.debug( "Preparing the list of logo names" );
         for ( OrganizationUnitSettings settings : settingsList ) {
             String logoName = settings.getLogoThumbnail();
             if ( logoName != null && !logoName.isEmpty() ) {
                 logoList.add( logoName );
             }
         }
-        LOG.info( "Returning the list prepared!" );
+        LOG.debug( "Returning the list prepared!" );
         return logoList;
     }
 
@@ -294,14 +294,14 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public void updateKeyOrganizationUnitSettingsByCriteria( String keyToUpdate, Object updatedRecord, String criteriaKey,
         Object criteriaValue, String collectionName )
     {
-        LOG.info( "Method updateKeyOrganizationUnitSettingsByCriteria called in collection name :" + collectionName
+        LOG.debug( "Method updateKeyOrganizationUnitSettingsByCriteria called in collection name :" + collectionName
             + " for keyToUpdate :" + keyToUpdate + " criteria key :" + criteriaKey );
         Query query = new Query();
         query.addCriteria( Criteria.where( criteriaKey ).is( criteriaValue ) );
         Update update = new Update().set( keyToUpdate, updatedRecord );
         LOG.debug( "Updating unit settings based on criteria" );
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
-        LOG.info( "Successfully completed updation of unit settings" );
+        LOG.debug( "Successfully completed updation of unit settings" );
     }
 
 
@@ -312,14 +312,14 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public void updateKeyOrganizationUnitSettingsByInCriteria( String keyToUpdate, Object updatedRecord, String criteriaKey,
         List<Object> criteriaValue, String collectionName )
     {
-        LOG.info( "Method updateKeyOrganizationUnitSettingsByInCriteria called in collection name :" + collectionName
+        LOG.debug( "Method updateKeyOrganizationUnitSettingsByInCriteria called in collection name :" + collectionName
             + " for keyToUpdate :" + keyToUpdate + " criteria key :" + criteriaKey );
         Query query = new Query();
         query.addCriteria( Criteria.where( criteriaKey ).in( criteriaValue ) );
         Update update = new Update().set( keyToUpdate, updatedRecord );
         LOG.debug( "Updating unit settings based on in criteria" );
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
-        LOG.info( "Successfully completed updation of unit settings" );
+        LOG.debug( "Successfully completed updation of unit settings" );
     }
 
 
@@ -329,7 +329,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileName( String profileName, String collectionName )
     {
-        LOG.info( "Method fetchOrganizationUnitSettingsByProfileName called for profileName:" + profileName
+        LOG.debug( "Method fetchOrganizationUnitSettingsByProfileName called for profileName:" + profileName
             + " and collectionName:" + collectionName );
 
         Query query = new Query();
@@ -338,7 +338,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class,
             collectionName );
         setCompleteUrlForSettings( organizationUnitSettings, collectionName );
-        LOG.info( "Successfully executed method fetchOrganizationUnitSettingsByProfileName" );
+        LOG.debug( "Successfully executed method fetchOrganizationUnitSettingsByProfileName" );
         return organizationUnitSettings;
     }
 
@@ -349,14 +349,14 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileUrl( String profileUrl, String collectionName )
     {
-        LOG.info( "Method fetchOrganizationUnitSettingsByProfileUrl called for profileUrl:" + profileUrl
+        LOG.debug( "Method fetchOrganizationUnitSettingsByProfileUrl called for profileUrl:" + profileUrl
             + " and collectionName:" + collectionName );
 
         OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(
             new BasicQuery( new BasicDBObject( KEY_PROFILE_URL, profileUrl ) ), OrganizationUnitSettings.class,
             collectionName );
         setCompleteUrlForSettings( organizationUnitSettings, collectionName );
-        LOG.info( "Successfully executed method fetchOrganizationUnitSettingsByProfileUrl" );
+        LOG.debug( "Successfully executed method fetchOrganizationUnitSettingsByProfileUrl" );
         return organizationUnitSettings;
     }
 
@@ -373,24 +373,24 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public void afterPropertiesSet() throws Exception
     {
-        LOG.info( "Checking if collections are created in mongodb" );
+        LOG.debug( "Checking if collections are created in mongodb" );
         if ( !mongoTemplate.collectionExists( COMPANY_SETTINGS_COLLECTION ) ) {
-            LOG.info( "Creating " + COMPANY_SETTINGS_COLLECTION );
+            LOG.debug( "Creating " + COMPANY_SETTINGS_COLLECTION );
             mongoTemplate.createCollection( COMPANY_SETTINGS_COLLECTION );
             createIndexOnIden( COMPANY_SETTINGS_COLLECTION );
         }
         if ( !mongoTemplate.collectionExists( REGION_SETTINGS_COLLECTION ) ) {
-            LOG.info( "Creating " + REGION_SETTINGS_COLLECTION );
+            LOG.debug( "Creating " + REGION_SETTINGS_COLLECTION );
             mongoTemplate.createCollection( REGION_SETTINGS_COLLECTION );
             createIndexOnIden( REGION_SETTINGS_COLLECTION );
         }
         if ( !mongoTemplate.collectionExists( BRANCH_SETTINGS_COLLECTION ) ) {
-            LOG.info( "Creating " + BRANCH_SETTINGS_COLLECTION );
+            LOG.debug( "Creating " + BRANCH_SETTINGS_COLLECTION );
             mongoTemplate.createCollection( BRANCH_SETTINGS_COLLECTION );
             createIndexOnIden( BRANCH_SETTINGS_COLLECTION );
         }
         if ( !mongoTemplate.collectionExists( AGENT_SETTINGS_COLLECTION ) ) {
-            LOG.info( "Creating " + AGENT_SETTINGS_COLLECTION );
+            LOG.debug( "Creating " + AGENT_SETTINGS_COLLECTION );
             mongoTemplate.createCollection( AGENT_SETTINGS_COLLECTION );
             createIndexOnIden( AGENT_SETTINGS_COLLECTION );
         }
@@ -401,7 +401,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public List<ProfileUrlEntity> fetchSEOOptimizedOrganizationUnitSettings( String collectionName, int skipCount,
         int numOfRecords, List<Long> excludedEntityIds )
     {
-        LOG.info( "Getting SEO related data for " + collectionName );
+        LOG.debug( "Getting SEO related data for " + collectionName );
         List<ProfileUrlEntity> profileUrls = null;
         // only get profile name
         Query query = new Query();
@@ -426,12 +426,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public long fetchSEOOptimizedOrganizationUnitCount( String collectionName, List<Long> excludedEntityIds )
     {
-        LOG.info( "Getting SEO Optimized count for collection " + collectionName );
+        LOG.debug( "Getting SEO Optimized count for collection " + collectionName );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).nin( excludedEntityIds ) );
         long count = mongoTemplate.count( query, collectionName );
-        LOG.info( "Returning count " + count );
+        LOG.debug( "Returning count " + count );
         return count;
     }
 
@@ -439,19 +439,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public void updateCompletedSurveyCountForAgent( long agentId, int incrementCount )
     {
-        LOG.info( "Method to update completed survey count for agent started." );
+        LOG.debug( "Method to update completed survey count for agent started." );
         Query query = new Query( Criteria.where( "iden" ).is( agentId ) );
         Update update = new Update();
         update.inc( CommonConstants.REVIEW_COUNT_MONGO, incrementCount );
         mongoTemplate.updateFirst( query, update, AgentSettings.class, CommonConstants.AGENT_SETTINGS_COLLECTION );
-        LOG.info( "Method to update completed survey count for agent finished." );
+        LOG.debug( "Method to update completed survey count for agent finished." );
     }
 
 
     @Override
     public List<FeedIngestionEntity> fetchSocialMediaTokens( String collectionName, int skipCount, int numOfRecords )
     {
-        LOG.info( "Fetching social media tokens from " + collectionName );
+        LOG.debug( "Fetching social media tokens from " + collectionName );
         List<FeedIngestionEntity> tokens = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true ) );
@@ -463,7 +463,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             query.limit( numOfRecords );
         }
         tokens = mongoTemplate.find( query, FeedIngestionEntity.class, collectionName );
-        LOG.info( "Fetched " + ( tokens != null ? tokens.size() : "none" ) + " items with social media tokens from "
+        LOG.debug( "Fetched " + ( tokens != null ? tokens.size() : "none" ) + " items with social media tokens from "
             + collectionName );
         return tokens;
     }
@@ -474,11 +474,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
      */
     public void removeOganizationUnitSettings( List<Long> agentIds, String collectionName )
     {
-        LOG.info( "Method removeOganizationUnitSettings() started." );
+        LOG.debug( "Method removeOganizationUnitSettings() started." );
         Query query = new Query();
         query.addCriteria( Criteria.where( "iden" ).in( agentIds ) );
         mongoTemplate.remove( query, collectionName );
-        LOG.info( "Method removeOganizationUnitSettings() finished." );
+        LOG.debug( "Method removeOganizationUnitSettings() finished." );
     }
 
 
@@ -499,7 +499,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public void setAgentDetails( Map<Long, AgentRankingReport> agentsReport )
     {
-        LOG.info( "Method setAgentNames() started." );
+        LOG.debug( "Method setAgentNames() started." );
         Set<Long> agentIds = agentsReport.keySet();
         List<AgentSettings> agentSettings = fetchMultipleAgentSettingsById( new ArrayList<Long>( agentIds ) );
         for ( AgentSettings setting : agentSettings ) {
@@ -515,7 +515,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
                 }
             }
         }
-        LOG.info( "Method setAgentNames() finished." );
+        LOG.debug( "Method setAgentNames() finished." );
     }
 
 
@@ -523,7 +523,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public OrganizationUnitSettings removeKeyInOrganizationSettings( OrganizationUnitSettings unitSettings, String keyToUpdate,
         String collectionName )
     {
-        LOG.info( "Method removeKeyInOrganizationSettings() started." );
+        LOG.debug( "Method removeKeyInOrganizationSettings() started." );
         Query query = new Query();
         query.addCriteria( Criteria.where( "_id" ).is( unitSettings.getId() ) );
         Update update = new Update().unset( keyToUpdate );
@@ -531,7 +531,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
         unitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
         setCompleteUrlForSettings( unitSettings, collectionName );
-        LOG.info( "Method removeKeyInOrganizationSettings() finished." );
+        LOG.debug( "Method removeKeyInOrganizationSettings() finished." );
         return unitSettings;
     }
 
@@ -556,7 +556,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public List<OrganizationUnitSettings> getCompanyList()
     {
-        LOG.info( "Method getCompanyList() started." );
+        LOG.debug( "Method getCompanyList() started." );
 
         List<OrganizationUnitSettings> unitSettings = null;
         Query query = new Query();
@@ -567,7 +567,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "query: " + query.toString() );
 
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
-        LOG.info( "Method getCompanyList() finished." );
+        LOG.debug( "Method getCompanyList() finished." );
         return unitSettings;
     }
 
@@ -587,7 +587,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             .include( KEY_PROFILE_IMAGE ).exclude( "_id" );
 
         query.with( new Sort( Direction.ASC, KEY_CONTACT_NAME ) );
-        LOG.info( "Query: " + query.toString() );
+        LOG.debug( "Query: " + query.toString() );
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
         LOG.debug( "Method getCompanyList() finished." );
         return unitSettings;
@@ -650,7 +650,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class,
             collectionName );
         setCompleteUrlForSettings( organizationUnitSettings, collectionName );
-        LOG.info( "Successfully executed method fetchOrganizationUnitSettingsByProfileName" );
+        LOG.debug( "Successfully executed method fetchOrganizationUnitSettingsByProfileName" );
         return organizationUnitSettings;
     }
 
@@ -659,9 +659,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public List<OrganizationUnitSettings> getOrganizationUnitListWithCRMSource( String source, String collectionName )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Getting Organization Unit Settings List from " + collectionName + " for crm source " + source );
+        LOG.debug( "Getting Organization Unit Settings List from " + collectionName + " for crm source " + source );
         if ( collectionName == null || collectionName.isEmpty() ) {
-            LOG.info( "Collection name is not present to fetch crm info list." );
+            LOG.debug( "Collection name is not present to fetch crm info list." );
             throw new InvalidInputException( "Collection name is not present to fetch crm info list." );
         }
         List<OrganizationUnitSettings> organizationUnitsSettingsList = null;
@@ -672,10 +672,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         }
         organizationUnitsSettingsList = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
         if ( organizationUnitsSettingsList == null || organizationUnitsSettingsList.isEmpty() ) {
-            LOG.info( "No records found for crm source: " + source );
+            LOG.debug( "No records found for crm source: " + source );
             throw new NoRecordsFetchedException( "No records found for crm source: " + source );
         }
-        LOG.info( "Successfully found unit settings for source " + source );
+        LOG.debug( "Successfully found unit settings for source " + source );
         return organizationUnitsSettingsList;
     }
 
@@ -691,9 +691,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public List<OrganizationUnitSettings> getCompanyListForEncompass( String state )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Getting Company list for encompass where state : " + state );
+        LOG.debug( "Getting Company list for encompass where state : " + state );
         if ( state == null || state.isEmpty() ) {
-            LOG.info( "state is not present to fetch encompass info list." );
+            LOG.debug( "state is not present to fetch encompass info list." );
             throw new InvalidInputException( "state is not present to fetch encompass info list." );
         }
         List<OrganizationUnitSettings> organizationUnitsSettingsList = null;
@@ -714,10 +714,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         organizationUnitsSettingsList = mongoTemplate.find( query, OrganizationUnitSettings.class,
             CommonConstants.COMPANY_SETTINGS_COLLECTION );
         if ( organizationUnitsSettingsList == null || organizationUnitsSettingsList.isEmpty() ) {
-            LOG.info( "No records found for state : " + state );
+            LOG.debug( "No records found for state : " + state );
             throw new NoRecordsFetchedException( "No records found for state : " + state );
         }
-        LOG.info( "Successfully found company settings for encompass where state : " + state );
+        LOG.debug( "Successfully found company settings for encompass where state : " + state );
         return organizationUnitsSettingsList;
     }
 
@@ -735,7 +735,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public List<ProfileImageUrlData> fetchProfileImageUrlsForEntityList( String entityType, HashSet<Long> entityList )
         throws InvalidInputException
     {
-        LOG.info( "Fetching profile image urls for entity type : " + entityType );
+        LOG.debug( "Fetching profile image urls for entity type : " + entityType );
         String collectionName = null;
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             collectionName = CommonConstants.COMPANY_SETTINGS_COLLECTION;
@@ -774,7 +774,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             profileImageUrlData.setProfileImageUrl( profileImageUrl );
             profileImageUrlList.add( profileImageUrlData );
         }
-        LOG.info( "Method fetchProfileImageUrlsForEntityList() finished" );
+        LOG.debug( "Method fetchProfileImageUrlsForEntityList() finished" );
         return profileImageUrlList;
     }
 
@@ -783,7 +783,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public Map<Long, String> getCollectionListOfUnprocessedImages( String collectionName, String imageType )
         throws InvalidInputException
     {
-        LOG.info( "Getting unprocessed " + imageType + " from collection name: " + collectionName );
+        LOG.debug( "Getting unprocessed " + imageType + " from collection name: " + collectionName );
         Map<Long, String> images = null;
         if ( collectionName == null || collectionName.isEmpty() || imageType == null || imageType.isEmpty() ) {
             LOG.error( "Invalid input getCollectionListOfUnprocessedImages" );
@@ -827,7 +827,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException
     {
-        LOG.info( "Updating thumbnail image details for collection : " + collectionName + " ID: " + iden + " imageType : "
+        LOG.debug( "Updating thumbnail image details for collection : " + collectionName + " ID: " + iden + " imageType : "
             + imageType + " with filename : " + fileName );
         if ( iden <= 0l || fileName == null || fileName.isEmpty() || collectionName == null || collectionName.isEmpty()
             || imageType == null || imageType.isEmpty() ) {
@@ -861,7 +861,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
         }
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
-        LOG.info( "Updated thumbnail image details" );
+        LOG.debug( "Updated thumbnail image details" );
     }
 
 
@@ -878,7 +878,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         if ( agentSettings == null ) {
             throw new InvalidInputException( "AgentSettings cannot be null" );
         }
-        LOG.info( "Method updateAgentSettingsForUserRestoration started for agentId : " + agentSettings.getIden() );
+        LOG.debug( "Method updateAgentSettingsForUserRestoration started for agentId : " + agentSettings.getIden() );
 
         //Set status to active in mongo
         Query query = new Query();
@@ -914,7 +914,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public List<OrganizationUnitSettings> fetchUnitSettingsConnectedToZillow( String collectionName, List<Long> identifiers )
     {
-        LOG.info( "Fetching social media tokens from " + collectionName );
+        LOG.debug( "Fetching social media tokens from " + collectionName );
         List<OrganizationUnitSettings> settings = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_ZILLOW_SOCIAL_MEDIA_TOKEN ).exists( true ) );
@@ -922,7 +922,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( KEY_SURVEY_SETTINGS )
             .include( KEY_CONTACT_DETAILS ).include( KEY_PROFILE_URL ).exclude( "_id" );
         settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
-        LOG.info( "Fetched " + ( settings != null ? settings.size() : "none" ) + " items with social media tokens from "
+        LOG.debug( "Fetched " + ( settings != null ? settings.size() : "none" ) + " items with social media tokens from "
             + collectionName );
         return settings;
     }
@@ -931,7 +931,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public SocialMediaTokens fetchSocialMediaTokens( String collectionName, long iden )
     {
-        LOG.info( "Getting social media tokens for id: " + iden + " for collection " + collectionName );
+        LOG.debug( "Getting social media tokens for id: " + iden + " for collection " + collectionName );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).exclude( "_id" );
@@ -943,7 +943,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public List<OrganizationUnitSettings> fetchUnitSettingsForSocialMediaTokens( String collectionName )
     {
-        LOG.info( "Fetching unit settings for social media token expiry from " + collectionName );
+        LOG.debug( "Fetching unit settings for social media token expiry from " + collectionName );
         List<OrganizationUnitSettings> settings = null;
 
         List<Criteria> cList = new ArrayList<>();
@@ -962,7 +962,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
 
         settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
-        LOG.info( "Fetched " + ( settings != null ? settings.size() : "none" ) + " unit settings with social media tokens from "
+        LOG.debug( "Fetched " + ( settings != null ? settings.size() : "none" ) + " unit settings with social media tokens from "
             + collectionName );
 
         return settings;

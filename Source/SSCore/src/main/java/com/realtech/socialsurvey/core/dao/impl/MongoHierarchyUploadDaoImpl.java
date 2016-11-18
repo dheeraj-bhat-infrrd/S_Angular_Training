@@ -47,11 +47,11 @@ public class MongoHierarchyUploadDaoImpl implements HierarchyUploadDao
     @Override
     public HierarchyUpload getHierarchyUploadByCompany( long companyId ) throws InvalidInputException
     {
-        LOG.info( "Method to get hierarchy upload for companyId : " + companyId + " started" );
+        LOG.debug( "Method to get hierarchy upload for companyId : " + companyId + " started" );
         //Fetch from mongo
         HierarchyUpload hierarchyUpload = fetchHierarchyUploadFromCollection( companyId,
             CommonConstants.HIERARCHY_UPLOAD_COLLECTION );
-        LOG.info( "Method to get hierarchy upload for companyId : " + companyId + " finished" );
+        LOG.debug( "Method to get hierarchy upload for companyId : " + companyId + " finished" );
         return hierarchyUpload;
     }
 
