@@ -4873,11 +4873,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setReview( reviewDescription );
 
                 surveyHandler.updateZillowSummaryInExistingSurveyDetails( surveyDetails );
+            } else if(surveyDetails.getSourceId() == null || surveyDetails.getSourceId().isEmpty()) {
+                
             }
 
             if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
                 && fromBatch ) {
                 postToTempTable( collectionName, profile, surveyDetails, review );
+                surveyDetails.setSourceId( sourceId );
+
+                surveyHandler.updateZillowSourceIdInExistingSurveyDetails( surveyDetails );
             }
 
             /* if ( fromPublicPage ) {

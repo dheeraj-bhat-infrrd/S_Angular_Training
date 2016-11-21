@@ -356,4 +356,7 @@ public interface SurveyHandler
     void sendSurveyReminderEmail( SurveyPreInitiation survey ) throws InvalidInputException, ProfileNotFoundException;
     
     public void updateSurveySourceIdInMongo();
+
+
+    void updateZillowSourceIdInExistingSurveyDetails( SurveyDetails surveyDetails );
 }
