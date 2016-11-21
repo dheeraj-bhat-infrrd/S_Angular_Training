@@ -25,9 +25,6 @@ import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.UnavailableException;
 
-import com.realtech.socialsurvey.core.entities.GoogleBusinessToken;
-import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -41,9 +38,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -76,6 +70,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.GoogleBusinessToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
 import com.realtech.socialsurvey.core.entities.LendingTreeToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
@@ -115,6 +110,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -130,9 +126,13 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
+
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 
 @DependsOn ( "generic")
@@ -1518,11 +1518,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 && !companyTokens.getRealtorToken().getRealtorProfileLink().equals( "" ) ) {
                 entityTokens.getRealtorToken().setRealtorProfileLink( companyTokens.getRealtorToken().getRealtorProfileLink() );
             }
-            if (
-                ( entityTokens.getGoogleBusinessToken().getGoogleBusinessLink() == null || entityTokens.getGoogleBusinessToken()
-                    .getGoogleBusinessLink().equals( "" ) )
-                    && companyTokens.getGoogleBusinessToken().getGoogleBusinessLink() != null && !companyTokens
-                    .getGoogleBusinessToken().getGoogleBusinessLink().equals( "" ) ) {
+            if ( ( entityTokens.getGoogleBusinessToken().getGoogleBusinessLink() == null
+                || entityTokens.getGoogleBusinessToken().getGoogleBusinessLink().equals( "" ) )
+                && companyTokens.getGoogleBusinessToken().getGoogleBusinessLink() != null
+                && !companyTokens.getGoogleBusinessToken().getGoogleBusinessLink().equals( "" ) ) {
                 entityTokens.getGoogleBusinessToken()
                     .setGoogleBusinessLink( companyTokens.getGoogleBusinessToken().getGoogleBusinessLink() );
             }
@@ -1569,9 +1568,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( mediaTokens.getRealtorToken() == null ) {
             mediaTokens.setRealtorToken( new RealtorToken() );
         }
-	    if ( mediaTokens.getGoogleBusinessToken() == null ) {
-		    mediaTokens.setGoogleBusinessToken( new GoogleBusinessToken() );
-	    }
+        if ( mediaTokens.getGoogleBusinessToken() == null ) {
+            mediaTokens.setGoogleBusinessToken( new GoogleBusinessToken() );
+        }
         return mediaTokens;
     }
 
@@ -1830,14 +1829,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             fetchAbusive, startDate, endDate, sortCriteria );
 
         //TODO : remove this . Temporary fix for Zillow review URl
-        for (SurveyDetails review : surveyDetails){
-            if(review.getSource().equals( "Zillow" )){
-                if(StringUtils.isEmpty( review.getSourceId() ) ) {
+        for ( SurveyDetails review : surveyDetails ) {
+            if ( review.getSource().equals( "Zillow" ) ) {
+                if ( StringUtils.isEmpty( review.getSourceId() ) ) {
                     review.setSourceId( review.getCompleteProfileUrl() );
                 }
             }
         }
-        
+
         // This is not needed. Commenting out
         /*for (SurveyDetails review : surveyDetails) {
             OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
@@ -1895,11 +1894,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         surveyDetails = surveyDetailsDao.getFeedbacksForReports( idenColumnName, iden, startIndex, numOfRows, startScore,
             limitScore, fetchAbusive, startDate, endDate, sortCriteria );
-        
+
         //TODO : remove this . Temporary fix for Zillow review URl
-        for (SurveyDetails review : surveyDetails){
-            if(review.getSource().equals( "Zillow" )){
-                if(StringUtils.isEmpty( review.getSourceId() ) ) {
+        for ( SurveyDetails review : surveyDetails ) {
+            if ( review.getSource().equals( "Zillow" ) ) {
+                if ( StringUtils.isEmpty( review.getSourceId() ) ) {
                     review.setSourceId( review.getCompleteProfileUrl() );
                 }
             }
@@ -2748,10 +2747,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         && mediaTokens.getRealtorToken().getRealtorProfileLink() != null ) {
                         review.setRealtorProfileUrl( mediaTokens.getRealtorToken().getRealtorProfileLink() );
                     }
-	                if ( mediaTokens.getGoogleBusinessToken() != null
-		                && mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
-		                review.setGoogleBusinessProfileUrl( mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink() );
-	                }
+                    if ( mediaTokens.getGoogleBusinessToken() != null
+                        && mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
+                        review.setGoogleBusinessProfileUrl( mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink() );
+                    }
                 }
             }
         }
@@ -4797,7 +4796,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             String sourceId = (String) review.get( "reviewURL" );
             String reviewDescription = (String) review.get( "description" );
             String summary = (String) review.get( "reviewSummary" );
-            queries.put( CommonConstants.SURVEY_SOURCE_ID_COLUMN, sourceId );
+            //            TODO -  need to remove this after fixing zillow issue
+            //queries.put( CommonConstants.SURVEY_SOURCE_ID_COLUMN, sourceId );
+            queries.put( CommonConstants.REVIEW_COLUMN, reviewDescription );
             boolean isAbusive = false;
             if ( fromBatch ) {
                 utils.checkReviewForSwearWords( reviewDescription, surveyHandler.getSwearList() );

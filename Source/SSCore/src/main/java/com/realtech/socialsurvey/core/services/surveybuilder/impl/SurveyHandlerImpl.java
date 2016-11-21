@@ -3880,31 +3880,53 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
+    @Transactional
     public void updateSurveySourceIdInMongo()
     {
         try {
-            emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail,
-                "SurveySourceIdUpdater started successfully.", "SurveySourceIdUpdater started successfully.", null );
-            int batch = 500;
+            int batch = 1000;
             int count = 0;
             List<SurveyDetails> surveys = null;
             do {
                 surveys = surveyDetailsDao.getAllSurveys( count, batch );
-
+                LOG.info( "Number of reveiws fetched: " + surveys.size() );
                 List<Long> surveyPreInitiationIds = new ArrayList<Long>();
+                List<SurveyDetails> surveys1 = new ArrayList<SurveyDetails>();
+                List<SurveyDetails> surveys2 = new ArrayList<SurveyDetails>();
                 for ( SurveyDetails survey : surveys ) {
-                    surveyPreInitiationIds.add( survey.getSurveyPreIntitiationId() );
+                    if ( survey.getSurveyPreIntitiationId() == 0 ) {
+                        surveys2.add( survey );
+                    } else {
+                        surveys1.add( survey );
+                        surveyPreInitiationIds.add( survey.getSurveyPreIntitiationId() );
+                    }
                 }
 
-                Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
-                    .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
+                LOG.info( "Number of reveiws fetched in surveys1: " + surveys1.size() );
+                LOG.info( "Number of reveiws fetched in surveys2: " + surveys2.size() );
 
-                for ( SurveyDetails survey : surveys ) {
-                    if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
-                        String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
-                        if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) )
-                            survey.setSourceId( sourceId );
-                        surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+                //                Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
+                //                    .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
+
+                //                for ( SurveyDetails survey : surveys1 ) {
+                //                    if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
+                //                        String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
+                //                        if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) ) {
+                //                            survey.setSourceId( sourceId );
+                //                            surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+                //                        }
+                //                    }
+                //                }
+
+                for ( SurveyDetails survey : surveys2 ) {
+                    List<SurveyPreInitiation> spis = surveyPreInitiationDao
+                        .getSurveyByAgentIdAndCustomeEmail( survey.getAgentId(), survey.getCustomerEmail() );
+                    if ( spis.size() == 1 ) {
+                        if ( !StringUtils.isEmpty( spis.get( 0 ).getSurveySourceId() )
+                            && StringUtils.isEmpty( survey.getSourceId() ) ) {
+                            survey.setSourceId( spis.get( 0 ).getSurveySourceId() );
+                            surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+                        }
                     }
                 }
                 count = count + surveys.size();

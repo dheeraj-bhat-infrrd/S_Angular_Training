@@ -234,14 +234,14 @@ public class EmailFormatHelper
             Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
             if ( hierarchyMap != null && !hierarchyMap.isEmpty() ) {
                 if ( hierarchyMap.containsKey( CommonConstants.COMPANY_ID_COLUMN ) )
-                    companySettings = organizationManagementService.getCompanySettings( hierarchyMap
-                        .get( CommonConstants.COMPANY_ID_COLUMN ) );
+                    companySettings = organizationManagementService
+                        .getCompanySettings( hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN ) );
                 if ( hierarchyMap.containsKey( CommonConstants.REGION_ID_COLUMN ) )
-                    regionSettings = organizationManagementService.getRegionSettings( hierarchyMap
-                        .get( CommonConstants.REGION_ID_COLUMN ) );
+                    regionSettings = organizationManagementService
+                        .getRegionSettings( hierarchyMap.get( CommonConstants.REGION_ID_COLUMN ) );
                 if ( hierarchyMap.containsKey( CommonConstants.BRANCH_ID_COLUMN ) )
-                    branchSettings = organizationManagementService.getBranchSettingsDefault( hierarchyMap
-                        .get( CommonConstants.BRANCH_ID_COLUMN ) );
+                    branchSettings = organizationManagementService
+                        .getBranchSettingsDefault( hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
             }
             Map<SettingsForApplication, OrganizationUnit> map = null;
             try {
@@ -251,9 +251,10 @@ public class EmailFormatHelper
                     throw new FatalException( "Unable to fetch primary profile this user " + agentSettings.getIden() );
                 }
             } catch ( InvalidSettingsStateException e ) {
-                throw new InternalServerException( new ProfileServiceErrorCode(
-                    CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
-                    "Error occured while fetching region profile" ), e.getMessage() );
+                throw new InternalServerException(
+                    new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
+                        CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile" ),
+                    e.getMessage() );
             } catch ( ProfileNotFoundException e ) {
                 LOG.error( "No profile found for the user ", e );
             }
@@ -486,7 +487,8 @@ public class EmailFormatHelper
         content = StringUtils.replace( content, "[company_lending_tree_link]", processUrl( company_lending_tree_link ) );
         content = StringUtils.replace( content, "[company_realtor_com_link]", processUrl( company_realtor_com_link ) );
 
-        content = StringUtils.replace( content, "[survey_source_id]", surveyMap.get( CommonConstants.SURVEY_SOURCE_ID_COLUMN ) );
+        content = StringUtils.replace( content, "[survey_source_id]",
+            surveyMap.get( CommonConstants.SURVEY_SOURCE_ID_COLUMN ) );
         content = StringUtils.replace( content, "[survey_source]", surveyMap.get( CommonConstants.SURVEY_SOURCE_COLUMN ) );
         //JIRA SS-626 end
         content = StringUtils.replace( content, "null", "" );
@@ -547,7 +549,8 @@ public class EmailFormatHelper
                 surveySource = survey.getSurveySource();
         }
         LOG.info( "Method fetchSurveySourceId finished for agentId : " + agentId + " and customer : " + customerEmailAddress );
-        surveyMap.put( CommonConstants.SURVEY_SOURCE_ID_COLUMN, surveySourceId );
+        surveyMap.put( CommonConstants.SURVEY_SOURCE_ID_COLUMN,
+            !StringUtils.isEmpty( surveySourceId ) ? surveySourceId : "--" );
         surveyMap.put( CommonConstants.SURVEY_SOURCE_COLUMN, surveySource );
         return surveyMap;
     }
