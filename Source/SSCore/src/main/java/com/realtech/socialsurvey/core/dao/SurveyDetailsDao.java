@@ -334,4 +334,7 @@ public interface SurveyDetailsDao
 
 
     public void updateSurveySourceIdInMongo( SurveyDetails survey );
+
+
+    void updateZillowSourceIdInExistingSurveyDetails( SurveyDetails surveyDetails );
 }
