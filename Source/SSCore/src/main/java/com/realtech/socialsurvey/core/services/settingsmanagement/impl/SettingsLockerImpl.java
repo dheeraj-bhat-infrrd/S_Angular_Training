@@ -24,11 +24,11 @@ public class SettingsLockerImpl implements SettingsLocker {
 			LOG.warn("Invalid values set to lock the settings for company");
 			throw new InvalidInputException("Invalid values set to lock the settings");
 		}
-		LOG.info("Setting lock values for company: " + company.getCompanyId() + " for settings " + settings + " with lock status: " + hasBeenLocked);
+		LOG.debug("Setting lock values for company: " + company.getCompanyId() + " for settings " + settings + " with lock status: " + hasBeenLocked);
 		long modifiedSettingsLockValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Long.parseLong(company.getSettingsLockStatus()),
 				settings, hasBeenLocked);
 		company.setSettingsLockStatus(String.valueOf(modifiedSettingsLockValue));
-		LOG.info("Setting lock values for company: " + company.getCompanyId() + " completed.");
+		LOG.debug("Setting lock values for company: " + company.getCompanyId() + " completed.");
 		return company;
 	}
 
@@ -38,11 +38,11 @@ public class SettingsLockerImpl implements SettingsLocker {
 			LOG.warn("Invalid values set to lock the settings for region");
 			throw new InvalidInputException("Invalid values set to lock the region");
 		}
-		LOG.info("Setting lock values for region: " + region.getRegionId() + " for settings " + settings + " with lock status: " + hasBeenLocked);
+		LOG.debug("Setting lock values for region: " + region.getRegionId() + " for settings " + settings + " with lock status: " + hasBeenLocked);
 		long modifiedSettingsLockValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Long.parseLong(region.getSettingsLockStatus()),
 				settings, hasBeenLocked);
 		region.setSettingsLockStatus(String.valueOf(modifiedSettingsLockValue));
-		LOG.info("Setting lock values for region: " + region.getRegionId() + " completed.");
+		LOG.debug("Setting lock values for region: " + region.getRegionId() + " completed.");
 		return region;
 	}
 
@@ -52,17 +52,17 @@ public class SettingsLockerImpl implements SettingsLocker {
 			LOG.warn("Invalid values set to lock the settings for branch");
 			throw new InvalidInputException("Invalid values set to lock the branch");
 		}
-		LOG.info("Setting lock values for branch: " + branch.getBranchId() + " for settings " + settings + " with lock status: " + hasBeenLocked);
+		LOG.debug("Setting lock values for branch: " + branch.getBranchId() + " for settings " + settings + " with lock status: " + hasBeenLocked);
 		long modifiedSettingsLockValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Long.parseLong(branch.getSettingsLockStatus()),
 				settings, hasBeenLocked);
 		branch.setSettingsLockStatus(String.valueOf(modifiedSettingsLockValue));
-		LOG.info("Setting lock values for branch: " + branch.getBranchId() + " completed.");
+		LOG.debug("Setting lock values for branch: " + branch.getBranchId() + " completed.");
 		return branch;
 	}
 
 	@Override
 	public boolean isSettingsValueLocked(OrganizationUnit organizationUnit, long currentLockValue, SettingsForApplication settings) {
-		LOG.info("Checking if the value is locked for the settings");
+		LOG.debug("Checking if the value is locked for the settings");
 		boolean isValueLocked = false;
 		String sCurrentLockValue = String.valueOf(currentLockValue);
 		// find index of the settings to be checked for.
@@ -106,7 +106,7 @@ public class SettingsLockerImpl implements SettingsLocker {
 
 	@Override
 	public OrganizationUnit getHighestLockerLevel(int lockUnitValue) throws InvalidSettingsStateException {
-		LOG.info("Getting highest locker for " + lockUnitValue);
+		LOG.debug("Getting highest locker for " + lockUnitValue);
 		OrganizationUnit organizationUnit = null;
 		if (lockUnitValue == CommonConstants.LOCKED_BY_NONE) {
 			organizationUnit = null;
