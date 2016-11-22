@@ -10913,6 +10913,7 @@ function testEnableLoneCallBack(response) {
 	if (map == "Successfully enabled lone wolf connection") {
 		showInfo(map);
 		$("#lone-state").val('prod');
+		$("#lone-transaction-start-date").prop("disabled", true);
 		showLoneWolfButtons();
 	} else {
 		showError(map);
@@ -11002,6 +11003,8 @@ function testDisconnectLoneWolfCallBack(response) {
 	var map = response;
 	if (map == "Successfully disabled lone wolf connection") {
 		$("#lone-state").val('dryrun');
+		$("#lone-transaction-start-date").prop("disabled", false);
+		initializeStartDate();
 		showLoneWolfButtons();
 		showInfo(map);
 	} else {
@@ -11234,3 +11237,23 @@ $(document).on('click','ul.accordion li',function(){
 $(document).on('click','.email-content',function(event){
 	event.stopPropagation();
 });
+
+
+function initializeStartDate(){
+	var startDate;
+	var fromEndDate = new Date();
+	var toEndDate = new Date();
+	$("input[data-date-type='startDate']").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: fromEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        startDate = new Date(selected.date.valueOf());
+        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+        $("input[data-date-type='endDate']").datepicker('setStartDate', startDate);
+    });
+}
