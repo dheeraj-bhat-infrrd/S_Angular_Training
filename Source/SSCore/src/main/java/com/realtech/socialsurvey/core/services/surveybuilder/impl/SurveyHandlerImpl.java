@@ -3894,36 +3894,34 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             int batch = 1000;
             int count = 0;
             List<SurveyDetails> surveys = null;
+            List<SurveyDetails> surveys1 = new ArrayList<SurveyDetails>();
+            List<SurveyDetails> surveys2 = new ArrayList<SurveyDetails>();
             do {
                 surveys = surveyDetailsDao.getAllSurveys( count, batch );
                 LOG.debug( "Number of reveiws fetched: " + surveys.size() );
                 List<Long> surveyPreInitiationIds = new ArrayList<Long>();
-                List<SurveyDetails> surveys1 = new ArrayList<SurveyDetails>();
-                List<SurveyDetails> surveys2 = new ArrayList<SurveyDetails>();
+                List<SurveyDetails> surveysWithIds = new ArrayList<SurveyDetails>();
                 for ( SurveyDetails survey : surveys ) {
-                    if ( survey.getSurveyPreIntitiationId() == 0 ) {
-                        surveys2.add( survey );
-                    } else {
-                        surveys1.add( survey );
+                     if( survey.getSurveyPreIntitiationId() != 0 ) {
+                         surveysWithIds.add( survey );
                         surveyPreInitiationIds.add( survey.getSurveyPreIntitiationId() );
                     }
                 }
 
-                LOG.debug( "Number of reveiws fetched in surveys1: " + surveys1.size() );
-                LOG.debug( "Number of reveiws fetched in surveys2: " + surveys2.size() );
+                LOG.debug( "Number of reveiws fetched in surveysWithIds: " + surveysWithIds.size() );
 
-                //                Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
-                //                    .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
+               Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
+                    .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
 
-                //                for ( SurveyDetails survey : surveys1 ) {
-                //                    if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
-                //                        String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
-                //                        if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) ) {
-                //                            survey.setSourceId( sourceId );
-                //                            surveyDetailsDao.updateSurveySourceIdInMongo( survey );
-                //                        }
-                //                    }
-                //                }
+                for ( SurveyDetails survey : surveys1 ) {
+                    if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
+                        String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
+                        if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) ) {
+                            survey.setSourceId( sourceId );
+                            surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( survey );
+                        }
+                    }
+                }
 
                 for ( SurveyDetails survey : surveys2 ) {
                     List<SurveyPreInitiation> spis = surveyPreInitiationDao
@@ -3932,7 +3930,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         if ( !StringUtils.isEmpty( spis.get( 0 ).getSurveySourceId() )
                             && StringUtils.isEmpty( survey.getSourceId() ) ) {
                             survey.setSourceId( spis.get( 0 ).getSurveySourceId() );
-                            surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+                            surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( survey );
                         }
                     }
                 }
