@@ -800,10 +800,10 @@ public class OrganizationManagementController
                 LOG.info( "Field Id is empty" );
                 encompassFieldId = CommonConstants.ENCOMPASS_DEFAULT_FEILD_ID;
             }
-            if ( state == null || state.isEmpty() || state.equals( CommonConstants.ENCOMPASS_DRY_RUN_STATE ) ) {
-                state = CommonConstants.ENCOMPASS_DRY_RUN_STATE;
+            if ( state == null || state.isEmpty() || state.equals( CommonConstants.CRM_INFO_DRY_RUN_STATE ) ) {
+                state = CommonConstants.CRM_INFO_DRY_RUN_STATE;
             } else {
-                state = CommonConstants.ENCOMPASS_PRODUCTION_STATE;
+                state = CommonConstants.CRM_INFO_PRODUCTION_STATE;
             }
 
             // TODO : Encrypting the password
@@ -869,7 +869,7 @@ public class OrganizationManagementController
             OrganizationUnitSettings companySettings = organizationManagementService
                 .getCompanySettings( user.getCompany().getCompanyId() );
             EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
-            encompassCrmInfo.setState( CommonConstants.ENCOMPASS_PRODUCTION_STATE );
+            encompassCrmInfo.setState( CommonConstants.CRM_INFO_PRODUCTION_STATE );
             encompassCrmInfo.setNumberOfDays( 0 );
             encompassCrmInfo.setEmailAddressForReport( null );
             encompassCrmInfo.setGenerateReport( false );
@@ -910,7 +910,7 @@ public class OrganizationManagementController
             OrganizationUnitSettings companySettings = organizationManagementService
                 .getCompanySettings( user.getCompany().getCompanyId() );
             EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
-            encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
+            encompassCrmInfo.setState( CommonConstants.CRM_INFO_DRY_RUN_STATE );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
             organizationManagementService.logEvent( CommonConstants.ENCOMPASS_CONNECTION, CommonConstants.ACTION_DISABLED,

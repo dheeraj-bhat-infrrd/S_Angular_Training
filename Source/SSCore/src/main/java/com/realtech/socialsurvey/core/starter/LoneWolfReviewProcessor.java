@@ -156,7 +156,7 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                         + organizationUnitSettings.getIden() );
                     LoneWolfCrmInfo loneWolfCrmInfo = (LoneWolfCrmInfo) organizationUnitSettings.getCrm_info();
                     //get records  only if state is prod 
-                    if(loneWolfCrmInfo != null && loneWolfCrmInfo.getState().equals( CommonConstants.ENCOMPASS_PRODUCTION_STATE )){
+                    if(loneWolfCrmInfo != null && loneWolfCrmInfo.getState().equals( CommonConstants.CRM_INFO_PRODUCTION_STATE )){
                         if ( StringUtils.isNotEmpty( loneWolfCrmInfo.getClientCode() ) ) {
 
                             entityId = organizationUnitSettings.getIden();
