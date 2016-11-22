@@ -17,6 +17,7 @@ public class SurveySettings {
     private boolean isSocialPostReminderDisabled;
 	
 	private boolean autoPostEnabled;
+	private boolean autoPostLinkToUserSiteEnabled;
 	private String happyText;
 	private String neutralText;
 	private String sadText;
@@ -114,6 +115,16 @@ public class SurveySettings {
 	public void setAutoPostEnabled(boolean autoPostEnabled) {
 		this.autoPostEnabled = autoPostEnabled;
 	}
+	
+	public boolean isAutoPostLinkToUserSiteEnabled()
+    {
+        return autoPostLinkToUserSiteEnabled;
+    }
+
+    public void setAutoPostLinkToUserSiteEnabled( boolean autoPostLinkToUserSiteEnabled )
+    {
+        this.autoPostLinkToUserSiteEnabled = autoPostLinkToUserSiteEnabled;
+    }
 
 	public String getHappyText() {
 		return happyText;

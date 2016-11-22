@@ -4378,6 +4378,42 @@ function updateAutoPostSetting(isautopostenabled, disableEle) {
 	});
 }
 
+function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disableEle) {
+
+	if ($(disableEle).data('requestRunning')) {
+		return;
+	}
+
+	disable(disableEle);
+
+	var payload = {
+		"autopostlinktousersite" : isautopostlinktositeenabled
+	};
+	var success = false;
+	$.ajax({
+		url : "./updateautopostlinktousersiteforsurvey.do",
+		type : "POST",
+		data : payload,
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			enable(disableEle);
+			if (success) {
+				$('#overlay-toast').html("Content added successfully!");
+			}
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
+		}
+	});
+}
+
 function resetTextForMoodFlow(mood, resetId) {
 	var payload = {
 		"mood" : mood
@@ -9725,6 +9761,16 @@ $('body').on('click', '#atpst-chk-box', function() {
 	} else {
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 		updateAutoPostSetting(false, '#atpst-chk-box');
+	}
+});
+
+$('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
+	if ($('#atpst-lnk-usr-ste-chk-box').hasClass('bd-check-img-checked')) {
+		$('#atpst-lnk-usr-ste-chk-box').removeClass('bd-check-img-checked');
+		updateAutoPostLinkToUserSiteSetting(true, '#atpst-lnk-usr-ste-chk-box');
+	} else {
+		$('#atpst-lnk-usr-ste-chk-box').addClass('bd-check-img-checked');
+		updateAutoPostLinkToUserSiteSetting(false, '#atpst-lnk-usr-ste-chk-box');
 	}
 });
 

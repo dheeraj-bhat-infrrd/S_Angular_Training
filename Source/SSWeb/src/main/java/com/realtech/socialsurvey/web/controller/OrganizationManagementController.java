@@ -741,10 +741,21 @@ public class OrganizationManagementController
             model.addAttribute( "columnValue", entityId );
 
             model.addAttribute( "autoPostEnabled", false );
+            model.addAttribute( "autoPostLinkToUserSite", false );
+            
+          //REALTECH_USER_ID is set only for real tech and SS admin
+            boolean isRealTechOrSSAdmin = false;
+            Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            if ( adminUserid != null ) {
+                isRealTechOrSSAdmin = true;
+            }
+            model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
+            
 
             if ( surveySettings != null ) {
                 model.addAttribute( "autoPostEnabled", surveySettings.isAutoPostEnabled() );
                 model.addAttribute( "minpostscore", surveySettings.getShow_survey_above_score() );
+                model.addAttribute( "autoPostLinkToUserSite", surveySettings );
             }
             surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
             model.addAttribute( "defaultSurveyProperties", surveySettings );
@@ -1533,6 +1544,65 @@ public class OrganizationManagementController
         return "Successfully updated autopost setting";
     }
 
+    @RequestMapping ( value = "/updateautopostlinktousersiteforsurvey", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateAutoPostLinkToUserSiteForSurvey( HttpServletRequest request )
+    {
+        LOG.info( "Method to update autopost link to user website for a survey started" );
+        HttpSession session = request.getSession();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
+        try {
+            String autopostLinkToUserSite = request.getParameter( "autopostlinktousersite" );
+            String collectionName = "";
+            boolean isAutoPostLinkToUserSiteEnabled = false;
+            if ( autopostLinkToUserSite != null && !autopostLinkToUserSite.isEmpty() ) {
+                isAutoPostLinkToUserSiteEnabled = Boolean.parseBoolean( autopostLinkToUserSite );
+
+                OrganizationUnitSettings unitSettings = null;
+                /*
+                 * OrganizationUnitSettings companySettings =
+                 * organizationManagementService.getCompanySettings( user.getCompany()
+                 * .getCompanyId() );
+                 */
+                if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getCompanySettings( entityId );
+
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getRegionSettings( entityId );
+
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getAgentSettings( entityId );
+
+                } else {
+                    throw new InvalidInputException( "Invalid Collection Type" );
+                }
+
+                SurveySettings surveySettings = unitSettings.getSurvey_settings();
+                surveySettings.setAutoPostLinkToUserSiteEnabled( isAutoPostLinkToUserSiteEnabled );
+                if ( organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings ) ) {
+                    unitSettings.setSurvey_settings( surveySettings );
+                    LOG.info( "Updated Survey Settings" );
+                }
+            }
+        } catch ( Exception e ) {
+            LOG.error(
+                "Exception occured in updateAutoPostLinkToUserSiteForSurvey() while updating whether to enable autopost or not. Nested exception is ",
+                e );
+            return e.getMessage();
+        }
+
+        LOG.info( "Method to update autopost link to user site for a survey finished" );
+        return "Successfully updated autopost link to user site setting";
+    }
 
     /**
      * Method to update Survey Reminder Settings

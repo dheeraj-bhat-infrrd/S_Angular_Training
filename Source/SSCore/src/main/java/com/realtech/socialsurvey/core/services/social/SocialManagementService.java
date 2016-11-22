@@ -284,5 +284,8 @@ public interface SocialManagementService
 
 
     String getLinkedinAuthUrl( String redirectUri );
+
+
+    public String getClientCompanyProfileUrlForAgentToPostInSocialMedia( Long agentId ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

@@ -67,6 +67,13 @@
 								<input type="hidden" id="at-pst-cb" name="autopost" value="${autoPostEnabled}">
 								<div class="float-left bd-check-txt">Allow user to autopost</div>
 							</div>
+							<c:if test="${isRealTechOrSSAdmin == 'true' }">
+							<div>
+								<div id="atpst-lnk-usr-ste-chk-box" class="float-left bd-check-img"></div>
+								<input type="hidden" id="at-pst-lnk-usr-ste-cb" name="autopostlinktousersite" value="${autoPostLinkToUserSite}">
+								<div class="float-left bd-check-txt">Allow autopost link to the user's website</div>
+							</div>
+							</c:if>
 						</div>
 					</div>
 					</form>
@@ -215,6 +222,10 @@ $(document).ready(function() {
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 	}
 	
+	if("${autoPostLinkToUserSite}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
+		$('#atpst-lnk-usr-ste-chk-box').addClass('bd-check-img-checked');
+	}
+
 	var accountMasterId = "${accountMasterId}";
 	if (accountMasterId != 5) {
 		

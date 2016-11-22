@@ -1122,8 +1122,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         String updatedFacebookMessage = facebookMessage;
 
+        long agentId  = socialMediaPostDetails.getAgentMediaPostDetails().getAgentId();
         AgentSettings agentSettings = userManagementService
-            .getUserSettings( socialMediaPostDetails.getAgentMediaPostDetails().getAgentId() );
+            .getUserSettings( agentId );
         
         
         //get profile url
@@ -1143,7 +1144,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( agentSettings != null ) {
                     User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
                     if ( agent != null && agent.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                        postToFacebookForAHierarchy( companyId, profileurl, facebookMessage, updatedFacebookMessage, rating,
+                        postToFacebookForAHierarchy( companyId, agentId, profileurl, facebookMessage, updatedFacebookMessage, rating,
                             serverBaseUrl, agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION , socialMediaPostDetails.getAgentMediaPostDetails(),
                             agentMediaPostResponseDetails, isZillow, isAgentsHidden );
                     }
@@ -1162,7 +1163,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( companySetting != null ) {
                     Company company = organizationManagementService.getCompanyById( companySetting.getIden() );
                     if ( company != null && company.getStatus() != CommonConstants.STATUS_INACTIVE ) {
-                        postToFacebookForAHierarchy( companyId, profileurl, facebookMessage, updatedFacebookMessage, rating,
+                        postToFacebookForAHierarchy( companyId, agentId, profileurl, facebookMessage, updatedFacebookMessage, rating,
                             serverBaseUrl, companySetting, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION , socialMediaPostDetails.getCompanyMediaPostDetails(),
                             companyMediaPostResponseDetails, isZillow, isAgentsHidden );
                     }
@@ -1181,7 +1182,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         if ( region != null && region.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                             RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                                 regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
-                            postToFacebookForAHierarchy( companyId, profileurl, facebookMessage, updatedFacebookMessage,
+                            postToFacebookForAHierarchy( companyId, agentId, profileurl, facebookMessage, updatedFacebookMessage,
                                 rating, serverBaseUrl, setting, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,  regionMediaPostDetails, regionMediaPostResponseDetails, isZillow, isAgentsHidden );
                         }
                     }
@@ -1200,7 +1201,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     Branch branch = userManagementService.getBranchById( setting.getIden() );
                     if ( branch != null && branch.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                         if ( setting != null ) {
-                            postToFacebookForAHierarchy( companyId, profileurl, facebookMessage, updatedFacebookMessage,
+                            postToFacebookForAHierarchy( companyId, agentId, profileurl, facebookMessage, updatedFacebookMessage,
                                 rating, serverBaseUrl, setting, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ,  branchMediaPostDetails, branchMediaPostResponseDetails, isZillow, isAgentsHidden );
                         }
                     }
@@ -1229,7 +1230,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @param isAgentsHidden
      * @throws InvalidInputException
      */
-    void postToFacebookForAHierarchy( long companyId, String  profileUrl, String facebookMessage,
+    void postToFacebookForAHierarchy( long companyId, long agentId, String  profileUrl, String facebookMessage,
         String updatedFacebookMessage, double rating, String serverBaseUrl, OrganizationUnitSettings setting, String collectionType,
         MediaPostDetails mediaPostDetails, EntityMediaPostResponseDetails mediaPostResponseDetails, boolean isZillow , boolean isAgentsHidden  )
         throws InvalidInputException
@@ -1238,7 +1239,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             
             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                 if ( !isZillow ) {
-                    updatedFacebookMessage = facebookMessage + setting.getCompleteProfileUrl() + "/";
+                    String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentId );
+                    if (profileUrlWithMessage == null){
+                        profileUrlWithMessage = setting.getCompleteProfileUrl() + "/";
+                    }else{
+                        profileUrlWithMessage = profileUrlWithMessage + ".";
+                    }
+                    updatedFacebookMessage = facebookMessage + profileUrlWithMessage ;
                 }
                 if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId,
                     profileUrl ) ) {
@@ -1401,7 +1408,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         try {
             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                 if ( !isZillow ) {
-                    updatedLinkedInMessage = linkedinMessage + setting.getCompleteProfileUrl() + "/";
+                    String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentSettings.getIden() );
+                    if (profileUrlWithMessage == null){
+                       profileUrlWithMessage = setting.getCompleteProfileUrl() + "/";
+                    }else{
+                        profileUrlWithMessage = profileUrlWithMessage + ".";
+                    }
+                    updatedLinkedInMessage = linkedinMessage + profileUrlWithMessage ;
                 }
 
                 SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
@@ -1763,8 +1776,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     accountMasterId, socialMediaPostDetails, socialMediaPostResponseDetails, companySettings.get( 0 ), false , isCompanyAgentHidden);
 
                 // Twitter message
+                String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentId );
+                if (profileUrlWithMessage == null){
+                    profileUrlWithMessage = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+                }
                 String twitterMessage = buildTwitterAutoPostMessage( customerDisplayName, agentName, rating, feedback,
-                    surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink, false );
+                    profileUrlWithMessage, false );
                 postToTwitterForHierarchy( twitterMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails , isCompanyAgentHidden);
 
@@ -3395,5 +3412,44 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         
         LOG.info( "Method getLinkedinAuthUrl ended" );
         return linkedInAuth.toString();
+    }
+    
+    @Override
+    public String getClientCompanyProfileUrlForAgentToPostInSocialMedia(Long agentId) throws InvalidInputException{
+        Map<String, List<OrganizationUnitSettings>> settingsMap = getSettingsForBranchesAndRegionsInHierarchy( agentId );
+        List<OrganizationUnitSettings> companySettings = settingsMap
+            .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> regionSettings = settingsMap
+            .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> branchSettings = settingsMap
+            .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( agentId );
+        String profileLink = null;
+        
+        if ( agentSettings.getSurvey_settings().isAutoPostLinkToUserSiteEnabled() ) {
+            if ( agentSettings != null && agentSettings.getContact_details() != null
+                && agentSettings.getContact_details().getWeb_addresses() != null
+                && agentSettings.getContact_details().getWeb_addresses().getWork() != null ) {
+                profileLink = agentSettings.getContact_details().getWeb_addresses().getWork();
+            } else if ( branchSettings != null && branchSettings.size() != 0
+                && branchSettings.get(0).getContact_details() != null
+                && branchSettings.get(0).getContact_details().getWeb_addresses() != null
+                && branchSettings.get(0).getContact_details().getWeb_addresses().getWork() != null ) {
+                profileLink = branchSettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
+            } else if ( regionSettings != null && regionSettings.size() != 0
+                && regionSettings.get( 0 ).getContact_details() != null
+                && regionSettings.get( 0 ).getContact_details().getWeb_addresses() != null
+                && regionSettings.get( 0 ).getContact_details().getWeb_addresses().getWork() != null ) {
+                profileLink = regionSettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
+            } else {
+                if ( companySettings != null && companySettings.get( 0 ).getContact_details() != null
+                    && companySettings.get( 0 ).getContact_details().getWeb_addresses() != null
+                    && companySettings.get( 0 ).getContact_details().getWeb_addresses().getWork() != null ) {
+                    profileLink = companySettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
+                }
+            }
+        }
+        return profileLink;
     }
 }
