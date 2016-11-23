@@ -1550,7 +1550,7 @@ public class OrganizationManagementController
     {
         LOG.info( "Method to update autopost link to user website for a survey started" );
         HttpSession session = request.getSession();
-        long companyId = (long) session.getAttribute( CommonConstants.COMPANY_ID );
+        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
 
         try {
             String autopostLinkToUserSite = request.getParameter( "autopostlinktousersite" );
