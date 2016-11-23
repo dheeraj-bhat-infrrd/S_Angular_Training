@@ -1239,7 +1239,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             
             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                 if ( !isZillow ) {
-                    String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentId );
+                    String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentId,setting, collectionType );
                     if (profileUrlWithMessage == null){
                         profileUrlWithMessage = setting.getCompleteProfileUrl() + "/";
                     }else{
@@ -1408,7 +1408,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         try {
             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                 if ( !isZillow ) {
-                    String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentSettings.getIden() );
+                    String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentSettings.getIden(),setting, collectionName  );
                     if (profileUrlWithMessage == null){
                        profileUrlWithMessage = setting.getCompleteProfileUrl() + "/";
                     }else{
@@ -1776,7 +1776,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     accountMasterId, socialMediaPostDetails, socialMediaPostResponseDetails, companySettings.get( 0 ), false , isCompanyAgentHidden);
 
                 // Twitter message
-                String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentId );
+                OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings( agentId );
+                String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentId, agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 if (profileUrlWithMessage == null){
                     profileUrlWithMessage = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
                 }
@@ -3415,7 +3416,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
     
     @Override
-    public String getClientCompanyProfileUrlForAgentToPostInSocialMedia(Long agentId) throws InvalidInputException{
+    public String getClientCompanyProfileUrlForAgentToPostInSocialMedia( Long agentId, OrganizationUnitSettings unitSettings,
+        String collectionType ) throws InvalidInputException
+    {
+
+        String profileLink = null;
+
         Map<String, List<OrganizationUnitSettings>> settingsMap = getSettingsForBranchesAndRegionsInHierarchy( agentId );
         List<OrganizationUnitSettings> companySettings = settingsMap
             .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -3423,31 +3429,83 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
         List<OrganizationUnitSettings> branchSettings = settingsMap
             .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-        
-        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( agentId );
-        String profileLink = null;
-        
-        if ( agentSettings.getSurvey_settings().isAutoPostLinkToUserSiteEnabled() ) {
-            if ( agentSettings != null && agentSettings.getContact_details() != null
-                && agentSettings.getContact_details().getWeb_addresses() != null
-                && agentSettings.getContact_details().getWeb_addresses().getWork() != null ) {
-                profileLink = agentSettings.getContact_details().getWeb_addresses().getWork();
-            } else if ( branchSettings != null && branchSettings.size() != 0
-                && branchSettings.get(0).getContact_details() != null
-                && branchSettings.get(0).getContact_details().getWeb_addresses() != null
-                && branchSettings.get(0).getContact_details().getWeb_addresses().getWork() != null ) {
-                profileLink = branchSettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
-            } else if ( regionSettings != null && regionSettings.size() != 0
-                && regionSettings.get( 0 ).getContact_details() != null
-                && regionSettings.get( 0 ).getContact_details().getWeb_addresses() != null
-                && regionSettings.get( 0 ).getContact_details().getWeb_addresses().getWork() != null ) {
-                profileLink = regionSettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
-            } else {
-                if ( companySettings != null && companySettings.get( 0 ).getContact_details() != null
-                    && companySettings.get( 0 ).getContact_details().getWeb_addresses() != null
-                    && companySettings.get( 0 ).getContact_details().getWeb_addresses().getWork() != null ) {
-                    profileLink = companySettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
-                }
+
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "unitSettings can't be null" );
+        }
+
+        if ( companySettings.get( 0 ).getSurvey_settings().isAutoPostLinkToUserSiteEnabled() ) {
+            switch ( collectionType ) {
+                case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
+                    if ( unitSettings.getContact_details() != null
+                        && unitSettings.getContact_details().getWeb_addresses() != null
+                        && unitSettings.getContact_details().getWeb_addresses().getWork() != null ) {
+                        profileLink = unitSettings.getContact_details().getWeb_addresses().getWork();
+                    }
+                case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
+                    if ( collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+                        if ( profileLink != null ) {
+                            return profileLink;
+                        } else {
+                            if ( branchSettings != null && branchSettings.size() != 0
+                                && branchSettings.get( 0 ).getContact_details() != null
+                                && branchSettings.get( 0 ).getContact_details().getWeb_addresses() != null
+                                && branchSettings.get( 0 ).getContact_details().getWeb_addresses().getWork() != null ) {
+                                profileLink = branchSettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
+                            }
+                        }
+                    } else {
+                        if ( unitSettings.getContact_details() != null
+                            && unitSettings.getContact_details().getWeb_addresses() != null
+                            && unitSettings.getContact_details().getWeb_addresses().getWork() != null ) {
+                            profileLink = unitSettings.getContact_details().getWeb_addresses().getWork();
+                        }
+                    }
+                case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
+                    if ( collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION )
+                        || collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+                        if ( profileLink != null ) {
+                            return profileLink;
+                        } else {
+                            if ( regionSettings != null && regionSettings.size() != 0
+                                && regionSettings.get( 0 ).getContact_details() != null
+                                && regionSettings.get( 0 ).getContact_details().getWeb_addresses() != null
+                                && regionSettings.get( 0 ).getContact_details().getWeb_addresses().getWork() != null ) {
+                                profileLink = regionSettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
+                            }
+                        }
+                    } else {
+                        if ( unitSettings.getContact_details() != null
+                            && unitSettings.getContact_details().getWeb_addresses() != null
+                            && unitSettings.getContact_details().getWeb_addresses().getWork() != null ) {
+                            profileLink = unitSettings.getContact_details().getWeb_addresses().getWork();
+                        }
+                    }
+                case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
+                    if ( collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION )
+                        || collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
+                        || collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                        if ( profileLink != null ) {
+                            return profileLink;
+                        } else {
+                            if ( companySettings != null && companySettings.size() != 0
+                                && companySettings.get( 0 ).getContact_details() != null
+                                && companySettings.get( 0 ).getContact_details().getWeb_addresses() != null
+                                && companySettings.get( 0 ).getContact_details().getWeb_addresses().getWork() != null ) {
+                                profileLink = companySettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
+                            }
+                        }
+                    } else {
+                        if ( unitSettings.getContact_details() != null
+                            && unitSettings.getContact_details().getWeb_addresses() != null
+                            && unitSettings.getContact_details().getWeb_addresses().getWork() != null ) {
+                            profileLink = unitSettings.getContact_details().getWeb_addresses().getWork();
+                        }
+                    }
+                    break;
+
+                default:
+                    throw new InvalidInputException( "Invalid collection type" );
             }
         }
         return profileLink;

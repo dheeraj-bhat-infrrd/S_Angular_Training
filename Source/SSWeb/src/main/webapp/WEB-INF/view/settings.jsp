@@ -67,7 +67,7 @@
 								<input type="hidden" id="at-pst-cb" name="autopost" value="${autoPostEnabled}">
 								<div class="float-left bd-check-txt">Allow user to autopost</div>
 							</div>
-							<c:if test="${isRealTechOrSSAdmin == 'true' }">
+							<c:if test="${isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
 							<div>
 								<div id="atpst-lnk-usr-ste-chk-box" class="float-left bd-check-img"></div>
 								<input type="hidden" id="at-pst-lnk-usr-ste-cb" name="autopostlinktousersite" value="${autoPostLinkToUserSite}">

@@ -4379,39 +4379,14 @@ function updateAutoPostSetting(isautopostenabled, disableEle) {
 }
 
 function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disableEle) {
-
-	if ($(disableEle).data('requestRunning')) {
-		return;
-	}
-
-	disable(disableEle);
-
 	var payload = {
 		"autopostlinktousersite" : isautopostlinktositeenabled
 	};
-	var success = false;
-	$.ajax({
-		url : "./updateautopostlinktousersiteforsurvey.do",
-		type : "POST",
-		data : payload,
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			enable(disableEle);
-			if (success) {
-				$('#overlay-toast').html("Content added successfully!");
-			}
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
-		}
-	});
+	
+	callAjaxPostWithPayloadData("./updateautopostlinktousersiteforsurvey.do",function(data) {
+		if (data == "success") $('#overlay-toast').html("Content updated successfully");
+	}, payload, true, disableEle);
+	
 }
 
 function resetTextForMoodFlow(mood, resetId) {
