@@ -3896,7 +3896,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             List<SurveyDetails> surveys = null;
             do {
                 surveys = surveyDetailsDao.getAllSurveys( count, batch );
-                LOG.debug( "Number of reveiws fetched: " + surveys.size() );
+                LOG.info( "Number of reveiws fetched: " + surveys.size() );
                 List<Long> surveyPreInitiationIds = new ArrayList<Long>();
                 List<SurveyDetails> surveys1 = new ArrayList<SurveyDetails>();
                 List<SurveyDetails> surveys2 = new ArrayList<SurveyDetails>();
@@ -3909,21 +3909,24 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     }
                 }
 
-                LOG.debug( "Number of reveiws fetched in surveys1: " + surveys1.size() );
-                LOG.debug( "Number of reveiws fetched in surveys2: " + surveys2.size() );
+                LOG.info( "Number of reveiws fetched in surveys1: " + surveys1.size() );
+                LOG.info( "Number of reveiws fetched in surveys2: " + surveys2.size() );
 
-                //                Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
-                //                    .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
+                if(surveys1 != null && surveys1.size() > 0){
+                    Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
+                        .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
 
-                //                for ( SurveyDetails survey : surveys1 ) {
-                //                    if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
-                //                        String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
-                //                        if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) ) {
-                //                            survey.setSourceId( sourceId );
-                //                            surveyDetailsDao.updateSurveySourceIdInMongo( survey );
-                //                        }
-                //                    }
-                //                }
+                    for ( SurveyDetails survey : surveys1 ) {
+                        if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
+                            String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
+                            if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) ) {
+                                survey.setSourceId( sourceId );
+                                surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( survey );
+                            }
+                        }
+                    }
+                }
+                                
 
                 for ( SurveyDetails survey : surveys2 ) {
                     List<SurveyPreInitiation> spis = surveyPreInitiationDao
@@ -3932,7 +3935,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         if ( !StringUtils.isEmpty( spis.get( 0 ).getSurveySourceId() )
                             && StringUtils.isEmpty( survey.getSourceId() ) ) {
                             survey.setSourceId( spis.get( 0 ).getSurveySourceId() );
-                            surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+                            surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( survey );
                         }
                     }
                 }
