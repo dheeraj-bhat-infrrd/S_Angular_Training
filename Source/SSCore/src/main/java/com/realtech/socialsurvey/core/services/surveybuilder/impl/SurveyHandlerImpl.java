@@ -3894,34 +3894,39 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             int batch = 1000;
             int count = 0;
             List<SurveyDetails> surveys = null;
-            List<SurveyDetails> surveys1 = new ArrayList<SurveyDetails>();
-            List<SurveyDetails> surveys2 = new ArrayList<SurveyDetails>();
             do {
                 surveys = surveyDetailsDao.getAllSurveys( count, batch );
-                LOG.debug( "Number of reveiws fetched: " + surveys.size() );
+                LOG.info( "Number of reveiws fetched: " + surveys.size() );
                 List<Long> surveyPreInitiationIds = new ArrayList<Long>();
-                List<SurveyDetails> surveysWithIds = new ArrayList<SurveyDetails>();
+                List<SurveyDetails> surveys1 = new ArrayList<SurveyDetails>();
+                List<SurveyDetails> surveys2 = new ArrayList<SurveyDetails>();
                 for ( SurveyDetails survey : surveys ) {
-                     if( survey.getSurveyPreIntitiationId() != 0 ) {
-                         surveysWithIds.add( survey );
+                    if ( survey.getSurveyPreIntitiationId() == 0 ) {
+                        surveys2.add( survey );
+                    } else {
+                        surveys1.add( survey );
                         surveyPreInitiationIds.add( survey.getSurveyPreIntitiationId() );
                     }
                 }
 
-                LOG.debug( "Number of reveiws fetched in surveysWithIds: " + surveysWithIds.size() );
+                LOG.info( "Number of reveiws fetched in surveys1: " + surveys1.size() );
+                LOG.info( "Number of reveiws fetched in surveys2: " + surveys2.size() );
 
-               Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
-                    .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
+                if(surveys1 != null && surveys1.size() > 0){
+                    Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
+                        .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
 
-                for ( SurveyDetails survey : surveys1 ) {
-                    if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
-                        String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
-                        if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) ) {
-                            survey.setSourceId( sourceId );
-                            surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( survey );
+                    for ( SurveyDetails survey : surveys1 ) {
+                        if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
+                            String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
+                            if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) ) {
+                                survey.setSourceId( sourceId );
+                                surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( survey );
+                            }
                         }
                     }
                 }
+                                
 
                 for ( SurveyDetails survey : surveys2 ) {
                     List<SurveyPreInitiation> spis = surveyPreInitiationDao
