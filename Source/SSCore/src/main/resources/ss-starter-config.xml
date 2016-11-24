@@ -660,7 +660,7 @@
 				<ref bean="hierarchyuploadjobdetail" />
 				<ref bean="billingreportjobdetail" />
 				<ref bean="dotloopjobdetail" />
-				 <ref bean="lonewolfjobdetail" /> 
+				<ref bean="lonewolfjobdetail" />
 				<ref bean="socialMediaTokenExpiryJobDetail" />
 				<ref bean="surveyfileuploadjobdetail" />
 				<ref bean="solrreviewcounterupdaterjobdetail" />
@@ -671,10 +671,9 @@
 				<ref bean="zillowreviewprocessandautopostjobdetail" />
 				<ref bean="surveyimporterjobdetail" />
 				<!-- <ref bean="remaxEntitiesTransfer" /> -->
-				<ref bean="hideUsersFromSearch" />
-				<ref bean="updateExistingCompanyPrice" />
-				<ref bean="hideUsersFromSearch" />	
-				<ref bean="surveysourceidupdater" />			
+				<!-- <ref bean="updateExistingCompanyPrice" /> -->
+				<!-- <ref bean="hideUsersFromSearch" />	-->
+				<!-- <ref bean="surveysourceidupdater" />-->			
 			</list>
 		</property>
 
@@ -695,7 +694,7 @@
 				<ref bean="hierarchyuploadcron" />
 				<ref bean="billingreportcron" />
 				<ref bean="dotloopcron" />
-				 <ref bean="lonewolfcron" /> 
+				<ref bean="lonewolfcron" />
 				<ref bean="socialmediatokenexpirycron" />
 				<ref bean="surveyfileuploadcron" />
 				<ref bean="solrreviewcounterupdatercron" />
@@ -706,10 +705,9 @@
 				<ref bean="zillowreviewprocessandautopostcron" />
 				<ref bean="surveyimportercron" />
 				<!-- <ref bean="remaxEntitiesTransfercron" /> -->
-				<ref bean="hideUsersFromSearchcron" />
-				<ref bean="updateExistingCompanyPricecron" />
-				<ref bean="hideUsersFromSearchcron" />
-				<ref bean="surveysourceidupdatercron" />
+				<!-- <ref bean="updateExistingCompanyPricecron" /> -->
+				<!-- <ref bean="hideUsersFromSearchcron" /> -->
+				<!-- <ref bean="surveysourceidupdatercron" /> -->
 			</list>
 		</property>
 		<property name="quartzProperties">

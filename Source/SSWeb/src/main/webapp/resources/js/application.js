@@ -4378,6 +4378,17 @@ function updateAutoPostSetting(isautopostenabled, disableEle) {
 	});
 }
 
+function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disableEle) {
+	var payload = {
+		"autopostlinktousersite" : isautopostlinktositeenabled
+	};
+	
+	callAjaxPostWithPayloadData("./updateautopostlinktousersiteforsurvey.do",function(data) {
+		if (data == "success") $('#overlay-toast').html("Content updated successfully");
+	}, payload, true, disableEle);
+	
+}
+
 function resetTextForMoodFlow(mood, resetId) {
 	var payload = {
 		"mood" : mood
@@ -9728,6 +9739,16 @@ $('body').on('click', '#atpst-chk-box', function() {
 	}
 });
 
+$('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
+	if ($('#atpst-lnk-usr-ste-chk-box').hasClass('bd-check-img-checked')) {
+		$('#atpst-lnk-usr-ste-chk-box').removeClass('bd-check-img-checked');
+		updateAutoPostLinkToUserSiteSetting(true, '#atpst-lnk-usr-ste-chk-box');
+	} else {
+		$('#atpst-lnk-usr-ste-chk-box').addClass('bd-check-img-checked');
+		updateAutoPostLinkToUserSiteSetting(false, '#atpst-lnk-usr-ste-chk-box');
+	}
+});
+
 // Dashboard fb and twitter share
 function getDashboardImageandCaption(loop) {
 	var name = "";
@@ -10941,7 +10962,8 @@ function showLoneWolfButtons() {
 	var state = $("#lone-state").val();
 	if (state == 'dryrun') {
 		$('#lone-dry-enable').show();
-		$('#lone-generate-report').show();
+		//TODO : uncooment the generate report show code when back end is ready
+	//	$('#lone-generate-report').show();
 		$('#lone-disconnect').hide();
 	} else if (state == 'prod') {
 		$('#lone-disconnect').show();

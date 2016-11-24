@@ -3092,11 +3092,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public List<SurveyDetails> getAllSurveys()
+    public List<SurveyDetails> getAllSurveys( int start, int rows )
     {
-        List<SurveyDetails> surveys = mongoTemplate.findAll( SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
-        if ( surveys == null || surveys.size() == 0 )
-            return null;
+        Query query = new Query();
+        if ( start > -1 ) {
+            query.skip( start );
+        }
+        if ( rows > -1 ) {
+            query.limit( rows );
+        }
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN )
+            .nin( Arrays.asList( "Zillow", "admin", "customer", "agent", "user", "SocialSurvey", "upload" ) ) );
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_ID_COLUMN ).is( null ) );
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+
         return surveys;
     }
 

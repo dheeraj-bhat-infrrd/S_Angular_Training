@@ -15,7 +15,7 @@ public interface LoneWolfIntegrationService
     
     List<LoneWolfTransaction> fetchLoneWolfTransactionsData( String secretKey, String apiToken, String clientCode, Map<String, String> queryParam  ) throws InvalidInputException;
     
-    List<LoneWolfMember> fetchLoneWolfMembersData( String secretKey, String apiToken, String clientCode );
+    List<LoneWolfMember> fetchLoneWolfMembersData( String secretKey, String apiToken, String clientCode ) throws InvalidInputException;
     
     Response testLoneWolfCompanyCredentials( String secretKey, String apiToken, String clientCode );
 
