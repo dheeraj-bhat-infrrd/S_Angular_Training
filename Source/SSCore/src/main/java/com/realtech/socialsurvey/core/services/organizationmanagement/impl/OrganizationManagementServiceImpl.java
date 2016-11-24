@@ -280,7 +280,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Value ( "${CDN_PATH}")
     String cdnPath;
-
+    
     @Autowired
     private ProfileCompletionList profileCompletionList;
 
@@ -7464,8 +7464,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         // update the values to company
         updateCompany( company );
     }
-
-
+    
+    
     @Override
     public void imageProcessorStarter()
     {
@@ -7484,6 +7484,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
                         updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
+                       
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7497,7 +7498,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         }
                     }
                 }
+                
+              //ask fb to rescrape pages with new thumbnail
+                askFbToRescrapePagesForSettings( images.keySet(), CommonConstants.COMPANY_SETTINGS_COLLECTION );
             }
+            
+            
+
+           
+           
+           
             // get unprocessed region profile images
             images = getUnprocessedProfileImages( CommonConstants.REGION_SETTINGS_COLLECTION );
             if ( images != null ) {
@@ -7519,7 +7529,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         }
                     }
                 }
+                
+              //ask fb to rescrape pages with new thumbnail
+                askFbToRescrapePagesForSettings( images.keySet(), CommonConstants.REGION_SETTINGS_COLLECTION );
             }
+            
+            
+            
             // get unprocessed branch profile images
             images = getUnprocessedProfileImages( CommonConstants.BRANCH_SETTINGS_COLLECTION );
             if ( images != null ) {
@@ -7541,7 +7557,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         }
                     }
                 }
+                
+              //ask fb to rescrape pages with new thumbnail
+                askFbToRescrapePagesForSettings( images.keySet(), CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                
             }
+            
+            
+            
             // get unprocessed agent profile images
             images = getUnprocessedProfileImages( CommonConstants.AGENT_SETTINGS_COLLECTION );
             if ( images != null ) {
@@ -7563,7 +7586,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         }
                     }
                 }
+                
+              //ask fb to rescrape pages with new thumbnail
+                askFbToRescrapePagesForSettings( images.keySet(), CommonConstants.AGENT_SETTINGS_COLLECTION );
             }
+            
+            
+          
 
             // get unprocessed company logo images
             images = getUnprocessedLogoImages( CommonConstants.COMPANY_SETTINGS_COLLECTION );
@@ -7872,6 +7901,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         List<Company> companyList = companyDao.getCompaniesByBillingModeAuto();
         return companyList;
+    }
+    
+    /**
+     * 
+     * @param entityIds
+     * @param collectionName
+     */
+    @Override
+    public void askFbToRescrapePagesForSettings(Set<Long> entityIds , String collectionName){
+        LOG.info( "Method askFbToRescrapePagesForSettings started" );
+        List<OrganizationUnitSettings> settingsList = organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds( entityIds, collectionName );
+        for(OrganizationUnitSettings settings : settingsList){
+          //ask facebook to rescrape image
+            try {
+                socialManagementService.askFaceBookToReScrapePage( settings.getCompleteProfileUrl() );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "Error while asking facebook to rescrape page" );
+            }
+        }
+        LOG.info( "Method askFbToRescrapePagesForSettings finished" );
     }
 }
 // JIRA: SS-27: By RM05: EOC
