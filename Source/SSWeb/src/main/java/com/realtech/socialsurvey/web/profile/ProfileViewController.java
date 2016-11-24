@@ -101,7 +101,7 @@ public class ProfileViewController
      * @return
      * @throws NoRecordsFetchedException 
      */
-    @RequestMapping ( value = "/company/{profileName}", method = RequestMethod.GET)
+    @RequestMapping ( value = { "/company/{profileName}", "/company/{profileName}/*" }, method = RequestMethod.GET)
     public String initCompanyProfilePage( @PathVariable String profileName, Model model, HttpServletRequest request,
         RedirectAttributes redirectAttributes ) throws NoRecordsFetchedException
     {
@@ -193,7 +193,7 @@ public class ProfileViewController
      * @return
      * @throws NoRecordsFetchedException 
      */
-    @RequestMapping ( value = "/region/{companyProfileName}/{regionProfileName}")
+    @RequestMapping ( value = { "/region/{companyProfileName}/{regionProfileName}", "/region/{companyProfileName}/{regionProfileName}/*" } )
     public String initRegionProfilePage( @PathVariable String companyProfileName, @PathVariable String regionProfileName,
         Model model, HttpServletRequest request, RedirectAttributes redirectAttributes ) throws NoRecordsFetchedException
     {
@@ -323,7 +323,7 @@ public class ProfileViewController
      * @return
      * @throws NoRecordsFetchedException 
      */
-    @RequestMapping ( value = "/office/{companyProfileName}/{branchProfileName}")
+    @RequestMapping ( value = { "/office/{companyProfileName}/{branchProfileName}", "/office/{companyProfileName}/{branchProfileName}/*" } )
     public String initBranchProfilePage( @PathVariable String companyProfileName, @PathVariable String branchProfileName,
         Model model, HttpServletRequest request, RedirectAttributes redirectAttributes ) throws NoRecordsFetchedException
     {
@@ -458,7 +458,7 @@ public class ProfileViewController
      * @return
      * @throws NoRecordsFetchedException 
      */
-    @RequestMapping ( value = "/{agentProfileName}")
+    @RequestMapping ( value = { "/{agentProfileName}", "/{agentProfileName}/*" } )
     public String initAgentProfilePage( @PathVariable String agentProfileName, Model model, HttpServletResponse response,
         HttpServletRequest request, RedirectAttributes redirectAttributes ) throws NoRecordsFetchedException
     {
