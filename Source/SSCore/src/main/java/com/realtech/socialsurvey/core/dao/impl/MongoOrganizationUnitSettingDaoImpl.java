@@ -157,8 +157,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).in( identifiers ) );
         query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );
-        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
-        return settings;
+        List<OrganizationUnitSettings> settingsList = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
+        for ( OrganizationUnitSettings settings : settingsList ) {
+            setCompleteUrlForSettings( settings, collectionName );
+        }
+        return settingsList;
     }
 
 
