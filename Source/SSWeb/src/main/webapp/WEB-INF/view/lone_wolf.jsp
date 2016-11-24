@@ -31,7 +31,12 @@
 							<div class="um-item-row-left text-right">Start Date</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<div class="rfr_icn icn-fname en-icn-fname"></div>
-								<input id="lone-transaction-start-date"  data-date-type="startDate" placeholder="Start Date" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left">
+								<c:if test="${lonestate == 'dryrun'}">
+									<input id="lone-transaction-start-date"  data-date-type="startDate" placeholder="Start Date" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left">
+								</c:if>
+								<c:if test="${lonestate == 'prod'}">
+									<input disabled id="lone-transaction-start-date" placeholder="Start Date" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left">
+								</c:if>
 							</div>
 						</div>
 					</div>
@@ -77,27 +82,7 @@
 <script>
 	$(document).ready(function() {
 		showLoneWolfButtons();
-		isRealTechOrSSAdmin = $
-		{
-			isRealTechOrSSAdmin
-		};
-		
-		var startDate;
-		var fromEndDate = new Date();
-		var toEndDate = new Date();
-		$("input[data-date-type='startDate']").datepicker({
-			orientation: "auto",
-			format: 'mm/dd/yyyy',
-			endDate: fromEndDate,
-			todayHighlight: true,
-			clearBtn: true,
-			autoclose: true
-		})
-		.on('changeDate', function(selected){
-	        startDate = new Date(selected.date.valueOf());
-	        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
-	        $("input[data-date-type='endDate']").datepicker('setStartDate', startDate);
-	    });
-		
+		isRealTechOrSSAdmin = ${isRealTechOrSSAdmin};
+		initializeStartDate();
 	});
 </script>

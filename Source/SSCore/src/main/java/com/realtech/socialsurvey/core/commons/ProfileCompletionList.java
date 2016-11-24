@@ -23,7 +23,7 @@ public class ProfileCompletionList {
 	 * @return Method returns default profile stages.
 	 */
 	public List<ProfileStage> getDefaultProfileCompletionList(boolean isAgent) {
-		LOG.info("Method getDefaultProfileCompletionList started");
+		LOG.debug("Method getDefaultProfileCompletionList started");
 
 		List<ProfileStage> profileStages = new ArrayList<ProfileStage>();
 		ProfileStage profileStage = null;
@@ -83,7 +83,7 @@ public class ProfileCompletionList {
 			profileStage.setStatus(CommonConstants.STATUS_ACTIVE);
 			profileStages.add(profileStage);
 		}
-		LOG.info("Method getDefaultProfileCompletionList ended");
+		LOG.debug("Method getDefaultProfileCompletionList ended");
 
 		return profileStages;
 
@@ -94,19 +94,19 @@ public class ProfileCompletionList {
 	 */
 	public List<ProfileStage> getProfileCompletionList(List<ProfileStage> curProfileStages) {
 
-		LOG.info("Method getProfileCompletionList started for profile stages : " + curProfileStages);
+		LOG.debug("Method getProfileCompletionList started for profile stages : " + curProfileStages);
 
 		List<ProfileStage> profilestages = new ArrayList<ProfileStage>();
 		for (ProfileStage profileStage : curProfileStages) {
 			if (profileStage.getStatus() == CommonConstants.STATUS_ACTIVE) {
-				LOG.info("Profile stage " + profileStage.getProfileStageKey() + " completed with status " + profileStage.getStatus());
+				LOG.debug("Profile stage " + profileStage.getProfileStageKey() + " completed with status " + profileStage.getStatus());
 				profilestages.add(profileStage);
 			}
 			else {
-				LOG.info("Profile stage " + profileStage.getProfileStageKey() + " completed with status " + profileStage.getStatus());
+				LOG.debug("Profile stage " + profileStage.getProfileStageKey() + " completed with status " + profileStage.getStatus());
 			}
 		}
-		LOG.info("Method getProfileCompletionList ended with filtered profile stages : " + profilestages);
+		LOG.debug("Method getProfileCompletionList ended with filtered profile stages : " + profilestages);
 		return profilestages;
 	}
 }

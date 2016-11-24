@@ -256,7 +256,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public SurveyDetails storeInitialSurveyDetails( User user, SurveyPreInitiation surveyPreInitiation, String baseUrl,
         boolean isOldRecord, boolean retakeSurvey ) throws SolrException, NoRecordsFetchedException, InvalidInputException
     {
-        LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() started." );
+        LOG.debug( "Method to store initial details of survey, storeInitialSurveyAnswers() started." );
         String agentName;
         long branchId = 0;
         long companyId = 0;
@@ -312,16 +312,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
-            // LOG.info( "Updating modified on column in agent hierarchy fro agent " );
+            // LOG.debug( "Updating modified on column in agent hierarchy fro agent " );
             // updateModifiedOnColumnForAgentHierachy( agentId );
-            LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() finished." );
+            LOG.debug( "Method to store initial details of survey, storeInitialSurveyAnswers() finished." );
             return surveyDetails;
         } else {
             //update survey PreIntitiation Id for survey
             survey.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
             survey.setRetakeSurvey( retakeSurvey );
             surveyDetailsDao.updateSurveyDetailsBySurveyId( survey );
-            LOG.info( "Method storeInitialSurveyAnswers() finished." );
+            LOG.debug( "Method storeInitialSurveyAnswers() finished." );
             return survey;
         }
     }
@@ -333,7 +333,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         surveyDetailsDao.insertSurveyDetails( surveyDetails );
         if ( surveyDetails.getAgentId() > 0l ) {
-            LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+            LOG.debug( "Updating modified on column in aagent hierarchy fro agent " );
             try {
                 updateModifiedOnColumnForAgentHierachy( surveyDetails.getAgentId() );
             } catch ( InvalidInputException e ) {
@@ -369,13 +369,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage )
     {
-        LOG.info( "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
+        LOG.debug( "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
         SurveyResponse surveyResponse = new SurveyResponse();
         surveyResponse.setAnswer( answer );
         surveyResponse.setQuestion( question );
         surveyResponse.setQuestionType( questionType );
         surveyDetailsDao.updateCustomerResponse( surveyId, surveyResponse, stage );
-        LOG.info(
+        LOG.debug(
             "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
     }
 
@@ -388,11 +388,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
         String agreedToShare )
     {
-        LOG.info(
+        LOG.debug(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
         surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare );
         surveyDetailsDao.updateFinalScore( surveyId );
-        LOG.info(
+        LOG.debug(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
     }
 
@@ -400,10 +400,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public SurveyDetails getSurveyDetails( long agentId, String customerEmail, String firstName, String lastName )
     {
-        LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email started." );
+        LOG.debug( "Method getSurveyDetails() to return survey details by agent id and customer email started." );
         SurveyDetails surveyDetails;
         surveyDetails = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
-        LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email finished." );
+        LOG.debug( "Method getSurveyDetails() to return survey details by agent id and customer email finished." );
         return surveyDetails;
     }
 
@@ -411,9 +411,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId )
     {
-        LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email started." );
+        LOG.debug( "Method getSurveyDetails() to return survey details by agent id and customer email started." );
         List<SurveyDetails> surveys = surveyDetailsDao.getSurveyDetailsByAgentAndCompany( companyId );
-        LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email finished." );
+        LOG.debug( "Method getSurveyDetails() to return survey details by agent id and customer email finished." );
         return surveys;
     }
 
@@ -421,9 +421,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName )
     {
-        LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, started" );
+        LOG.debug( "Method updateSurveyAsAbusive() to mark the survey as abusive, started" );
         surveyDetailsDao.updateSurveyAsAbusive( surveymongoId, reporterEmail, reporterName );
-        LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, finished" );
+        LOG.debug( "Method updateSurveyAsAbusive() to mark the survey as abusive, finished" );
     }
 
 
@@ -433,7 +433,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         throws InvalidInputException
     {
         if ( surveyPreInitiation == null ) {
-            LOG.info( "SurveyPreInitiation object passed null for insert" );
+            LOG.debug( "SurveyPreInitiation object passed null for insert" );
             throw new InvalidInputException( "SurveyPreInitiation object passed null for insert" );
         }
         LOG.debug( "Inside method saveSurveyPreInitiationObject " );
@@ -448,9 +448,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     public void updateSurveyAsClicked( String surveyMongoId )
     {
-        LOG.info( "Method updateSurveyAsClicked() to mark the survey as clicked, started" );
+        LOG.debug( "Method updateSurveyAsClicked() to mark the survey as clicked, started" );
         surveyDetailsDao.updateSurveyAsClicked( surveyMongoId );
-        LOG.info( "Method updateSurveyAsClicked() to mark the survey as clicked, finished" );
+        LOG.debug( "Method updateSurveyAsClicked() to mark the survey as clicked, finished" );
     }
 
 
@@ -462,7 +462,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public void updateReminderCount( long surveyPreInitiationId, boolean reminder )
     {
-        LOG.info( "Method to increase reminder count by 1, updateReminderCount() started." );
+        LOG.debug( "Method to increase reminder count by 1, updateReminderCount() started." );
 
         SurveyPreInitiation survey = surveyPreInitiationDao.findById( SurveyPreInitiation.class, surveyPreInitiationId );
         if ( survey != null ) {
@@ -474,7 +474,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
             surveyPreInitiationDao.merge( survey );
         }
-        LOG.info( "Method to increase reminder count by 1, updateReminderCount() finished." );
+        LOG.debug( "Method to increase reminder count by 1, updateReminderCount() finished." );
     }
 
 
@@ -496,13 +496,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public void markSurveyAsSent( SurveyPreInitiation surveyPreInitiation )
     {
-        LOG.info( "Method to increase reminder count by 1, updateReminderCount() started." );
+        LOG.debug( "Method to increase reminder count by 1, updateReminderCount() started." );
         if ( surveyPreInitiation != null ) {
             surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiation.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiationDao.merge( surveyPreInitiation );
         }
-        LOG.info( "Method to increase reminder count by 1, updateReminderCount() finished." );
+        LOG.debug( "Method to increase reminder count by 1, updateReminderCount() finished." );
     }
 
 
@@ -638,7 +638,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public List<SurveyPreInitiation> getIncompleteSurveyCustomersEmail( Company company )
     {
-        LOG.info( "started." );
+        LOG.debug( "started." );
 
         List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
 
@@ -649,7 +649,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
             statusCriteria );
-        LOG.info( "finished." );
+        LOG.debug( "finished." );
         return incompleteSurveyCustomers;
     }
 
@@ -657,18 +657,18 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public void updateReminderCount( List<Long> agents, List<String> customers )
     {
-        LOG.info( "Method to increase reminder count by 1, updateReminderCount() started." );
+        LOG.debug( "Method to increase reminder count by 1, updateReminderCount() started." );
         surveyDetailsDao.updateReminderCount( agents, customers );
-        LOG.info( "Method to increase reminder count by 1, updateReminderCount() finished." );
+        LOG.debug( "Method to increase reminder count by 1, updateReminderCount() finished." );
     }
 
 
     @Override
     public void updateReminderCountForSocialPosts( Long agentId, String customerEmail )
     {
-        LOG.info( "Method to increase reminder count by 1, updateReminderCountForSocialPosts() started." );
+        LOG.debug( "Method to increase reminder count by 1, updateReminderCountForSocialPosts() started." );
         surveyDetailsDao.updateReminderCountForSocialPost( agentId, customerEmail );
-        LOG.info( "Method to increase reminder count by 1, updateReminderCountForSocialPosts() finished." );
+        LOG.debug( "Method to increase reminder count by 1, updateReminderCountForSocialPosts() finished." );
     }
 
 
@@ -678,7 +678,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public List<SurveyDetails> getIncompleteSocialPostSurveys( long companyId )
     {
-        LOG.info( "started." );
+        LOG.debug( "started." );
         int reminderInterval = 0;
         int maxReminders = 0;
         List<SurveyDetails> incompleteSocialPostCustomers = new ArrayList<>();
@@ -708,7 +708,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         incompleteSocialPostCustomers = surveyDetailsDao.getIncompleteSocialPostCustomersEmail( companyId, reminderInterval,
             maxReminders );
-        LOG.info( "finished." );
+        LOG.debug( "finished." );
         return incompleteSocialPostCustomers;
     }
 
@@ -731,10 +731,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void increaseSurveyCountForAgent( long agentId )
         throws SolrException, NoRecordsFetchedException, InvalidInputException
     {
-        LOG.info( "Method to increase survey count for agent started." );
+        LOG.debug( "Method to increase survey count for agent started." );
         organizationUnitSettingsDao.updateCompletedSurveyCountForAgent( agentId, 1 );
         solrSearchService.updateCompletedSurveyCountForUserInSolr( agentId, 1 );
-        LOG.info( "Method to increase survey count for agent finished." );
+        LOG.debug( "Method to increase survey count for agent finished." );
     }
 
 
@@ -742,19 +742,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void decreaseSurveyCountForAgent( long agentId )
         throws SolrException, NoRecordsFetchedException, InvalidInputException
     {
-        LOG.info( "Method to decrease survey count for agent started." );
+        LOG.debug( "Method to decrease survey count for agent started." );
         organizationUnitSettingsDao.updateCompletedSurveyCountForAgent( agentId, -1 );
         solrSearchService.updateCompletedSurveyCountForUserInSolr( agentId, -1 );
-        LOG.info( "Method to decrease survey count for agent finished." );
+        LOG.debug( "Method to decrease survey count for agent finished." );
     }
 
 
     @Override
     public void changeStatusOfSurvey( String surveyId, boolean editable )
     {
-        LOG.info( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started." );
+        LOG.debug( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started." );
         surveyDetailsDao.changeStatusOfSurvey( surveyId, editable );
-        LOG.info( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished." );
+        LOG.debug( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished." );
     }
 
 
@@ -877,9 +877,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         //JIRA SS-1363 end
 
-        LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
+        LOG.debug( "Initiating URL Service to shorten the url " + surveyLink );
         surveyLink = urlService.shortenUrl( surveyLink );
-        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
+        LOG.debug( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
 
         String mailBody = "";
         String mailSubject = "";
@@ -958,7 +958,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         String custRelationWithAgent, User user, String surveyUrl )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
     {
-        LOG.info( "sendSurveyRestartMail() started." );
+        LOG.debug( "sendSurveyRestartMail() started." );
         Map<String, Long> hierarchyMap = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
         String logoUrl = null;
@@ -1072,9 +1072,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
 
 
-        LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
+        LOG.debug( "Initiating URL Service to shorten the url " + surveyUrl );
         surveyUrl = urlService.shortenUrl( surveyUrl );
-        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
+        LOG.debug( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
 
         //get mail subject and body
         String mailBody = "";
@@ -1141,7 +1141,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
         }
-        LOG.info( "sendSurveyRestartMail() finished." );
+        LOG.debug( "sendSurveyRestartMail() finished." );
     }
 
 
@@ -1149,7 +1149,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
     {
-        LOG.info( "sendSurveyCompletionMail() started." );
+        LOG.debug( "sendSurveyCompletionMail() started." );
         Map<String, Long> hierarchyMap = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
         String logoUrl = null;
@@ -1289,7 +1289,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
         }
-        LOG.info( "sendSurveyCompletionMail() finished." );
+        LOG.debug( "sendSurveyCompletionMail() finished." );
     }
 
 
@@ -1297,7 +1297,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
     {
-        LOG.info( "sendSurveyCompletionUnpleasantMail() started." );
+        LOG.debug( "sendSurveyCompletionUnpleasantMail() started." );
         Map<String, Long> hierarchyMap = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
         String logoUrl = null;
@@ -1447,7 +1447,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } else {
             sendSurveyCompletionMail( custEmail, custFirstName, custLastName, user );
         }
-        LOG.info( "sendSurveyCompletionUnpleasantMail() finished." );
+        LOG.debug( "sendSurveyCompletionUnpleasantMail() finished." );
     }
 
 
@@ -1455,7 +1455,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user,
         String links ) throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
     {
-        LOG.info( "sendSocialPostReminderMail() started." );
+        LOG.debug( "sendSocialPostReminderMail() started." );
         Map<String, Long> hierarchyMap = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
         String logoUrl = null;
@@ -1610,7 +1610,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
         }
 
-        LOG.info( "sendSocialPostReminderMail() finished." );
+        LOG.debug( "sendSocialPostReminderMail() finished." );
     }
 
 
@@ -1620,7 +1620,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName,
         String custLastName )
     {
-        LOG.info( "Method getPreInitiatedSurvey() started. " );
+        LOG.debug( "Method getPreInitiatedSurvey() started. " );
         /*Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.AGENT_ID_COLUMN, agentId );
         queries.put( "customerEmailId", customerEmail );*/
@@ -1666,7 +1666,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         }
 
-        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() finished. " );
+        LOG.debug( "Method getSurveyByAgentIdAndCutomerEmail() finished. " );
         return surveyPreInitiation;
     }
 
@@ -1675,10 +1675,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public SurveyPreInitiation getPreInitiatedSurvey( long surveyPreInitiationId )
     {
-        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() started for id " + surveyPreInitiationId );
+        LOG.debug( "Method getSurveyByAgentIdAndCutomerEmail() started for id " + surveyPreInitiationId );
         SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById( SurveyPreInitiation.class,
             surveyPreInitiationId );
-        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() finished for id " + surveyPreInitiationId );
+        LOG.debug( "Method getSurveyByAgentIdAndCutomerEmail() finished for id " + surveyPreInitiationId );
         return surveyPreInitiation;
     }
 
@@ -1688,12 +1688,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public void deleteSurveyPreInitiationDetailsPermanently( SurveyPreInitiation surveyPreInitiation )
     {
-        LOG.info( "Method deleteSurveyPreInitiationDetailsPermanently() started." );
+        LOG.debug( "Method deleteSurveyPreInitiationDetailsPermanently() started." );
         if ( surveyPreInitiation != null )
             surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
         surveyPreInitiationDao.saveOrUpdate( surveyPreInitiation );
         //surveyPreInitiationDao.delete( surveyPreInitiation );
-        LOG.info( "Method deleteSurveyPreInitiationDetailsPermanently() finished." );
+        LOG.debug( "Method deleteSurveyPreInitiationDetailsPermanently() finished." );
     }
 
 
@@ -1722,10 +1722,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public void markSurveyAsStarted( SurveyPreInitiation surveyPreInitiation )
     {
-        LOG.info( "Method markSurveyAsStarted() started." );
+        LOG.debug( "Method markSurveyAsStarted() started." );
         surveyPreInitiation.setStatus( CommonConstants.SURVEY_STATUS_INITIATED );
         surveyPreInitiationDao.update( surveyPreInitiation );
-        LOG.info( "Method markSurveyAsStarted() finished." );
+        LOG.debug( "Method markSurveyAsStarted() finished." );
     }
 
 
@@ -1814,7 +1814,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             Date date = calendar.getTime();
 
             if ( engagementClosedTime.before( date ) ) {
-                LOG.info( "An old record found : " + survey.getSurveyPreIntitiationId() );
+                LOG.debug( "An old record found : " + survey.getSurveyPreIntitiationId() );
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD;
                 errorCode = SurveyErrorCode.OLD_RECORD.name();
                 oldRecords.add( survey );
@@ -1923,10 +1923,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     int validateUnitsettingsForDotloop( User user, SurveyPreInitiation surveyPreInitiation )
     {
-        LOG.info( "Inside method validateUnitSettingsForDotloop " );
+        LOG.debug( "Inside method validateUnitSettingsForDotloop " );
         int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
         if ( surveyPreInitiation != null ) {
-            LOG.info( "Processing survey pre initiation id: " + surveyPreInitiation.getSurveyPreIntitiationId() );
+            LOG.debug( "Processing survey pre initiation id: " + surveyPreInitiation.getSurveyPreIntitiationId() );
             boolean found = false;
             if ( surveyPreInitiation.getCompanyId() == user.getCompany().getCompanyId() ) {
                 LOG.debug( "Though the company id is same, the region or branch might be different " );
@@ -2065,7 +2065,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
             logoUrl = appLogoUrl;
         }
-        LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
+        LOG.debug( "Initiating URL Service to shorten the url " + surveyLink );
         try {
             surveyLink = urlService.shortenUrl( surveyLink );
         } catch ( InvalidInputException e ) {
@@ -2083,7 +2083,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(), mailContent.getParam_order() );
 
 
-            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
+            LOG.debug( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
 
             //JIRA SS-473 begin
             String agentDisclaimer = "";
@@ -2310,7 +2310,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         throws DuplicateSurveyRequestException, InvalidInputException, SelfSurveyInitiationException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
-        LOG.info( "Sending survey request for agent id: " + agentId + " recipientEmailId: " + recipientEmailId
+        LOG.debug( "Sending survey request for agent id: " + agentId + " recipientEmailId: " + recipientEmailId
             + " recipientFirstname: " + recipientFirstname + " recipientLastname: " + recipientLastname );
         if ( agentId <= 0l ) {
             LOG.warn( "Agentid should be non zero value" );
@@ -2398,7 +2398,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     //    @Transactional
     //    public void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
     //    {
-    //        LOG.info( "Method deleteZillowSurveysByEntity() started" );
+    //        LOG.debug( "Method deleteZillowSurveysByEntity() started" );
     //        if ( entityType == null || entityType.isEmpty() ) {
     //            throw new InvalidInputException( "Entity Type is invalid" );
     //        }
@@ -2406,7 +2406,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     //            throw new InvalidInputException( "Entity ID is invalid" );
     //        }
     //        surveyDetailsDao.removeZillowSurveysByEntity( entityType, entityId );
-    //        LOG.info( "Method deleteZillowSurveysByEntity() finished" );
+    //        LOG.debug( "Method deleteZillowSurveysByEntity() finished" );
     //    }
 
 
@@ -2415,7 +2415,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     //    @Transactional
     //    public void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
     //    {
-    //         LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
+    //         LOG.debug( "Method deleteExcessZillowSurveysByEntity() started" );
     //         if ( entityType == null || entityType.isEmpty() ) {
     //             throw new InvalidInputException( "Entity Type is invalid" );
     //         }
@@ -2423,14 +2423,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     //             throw new InvalidInputException( "Entity ID is invalid" );
     //         }
     //         surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
-    //         LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
+    //         LOG.debug( "Method deleteExcessZillowSurveysByEntity() finished" );
     //    }
 
     @Override
     @Transactional
     public void deleteExistingZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
     {
-        LOG.info( "Method deleteExistingZillowSurveysByEntity() started" );
+        LOG.debug( "Method deleteExistingZillowSurveysByEntity() started" );
         if ( entityType == null || entityType.isEmpty() ) {
             throw new InvalidInputException( "Entity Type is invalid" );
         }
@@ -2438,17 +2438,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             throw new InvalidInputException( "Entity ID is invalid" );
         }
         surveyDetailsDao.removeExistingZillowSurveysByEntity( entityType, entityId );
-        LOG.info( "Method deleteExistingZillowSurveysByEntity() finished" );
+        LOG.debug( "Method deleteExistingZillowSurveysByEntity() finished" );
     }
 
 
     @Override
     public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows )
     {
-        LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, started" );
+        LOG.debug( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, started" );
         List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( startIndex,
             numOfRows );
-        LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, finished" );
+        LOG.debug( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, finished" );
         return abusiveSurveyReports;
     }
 
@@ -2603,9 +2603,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void updateSurveyAsUnderResolution( String surveyId )
     {
 
-        LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, started" );
+        LOG.debug( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, started" );
         surveyDetailsDao.updateSurveyAsUnderResolution( surveyId );
-        LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, ended" );
+        LOG.debug( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, ended" );
     }
 
 
@@ -2715,10 +2715,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( long companyId, int startIndex, int numOfRows )
     {
-        LOG.info( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, started" );
+        LOG.debug( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, started" );
         List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( companyId,
             startIndex, numOfRows );
-        LOG.info( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, finished" );
+        LOG.debug( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, finished" );
         return abusiveSurveyReports;
     }
 
@@ -2826,9 +2826,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public List<SurveyDetails> getSurveysUnderResolution( long companyId, int startIndex, int numOfRows )
     {
-        LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, started" );
+        LOG.debug( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, started" );
         List<SurveyDetails> surveyDetails = surveyDetailsDao.getSurveysUnderResolution( companyId, startIndex, numOfRows );
-        LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, finished" );
+        LOG.debug( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, finished" );
         return surveyDetails;
     }
 
@@ -2836,10 +2836,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public SurveyDetails getSurveyDetails( String surveyMongoId )
     {
-        LOG.info( "Method getSurveyDetails() to return survey details by surveyMongoId started." );
+        LOG.debug( "Method getSurveyDetails() to return survey details by surveyMongoId started." );
         SurveyDetails surveyDetails;
         surveyDetails = surveyDetailsDao.getSurveyBySurveyMongoId( surveyMongoId );
-        LOG.info( "Method getSurveyDetails() to return survey details by surveyMongoId finished." );
+        LOG.debug( "Method getSurveyDetails() to return survey details by surveyMongoId finished." );
         return surveyDetails;
     }
 
@@ -2847,9 +2847,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public void updateSurveyAsUnAbusive( String surveyId )
     {
-        LOG.info( "Method unMarkAbusiveSurvey() started" );
+        LOG.debug( "Method unMarkAbusiveSurvey() started" );
         surveyDetailsDao.updateSurveyAsUnAbusive( surveyId );
-        LOG.info( "Method unMarkAbusiveSurvey() finished" );
+        LOG.debug( "Method unMarkAbusiveSurvey() finished" );
     }
 
 
@@ -2903,11 +2903,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             LOG.error( "Invalid to user id passed as parameter" );
             throw new InvalidInputException( "Invalid to user id passed as parameter" );
         }
-        LOG.info( "Method to move surveys from one user to another user,moveSurveysToAnotherUser() call started" );
+        LOG.debug( "Method to move surveys from one user to another user,moveSurveysToAnotherUser() call started" );
         List<Long> userIds = new ArrayList<Long>();
         userIds.add( fromUserId );
         userIds.add( toUserId );
-        LOG.info( "Fetching from and to user information" );
+        LOG.debug( "Fetching from and to user information" );
         List<User> userList = null;
         try {
             userList = userDao.getUsersForUserIds( userIds );
@@ -2916,43 +2916,43 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         if ( userList == null || userList.size() != 2 )
             throw new NoRecordsFetchedException( "Either from user or to user or both could not be found" );
-        LOG.info( "Fetched from and to user information" );
+        LOG.debug( "Fetched from and to user information" );
         User fromUser = userList.get( 0 ).getUserId() == fromUserId ? userList.get( 0 ) : userList.get( 1 );
         User toUser = userList.get( 1 ).getUserId() == toUserId ? userList.get( 1 ) : userList.get( 0 );
 
         // check if both user belong to same company
         //UserProfile fromUserProfile = getUserProfileWhereAgentForUser( fromUser );
         UserProfile toUserProfile = getUserProfileWhereAgentForUser( toUser );
-        LOG.info( "Validating whether both from and to user are agents" );
+        LOG.debug( "Validating whether both from and to user are agents" );
         // check if to user id is an agent
         if ( toUserProfile == null )
             throw new NoRecordsFetchedException( "To user id : " + toUser.getUserId() + " is not an agent" );
-        LOG.info( "Validating whether both from and to user belong to same company" );
+        LOG.debug( "Validating whether both from and to user belong to same company" );
         if ( fromUser.getCompany().getCompanyId() != toUser.getCompany().getCompanyId() )
             throw new UnsupportedOperationException( "From user : " + fromUser.getUserId() + " and to user id : "
                 + toUser.getUserId() + " do not belong to same company" );
 
         // replace agent id Survey Pre Initiation
-        LOG.info( "Moving all incomplete surveys of user : " + fromUserId + " to user : " + toUserId );
+        LOG.debug( "Moving all incomplete surveys of user : " + fromUserId + " to user : " + toUserId );
         surveyPreInitiationDao.updateAgentInfoOfPreInitiatedSurveys( fromUserId, toUser );
         // replace agent id in Surveys
-        LOG.info( "Moving all started & completed surveys of user : " + fromUserId + " to user : " + toUserId );
+        LOG.debug( "Moving all started & completed surveys of user : " + fromUserId + " to user : " + toUserId );
         surveyDetailsDao.updateAgentInfoInSurveys( fromUserId, toUser, toUserProfile );
         // update to user solr review count
-        LOG.info( "Updating review count of user : " + toUserId );
+        LOG.debug( "Updating review count of user : " + toUserId );
         solrSearchService.updateReviewCountOfUserInSolr( toUser );
         if ( fromUser.getStatus() == CommonConstants.STATUS_ACTIVE ) {
             // update from user solr review count
-            LOG.info( "Updating review count of user : " + fromUserId );
+            LOG.debug( "Updating review count of user : " + fromUserId );
             solrSearchService.updateReviewCountOfUserInSolr( fromUser );
         }
-        LOG.info( "Method to move surveys from one user to another user,moveSurveysToAnotherUser() call ended" );
+        LOG.debug( "Method to move surveys from one user to another user,moveSurveysToAnotherUser() call ended" );
     }
 
 
     UserProfile getUserProfileWhereAgentForUser( User user )
     {
-        LOG.info( "Method to find user profile where user is agent, getUserProfileWhereAgentForUser started" );
+        LOG.debug( "Method to find user profile where user is agent, getUserProfileWhereAgentForUser started" );
         UserProfile agentUserProfile = null;
         if ( user.getUserProfiles() != null ) {
             for ( UserProfile userProfile : user.getUserProfiles() ) {
@@ -2965,7 +2965,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 }
             }
         }
-        LOG.info( "Method to find user profile where user is agent, getUserProfileWhereAgentForUser ended" );
+        LOG.debug( "Method to find user profile where user is agent, getUserProfileWhereAgentForUser ended" );
         return agentUserProfile;
     }
 
@@ -2974,7 +2974,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public void importSurveyVOToDBs( SurveyImportVO surveyImportVO, String source ) throws NonFatalException
     {
-        LOG.info( "Method SurveyHandlerImpl.importSurveyVOToDBs started" );
+        LOG.debug( "Method SurveyHandlerImpl.importSurveyVOToDBs started" );
         User user = userManagementService.getUserByUserId( surveyImportVO.getUserId() );
         if ( user == null )
             throw new InvalidInputException( "User with userId : " + surveyImportVO.getUserId() + " was not found" );
@@ -2991,7 +2991,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             details.getCustomerLastName(), details.getAgentId(), details.getScore(), details.get_id(), details.getReview(),
             false, serverBaseUrl, true );
         surveyDetailsDao.updateModifiedDateForSurvey( details.get_id(), surveyImportVO.getSurveyDate() );
-        LOG.info( "Method SurveyHandlerImpl.importSurveyVOToDBs finished" );
+        LOG.debug( "Method SurveyHandlerImpl.importSurveyVOToDBs finished" );
     }
 
 
@@ -3029,7 +3029,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     SurveyPreInitiation importSurveyVOToSurveyPreInitiation( SurveyImportVO surveyImportVO, User user, String source )
         throws InvalidInputException
     {
-        LOG.info( "Method BulkSurveyImporter.importSurveyVOToSurveyPreInitiation started" );
+        LOG.debug( "Method BulkSurveyImporter.importSurveyVOToSurveyPreInitiation started" );
         SurveyPreInitiation survey = new SurveyPreInitiation();
         survey.setSurveySource( source );
         survey.setSurveySourceId( surveyImportVO.getSurveySourceId() );
@@ -3052,7 +3052,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         survey.setCity( surveyImportVO.getCity() );
         survey.setState( surveyImportVO.getState() );
         surveyPreInitiationDao.save( survey );
-        LOG.info( "Method BulkSurveyImporter.importSurveyVOToSurveyPreInitiation finished" );
+        LOG.debug( "Method BulkSurveyImporter.importSurveyVOToSurveyPreInitiation finished" );
         return survey;
     }
 
@@ -3107,6 +3107,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         surveyDetailsDao.updateZillowSummaryInExistingSurveyDetails( surveyDetails );
     }
+    
+    
+    @Override
+    public void updateZillowSourceIdInExistingSurveyDetails( SurveyDetails surveyDetails )
+    {
+        surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( surveyDetails );
+    }
 
 
     @Override
@@ -3154,7 +3161,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         Map<SettingsForApplication, OrganizationUnit> mapPrimaryHierarchy, OrganizationUnitSettings rSettings,
         OrganizationUnitSettings bSettings, Map<String, String> surveyMap ) throws InvalidInputException
     {
-        LOG.info( "Method replaceGateQuestionText started" );
+        LOG.debug( "Method replaceGateQuestionText started" );
         if ( user == null ) {
             LOG.error( "User cannot be null" );
             throw new InvalidInputException( "User cannot be null" );
@@ -3209,7 +3216,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             currentYear, "", "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, user, agentSettings,
             bSettings, rSettings, companySettings, mapPrimaryHierarchy, surveyMap );
 
-        LOG.info( "Method replaceGateQuestionText finished for User : " + user.getUserId() );
+        LOG.debug( "Method replaceGateQuestionText finished for User : " + user.getUserId() );
 
         return retStr;
     }
@@ -3228,7 +3235,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             LOG.error( "User cannot be null" );
             return null;
         }
-        LOG.info( "Method getLogoUrl started for user : " + user.getUserId() );
+        LOG.debug( "Method getLogoUrl started for user : " + user.getUserId() );
         Map<String, Long> hierarchyMap = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
         String logoUrl = null;
@@ -3270,7 +3277,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } catch ( InvalidSettingsStateException e ) {
             LOG.error( "An InvalidSettingsStateException occurred while fetching logo url. Reason : ", e );
         }
-        LOG.info( "Method getLogoUrl finished for user : " + user.getUserId() );
+        LOG.debug( "Method getLogoUrl finished for user : " + user.getUserId() );
         return logoUrl;
     }
 
@@ -3284,7 +3291,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             LOG.error( "User cannot be null" );
             return null;
         }
-        LOG.info( "Method getLogoUrl started for user : " + user.getUserId() );
+        LOG.debug( "Method getLogoUrl started for user : " + user.getUserId() );
         String logoUrl = null;
         if ( map == null ) {
             LOG.error( "Unable to fetch primary profile for this user " );
@@ -3300,7 +3307,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } else if ( organizationUnit == OrganizationUnit.AGENT && agentSettings != null ) {
             logoUrl = agentSettings.getLogo();
         }
-        LOG.info( "Method getLogoUrl finished for user : " + user.getUserId() );
+        LOG.debug( "Method getLogoUrl finished for user : " + user.getUserId() );
         return logoUrl;
     }
 
@@ -3532,10 +3539,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId )
     {
-        LOG.info( "method getSurveyBySurveyPreIntitiationId started for surveyPreIntitiationId : " + surveyPreIntitiationId );
+        LOG.debug( "method getSurveyBySurveyPreIntitiationId started for surveyPreIntitiationId : " + surveyPreIntitiationId );
         SurveyDetails survey = surveyDetailsDao.getSurveyBySurveyPreIntitiationId( surveyPreIntitiationId );
 
-        LOG.info( "method getSurveyBySurveyPreIntitiationId ended for surveyPreIntitiationId : " + surveyPreIntitiationId );
+        LOG.debug( "method getSurveyBySurveyPreIntitiationId ended for surveyPreIntitiationId : " + surveyPreIntitiationId );
         return survey;
     }
 
@@ -3547,7 +3554,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     private List<SurveyImportVO> getSurveyListFromCsv() throws InvalidInputException
     {
-        LOG.info( "BulkSurveyImporter.getSurveyListFromCsv started" );
+        LOG.debug( "BulkSurveyImporter.getSurveyListFromCsv started" );
         InputStream fileStream = null;
         List<SurveyImportVO> surveyList = new ArrayList<>();
         try {
@@ -3568,7 +3575,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 }
                 SurveyImportVO survey = new SurveyImportVO();
                 survey.setCustomerEmailAddress( DEFAULT_CUSTOMER_EMAIL_ID_FOR_3RD_PARTY );
-                LOG.info( "Processing row " + row.getRowNum() + " from the file." );
+                LOG.debug( "Processing row " + row.getRowNum() + " from the file." );
                 cells = row.cellIterator();
                 while ( cells.hasNext() ) {
                     cell = (XSSFCell) cells.next();
@@ -3622,13 +3629,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             //Delete file from location
             File surveyFile = new File( thirdPartySurveyImportPath );
             if ( surveyFile.delete() )
-                LOG.info( "Successfully deleted the third party import file" );
+                LOG.debug( "Successfully deleted the third party import file" );
             else
                 LOG.error( "Failed to delete third party import file." );
         } catch ( IOException e ) {
             LOG.error( "An IOException occurred while importing. Reason: ", e );
         }
-        LOG.info( "BulkSurveyImporter.getSurveyListFromCsv finished" );
+        LOG.debug( "BulkSurveyImporter.getSurveyListFromCsv finished" );
         return surveyList;
     }
 
@@ -3677,7 +3684,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public void begin3rdPartySurveyImport()
     {
-        LOG.info( "3rd party Survey Importer started" );
+        LOG.debug( "3rd party Survey Importer started" );
         try {
             List<SurveyImportVO> surveyImportVOs = getSurveyListFromCsv();
             if ( surveyImportVOs != null && !surveyImportVOs.isEmpty() ) {
@@ -3692,7 +3699,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } catch ( NonFatalException e ) {
             LOG.error( "An error occurred while uploading the surveys. Reason: ", e );
         }
-        LOG.info( "3rd party Survey Importer finished" );
+        LOG.debug( "3rd party Survey Importer finished" );
     }
 
 
@@ -3703,7 +3710,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public SurveysAndReviewsVO getSurveysByStatus( String status, int startIndex, int count, long companyId )
     {
-        LOG.info( "method getSurveysByStatus started for companyId " + companyId );
+        LOG.debug( "method getSurveysByStatus started for companyId " + companyId );
 
         //get mongo survey count
         int mongoSurveyCount = getSurveyCountForCompanyBySurveyStatus( companyId, status );
@@ -3741,14 +3748,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         SurveysAndReviewsVO surveyAndReviews = new SurveysAndReviewsVO();
         surveyAndReviews.setInitiatedSurveys( surveyReviewMap );
         surveyAndReviews.setPreInitiatedSurveys( preInitiatedSurveys );
-        LOG.info( "method getSurveysByStatus ended for companyId " + companyId );
+        LOG.debug( "method getSurveysByStatus ended for companyId " + companyId );
         return surveyAndReviews;
     }
 
 
     private int getSurveyCountForCompanyBySurveyStatus( long companyId, String status )
     {
-        LOG.info( "method getSurveyCountForCompanyBySurveyStatus started for companyId %s , status %s ", companyId, status );
+        LOG.debug( "method getSurveyCountForCompanyBySurveyStatus started for companyId %s , status %s ", companyId, status );
 
         long mongoSurveyCount = 0;
         if ( status.equals( "complete" ) ) {
@@ -3759,7 +3766,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mongoSurveyCount = surveyDetailsDao.getSurveysCountForCompany( companyId );
         }
 
-        LOG.info( "method getSurveyCountForCompanyBySurveyStatus ended for companyId %s , status %s ", companyId, status );
+        LOG.debug( "method getSurveyCountForCompanyBySurveyStatus ended for companyId %s , status %s ", companyId, status );
 
         return (int) mongoSurveyCount;
     }
@@ -3767,7 +3774,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     private List<SurveyDetails> getSurveysForCompanyBySurveyStatus( long companyId, String status, int start, int batchSize )
     {
-        LOG.info(
+        LOG.debug(
             "method getSurveysForCompanyBySurveyStatus started for companyId %s , startIndex %s , batchSiz %s , status %s ",
             companyId, start, batchSize, status );
         List<SurveyDetails> surveyDetails = null;
@@ -3779,7 +3786,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             surveyDetails = surveyDetailsDao.getSurveysForCompanyByStartIndex( start, batchSize, companyId );
         }
 
-        LOG.info( "method getSurveysForCompanyBySurveyStatus ended for companyId %s , startIndex %s , batchSiz %s , status %s ",
+        LOG.debug( "method getSurveysForCompanyBySurveyStatus ended for companyId %s , startIndex %s , batchSiz %s , status %s ",
             companyId, start, batchSize, status );
         return surveyDetails;
     }
@@ -3788,7 +3795,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     private Map<SurveyDetails, SurveyPreInitiation> getPreinititatedSurveyForMongoSurveyDetail(
         List<SurveyDetails> surveyDetails )
     {
-        LOG.info( "method getPreinititatedSurveyForMongoSurveyDetail started" );
+        LOG.debug( "method getPreinititatedSurveyForMongoSurveyDetail started" );
         Map<SurveyDetails, SurveyPreInitiation> surveyReviewMap = new HashMap<SurveyDetails, SurveyPreInitiation>();
         List<Long> surveyPreinitiationIds = new ArrayList<Long>();
 
@@ -3805,14 +3812,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
 
 
-        LOG.info( "method getPreinititatedSurveyForMongoSurveyDetail ended" );
+        LOG.debug( "method getPreinititatedSurveyForMongoSurveyDetail ended" );
         return surveyReviewMap;
     }
 
 
     private Map<String, Integer> getStartIndexAndBatchForMonogAndSqlQuery( int startIndex, int endIndex, int mongoSurveyCount )
     {
-        LOG.info( "method getStartIndexAndBatchForMonogAndSqlQuery started " );
+        LOG.debug( "method getStartIndexAndBatchForMonogAndSqlQuery started " );
         Map<String, Integer> startindexBatchSizeMap = new HashMap<String, Integer>();
         int monogStartIndex = 0;
         int mongoBatch = 0;
@@ -3840,14 +3847,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         startindexBatchSizeMap.put( "sqlStartIndex", sqlStartIndex );
         startindexBatchSizeMap.put( "sqlBatch", sqlBatch );
 
-        LOG.info( "method getStartIndexAndBatchForMonogAndSqlQuery ended " );
+        LOG.debug( "method getStartIndexAndBatchForMonogAndSqlQuery ended " );
         return startindexBatchSizeMap;
     }
 
 
     private void getUsersForMongoSurveyDetail( List<SurveyDetails> surveyDetails )
     {
-        LOG.info( "method getUsersForMongoSurveyDetail started" );
+        LOG.debug( "method getUsersForMongoSurveyDetail started" );
         List<Long> userIds = new ArrayList<Long>();
 
         for ( SurveyDetails surveyDetail : surveyDetails ) {
@@ -3874,7 +3881,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             i++;
         }
 
-        LOG.info( "method getUsersForMongoSurveyDetail ended" );
+        LOG.debug( "method getUsersForMongoSurveyDetail ended" );
 
     }
 
@@ -3905,18 +3912,21 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.info( "Number of reveiws fetched in surveys1: " + surveys1.size() );
                 LOG.info( "Number of reveiws fetched in surveys2: " + surveys2.size() );
 
-                //                Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
-                //                    .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
+                if(surveys1 != null && surveys1.size() > 0){
+                    Map<Long, SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao
+                        .getPreInitiatedSurveyForIds( surveyPreInitiationIds );
 
-                //                for ( SurveyDetails survey : surveys1 ) {
-                //                    if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
-                //                        String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
-                //                        if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) ) {
-                //                            survey.setSourceId( sourceId );
-                //                            surveyDetailsDao.updateSurveySourceIdInMongo( survey );
-                //                        }
-                //                    }
-                //                }
+                    for ( SurveyDetails survey : surveys1 ) {
+                        if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
+                            String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
+                            if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) ) {
+                                survey.setSourceId( sourceId );
+                                surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( survey );
+                            }
+                        }
+                    }
+                }
+                                
 
                 for ( SurveyDetails survey : surveys2 ) {
                     List<SurveyPreInitiation> spis = surveyPreInitiationDao
@@ -3925,7 +3935,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         if ( !StringUtils.isEmpty( spis.get( 0 ).getSurveySourceId() )
                             && StringUtils.isEmpty( survey.getSourceId() ) ) {
                             survey.setSourceId( spis.get( 0 ).getSurveySourceId() );
-                            surveyDetailsDao.updateSurveySourceIdInMongo( survey );
+                            surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( survey );
                         }
                     }
                 }

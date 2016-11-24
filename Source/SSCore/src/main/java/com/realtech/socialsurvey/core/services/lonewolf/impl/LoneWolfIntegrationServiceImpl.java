@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.services.lonewolf.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,9 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -27,6 +23,9 @@ import com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntergrationA
 import com.realtech.socialsurvey.core.services.lonewolf.LoneWolfIntegrationService;
 import com.realtech.socialsurvey.core.utils.LoneWolfRestUtils;
 
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
+
 
 @Component
 public class LoneWolfIntegrationServiceImpl implements LoneWolfIntegrationService
@@ -36,6 +35,7 @@ public class LoneWolfIntegrationServiceImpl implements LoneWolfIntegrationServic
 
     @Autowired
     private LoneWolfRestUtils loneWolfRestUtils;
+    
     @Autowired
     private LoneWolfIntergrationApiBuilder loneWolfIntegrationApiBuilder;
 

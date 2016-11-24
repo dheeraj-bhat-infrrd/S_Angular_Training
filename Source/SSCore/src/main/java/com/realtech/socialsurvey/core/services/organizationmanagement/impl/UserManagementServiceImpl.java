@@ -262,7 +262,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public ProfilesMaster getProfilesMasterById( int profileId ) throws InvalidInputException
     {
-        LOG.info( "Method getProfilesMasterById called for profileId : " + profileId );
+        LOG.debug( "Method getProfilesMasterById called for profileId : " + profileId );
         if ( profileId <= 0 ) {
             throw new InvalidInputException( "profile Id is not set for getting profile master" );
         }
@@ -272,7 +272,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         } else {
             throw new InvalidInputException( "No profile master detected for profileID : " + profileId );
         }
-        LOG.info( "Method getProfilesMasterById finished for profileId : " + profileId );
+        LOG.debug( "Method getProfilesMasterById finished for profileId : " + profileId );
         return profilesMaster;
     }
 
@@ -284,7 +284,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void inviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation,
         String referralCode ) throws InvalidInputException, UndeliveredEmailException, NonFatalException
     {
-        LOG.info( "Inviting corporate to register. Details\t first name:" + firstName + "\t lastName: " + lastName
+        LOG.debug( "Inviting corporate to register. Details\t first name:" + firstName + "\t lastName: " + lastName
             + "\t email id: " + emailId );
 
         Map<String, String> urlParams = new HashMap<String, String>();
@@ -302,7 +302,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Sending invitation for registration" );
         inviteUser( url, emailId, firstName, lastName, isReinvitation );
 
-        LOG.info( "Successfully sent invitation to :" + emailId + " for registration" );
+        LOG.debug( "Successfully sent invitation to :" + emailId + " for registration" );
     }
 
 
@@ -311,7 +311,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void validateAndInviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation,
         String referralCode ) throws InvalidInputException, UserAlreadyExistsException, NonFatalException
     {
-        LOG.info( "Validating and inviting corporate to register. Details\t first name:" + firstName + "\t lastName: "
+        LOG.debug( "Validating and inviting corporate to register. Details\t first name:" + firstName + "\t lastName: "
             + lastName + "\t email id: " + emailId );
         LOG.debug( "Validating form elements" );
         validateFormParametersForInvitation( firstName, lastName, emailId );
@@ -387,12 +387,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public Map<String, String> validateRegistrationUrl( String encryptedUrlParameter ) throws InvalidInputException
     {
-        LOG.info( "Method validateRegistrationUrl() called " );
+        LOG.debug( "Method validateRegistrationUrl() called " );
 
         Map<String, String> urlParameters = urlGenerator.decryptParameters( encryptedUrlParameter );
         validateCompanyRegistrationUrlParameters( encryptedUrlParameter );
 
-        LOG.info( "Method validateRegistrationUrl() finished " );
+        LOG.debug( "Method validateRegistrationUrl() finished " );
         return urlParameters;
     }
 
@@ -432,7 +432,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public User addCorporateAdminAndUpdateStage( String firstName, String lastName, String emailId, String password,
         boolean isDirectRegistration ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException
     {
-        LOG.info( "Method to add corporate admin called for emailId : " + emailId );
+        LOG.debug( "Method to add corporate admin called for emailId : " + emailId );
         if ( userExists( emailId ) ) {
             throw new UserAlreadyExistsException( "User with User ID : " + emailId + " already exists" );
         }
@@ -492,7 +492,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
          * invalidateRegistrationInvite(emailId); }
          */
         setProfilesOfUser( user );
-        LOG.info( "Successfully executed method to add corporate admin for emailId : " + emailId );
+        LOG.debug( "Successfully executed method to add corporate admin for emailId : " + emailId );
         return user;
     }
 
@@ -518,7 +518,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( profileMasterId <= 0 ) {
             throw new InvalidInputException( "Profile master id is not set for updation of Profile completion stage" );
         }
-        LOG.info( "Mehtod updateProfileCompletionStage called for profileCompletionStage : " + profileCompletionStage
+        LOG.debug( "Mehtod updateProfileCompletionStage called for profileCompletionStage : " + profileCompletionStage
             + " and profileMasterId : " + profileMasterId + " and userId : " + user.getUserId() );
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( CommonConstants.USER_COLUMN, user );
@@ -535,7 +535,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         } else {
             LOG.warn( "No profile found for updating profile completion stage" );
         }
-        LOG.info( "Mehtod updateProfileCompletionStage finished for profileCompletionStage : " + profileCompletionStage );
+        LOG.debug( "Mehtod updateProfileCompletionStage finished for profileCompletionStage : " + profileCompletionStage );
     }
 
 
@@ -549,7 +549,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public void verifyAccount( String encryptedUrlParams ) throws InvalidInputException, SolrException
     {
-        LOG.info( "Method to verify account called for encryptedUrlParams" );
+        LOG.debug( "Method to verify account called for encryptedUrlParams" );
         Map<String, String> urlParams = urlGenerator.decryptParameters( encryptedUrlParams );
         if ( urlParams == null || urlParams.isEmpty() ) {
             throw new InvalidInputException( "Url params are invalid for account verification" );
@@ -562,7 +562,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         } else {
             throw new InvalidInputException( "User id field not present in url params" );
         }
-        LOG.info( "Successfully completed method to verify account" );
+        LOG.debug( "Successfully completed method to verify account" );
     }
 
 
@@ -580,7 +580,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email Id is either null or empty in inviteUserToRegister()." );
         }
-        LOG.info( "Method to add a new user, inviteUserToRegister() called for email id : " + emailId );
+        LOG.debug( "Method to add a new user, inviteUserToRegister() called for email id : " + emailId );
 
         if ( userExists( emailId ) ) {
             throw new UserAlreadyExistsException( "User with User ID : " + emailId + " already exists" );
@@ -602,7 +602,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             sendRegistrationCompletionLink( emailId, firstName, lastName, admin.getCompany().getCompanyId(), profileName,
                 user.getLoginName(), holdSendingMail );
         }
-        LOG.info( "Method to add a new user, inviteUserToRegister finished for email id : " + emailId );
+        LOG.debug( "Method to add a new user, inviteUserToRegister finished for email id : " + emailId );
         return user;
     }
 
@@ -621,7 +621,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email Id is either null or empty in inviteUserToRegister()." );
         }
-        LOG.info( "Method to add a new user, inviteNewUser() called for email id : " + emailId );
+        LOG.debug( "Method to add a new user, inviteNewUser() called for email id : " + emailId );
 
         if ( userExists( emailId ) ) {
             throw new UserAlreadyExistsException( "User with User ID : " + emailId + " already exists" );
@@ -635,7 +635,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //update the corrupted record for newly registered user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
-        LOG.info( "Method to add a new user, inviteNewUser() finished for email id : " + emailId );
+        LOG.debug( "Method to add a new user, inviteNewUser() finished for email id : " + emailId );
         return user;
     }
 
@@ -654,7 +654,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new InvalidInputException( "User id is invalid in deactivateExistingUser" );
         }
 
-        LOG.info( "Method to deactivate user " + userIdToRemove + " called." );
+        LOG.debug( "Method to deactivate user " + userIdToRemove + " called." );
         User userToBeDeactivated = userDao.findById( User.class, userIdToRemove );
         if ( userToBeDeactivated == null ) {
             throw new InvalidInputException( "No user found in databse for user id : " + userIdToRemove );
@@ -665,7 +665,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
         userToBeDeactivated.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
-        LOG.info( "Deactivating user " + userToBeDeactivated.getFirstName() );
+        LOG.debug( "Deactivating user " + userToBeDeactivated.getFirstName() );
         userDao.update( userToBeDeactivated );
 
         // Create an entry into the RemovedUser table for keeping historical records of users.
@@ -699,7 +699,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //Delete entries from the Survey Details Collection
         surveyDetailsDao.deleteIncompleteSurveysForAgent( userIdToRemove );
 
-        LOG.info( "Method to deactivate user " + userToBeDeactivated.getFirstName() + " finished." );
+        LOG.debug( "Method to deactivate user " + userToBeDeactivated.getFirstName() + " finished." );
     }
 
 
@@ -714,7 +714,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new InvalidInputException( "User id is invalid in restoreDeletedUser" );
         }
 
-        LOG.info( "Method to activate user " + userId + " called." );
+        LOG.debug( "Method to activate user " + userId + " called." );
 
         if ( userId <= 0l ) {
             throw new InvalidInputException( "Invalid userId" );
@@ -816,7 +816,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( agentsReviewCount != null && !agentsReviewCount.isEmpty() )
             solrSearchService.updateCompletedSurveyCountForMultipleUserInSolr( agentsReviewCount );
 
-        LOG.info( "Method to reactivate user " + user.getFirstName() + " finished." );
+        LOG.debug( "Method to reactivate user " + user.getFirstName() + " finished." );
     }
 
 
@@ -827,7 +827,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public User getUserByLoginName( User admin, String loginName ) throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method to fetch list of users on the basis of email id is called." );
+        LOG.debug( "Method to fetch list of users on the basis of email id is called." );
 
         if ( admin == null ) {
             throw new InvalidInputException( "Admin user is null in getUserByLoginName()" );
@@ -842,7 +842,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( users == null || users.isEmpty() ) {
             throw new NoRecordsFetchedException( "No users found with the login name : {}", loginName );
         }
-        LOG.info( "Method to fetch list of users on the basis of email id is finished." );
+        LOG.debug( "Method to fetch list of users on the basis of email id is finished." );
         return users.get( CommonConstants.INITIAL_INDEX );
     }
 
@@ -858,7 +858,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public User getUserByEmailAddress( String emailId ) throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method to fetch user having emailId : " + emailId + " started." );
+        LOG.debug( "Method to fetch user having emailId : " + emailId + " started." );
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id is null or empty" );
         }
@@ -885,13 +885,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public List<User> getUsersByEmailId( String emailId ) throws InvalidInputException
     {
-        LOG.info( "Method getUsersByEmailId started for emailId : " + emailId );
+        LOG.debug( "Method getUsersByEmailId started for emailId : " + emailId );
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email ID is empty" );
         }
         List<User> users = userDao.findByColumn( User.class, CommonConstants.EMAIL_ID, emailId );
 
-        LOG.info( "Method getUsersByEmailId finished for emailId : " + emailId );
+        LOG.debug( "Method getUsersByEmailId finished for emailId : " + emailId );
         return users;
     }
 
@@ -902,7 +902,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public User getUserByEmailAndCompany( long companyId, String emailId )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method getUserByEmailAndCompany() called from UserManagementService" );
+        LOG.debug( "Method getUserByEmailAndCompany() called from UserManagementService" );
 
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id is null or empty in getUserByEmailAndCompany()" );
@@ -919,7 +919,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new NoRecordsFetchedException( "No users found with the login name : {}", emailId );
         }
 
-        LOG.info( "Method getUserByEmailAndCompany() finished from UserManagementService" );
+        LOG.debug( "Method getUserByEmailAndCompany() finished from UserManagementService" );
         return users.get( CommonConstants.INITIAL_INDEX );
     }
 
@@ -929,7 +929,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public User getUserByEmail( String emailId ) throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method getUserByEmail() called from UserManagementService" );
+        LOG.debug( "Method getUserByEmail() called from UserManagementService" );
 
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id is null or empty in getUserByEmailAndCompany()" );
@@ -943,7 +943,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new NoRecordsFetchedException( "No users found with the login name : {}", emailId );
         }
 
-        LOG.info( "Method getUserByEmail() finished from UserManagementService" );
+        LOG.debug( "Method getUserByEmail() finished from UserManagementService" );
         return users.get( CommonConstants.INITIAL_INDEX );
     }
 
@@ -952,7 +952,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public List<User> getUsersBySimilarEmailId( User admin, String emailId ) throws InvalidInputException
     {
-        LOG.info( "Method to fetch list of users on the basis of email id is called." );
+        LOG.debug( "Method to fetch list of users on the basis of email id is called." );
 
         if ( admin == null ) {
             throw new InvalidInputException( "Admin user is null in getUsersByEmailId()" );
@@ -963,7 +963,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         List<User> users = userDao.fetchUsersBySimilarEmailId( admin, emailId );
 
-        LOG.info( "Method to fetch list of users on the basis of email id is finished." );
+        LOG.debug( "Method to fetch list of users on the basis of email id is finished." );
         return users;
     }
 
@@ -972,7 +972,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public boolean isUserAdditionAllowed( User user ) throws NoRecordsFetchedException, InvalidInputException
     {
-        LOG.info( "Method to check whether users can be added or not started." );
+        LOG.debug( "Method to check whether users can be added or not started." );
         boolean isUserAdditionAllowed = false;
 
         if ( user == null ) {
@@ -1000,7 +1000,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             isUserAdditionAllowed = true;
         }
 
-        LOG.info( "Method to check whether users can be added or not finished." );
+        LOG.debug( "Method to check whether users can be added or not finished." );
         return isUserAdditionAllowed;
     }
 
@@ -1023,7 +1023,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( userIdToRemove <= 0l ) {
             throw new InvalidInputException( "User id is invalid in removeBranchAdmin" );
         }
-        LOG.info( "Method to removeBranchAdmin called for branchId : " + branchId + " and userId : " + userIdToRemove );
+        LOG.debug( "Method to removeBranchAdmin called for branchId : " + branchId + " and userId : " + userIdToRemove );
 
         LOG.debug( "Selecting user for the userId provided for branch admin : " + userIdToRemove );
         User userToBeDeactivated = userDao.findById( User.class, userIdToRemove );
@@ -1036,7 +1036,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
          */
         userProfileDao.deactivateUserProfileForBranch( admin, branchId, userToBeDeactivated );
 
-        LOG.info( "Method to removeBranchAdmin finished for branchId : " + branchId + " and userId : " + userIdToRemove );
+        LOG.debug( "Method to removeBranchAdmin finished for branchId : " + branchId + " and userId : " + userIdToRemove );
     }
 
 
@@ -1056,7 +1056,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( userId <= 0l ) {
             throw new InvalidInputException( "User id is invalid in unassignRegionAdmin" );
         }
-        LOG.info( "Method to removeRegionAdmin called for regionId : " + regionId + " and userId : " + userId );
+        LOG.debug( "Method to removeRegionAdmin called for regionId : " + regionId + " and userId : " + userId );
 
         LOG.debug( "Selecting user for the userId provided for region admin : " + userId );
         User userToBeDeactivated = userDao.findById( User.class, userId );
@@ -1066,7 +1066,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         userProfileDao.deactivateUserProfileForRegion( admin, regionId, userToBeDeactivated );
 
-        LOG.info( "Method to unassignRegionAdmin finished for regionId : " + regionId + " and userId : " + userId );
+        LOG.debug( "Method to unassignRegionAdmin finished for regionId : " + regionId + " and userId : " + userId );
 
     }
 
@@ -1104,13 +1104,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public User getUserObjByUserId( long userId ) throws InvalidInputException
     {
-        LOG.info( "Method to find user on the basis of user id started for user id " + userId );
+        LOG.debug( "Method to find user on the basis of user id started for user id " + userId );
         User user = null;
         user = userDao.findById( User.class, userId );
         if ( user == null ) {
             throw new InvalidInputException( "User not found for userId:" + userId );
         }
-        LOG.info( "Method to find user on the basis of user id finished for user id " + userId );
+        LOG.debug( "Method to find user on the basis of user id finished for user id " + userId );
         return user;
     }
 
@@ -1119,14 +1119,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public User getUserByProfileId( long profileId ) throws InvalidInputException
     {
-        LOG.info( "Method to find userprofile on the basis of profile id started for profileId " + profileId );
+        LOG.debug( "Method to find userprofile on the basis of profile id started for profileId " + profileId );
 
         UserProfile userProfile = userProfileDao.findById( UserProfile.class, profileId );
         if ( userProfile == null ) {
             throw new InvalidInputException( "UserProfile not found for userId:" + profileId );
         }
 
-        LOG.info( "Method to find userprofile on the basis of user id finished for profileId " + profileId );
+        LOG.debug( "Method to find userprofile on the basis of user id finished for profileId " + profileId );
         return userProfile.getUser();
     }
 
@@ -1142,7 +1142,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( userIds == null ) {
             throw new InvalidInputException( "Invalid parameter passed : passed parameter user id list is null" );
         }
-        LOG.info( "Method to find multiple users on the basis of list of user id started for user ids " + userIds );
+        LOG.debug( "Method to find multiple users on the basis of list of user id started for user ids " + userIds );
         List<ProListUser> users = new ArrayList<ProListUser>();
         List<AgentSettings> agentSettingsList = new ArrayList<AgentSettings>();
         for ( Long id : userIds ) {
@@ -1202,7 +1202,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 CommonConstants.NO_LIMIT, false, false, false, 0, 0 ) );
             users.add( user );
         }
-        LOG.info( "Method to find multiple users on the basis of list of user id finished for user ids " + userIds );
+        LOG.debug( "Method to find multiple users on the basis of list of user id finished for user ids " + userIds );
         return users;
     }
 
@@ -1217,14 +1217,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( user == null ) {
             throw new InvalidInputException( "Invalid parameter passed : passed parameter user is null" );
         }
-        LOG.info( "Method to find branches assigned to the user started for " + user.getFirstName() );
+        LOG.debug( "Method to find branches assigned to the user started for " + user.getFirstName() );
         List<Long> branchIds = userProfileDao.getBranchIdsForUser( user );
         if ( branchIds == null || branchIds.isEmpty() ) {
             LOG.error( "No branch found for user : " + user.getUserId() );
             throw new NoRecordsFetchedException( "No branch found for user : " + user.getUserId() );
         }
         List<Branch> branches = branchDao.findByColumnForMultipleValues( Branch.class, "branchId", branchIds );
-        LOG.info( "Method to find branches assigned to the user finished for " + user.getFirstName() );
+        LOG.debug( "Method to find branches assigned to the user finished for " + user.getFirstName() );
         return branches;
     }
 
@@ -1240,13 +1240,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "User cannote be null." );
             throw new InvalidInputException( "Null value found  user found for userId specified in getUsersForCompany()" );
         }
-        LOG.info( "Method getUsersForCompany() started for " + user.getUserId() );
+        LOG.debug( "Method getUsersForCompany() started for " + user.getUserId() );
         List<User> users = userDao.getUsersForCompany( user.getCompany() );
         if ( users == null || users.isEmpty() ) {
             LOG.error( "No user found for company : " + user.getCompany().getCompany() );
             throw new NoRecordsFetchedException( "No user found for company : " + user.getCompany().getCompany() );
         }
-        LOG.info( "Method getUsersForCompany() started for " + user.getUserId() );
+        LOG.debug( "Method getUsersForCompany() started for " + user.getUserId() );
         return users;
     }
 
@@ -1256,7 +1256,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void afterPropertiesSet() throws Exception
     {
-        LOG.info( "afterPropertiesSet for UserManagementServiceImpl called" );
+        LOG.debug( "afterPropertiesSet for UserManagementServiceImpl called" );
         Map<Integer, ProfilesMaster> profilesMap = new HashMap<>();
         LOG.debug( "Populating profile master from db into the hashMap" );
         profilesMap = utilityService.populateProfileMastersMap();
@@ -1265,7 +1265,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         LOG.debug( "Successfully populated profile master from db into the hashMap" );
 
-        LOG.info( "afterPropertiesSet for UserManagementServiceImpl completed" );
+        LOG.debug( "afterPropertiesSet for UserManagementServiceImpl completed" );
     }
 
 
@@ -1285,7 +1285,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( userId <= 0l ) {
             throw new InvalidInputException( "User id is invalid in assignBranchAdmin" );
         }
-        LOG.info( "Method to assign branch admin called for branchId : " + branchId + " and userId : " + userId );
+        LOG.debug( "Method to assign branch admin called for branchId : " + branchId + " and userId : " + userId );
 
         LOG.debug( "Selecting user for the userId provided for branch admin : " + userId );
 
@@ -1311,7 +1311,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             userProfile.setIsPrimary( isPrimary );
             userProfileDao.save( userProfile );
         } else if ( userProfile.getStatus() == CommonConstants.STATUS_INACTIVE ) {
-            LOG.info( "User profile for same user and branch already exists. Activating the same." );
+            LOG.debug( "User profile for same user and branch already exists. Activating the same." );
             userProfile.setStatus( CommonConstants.STATUS_ACTIVE );
             userProfile.setModifiedBy( String.valueOf( admin.getUserId() ) );
             userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -1321,7 +1321,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             userProfileDao.update( userProfile );
         }
 
-        LOG.info( "Method to assignBranchAdmin finished for branchId : " + branchId + " and userId : " + userId );
+        LOG.debug( "Method to assignBranchAdmin finished for branchId : " + branchId + " and userId : " + userId );
 
         return user;
     }
@@ -1392,7 +1392,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public void updateUserStatus( long userId, int status ) throws InvalidInputException, SolrException
     {
-        LOG.info(
+        LOG.debug(
             "Method updateUserStatus of user management services called for userId : " + userId + " and status :" + status );
         User user = getUserByUserId( userId );
         if ( user == null ) {
@@ -1407,7 +1407,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
          * Updating status of user into solr
          */
         solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.STATUS_SOLR, String.valueOf( status ) );
-        LOG.info( "Successfully completed method to update user status" );
+        LOG.debug( "Successfully completed method to update user status" );
     }
 
 
@@ -1422,7 +1422,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( admin == null ) {
             throw new InvalidInputException( "No admin user present." );
         }
-        LOG.info( "Method to assign user to a branch called for user : " + admin.getUserId() );
+        LOG.debug( "Method to assign user to a branch called for user : " + admin.getUserId() );
         User user = getUserByUserId( userId );
 
         if ( user == null ) {
@@ -1469,13 +1469,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userProfileDao.saveOrUpdate( userProfile );
 
         if ( user.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE ) {
-            LOG.info( "Updating isAtleastOneProfileComplete as 1 for user : " + user.getFirstName() );
+            LOG.debug( "Updating isAtleastOneProfileComplete as 1 for user : " + user.getFirstName() );
             user.setIsAtleastOneUserprofileComplete( CommonConstants.STATUS_ACTIVE );
             userDao.update( user );
         }
         setProfilesOfUser( user );
         solrSearchService.addUserToSolr( user );
-        LOG.info( "Method to assign user to a branch finished for user : " + admin.getUserId() );
+        LOG.debug( "Method to assign user to a branch finished for user : " + admin.getUserId() );
     }
 
 
@@ -1491,7 +1491,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( admin == null ) {
             throw new InvalidInputException( "No admin user present." );
         }
-        LOG.info( "Method to unassign user from a branch called for user : " + admin.getUserId() );
+        LOG.debug( "Method to unassign user from a branch called for user : " + admin.getUserId() );
         User user = userDao.findById( User.class, userId );
 
         if ( user == null ) {
@@ -1516,7 +1516,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
         }
         userProfileDao.saveOrUpdate( userProfile );
-        LOG.info( "Method to unassign user from a branch finished for user : " + admin.getUserId() );
+        LOG.debug( "Method to unassign user from a branch finished for user : " + admin.getUserId() );
 
     }
 
@@ -1571,11 +1571,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void updateUser( User admin, long userIdToUpdate, boolean isActive ) throws InvalidInputException
     {
-        LOG.info( "Method to update a user called for user : " + userIdToUpdate );
+        LOG.debug( "Method to update a user called for user : " + userIdToUpdate );
         if ( admin == null ) {
             throw new InvalidInputException( "No admin user present." );
         }
-        LOG.info( "Method to assign user to a branch called for user : " + admin.getUserId() );
+        LOG.debug( "Method to assign user to a branch called for user : " + admin.getUserId() );
         User user = userDao.findById( User.class, userIdToUpdate );
 
         if ( user == null ) {
@@ -1584,7 +1584,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         user.setModifiedBy( String.valueOf( admin.getUserId() ) );
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        LOG.info( "Setting the user {} as {}", user.getFirstName(), isActive );
+        LOG.debug( "Setting the user {} as {}", user.getFirstName(), isActive );
         if ( isActive ) {
             user.setStatus( CommonConstants.STATUS_ACTIVE );
         } else {
@@ -1593,7 +1593,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         userDao.update( user );
 
-        LOG.info( "Method to update a user finished for user : " + userIdToUpdate );
+        LOG.debug( "Method to update a user finished for user : " + userIdToUpdate );
     }
 
 
@@ -1604,12 +1604,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void updateUserProfile( User admin, long profileIdToUpdate, int status ) throws InvalidInputException
     {
-        LOG.info( "Method to update a user called for user profile: " + profileIdToUpdate );
+        LOG.debug( "Method to update a user called for user profile: " + profileIdToUpdate );
         if ( admin == null ) {
             throw new InvalidInputException( "No admin user present." );
         }
 
-        LOG.info( "Method to assign user to a branch called by user : " + admin.getUserId() );
+        LOG.debug( "Method to assign user to a branch called by user : " + admin.getUserId() );
         UserProfile userProfile = userProfileDao.findById( UserProfile.class, profileIdToUpdate );
         if ( userProfile == null ) {
             throw new InvalidInputException( "No user profile present for the specified userId" );
@@ -1620,7 +1620,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userProfile.setStatus( status );
 
         userProfileDao.update( userProfile );
-        LOG.info( "Method to update a user finished for user : " + profileIdToUpdate );
+        LOG.debug( "Method to update a user finished for user : " + profileIdToUpdate );
     }
 
 
@@ -1628,7 +1628,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public void removeUserProfile( long profileIdToDelete ) throws InvalidInputException
     {
-        LOG.info( "Method to delete a profile called for user profile: " + profileIdToDelete );
+        LOG.debug( "Method to delete a profile called for user profile: " + profileIdToDelete );
 
         UserProfile userProfile = userProfileDao.findById( UserProfile.class, profileIdToDelete );
 
@@ -1639,7 +1639,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userProfileDao.delete( userProfile );
         //calling method to remove user profile from database
 
-        LOG.info( "Method to delete a profile finished for profile : " + profileIdToDelete );
+        LOG.debug( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
 
 
@@ -1648,7 +1648,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void updateUserInSolr( User user ) throws InvalidInputException, SolrException
     {
 
-        LOG.info( "Method to updateUserInSolr started" );
+        LOG.debug( "Method to updateUserInSolr started" );
         //update user in solr
         if ( user == null ) {
             throw new InvalidInputException( "Method to updateUserInSolr ended" );
@@ -1664,12 +1664,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public void updateUserProfilesStatus( User admin, long profileIdToUpdate ) throws InvalidInputException
     {
-        LOG.info( "Method to update a user called for user: " + profileIdToUpdate );
+        LOG.debug( "Method to update a user called for user: " + profileIdToUpdate );
         if ( admin == null ) {
             throw new InvalidInputException( "No admin user present." );
         }
 
-        LOG.info( "Method to assign user to a branch called by user : " + admin.getUserId() );
+        LOG.debug( "Method to assign user to a branch called by user : " + admin.getUserId() );
         UserProfile userProfile = userProfileDao.findById( UserProfile.class, profileIdToUpdate );
         if ( userProfile == null ) {
             throw new InvalidInputException( "No user profile present for the specified userId" );
@@ -1687,7 +1687,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
         userDao.update( user );
-        LOG.info( "Method to update a user finished for user : " + profileIdToUpdate );
+        LOG.debug( "Method to update a user finished for user : " + profileIdToUpdate );
     }
 
 
@@ -1769,7 +1769,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void sendRegistrationCompletionLink( String emailId, String firstName, String lastName, long companyId,
         String profileName, String loginName, boolean holdSendingMail ) throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Method to send profile completion link to the user started." );
+        LOG.debug( "Method to send profile completion link to the user started." );
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Invalid parameter passed : passed parameter emailId is null or empty" );
         }
@@ -1787,7 +1787,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         urlParams.put( CommonConstants.COMPANY, String.valueOf( companyId ) );
 
-        LOG.info( "Generating URL" );
+        LOG.debug( "Generating URL" );
         String url = urlGenerator.generateUrl( urlParams,
             applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE );
         String name = firstName;
@@ -1867,13 +1867,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "User object passed was be null" );
             throw new InvalidInputException( "User object passed was be null" );
         }
-        LOG.info( "Method getAllUserProfilesForUser() called to fetch the list of user profiles for the user" );
+        LOG.debug( "Method getAllUserProfilesForUser() called to fetch the list of user profiles for the user" );
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.USER_COLUMN, user );
         queries.put( CommonConstants.COMPANY_COLUMN, user.getCompany() );
         List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
-        LOG.info( "Method getAllUserProfilesForUser() finised successfully" );
+        LOG.debug( "Method getAllUserProfilesForUser() finised successfully" );
         return userProfiles;
     }
 
@@ -2204,10 +2204,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         AgentSettings agentSettings = null;
         Map<Long, OrganizationUnitSettings> branchesSettings = null;
         Map<Long, OrganizationUnitSettings> regionsSettings = null;
-        LOG.info( "Getting the canonical settings for the user: " + user.toString() );
+        LOG.debug( "Getting the canonical settings for the user: " + user.toString() );
 
         // get the settings according to the profile and account type
-        LOG.info( "Getting the company settings for the user" );
+        LOG.debug( "Getting the company settings for the user" );
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
         canonicalUserSettings.setCompanySettings( companySettings );
 
@@ -2301,7 +2301,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public AgentSettings getUserSettings( long agentId ) throws InvalidInputException
     {
-        LOG.info( "Getting agent settings for agent id: " + agentId );
+        LOG.debug( "Getting agent settings for agent id: " + agentId );
         if ( agentId <= 0l ) {
             throw new InvalidInputException( "Invalid agent id for fetching user settings" );
         }
@@ -2317,7 +2317,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public ContactDetailsSettings fetchAgentContactDetailByEncryptedId( String userEncryptedId ) throws InvalidInputException
     {
-        LOG.info( "Getting agent settings for userEncryptedId id: " + userEncryptedId );
+        LOG.debug( "Getting agent settings for userEncryptedId id: " + userEncryptedId );
         if ( userEncryptedId == null || userEncryptedId.isEmpty() ) {
             throw new InvalidInputException( "Invalid userEncrypted id for fetching user settings" );
         }
@@ -2331,7 +2331,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public AgentSettings getAgentSettingsForUserProfiles( long userId ) throws InvalidInputException
     {
-        LOG.info( "Getting agent settings for user id: " + userId );
+        LOG.debug( "Getting agent settings for user id: " + userId );
         AgentSettings agentSettings = getUserSettings( userId );
         return agentSettings;
     }
@@ -2450,7 +2450,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "assignUserToCompany : userId parameter is null" );
             throw new InvalidInputException( "assignUserToCompany : userId parameter is null" );
         }
-        LOG.info( "Method to assign user to a branch called for user : " + admin.getUserId() );
+        LOG.debug( "Method to assign user to a branch called for user : " + admin.getUserId() );
         User user = getUserByUserId( userId );
 
         if ( user == null ) {
@@ -2496,7 +2496,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         setProfilesOfUser( user );
         LOG.debug( "Adding user to solr" );
         solrSearchService.addUserToSolr( user );
-        LOG.info( "Method to assign user to a company finished for user : " + admin.getUserId() );
+        LOG.debug( "Method to assign user to a company finished for user : " + admin.getUserId() );
     }
 
 
@@ -2571,7 +2571,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "assignUserToRegion : regionId parameter is null" );
             throw new InvalidInputException( "assignUserToRegion : regionId parameter is null" );
         }
-        LOG.info( "Method to assign user to a branch called for user : " + admin.getUserId() );
+        LOG.debug( "Method to assign user to a branch called for user : " + admin.getUserId() );
         User user = getUserByUserId( userId );
 
         if ( user == null ) {
@@ -2624,7 +2624,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         setProfilesOfUser( user );
         LOG.debug( "Adding user to solr" );
         solrSearchService.addUserToSolr( user );
-        LOG.info( "Method to assign user to a company finished for user : " + admin.getUserId() );
+        LOG.debug( "Method to assign user to a company finished for user : " + admin.getUserId() );
 
     }
 
@@ -2638,7 +2638,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( user == null ) {
             throw new InvalidInputException( "passed parameter user is null" );
         }
-        LOG.info( "Inserting agent settings. User id: " + user.getUserId() );
+        LOG.debug( "Inserting agent settings. User id: " + user.getUserId() );
         AgentSettings agentSettings = new AgentSettings();
         agentSettings.setIden( user.getUserId() );
         agentSettings.setCreatedBy( user.getCreatedBy() );
@@ -2698,7 +2698,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 
         organizationUnitSettingsDao.insertAgentSettings( agentSettings );
-        LOG.info( "Inserted into agent settings" );
+        LOG.debug( "Inserted into agent settings" );
     }
 
 
@@ -2733,7 +2733,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     public String generateIndividualProfileName( long userId, String name, String emailId ) throws InvalidInputException
     {
-        LOG.info( "Method generateIndividualProfileName called for userId:" + userId + " and emailId:" + emailId );
+        LOG.debug( "Method generateIndividualProfileName called for userId:" + userId + " and emailId:" + emailId );
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "emailId is null or empty while generating agent profile name" );
         }
@@ -2762,7 +2762,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 profileName = utils.appendIdenToProfileName( profileName, userId );
             }
         }
-        LOG.info( "Method generateIndividualProfileName finished successfully.Returning profileName: " + profileName );
+        LOG.debug( "Method generateIndividualProfileName finished successfully.Returning profileName: " + profileName );
         return profileName;
     }
 
@@ -2779,7 +2779,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings )
         throws InvalidInputException
     {
-        LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        LOG.debug( "Method to update profile name and url in AGENT SETTINGS started" );
         if ( agentSettings == null ) {
             throw new InvalidInputException( "passsed input parameter agentSettings is null" );
         }
@@ -2787,7 +2787,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             profileName, agentSettings );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
             profileUrl, agentSettings );
-        LOG.info( "Method to update profile name and url in AGENT SETTINGS finished" );
+        LOG.debug( "Method to update profile name and url in AGENT SETTINGS finished" );
     }
 
 
@@ -2802,8 +2802,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void updateProfileUrlInBranchSettings( String profileName, String profileUrl,
         OrganizationUnitSettings branchSettings ) throws InvalidInputException
     {
-        LOG.info( "Method to update profile name and url in BRANCH SETTINGS started" );
-        LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        LOG.debug( "Method to update profile name and url in BRANCH SETTINGS started" );
+        LOG.debug( "Method to update profile name and url in AGENT SETTINGS started" );
         if ( branchSettings == null ) {
             throw new InvalidInputException( "passsed input parameter agentSettings is null" );
         }
@@ -2815,7 +2815,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, branchSettings,
             MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
 
-        LOG.info( "Method to update profile name and url in BRANCH SETTINGS finished" );
+        LOG.debug( "Method to update profile name and url in BRANCH SETTINGS finished" );
     }
 
 
@@ -2830,8 +2830,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void updateProfileUrlInRegionSettings( String profileName, String profileUrl,
         OrganizationUnitSettings regionSettings ) throws InvalidInputException
     {
-        LOG.info( "Method to update profile name and url in REGION SETTINGS started" );
-        LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        LOG.debug( "Method to update profile name and url in REGION SETTINGS started" );
+        LOG.debug( "Method to update profile name and url in AGENT SETTINGS started" );
         if ( regionSettings == null ) {
             throw new InvalidInputException( "passsed input parameter agentSettings is null" );
         }
@@ -2843,7 +2843,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, regionSettings,
             MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
 
-        LOG.info( "Method to update profile name and url in REGION SETTINGS finished" );
+        LOG.debug( "Method to update profile name and url in REGION SETTINGS finished" );
     }
 
 
@@ -2858,8 +2858,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void updateProfileUrlInCompanySettings( String profileName, String profileUrl,
         OrganizationUnitSettings companySettings ) throws InvalidInputException
     {
-        LOG.info( "Method to update profile name and url in COMPANY SETTINGS started" );
-        LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        LOG.debug( "Method to update profile name and url in COMPANY SETTINGS started" );
+        LOG.debug( "Method to update profile name and url in AGENT SETTINGS started" );
         if ( companySettings == null ) {
             throw new InvalidInputException( "passsed input parameter agentSettings is null" );
         }
@@ -2871,7 +2871,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, companySettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
-        LOG.info( "Method to update profile name and url in COMPANY SETTINGS finished" );
+        LOG.debug( "Method to update profile name and url in COMPANY SETTINGS finished" );
     }
 
 
@@ -2883,7 +2883,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<UserFromSearch> checkUserCanEdit( User admin, UserFromSearch adminFromSearch, List<UserFromSearch> users )
         throws InvalidInputException
     {
-        LOG.info( "Method checkUserCanEdit called for admin:" + admin + " and adminUser:" + adminFromSearch );
+        LOG.debug( "Method checkUserCanEdit called for admin:" + admin + " and adminUser:" + adminFromSearch );
         /**
          * Company admin : able to edit any user and himself
          */
@@ -2916,7 +2916,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 }
             }
         }
-        LOG.info( "Method checkUserCanEdit executed successfully" );
+        LOG.debug( "Method checkUserCanEdit executed successfully" );
         return users;
     }
 
@@ -2929,7 +2929,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public User updateUserOnCompleteRegistration( User user, String emailId, long companyId, String firstName, String lastName,
         String password ) throws SolrException, InvalidInputException
     {
-        LOG.info( "Method updateUserOnCompleteRegistration called" );
+        LOG.debug( "Method updateUserOnCompleteRegistration called" );
         if ( user == null ) {
             throw new InvalidInputException( "User id null in updateUserOnCompleteRegistration" );
         }
@@ -2993,7 +2993,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.PROFILE_NAME_SOLR, profileName );
         LOG.debug( "Successfully modified user detail in solr" );
 
-        LOG.info( "Method updateUserOnCompleteRegistration executed successfully" );
+        LOG.debug( "Method updateUserOnCompleteRegistration executed successfully" );
 
         return user;
     }
@@ -3042,11 +3042,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void updateUserLoginTimeAndNum( User user ) throws NonFatalException
     {
-        LOG.info( "Updating users login time and number of logins for user: " + user.toString() );
+        LOG.debug( "Updating users login time and number of logins for user: " + user.toString() );
         user.setLastLogin( new Timestamp( System.currentTimeMillis() ) );
         user.setNumOfLogins( user.getNumOfLogins() + 1 );
         userDao.update( user );
-        LOG.info( "Updated user login time and number of login" );
+        LOG.debug( "Updated user login time and number of login" );
     }
 
 
@@ -3057,7 +3057,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( company == null ) {
             throw new InvalidInputException( "Company passed in updateUserCountModificationNotification is null" );
         }
-        LOG.info( "Adding a record in user count modification notification table for company " + company.getCompany() );
+        LOG.debug( "Adding a record in user count modification notification table for company " + company.getCompany() );
         // search for the record in the table. it might be possible that record is already present.
         List<UsercountModificationNotification> userCountNotifications = userCountModificationDao
             .findByColumn( UsercountModificationNotification.class, CommonConstants.COMPANY_COLUMN, company );
@@ -3081,7 +3081,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             userCountModificationDao.save( userCountNotification );
         }
 
-        LOG.info(
+        LOG.debug(
             "Finished adding a record in user count modification notification table for company " + company.getCompany() );
     }
 
@@ -3113,11 +3113,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public void updateUser( User user, Map<String, Object> map ) throws SolrException, InvalidInputException
     {
-        LOG.info( "Method updateUser() started to update user." );
+        LOG.debug( "Method updateUser() started to update user." );
         userDao.merge( user );
         userProfileDao.updateEmailIdForUserProfile( user.getUserId(), user.getEmailId() );
         solrSearchService.editUserInSolrWithMultipleValues( user.getUserId(), map );
-        LOG.info( "Method updateUser() finished to update user." );
+        LOG.debug( "Method updateUser() finished to update user." );
     }
 
 
@@ -3416,7 +3416,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public List<SettingsDetails> getSettingScoresById( long companyId, long regionId, long branchId )
     {
-        LOG.info(
+        LOG.debug(
             "Inside method getSettingScoresById for company " + companyId + " region " + regionId + " branch " + branchId );
         return settingsSetterDao.getScoresById( companyId, regionId, branchId );
     }
@@ -3527,7 +3527,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         long count = apiKeyDao.findNumberOfRowsByKeyValue( UserApiKey.class, queryMap );
         LOG.debug( "Found " + count + " records from the api keys" );
         if ( count > 0l ) {
-            LOG.info( "API key is valid" );
+            LOG.debug( "API key is valid" );
             valid = true;
         }
         return valid;
@@ -3676,7 +3676,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public List<UserFromSearch> getUsersByUserIds( Set<Long> userIds ) throws InvalidInputException
     {
-        LOG.info( "Method to find users on the basis of user ids started for user ids : " + userIds );
+        LOG.debug( "Method to find users on the basis of user ids started for user ids : " + userIds );
         if ( userIds == null || userIds.size() <= 0 ) {
             throw new InvalidInputException( "Invalid input parameter : Null or empty User Id List passed " );
         }
@@ -3684,7 +3684,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( userList == null ) {
             throw new InvalidInputException( "User not found for userId:" + userIds );
         }
-        LOG.info( "Method to find users on the basis of user ids ended for user ids : " + userIds );
+        LOG.debug( "Method to find users on the basis of user ids ended for user ids : " + userIds );
         return userList;
     }
 
@@ -3695,7 +3695,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public User getActiveUserByEmailAndCompany( long companyId, String emailId )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method getUserByEmailAndCompany() called from UserManagementService" );
+        LOG.debug( "Method getUserByEmailAndCompany() called from UserManagementService" );
 
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id is null or empty in getUserByEmailAndCompany()" );
@@ -3712,7 +3712,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         //User user = userDao.getActiveUserByEmailAndCompany( emailId, company );
 
-        LOG.info( "Method getUserByEmailAndCompany() finished from UserManagementService" );
+        LOG.debug( "Method getUserByEmailAndCompany() finished from UserManagementService" );
         return user;
     }
 
@@ -3751,7 +3751,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<User> searchUsersInCompanyByMultipleCriteria( Map<String, Object> queries )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method searchUsersInCompanyByMultipleCriteria started." );
+        LOG.debug( "Method searchUsersInCompanyByMultipleCriteria started." );
 
         if ( queries == null || queries.isEmpty() ) {
             throw new InvalidInputException( "The search criteria cannot be empty" );
@@ -3761,7 +3761,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( users == null || users.isEmpty() ) {
             throw new NoRecordsFetchedException( "No users found for the specified criteria" );
         }
-        LOG.info( "Method searchUsersInCompanyByMultipleCriteria finished." );
+        LOG.debug( "Method searchUsersInCompanyByMultipleCriteria finished." );
         return users;
     }
 
@@ -3814,7 +3814,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email Id is either null or empty in inviteUserToRegister()." );
         }
-        LOG.info( "Method to add a new user, inviteUserToRegister() called for email id : " + emailId );
+        LOG.debug( "Method to add a new user, inviteUserToRegister() called for email id : " + emailId );
 
         if ( userExists( emailId ) ) {
             throw new UserAlreadyExistsException( "User with User ID : " + emailId + " already exists" );
@@ -3836,7 +3836,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             admin.getCompany().getCompanyId() );
 
 
-        LOG.info( "Method to add a new user, inviteUserToRegister finished for email id : " + emailId );
+        LOG.debug( "Method to add a new user, inviteUserToRegister finished for email id : " + emailId );
         return user;
     }
 
@@ -3850,7 +3850,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         urlParams.put( NAME, name );
         urlParams.put( CommonConstants.URL_PARAM_RESET_PASSWORD, CommonConstants.URL_PARAM_RESETORSET_VALUE_SET );
 
-        LOG.info( "Generating URL" );
+        LOG.debug( "Generating URL" );
         String url = urlGenerator.generateUrl( urlParams, applicationBaseUrl + CommonConstants.RESET_PASSWORD );
 
         emailServices.sendInvitationToSocialSurveyAdmin( url, emailId, name, emailId );
@@ -3883,7 +3883,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void deleteSSAdmin( User admin, long ssAdminId ) throws InvalidInputException
     {
 
-        LOG.info( "Method to deleteSSAdmin user " + ssAdminId + " called." );
+        LOG.debug( "Method to deleteSSAdmin user " + ssAdminId + " called." );
         User userToBeDeactivated = userDao.findById( User.class, ssAdminId );
         if ( admin == null ) {
             throw new InvalidInputException( "Passed parameter admin is null" );
@@ -3907,7 +3907,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
         userToBeDeactivated.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
-        LOG.info( "Deactivating user " + userToBeDeactivated.getFirstName() );
+        LOG.debug( "Deactivating user " + userToBeDeactivated.getFirstName() );
         userDao.update( userToBeDeactivated );
     }
 
@@ -3916,7 +3916,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public User saveEmailUserMapping( String emailId, long userId ) throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method to saveEmailUserMapping for : " + emailId + " started." );
+        LOG.debug( "Method to saveEmailUserMapping for : " + emailId + " started." );
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id is null or empty" );
         }
@@ -3947,7 +3947,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public CompanyIgnoredEmailMapping saveIgnoredEmailCompanyMapping( String emailId, long companyId )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method to saveIgnoredEmailCompanyMapping for  : " + emailId + " started." );
+        LOG.debug( "Method to saveIgnoredEmailCompanyMapping for  : " + emailId + " started." );
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id is null or empty" );
         }
@@ -3993,7 +3993,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method to getUsersAndEmailMappingForCompant for  companyId : " + companyId + " started." );
+        LOG.debug( "Method to getUsersAndEmailMappingForCompant for  companyId : " + companyId + " started." );
         UserList userList = new UserList();
         Company company = companyDao.findById( Company.class, companyId );
 
@@ -4036,7 +4036,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<UserEmailMapping> getUserEmailMappingsForUser( long agentId )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method to getUserEmailMappingsForUser for  agentId : " + agentId + " started." );
+        LOG.debug( "Method to getUserEmailMappingsForUser for  agentId : " + agentId + " started." );
 
         User user = userDao.findById( User.class, agentId );
 
@@ -4066,7 +4066,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void deleteUserEmailMapping( User agent, long emailMappingId ) throws InvalidInputException
     {
-        LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
+        LOG.debug( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
         if ( agent == null ) {
             throw new InvalidInputException( "Passed parameter agent is null " );
         }
@@ -4086,7 +4086,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userEmailMappingDao.update( userEmailMapping );
 
-        LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
+        LOG.debug( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
     }
 
 
@@ -4094,7 +4094,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException
     {
-        LOG.info( "Method to updateUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
+        LOG.debug( "Method to updateUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
         if ( agent == null ) {
             throw new InvalidInputException( "Passed parameter agent is null " );
         }
@@ -4114,7 +4114,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userEmailMappingDao.update( userEmailMapping );
 
-        LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
+        LOG.debug( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
     }
 
 
@@ -4122,7 +4122,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void deleteIgnoredEmailMapping( String emailId ) throws InvalidInputException
     {
-        LOG.info( "method deleteIgnoredEmailMapping  started for email id : " + emailId );
+        LOG.debug( "method deleteIgnoredEmailMapping  started for email id : " + emailId );
 
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Passed parameter emailId is invalid" );
@@ -4138,7 +4138,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
         }
 
-        LOG.info( "method deleteIgnoredEmailMapping finished" );
+        LOG.debug( "method deleteIgnoredEmailMapping finished" );
     }
 
 
@@ -4146,7 +4146,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public boolean isUserSocialSurveyAdmin( long userId ) throws InvalidInputException
     {
-        LOG.info( "method isUserIsSocialSurveyAdmin  started for userId : " + userId );
+        LOG.debug( "method isUserIsSocialSurveyAdmin  started for userId : " + userId );
 
         User user = null;
         user = userDao.findById( User.class, userId );
@@ -4172,7 +4172,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
         throws InvalidInputException, SolrException
     {
-        LOG.info( "Method deleteUserDataFromAllSources called for userId:" + userIdToBeDeleted );
+        LOG.debug( "Method deleteUserDataFromAllSources called for userId:" + userIdToBeDeleted );
 
         // Removing user data from MySql DB & MongoDB.
         this.removeExistingUser( loggedInUser, userIdToBeDeleted, status );
@@ -4183,7 +4183,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         // Removing user data from solr.
         solrSearchService.removeUserFromSolr( userIdToBeDeleted );
 
-        LOG.info( "Method deleteUserDataFromAllSources executed successfully" );
+        LOG.debug( "Method deleteUserDataFromAllSources executed successfully" );
     }
 
 
@@ -4200,7 +4200,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
             //updating last run time for batch in database
             batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER );
-            LOG.info( "Completed CrmDataAgentIdMapper" );
+            LOG.debug( "Completed CrmDataAgentIdMapper" );
         } catch ( Exception e ) {
             LOG.error( "Error in CrmDataAgentIdMapper", e );
             try {
@@ -4498,7 +4498,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     }
                 }
             }
-            LOG.info( "Completed IncompleteSurveyReminderSender" );
+            LOG.debug( "Completed IncompleteSurveyReminderSender" );
             //Update last build time in batch tracker table
             batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER );
         } catch ( Exception e ) {
@@ -4524,7 +4524,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public User activateCompanyAdmin( User companyAdmin )
         throws InvalidInputException, HierarchyAlreadyExistsException, SolrException
     {
-        LOG.info( "UserManagementService.activateCompanyAdmin started" );
+        LOG.debug( "UserManagementService.activateCompanyAdmin started" );
         //Update the USER table status
         companyAdmin.setStatus( CommonConstants.STATUS_ACTIVE );
         companyAdmin.setIsAtleastOneUserprofileComplete( 1 );
@@ -4541,7 +4541,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //Activate agent in Solr
         solrSearchService.editUserInSolr( companyAdmin.getUserId(), CommonConstants.STATUS_COLUMN,
             String.valueOf( CommonConstants.STATUS_ACTIVE ) );
-        LOG.info( "UserManagementService.activateCompanyAdmin finished" );
+        LOG.debug( "UserManagementService.activateCompanyAdmin finished" );
         return companyAdmin;
     }
 

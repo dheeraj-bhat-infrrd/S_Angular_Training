@@ -281,7 +281,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     public void afterPropertiesSet() throws Exception
     {
-        LOG.info( "afterPropertiesSet called for profile management service" );
+        LOG.debug( "afterPropertiesSet called for profile management service" );
     }
 
 
@@ -289,7 +289,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public LockSettings aggregateParentLockSettings( User user, AccountType accountType, UserSettings settings, long branchId,
         long regionId, int profilesMaster ) throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method aggregateParentLockSettings() called from ProfileManagementService" );
+        LOG.debug( "Method aggregateParentLockSettings() called from ProfileManagementService" );
         if ( user == null ) {
             throw new InvalidInputException( "User is not set." );
         }
@@ -380,7 +380,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     throw new InvalidInputException( "Account type is invalid in aggregateParentLockSettings" );
             }
         }
-        LOG.info( "Method aggregateParentLockSettings() finished from ProfileManagementService" );
+        LOG.debug( "Method aggregateParentLockSettings() finished from ProfileManagementService" );
         return parentLockSettings;
     }
 
@@ -469,7 +469,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public OrganizationUnitSettings aggregateUserProfile( User user, AccountType accountType, UserSettings settings,
         long branchId, long regionId, int profilesMaster ) throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method aggregateUserProfile() called from ProfileManagementService" );
+        LOG.debug( "Method aggregateUserProfile() called from ProfileManagementService" );
         if ( user == null ) {
             throw new InvalidInputException( "User is not set." );
         }
@@ -504,7 +504,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     break;
 
                 case COMPANY:
-                    LOG.info( "Company account type" );
+                    LOG.debug( "Company account type" );
                     branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
 
                     // Branch Admin
@@ -522,7 +522,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     break;
 
                 case ENTERPRISE:
-                    LOG.info( "Enterprise account type" );
+                    LOG.debug( "Enterprise account type" );
                     if ( branchId > 0l ) {
                         branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
 
@@ -557,7 +557,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     throw new InvalidInputException( "Account type is invalid in aggregateUserProfile" );
             }
         }
-        LOG.info( "Method aggregateUserProfile() finished from ProfileManagementService" );
+        LOG.debug( "Method aggregateUserProfile() finished from ProfileManagementService" );
         return userProfile;
     }
 
@@ -768,14 +768,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( companySettings == null ) {
             throw new InvalidInputException( "Company settings passed can not be null" );
         }
-        LOG.info( "Updating logo" );
+        LOG.debug( "Updating logo" );
         /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             logo, companySettings, collection );*/
         organizationManagementService.updateImageForOrganizationUnitSetting( companySettings.getIden(), logo, collection,
             CommonConstants.IMAGE_TYPE_LOGO, false, false );
         /*organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), logo, collection,
             CommonConstants.IMAGE_TYPE_LOGO, false, false );*/
-        LOG.info( "Logo updated successfully" );
+        LOG.debug( "Logo updated successfully" );
     }
 
 
@@ -793,14 +793,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( companySettings == null ) {
             throw new InvalidInputException( "Company settings passed can not be null" );
         }
-        LOG.info( "Updating image" );
+        LOG.debug( "Updating image" );
         /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, image, companySettings, collection );*/
         /*organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), image, collection,
             CommonConstants.IMAGE_TYPE_PROFILE, false, false );*/
         organizationManagementService.updateImageForOrganizationUnitSetting( companySettings.getIden(), image, collection,
             CommonConstants.IMAGE_TYPE_PROFILE, false, false );
-        LOG.info( "Image updated successfully" );
+        LOG.debug( "Image updated successfully" );
     }
 
 
@@ -819,7 +819,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( companySettings == null ) {
             throw new InvalidInputException( "Company settings passed can not be null" );
         }
-        LOG.info( "Updating vertical" );
+        LOG.debug( "Updating vertical" );
         if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
 
             List<VerticalsMaster> verticalsMasters = organizationManagementService.getAllVerticalsMaster();
@@ -842,7 +842,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_VERTICAL, vertical, companySettings, collection );
-        LOG.info( "vertical updated successfully" );
+        LOG.debug( "vertical updated successfully" );
     }
 
 
@@ -860,11 +860,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( unitSettings == null ) {
             throw new InvalidInputException( "Unit settings passed can not be null" );
         }
-        LOG.info( "Adding associations" );
+        LOG.debug( "Adding associations" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations, unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        LOG.info( "Associations added successfully" );
+        LOG.debug( "Associations added successfully" );
         return associations;
     }
 
@@ -882,10 +882,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( agentSettings == null ) {
             throw new InvalidInputException( "Agent settings passed can not be null" );
         }
-        LOG.info( "Adding associations" );
+        LOG.debug( "Adding associations" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION,
             associations, agentSettings );
-        LOG.info( "Associations added successfully" );
+        LOG.debug( "Associations added successfully" );
         return associations;
     }
 
@@ -904,10 +904,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( unitSettings == null ) {
             throw new InvalidInputException( "Unit settings passed can not be null" );
         }
-        LOG.info( "Updating lock detail information" );
+        LOG.debug( "Updating lock detail information" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_LOCK_SETTINGS, lockSettings, unitSettings, collection );
-        LOG.info( "lock details updated successfully" );
+        LOG.debug( "lock details updated successfully" );
         return lockSettings;
     }
 
@@ -926,13 +926,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( unitSettings == null ) {
             throw new InvalidInputException( "Unit settings passed can not be null" );
         }
-        LOG.info( "Updating contact detail information" );
+        LOG.debug( "Updating contact detail information" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contactDetailsSettings, unitSettings, collection );
         // Update the seo content flag to true
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_SEO_CONTENT_MODIFIED, true, unitSettings, collection );
-        LOG.info( "Contact details updated successfully" );
+        LOG.debug( "Contact details updated successfully" );
         return contactDetailsSettings;
     }
 
@@ -950,13 +950,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( agentSettings == null ) {
             throw new InvalidInputException( "Agent settings passed can not be null" );
         }
-        LOG.info( "Updating contact detail information" );
+        LOG.debug( "Updating contact detail information" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contactDetailsSettings, agentSettings );
         // Update the seo content flag to true
         organizationUnitSettingsDao.updateParticularKeyAgentSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_SEO_CONTENT_MODIFIED, true, agentSettings );
-        LOG.info( "Contact details updated successfully" );
+        LOG.debug( "Contact details updated successfully" );
         return contactDetailsSettings;
     }
 
@@ -975,10 +975,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( unitSettings == null ) {
             throw new InvalidInputException( "Unit settings passed can not be null" );
         }
-        LOG.info( "Adding achievements" );
+        LOG.debug( "Adding achievements" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS, achievements, unitSettings, collection );
-        LOG.info( "Achievements added successfully" );
+        LOG.debug( "Achievements added successfully" );
         return achievements;
     }
 
@@ -996,10 +996,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( agentSettings == null ) {
             throw new InvalidInputException( "Agent settings passed can not be null" );
         }
-        LOG.info( "Adding achievements" );
+        LOG.debug( "Adding achievements" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS,
             achievements, agentSettings );
-        LOG.info( "Achievements added successfully" );
+        LOG.debug( "Achievements added successfully" );
         return achievements;
     }
 
@@ -1025,10 +1025,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             licenses = new Licenses();
         }
         licenses.setAuthorized_in( authorisedIn );
-        LOG.info( "Adding Licences list" );
+        LOG.debug( "Adding Licences list" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_LICENCES, licenses, unitSettings, collection );
-        LOG.info( "Licence authorisations added successfully" );
+        LOG.debug( "Licence authorisations added successfully" );
         return licenses;
     }
 
@@ -1053,10 +1053,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             licenses = new Licenses();
         }
         licenses.setAuthorized_in( authorisedIn );
-        LOG.info( "Adding Licences list" );
+        LOG.debug( "Adding Licences list" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LICENCES,
             licenses, agentSettings );
-        LOG.info( "Licence authorisations added successfully" );
+        LOG.debug( "Licence authorisations added successfully" );
         return licenses;
     }
 
@@ -1075,10 +1075,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( unitSettings == null ) {
             throw new InvalidInputException( "Unit settings passed can not be null" );
         }
-        LOG.info( "Updating the social media tokens in profile." );
+        LOG.debug( "Updating the social media tokens in profile." );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, mediaTokens, unitSettings, collection );
-        LOG.info( "Successfully updated the social media tokens." );
+        LOG.debug( "Successfully updated the social media tokens." );
     }
 
 
@@ -1096,10 +1096,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( unitSettings == null ) {
             throw new InvalidInputException( "Unit settings passed can not be null" );
         }
-        LOG.info( "Updating disclaimer" );
+        LOG.debug( "Updating disclaimer" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_DISCLAIMER, disclaimer, unitSettings, collection );
-        LOG.info( "Disclaimer updated successfully" );
+        LOG.debug( "Disclaimer updated successfully" );
     }
 
 
@@ -1117,7 +1117,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( branchProfileName == null || branchProfileName.isEmpty() ) {
             throw new ProfileNotFoundException( "branchProfileName is null or empty in getIndividualsForBranch" );
         }
-        LOG.info( "Method getIndividualsForBranch called for companyProfileName: " + companyProfileName + " branchProfileName:"
+        LOG.debug( "Method getIndividualsForBranch called for companyProfileName: " + companyProfileName + " branchProfileName:"
             + branchProfileName );
         List<AgentSettings> users = null;
         OrganizationUnitSettings branchSettings = getBranchByProfileName( companyProfileName, branchProfileName );
@@ -1125,7 +1125,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             LOG.debug( "Fetching user profiles for branchId: " + branchSettings.getIden() );
             users = getIndividualsByBranchId( branchSettings.getIden() );
         }
-        LOG.info( "Method getIndividualsForBranch executed successfully" );
+        LOG.debug( "Method getIndividualsForBranch executed successfully" );
         return users;
     }
 
@@ -1146,7 +1146,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( regionProfileName == null || regionProfileName.isEmpty() ) {
             throw new InvalidInputException( "regionProfileName is null or empty in getIndividualsForRegion" );
         }
-        LOG.info( "Method getIndividualsForRegion called for companyProfileName:" + companyProfileName
+        LOG.debug( "Method getIndividualsForRegion called for companyProfileName:" + companyProfileName
             + " and branchProfileName:" + regionProfileName );
         List<AgentSettings> users = null;
         OrganizationUnitSettings regionSettings = getRegionByProfileName( companyProfileName, regionProfileName );
@@ -1154,7 +1154,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             users = getIndividualsByRegionId( regionSettings.getIden() );
         }
 
-        LOG.info( "Method getIndividualsForRegion executed successfully" );
+        LOG.debug( "Method getIndividualsForRegion executed successfully" );
         return users;
     }
 
@@ -1173,7 +1173,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
             throw new InvalidInputException( "companyProfileName is null or empty in getIndividualsForCompany" );
         }
-        LOG.info( "Method getIndividualsForCompany called for companyProfileName: " + companyProfileName );
+        LOG.debug( "Method getIndividualsForCompany called for companyProfileName: " + companyProfileName );
         List<AgentSettings> users = null;
         OrganizationUnitSettings companySettings = getCompanyProfileByProfileName( companyProfileName );
         if ( companySettings != null ) {
@@ -1184,7 +1184,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 users = getIndividualsByBranchId( defaultBranch.getBranchId() );
             }
         }
-        LOG.info( "Method getIndividualsForCompany executed successfully" );
+        LOG.debug( "Method getIndividualsForCompany executed successfully" );
         return users;
     }
 
@@ -1203,7 +1203,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( companyId <= 0l ) {
             throw new InvalidInputException( "Invalid companyId passed in getIndividualsForCompany" );
         }
-        LOG.info( "Method getIndividualsForCompany called for companyId: " + companyId );
+        LOG.debug( "Method getIndividualsForCompany called for companyId: " + companyId );
         List<AgentSettings> users = null;
         Region defaultRegion = organizationManagementService
             .getDefaultRegionForCompany( companyDao.findById( Company.class, companyId ) );
@@ -1211,7 +1211,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion( defaultRegion.getRegionId() );
             users = getIndividualsByBranchId( defaultBranch.getBranchId() );
         }
-        LOG.info( "Method getIndividualsForCompany executed successfully" );
+        LOG.debug( "Method getIndividualsForCompany executed successfully" );
         return users;
     }
 
@@ -1224,7 +1224,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public OrganizationUnitSettings getRegionByProfileName( String companyProfileName, String regionProfileName )
         throws ProfileNotFoundException, InvalidInputException
     {
-        LOG.info( "Method getRegionByProfileName called for companyProfileName:" + companyProfileName
+        LOG.debug( "Method getRegionByProfileName called for companyProfileName:" + companyProfileName
             + " and regionProfileName:" + regionProfileName );
         OrganizationUnitSettings companySettings = null;
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
@@ -1253,7 +1253,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         LOG.debug( "Generating final region settings based on lock settings" );
         regionSettings = aggregateRegionProfile( companySettings, regionSettings );
-        LOG.info( "Method getRegionByProfileName excecuted successfully" );
+        LOG.debug( "Method getRegionByProfileName excecuted successfully" );
         return regionSettings;
     }
 
@@ -1266,7 +1266,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public OrganizationUnitSettings getBranchByProfileName( String companyProfileName, String branchProfileName )
         throws ProfileNotFoundException, InvalidInputException
     {
-        LOG.info( "Method getBranchByProfileName called for companyProfileName:" + companyProfileName
+        LOG.debug( "Method getBranchByProfileName called for companyProfileName:" + companyProfileName
             + " and branchProfileName:" + branchProfileName );
 
         OrganizationUnitSettings companySettings = getCompanyProfileByProfileName( companyProfileName );
@@ -1299,7 +1299,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         branchSettings = aggregateBranchProfile( companySettings, regionSettings, branchSettings );
 
-        LOG.info( "Method getBranchByProfileName excecuted successfully" );
+        LOG.debug( "Method getBranchByProfileName excecuted successfully" );
         return branchSettings;
     }
 
@@ -1311,7 +1311,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Transactional
     public OrganizationUnitSettings getCompanyProfileByProfileName( String profileName ) throws ProfileNotFoundException
     {
-        LOG.info( "Method getCompanyDetailsByProfileName called for profileName : " + profileName );
+        LOG.debug( "Method getCompanyDetailsByProfileName called for profileName : " + profileName );
         if ( profileName == null || profileName.isEmpty() ) {
             throw new ProfileNotFoundException( "profile name is null or empty while getting company details" );
         }
@@ -1322,7 +1322,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new ProfileNotFoundException( "Unable to find company settings with profile name : " + profileName );
         }
 
-        LOG.info( "Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings );
+        LOG.debug( "Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings );
         return companySettings;
     }
 
@@ -1337,7 +1337,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public OrganizationUnitSettings getIndividualByProfileName( String agentProfileName )
         throws ProfileNotFoundException, InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method getIndividualByProfileName called for agentProfileName:" + agentProfileName );
+        LOG.debug( "Method getIndividualByProfileName called for agentProfileName:" + agentProfileName );
 
         OrganizationUnitSettings agentSettings = null;
         if ( agentProfileName == null || agentProfileName.isEmpty() ) {
@@ -1391,7 +1391,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         agentSettings = aggregateAgentProfile( companySettings, regionSettings, branchSettings, agentSettings );
         agentSettings = aggregateAgentDetails( user, agentSettings, agentSettings.getLockSettings() );
 
-        LOG.info( "Method getIndividualByProfileName executed successfully" );
+        LOG.debug( "Method getIndividualByProfileName executed successfully" );
         return agentSettings;
     }
 
@@ -1401,7 +1401,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public OrganizationUnitSettings getIndividualSettingsByProfileName( String agentProfileName )
         throws ProfileNotFoundException, InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method getIndividualByProfileName called for agentProfileName:" + agentProfileName );
+        LOG.debug( "Method getIndividualByProfileName called for agentProfileName:" + agentProfileName );
 
         OrganizationUnitSettings agentSettings = null;
         if ( agentProfileName == null || agentProfileName.isEmpty() ) {
@@ -1421,9 +1421,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings )
         throws InvalidInputException, ProfileNotFoundException
     {
-        LOG.info( "Inside method getPrimaryHierarchyByAgentProfile " );
+        LOG.debug( "Inside method getPrimaryHierarchyByAgentProfile " );
         Map<String, Long> hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( agentSettings.getIden() );
-        LOG.info( "Returning from getPrimaryHierarchyByAgentProfile " );
+        LOG.debug( "Returning from getPrimaryHierarchyByAgentProfile " );
         return hierarchyMap;
     }
 
@@ -1433,7 +1433,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public SocialMediaTokens aggregateSocialProfiles( OrganizationUnitSettings unitSettings, String entity )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method aggregateSocialProfiles called for agentProfileName:" + unitSettings.getProfileName() );
+        LOG.debug( "Method aggregateSocialProfiles called for agentProfileName:" + unitSettings.getProfileName() );
 
         long companyId = 0l;
         if ( entity.equals( CommonConstants.AGENT_ID ) ) {
@@ -1527,7 +1527,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
         }
 
-        LOG.info( "Method aggregateSocialProfiles executed successfully: " + entityTokens.toString() );
+        LOG.debug( "Method aggregateSocialProfiles executed successfully: " + entityTokens.toString() );
         return entityTokens;
     }
 
@@ -1584,7 +1584,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Transactional
     public User getUserByProfileName( String agentProfileName, boolean checkStatus ) throws ProfileNotFoundException
     {
-        LOG.info( "Method getUserProfilesByProfileName called for agentProfileName:" + agentProfileName );
+        LOG.debug( "Method getUserProfilesByProfileName called for agentProfileName:" + agentProfileName );
 
         OrganizationUnitSettings agentSettings = null;
         if ( agentProfileName == null || agentProfileName.isEmpty() ) {
@@ -1602,7 +1602,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new ProfileNotFoundException( "No active agent found." );
         }
 
-        LOG.info( "Method getUserProfilesByProfileName executed successfully" );
+        LOG.debug( "Method getUserProfilesByProfileName executed successfully" );
         return user;
     }
 
@@ -1612,7 +1612,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public UserCompositeEntity getCompositeUserObjectByProfileName( String agentProfileName, boolean checkStatus )
         throws ProfileNotFoundException
     {
-        LOG.info(
+        LOG.debug(
             "Getting the user composite object by profile name: " + agentProfileName + " and check status: " + checkStatus );
         if ( agentProfileName == null || agentProfileName.isEmpty() ) {
             LOG.error( "agentProfileName is null or empty while getting agent settings" );
@@ -1646,7 +1646,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             compositeUserObject.setUser( user );
             compositeUserObject.setAgentSettings( agentSettings );
         }
-        LOG.info( "Returning the user composite object." );
+        LOG.debug( "Returning the user composite object." );
         return compositeUserObject;
     }
 
@@ -1655,7 +1655,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Transactional
     public List<AgentSettings> getIndividualsByBranchId( long branchId ) throws InvalidInputException
     {
-        LOG.info( "Method getIndividualsByBranchId called for branchId:" + branchId );
+        LOG.debug( "Method getIndividualsByBranchId called for branchId:" + branchId );
         List<AgentSettings> users = null;
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
@@ -1671,7 +1671,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
             LOG.debug( "Returning :" + users.size() + " individuals for branch : " + branchId );
         }
-        LOG.info( "Method getIndividualsByBranchId executed successfully" );
+        LOG.debug( "Method getIndividualsByBranchId executed successfully" );
         return users;
     }
 
@@ -1689,7 +1689,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<AgentSettings> getIndividualsByBranchId( long branchId, int startIndex, int batchSize )
         throws InvalidInputException
     {
-        LOG.info( "Method getIndividualsByBranchId called for branchId:" + branchId + ", startIndex: " + startIndex
+        LOG.debug( "Method getIndividualsByBranchId called for branchId:" + branchId + ", startIndex: " + startIndex
             + ", batchSize: " + batchSize );
         List<AgentSettings> users = null;
         Map<String, Object> queries = new HashMap<String, Object>();
@@ -1705,7 +1705,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
             LOG.debug( "Returning :" + users.size() + " individuals for branch : " + branchId );
         }
-        LOG.info( "Method getIndividualsByBranchId executed successfully" );
+        LOG.debug( "Method getIndividualsByBranchId executed successfully" );
         return users;
     }
 
@@ -1714,12 +1714,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive,
         boolean notRecommended )
     {
-        LOG.info( "Method getReviewsCountForCompany called for companyId:" + companyId + " minscore:" + minScore + " maxscore:"
+        LOG.debug( "Method getReviewsCountForCompany called for companyId:" + companyId + " minscore:" + minScore + " maxscore:"
             + maxScore );
         long reviewsCount = 0;
         reviewsCount = surveyDetailsDao.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, companyId, minScore, maxScore,
             fetchAbusive, notRecommended, false, 0l );
-        LOG.info( "Method getReviewsCountForCompany executed successfully" );
+        LOG.debug( "Method getReviewsCountForCompany executed successfully" );
         return reviewsCount;
     }
 
@@ -1731,7 +1731,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Transactional
     public List<AgentSettings> getIndividualsByRegionId( long regionId ) throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method getIndividualsByRegionId called for regionId: " + regionId );
+        LOG.debug( "Method getIndividualsByRegionId called for regionId: " + regionId );
         List<AgentSettings> users = null;
         if ( regionId <= 0l ) {
             throw new InvalidInputException( "Region id is not set for getIndividualsByRegionId" );
@@ -1756,7 +1756,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 users.add( organizationUnitSettingsDao.fetchAgentSettingsById( userProfile.getUser().getUserId() ) );
             }
         }
-        LOG.info( "Method getIndividualsByRegionId executed successfully" );
+        LOG.debug( "Method getIndividualsByRegionId executed successfully" );
         return users;
     }
 
@@ -1766,7 +1766,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<AgentSettings> getIndividualsByRegionId( long regionId, int startIndex, int batchSize )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method getIndividualsByRegionId called for regionId: " + regionId );
+        LOG.debug( "Method getIndividualsByRegionId called for regionId: " + regionId );
         List<AgentSettings> users = null;
         if ( regionId <= 0l ) {
             throw new InvalidInputException( "Region id is not set for getIndividualsByRegionId" );
@@ -1791,7 +1791,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 users.add( organizationUnitSettingsDao.fetchAgentSettingsById( userProfile.getUser().getUserId() ) );
             }
         }
-        LOG.info( "Method getIndividualsByRegionId executed successfully" );
+        LOG.debug( "Method getIndividualsByRegionId executed successfully" );
         return users;
     }
 
@@ -1805,7 +1805,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
         throws InvalidInputException
     {
-        LOG.info( "Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore
+        LOG.debug( "Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore
             + " startIndex:" + startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel );
         List<SurveyDetails> surveyDetails = null;
         if ( iden <= 0l ) {
@@ -1872,7 +1872,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         int numOfRows, String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
         throws InvalidInputException
     {
-        LOG.info( "Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore
+        LOG.debug( "Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore
             + " startIndex:" + startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel );
         List<SurveyDetails> surveyDetails = null;
         if ( iden <= 0l ) {
@@ -1923,7 +1923,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public double getAverageRatings( long iden, String profileLevel, boolean aggregateAbusive, boolean includeZillow,
         long zillowTotalScore, long zillowReviewCount ) throws InvalidInputException
     {
-        LOG.info( "Method getAverageRatings called for iden :" + iden + " profilelevel:" + profileLevel );
+        LOG.debug( "Method getAverageRatings called for iden :" + iden + " profilelevel:" + profileLevel );
         if ( iden <= 0l ) {
             throw new InvalidInputException( "iden is invalid for getting average rating os a company" );
         }
@@ -1934,7 +1934,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         //get formatted survey score using rating format  
         averageRating = surveyHandler.getFormattedSurveyScore( averageRating );
 
-        LOG.info( "Method getAverageRatings executed successfully.Returning: " + averageRating );
+        LOG.debug( "Method getAverageRatings executed successfully.Returning: " + averageRating );
         return averageRating;
     }
 
@@ -1993,7 +1993,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
         boolean notRecommended, boolean includeZillow, long zillowReviewCount ) throws InvalidInputException
     {
-        LOG.info( "Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore
+        LOG.debug( "Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore
             + " profilelevel:" + profileLevel );
         if ( iden <= 0l ) {
             throw new InvalidInputException( "Iden is invalid for getting reviews count" );
@@ -2002,7 +2002,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive,
             notRecommended, includeZillow, zillowReviewCount );
-        LOG.info( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
+        LOG.debug( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
         return reviewsCount;
     }
 
@@ -2017,7 +2017,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public Collection<UserFromSearch> getProListByProfileLevel( long iden, String profileLevel, int start, int numOfRows )
         throws InvalidInputException, SolrException
     {
-        LOG.info( "Method getProListByProfileLevel called for iden: " + iden + " profileLevel:" + profileLevel + " start:"
+        LOG.debug( "Method getProListByProfileLevel called for iden: " + iden + " profileLevel:" + profileLevel + " start:"
             + start + " numOfRows:" + numOfRows );
         if ( iden <= 0l ) {
             throw new InvalidInputException( "iden is invalid in getProListByProfileLevel" );
@@ -2042,7 +2042,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         solrSearchResult = solrSearchService.searchUsersByIden( iden, idenFieldName, true, start, numOfRows );
 
-        LOG.info( "Method getProListByProfileLevel finished successfully" );
+        LOG.debug( "Method getProListByProfileLevel finished successfully" );
         return solrSearchResult;
     }
 
@@ -2068,7 +2068,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public void generateAndSendEmailVerificationRequestLinkToAdmin( List<MiscValues> mailIds, long companyId, String entityType,
         OrganizationUnitSettings entitySettings ) throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Method generateAndSendEmailVerificationRequestLinkToAdmin started " );
+        LOG.debug( "Method generateAndSendEmailVerificationRequestLinkToAdmin started " );
         Map<String, String> urlParams = null;
 
         if ( entitySettings == null ) {
@@ -2253,7 +2253,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<SurveyPreInitiation> getIncompleteSurvey( long iden, double startScore, double limitScore, int startIndex,
         int numOfRows, String profileLevel, Date startDate, Date endDate, boolean realtechAdmin ) throws InvalidInputException
     {
-        LOG.info( "Method getIncompleteSurvey() called for iden:" + iden + " startScore:" + startScore + " limitScore:"
+        LOG.debug( "Method getIncompleteSurvey() called for iden:" + iden + " startScore:" + startScore + " limitScore:"
             + limitScore + " startIndex:" + startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel );
         if ( iden <= 0l ) {
             throw new InvalidInputException( "iden is invalid while fetching incomplete reviews" );
@@ -2283,7 +2283,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     public List<AgentSettings> getIndividualsByBranchIds( Set<Long> branchIds ) throws InvalidInputException
     {
-        LOG.info( "Method getIndividualsByBranchIds called for branchIds:" + branchIds );
+        LOG.debug( "Method getIndividualsByBranchIds called for branchIds:" + branchIds );
         List<AgentSettings> users = null;
         if ( branchIds != null && !branchIds.isEmpty() ) {
             users = new ArrayList<AgentSettings>();
@@ -2294,7 +2294,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
             }
         }
-        LOG.info( "Method getIndividualsByBranchIds executed successfully" );
+        LOG.debug( "Method getIndividualsByBranchIds executed successfully" );
         return users;
     }
 
@@ -2306,7 +2306,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<AgentSettings> getIndividualsByRegionIds( Set<Long> regionIds )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method getIndividualsByBranchIds called for regionIds:" + regionIds );
+        LOG.debug( "Method getIndividualsByBranchIds called for regionIds:" + regionIds );
         List<AgentSettings> users = null;
         if ( regionIds != null && !regionIds.isEmpty() ) {
             users = new ArrayList<AgentSettings>();
@@ -2317,7 +2317,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
             }
         }
-        LOG.info( "Method getIndividualsByRegionIds executed successfully" );
+        LOG.debug( "Method getIndividualsByRegionIds executed successfully" );
         return users;
     }
 
@@ -2403,7 +2403,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     public void addSocialPosts( User user, long entityId, String entityType, String postText ) throws InvalidInputException
     {
-        LOG.info( "Method to add post to a user's profile started." );
+        LOG.debug( "Method to add post to a user's profile started." );
         SocialPost socialPost = new SocialPost();
         socialPost.setPostedBy( user.getFirstName() + " " + user.getLastName() );
         socialPost.setPostText( postText );
@@ -2425,9 +2425,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         socialPost.setTimeInMillis( System.currentTimeMillis() );
         socialPostDao.addPostToUserProfile( socialPost );
-        LOG.info( "Updating modified on column in aagent hierarchy fro agent " + user.getFirstName() );
+        LOG.debug( "Updating modified on column in aagent hierarchy fro agent " + user.getFirstName() );
         surveyHandler.updateModifiedOnColumnForEntity( entityType, entityId );
-        LOG.info( "Method to add post to a user's profile finished." );
+        LOG.debug( "Method to add post to a user's profile finished." );
     }
 
 
@@ -2437,7 +2437,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     public void deleteSocialPost( String postMongoId ) throws InvalidInputException
     {
-        LOG.info( "Method to delete post to a user's profile started." );
+        LOG.debug( "Method to delete post to a user's profile started." );
         SocialPost socialPost = socialPostDao.getPostByMongoObjectId( postMongoId );
         if ( socialPost == null ) {
             throw new InvalidInputException( "No Status Found", DisplayMessageConstants.GENERAL_ERROR );
@@ -2458,7 +2458,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         } catch ( SolrException e ) {
             throw new InvalidInputException( "Error removing social post from Solr. Reason : ", e );
         }
-        LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+        LOG.debug( "Updating modified on column in aagent hierarchy fro agent " );
         if ( companyId > 0 ) {
             surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, companyId );
         }
@@ -2471,7 +2471,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( agentId > 0 ) {
             surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, agentId );
         }
-        LOG.info( "Method to delete post to a user's profile finished." );
+        LOG.debug( "Method to delete post to a user's profile finished." );
     }
 
 
@@ -2482,7 +2482,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<SocialPost> getSocialPosts( long entityId, String entityType, int startIndex, int batchSize )
         throws InvalidInputException
     {
-        LOG.info( "Method to fetch social posts , getSocialPosts() started." );
+        LOG.debug( "Method to fetch social posts , getSocialPosts() started." );
         if ( entityType == null ) {
             throw new InvalidInputException( "No entity type found in session", DisplayMessageConstants.GENERAL_ERROR );
         }
@@ -2499,7 +2499,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         List<SocialPost> posts = socialPostDao.getSocialPosts( iden, key, startIndex, batchSize );
-        LOG.info( "Method to fetch social posts , getSocialPosts() finished." );
+        LOG.debug( "Method to fetch social posts , getSocialPosts() finished." );
         return posts;
     }
 
@@ -2511,7 +2511,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<SocialPost> getCumulativeSocialPosts( long entityId, String entityType, int startIndex, int numOfRows,
         String profileLevel, Date startDate, Date endDate ) throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method to fetch social posts , getCumulativeSocialPosts() started." );
+        LOG.debug( "Method to fetch social posts , getCumulativeSocialPosts() started." );
         List<SocialPost> posts = new ArrayList<SocialPost>();
         if ( entityType == null ) {
             throw new InvalidInputException( "No entity type found in session", DisplayMessageConstants.GENERAL_ERROR );
@@ -2574,7 +2574,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
             }
         }
-        LOG.info( "Method to fetch social posts , getCumulativeSocialPosts() finished." );
+        LOG.debug( "Method to fetch social posts , getCumulativeSocialPosts() finished." );
         return posts;
     }
 
@@ -2585,9 +2585,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     public long getPostsCountForUser( String columnName, long columnValue )
     {
-        LOG.info( "Method to fetch count of social posts for a particular user, getPostsCountForUser() started." );
+        LOG.debug( "Method to fetch count of social posts for a particular user, getPostsCountForUser() started." );
         long postsCount = socialPostDao.getPostsCountByUserId( columnName, columnValue );
-        LOG.info( "Method to fetch count of social posts for a particular user, getPostsCountForUser() finished." );
+        LOG.debug( "Method to fetch count of social posts for a particular user, getPostsCountForUser() finished." );
         return postsCount;
     }
 
@@ -2596,11 +2596,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public void updateLinkedInProfileData( String collectionName, OrganizationUnitSettings organizationUnitSettings,
         LinkedInProfileData linkedInProfileData ) throws InvalidInputException
     {
-        LOG.info( "Updating linked in profile data into " + collectionName );
+        LOG.debug( "Updating linked in profile data into " + collectionName );
         if ( linkedInProfileData == null ) {
             throw new InvalidInputException( "LinkedInProfile details passed can not be null" );
         }
-        LOG.info( "Updating linkedin profile detail information" );
+        LOG.debug( "Updating linkedin profile detail information" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_PROFILEDATA, linkedInProfileData, organizationUnitSettings,
             collectionName );
@@ -2617,7 +2617,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 collectionName );*/
         }
 
-        LOG.info( "Updated the linkedin profile data." );
+        LOG.debug( "Updated the linkedin profile data." );
 
     }
 
@@ -2628,10 +2628,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( expertise == null || expertise.isEmpty() ) {
             throw new InvalidInputException( "Expertise list is not proper" );
         }
-        LOG.info( "Updating agent expertise" );
+        LOG.debug( "Updating agent expertise" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_EXPERTISE,
             expertise, agentSettings );
-        LOG.info( "Updated agent expertise." );
+        LOG.debug( "Updated agent expertise." );
     }
 
 
@@ -2641,10 +2641,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( hobbies == null || hobbies.isEmpty() ) {
             throw new InvalidInputException( "Hobbies list is not proper" );
         }
-        LOG.info( "Updating agent hobbies" );
+        LOG.debug( "Updating agent hobbies" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_HOBBIES, hobbies,
             agentSettings );
-        LOG.info( "Updated agent hobbies." );
+        LOG.debug( "Updated agent hobbies." );
     }
 
 
@@ -2655,10 +2655,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( companyPositions == null || companyPositions.isEmpty() ) {
             throw new InvalidInputException( "Company positions passed are not proper" );
         }
-        LOG.info( "Updating company positions" );
+        LOG.debug( "Updating company positions" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_COMPANY_POSITIONS,
             companyPositions, agentSettings );
-        LOG.info( "Updated company positions." );
+        LOG.debug( "Updated company positions." );
     }
 
 
@@ -2666,10 +2666,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public void updateProfileStages( List<ProfileStage> profileStages, OrganizationUnitSettings settings,
         String collectionName )
     {
-        LOG.info( "Method to update profile stages started." );
+        LOG.debug( "Method to update profile stages started." );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_STAGES, profileStages, settings, collectionName );
-        LOG.info( "Method to update profile stages finished." );
+        LOG.debug( "Method to update profile stages finished." );
     }
 
 
@@ -2793,7 +2793,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Transactional
     public String aggregateDisclaimer( OrganizationUnitSettings unitSettings, String entity ) throws InvalidInputException
     {
-        LOG.info( "Method aggregateDisclaimer() called from ProfileManagementService" );
+        LOG.debug( "Method aggregateDisclaimer() called from ProfileManagementService" );
         String disclaimer = "";
 
         if ( unitSettings.getDisclaimer() != null && !unitSettings.getDisclaimer().isEmpty() ) {
@@ -2867,7 +2867,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
         }
 
-        LOG.info( "Method aggregateDisclaimer() called from ProfileManagementService" );
+        LOG.debug( "Method aggregateDisclaimer() called from ProfileManagementService" );
         return disclaimer;
     }
 
@@ -2877,7 +2877,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<AgentRankingReport> getAgentReport( long iden, String columnName, Date startDate, Date endDate, Object object )
         throws InvalidInputException
     {
-        LOG.info( "Method to get Agent's Report for a specific time and all time started." );
+        LOG.debug( "Method to get Agent's Report for a specific time and all time started." );
         if ( columnName == null || columnName.isEmpty() ) {
             throw new InvalidInputException( "Null/Empty value passed for profile level." );
         }
@@ -2894,7 +2894,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         // FIX for JIRA: SS-1112: EOC
         organizationUnitSettingsDao.setAgentDetails( agentReportData );
 
-        LOG.info( "Method to get Agent's Report for a specific time and all time finished." );
+        LOG.debug( "Method to get Agent's Report for a specific time and all time finished." );
         return new ArrayList<>( agentReportData.values() );
     }
 
@@ -2949,7 +2949,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         AccountType accountType = AccountType
             .getAccountType( company.getLicenseDetails().get( 0 ).getAccountsMaster().getAccountsMasterId() );
 
-        LOG.info( "Method getIndividualsBreadCrumb called :" );
+        LOG.debug( "Method getIndividualsBreadCrumb called :" );
         List<BreadCrumb> breadCrumbList = new ArrayList<>();
 
         switch ( accountType.getValue() ) {
@@ -2990,7 +2990,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         Collections.reverse( breadCrumbList );
-        LOG.info( "Method getIndividualsBreadCrumb finished :" );
+        LOG.debug( "Method getIndividualsBreadCrumb finished :" );
         return breadCrumbList;
     }
 
@@ -3000,7 +3000,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<BreadCrumb> getRegionsBreadCrumb( OrganizationUnitSettings regionProfile )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method getRegionsBreadCrumb called :" );
+        LOG.debug( "Method getRegionsBreadCrumb called :" );
         List<BreadCrumb> breadCrumbList = new ArrayList<>();
 
         Region region = regionDao.findById( Region.class, regionProfile.getIden() );
@@ -3009,7 +3009,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         updateCrumbListWithVerticalName( breadCrumbList, company );
 
         Collections.reverse( breadCrumbList );
-        LOG.info( "Method getRegionsBreadCrumb finished :" );
+        LOG.debug( "Method getRegionsBreadCrumb finished :" );
         return breadCrumbList;
     }
 
@@ -3019,7 +3019,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<BreadCrumb> getBranchsBreadCrumb( OrganizationUnitSettings branchProfile )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.info( "Method getBranchsBreadCrumb called :" );
+        LOG.debug( "Method getBranchsBreadCrumb called :" );
         List<BreadCrumb> breadCrumbList = new ArrayList<>();
 
         Branch branch = branchDao.findById( Branch.class, branchProfile.getIden() );
@@ -3032,7 +3032,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         updateCrumbListWithVerticalName( breadCrumbList, company );
 
         Collections.reverse( breadCrumbList );
-        LOG.info( "Method getBranchsBreadCrumb finished :" );
+        LOG.debug( "Method getBranchsBreadCrumb finished :" );
         return breadCrumbList;
     }
 
@@ -3085,9 +3085,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<OrganizationUnitSettings> getCompanyList( String verticalName )
         throws InvalidInputException, ProfileNotFoundException
     {
-        LOG.info( "Method getCompanyList called :" );
+        LOG.debug( "Method getCompanyList called :" );
         List<OrganizationUnitSettings> companyList = organizationUnitSettingsDao.getCompanyListByVerticalName( verticalName );
-        LOG.info( "Method getCompanyList finished :" );
+        LOG.debug( "Method getCompanyList finished :" );
         return companyList;
     }
 
@@ -3096,7 +3096,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Transactional
     public void updateCompanyName( long userId, long companyId, String companyName ) throws InvalidInputException
     {
-        LOG.info( "Method updateCompanyName of profileManagementService called for companyId : " + companyId );
+        LOG.debug( "Method updateCompanyName of profileManagementService called for companyId : " + companyId );
 
         Company company = companyDao.findById( Company.class, companyId );
         if ( company == null ) {
@@ -3107,7 +3107,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         company.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         companyDao.update( company );
 
-        LOG.info( "Successfully completed method to update company name" );
+        LOG.debug( "Successfully completed method to update company name" );
     }
 
 
@@ -3115,7 +3115,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Transactional
     public void updateRegionName( long userId, long regionId, String regionName ) throws InvalidInputException
     {
-        LOG.info( "Method updateRegionName of profileManagementService called for regionId : " + regionId );
+        LOG.debug( "Method updateRegionName of profileManagementService called for regionId : " + regionId );
 
         Region region = regionDao.findById( Region.class, regionId );
         if ( region == null ) {
@@ -3126,7 +3126,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         region.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         regionDao.update( region );
 
-        LOG.info( "Successfully completed method to update region name" );
+        LOG.debug( "Successfully completed method to update region name" );
     }
 
 
@@ -3134,7 +3134,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Transactional
     public void updateBranchName( long userId, long branchId, String branchName ) throws InvalidInputException
     {
-        LOG.info( "Method updateBranchName of profileManagementService called for branchId : " + branchId );
+        LOG.debug( "Method updateBranchName of profileManagementService called for branchId : " + branchId );
 
         Branch branch = branchDao.findById( Branch.class, branchId );
         if ( branch == null ) {
@@ -3145,7 +3145,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         branch.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         branchDao.update( branch );
 
-        LOG.info( "Successfully completed method to update branch name" );
+        LOG.debug( "Successfully completed method to update branch name" );
     }
 
 
@@ -3153,7 +3153,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Transactional
     public void updateIndividualName( long userId, long individualId, String individualName ) throws InvalidInputException
     {
-        LOG.info( "Method updateIndividualName of profileManagementService called for individualId : " + individualId );
+        LOG.debug( "Method updateIndividualName of profileManagementService called for individualId : " + individualId );
 
         User user = userDao.findById( User.class, individualId );
         if ( user == null ) {
@@ -3186,7 +3186,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userDao.update( user );
 
-        LOG.info( "Successfully completed method to update individual name" );
+        LOG.debug( "Successfully completed method to update individual name" );
     }
 
 
@@ -3194,7 +3194,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Transactional
     public void updateCompanyEmail( long companyId, String emailId ) throws NonFatalException
     {
-        LOG.info( "Method updateCompanyEmail of profileManagementService called for companyId : " + companyId );
+        LOG.debug( "Method updateCompanyEmail of profileManagementService called for companyId : " + companyId );
 
         Company company = companyDao.findById( Company.class, companyId );
         if ( company == null ) {
@@ -3238,7 +3238,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             // Fix for JIRA: SS-1358 - Updating email address should update SOLR records as well
             // END
 
-            LOG.info( "Successfully completed method to update company email" );
+            LOG.debug( "Successfully completed method to update company email" );
         } else {
             LOG.error( "Could not find the owner of the company" );
         }
@@ -3249,7 +3249,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Transactional
     public void updateIndividualEmail( long userId, String emailId ) throws InvalidInputException
     {
-        LOG.info( "Method updateIndividualEmail of profileManagementService called for userId : " + userId );
+        LOG.debug( "Method updateIndividualEmail of profileManagementService called for userId : " + userId );
 
         User user = userDao.findById( User.class, userId );
         if ( user == null ) {
@@ -3267,7 +3267,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             userProfileDao.update( userProfile );
         }
 
-        LOG.info( "Successfully completed method to update individual email" );
+        LOG.debug( "Successfully completed method to update individual email" );
     }
 
 
@@ -3484,7 +3484,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         boolean webAddressLocked = true;
         boolean phoneNumberLocked = true;
         AgentSettings unitSettings = null;
-        LOG.info( "Inside method getPrimaryHeirarchyByEntity for entity " + entityType );
+        LOG.debug( "Inside method getPrimaryHeirarchyByEntity for entity " + entityType );
         Map<String, Long> hierarchyDetails = getHierarchyDetailsByEntity( entityType, entityId );
         long companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
         long regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
@@ -3492,7 +3492,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         List<SettingsDetails> settingsDetailsList = settingsManager.getScoreForCompleteHeirarchy( companyId, branchId,
             regionId );
 
-        LOG.info( "Calculate lock and setting score " );
+        LOG.debug( "Calculate lock and setting score " );
         Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
         long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
         long currentSetAggregateValue = totalScore.get( CommonConstants.SETTING_SCORE );
@@ -3685,7 +3685,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public OrganizationUnitSettings getRegionSettingsByProfileName( String companyProfileName, String regionProfileName )
         throws ProfileNotFoundException, InvalidInputException
     {
-        LOG.info( "Method getRegionByProfileName called for companyProfileName:" + companyProfileName
+        LOG.debug( "Method getRegionByProfileName called for companyProfileName:" + companyProfileName
             + " and regionProfileName:" + regionProfileName );
         if ( regionProfileName == null || regionProfileName.isEmpty() ) {
             throw new ProfileNotFoundException( "regionProfileName is null or empty in getRegionByProfileName" );
@@ -3708,7 +3708,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public OrganizationUnitSettings getBranchSettingsByProfileName( String companyProfileName, String branchProfileName )
         throws ProfileNotFoundException, InvalidInputException
     {
-        LOG.info( "Method getBranchSettingsByProfileName called for companyProfileName:" + companyProfileName
+        LOG.debug( "Method getBranchSettingsByProfileName called for companyProfileName:" + companyProfileName
             + " and branchProfileName:" + branchProfileName );
 
         OrganizationUnitSettings companySettings = getCompanyProfileByProfileName( companyProfileName );
@@ -4641,7 +4641,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id passed cannot be null or empty in updateEmailIdInSolr" );
         }
-        LOG.info( "Updating verified email id info into solr for user id : " + iden );
+        LOG.debug( "Updating verified email id info into solr for user id : " + iden );
         Map<String, Object> editKeys = new HashMap<String, Object>();
         editKeys.put( CommonConstants.USER_LOGIN_NAME_SOLR, emailId );
         editKeys.put( CommonConstants.USER_EMAIL_ID_SOLR, emailId );
@@ -4650,7 +4650,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         } catch ( SolrException se ) {
             throw new NonFatalException( se.getMessage() );
         }
-        LOG.info( "Updated verified email id info into solr for user id : " + iden );
+        LOG.debug( "Updated verified email id info into solr for user id : " + iden );
     }
 
 
@@ -4667,19 +4667,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
 
         if ( profile == null || collection == null || collection.isEmpty() ) {
-            LOG.info( "Invalid parameters passed to fetchZillowData for fetching zillow feed" );
+            LOG.debug( "Invalid parameters passed to fetchZillowData for fetching zillow feed" );
             throw new InvalidInputException( "Invalid parameters passed to fetchZillowData for fetching zillow feed" );
         }
-        LOG.info( "Method to fetch zillow feed called for ID :" + profile.getIden() + " of collection : " + collection );
+        LOG.debug( "Method to fetch zillow feed called for ID :" + profile.getIden() + " of collection : " + collection );
         if ( profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null ) {
             // fetching zillow feed
             LOG.debug( "Fetching zillow feed for " + profile.getId() + " from " + collection );
             List<SurveyDetails> surveyDetailsList = fetchAndSaveZillowFeeds( profile, collection, companyId, fromBatch,
                 fromPublicPage );
-            LOG.info( "Method to fetch zillow feed finished." );
+            LOG.debug( "Method to fetch zillow feed finished." );
             return surveyDetailsList;
         } else {
-            LOG.info( "Zillow is not added for the profile" );
+            LOG.debug( "Zillow is not added for the profile" );
             throw new InvalidInputException( "Zillow is not added for the profile" );
         }
     }
@@ -4737,17 +4737,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     void reportBugOnZillowFetchFail( String unitName, String zillowScreenName, Exception exception )
     {
         try {
-            LOG.info( "Building error message for the zillow review fetch failure" );
+            LOG.debug( "Building error message for the zillow review fetch failure" );
             String errorMsg = "<br>" + exception.getMessage()
                 + "<br><br>Error while fetching zillow reviews for a unit/Agent<br>";
             errorMsg += "<br>Social Application : Zillow<br>";
             errorMsg += "<br>Unit/Agent Name : " + unitName + "<br>";
             errorMsg += "<br>Zillow Screen Name : " + zillowScreenName + "<br>";
             errorMsg += "<br>StackTrace : <br>" + ExceptionUtils.getStackTrace( exception ).replaceAll( "\n", "<br>" ) + "<br>";
-            LOG.info( "Error message built for zillow review fetch failure" );
-            LOG.info( "Sending bug mail to admin for zillow review fetch failure" );
+            LOG.debug( "Error message built for zillow review fetch failure" );
+            LOG.debug( "Sending bug mail to admin for zillow review fetch failure" );
             emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMsg, applicationAdminEmail );
-            LOG.info( "Sent bug mail to admin for zillow review fetch failure" );
+            LOG.debug( "Sent bug mail to admin for zillow review fetch failure" );
         } catch ( UndeliveredEmailException ude ) {
             LOG.error( "error while sending report bug mail to admin ", ude );
         } catch ( InvalidInputException iie ) {
@@ -4789,9 +4789,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         List<String> latestSurveyIdList = new ArrayList<String>();
         queries.put( idenColumnName, profile.getIden() );
 
-        // LOG.info( "Deleting existing reviews for profile type : " + idenColumnName + " and profile id : " + profile.getIden() );
+        // LOG.debug( "Deleting existing reviews for profile type : " + idenColumnName + " and profile id : " + profile.getIden() );
         // surveyHandler.deleteExistingZillowSurveysByEntity( idenColumnName, profile.getIden() );
-        // LOG.info( "Deleted existing reviews for profile type : " + idenColumnName + " and profile id : " + profile.getIden() );
+        // LOG.debug( "Deleted existing reviews for profile type : " + idenColumnName + " and profile id : " + profile.getIden() );
         for ( Map<String, Object> review : reviews ) {
             String sourceId = (String) review.get( "reviewURL" );
             String reviewDescription = (String) review.get( "description" );
@@ -4873,11 +4873,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setReview( reviewDescription );
 
                 surveyHandler.updateZillowSummaryInExistingSurveyDetails( surveyDetails );
+            } else if(surveyDetails.getSourceId() == null || surveyDetails.getSourceId().isEmpty()) {
+                
             }
 
             if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
                 && fromBatch ) {
                 postToTempTable( collectionName, profile, surveyDetails, review );
+                surveyDetails.setSourceId( sourceId );
+
+                surveyHandler.updateZillowSourceIdInExistingSurveyDetails( surveyDetails );
             }
 
             /* if ( fromPublicPage ) {
@@ -4933,7 +4938,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Review passed as argument in pushToZillowPostTemp cannot be null or empty" );
         }
 
-        LOG.info( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp started" );
+        LOG.debug( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp started" );
         String columnName = null;
         if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
             columnName = CommonConstants.COMPANY_ID_COLUMN;
@@ -4966,7 +4971,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         // Persisting Zillow Temp Post Object
         zillowTempPostDao.saveOrUpdateZillowTempPost( zillowTempPost );
 
-        LOG.info( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp ended" );
+        LOG.debug( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp ended" );
     }
 
 
@@ -5098,7 +5103,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
             //updating last run time for batch in database
             batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_IMAGE_LOADER );
-            LOG.info( "Completed ImageUploader" );
+            LOG.debug( "Completed ImageUploader" );
         } catch ( Exception e ) {
             LOG.error( "Error in ImageUploader", e );
             try {
@@ -5167,7 +5172,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     fileName = fileUploadService.uploadProfileImageFile( tempImage, imageName, false );
                     FileUtils
                         .deleteQuietly( new File( CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + imageName ) );
-                    LOG.info( "Successfully retrieved photo of contact" );
+                    LOG.debug( "Successfully retrieved photo of contact" );
                 } else {
                     return null;
                 }
