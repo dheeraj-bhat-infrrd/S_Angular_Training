@@ -57,7 +57,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public void deactivateAllUserProfilesForUser( User admin, User userToBeDeactivated, int status )
     {
 
-        LOG.info( "Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName() );
+        LOG.debug( "Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName() );
         Query query = getSession().getNamedQuery( "UserProfile.updateProfileByUser" );
         // Setting status for user profile as inactive.
         query.setParameter( 0, status );
@@ -65,7 +65,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.setParameter( 2, new Timestamp( System.currentTimeMillis() ) );
         query.setParameter( 3, userToBeDeactivated );
         query.executeUpdate();
-        LOG.info( "Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName() );
+        LOG.debug( "Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName() );
 
     }
 
@@ -78,7 +78,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public void activateAllUserProfilesForUser( User userToBeActivated )
     {
 
-        LOG.info( "Method activateUserProfileByUser called to deactivate user : " + userToBeActivated.getFirstName() );
+        LOG.debug( "Method activateUserProfileByUser called to deactivate user : " + userToBeActivated.getFirstName() );
         Query query = getSession().getNamedQuery( "UserProfile.updateProfileByUser" );
         // Setting status for user profile as inactive.
         query.setParameter( 0, CommonConstants.STATUS_ACTIVE );
@@ -86,7 +86,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.setParameter( 2, new Timestamp( System.currentTimeMillis() ) );
         query.setParameter( 3, userToBeActivated );
         query.executeUpdate();
-        LOG.info( "Method activateUserProfileByUser called to deactivate user : " + userToBeActivated.getFirstName() );
+        LOG.debug( "Method activateUserProfileByUser called to deactivate user : " + userToBeActivated.getFirstName() );
 
     }
 
@@ -97,7 +97,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Override
     public void deactivateUserProfileForBranch( User admin, long branchId, User userToBeDeactivated )
     {
-        LOG.info( "Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName() );
+        LOG.debug( "Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName() );
         Query query = getSession().getNamedQuery( "UserProfile.updateByUser" );
         // Setting status for user profile as inactive.
         query.setParameter( 0, CommonConstants.STATUS_INACTIVE );
@@ -106,7 +106,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.setParameter( 3, userToBeDeactivated );
         query.setParameter( 4, branchId );
         query.executeUpdate();
-        LOG.info( "Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName() );
+        LOG.debug( "Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName() );
     }
 
 
@@ -116,7 +116,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Override
     public void deactivateUserProfileForRegion( User admin, long regionId, User userToBeDeactivated )
     {
-        LOG.info( "Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName() );
+        LOG.debug( "Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName() );
         Query query = getSession().getNamedQuery( "UserProfile.updateByUser" );
         // Setting status for user profile as inactive.
         query.setParameter( 0, CommonConstants.STATUS_INACTIVE );
@@ -125,7 +125,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.setParameter( 3, userToBeDeactivated );
         query.setParameter( 4, regionId );
         query.executeUpdate();
-        LOG.info( "Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName() );
+        LOG.debug( "Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName() );
     }
 
 
@@ -133,7 +133,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @SuppressWarnings ( "unchecked")
     public List<Long> getBranchIdsForUser( User user )
     {
-        LOG.info( "Method getBranchIdsForUser called to fetch branch ids assigned to user : " + user.getFirstName() );
+        LOG.debug( "Method getBranchIdsForUser called to fetch branch ids assigned to user : " + user.getFirstName() );
         Criteria criteria = getSession().createCriteria( UserProfile.class );
         List<Long> branchIds = new ArrayList<>();
         try {
@@ -150,7 +150,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
             LOG.error( "Exception caught in getBranchIdsForUser() ", hibernateException );
             throw new DatabaseException( "Exception caught in getBranchIdsForUser() ", hibernateException );
         }
-        LOG.info( "Method getBranchIdsForUser finished to fetch branch ids assigned to user : " + user.getFirstName() );
+        LOG.debug( "Method getBranchIdsForUser finished to fetch branch ids assigned to user : " + user.getFirstName() );
         return branchIds;
     }
 
@@ -159,7 +159,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Override
     public List<Long> getBranchesForAdmin( User user, List<ProfilesMaster> profilesMasters )
     {
-        LOG.info( "Method getBranchesForAdmin() called to fetch branches assigned to user : " + user.getFirstName() );
+        LOG.debug( "Method getBranchesForAdmin() called to fetch branches assigned to user : " + user.getFirstName() );
         Criteria criteria = getSession().createCriteria( UserProfile.class );
         List<Long> branchIds = new ArrayList<>();
         try {
@@ -179,7 +179,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
             LOG.error( "Exception caught in getBranchesForAdmin() ", hibernateException );
             throw new DatabaseException( "Exception caught in getBranchesForAdmin() ", hibernateException );
         }
-        LOG.info( "Method getBranchesForAdmin() finished to fetch branches assigned to user : " + user.getFirstName() );
+        LOG.debug( "Method getBranchesForAdmin() finished to fetch branches assigned to user : " + user.getFirstName() );
         return branchIds;
     }
 
@@ -187,21 +187,21 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Override
     public void deleteUserProfilesByCompany( long companyId )
     {
-        LOG.info( "Method deleteUserProfilesByCompany() called to delete profiles of company id : " + companyId );
+        LOG.debug( "Method deleteUserProfilesByCompany() called to delete profiles of company id : " + companyId );
         Query query = getSession().createQuery( "delete from UserProfile where company.companyId=?" );
         query.setParameter( 0, companyId );
         query.executeUpdate();
-        LOG.info( "Method deleteUserProfilesByCompany() finished." );
+        LOG.debug( "Method deleteUserProfilesByCompany() finished." );
     }
 
     @Override
     public void deleteUserProfilesByUser( long userId )
     {
-        LOG.info( "Method deleteUserProfilesByUser() called to delete profiles of userId id : " + userId );
+        LOG.debug( "Method deleteUserProfilesByUser() called to delete profiles of userId id : " + userId );
         Query query = getSession().createQuery( "delete from UserProfile where user.userId=?" );
         query.setParameter( 0, userId );
         query.executeUpdate();
-        LOG.info( "Method deleteUserProfilesByUser() finished." );
+        LOG.debug( "Method deleteUserProfilesByUser() finished." );
     }
 
     @SuppressWarnings ( "unchecked")
@@ -209,7 +209,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public List<UserProfile> findUserProfilesInBatch( Map<String, Object> queries, int startIndex, int batchSize )
     {
 
-        LOG.info( "Method findUserProfilesInBatch() called" );
+        LOG.debug( "Method findUserProfilesInBatch() called" );
 
         Criteria criteria = getSession().createCriteria( UserProfile.class );
         try {
@@ -237,7 +237,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Transactional
     public Map<String, Long> findPrimaryUserProfileByAgentId( long entityId )
     {
-        LOG.info( "Method findPrimaryUserProfileByAgentId() called for agent id : " + entityId );
+        LOG.debug( "Method findPrimaryUserProfileByAgentId() called for agent id : " + entityId );
         Map<String, Long> hierarchyMap = new HashMap<String, Long>();
         String hqlQuery = "select u.company.companyId, u.regionId, u.branchId, u.agentId from UserProfile u where u.agentId=? AND u.isPrimary = ?";
         Query query = getSession().createQuery( hqlQuery );
@@ -250,7 +250,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
             hierarchyMap.put( CommonConstants.BRANCH_ID_COLUMN, Long.valueOf( String.valueOf( row[2] ) ) );
             hierarchyMap.put( CommonConstants.AGENT_ID_COLUMN, Long.valueOf( String.valueOf( row[3] ) ) );
         }
-        LOG.info( "Method deleteUserProfilesByCompany() finished." );
+        LOG.debug( "Method deleteUserProfilesByCompany() finished." );
         return hierarchyMap;
     }
 
@@ -258,10 +258,10 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Override
     public Set<Long> findUserIdsByBranch( long branchId )
     {
-        LOG.info( "Method call started for findUserIdsByBranch for branch : " + branchId );
+        LOG.debug( "Method call started for findUserIdsByBranch for branch : " + branchId );
         Set<Long> userIds = new HashSet<Long>();
 
-        LOG.info( "Fetching users for branch : " + branchId );
+        LOG.debug( "Fetching users for branch : " + branchId );
         Query query = getSession().createSQLQuery( "SELECT USER_ID FROM USER_PROFILE WHERE STATUS = ? and BRANCH_ID = ?" );
         query.setParameter( 0, CommonConstants.STATUS_ACTIVE );
         query.setParameter( 1, branchId );
@@ -271,8 +271,8 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
             userIds.add( Long.valueOf( row.intValue() ) );
         }
 
-        LOG.info( "Fetched " + userIds.size() + " users for branch : " + branchId );
-        LOG.info( "Method call ended for findUserIdsByBranch for branch : " + branchId );
+        LOG.debug( "Fetched " + userIds.size() + " users for branch : " + branchId );
+        LOG.debug( "Method call ended for findUserIdsByBranch for branch : " + branchId );
         return userIds;
     }
 
@@ -280,10 +280,10 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Override
     public Set<Long> findUserIdsByRegion( long regionId )
     {
-        LOG.info( "Method call started for findUserIdsByRegion for region : " + regionId );
+        LOG.debug( "Method call started for findUserIdsByRegion for region : " + regionId );
         Set<Long> userIds = new HashSet<Long>();
 
-        LOG.info( "Fetching users for region : " + regionId );
+        LOG.debug( "Fetching users for region : " + regionId );
         Query query = getSession().createSQLQuery( "SELECT USER_ID FROM USER_PROFILE WHERE STATUS = ? and REGION_ID = ?" );
         query.setParameter( 0, CommonConstants.STATUS_ACTIVE );
         query.setParameter( 1, regionId );
@@ -293,8 +293,8 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
             userIds.add( Long.valueOf( row.intValue() ) );
         }
 
-        LOG.info( "Fetched " + userIds.size() + " users for region : " + regionId );
-        LOG.info( "Method call ended for findUserIdsByRegion for region : " + regionId );
+        LOG.debug( "Fetched " + userIds.size() + " users for region : " + regionId );
+        LOG.debug( "Method call ended for findUserIdsByRegion for region : " + regionId );
         return userIds;
     }
 
@@ -303,14 +303,14 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Transactional
     public int getUsersUnderBranchAdminCount( User user )
     {
-        LOG.info( "Method call started for getUsersUnderBranchAdminCount for branch admin id : " + user.getUserId() );
+        LOG.debug( "Method call started for getUsersUnderBranchAdminCount for branch admin id : " + user.getUserId() );
         Query query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + branchUserSearchQuery + " ) as subQuery" );
         query.setParameter( 0, user.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
         query.setParameter( 2, user.getCompany().getCompanyId() );
         query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
 
-        LOG.info( "Method call ended for getUsersUnderBranchAdminCount for branch admin id : " + user.getUserId() );
+        LOG.debug( "Method call ended for getUsersUnderBranchAdminCount for branch admin id : " + user.getUserId() );
         return ( (BigInteger) query.uniqueResult() ).intValue();
     }
 
@@ -319,14 +319,14 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Transactional
     public int getUsersUnderRegionAdminCount( User user )
     {
-        LOG.info( "Method call started for getUsersUnderRegionAdminCount for region admin id : " + user.getUserId() );
+        LOG.debug( "Method call started for getUsersUnderRegionAdminCount for region admin id : " + user.getUserId() );
         Query query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + regionUserSearchQuery + " ) as subQuery" );
         query.setParameter( 0, user.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
         query.setParameter( 2, user.getCompany().getCompanyId() );
         query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
 
-        LOG.info( "Method call ended for getUsersUnderRegionAdminCount for region admin id : " + user.getUserId() );
+        LOG.debug( "Method call ended for getUsersUnderRegionAdminCount for region admin id : " + user.getUserId() );
         return ( (BigInteger) query.uniqueResult() ).intValue();
     }
 
@@ -335,14 +335,14 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Transactional
     public int getUsersUnderCompanyAdminCount( User user )
     {
-        LOG.info( "Method call started for getUsersUnderCompanyAdminCount for company admin id : " + user.getUserId() );
+        LOG.debug( "Method call started for getUsersUnderCompanyAdminCount for company admin id : " + user.getUserId() );
         Query query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + companyUserSearchQuery + " ) as subQuery" );
         query.setParameter( 0, user.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
         query.setParameter( 2, user.getCompany().getCompanyId() );
         query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
 
-        LOG.info( "Method call ended for getUsersUnderCompanyAdminCount for company admin id : " + user.getUserId() );
+        LOG.debug( "Method call ended for getUsersUnderCompanyAdminCount for company admin id : " + user.getUserId() );
         return ( (BigInteger) query.uniqueResult() ).intValue();
     }
 
@@ -352,7 +352,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public List<UserFromSearch> findUsersUnderBranchAdmin( User user, int startIndex, int batchSize )
     {
         List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
-        LOG.info( "Method call started for findUsersUnderBranchAdmin for branch admin id : " + user.getUserId() );
+        LOG.debug( "Method call started for findUsersUnderBranchAdmin for branch admin id : " + user.getUserId() );
         Query query = getSession().createSQLQuery( branchUserSearchQuery );
         query.setParameter( 0, user.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
@@ -369,7 +369,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
         userList = buildUserFromSearch( rows );
 
-        LOG.info( "Method call ended for findUsersUnderBranchAdmin for branch admin id : " + user.getUserId() );
+        LOG.debug( "Method call ended for findUsersUnderBranchAdmin for branch admin id : " + user.getUserId() );
         return userList;
     }
 
@@ -379,7 +379,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public List<UserFromSearch> findUsersUnderRegionAdmin( User admin, int startIndex, int batchSize )
     {
         List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
-        LOG.info( "Method call started for findUsersUnderRegionAdmin for region admin id : " + admin.getUserId() );
+        LOG.debug( "Method call started for findUsersUnderRegionAdmin for region admin id : " + admin.getUserId() );
         Query query = getSession().createSQLQuery( regionUserSearchQuery );
 
         query.setParameter( 0, admin.getUserId() );
@@ -397,7 +397,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
         userList = buildUserFromSearch( rows );
 
-        LOG.info( "Method call ended for findUsersUnderRegionAdmin for region admin id : " + admin.getUserId() );
+        LOG.debug( "Method call ended for findUsersUnderRegionAdmin for region admin id : " + admin.getUserId() );
         return userList;
     }
 
@@ -407,7 +407,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public List<UserFromSearch> findUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize )
     {
         List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
-        LOG.info( "Method call started for findUsersUnderCompanyAdmin for company admin id : " + admin.getUserId() );
+        LOG.debug( "Method call started for findUsersUnderCompanyAdmin for company admin id : " + admin.getUserId() );
         Query query = getSession().createSQLQuery( companyUserSearchQuery );
 
         query.setParameter( 0, admin.getUserId() );
@@ -424,7 +424,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         List<Object[]> rows = (List<Object[]>) query.list();
 
         userList = buildUserFromSearch( rows );
-        LOG.info( "Method call ended for findUsersUnderCompanyAdmin for company admin id : " + admin.getUserId() );
+        LOG.debug( "Method call ended for findUsersUnderCompanyAdmin for company admin id : " + admin.getUserId() );
         return userList;
     }
 
@@ -434,14 +434,14 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public List<UserFromSearch> getUserFromSearchByUserIds( Set<Long> userIds )
     {
         List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
-        LOG.info( "Method call started for getUserFromSearchByUserIds for user ids : " + userIds );
+        LOG.debug( "Method call started for getUserFromSearchByUserIds for user ids : " + userIds );
         String queryStr = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM USER_PROFILE UP JOIN USERS US ON US.USER_ID = UP.USER_ID WHERE UP.USER_ID IN ( :userIds ) GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME";
         Query query = getSession().createSQLQuery( queryStr );
         query.setParameterList( "userIds", userIds );
         List<Object[]> rows = (List<Object[]>) query.list();
 
         userList = buildUserFromSearch( rows );
-        LOG.info( "Method call ended for getUserFromSearchByUserIds for user ids" );
+        LOG.debug( "Method call ended for getUserFromSearchByUserIds for user ids" );
         return userList;
     }
 
@@ -491,7 +491,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
     private List<UserFromSearch> buildUserFromSearch( List<Object[]> rows )
     {
-        LOG.info( "Method call buildUserFromSearch started" );
+        LOG.debug( "Method call buildUserFromSearch started" );
         List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
         for ( Object[] row : rows ) {
             UserFromSearch userFromSearch = new UserFromSearch();
@@ -532,7 +532,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
             userList.add( userFromSearch );
         }
-        LOG.info( "Method call buildUserFromSearch ended" );
+        LOG.debug( "Method call buildUserFromSearch ended" );
         return userList;
     }
 
@@ -546,7 +546,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Override
     public void updateRegionIdForBranch( long branchId, long regionId ) throws InvalidInputException
     {
-        LOG.info( "Method to update regionId to " + regionId + " for branchId : " + branchId + " in USER_PROFILE started." );
+        LOG.debug( "Method to update regionId to " + regionId + " for branchId : " + branchId + " in USER_PROFILE started." );
         //Check if regionId is invalid
         if ( regionId <= 0l ) {
             throw new InvalidInputException( "Invalid regionId : " + regionId );
@@ -560,7 +560,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.setParameter( 0, regionId );
         query.setParameter( 1, branchId );
         query.executeUpdate();
-        LOG.info( "Method to update regionId to " + regionId + " for branchId : " + branchId + " in USER_PROFILE finished." );
+        LOG.debug( "Method to update regionId to " + regionId + " for branchId : " + branchId + " in USER_PROFILE finished." );
     }
 
 
@@ -574,7 +574,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Transactional
     public void updateEmailIdForUserProfile( long userId, String emailId ) throws InvalidInputException
     {
-        LOG.info( "Method to update emailId to : " + emailId + " for user profiles of user ID : " + userId + " started." );
+        LOG.debug( "Method to update emailId to : " + emailId + " for user profiles of user ID : " + userId + " started." );
         //Check if userId and emailId are null
         if ( userId <= 0l ) {
             throw new InvalidInputException( "Invalid user ID  : " + userId );
@@ -589,7 +589,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.setString( "emailId", emailId );
         query.setLong( "userId", userId );
         query.executeUpdate();
-        LOG.info( "Method to update emailId to : " + emailId + " for user profiles of user ID : " + userId + " finished." );
+        LOG.debug( "Method to update emailId to : " + emailId + " for user profiles of user ID : " + userId + " finished." );
     }
 
 
@@ -658,7 +658,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Transactional
     public UserProfile findUserProfile( long userId, long branchId, long regionId, int profilesMasterId ) throws NoRecordsFetchedException
     {
-        LOG.info( "Method to find userProfile for userId: " + userId + " branchId: " + branchId + " regionId : " + regionId + " started." );
+        LOG.debug( "Method to find userProfile for userId: " + userId + " branchId: " + branchId + " regionId : " + regionId + " started." );
         Criteria criteria = getSession().createCriteria( UserProfile.class );
         criteria.add( Restrictions.eq( CommonConstants.USER_COLUMN + "." + CommonConstants.USER_ID, userId ) );
         criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
@@ -669,7 +669,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         if ( userProfiles == null || userProfiles.isEmpty() ) {
             throw new NoRecordsFetchedException( "No records fetched for userId : " + userId + " branchId: " + branchId + " regionId : " + regionId );
         }
-        LOG.info( "Method to find userProfile for userId: " + userId + " branchId: " + branchId + " regionId : " + regionId + " finished." );
+        LOG.debug( "Method to find userProfile for userId: " + userId + " branchId: " + branchId + " regionId : " + regionId + " finished." );
         return userProfiles.get( 0 );
     }
  }

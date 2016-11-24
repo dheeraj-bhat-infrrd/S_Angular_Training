@@ -5356,7 +5356,7 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	height: 30px;
 	width: 20px;
 	background: url(../images/radios.png) no-repeat;
-	background-position: -116px center;
+	background-position: -114px center;
 	cursor: pointer;
 }
 
@@ -6425,7 +6425,7 @@ tr.u-tbl-header td {
 	height: 100%;
 	overflow-y: auto;
 	overflow-x: hidden;
-	z-index: 55555555;
+	z-index: 1000;
 	background-color: rgba(0, 0, 0, 0.5);
 }
 

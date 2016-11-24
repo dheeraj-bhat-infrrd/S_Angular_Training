@@ -155,95 +155,99 @@ public class LoneWolfReviewProcessor extends QuartzJobBean
                     LOG.info( "Getting lonewolf records for collection " + collectionName + " and id : "
                         + organizationUnitSettings.getIden() );
                     LoneWolfCrmInfo loneWolfCrmInfo = (LoneWolfCrmInfo) organizationUnitSettings.getCrm_info();
-                    if ( StringUtils.isNotEmpty( loneWolfCrmInfo.getClientCode() ) ) {
+                    //get records  only if state is prod 
+                    if(loneWolfCrmInfo != null && loneWolfCrmInfo.getState().equals( CommonConstants.CRM_INFO_PRODUCTION_STATE )){
+                        if ( StringUtils.isNotEmpty( loneWolfCrmInfo.getClientCode() ) ) {
 
-                        entityId = organizationUnitSettings.getIden();
+                            entityId = organizationUnitSettings.getIden();
 
-                        //make an entry in crm batch tracker and update last run start time
-                        long recentRecordFetchedTime = crmBatchTrackerService
-                            .getRecentRecordFetchedAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType, entityId,
-                                CommonConstants.CRM_SOURCE_LONEWOLF );
-                        if(loneWolfCrmInfo.getTransactionStartDate() != null){
-                            if(recentRecordFetchedTime <= CommonConstants.EPOCH_TIME_IN_MILLIS){
-                                recentRecordFetchedTime = loneWolfCrmInfo.getTransactionStartDate().getTime();
+                            //make an entry in crm batch tracker and update last run start time
+                            long recentRecordFetchedTime = crmBatchTrackerService
+                                .getRecentRecordFetchedAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType, entityId,
+                                    CommonConstants.CRM_SOURCE_LONEWOLF );
+                            if(loneWolfCrmInfo.getTransactionStartDate() != null){
+                                if(recentRecordFetchedTime <= CommonConstants.EPOCH_TIME_IN_MILLIS){
+                                    recentRecordFetchedTime = loneWolfCrmInfo.getTransactionStartDate().getTime();
+                                }
                             }
-                        }
-                        
-                        try {
                             
-                            //Fetch transactions data from lone wolf.
-                            int skip = 0;
-                            String filter = loneWolfRestUtils.generateFilterQueryParamFor( recentRecordFetchedTime );
-                            List<LoneWolfTransaction> loneWolfTransactionsBatch = null;
-                            List<LoneWolfTransaction> loneWolfTransactions = new ArrayList<LoneWolfTransaction>();
-                            do {
-                                LOG.debug(
-                                    "Fetching record in batch of " + CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE );
-                                LOG.debug( "Fetching records start from " + skip );
-                                // use linked hash map to maintain the order
-                                Map<String, String> queryParam = new LinkedHashMap<String, String>();
-                                queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$TOP,
-                                    String.valueOf( CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE ) );
-                                queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$FILTER, filter );
-                                queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$ORDERBY,
-                                    CommonConstants.LONEWOLF_QUERY_PARAM_ORDERBY_VALUE );
-                                queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$SKIP, String.valueOf( skip ) );
-
-                                loneWolfTransactionsBatch = loneWolfIntegrationService.fetchLoneWolfTransactionsData( secretKey,
-                                    apiToken, loneWolfCrmInfo.getClientCode(), queryParam );
-                                loneWolfTransactions.addAll( loneWolfTransactionsBatch );
-
-                                skip += CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE;
-
-                            } while ( loneWolfTransactionsBatch != null
-                                && loneWolfTransactionsBatch.size() == CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE );
-
-                            //Fetch members data from lonewolf.
-                            Map<String, LoneWolfMember> membersById = fetchLoneWolfMembersDataMap( secretKey, apiToken,
-                                loneWolfCrmInfo.getClientCode() );
-
-                            //Process lone wolf transactions and put it in survey pre initiation table to send surveys
-                            processLoneWolfTransactions( loneWolfTransactions, membersById, collectionName, entityId , loneWolfCrmInfo.getClassificationCodes() );
-
-                            //insert crmbatchTrackerHistory with count of Records Fetched
-                            crmBatchTracker = crmBatchTrackerService.getCrmBatchTracker( entityType, entityId,
-                                CommonConstants.CRM_SOURCE_LONEWOLF );
-
-                            if ( crmBatchTracker != null ) {
-                                crmBatchTrackerHistoryService.insertCrmBatchTrackerHistory( newRecordFoundCount,
-                                    crmBatchTracker.getCrmBatchTrackerId(), CommonConstants.CRM_SOURCE_LONEWOLF );
-                            }
-
-                            // update  last run end time and count of new records found in crm batch tracker
-                            crmBatchTrackerService.updateLastRunEndTimeByEntityTypeAndSourceType( entityType, entityId,
-                                CommonConstants.CRM_SOURCE_LONEWOLF, newRecordFoundCount );
-
-                        } catch ( Exception e ) {
-                            LOG.error( "Exception caught for collection " + collectionName + "having iden as "
-                                + organizationUnitSettings.getIden(), e );
-
-                            // update  error message in crm batch tracker
-                            crmBatchTrackerService.updateErrorForBatchTrackerByEntityTypeAndSourceType( entityType, entityId,
-                                CommonConstants.CRM_SOURCE_LONEWOLF, e.getMessage() );
                             try {
-                                LOG.info( "Building error message for the auto post failure" );
-                                String errorMsg = "Error while processing lonewolf feed for collection " + collectionName
-                                    + ", profile name " + organizationUnitSettings.getProfileName() + " with iden "
-                                    + organizationUnitSettings.getIden() + "at time " + new Date( System.currentTimeMillis() )
-                                    + " <br>";
-                                errorMsg += "<br>" + e.getMessage() + "<br><br>";
-                                errorMsg += "<br>StackTrace : <br>"
-                                    + ExceptionUtils.getStackTrace( e ).replaceAll( "\n", "<br>" ) + "<br>";
-                                LOG.info( "Sending bug mail to admin" );
-                                emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMsg, applicationAdminEmail );
-                                LOG.info( "Sent bug mail to admin for the auto post failure" );
-                            } catch ( UndeliveredEmailException ude ) {
-                                LOG.error( "error while sending report bug mail to admin ", ude );
-                            } catch ( InvalidInputException iie ) {
-                                LOG.error( "error while sending report bug mail to admin ", iie );
+                                
+                                //Fetch transactions data from lone wolf.
+                                int skip = 0;
+                                String filter = loneWolfRestUtils.generateFilterQueryParamFor( recentRecordFetchedTime );
+                                List<LoneWolfTransaction> loneWolfTransactionsBatch = null;
+                                List<LoneWolfTransaction> loneWolfTransactions = new ArrayList<LoneWolfTransaction>();
+                                do {
+                                    LOG.debug(
+                                        "Fetching record in batch of " + CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE );
+                                    LOG.debug( "Fetching records start from " + skip );
+                                    // use linked hash map to maintain the order
+                                    Map<String, String> queryParam = new LinkedHashMap<String, String>();
+                                    queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$TOP,
+                                        String.valueOf( CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE ) );
+                                    queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$FILTER, filter );
+                                    queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$ORDERBY,
+                                        CommonConstants.LONEWOLF_QUERY_PARAM_ORDERBY_VALUE );
+                                    queryParam.put( CommonConstants.LONEWOLF_QUERY_PARAM_$SKIP, String.valueOf( skip ) );
+
+                                    loneWolfTransactionsBatch = loneWolfIntegrationService.fetchLoneWolfTransactionsData( secretKey,
+                                        apiToken, loneWolfCrmInfo.getClientCode(), queryParam );
+                                    loneWolfTransactions.addAll( loneWolfTransactionsBatch );
+
+                                    skip += CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE;
+
+                                } while ( loneWolfTransactionsBatch != null
+                                    && loneWolfTransactionsBatch.size() == CommonConstants.LONEWOLF_TRANSACTION_API_BATCH_SIZE );
+
+                                //Fetch members data from lonewolf.
+                                Map<String, LoneWolfMember> membersById = fetchLoneWolfMembersDataMap( secretKey, apiToken,
+                                    loneWolfCrmInfo.getClientCode() );
+
+                                //Process lone wolf transactions and put it in survey pre initiation table to send surveys
+                                processLoneWolfTransactions( loneWolfTransactions, membersById, collectionName, entityId , loneWolfCrmInfo.getClassificationCodes() );
+
+                                //insert crmbatchTrackerHistory with count of Records Fetched
+                                crmBatchTracker = crmBatchTrackerService.getCrmBatchTracker( entityType, entityId,
+                                    CommonConstants.CRM_SOURCE_LONEWOLF );
+
+                                if ( crmBatchTracker != null ) {
+                                    crmBatchTrackerHistoryService.insertCrmBatchTrackerHistory( newRecordFoundCount,
+                                        crmBatchTracker.getCrmBatchTrackerId(), CommonConstants.CRM_SOURCE_LONEWOLF );
+                                }
+
+                                // update  last run end time and count of new records found in crm batch tracker
+                                crmBatchTrackerService.updateLastRunEndTimeByEntityTypeAndSourceType( entityType, entityId,
+                                    CommonConstants.CRM_SOURCE_LONEWOLF, newRecordFoundCount );
+
+                            } catch ( Exception e ) {
+                                LOG.error( "Exception caught for collection " + collectionName + "having iden as "
+                                    + organizationUnitSettings.getIden(), e );
+
+                                // update  error message in crm batch tracker
+                                crmBatchTrackerService.updateErrorForBatchTrackerByEntityTypeAndSourceType( entityType, entityId,
+                                    CommonConstants.CRM_SOURCE_LONEWOLF, e.getMessage() );
+                                try {
+                                    LOG.info( "Building error message for the auto post failure" );
+                                    String errorMsg = "Error while processing lonewolf feed for collection " + collectionName
+                                        + ", profile name " + organizationUnitSettings.getProfileName() + " with iden "
+                                        + organizationUnitSettings.getIden() + "at time " + new Date( System.currentTimeMillis() )
+                                        + " <br>";
+                                    errorMsg += "<br>" + e.getMessage() + "<br><br>";
+                                    errorMsg += "<br>StackTrace : <br>"
+                                        + ExceptionUtils.getStackTrace( e ).replaceAll( "\n", "<br>" ) + "<br>";
+                                    LOG.info( "Sending bug mail to admin" );
+                                    emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMsg, applicationAdminEmail );
+                                    LOG.info( "Sent bug mail to admin for the auto post failure" );
+                                } catch ( UndeliveredEmailException ude ) {
+                                    LOG.error( "error while sending report bug mail to admin ", ude );
+                                } catch ( InvalidInputException iie ) {
+                                    LOG.error( "error while sending report bug mail to admin ", iie );
+                                }
                             }
-                        }
+                        }  
                     }
+                    
                 }
             }
         } catch ( InvalidInputException | NoRecordsFetchedException e1 ) {

@@ -1,8 +1,6 @@
 package com.realtech.socialsurvey.web.rest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.QueryParam;
@@ -18,17 +16,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import retrofit.mime.TypedByteArray;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.LoneWolfClassificationCode;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.LoneWolfErrorCode;
 import com.realtech.socialsurvey.core.services.lonewolf.LoneWolfIntegrationService;
+
+import retrofit.mime.TypedByteArray;
 
 
 @Controller
@@ -58,13 +55,13 @@ public class LoneWolfController extends AbstractController
      */
     @ResponseBody
     @RequestMapping ( value = "/testcredentials")
-    public String testCompanyCredentials( @QueryParam ( value = "clientCode") String clientCode )
+    public String testCompanyCredentials( @QueryParam ( value = "clientCode") String clientCode,
+        @QueryParam ( value = "entityId") Long entityId, @QueryParam ( value = "entityType") String entityType )
     {
         LOG.info( "Method to test lonewolf credentials started for clientCode : " + clientCode + " started." );
         Response response = null;
         boolean status = false;
         String message = null;
-        List<LoneWolfClassificationCode> classificationCodes = new ArrayList<LoneWolfClassificationCode>();
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
             try {
@@ -93,13 +90,11 @@ public class LoneWolfController extends AbstractController
                         message = responseMap.get( "Message" );
                     }
                 }
-                
-                classificationCodes = loneWolfIntegrationService.fetchLoneWolfClassificationCodes(secretKey, apiToken, clientCode);
 
-                
+
                 resultMap.put( CommonConstants.STATUS_COLUMN, status );
                 resultMap.put( CommonConstants.MESSAGE, message );
-                resultMap.put( "classifications", classificationCodes );
+
                 response = Response.ok( new Gson().toJson( resultMap ) ).build();
             } catch ( Exception e ) {
                 throw new InternalServerException( new LoneWolfErrorCode( CommonConstants.ERROR_CODE_GENERAL,

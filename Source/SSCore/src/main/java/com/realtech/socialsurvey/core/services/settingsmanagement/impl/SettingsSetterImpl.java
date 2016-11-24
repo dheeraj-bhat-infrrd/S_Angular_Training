@@ -26,7 +26,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 		if (company == null || settings == null) {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
-		LOG.info("Setting values to company " + company);
+		LOG.debug("Setting values to company " + company);
 		long modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Long.parseLong(company.getSettingsSetStatus()),
 				settings, hasBeenSet);
 		company.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
@@ -40,7 +40,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 		if (region == null || settings == null) {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
-		LOG.info("Setting values to region " + region);
+		LOG.debug("Setting values to region " + region);
 		long modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Long.parseLong(region.getSettingsSetStatus()), settings,
 				hasBeenSet);
 		region.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
@@ -54,7 +54,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 		if (branch == null || settings == null) {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
-		LOG.info("Setting values to branch " + branch);
+		LOG.debug("Setting values to branch " + branch);
 		long modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Long.parseLong(branch.getSettingsSetStatus()), settings,
 				hasBeenSet);
 		branch.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
@@ -95,7 +95,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 
 	@Override
 	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, long currentSetValue, SettingsForApplication settings) {
-		LOG.info("Checking if the value is set for the settings");
+		LOG.debug("Checking if the value is set for the settings");
 		boolean isValueSet = false;
 		String sCurrentSetValue = String.valueOf(currentSetValue);
 		// find index of the settings to be checked for.
@@ -139,7 +139,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 
 	@Override
 	public SettingsSetterLevel getSettingsSetLevel(long currentSetAggregateValue, SettingsForApplication settings) {
-		LOG.info("Getting all the levels where settings are set for aggregate value: " + currentSetAggregateValue);
+		LOG.debug("Getting all the levels where settings are set for aggregate value: " + currentSetAggregateValue);
 		SettingsSetterLevel level = new SettingsSetterLevel();
 		String sCurrentSetValue = String.valueOf(currentSetAggregateValue);
 		// find index of the settings to be checked for.
@@ -180,7 +180,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 
 	@Override
 	public OrganizationUnit getLowestSetterLevel(int setUnitValue) throws InvalidSettingsStateException {
-		LOG.info("Getting the lowest setter level for " + setUnitValue);
+		LOG.debug("Getting the lowest setter level for " + setUnitValue);
 		OrganizationUnit organizationUnit = null;
 		if (setUnitValue == CommonConstants.SET_BY_NONE) {
 			organizationUnit = null;

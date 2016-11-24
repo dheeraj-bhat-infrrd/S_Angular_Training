@@ -3887,17 +3887,31 @@ function saveTestLoneDetailsCallBack(response) {
 
 	var map = $.parseJSON(response);
 	classificationsList = map.classifications;
+	var savedClassificationsByCode = map.savedClassificationsByCode;
 	
-	var $classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="B" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
-	var $classificationTypeSeller = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="S" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Seller</div></div>';
-	var $classificationTypeBoth = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="SB" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Both</div></div>';
-	var $classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
-
 	if (map.status == true) {
 		//show classification list
 		for (var i = 0; i < classificationsList.length; i++) {
 		    var classification = classificationsList[i];
-		    classification.loneWolfTransactionParticipantsType = "U";
+		    var $classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="B" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
+			var $classificationTypeSeller = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="S" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Seller</div></div>';
+			var $classificationTypeBoth = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="SB" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Both</div></div>';
+			var $classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
+		    if(savedClassificationsByCode[classification.Code] != null){
+		    	classification.loneWolfTransactionParticipantsType = savedClassificationsByCode[classification.Code];
+		    	if(classification.loneWolfTransactionParticipantsType == "B"){
+		    		$classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="B" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
+		    	}else if(classification.loneWolfTransactionParticipantsType == "S"){
+		    		$classificationTypeSeller = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="S" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">Seller</div></div>';
+		    	}else if(classification.loneWolfTransactionParticipantsType == "SB"){
+		    		$classificationTypeBoth = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="SB" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">Both</div></div>';
+		    	}else{
+		    		$classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
+		    	}
+		    }else{
+		    	classification.loneWolfTransactionParticipantsType = "N";
+		    	$classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
+		    }
 		    classificationsList[i] = classification;
 		    
 			var $classificationCode = '<div class="float-left opacity-red sq-smile-icn-text clasfction-code-txt compl-sq-smile-sad-text-disabled">' + classification.Code + ' - ' + classification.Name + '</div>';
@@ -3923,7 +3937,7 @@ function saveTestLoneDetailsCallBack(response) {
 		$("#transaction-start-div").show();
 		
 		
-		showInfo("Successfully Connected to Lone Wolf. Please select classifications");
+		showInfo(map.message);
 	} else {
 		showError(map.message);
 	}
@@ -10881,7 +10895,7 @@ function initiateLoneWolfSaveConnection(warn) {
 		"clientCode" : client
 	};
 	showOverlay();
-	callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/lonewolf/testcredentials.do", saveTestLoneDetailsCallBack, payload, true, '#lone-get-classification');
+	callAjaxGetWithPayloadData(getLocationOrigin() + "/getlonewolfclassifications.do", saveTestLoneDetailsCallBack, payload, true, '#lone-get-classification');
 	if (warn) {
 		$('#overlay-cancel').click();
 	}
@@ -10913,6 +10927,7 @@ function testEnableLoneCallBack(response) {
 	if (map == "Successfully enabled lone wolf connection") {
 		showInfo(map);
 		$("#lone-state").val('prod');
+		$("#lone-transaction-start-date").prop("disabled", true);
 		showLoneWolfButtons();
 	} else {
 		showError(map);
@@ -11002,6 +11017,8 @@ function testDisconnectLoneWolfCallBack(response) {
 	var map = response;
 	if (map == "Successfully disabled lone wolf connection") {
 		$("#lone-state").val('dryrun');
+		$("#lone-transaction-start-date").prop("disabled", false);
+		initializeStartDate();
 		showLoneWolfButtons();
 		showInfo(map);
 	} else {
@@ -11234,3 +11251,23 @@ $(document).on('click','ul.accordion li',function(){
 $(document).on('click','.email-content',function(event){
 	event.stopPropagation();
 });
+
+
+function initializeStartDate(){
+	var startDate;
+	var fromEndDate = new Date();
+	var toEndDate = new Date();
+	$("input[data-date-type='startDate']").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: fromEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        startDate = new Date(selected.date.valueOf());
+        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+        $("input[data-date-type='endDate']").datepicker('setStartDate', startDate);
+    });
+}

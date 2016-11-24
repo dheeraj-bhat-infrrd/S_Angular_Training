@@ -703,10 +703,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_CRM_INFO ).exists( true ).and( KEY_CRM_INFO_SOURCE )
             .is( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) );
-        if ( state.equals( CommonConstants.ENCOMPASS_DRY_RUN_STATE ) ) {
+        if ( state.equals( CommonConstants.CRM_INFO_DRY_RUN_STATE ) ) {
             query.addCriteria( Criteria.where( KEY_CRM_INFO + "." + CommonConstants.STATE ).is( state )
                 .and( KEY_CRM_INFO + "." + CommonConstants.ENCOMPASS_GENERATE_REPORT_COLUMN ).is( true ) );
-        } else if ( state.equals( CommonConstants.ENCOMPASS_PRODUCTION_STATE ) ) {
+        } else if ( state.equals( CommonConstants.CRM_INFO_PRODUCTION_STATE ) ) {
             query.addCriteria( Criteria.where( KEY_CRM_INFO + "." + CommonConstants.STATE ).is( state ) );
         } else {
             throw new InvalidInputException( "Invalid encompass crm info state : " + state );
