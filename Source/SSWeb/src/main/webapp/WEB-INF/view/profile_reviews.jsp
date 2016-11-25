@@ -191,7 +191,7 @@
 						    <span class="float-left ppl-share-icns icn-twit-rev" id ="twitt_${loop.index}" onclick="twitterProfileFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(twitterReview)}&url=${reviewItem.completeProfileUrl}"></span>
 						 <span
 						class="float-left ppl-share-icns icn-lin-rev" title="LinkedIn"
-						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl}/${reviewItem._id}&title=${reviewItem.agentName}&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)}&reviewid=${reviewItem._id}&source="></span>
+						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl}/${reviewItem._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)}&reviewid=${reviewItem._id}&source="></span>
 					<span class="float-left" title="Google+">
 						<button
 							class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"
