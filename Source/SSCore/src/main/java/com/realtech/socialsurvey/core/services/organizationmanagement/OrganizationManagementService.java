@@ -1410,4 +1410,7 @@ public interface OrganizationManagementService
 
 
     public List<Company> getCompaniesByBillingModeAuto();
+
+
+    void askFbToRescrapePagesForSettings( Set<Long> entityIds, String collectionName );
 }

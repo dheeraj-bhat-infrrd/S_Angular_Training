@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
@@ -218,6 +219,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     private String facebookRedirectUri;
     @Value ( "${FB_REDIRECT_URI_FOR_MAIL}")
     private String facebookRedirectUriForMail;
+    @Value ( "${FB_GRAPH_URI}")
+    private String fbGraphUrl;
     
 
     // Twitter
@@ -3393,7 +3396,31 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         linkedInAuth.append( "&state=" ).append( "SOCIALSURVEY" );
         linkedInAuth.append( "&scope=" ).append( linkedinScope );
         
-        LOG.info( "Method getLinkedinAuthUrl ended" );
+        LOG.info( "Method getLinkedinAuthUrl ended" );  
         return linkedInAuth.toString();
+    }
+    
+    /**
+     * 
+     * @param url
+     * @throws InvalidInputException 
+     */
+    @Override
+    public void askFaceBookToReScrapePage(String url) throws InvalidInputException{
+        LOG.info( "method forceFaceBookToReScrapePage started for page " + url );
+        if(StringUtils.isEmpty( url )){
+            throw new InvalidInputException("Passed Parameter Url is null or empty");
+        }
+        
+        String facebookRescrapeUrl = fbGraphUrl +"?scrape=true&id=" + url;
+        
+        RestTemplate restTemplate = new RestTemplate();
+        try{
+            restTemplate.postForLocation( facebookRescrapeUrl , Object.class );
+        }catch(Exception e){
+            LOG.error( "Error while asking fb to rescrape the url " + url );
+        }
+        
+        LOG.info( "method forceFaceBookToReScrapePage finished for page " + url );
     }
 }

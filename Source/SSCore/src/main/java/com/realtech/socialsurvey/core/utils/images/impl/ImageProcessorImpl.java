@@ -146,7 +146,7 @@ public class ImageProcessorImpl implements ImageProcessor {
         try {
             thumbnailImg = originalImageName.substring( originalImageName.lastIndexOf( "/" ) + 1,
                 originalImageName.lastIndexOf( "." + extension ) )
-                + "-t." + extension;
+                + "-th." + extension;
         } catch ( StringIndexOutOfBoundsException e ) {
             throw new InvalidInputException( "Error. Unable to generate thumbnail image name for fileName : "
                 + originalImageName + ".", e );
