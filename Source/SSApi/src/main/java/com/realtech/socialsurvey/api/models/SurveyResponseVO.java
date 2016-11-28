@@ -1,18 +1,27 @@
 package com.realtech.socialsurvey.api.models;
 
-import com.realtech.socialsurvey.core.entities.SurveyResponse;
-
 public class SurveyResponseVO
 {
-    private SurveyResponse surveyResponse;
-
-    public SurveyResponse getSurveyResponse()
-    {
-        return surveyResponse;
+    private String question;
+    private String questionType;
+    private String answer;
+    
+    public String getQuestion() {
+        return question;
     }
-
-    public void setSurveyResponse( SurveyResponse surveyResponse )
-    {
-        this.surveyResponse = surveyResponse;
+    public void setQuestion(String question) {
+        this.question = question;
+    }
+    public String getQuestionType() {
+        return questionType;
+    }
+    public void setQuestionType(String questionType) {
+        this.questionType = questionType;
+    }
+    public String getAnswer() {
+        return answer;
+    }
+    public void setAnswer(String answer) {
+        this.answer = answer;
     }
 }

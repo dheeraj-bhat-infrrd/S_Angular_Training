@@ -68,16 +68,16 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
 			if(d.getSurveyResponse() != null){
 			    for (SurveyResponse response : d.getSurveyResponse()){
 			        SurveyResponseVO responseVO = new SurveyResponseVO();
-			        responseVO.setSurveyResponse( response );
+			        responseVO.setQuestionType( response.getQuestionType() );
+	                responseVO.setQuestion( response.getQuestion() );
+	                responseVO.setAnswer( response.getAnswer() );
 			        surveyResponses.add( responseVO );
 			    }
 			}
 	         SurveyResponseVO responseVO = new SurveyResponseVO();
-	         SurveyResponse gatewayQuestion = new SurveyResponse();
-	         gatewayQuestion.setQuestionType( "Gateway-Question" );
-	         gatewayQuestion.setQuestion( "How would you rate your overall experience?" );
-	         gatewayQuestion.setAnswer( d.getMood() );
-	         responseVO.setSurveyResponse( gatewayQuestion );
+	         responseVO.setQuestionType( "Gateway-Question" );
+	         responseVO.setQuestion( "How would you rate your overall experience?" );
+	         responseVO.setAnswer( d.getMood() );
 	         surveyResponses.add( responseVO );
 			review.setSurveyResponses( surveyResponses );
 			review.setReview( d.getReview() );
