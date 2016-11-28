@@ -4,6 +4,7 @@ public class TransactionInfoGetVO {
 
 	
  	private String transactionRef;
+ 	private String surveySentDate;
  	private String transactionDate;
  	private String transactionCity;
  	private String transactionState;
@@ -66,4 +67,12 @@ public class TransactionInfoGetVO {
 
 
 	 	
+	public String getSurveySentDate()
+    {
+        return surveySentDate;
+    }
+    public void setSurveySentDate( String surveySentDate )
+    {
+        this.surveySentDate = surveySentDate;
+    }	 	
 }

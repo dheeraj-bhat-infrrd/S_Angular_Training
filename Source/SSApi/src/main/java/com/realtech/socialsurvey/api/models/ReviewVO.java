@@ -1,18 +1,22 @@
 package com.realtech.socialsurvey.api.models;
 
+import java.util.List;
+
 public class ReviewVO {
 
 	
 	private String source;
 	private String reviewDate;
+	private String review;
 	private String rating;
 	private String summary;
 	private String description;
 	private boolean isReportedAbusive;
 	private boolean isCRMVerified;
+	private List<SurveyResponseVO> surveyResponses;
 	
 	
-	public String getSource() {
+    public String getSource() {
 		return source;
 	}
 	public void setSource(String source) {
@@ -54,4 +58,20 @@ public class ReviewVO {
 	public void setIsCRMVerified(boolean isCRMVerified) {
 		this.isCRMVerified = isCRMVerified;
 	}
+	public List<SurveyResponseVO> getSurveyResponses()
+    {
+        return surveyResponses;
+    }
+    public void setSurveyResponses( List<SurveyResponseVO> surveyResponses )
+    {
+        this.surveyResponses = surveyResponses;
+    }
+    public String getReview()
+    {
+        return review;
+    }
+    public void setReview( String review )
+    {
+        this.review = review;
+    }
 }
