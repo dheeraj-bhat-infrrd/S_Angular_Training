@@ -11,6 +11,7 @@ public class ReviewVO {
 	private String rating;
 	private String summary;
 	private String description;
+	private boolean agreedToShare;
 	private boolean isReportedAbusive;
 	private boolean isCRMVerified;
 	private List<SurveyResponseVO> surveyResponses;
@@ -74,4 +75,13 @@ public class ReviewVO {
     {
         this.review = review;
     }
+    public boolean isAgreedToShare()
+    {
+        return agreedToShare;
+    }
+    public void setAgreedToShare( boolean agreedToShare )
+    {
+        this.agreedToShare = agreedToShare;
+    }
+    
 }

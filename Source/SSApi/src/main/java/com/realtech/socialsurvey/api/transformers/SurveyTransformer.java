@@ -63,6 +63,7 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
 			review.setRating(String.valueOf(d.getScore()));
 			review.setReviewDate(d.getModifiedOn().toString());
 			review.setSource(d.getSource());
+			review.setAgreedToShare( Boolean.parseBoolean( d.getAgreedToShare() ) );
 			review.setIsReportedAbusive(d.isAbusive());
 			
 			if(d.getSurveyResponse() != null){
