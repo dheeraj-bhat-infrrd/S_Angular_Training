@@ -4856,6 +4856,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setAbusive( isAbusive );
                 surveyDetails.setAbuseRepByUser( false );
                 surveyDetails.setShowSurveyOnUI( true );
+                surveyDetails.setSurveyCompletedDate( convertStringToDate( createdDate ) );
 
                 // saving zillow review summary
                 surveyDetails.setSummary( summary );
