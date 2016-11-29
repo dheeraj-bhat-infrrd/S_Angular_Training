@@ -9,9 +9,11 @@
 				<c:if test="${appSettings != null && appSettings.crm_info != null && appSettings.crm_info.crm_source == 'LONEWOLF'}">
 					<c:set var="loneclient" value="${ appSettings.crm_info.clientCode }" />
 					<c:set var="lonestate" value="${ appSettings.crm_info.state }" />
+					<c:set var="lonedate" value="${ appSettings.crm_info.transactionStartDate }" />
 				</c:if>
 				<form id="lone-wolf-form">
 					<input id="lone-state" name="lone-state" type="hidden" value="${lonestate}" />
+					<input id="transaction-start-date" name="transaction-start-date" type="hidden" value="${lonedate}" />	
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
@@ -31,12 +33,7 @@
 							<div class="um-item-row-left text-right">Start Date</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<div class="rfr_icn icn-fname en-icn-fname"></div>
-								<c:if test="${lonestate == 'dryrun'}">
-									<input id="lone-transaction-start-date"  data-date-type="startDate" placeholder="Start Date" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left">
-								</c:if>
-								<c:if test="${lonestate == 'prod'}">
-									<input disabled id="lone-transaction-start-date" placeholder="Start Date" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left">
-								</c:if>
+								<input id="lone-transaction-start-date"  data-date-type="startDate" placeholder="Start Date" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left">
 							</div>
 						</div>
 					</div>
@@ -83,6 +80,21 @@
 	$(document).ready(function() {
 		showLoneWolfButtons();
 		isRealTechOrSSAdmin = ${isRealTechOrSSAdmin};
-		initializeStartDate();
+		var startDate;
+		var fromEndDate = new Date();
+		var toEndDate = new Date();
+		$("input[data-date-type='startDate']").datepicker({
+			orientation: "auto",
+			format: 'mm/dd/yyyy',
+			endDate: fromEndDate,
+			todayHighlight: true,
+			clearBtn: true,
+			autoclose: true
+		})
+		.on('changeDate', function(selected){
+		    startDate = new Date(selected.date.valueOf());
+		    startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		    $("input[data-date-type='endDate']").datepicker('setStartDate', startDate);
+		});
 	});
 </script>
