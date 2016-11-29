@@ -3084,7 +3084,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setReview( surveyImportVO.getReview() );
         surveyDetails.setScore( surveyImportVO.getScore() );
         surveyDetails.setSurveyTransactionDate( surveyImportVO.getSurveyDate() );
-
+        surveyDetails.setSurveyCompletedDate( surveyImportVO.getSurveyDate() );
         surveyDetails.setUrl(
             composeLink( user.getUserId(), surveyImportVO.getCustomerEmailAddress(), surveyImportVO.getCustomerFirstName(),
                 surveyImportVO.getCustomerLastName(), surveyPreInitiation.getSurveyPreIntitiationId(), false ) );

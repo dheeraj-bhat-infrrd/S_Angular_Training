@@ -229,6 +229,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( "review", review );
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, isAbusive );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        update.set( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN, new Date() );
         update.set( CommonConstants.EDITABLE_SURVEY_COLUMN, false );
         update.set( CommonConstants.AGREE_SHARE_COLUMN, agreedToShare );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
