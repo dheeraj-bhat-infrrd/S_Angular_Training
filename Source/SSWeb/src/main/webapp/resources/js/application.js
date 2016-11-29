@@ -3934,15 +3934,42 @@ function saveTestLoneDetailsCallBack(response) {
 		$("#lone-generate-report").hide();
 				
 		$("#classification-div").show();
+		
+		if($("#lone-state").val() == 'prod'){
+			$("#lone-transaction-start-date").prop("disabled", true);		
+		}else{
+			$("#lone-transaction-start-date").prop("disabled", false);		
+		}
 		$("#transaction-start-div").show();
-		
-		
+		if( $("#lone-transaction-start-date").val() == "" ){
+			$("#lone-transaction-start-date").val(formatDate(((String)($("#transaction-start-date").val())),"/","MDY"));
+		}		
 		showInfo(map.message);
 	} else {
 		showError(map.message);
 	}
 }
 
+function formatDate(date,seperator,order){
+	if( date != "" && date != undefined ){
+		var dateString = (String)(date);
+		var year = dateString.slice(-4),
+		    month = ['Jan','Feb','Mar','Apr','May','Jun',
+		             'Jul','Aug','Sep','Oct','Nov','Dec'].indexOf(dateString.substr(4,3))+1,
+		    day = dateString.substr(8,2);
+		if(order == "MDY")
+			return ((month<10?'0':'') + month + seperator + day + seperator + year);
+		else if(order == "DMY")
+			return ( day + seperator + (month<10?'0':'') + month + seperator + year);
+		else if(order == "YDM")
+			return (year + seperator + day + seperator + (month<10?'0':'') + month);
+		else 
+			return "please specifiy date order as MDY or DMY or YDM"
+	}
+	else {
+		return "";
+	}
+}
 
 function bindClickToClassificationTypeButton(){
 	$('.bd-cust-rad-img').click(function(e) {
@@ -4390,6 +4417,17 @@ function updateAutoPostSetting(isautopostenabled, disableEle) {
 			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
 		}
 	});
+}
+
+function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disableEle) {
+	var payload = {
+		"autopostlinktousersite" : isautopostlinktositeenabled
+	};
+	
+	callAjaxPostWithPayloadData("./updateautopostlinktousersiteforsurvey.do",function(data) {
+		if (data == "success") $('#overlay-toast').html("Content updated successfully");
+	}, payload, true, disableEle);
+	
 }
 
 function resetTextForMoodFlow(mood, resetId) {
@@ -9742,6 +9780,16 @@ $('body').on('click', '#atpst-chk-box', function() {
 	}
 });
 
+$('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
+	if ($('#atpst-lnk-usr-ste-chk-box').hasClass('bd-check-img-checked')) {
+		$('#atpst-lnk-usr-ste-chk-box').removeClass('bd-check-img-checked');
+		updateAutoPostLinkToUserSiteSetting(true, '#atpst-lnk-usr-ste-chk-box');
+	} else {
+		$('#atpst-lnk-usr-ste-chk-box').addClass('bd-check-img-checked');
+		updateAutoPostLinkToUserSiteSetting(false, '#atpst-lnk-usr-ste-chk-box');
+	}
+});
+
 // Dashboard fb and twitter share
 function getDashboardImageandCaption(loop) {
 	var name = "";
@@ -10927,7 +10975,6 @@ function testEnableLoneCallBack(response) {
 	if (map == "Successfully enabled lone wolf connection") {
 		showInfo(map);
 		$("#lone-state").val('prod');
-		$("#lone-transaction-start-date").prop("disabled", true);
 		showLoneWolfButtons();
 	} else {
 		showError(map);
@@ -11017,8 +11064,6 @@ function testDisconnectLoneWolfCallBack(response) {
 	var map = response;
 	if (map == "Successfully disabled lone wolf connection") {
 		$("#lone-state").val('dryrun');
-		$("#lone-transaction-start-date").prop("disabled", false);
-		initializeStartDate();
 		showLoneWolfButtons();
 		showInfo(map);
 	} else {
@@ -11251,23 +11296,3 @@ $(document).on('click','ul.accordion li',function(){
 $(document).on('click','.email-content',function(event){
 	event.stopPropagation();
 });
-
-
-function initializeStartDate(){
-	var startDate;
-	var fromEndDate = new Date();
-	var toEndDate = new Date();
-	$("input[data-date-type='startDate']").datepicker({
-		orientation: "auto",
-		format: 'mm/dd/yyyy',
-		endDate: fromEndDate,
-		todayHighlight: true,
-		clearBtn: true,
-		autoclose: true
-	})
-	.on('changeDate', function(selected){
-        startDate = new Date(selected.date.valueOf());
-        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
-        $("input[data-date-type='endDate']").datepicker('setStartDate', startDate);
-    });
-}
