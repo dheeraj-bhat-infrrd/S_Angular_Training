@@ -9,9 +9,11 @@
 				<c:if test="${appSettings != null && appSettings.crm_info != null && appSettings.crm_info.crm_source == 'LONEWOLF'}">
 					<c:set var="loneclient" value="${ appSettings.crm_info.clientCode }" />
 					<c:set var="lonestate" value="${ appSettings.crm_info.state }" />
+					<c:set var="lonedate" value="${ appSettings.crm_info.transactionStartDate }" />
 				</c:if>
 				<form id="lone-wolf-form">
 					<input id="lone-state" name="lone-state" type="hidden" value="${lonestate}" />
+					<input id="transaction-start-date" name="transaction-start-date" type="hidden" value="${lonedate}" />	
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
@@ -77,11 +79,7 @@
 <script>
 	$(document).ready(function() {
 		showLoneWolfButtons();
-		isRealTechOrSSAdmin = $
-		{
-			isRealTechOrSSAdmin
-		};
-		
+		isRealTechOrSSAdmin = ${isRealTechOrSSAdmin};
 		var startDate;
 		var fromEndDate = new Date();
 		var toEndDate = new Date();
@@ -94,10 +92,9 @@
 			autoclose: true
 		})
 		.on('changeDate', function(selected){
-	        startDate = new Date(selected.date.valueOf());
-	        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
-	        $("input[data-date-type='endDate']").datepicker('setStartDate', startDate);
-	    });
-		
+		    startDate = new Date(selected.date.valueOf());
+		    startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		    $("input[data-date-type='endDate']").datepicker('setStartDate', startDate);
+		});
 	});
 </script>

@@ -2,7 +2,7 @@ package com.realtech.socialsurvey.core.enums;
 
 public enum LoneWolfTransactionParticipantsType
 {
-    SELLER( "S" ), BUYER( "B" ), SELLERBUYERBOTH( "SB" ), UNKNOWN( "U" ), NONE( "N" ) ;
+    SELLER( "S" ), BUYER( "B" ), SELLERBUYERBOTH( "SB" ), NONE( "N" );
 
     private final String participantType;
 

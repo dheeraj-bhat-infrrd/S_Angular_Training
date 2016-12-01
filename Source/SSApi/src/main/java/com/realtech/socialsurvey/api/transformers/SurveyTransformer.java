@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.api.transformers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -7,9 +10,11 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.api.models.ReviewVO;
 import com.realtech.socialsurvey.api.models.ServiceProviderInfo;
 import com.realtech.socialsurvey.api.models.SurveyGetVO;
+import com.realtech.socialsurvey.api.models.SurveyResponseVO;
 import com.realtech.socialsurvey.api.models.TransactionInfoGetVO;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 @Component
@@ -34,6 +39,7 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
 		ServiceProviderInfo serviceProviderInfo = new ServiceProviderInfo();
 		ReviewVO review = new ReviewVO();
 		SurveyGetVO survey = new SurveyGetVO();
+		List<SurveyResponseVO> surveyResponses = new ArrayList<SurveyResponseVO>();
 		
 		if( d != null ){
 			transactionInfo.setCustomerEmail(d.getCustomerEmail());
@@ -45,7 +51,9 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
 			if(d.getSurveyTransactionDate() != null)
 				transactionInfo.setTransactionDate(String.valueOf(d.getSurveyTransactionDate()));
 			transactionInfo.setTransactionRef(d.getSourceId());
-				
+			if( objects[0] != null && objects[0] instanceof SurveyPreInitiation )
+			    transactionInfo.setSurveySentDate( String.valueOf( ((SurveyPreInitiation)objects[0]).getLastReminderTime()) );
+										
 			serviceProviderInfo.setServiceProviderEmail(d.getAgentEmailId());
 			serviceProviderInfo.setServiceProviderName(d.getAgentName());
 	
@@ -55,8 +63,25 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
 			review.setRating(String.valueOf(d.getScore()));
 			review.setReviewDate(d.getModifiedOn().toString());
 			review.setSource(d.getSource());
+			review.setAgreedToShare( Boolean.parseBoolean( d.getAgreedToShare() ) );
 			review.setIsReportedAbusive(d.isAbusive());
 			
+			if(d.getSurveyResponse() != null){
+			    for (SurveyResponse response : d.getSurveyResponse()){
+			        SurveyResponseVO responseVO = new SurveyResponseVO();
+			        responseVO.setQuestionType( response.getQuestionType() );
+	                responseVO.setQuestion( response.getQuestion() );
+	                responseVO.setAnswer( response.getAnswer() );
+			        surveyResponses.add( responseVO );
+			    }
+			}
+	         SurveyResponseVO responseVO = new SurveyResponseVO();
+	         responseVO.setQuestionType( "Gateway-Question" );
+	         responseVO.setQuestion( "How would you rate your overall experience?" );
+	         responseVO.setAnswer( d.getMood() );
+	         surveyResponses.add( responseVO );
+			review.setSurveyResponses( surveyResponses );
+			review.setReview( d.getReview() );
 			//review.setIsCRMVerified(surveyPreInitiation);
 			boolean isCRMVerified = false;
 			if(d.getSource()!= null)

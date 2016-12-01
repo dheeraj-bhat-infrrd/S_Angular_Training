@@ -68,6 +68,7 @@ public interface SocialManagementService
     public SocialMediaTokens updateSocialMediaTokens( String collection, OrganizationUnitSettings unitSettings,
         SocialMediaTokens mediaTokens ) throws InvalidInputException;
 
+
     /**
      * Updates social media token for the given id
      * @param collection
@@ -76,8 +77,9 @@ public interface SocialManagementService
      * @return
      * @throws InvalidInputException
      */
-    public SocialMediaTokens updateSocialMediaTokens( String collection, long iden,
-        SocialMediaTokens mediaTokens ) throws InvalidInputException;
+    public SocialMediaTokens updateSocialMediaTokens( String collection, long iden, SocialMediaTokens mediaTokens )
+        throws InvalidInputException;
+
 
     public SocialMediaTokens updateAgentSocialMediaTokens( AgentSettings agentSettings, SocialMediaTokens mediaTokens )
         throws InvalidInputException;
@@ -117,9 +119,9 @@ public interface SocialManagementService
     public List<OrganizationUnitSettings> getBranchAndRegionSettingsForUser( long userId );
 
 
-    public boolean updateLinkedin( OrganizationUnitSettings settings, String collectionName ,String message, String linkedinProfileUrl,
-        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow, AgentSettings agentSettings,
-        SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException;
+    public boolean updateLinkedin( OrganizationUnitSettings settings, String collectionName, String message,
+        String linkedinProfileUrl, String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow,
+        AgentSettings agentSettings, SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException;
 
 
     public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, boolean removeFeed,
@@ -170,18 +172,18 @@ public interface SocialManagementService
 
     void postToFacebookForHierarchy( String facebookMessage, double rating, String serverBaseUrl, int accountMasterId,
         SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails,
-        boolean isZillow , boolean isAgentsHidden) throws InvalidInputException, NoRecordsFetchedException;
+        boolean isZillow, boolean isAgentsHidden ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     void postToLinkedInForHierarchy( String linkedinMessage, double rating, String linkedinProfileUrl,
         String linkedinMessageFeedback, int accountMasterId, SocialMediaPostDetails socialMediaPostDetails,
         SocialMediaPostResponseDetails socialMediaPostResponseDetails, OrganizationUnitSettings companySettings,
-        boolean isZillow , boolean isAgentsHidden) throws InvalidInputException, NoRecordsFetchedException;
+        boolean isZillow, boolean isAgentsHidden ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     void postToTwitterForHierarchy( String twitterMessage, double rating, String serverBaseUrl, int accountMasterId,
-        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails , boolean isAgentsHidden )
-        throws InvalidInputException, NoRecordsFetchedException;
+        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails,
+        boolean isAgentsHidden ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     public Map<String, List<OrganizationUnitSettings>> getSettingsForBranchesRegionsAndCompanyInAgentsHierarchy( long agentId )
@@ -248,25 +250,29 @@ public interface SocialManagementService
     public XSSFWorkbook getUserSurveyReportByTabId( int tabId, long companyId )
         throws InvalidInputException, NoRecordsFetchedException;
 
+
     public void imcompleteSocialPostReminderSender();
 
+
     public void zillowReviewProcessorStarter();
-    
+
+
     /**
      * 
      * @param collectionName
      * @param iden
      * @param facebookToken
      */
-    public void updateFacebookToken( String collectionName , long iden ,  FacebookToken facebookToken);
-    
+    public void updateFacebookToken( String collectionName, long iden, FacebookToken facebookToken );
+
+
     /**
      * 
      * @param collectionName
      * @param iden
      * @param linkedInToken
      */
-    public void updateLinkedinToken( String collectionName , long iden ,  LinkedInToken linkedInToken);
+    public void updateLinkedinToken( String collectionName, long iden, LinkedInToken linkedInToken );
 
 
     Facebook getFacebookInstanceByCallBackUrl( String callBackUrl );
@@ -286,6 +292,10 @@ public interface SocialManagementService
     String getLinkedinAuthUrl( String redirectUri );
 
 
-    public String getClientCompanyProfileUrlForAgentToPostInSocialMedia( Long agentId, OrganizationUnitSettings unitSettings, String collectionType ) throws InvalidInputException;
+    void askFaceBookToReScrapePage( String url ) throws InvalidInputException;
+
+
+    public String getClientCompanyProfileUrlForAgentToPostInSocialMedia( Long agentId, OrganizationUnitSettings unitSettings,
+        String collectionType ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

@@ -11,8 +11,8 @@ import com.realtech.socialsurvey.core.utils.images.impl.ImageProcessingException
  */
 public interface ImageProcessor {
 
-	public static final int THUMBNAIL_WIDTH = 321;
-	public static final int THUMBNAIL_HEIGHT = 321;
+	public static final int THUMBNAIL_WIDTH = 200;
+	public static final int THUMBNAIL_HEIGHT = 200;
 	
 	/**
 	 * Processes and updates the provided

@@ -3887,17 +3887,31 @@ function saveTestLoneDetailsCallBack(response) {
 
 	var map = $.parseJSON(response);
 	classificationsList = map.classifications;
+	var savedClassificationsByCode = map.savedClassificationsByCode;
 	
-	var $classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="B" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
-	var $classificationTypeSeller = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="S" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Seller</div></div>';
-	var $classificationTypeBoth = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="SB" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Both</div></div>';
-	var $classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
-
 	if (map.status == true) {
 		//show classification list
 		for (var i = 0; i < classificationsList.length; i++) {
 		    var classification = classificationsList[i];
-		    classification.loneWolfTransactionParticipantsType = "U";
+		    var $classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="B" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
+			var $classificationTypeSeller = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="S" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Seller</div></div>';
+			var $classificationTypeBoth = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="SB" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Both</div></div>';
+			var $classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
+		    if(savedClassificationsByCode[classification.Code] != null){
+		    	classification.loneWolfTransactionParticipantsType = savedClassificationsByCode[classification.Code];
+		    	if(classification.loneWolfTransactionParticipantsType == "B"){
+		    		$classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="B" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
+		    	}else if(classification.loneWolfTransactionParticipantsType == "S"){
+		    		$classificationTypeSeller = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="S" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">Seller</div></div>';
+		    	}else if(classification.loneWolfTransactionParticipantsType == "SB"){
+		    		$classificationTypeBoth = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="SB" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">Both</div></div>';
+		    	}else{
+		    		$classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
+		    	}
+		    }else{
+		    	classification.loneWolfTransactionParticipantsType = "N";
+		    	$classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
+		    }
 		    classificationsList[i] = classification;
 		    
 			var $classificationCode = '<div class="float-left opacity-red sq-smile-icn-text clasfction-code-txt compl-sq-smile-sad-text-disabled">' + classification.Code + ' - ' + classification.Name + '</div>';
@@ -3920,15 +3934,42 @@ function saveTestLoneDetailsCallBack(response) {
 		$("#lone-generate-report").hide();
 				
 		$("#classification-div").show();
+		
+		if($("#lone-state").val() == 'prod'){
+			$("#lone-transaction-start-date").prop("disabled", true);		
+		}else{
+			$("#lone-transaction-start-date").prop("disabled", false);		
+		}
 		$("#transaction-start-div").show();
-		
-		
-		showInfo("Successfully Connected to Lone Wolf. Please select classifications");
+		if( $("#lone-transaction-start-date").val() == "" ){
+			$("#lone-transaction-start-date").val(formatDate(((String)($("#transaction-start-date").val())),"/","MDY"));
+		}		
+		showInfo(map.message);
 	} else {
 		showError(map.message);
 	}
 }
 
+function formatDate(date,seperator,order){
+	if( date != "" && date != undefined ){
+		var dateString = (String)(date);
+		var year = dateString.slice(-4),
+		    month = ['Jan','Feb','Mar','Apr','May','Jun',
+		             'Jul','Aug','Sep','Oct','Nov','Dec'].indexOf(dateString.substr(4,3))+1,
+		    day = dateString.substr(8,2);
+		if(order == "MDY")
+			return ((month<10?'0':'') + month + seperator + day + seperator + year);
+		else if(order == "DMY")
+			return ( day + seperator + (month<10?'0':'') + month + seperator + year);
+		else if(order == "YDM")
+			return (year + seperator + day + seperator + (month<10?'0':'') + month);
+		else 
+			return "please specifiy date order as MDY or DMY or YDM"
+	}
+	else {
+		return "";
+	}
+}
 
 function bindClickToClassificationTypeButton(){
 	$('.bd-cust-rad-img').click(function(e) {
@@ -9043,6 +9084,23 @@ $(document).on('click', '.hdr-link-item-dropdown-item', function(e) {
 	showOverlay();
 });
 
+$(document).on('click', '#hdr-sm-settings-dropdown', function(e) {
+	$('#hdr-link-item-dropdown-sm').toggle();
+});
+
+$(document).on('mouseover', '#hdr-link-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').show();
+});
+
+$(document).on('mouseout', '#hdr-link-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').hide();
+});
+
+$(document).on('click', '.hdr-link-item-dropdown-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').hide();
+	showOverlay();
+});
+
 // Help page onclick function
 $(document).on('click', '#send-help-mail-button', function() {
 	var subject = "";
@@ -10902,7 +10960,7 @@ function initiateLoneWolfSaveConnection(warn) {
 		"clientCode" : client
 	};
 	showOverlay();
-	callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/lonewolf/testcredentials.do", saveTestLoneDetailsCallBack, payload, true, '#lone-get-classification');
+	callAjaxGetWithPayloadData(getLocationOrigin() + "/getlonewolfclassifications.do", saveTestLoneDetailsCallBack, payload, true, '#lone-get-classification');
 	if (warn) {
 		$('#overlay-cancel').click();
 	}

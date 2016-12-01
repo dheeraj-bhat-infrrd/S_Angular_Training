@@ -54,7 +54,7 @@ public class SettingsManagerImpl implements SettingsManager
     @Transactional
     public List<SettingsDetails> getScoreForCompleteHeirarchy( long companyId, long branchId, long regionId )
     {
-        LOG.info( "Inside method getScoreForCompleteHeirarchy " );
+        LOG.debug( "Inside method getScoreForCompleteHeirarchy " );
         return settingsSetterDao.getScoresById( companyId, regionId, branchId );
     }
 
@@ -62,7 +62,7 @@ public class SettingsManagerImpl implements SettingsManager
     public Map<SettingsForApplication, OrganizationUnit> getClosestSettingLevel( String currentSetAggregateValue,
         String currentLockAggregateValue ) throws InvalidSettingsStateException
     {
-        LOG.info( "Getting a map of all the settings with the closest level of setter" );
+        LOG.debug( "Getting a map of all the settings with the closest level of setter" );
         int lockValueLength = currentLockAggregateValue.length();
         int loopTillValue = ( currentSetAggregateValue.length() > lockValueLength ? currentSetAggregateValue.length()
             : lockValueLength );

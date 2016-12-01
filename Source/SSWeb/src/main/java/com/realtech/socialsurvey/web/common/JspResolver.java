@@ -161,6 +161,10 @@ public interface JspResolver {
 	
 	//Social Monitor
     public static final String SOCIAL_MONITOR = "view-social-monitor";
+    
+    //Reviews Monitor
+    public static final String REVIEWS_MONITOR = "view-reviews-monitor";
+    
     //social media
     public static final String POST_ON_SOCIAL_MEDIA_SUCCESS = "post-on-social-media-success";
     

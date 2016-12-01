@@ -288,6 +288,7 @@ public interface CommonConstants
     public static final String REVIEW_COLUMN = "review";
     public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
     public static final String USER_ENCRYPTED_ID = "userEncryptedId";
+    public static final String SURVEY_COMPLETED_DATE_COLUMN = "surveyCompletedDate";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -501,8 +502,8 @@ public interface CommonConstants
     public static final String SURVEY_SOURCE_3RD_PARTY = "3rd Party Review";
     public static final String SURVEY_SOURCE_FILE_UPLOAD = "upload";
     public static final String SURVEY_SOURCE_FTP = "ftp";
-    public static final String ENCOMPASS_DRY_RUN_STATE = "dryrun";
-    public static final String ENCOMPASS_PRODUCTION_STATE = "prod";
+    public static final String CRM_INFO_DRY_RUN_STATE = "dryrun";
+    public static final String CRM_INFO_PRODUCTION_STATE = "prod";
     public static final String ENCOMPASS_CLIENT_URL_COLUMN = "clientUrl";
     public static final String ENCOMPASS_USERNAME_COLUMN = "userName";
     public static final String ENCOMPASS_PASSWORD_COLUMN = "password";
