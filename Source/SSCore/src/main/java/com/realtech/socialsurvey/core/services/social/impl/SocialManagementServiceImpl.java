@@ -259,6 +259,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Value ( "${CUSTOM_SOCIALNETWORK_POST_COMPANY_ID}")
     private String customisedSocialNetworkCompanyId;
 
+    @Value ( "${GSF_SOCIALNETWORK_POST_COMPANY_ID}")
+    private String gsfSocialNetworkCompanyId;
+
     @Value ( "${ZILLOW_AUTO_POST_THRESHOLD}")
     private int zillowAutoPostThreshold;
 
@@ -477,13 +480,14 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret() ) );
                     try {
                         twitterNotSetup = false;
-                        // TODO: Hard coded bad code: DELETE: BEGIN
                         if ( companyId == Long.parseLong( customisedSocialNetworkCompanyId ) ) {
                             message = message.replace( "@SocialSurveyMe", "#REMAXagentreviews" );
+                        } else if ( companyId == Long.parseLong( gsfSocialNetworkCompanyId ) ) {
+                            message = String.format( CommonConstants.GSF_TWITTER_MESSAGE,
+                                agentSettings.getCompleteProfileUrl() );
+                            message = message.replaceAll( "null", "" );
                         }
-                        // TODO: Hard coded bad code: DELETE: END
                         StatusUpdate statusUpdate = new StatusUpdate( message );
-                        // TODO: Hard coded bad code: DELETE: BEGIN
                         if ( companyId == Long.parseLong( customisedSocialNetworkCompanyId ) ) {
                             try {
                                 statusUpdate.setMedia( "Picture",
@@ -496,7 +500,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             }
                         }
                         twitter.updateStatus( statusUpdate );
-                        // twitter.updateStatus(message);
                     } catch ( RuntimeException e ) {
                         LOG.error( "Runtime exception caught while trying to tweet. Nested exception is ", e );
                     }
