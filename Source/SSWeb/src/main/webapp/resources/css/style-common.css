@@ -8499,7 +8499,25 @@ input.zillow-input {
 	box-shadow: 3px 3px 30px #444;
 }
 
+.hdr-link-item-dropdown-sm {
+	position: absolute;
+	top: 61px;
+	left: 0;
+	width: 200px;
+	border-top: 3px solid #5cc7ef;
+	background-color: #fff;
+	color: #666;
+	box-shadow: 3px 3px 30px #444;
+}
+
 .hdr-link-item-dropdown-item {
+	line-height: 35px;
+	padding: 0 6px;
+	border-bottom: 1px solid #dcdcdc;
+	cursor: pointer;
+}
+
+.hdr-link-item-dropdown-item-sm {
 	line-height: 35px;
 	padding: 0 6px;
 	border-bottom: 1px solid #dcdcdc;
@@ -8510,7 +8528,16 @@ input.zillow-input {
 	border-bottom: none;
 }
 
+.hdr-link-item-dropdown-item-sm:last-child {
+	border-bottom: none;
+}
+
 .hdr-link-item-dropdown-item:hover {
+	color: #fff;
+	background-color: #5cc7ef;
+}
+
+.hdr-link-item-dropdown-item-sm:hover {
 	color: #fff;
 	background-color: #5cc7ef;
 }
@@ -8519,7 +8546,20 @@ input.zillow-input {
 	padding-right: 20px !important;
 }
 
+.hdr-link-item-sm {
+	padding-right: 20px !important;
+}
+
 .hdr-link-item-dropdown-icn {
+	position: absolute;
+	right: 7px;
+	top: 31px;
+	width: 10px;
+	height: 10px;
+	background: url(../images/arrow-down-white.png) no-repeat center;
+}
+
+.hdr-link-item-dropdown-icn-sm {
 	position: absolute;
 	right: 7px;
 	top: 31px;
@@ -8575,7 +8615,6 @@ label.url-change-input-label {
 .dotloop-iframe {
 	max-width: 100%;
 }
-
 .contact-div {
 	margin-left: 30%;
 	margin-bottom: 40px;
@@ -9053,4 +9092,10 @@ ul.accordion li>a:before {
 
 .classification-code-wrapper {
 	width: 650px !important;
+}
+
+.vendasta-cont {
+	margin: 0px auto 0px 0px;
+	width: 100%;
+	height: auto;
 }

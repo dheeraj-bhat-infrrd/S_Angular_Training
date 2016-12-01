@@ -13,5 +13,7 @@ public interface AdminAuthenticationService {
      * @throws InvalidInputException
      */
     public long validateAuthHeader( String authorizationHeader ) throws AuthorizationException;
+    
+    public boolean validateSSOTuple( String productId, String ssoToken, String ssoTicket );
 
 }

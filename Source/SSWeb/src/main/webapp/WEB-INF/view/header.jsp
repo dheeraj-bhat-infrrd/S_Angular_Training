@@ -211,6 +211,7 @@
 				</c:if>
 				<c:if test="${ highestrole == 1 }">
 					<div class="header-links-item" onclick="showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></div>
+					<div class="header-links-item" onclick="showMainContent('./showreviewsmonitorpage.do')"><spring:message code="label.reviewsmonitor.key" /></div>					
 				</c:if>
 				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
 				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
@@ -313,8 +314,17 @@
 					</c:if>
 				</c:if>
 				<c:if test="${ highestrole == 1 }">
-					<div class="hdr-link-item">
+					<div id="hdr-link-item-sm" class="hdr-link-item hdr-link-item-sm pos-relative">
 						<a href="javascript:showMainContent('./showsocialmonitortpage.do')" onclick="showOverlay();"><spring:message code="label.socialmonitor.key" /></a>
+						<div id="hdr-sm-settings-dropdown" class="hdr-link-item-dropdown-icn-sm"></div>
+						<div id="hdr-link-item-dropdown-sm" class="hdr-link-item-dropdown-sm hide">
+							<div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showsocialmonitortpage.do');">
+								<spring:message code="label.socialmonitor.key" />
+							</div>
+							<div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showreviewsmonitorpage.do');">
+								<spring:message code="label.reviewsmonitor.key" />
+							</div>
+						</div>
 					</div>
 				</c:if>
 				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">

@@ -9084,6 +9084,23 @@ $(document).on('click', '.hdr-link-item-dropdown-item', function(e) {
 	showOverlay();
 });
 
+$(document).on('click', '#hdr-sm-settings-dropdown', function(e) {
+	$('#hdr-link-item-dropdown-sm').toggle();
+});
+
+$(document).on('mouseover', '#hdr-link-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').show();
+});
+
+$(document).on('mouseout', '#hdr-link-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').hide();
+});
+
+$(document).on('click', '.hdr-link-item-dropdown-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').hide();
+	showOverlay();
+});
+
 // Help page onclick function
 $(document).on('click', '#send-help-mail-button', function() {
 	var subject = "";
