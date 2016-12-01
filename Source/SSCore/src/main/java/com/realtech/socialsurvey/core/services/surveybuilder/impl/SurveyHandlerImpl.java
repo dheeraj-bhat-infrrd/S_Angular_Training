@@ -298,6 +298,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         surveyDetails.setRetakeSurvey( retakeSurvey );
         surveyDetails.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
+        surveyDetails.setSurveyTransactionDate( surveyPreInitiation.getEngagementClosedTime() );
         surveyDetails.setState( surveyPreInitiation.getState() );
         surveyDetails.setCity( surveyPreInitiation.getCity() );
 
@@ -3704,16 +3705,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     /*
-     * 
+     * (non-Javadoc)
+     * @see com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler#getSurveysByFilterCriteria(java.lang.String, java.lang.String, java.util.Date, java.util.Date, java.util.List, int, int, long)
      */
     @Override
     @Transactional
-    public SurveysAndReviewsVO getSurveysByStatus( String status, int startIndex, int count, long companyId )
+    public SurveysAndReviewsVO getSurveysByFilterCriteria( String status,  String mood , Date startReviewDate , Date startTransactionDate,  List<Long> userIds ,  int startIndex, int count, long companyId )
     {
         LOG.debug( "method getSurveysByStatus started for companyId " + companyId );
 
         //get mongo survey count
-        int mongoSurveyCount = getSurveyCountForCompanyBySurveyStatus( companyId, status );
+        int mongoSurveyCount = getSurveyCountForCompanyBySurveyStatus( companyId, status , mood , startReviewDate , startTransactionDate , userIds );
         int endIndex = startIndex + count;
 
         //get start index and batch size for mongo and sql get survey query
@@ -3727,7 +3729,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         //get survey from mongo
         List<SurveyDetails> surveyDetails = null;
         if ( mongoBatch > 0 )
-            surveyDetails = getSurveysForCompanyBySurveyStatus( companyId, status, monogStartIndex, mongoBatch );
+            surveyDetails = getSurveysForCompanyBySurveyStatus( companyId, status, monogStartIndex, mongoBatch , mood , startReviewDate , startTransactionDate , userIds );
         else
             surveyDetails = new ArrayList<SurveyDetails>();
 
@@ -3739,10 +3741,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         //get pre initiated survey from sql
         List<SurveyPreInitiation> preInitiatedSurveys = null;
-        if ( sqlBatch > 0 )
-            preInitiatedSurveys = surveyPreInitiationDao.getPreInitiatedSurveyForCompany( sqlStartIndex, sqlBatch, companyId );
-        else
+        if ( sqlBatch > 0 &&  StringUtils.isEmpty( mood ) && startReviewDate == null ){
+            Timestamp startEngagementClosedTime = null;
+            if(startTransactionDate != null)
+                startEngagementClosedTime = new Timestamp( startTransactionDate.getTime() );
+            preInitiatedSurveys = surveyPreInitiationDao.getPreInitiatedSurveyForCompanyByCriteria( sqlStartIndex, sqlBatch, userIds , startEngagementClosedTime , companyId );
+        }else{
             preInitiatedSurveys = new ArrayList<SurveyPreInitiation>();
+        }
 
 
         SurveysAndReviewsVO surveyAndReviews = new SurveysAndReviewsVO();
@@ -3753,45 +3759,53 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    private int getSurveyCountForCompanyBySurveyStatus( long companyId, String status )
+    /**
+     * 
+     * @param companyId
+     * @param status
+     * @param mood
+     * @param startReviewDate
+     * @param startTransactionDate
+     * @param userIds
+     * @return
+     */
+    private int getSurveyCountForCompanyBySurveyStatus( long companyId, String status , String mood , Date startReviewDate , Date startTransactionDate , List<Long> userIds  )
     {
         LOG.debug( "method getSurveyCountForCompanyBySurveyStatus started for companyId %s , status %s ", companyId, status );
 
-        long mongoSurveyCount = 0;
-        if ( status.equals( "complete" ) ) {
-            mongoSurveyCount = surveyDetailsDao.getCompletedSurveyCount( companyId );
-        } else if ( status.equals( "incomplete" ) ) {
-            mongoSurveyCount = surveyDetailsDao.getIncompleteSurveyCount( companyId );
-        } else if ( status.equals( "all" ) ) {
-            mongoSurveyCount = surveyDetailsDao.getSurveysCountForCompany( companyId );
-        }
-
+        long mongoSurveyCount = surveyDetailsDao.getFilteredSurveyCount( companyId , status , mood, startReviewDate , startTransactionDate , userIds);
+        
         LOG.debug( "method getSurveyCountForCompanyBySurveyStatus ended for companyId %s , status %s ", companyId, status );
 
         return (int) mongoSurveyCount;
     }
 
 
-    private List<SurveyDetails> getSurveysForCompanyBySurveyStatus( long companyId, String status, int start, int batchSize )
+    /**
+     * 
+     * @param companyId
+     * @param status
+     * @param start
+     * @param batchSize
+     * @return
+     */
+    private List<SurveyDetails> getSurveysForCompanyBySurveyStatus( long companyId, String status, int start, int batchSize , String mood , Date startReviewDate , Date startTransactionDate, List<Long> userIds   )
     {
-        LOG.debug(
-            "method getSurveysForCompanyBySurveyStatus started for companyId %s , startIndex %s , batchSiz %s , status %s ",
+        LOG.debug("method getSurveysForCompanyBySurveyStatus started for companyId %s , startIndex %s , batchSize %s , status %s ",
             companyId, start, batchSize, status );
-        List<SurveyDetails> surveyDetails = null;
-        if ( status.equals( "complete" ) ) {
-            surveyDetails = surveyDetailsDao.getCompletedSurveyByStartIndexAndBatchSize( start, batchSize, companyId );
-        } else if ( status.equals( "incomplete" ) ) {
-            surveyDetails = surveyDetailsDao.getIncompleteSurveyByStartIndexAndBatchSize( start, batchSize, companyId );
-        } else if ( status.equals( "all" ) ) {
-            surveyDetails = surveyDetailsDao.getSurveysForCompanyByStartIndex( start, batchSize, companyId );
-        }
-
-        LOG.debug( "method getSurveysForCompanyBySurveyStatus ended for companyId %s , startIndex %s , batchSiz %s , status %s ",
+        List<SurveyDetails> surveyDetails = surveyDetailsDao.getFilteredSurveys( start, batchSize, companyId , status, mood, startReviewDate , startTransactionDate , userIds);
+         
+        LOG.debug( "method getSurveysForCompanyBySurveyStatus ended for companyId %s , startIndex %s , batchSize %s , status %s ",
             companyId, start, batchSize, status );
         return surveyDetails;
     }
 
 
+    /**
+     * 
+     * @param surveyDetails
+     * @return
+     */
     private Map<SurveyDetails, SurveyPreInitiation> getPreinititatedSurveyForMongoSurveyDetail(
         List<SurveyDetails> surveyDetails )
     {
