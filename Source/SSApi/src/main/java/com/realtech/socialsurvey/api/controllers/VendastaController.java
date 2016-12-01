@@ -1,19 +1,16 @@
 package com.realtech.socialsurvey.api.controllers;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,7 +44,7 @@ public class VendastaController
 
     @RequestMapping ( "/authorization/*")
     @ApiOperation ( value = "Authorize Vendasta SSO Request")
-    public ResponseEntity<?> Authorizer( HttpServletRequest request )
+    public void authorizer( HttpServletRequest request, HttpServletResponse response )
     {
 
         LOGGER.info( "VendastaController.Authorizer started" );
@@ -56,28 +53,24 @@ public class VendastaController
         String productId = request.getParameter( "product_id" );
         String ssoToken = request.getParameter( "sso_token" );
 
-        if ( productId == "RM" && nextUrl != null && nextUrl.isEmpty() && ssoToken == "RM" ) {
+        if ( !StringUtils.isEmpty( productId ) && productId.equalsIgnoreCase( "RM" ) && !StringUtils.isEmpty( nextUrl )
+            && !StringUtils.isEmpty( ssoToken ) ) {
             try {
                 String outputUrl = URLDecoder.decode( nextUrl, "UTF-8" );
                 outputUrl += "&sso_token=" + ssoToken + "&sso_ticket=" + String.valueOf( System.currentTimeMillis() );
-                HttpClient client = HttpClientBuilder.create().build();
-                client.execute( new HttpGet( outputUrl ) );
-            } catch ( UnsupportedEncodingException exception ) {
-                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Invalid Passed parameter/s ", null, null,
-                    request );
-            } catch ( IOException exception ) {
-                return restUtils.getRestResponseEntity( HttpStatus.INTERNAL_SERVER_ERROR, "Passed parameter count is invalid",
-                    null, null, request );
+                response.sendRedirect( outputUrl );
+
+            } catch ( Exception exception ) {
+                LOGGER.error( "VendastaController.Authorizer exception: " + exception );
             }
         }
         LOGGER.info( "VendastaController.Authorizer finished" );
-        return restUtils.getRestResponseEntity( HttpStatus.CREATED, "SSO ticket generated", null, null, request );
     }
 
 
     @RequestMapping ( "/validation/*")
     @ApiOperation ( value = "Validate SSO Ticket")
-    public ResponseEntity<?> Validator( HttpServletRequest request )
+    public ResponseEntity<?> validator( HttpServletRequest request )
     {
         LOGGER.info( "VendastaController.Validator started" );
 
@@ -87,10 +80,10 @@ public class VendastaController
 
         if ( adminAuthenticationService.validateSSOTuple( productId, ssoToken, ssoTicket ) ) {
             LOGGER.info( "VendastaController.Validator finished" );
-            return restUtils.getRestResponseEntity( HttpStatus.CREATED, "SSO ticket validated", null, null, request );
+            return restUtils.getRestResponseEntity( HttpStatus.OK, "SSO ticket validated", null, null, request );
         } else {
             LOGGER.debug( "VendastaController.Validator failed" );
-            return restUtils.getRestResponseEntity( HttpStatus.CREATED, "Invalid SSO ticket", null, null, request );
+            return restUtils.getRestResponseEntity( HttpStatus.OK, "Invalid SSO ticket", null, null, request );
 
         }
     }
