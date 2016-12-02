@@ -514,7 +514,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Override
     public boolean updateLinkedin( OrganizationUnitSettings settings, String collectionName, String message,
         String linkedinProfileUrl, String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow,
-        AgentSettings agentSettings, SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException
+        AgentSettings agentSettings, SocialMediaPostResponse linkedinPostResponse, String surveyId ) throws NonFatalException
     {
         if ( settings == null ) {
             throw new InvalidInputException( "AgentSettings can not be null" );
@@ -575,9 +575,15 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         } else if ( companySettings.getLogo() != null && !companySettings.getLogo().isEmpty() ) {
                             imageUrl = companySettings.getLogo();
                         }
-
-                        String profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                        String profileUrl = "";
+                        if( surveyId != null && !surveyId.isEmpty()){
+                            profileUrl  = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                                + agentSettings.getProfileUrl() + "/" + String.valueOf( surveyId ) ;
+                        }
+                        else{
+                            profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL                
                             + agentSettings.getProfileUrl();
+                        }
                         message = StringEscapeUtils.escapeXml( message );
 
                         message = message.replace( "&amp;lmnlf;", "\\n" ).replace( "&amp;dash;", "\\u2014" );
@@ -1319,7 +1325,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     public void postToLinkedInForHierarchy( String linkedinMessage, double rating, String linkedinProfileUrl,
         String linkedinMessageFeedback, int accountMasterId, SocialMediaPostDetails socialMediaPostDetails,
         SocialMediaPostResponseDetails socialMediaPostResponseDetails, OrganizationUnitSettings companySettings,
-        boolean isZillow, boolean isAgentsHidden ) throws InvalidInputException, NoRecordsFetchedException
+        boolean isZillow, boolean isAgentsHidden, String surveyId ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "Method postToLinkedInForHierarchy() started" );
         if ( socialMediaPostDetails == null ) {
@@ -1355,7 +1361,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, rating, isZillow,
                             updatedLinkedInMessage, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
                             companySettings, agentSettings, socialMediaPostDetails.getAgentMediaPostDetails(),
-                            agentMediaPostResponseDetails );
+                            agentMediaPostResponseDetails, surveyId );
                     }
                 }
             }
@@ -1374,7 +1380,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, rating, isZillow,
                             updatedLinkedInMessage, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
                             companySettings, agentSettings, socialMediaPostDetails.getCompanyMediaPostDetails(),
-                            companyMediaPostResponseDetails );
+                            companyMediaPostResponseDetails, surveyId );
                     }
                 }
             }
@@ -1394,7 +1400,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             postToLinkedInForAHierarchy( setting,
                                 MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, rating, isZillow,
                                 updatedLinkedInMessage, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
-                                companySettings, agentSettings, regionMediaPostDetails, regionMediaPostResponseDetails );
+                                companySettings, agentSettings, regionMediaPostDetails, regionMediaPostResponseDetails, surveyId );
                         }
                     }
                 }
@@ -1413,7 +1419,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             postToLinkedInForAHierarchy( setting,
                                 MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, rating, isZillow,
                                 updatedLinkedInMessage, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
-                                companySettings, agentSettings, branchMediaPostDetails, branchMediaPostResponseDetails );
+                                companySettings, agentSettings, branchMediaPostDetails, branchMediaPostResponseDetails, surveyId );
                         }
                     }
                 }
@@ -1427,7 +1433,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     void postToLinkedInForAHierarchy( OrganizationUnitSettings setting, String collectionName, Double rating, boolean isZillow,
         String updatedLinkedInMessage, String linkedinMessage, String linkedinProfileUrl, String linkedinMessageFeedback,
         OrganizationUnitSettings companySettings, AgentSettings agentSettings, MediaPostDetails mediaPostDetails,
-        EntityMediaPostResponseDetails mediaPostResponseDetails )
+        EntityMediaPostResponseDetails mediaPostResponseDetails, String surveyId )
     {
         try {
             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
@@ -1446,7 +1452,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
 
                 if ( !updateLinkedin( setting, collectionName, updatedLinkedInMessage, linkedinProfileUrl,
-                    linkedinMessageFeedback, companySettings, isZillow, agentSettings, linkedinPostResponse ) ) {
+                    linkedinMessageFeedback, companySettings, isZillow, agentSettings, linkedinPostResponse, surveyId ) ) {
                     List<String> socialList = mediaPostDetails.getSharedOn();
                     if ( !socialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                         socialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
@@ -1798,7 +1804,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                 postToLinkedInForHierarchy( linkedinMessage, rating, linkedinProfileUrl, linkedinMessageFeedback,
                     accountMasterId, socialMediaPostDetails, socialMediaPostResponseDetails, companySettings.get( 0 ), false,
-                    isCompanyAgentHidden );
+                    isCompanyAgentHidden, surveyId );
 
                 // Twitter message
                 OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings( agentId );
@@ -3187,7 +3193,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                 postToLinkedInForHierarchy( linkedinMessage, zillowTempPost.getZillowReviewRating(), linkedinProfileUrl,
                     linkedinMessageFeedback, accountMasterId, socialMediaPostDetails, socialMediaPostResponseDetails,
-                    companySettings.get( 0 ), true, isCompanyAgentHidden );
+                    companySettings.get( 0 ), true, isCompanyAgentHidden, null );
 
                 // Twitter message 
                 String twitterMessage = buildTwitterAutoPostMessage( customerDisplayName, agentName, rating, feedback,
