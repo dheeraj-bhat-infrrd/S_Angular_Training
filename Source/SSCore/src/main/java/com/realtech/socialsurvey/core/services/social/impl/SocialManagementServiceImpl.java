@@ -1259,7 +1259,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( !isZillow ) {
                     String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentId, setting,
                         collectionType );
-                    if ( profileUrlWithMessage == null ) {
+                    if ( profileUrlWithMessage == null || profileUrlWithMessage.isEmpty() ) {
                         profileUrlWithMessage = setting.getCompleteProfileUrl() + "/";
                     } else {
                         profileUrlWithMessage = profileUrlWithMessage + ".";
@@ -1434,7 +1434,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( !isZillow ) {
                     String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia(
                         agentSettings.getIden(), setting, collectionName );
-                    if ( profileUrlWithMessage == null ) {
+                    if ( profileUrlWithMessage == null || profileUrlWithMessage.isEmpty() ) {
                         profileUrlWithMessage = setting.getCompleteProfileUrl() + "/";
                     } else {
                         profileUrlWithMessage = profileUrlWithMessage + ".";
@@ -1804,7 +1804,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings( agentId );
                 String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentId, agentSettings,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-                if ( profileUrlWithMessage == null ) {
+                if ( profileUrlWithMessage == null || profileUrlWithMessage.isEmpty() ) {
                     profileUrlWithMessage = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
                         + agentProfileLink;
                 }
