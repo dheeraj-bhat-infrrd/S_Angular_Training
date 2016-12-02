@@ -2725,8 +2725,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 url = "https://plus.google.com/share?url=" + organizationUnitSettings.getCompleteProfileUrl();
                 break;
             case CommonConstants.LINKEDIN_LABEL:
-                url += "https://www.linkedin.com/shareArticle?mini=true&url=" + organizationUnitSettings.getCompleteProfileUrl()
-                    + "&title=&summary=" + reviewText + "&source=";
+                url += "https://www.linkedin.com/shareArticle?mini=true&url="
+                    + organizationUnitSettings.getCompleteProfileUrl() + "/" + survey.get_id() + "&title=&summary=" + reviewText + "&source=";
                 break;
             case CommonConstants.TWITTER_LABEL:
                 url += "https://twitter.com/intent/tweet?text=" + reviewText + ".&url="
