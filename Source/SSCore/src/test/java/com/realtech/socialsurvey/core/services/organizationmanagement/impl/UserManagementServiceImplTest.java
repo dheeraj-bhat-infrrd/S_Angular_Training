@@ -989,21 +989,6 @@ public class UserManagementServiceImplTest
     }
 
 
-    //Tests for GetUsersByEmailId
-    @Test ( expected = InvalidInputException.class)
-    public void testGetUsersByEmailIdForEmailIdNull() throws InvalidInputException
-    {
-        userManagementServiceImpl.getUsersByEmailId( null );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testGetUsersByEmailIdForEmailIdEmpty() throws InvalidInputException
-    {
-        userManagementServiceImpl.getUsersByEmailId( "" );
-    }
-
-
     //Tests for SearchUsersInCompanyByMultipleCriteria
     @Test ( expected = InvalidInputException.class)
     public void testSearchUsersInCompanyByMultipleCriteriaForQueriesNull() throws InvalidInputException,

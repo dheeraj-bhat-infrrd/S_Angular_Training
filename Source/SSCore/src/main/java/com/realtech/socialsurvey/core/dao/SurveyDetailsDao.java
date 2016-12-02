@@ -294,22 +294,15 @@ public interface SurveyDetailsDao
      * @param stage
      * @return
      */
-    public List<SurveyDetails> getCompletedSurveyByStartIndexAndBatchSize( int start, int batchSize, long companyId );
+    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId  , String status , String mood , Date startReviewDate , Date startTransactionDate , List<Long> userIds );
 
-
-    public List<SurveyDetails> getSurveysForCompanyByStartIndex( int start, int batchSize, long companyId );
-
-
-    public List<SurveyDetails> getIncompleteSurveyByStartIndexAndBatchSize( int start, int batchSize, long companyId );
-
-
-    public Long getCompletedSurveyCount( long companyId );
-
-
-    public Long getSurveysCountForCompany( long companyId );
-
-
-    public Long getIncompleteSurveyCount( long companyId );
+    /**
+     * 
+     * @param companyId
+     * @param status
+     * @return
+     */
+    public Long getFilteredSurveyCount( long companyId , String status , String mood , Date startReviewDate , Date startTransactionDate , List<Long> userIds );
 
 
     void insertApiRequestDetails( ApiRequestDetails apiRequestDetails );
