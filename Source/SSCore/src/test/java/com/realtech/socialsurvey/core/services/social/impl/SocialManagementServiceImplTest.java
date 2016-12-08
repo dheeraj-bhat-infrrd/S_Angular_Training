@@ -109,7 +109,7 @@ public class SocialManagementServiceImplTest
     public void testUpdateLinkedinNullAgentSettings() throws NonFatalException
     {
         socialManagementServiceImpl.updateLinkedin( null, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, new OrganizationUnitSettings(), false, new AgentSettings(), new SocialMediaPostResponse() );
+            TestConstants.TEST_STRING, new OrganizationUnitSettings(), false, new AgentSettings(), new SocialMediaPostResponse(), TestConstants.TEST_STRING );
     }
 
 
@@ -347,7 +347,7 @@ public class SocialManagementServiceImplTest
     public void testPostToLinkedInForHierarchyForNullSMPRD() throws InvalidInputException, NoRecordsFetchedException
     {
         socialManagementServiceImpl.postToLinkedInForHierarchy( "test", 5.0, "test2", "test3", 2, null,
-            new SocialMediaPostResponseDetails(), new OrganizationUnitSettings(), false , false );
+            new SocialMediaPostResponseDetails(), new OrganizationUnitSettings(), false , false, TestConstants.TEST_STRING );
     }
 
 
@@ -355,7 +355,7 @@ public class SocialManagementServiceImplTest
     public void testPostToLinkedInForHierarchyForNullSMPD() throws InvalidInputException, NoRecordsFetchedException
     {
         socialManagementServiceImpl.postToLinkedInForHierarchy( "test", 5.0, "test2", "test3", 2, new SocialMediaPostDetails(),
-            null, new OrganizationUnitSettings(), false , false);
+            null, new OrganizationUnitSettings(), false , false, TestConstants.TEST_STRING );
     }
 
     

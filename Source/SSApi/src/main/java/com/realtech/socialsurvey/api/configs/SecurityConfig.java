@@ -9,7 +9,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
+import com.realtech.socialsurvey.api.web.SSOAllowFromStrategy;
 import com.realtech.socialsurvey.api.web.SimpleCORSFilter;
 
 @Configuration
@@ -21,7 +23,8 @@ public class SecurityConfig extends ResourceServerConfigurerAdapter {
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-
+	    
+	    http.headers().addHeaderWriter( new XFrameOptionsHeaderWriter(new SSOAllowFromStrategy()) );
 		http.addFilterBefore(new SimpleCORSFilter(), ChannelProcessingFilter.class).authorizeRequests()
 				.antMatchers("/**").permitAll();
 	}
