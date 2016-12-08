@@ -15,11 +15,10 @@
 		</div>
 	</div>
 	<div class="vendasta-container">
-		<iframe class="vendasta-iframe" src="http://social-survery-sandbox.steprep-demo-hrd.appspot.com/overview/?sso_token=RM101" height="600px" width="1366px" position="inherit" allowfullscreen="">
+		<iframe id="vendasta-iframe" height="600px" width="1366px" src="http://social-survery-sandbox.steprep-demo-hrd.appspot.com/overview/?sso_token=RM101" position="inherit" allowfullscreen="">
 		  Vendasta Integration
 		</iframe>
 	</div>
 </body>
-
 
 	

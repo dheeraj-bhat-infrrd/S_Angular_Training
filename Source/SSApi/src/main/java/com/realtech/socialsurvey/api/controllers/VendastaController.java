@@ -19,10 +19,6 @@ import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 
-/**
- * @author yoganand
- *
- */
 @RestController
 @RequestMapping ( "/sso/")
 public class VendastaController
@@ -57,7 +53,7 @@ public class VendastaController
             && !StringUtils.isEmpty( ssoToken ) ) {
             try {
                 String outputUrl = URLDecoder.decode( nextUrl, "UTF-8" );
-                outputUrl += "&sso_token=" + ssoToken + "&sso_ticket=" + String.valueOf( System.currentTimeMillis() );
+                outputUrl += "&sso_token=" + ssoToken + "&sso_ticket=" + String.valueOf( System.currentTimeMillis() );               
                 response.sendRedirect( outputUrl );
 
             } catch ( Exception exception ) {
