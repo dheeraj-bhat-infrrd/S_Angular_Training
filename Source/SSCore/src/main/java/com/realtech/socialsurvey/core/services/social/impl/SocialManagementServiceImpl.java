@@ -1441,7 +1441,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia(
                         agentSettings.getIden(), setting, collectionName );
                     if ( profileUrlWithMessage == null || profileUrlWithMessage.isEmpty() ) {
-                        profileUrlWithMessage = setting.getCompleteProfileUrl() + "/";
+                        profileUrlWithMessage = setting.getCompleteProfileUrl() + "/.";
                     } else {
                         profileUrlWithMessage = profileUrlWithMessage + ".";
                     }
