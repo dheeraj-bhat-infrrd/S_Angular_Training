@@ -4430,6 +4430,17 @@ function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disabl
 	
 }
 
+function updateVendastaAccessSetting(hasVendastaAcess, disableEle) {
+	var payload = {
+		"hasVendastaAcess" : hasVendastaAcess
+	};
+	
+	callAjaxPostWithPayloadData("./updatevendastaaccesssetting.do",function(data) {
+		if (data == "success") $('#overlay-toast').html("Content updated successfully");
+	}, payload, true, disableEle);
+	
+}
+
 function resetTextForMoodFlow(mood, resetId) {
 	var payload = {
 		"mood" : mood
@@ -9807,6 +9818,31 @@ $('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
 	}
 });
 
+$('body').on('click', '#vndsta-access-chk-box', function() {
+	if ($('#vndsta-access-chk-box').hasClass('bd-check-img-checked')) {
+		$('#vndsta-access-chk-box').removeClass('bd-check-img-checked');
+		showOrHideReviewsMonitor( true );
+		updateVendastaAccessSetting(true, '#vndsta-access-chk-box');
+	} else {
+		$('#vndsta-access-chk-box').addClass('bd-check-img-checked');
+		showOrHideReviewsMonitor( false );
+		updateVendastaAccessSetting(false, '#vndsta-access-chk-box');
+	}
+});
+
+function showOrHideReviewsMonitor(vendastaAccess)
+{
+	if( vendastaAccess == true || vendastaAccess == "true" )
+		{
+		$("#reviews-monitor-main").show();
+		$("#reviews-monitor-slider").show();
+		}
+	else{
+		$("#reviews-monitor-main").hide();
+		$("#reviews-monitor-slider").hide();
+	}
+}
+
 // Dashboard fb and twitter share
 function getDashboardImageandCaption(loop) {
 	var name = "";
@@ -11313,3 +11349,21 @@ $(document).on('click','ul.accordion li',function(){
 $(document).on('click','.email-content',function(event){
 	event.stopPropagation();
 });
+
+//load Reviews monitor Iframe with Vendasta product URL
+function loadVendastaIframe()
+{
+	$("#vendasta-iframe").attr("src", fetchVendastaUrl());
+}
+
+function fetchVendastaUrl()
+{
+	return "http://social-survery-sandbox.steprep-demo-hrd.appspot.com?sso_token=TSH4CQRZ";
+}
+
+function testVendastaIframe(){
+	if( $("#vendasta-iframe").contents().find("body").length == 0){
+		$("#vendasta-iframe").hide();
+		$("retry-cont").show();
+	}
+}

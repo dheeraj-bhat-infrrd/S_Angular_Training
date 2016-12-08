@@ -12,13 +12,26 @@
 					<spring:message code="label.reviewsmonitor.key" />
 				</div>
 			</div>
-		</div>
+		</div>		
 	</div>
 	<div class="vendasta-container">
-		<iframe id="vendasta-iframe" height="600px" width="1366px" src="http://social-survery-sandbox.steprep-demo-hrd.appspot.com/overview/?sso_token=RM101" position="inherit" allowfullscreen="">
-		  Vendasta Integration
-		</iframe>
+		<iframe id="vendasta-iframe" height="600px" width="102%" > 
+		//onload="javascript:testVendastaIframe()" >
+			Vendasta Integration
+		</iframe>		
+		<div id="retry-cont" class="container retry-container hide">
+			<div id="retry" class="review-retry cursor-pointer rvw-rty-small">Unable to connect<br/>Retry</div>
+		</div>
 	</div>
-</body>
-
+<script>
+$(document).ready( function() { 
+	loadVendastaIframe();
+	
+	$(document).on('click', '#retry', function() {
+		$("retry-cont").hide();
+		$("#vendasta-iframe").show();
+		loadVendastaIframe();
+	});
+});
+</script>
 	

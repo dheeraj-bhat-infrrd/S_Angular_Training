@@ -30,6 +30,7 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/intlTelInput.css">
 </head>
 <body>
+<input id="vendastaAccess" type="hidden" value="false">
 	<div id="overlay-linkedin-import" class="overlay-login overlay-main hide"></div>
 	<div id="overlay-send-survey" class="overlay-login overlay-main hide"></div>
 	<div id="srv-req-pop" class="survey-request-popup-container hide">
@@ -211,7 +212,9 @@
 				</c:if>
 				<c:if test="${ highestrole == 1 }">
 					<div class="header-links-item" onclick="showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></div>
-					<div class="header-links-item" onclick="showMainContent('./showreviewsmonitorpage.do')"><spring:message code="label.reviewsmonitor.key" /></div>					
+					<div id="reviews-monitor-slider" class="hide">
+					<div class="header-links-item" onclick="showMainContent('./showreviewsmonitorpage.do')"><spring:message code="label.reviewsmonitor.key" /></div>
+					</div>					
 				</c:if>
 				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
 				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
@@ -316,13 +319,15 @@
 				<c:if test="${ highestrole == 1 }">
 					<div id="hdr-link-item-sm" class="hdr-link-item hdr-link-item-sm pos-relative">
 						<a href="javascript:showMainContent('./showsocialmonitortpage.do')" onclick="showOverlay();"><spring:message code="label.socialmonitor.key" /></a>
-						<div id="hdr-sm-settings-dropdown" class="hdr-link-item-dropdown-icn-sm"></div>
-						<div id="hdr-link-item-dropdown-sm" class="hdr-link-item-dropdown-sm hide">
-							<div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showsocialmonitortpage.do');">
-								<spring:message code="label.socialmonitor.key" />
-							</div>
-							<div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showreviewsmonitorpage.do');">
-								<spring:message code="label.reviewsmonitor.key" />
+						<div id="reviews-monitor-main" class="hide">
+							<div id="hdr-sm-settings-dropdown" class="hdr-link-item-dropdown-icn-sm"></div>
+							<div id="hdr-link-item-dropdown-sm" class="hdr-link-item-dropdown-sm hide">
+								<div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showsocialmonitortpage.do');">
+									<spring:message code="label.socialmonitor.key" />
+								</div>
+								<div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showreviewsmonitorpage.do');">
+									<spring:message code="label.reviewsmonitor.key" />
+								</div>
 							</div>
 						</div>
 					</div>

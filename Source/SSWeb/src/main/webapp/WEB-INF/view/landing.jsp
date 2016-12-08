@@ -7,10 +7,19 @@
 <script src="${initParam.resourcesPath}/resources/js/jquery.cookie.js"></script>
 <script type="text/javascript">
 var hiddenSection = false;
+var vendastaAccess = false;
 $(document).ready(function() {
 	callAjaxGetWithPayloadData("/ishiddensection.do", function(data) {
 		hiddenSection = data;
 	});
+	
+	//show or hide reviews monitor
+	callAjaxGetWithPayloadData("/isVendastaAccessible.do", function(data) {
+		vendastaAccess = data;
+		$("#vendastaAccess").val( vendastaAccess );
+		showOrHideReviewsMonitor( vendastaAccess );
+	});
+
 	
 	// Show popup if any active session found
 	var activeSessionFound = "${activeSessionFound}";

@@ -967,3 +967,7 @@ font-size: 40px;
 display: inline-block;
 }
     
+.stng-padng {
+	height: 250px;
+	padding-right: 50px;
+}
