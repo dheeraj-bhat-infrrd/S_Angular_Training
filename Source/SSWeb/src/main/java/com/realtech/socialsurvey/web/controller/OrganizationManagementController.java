@@ -742,21 +742,22 @@ public class OrganizationManagementController
 
             model.addAttribute( "autoPostEnabled", false );
             model.addAttribute( "autoPostLinkToUserSite", false );
-            
-          //REALTECH_USER_ID is set only for real tech and SS admin
+            model.addAttribute( "vendastaAccess", unitSettings.isVendastaAccessible() );
+
+            //REALTECH_USER_ID is set only for real tech and SS admin
             boolean isRealTechOrSSAdmin = false;
             Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
             if ( adminUserid != null ) {
                 isRealTechOrSSAdmin = true;
             }
             model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
-            
 
             if ( surveySettings != null ) {
                 model.addAttribute( "autoPostEnabled", surveySettings.isAutoPostEnabled() );
                 model.addAttribute( "minpostscore", surveySettings.getShow_survey_above_score() );
                 model.addAttribute( "autoPostLinkToUserSite", surveySettings.isAutoPostLinkToUserSiteEnabled() );
             }
+
             surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
             model.addAttribute( "defaultSurveyProperties", surveySettings );
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
@@ -1554,24 +1555,28 @@ public class OrganizationManagementController
 
         try {
             String autopostLinkToUserSite = request.getParameter( "autopostlinktousersite" );
-            
+
             boolean isAutoPostLinkToUserSiteEnabled = false;
             if ( autopostLinkToUserSite != null && !autopostLinkToUserSite.isEmpty() ) {
                 isAutoPostLinkToUserSiteEnabled = Boolean.parseBoolean( autopostLinkToUserSite );
 
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-                
 
-                SurveySettings surveySettings = companySettings.getSurvey_settings();
-                surveySettings.setAutoPostLinkToUserSiteEnabled( isAutoPostLinkToUserSiteEnabled );
-                if ( organizationManagementService.updateScoreForSurvey( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, surveySettings ) ) {
-                    companySettings.setSurvey_settings( surveySettings );
-                    LOG.info( "Updated Survey Settings" );
+                if ( companySettings == null )
+                    throw new Exception();
+                else {
+                    SurveySettings surveySettings = companySettings.getSurvey_settings();
+                    surveySettings.setAutoPostLinkToUserSiteEnabled( isAutoPostLinkToUserSiteEnabled );
+                    if ( organizationManagementService.updateScoreForSurvey(
+                        MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, surveySettings ) ) {
+                        companySettings.setSurvey_settings( surveySettings );
+                        LOG.info( "Updated Survey Settings" );
+                    }
                 }
             }
         } catch ( Exception error ) {
             LOG.error(
-                "Exception occured in updateAutoPostLinkToUserSiteForSurvey() while updating whether to enable autopost or not. Nested exception is ",
+                "Exception occured in updateAutoPostLinkToUserSiteForSurvey() while updating whether to enable autopost link to company site or not. Nested exception is ",
                 error );
             return error.getMessage();
         }
@@ -1579,6 +1584,46 @@ public class OrganizationManagementController
         LOG.info( "Method to update autopost link to user site for a survey finished" );
         return "Successfully updated autopost link to user site setting";
     }
+
+
+    @RequestMapping ( value = "/updatevendastaaccesssetting", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateVendastaAccessSettings( HttpServletRequest request )
+    {
+        LOG.info( "Method to update Vendasta Access Settings started" );
+        HttpSession session = request.getSession();
+        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
+        try {
+            String hasVendastaAcess = request.getParameter( "hasVendastaAcess" );
+            boolean isVendastaAcessible = false;
+            if ( hasVendastaAcess != null && !hasVendastaAcess.isEmpty() ) {
+                isVendastaAcessible = Boolean.parseBoolean( hasVendastaAcess );
+
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+
+                if ( companySettings == null )
+                    throw new Exception();
+                else {
+                    companySettings.setVendastaAccess( isVendastaAcessible );
+                    if ( organizationManagementService.updateVendastaAccess(
+                        MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings ) ) {
+                        LOG.info( "Updated Vendasta Access Settings" );
+                    }
+                }
+            }
+        } catch ( Exception error ) {
+            LOG.error(
+                "Exception occured in updateVendastaAccessSettings() while updating Vendasta Access Settings. Nested exception is ",
+                error );
+            return error.getMessage();
+        }
+
+        LOG.info( "Method to update Vendasta Access Settings finished" );
+        return "Successfully updated Vendasta Access Settings";
+    }
+
 
     /**
      * Method to update Survey Reminder Settings

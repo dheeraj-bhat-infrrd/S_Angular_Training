@@ -61,6 +61,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_ACCOUNT_DISABLED = "isAccountDisabled";
     public static final String KEY_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
     public static final String KEY_SEO_CONTENT_MODIFIED = "isSeoContentModified";
+    public static final String KEY_VENDASTA_ACCESS = "vendastaAccessible";
     public static final String KEY_CONTACT_DETAIL_SETTINGS = "contact_details";
     public static final String KEY_LOCK_SETTINGS = "lockSettings";
     public static final String KEY_LINKEDIN_PROFILEDATA = "linkedInProfileData";

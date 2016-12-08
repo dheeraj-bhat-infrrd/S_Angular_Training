@@ -26,6 +26,7 @@ public class OrganizationUnitSettings
     private boolean isAccountDisabled;
     private boolean isDefaultBySystem;
     private boolean isSeoContentModified;
+    private boolean vendastaAccessible;
     private ContactDetailsSettings contact_details;
     private String vertical;
     private CRMInfo crm_info;
@@ -212,6 +213,18 @@ public class OrganizationUnitSettings
     public void setSeoContentModified( boolean isSeoContentModified )
     {
         this.isSeoContentModified = isSeoContentModified;
+    }
+    
+    
+    public boolean isVendastaAccessible()
+    {
+        return vendastaAccessible;
+    }
+
+
+    public void setVendastaAccess( boolean vendastaAccess )
+    {
+        this.vendastaAccessible = vendastaAccess;
     }
 
 
