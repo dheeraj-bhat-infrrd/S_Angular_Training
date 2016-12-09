@@ -1,7 +1,5 @@
 package com.realtech.socialsurvey.api.transformers;
 
-import javax.activity.InvalidActivityException;
-
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
