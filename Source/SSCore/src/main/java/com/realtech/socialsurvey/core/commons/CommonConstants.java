@@ -880,7 +880,7 @@ public interface CommonConstants
     public static final DecimalFormat SOCIAL_RANKING_WHOLE_FORMAT = new DecimalFormat( "#" );
 
     public static final String TWITTER_MESSAGE = "%s Star Survey Response from %s for %s on %s ";
-    public static final String GSF_TWITTER_MESSAGE = "Read what another happy customer has to say about #GoGSF #mortgage %s #GoGSFBranch";
+    public static final String GSF_TWITTER_MESSAGE = "Read what another happy customer has to say about #GoGSF #mortgage %s";
     public static final String ZILLOW_TWITTER_MESSAGE = "%s Star response from %s for %s on %s ";
 
     // file upload types
