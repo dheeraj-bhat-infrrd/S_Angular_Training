@@ -4430,6 +4430,17 @@ function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disabl
 	
 }
 
+function updateVendastaAccessSetting(hasVendastaAcess, disableEle) {
+	var payload = {
+		"hasVendastaAcess" : hasVendastaAcess
+	};
+	
+	callAjaxPostWithPayloadData("./updatevendastaaccesssetting.do",function(data) {
+		if (data == "success") $('#overlay-toast').html("Content updated successfully");
+	}, payload, true, disableEle);
+	
+}
+
 function resetTextForMoodFlow(mood, resetId) {
 	var payload = {
 		"mood" : mood
@@ -6075,7 +6086,7 @@ function showMasterQuestionPage() {
 		}
 		
 		var fmt_rating = Number(rating).toFixed(1);
-		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
+		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
 		if (twitterFeedback.length > 109) {
 			twitterFeedback = twitterFeedback.substring(0, 70);
@@ -9084,6 +9095,23 @@ $(document).on('click', '.hdr-link-item-dropdown-item', function(e) {
 	showOverlay();
 });
 
+$(document).on('click', '#hdr-sm-settings-dropdown', function(e) {
+	$('#hdr-link-item-dropdown-sm').toggle();
+});
+
+$(document).on('mouseover', '#hdr-link-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').show();
+});
+
+$(document).on('mouseout', '#hdr-link-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').hide();
+});
+
+$(document).on('click', '.hdr-link-item-dropdown-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').hide();
+	showOverlay();
+});
+
 // Help page onclick function
 $(document).on('click', '#send-help-mail-button', function() {
 	var subject = "";
@@ -9789,6 +9817,31 @@ $('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
 		updateAutoPostLinkToUserSiteSetting(false, '#atpst-lnk-usr-ste-chk-box');
 	}
 });
+
+$('body').on('click', '#vndsta-access-chk-box', function() {
+	if ($('#vndsta-access-chk-box').hasClass('bd-check-img-checked')) {
+		$('#vndsta-access-chk-box').removeClass('bd-check-img-checked');
+		showOrHideReviewsMonitor( true );
+		updateVendastaAccessSetting(true, '#vndsta-access-chk-box');
+	} else {
+		$('#vndsta-access-chk-box').addClass('bd-check-img-checked');
+		showOrHideReviewsMonitor( false );
+		updateVendastaAccessSetting(false, '#vndsta-access-chk-box');
+	}
+});
+
+function showOrHideReviewsMonitor(vendastaAccess)
+{
+	if( vendastaAccess == true || vendastaAccess == "true" )
+		{
+		$("#reviews-monitor-main").show();
+		$("#reviews-monitor-slider").show();
+		}
+	else{
+		$("#reviews-monitor-main").hide();
+		$("#reviews-monitor-slider").hide();
+	}
+}
 
 // Dashboard fb and twitter share
 function getDashboardImageandCaption(loop) {
@@ -11236,7 +11289,7 @@ function paintReviews(result, isRequestFromDashBoard) {
 		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' + reviewItem.completeProfileUrl.replace("localhost", "127.0.0.1") + '&description=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' .&redirect_uri=https://www.facebook.com"></span>';
 		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
 		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url=' + reviewItem.completeProfileUrl + '"></span>';
-		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
 		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"' + '' + 'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
@@ -11296,3 +11349,21 @@ $(document).on('click','ul.accordion li',function(){
 $(document).on('click','.email-content',function(event){
 	event.stopPropagation();
 });
+
+//load Reviews monitor Iframe with Vendasta product URL
+function loadVendastaIframe()
+{
+	$("#vendasta-iframe").attr("src", fetchVendastaUrl());
+}
+
+function fetchVendastaUrl()
+{
+	return "http://social-survery-sandbox.steprep-demo-hrd.appspot.com?sso_token=TSH4CQRZ";
+}
+
+function testVendastaIframe(){
+	if( $("#vendasta-iframe").contents().find("body").length == 0){
+		$("#vendasta-iframe").hide();
+		$("retry-cont").show();
+	}
+}
