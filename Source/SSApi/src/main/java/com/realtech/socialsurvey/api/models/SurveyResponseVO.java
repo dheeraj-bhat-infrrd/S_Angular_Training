@@ -3,7 +3,7 @@ package com.realtech.socialsurvey.api.models;
 public class SurveyResponseVO
 {
     private String question;
-    private String questionType;
+    private String type;
     private String answer;
     
     public String getQuestion() {
@@ -12,11 +12,11 @@ public class SurveyResponseVO
     public void setQuestion(String question) {
         this.question = question;
     }
-    public String getQuestionType() {
-        return questionType;
+    public String getType() {
+        return type;
     }
-    public void setQuestionType(String questionType) {
-        this.questionType = questionType;
+    public void setType(String type) {
+        this.type = type;
     }
     public String getAnswer() {
         return answer;
