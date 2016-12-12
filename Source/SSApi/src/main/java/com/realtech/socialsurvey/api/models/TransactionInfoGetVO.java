@@ -4,6 +4,7 @@ public class TransactionInfoGetVO {
 
 	
  	private String transactionRef;
+ 	private String surveySentDateTime;
  	private String transactionDate;
  	private String transactionCity;
  	private String transactionState;
@@ -13,8 +14,7 @@ public class TransactionInfoGetVO {
  	private String customerFirstName;
  	private String customerLastName;
  	private String customerEmail;
- 	
- 	
+ 	 	
 	public String getTransactionRef() {
 		return transactionRef;
 	}
@@ -63,7 +63,13 @@ public class TransactionInfoGetVO {
 	public void setCustomerEmail(String customerEmail) {
 		this.customerEmail = customerEmail;
 	}
-
-
 	 	
+	public String getSurveySentDateTime()
+    {
+        return surveySentDateTime;
+    }
+    public void setSurveySentDateTime( String surveySentDate )
+    {
+        this.surveySentDateTime = surveySentDate;
+    }
 }

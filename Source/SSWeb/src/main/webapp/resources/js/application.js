@@ -4419,6 +4419,17 @@ function updateAutoPostSetting(isautopostenabled, disableEle) {
 	});
 }
 
+function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disableEle) {
+	var payload = {
+		"autopostlinktousersite" : isautopostlinktositeenabled
+	};
+	
+	callAjaxPostWithPayloadData("./updateautopostlinktousersiteforsurvey.do",function(data) {
+		if (data == "success") $('#overlay-toast').html("Content updated successfully");
+	}, payload, true, disableEle);
+	
+}
+
 function resetTextForMoodFlow(mood, resetId) {
 	var payload = {
 		"mood" : mood
@@ -6064,7 +6075,7 @@ function showMasterQuestionPage() {
 		}
 		
 		var fmt_rating = Number(rating).toFixed(1);
-		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
+		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
 		if (twitterFeedback.length > 109) {
 			twitterFeedback = twitterFeedback.substring(0, 70);
@@ -9769,6 +9780,16 @@ $('body').on('click', '#atpst-chk-box', function() {
 	}
 });
 
+$('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
+	if ($('#atpst-lnk-usr-ste-chk-box').hasClass('bd-check-img-checked')) {
+		$('#atpst-lnk-usr-ste-chk-box').removeClass('bd-check-img-checked');
+		updateAutoPostLinkToUserSiteSetting(true, '#atpst-lnk-usr-ste-chk-box');
+	} else {
+		$('#atpst-lnk-usr-ste-chk-box').addClass('bd-check-img-checked');
+		updateAutoPostLinkToUserSiteSetting(false, '#atpst-lnk-usr-ste-chk-box');
+	}
+});
+
 // Dashboard fb and twitter share
 function getDashboardImageandCaption(loop) {
 	var name = "";
@@ -11215,7 +11236,7 @@ function paintReviews(result, isRequestFromDashBoard) {
 		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' + reviewItem.completeProfileUrl.replace("localhost", "127.0.0.1") + '&description=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' .&redirect_uri=https://www.facebook.com"></span>';
 		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
 		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url=' + reviewItem.completeProfileUrl + '"></span>';
-		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
 		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"' + '' + 'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';

@@ -1,18 +1,25 @@
 package com.realtech.socialsurvey.api.models;
 
+import java.util.List;
+
 public class ReviewVO {
 
 	
 	private String source;
 	private String reviewDate;
+	private String reviewUpdatedDateTime;
+	private String review;
 	private String rating;
 	private String summary;
 	private String description;
+	private boolean agreedToShare;
 	private boolean isReportedAbusive;
 	private boolean isCRMVerified;
+	private boolean retakeSurvey;
+	private List<SurveyResponseVO> surveyResponses;
 	
 	
-	public String getSource() {
+    public String getSource() {
 		return source;
 	}
 	public void setSource(String source) {
@@ -54,4 +61,45 @@ public class ReviewVO {
 	public void setIsCRMVerified(boolean isCRMVerified) {
 		this.isCRMVerified = isCRMVerified;
 	}
+	public List<SurveyResponseVO> getSurveyResponses()
+    {
+        return surveyResponses;
+    }
+    public void setSurveyResponses( List<SurveyResponseVO> surveyResponses )
+    {
+        this.surveyResponses = surveyResponses;
+    }
+    public String getReview()
+    {
+        return review;
+    }
+    public void setReview( String review )
+    {
+        this.review = review;
+    }
+    public boolean isAgreedToShare()
+    {
+        return agreedToShare;
+    }
+    public void setAgreedToShare( boolean agreedToShare )
+    {
+        this.agreedToShare = agreedToShare;
+    }
+    public String getReviewUpdatedDateTime()
+    {
+        return reviewUpdatedDateTime;
+    }
+    public void setReviewUpdatedDateTime( String reviewUpdatedDateTime )
+    {
+        this.reviewUpdatedDateTime = reviewUpdatedDateTime;
+    }
+    public boolean isRetakeSurvey()
+    {
+        return retakeSurvey;
+    }
+    public void setRetakeSurvey( boolean retakeSurvey )
+    {
+        this.retakeSurvey = retakeSurvey;
+    }
+    
 }
