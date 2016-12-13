@@ -1,8 +1,6 @@
 package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -439,7 +437,9 @@ public class SurveyHandlerImplTest
         user.setCompany( company );
         surveyPreInitiation.setCompanyId( 1 );
         List<UserProfile> profiles = new ArrayList<UserProfile>();
-        profiles.add( new UserProfile() );
+        UserProfile profile = new UserProfile();
+        profile.setRegionId( 12 );
+        profiles.add( profile );
         user.setUserProfiles( profiles );
         surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
         assertEquals( "", 3, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
