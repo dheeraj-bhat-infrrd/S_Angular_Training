@@ -1944,7 +1944,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                             }
                         }
                     }
-                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 } else if ( surveyPreInitiation.getCollectionName()
                     .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
                     LOG.debug( "The user region should be same " );
@@ -1959,7 +1958,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                             }
                         }
                     }
-
                 } else if ( surveyPreInitiation.getCollectionName()
                     .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
                     found = true;
