@@ -1864,10 +1864,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 invalidAgents.add( survey );
                 companies.add( survey.getCompanyId() );
             }
-            if ( status != CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD
-                && status != CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD
-                && status != CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD
-                && status != CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD ) {
+            if ( status == CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED ) {
                 if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_DOTLOOP ) ) {
                     status = validateUnitsettingsForDotloop( user, survey );
                     if ( status == CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) {
@@ -1945,7 +1942,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                             }
                         }
                     }
-                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 } else if ( surveyPreInitiation.getCollectionName()
                     .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
                     LOG.debug( "The user region should be same " );
@@ -1960,7 +1956,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                             }
                         }
                     }
-
                 } else if ( surveyPreInitiation.getCollectionName()
                     .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
                     found = true;

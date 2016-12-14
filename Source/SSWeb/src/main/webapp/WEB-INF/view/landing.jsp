@@ -12,15 +12,7 @@ $(document).ready(function() {
 	callAjaxGetWithPayloadData("/ishiddensection.do", function(data) {
 		hiddenSection = data;
 	});
-	
-	//show or hide reviews monitor
-	callAjaxGetWithPayloadData("/isVendastaAccessible.do", function(data) {
-		vendastaAccess = data;
-		$("#vendastaAccess").val( vendastaAccess );
-		showOrHideReviewsMonitor( vendastaAccess );
-	});
-
-	
+		
 	// Show popup if any active session found
 	var activeSessionFound = "${activeSessionFound}";
 	if (activeSessionFound == "true") {
@@ -28,6 +20,11 @@ $(document).ready(function() {
 	} else {
 		landingFlow();
 	}
+	callAjaxGetWithPayloadData("/isvendastaaccessibleforthesession.do", function(data) {
+		vendastaAccess = data;
+		showOrHideReviewsMonitor( vendastaAccess );
+		showOrHideVendastaProductSettings( vendastaAccess );
+	});
 });
 
 function landingFlow() {

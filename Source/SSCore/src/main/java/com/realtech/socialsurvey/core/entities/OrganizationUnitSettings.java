@@ -58,6 +58,8 @@ public class OrganizationUnitSettings
     private String status;
     private boolean hiddenSection;
     private boolean sendEmailFromCompany;
+    // vendasta product details 
+    private VendastaProductSettings vendasta_rm_settings;
 
 
     public boolean isSendEmailFromCompany()
@@ -581,7 +583,17 @@ public class OrganizationUnitSettings
         this.allowZillowAutoPost = allowZillowAutoPost;
     }
 
+    public VendastaProductSettings getVendasta_rm_settings()
+    {
+        return vendasta_rm_settings;
+    }
 
+
+    public void setVendasta_rm_settings( VendastaProductSettings vendasta_rm_settings )
+    {
+        this.vendasta_rm_settings = vendasta_rm_settings;
+    }
+    
     @Override
     public String toString()
     {
@@ -594,4 +606,5 @@ public class OrganizationUnitSettings
             + lockSettings + ", disclaimer=" + disclaimer + ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy
             + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + "]";
     }
+    
 }

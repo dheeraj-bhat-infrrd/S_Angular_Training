@@ -1146,21 +1146,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         return true;
     }
-    
-    @Override
-    public boolean updateVendastaAccess( String collectionName, OrganizationUnitSettings unitSettings ) throws InvalidInputException
-    {
-        if ( unitSettings == null ) {
-            throw new InvalidInputException( "Unit settings cannot be null." );
-        }
-
-        LOG.debug( "Updating unitSettings: " + unitSettings + " with vendasta Access: " + unitSettings.isVendastaAccessible() );
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_VENDASTA_ACCESS, unitSettings.isVendastaAccessible(), unitSettings, collectionName );
-        LOG.debug( "Updated the record successfully" );
-
-        return true;
-    }
 
 
     @Override

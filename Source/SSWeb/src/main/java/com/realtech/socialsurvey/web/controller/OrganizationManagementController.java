@@ -188,7 +188,6 @@ public class OrganizationManagementController
     @Autowired
     private WorkbookData workbookData;
 
-
     /**
      * Method to upload logo image for a company
      * 
@@ -1545,6 +1544,7 @@ public class OrganizationManagementController
         return "Successfully updated autopost setting";
     }
 
+
     @RequestMapping ( value = "/updateautopostlinktousersiteforsurvey", method = RequestMethod.POST)
     @ResponseBody
     public String updateAutoPostLinkToUserSiteForSurvey( HttpServletRequest request )
@@ -1583,45 +1583,6 @@ public class OrganizationManagementController
 
         LOG.info( "Method to update autopost link to user site for a survey finished" );
         return "Successfully updated autopost link to user site setting";
-    }
-
-
-    @RequestMapping ( value = "/updatevendastaaccesssetting", method = RequestMethod.POST)
-    @ResponseBody
-    public String updateVendastaAccessSettings( HttpServletRequest request )
-    {
-        LOG.info( "Method to update Vendasta Access Settings started" );
-        HttpSession session = request.getSession();
-        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-
-        try {
-            String hasVendastaAcess = request.getParameter( "hasVendastaAcess" );
-            boolean isVendastaAcessible = false;
-            if ( hasVendastaAcess != null && !hasVendastaAcess.isEmpty() ) {
-                isVendastaAcessible = Boolean.parseBoolean( hasVendastaAcess );
-
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-
-                if ( companySettings == null )
-                    throw new Exception();
-                else {
-                    companySettings.setVendastaAccess( isVendastaAcessible );
-                    if ( organizationManagementService.updateVendastaAccess(
-                        MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings ) ) {
-                        LOG.info( "Updated Vendasta Access Settings" );
-                    }
-                }
-            }
-        } catch ( Exception error ) {
-            LOG.error(
-                "Exception occured in updateVendastaAccessSettings() while updating Vendasta Access Settings. Nested exception is ",
-                error );
-            return error.getMessage();
-        }
-
-        LOG.info( "Method to update Vendasta Access Settings finished" );
-        return "Successfully updated Vendasta Access Settings";
     }
 
 

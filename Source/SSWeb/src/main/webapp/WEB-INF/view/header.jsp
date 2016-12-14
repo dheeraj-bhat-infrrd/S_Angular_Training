@@ -30,7 +30,6 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/intlTelInput.css">
 </head>
 <body>
-<input id="vendastaAccess" type="hidden" value="false">
 	<div id="overlay-linkedin-import" class="overlay-login overlay-main hide"></div>
 	<div id="overlay-send-survey" class="overlay-login overlay-main hide"></div>
 	<div id="srv-req-pop" class="survey-request-popup-container hide">
@@ -200,6 +199,9 @@
 				<c:if test="${!hiddenSectionDashboard}">
 					<div class="header-links-item" onclick="showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></div>
 				</c:if>
+				<c:if test="true">
+					<div id="vndsta-setting-one" class="header-links-item hide" onclick="showMainContent('./showvendastasettings.do')"><spring:message code="label.vendastaproductsettings.key" /></div>
+				</c:if>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
 					<div class="header-links-item" onclick="showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></div>
@@ -283,6 +285,11 @@
 									<spring:message code="label.appsettings.key" />
 								</div>
 							</c:if>
+							<c:if test="true">
+								<div id="vndsta-setting-two" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showvendastasettings.do');">
+									<spring:message code="label.vendastaproductsettings.key" />
+								</div>
+							</c:if>
 						</div>
 					</div>
 					</c:if>
@@ -310,6 +317,11 @@
 							<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showapps.do');">
 									<spring:message code="label.appsettings.key" />
+								</div>
+							</c:if>
+							<c:if test="true">
+								<div id="vndsta-setting-three" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showvendastasettings.do');">
+									<spring:message code="label.vendastaproductsettings.key" />
 								</div>
 							</c:if>
 						</div>
