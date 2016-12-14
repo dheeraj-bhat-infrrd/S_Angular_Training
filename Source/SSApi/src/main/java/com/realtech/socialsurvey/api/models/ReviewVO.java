@@ -7,6 +7,7 @@ public class ReviewVO {
 	
 	private String source;
 	private String reviewDate;
+	private String reviewUpdatedDateTime;
 	private String review;
 	private String rating;
 	private String summary;
@@ -14,6 +15,7 @@ public class ReviewVO {
 	private boolean agreedToShare;
 	private boolean isReportedAbusive;
 	private boolean isCRMVerified;
+	private boolean retakeSurvey;
 	private List<SurveyResponseVO> surveyResponses;
 	
 	
@@ -82,6 +84,22 @@ public class ReviewVO {
     public void setAgreedToShare( boolean agreedToShare )
     {
         this.agreedToShare = agreedToShare;
+    }
+    public String getReviewUpdatedDateTime()
+    {
+        return reviewUpdatedDateTime;
+    }
+    public void setReviewUpdatedDateTime( String reviewUpdatedDateTime )
+    {
+        this.reviewUpdatedDateTime = reviewUpdatedDateTime;
+    }
+    public boolean isRetakeSurvey()
+    {
+        return retakeSurvey;
+    }
+    public void setRetakeSurvey( boolean retakeSurvey )
+    {
+        this.retakeSurvey = retakeSurvey;
     }
     
 }
