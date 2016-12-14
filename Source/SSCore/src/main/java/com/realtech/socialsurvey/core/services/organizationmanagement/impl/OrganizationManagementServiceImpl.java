@@ -103,6 +103,7 @@ import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VendastaProductSettings;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
@@ -1156,7 +1157,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Updating unitSettings: " + unitSettings + " with vendasta Access: " + unitSettings.isVendastaAccessible() );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_VENDASTA_ACCESS, unitSettings.isVendastaAccessible(), unitSettings, collectionName );
+            CommonConstants.VENDASTA_ACCESS, unitSettings.isVendastaAccessible(), unitSettings, collectionName );
         LOG.debug( "Updated the record successfully" );
 
         return true;
@@ -7936,6 +7937,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         LOG.info( "Method askFbToRescrapePagesForSettings finished" );
+    }
+    
+    @Override
+    public boolean updateVendastaRMSettings(String collectionName, OrganizationUnitSettings unitSettings,
+        VendastaProductSettings vendastaReputationManagementSettings ) throws InvalidInputException{
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "OrganizationUnitSettings cannot be null." );
+        }
+
+        LOG.debug( "Updating collectionName: " + unitSettings + " with vendastaReputationManagementSettings: " + vendastaReputationManagementSettings );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_VENDASTA_RM_SETTINGS, vendastaReputationManagementSettings, unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Updated the record successfully" );
+
+        return true;
     }
 }
 // JIRA: SS-27: By RM05: EOC

@@ -57,6 +57,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.VendastaProductSettings;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -187,6 +188,9 @@ public class OrganizationManagementController
 
     @Autowired
     private WorkbookData workbookData;
+
+    @Value ( "${VENDASTA_REPUTATION_MANAGEMENT_URL}")
+    private String productUrl;
 
 
     /**
@@ -1545,6 +1549,7 @@ public class OrganizationManagementController
         return "Successfully updated autopost setting";
     }
 
+
     @RequestMapping ( value = "/updateautopostlinktousersiteforsurvey", method = RequestMethod.POST)
     @ResponseBody
     public String updateAutoPostLinkToUserSiteForSurvey( HttpServletRequest request )
@@ -1592,23 +1597,42 @@ public class OrganizationManagementController
     {
         LOG.info( "Method to update Vendasta Access Settings started" );
         HttpSession session = request.getSession();
-        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         try {
             String hasVendastaAcess = request.getParameter( "hasVendastaAcess" );
             boolean isVendastaAcessible = false;
+            OrganizationUnitSettings unitSettings = null;
+            String collectionName = "";
+
             if ( hasVendastaAcess != null && !hasVendastaAcess.isEmpty() ) {
                 isVendastaAcessible = Boolean.parseBoolean( hasVendastaAcess );
 
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+                if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getCompanySettings( entityId );
 
-                if ( companySettings == null )
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getRegionSettings( entityId );
+
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getAgentSettings( entityId );
+
+                } else {
+                    throw new InvalidInputException( "Invalid Collection Type" );
+                }
+                if ( unitSettings == null )
                     throw new Exception();
                 else {
-                    companySettings.setVendastaAccess( isVendastaAcessible );
-                    if ( organizationManagementService.updateVendastaAccess(
-                        MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings ) ) {
+                    unitSettings.setVendastaAccess( isVendastaAcessible );
+                    if ( organizationManagementService.updateVendastaAccess( collectionName, unitSettings ) ) {
                         LOG.info( "Updated Vendasta Access Settings" );
                     }
                 }
@@ -3529,5 +3553,184 @@ public class OrganizationManagementController
         fineNameMap.put( CommonConstants.CORRUPT_USER_TABID, "Corrupt-Survey-Report" );
         return fineNameMap;
     }
+
+
+    @RequestMapping ( value = "/isvendastaaccessibleforthesession")
+    @ResponseBody
+    public String isVendastaAccessible( Model model, HttpServletRequest request )
+    {
+        HttpSession session = request.getSession( false );
+
+        String vendastaAccess = null;
+        if ( session != null && session.getAttribute( CommonConstants.VENDASTA_ACCESS ) != null ) {
+            vendastaAccess = String.valueOf( session.getAttribute( CommonConstants.VENDASTA_ACCESS ) );
+        }
+
+        if ( vendastaAccess != null ) {
+            return vendastaAccess;
+        } else {
+            return "false";
+        }
+
+    }
+
+
+    @RequestMapping ( value = "/fetchvendastaurl")
+    @ResponseBody
+    public String fetchVendastaUrl( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method fetchVendastaUrl() started." );
+        HttpSession session = request.getSession( false );
+        String vendastaAccess = null;
+
+        if ( session != null && session.getAttribute( CommonConstants.VENDASTA_ACCESS ) != null ) {
+            vendastaAccess = String.valueOf( session.getAttribute( CommonConstants.VENDASTA_ACCESS ) );
+        }
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+
+        if ( vendastaAccess != null && vendastaAccess == "true" ) {
+            String columnName = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            Long columnValue = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+            try {
+                OrganizationUnitSettings unitSettings = null;
+                if ( columnName != null && columnValue != null ) {
+                    if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                        unitSettings = organizationManagementService.getCompanySettings( columnValue );
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                        unitSettings = organizationManagementService.getRegionSettings( columnValue );
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                        unitSettings = organizationManagementService.getBranchSettingsDefault( columnValue );
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                        unitSettings = organizationManagementService.getAgentSettings( columnValue );
+                    } else {
+                        throw new InvalidInputException( "Invalid Collection Type" );
+                    }
+
+                    responseMap.put( "url", productUrl );
+                    responseMap.put( "ssoToken", unitSettings.getVendasta_rm_settings().getAccountId() );
+                    responseMap.put( "status", "success" );
+                }
+            } catch ( InvalidInputException | NoRecordsFetchedException error ) {
+                responseMap.put( "status", "failed" );
+                LOG.error( "No such entity with Id: " + columnValue );
+            } catch ( Exception error ) {
+                responseMap.put( "status", "failed" );
+            }
+        } else {
+            responseMap.put( "status", "failed" );
+        }
+        LOG.info( "Method fetchVendastaUrl() finished." );
+        return new Gson().toJson( responseMap );
+    }
+
+
+    @RequestMapping ( value = "/showvendastasettings")
+    public String showVendastaSettings( Model model, HttpServletRequest request )
+    {
+
+        LOG.info( "Method showVendastaSettings of OrganizationManagementController called" );
+        HttpSession session = request.getSession( false );
+        String vendastaAccess = null;
+
+        if ( session != null && session.getAttribute( CommonConstants.VENDASTA_ACCESS ) != null ) {
+            vendastaAccess = String.valueOf( session.getAttribute( CommonConstants.VENDASTA_ACCESS ) );
+        }
+
+        if ( vendastaAccess != null && vendastaAccess == "true" ) {
+            String columnName = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            Long columnValue = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+            try {
+                OrganizationUnitSettings unitSettings = null;
+                if ( columnName != null && columnValue != null ) {
+                    if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                        unitSettings = organizationManagementService.getCompanySettings( columnValue );
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                        unitSettings = organizationManagementService.getRegionSettings( columnValue );
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                        unitSettings = organizationManagementService.getBranchSettingsDefault( columnValue );
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                        unitSettings = organizationManagementService.getAgentSettings( columnValue );
+                    } else {
+                        throw new InvalidInputException( "Invalid Collection Type" );
+                    }
+                    if ( unitSettings.getVendasta_rm_settings() != null
+                        && unitSettings.getVendasta_rm_settings().getAccountId() != null )
+                        model.addAttribute( "accountId", unitSettings.getVendasta_rm_settings().getAccountId() );
+
+                }
+            } catch ( NonFatalException error ) {
+                LOG.error( "NonfatalException while showing vendasta settings. Reason: " + error.getMessage(), error );
+                model.addAttribute( "message",
+                    messageUtils.getDisplayMessage( error.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+                return JspResolver.MESSAGE_HEADER;
+            }
+        } else {
+
+        }
+
+        LOG.info( "Method showVendastaSettings of OrganizationManagementController finished" );
+        return JspResolver.VENDASTA_SETTINGS;
+    }
+
+
+    @RequestMapping ( value = "/updatevendastasettings", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateVendastaSettings( HttpServletRequest request )
+    {
+
+        LOG.info( "Updating Vendasta Product settings" );
+        String message = "";
+        String collectionName = "";
+        try {
+            HttpSession session = request.getSession( false );
+            String columnName = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            Long columnValue = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            OrganizationUnitSettings unitSettings = null;
+            if ( columnName != null && columnValue != null ) {
+                if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                    unitSettings = organizationManagementService.getCompanySettings( columnValue );
+
+                } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                    unitSettings = organizationManagementService.getRegionSettings( columnValue );
+
+                } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                    unitSettings = organizationManagementService.getBranchSettingsDefault( columnValue );
+
+                } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                    unitSettings = organizationManagementService.getAgentSettings( columnValue );
+                } else {
+                    throw new InvalidInputException( "Invalid Collection Type" );
+                }
+                String accountId = request.getParameter( "accountId" );
+                VendastaProductSettings settings = new VendastaProductSettings();
+                if ( accountId != null  && !accountId.isEmpty() ) {
+                    settings.setAccountId( accountId );
+                    if ( organizationManagementService.updateVendastaRMSettings( collectionName, unitSettings, settings ) ) {
+                        LOG.info( "Updated Vendasta Product settings" );
+                        message = messageUtils.getDisplayMessage( DisplayMessageConstants.UPDATING_VENDASTA_SETTINGS_SUCCESSFUL,
+                            DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                    }
+                }
+                else {
+                    message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_ACCOUNT_ID,
+                        DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                }
+            }
+        } catch ( NonFatalException error ) {
+            LOG.error( "NonFatalException while updating Vendasta Product settings. Reason : " + error.getMessage(), error );
+            message = messageUtils.getDisplayMessage( error.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+
+        return message;
+    }
+
 }
 // JIRA: SS-24 BY RM02 EOC

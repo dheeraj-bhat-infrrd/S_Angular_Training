@@ -235,24 +235,6 @@ public class DashboardController
         }
         return String.valueOf( hiddenSection );
     }
-    
-    @RequestMapping ( value = "/isVendastaAccessible")
-    @ResponseBody
-    public String isVendastaAccessible()
-    {
-        User user = sessionHelper.getCurrentUser();
-        boolean isVendastaAccessible = false;
-        try {
-            OrganizationUnitSettings settings = organizationManagementService
-                .getCompanySettings( user.getCompany().getCompanyId() );
-            if ( settings != null ) {
-                isVendastaAccessible = settings.isVendastaAccessible();
-            }
-        } catch ( InvalidInputException e ) {
-            LOG.error( "fetching isVendastaAccessible varibale value failed." + e );
-        }
-        return String.valueOf( isVendastaAccessible );
-    }
 
     /*
      * Method to get profile details for displaying

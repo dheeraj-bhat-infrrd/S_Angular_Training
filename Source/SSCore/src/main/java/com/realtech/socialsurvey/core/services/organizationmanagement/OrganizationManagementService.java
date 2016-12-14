@@ -1416,4 +1416,9 @@ public interface OrganizationManagementService
 
 
     public boolean updateVendastaAccess( String collectionName, OrganizationUnitSettings unitSettings ) throws InvalidInputException;
+
+
+    public boolean updateVendastaRMSettings( String collectionName, OrganizationUnitSettings unitSettings,
+        VendastaProductSettings vendastaReputationManagementSettings ) throws InvalidInputException;
+
 }
