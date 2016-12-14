@@ -381,8 +381,11 @@
     .resp-vms-acnt {
     margin: 0 auto;
     width: 200px;
-    text-align: center;
-    padding: 4px 0px 4px 0px;
+    outline: none;
+    box-shadow: none;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+    padding: 4px 10px 4px 10px;
     }
 }
 

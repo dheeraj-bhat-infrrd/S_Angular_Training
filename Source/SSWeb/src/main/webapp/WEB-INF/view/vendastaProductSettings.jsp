@@ -23,7 +23,7 @@
 		</div>
 		<div class="vms-input vms-resp-input">
 			<input id="account-iden" name="account-iden"
-				class="account-id resp-vms-acnt"
+				class="vendasta-account-id resp-vms-acnt"
 				placeholder="<spring:message code="label.vendasta.account.identifier.key" />">
 		</div>
 		<div id="vndsta-form-submit"
