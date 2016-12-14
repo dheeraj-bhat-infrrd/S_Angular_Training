@@ -25,7 +25,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, List<SurveyPreInitiation>, SurveyPutVO> {
 
 	
-	 private static final DateFormat df = new SimpleDateFormat("YYYY-MM-dd HH:MM:SS");
+	 private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	 
 	 @Autowired
 	 private Utils utils;
