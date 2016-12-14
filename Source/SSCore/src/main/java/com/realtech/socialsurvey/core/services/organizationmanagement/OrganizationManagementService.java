@@ -1414,6 +1414,4 @@ public interface OrganizationManagementService
 
     void askFbToRescrapePagesForSettings( Set<Long> entityIds, String collectionName );
 
-
-    public boolean updateVendastaAccess( String collectionName, OrganizationUnitSettings unitSettings ) throws InvalidInputException;
 }

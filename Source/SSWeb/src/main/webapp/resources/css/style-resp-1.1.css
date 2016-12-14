@@ -344,6 +344,49 @@
     #admin-bill-rep-bnt{
     float:none !important;
     }
+    .vms-resp-txt {
+    margin: 0 auto;
+    text-align: center;
+    width: 200px;
+    padding-bottom: 15px;  
+    font-size: 14px;
+    float: none;
+    margin-bottom: 20px;
+    
+    }
+    .vms-resp-input {
+	margin: 0 auto;
+    width: 200px;
+    float: none;
+    margin-bottom: 30px;
+    }
+    .vms-resp {
+    padding-right: 10px;
+	width: 200px;
+    line-height: 25px;
+    font-size: 15px;
+    float:none;
+    }
+    .vms-resp-submit {
+    margin: 0 auto;
+    border-radius: 3px;
+    background-color: #009FE0;
+    line-height: 25px;
+    width: 80px;
+    text-align: center;
+    color: #fff;
+    text-transform: uppercase;
+    cursor:pointer;
+    }
+    .resp-vms-acnt {
+    margin: 0 auto;
+    width: 200px;
+    outline: none;
+    box-shadow: none;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+    padding: 4px 10px 4px 10px;
+    }
 }
 
 
@@ -469,8 +512,7 @@
     }
     .admin-report-val-col{
      float:none !important;
-    }
-    
+    } 
 }
 
 

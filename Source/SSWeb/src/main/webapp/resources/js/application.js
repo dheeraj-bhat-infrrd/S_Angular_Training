@@ -1848,6 +1848,11 @@ $(document).on('click', '.da-dd-item', function(e) {
 		showDashOverlay('#social-media-dash');
 		var selectedTab = window.location.hash.split("#")[1];
 		showMainContent('./' + selectedTab + '.do');
+		callAjaxGetWithPayloadData("/isvendastaaccessibleforthesession.do", function(data) {
+			vendastaAccess = JSON.parse(data);
+			showOrHideReviewsMonitor( vendastaAccess );
+			showOrHideVendastaProductSettings( vendastaAccess );
+		});
 	});
 });
 
@@ -9822,10 +9827,12 @@ $('body').on('click', '#vndsta-access-chk-box', function() {
 	if ($('#vndsta-access-chk-box').hasClass('bd-check-img-checked')) {
 		$('#vndsta-access-chk-box').removeClass('bd-check-img-checked');
 		showOrHideReviewsMonitor( true );
+		showOrHideVendastaProductSettings( true );
 		updateVendastaAccessSetting(true, '#vndsta-access-chk-box');
 	} else {
 		$('#vndsta-access-chk-box').addClass('bd-check-img-checked');
 		showOrHideReviewsMonitor( false );
+		showOrHideVendastaProductSettings( false );
 		updateVendastaAccessSetting(false, '#vndsta-access-chk-box');
 	}
 });
@@ -9841,6 +9848,21 @@ function showOrHideReviewsMonitor(vendastaAccess)
 		$("#reviews-monitor-main").hide();
 		$("#reviews-monitor-slider").hide();
 	}
+}
+
+function showOrHideVendastaProductSettings(flag)
+{	
+	if( flag == true || flag == "true" )
+	{
+		$("#vndsta-setting-one").show();
+		$("#vndsta-setting-two").show();
+		$("#vndsta-setting-three").show();
+	}
+	else{
+		$("#vndsta-setting-one").hide();
+		$("#vndsta-setting-two").hide();
+		$("#vndsta-setting-three").hide();
+	}	
 }
 
 // Dashboard fb and twitter share
@@ -11349,21 +11371,3 @@ $(document).on('click','ul.accordion li',function(){
 $(document).on('click','.email-content',function(event){
 	event.stopPropagation();
 });
-
-//load Reviews monitor Iframe with Vendasta product URL
-function loadVendastaIframe()
-{
-	$("#vendasta-iframe").attr("src", fetchVendastaUrl());
-}
-
-function fetchVendastaUrl()
-{
-	return "http://social-survery-sandbox.steprep-demo-hrd.appspot.com?sso_token=TSH4CQRZ";
-}
-
-function testVendastaIframe(){
-	if( $("#vendasta-iframe").contents().find("body").length == 0){
-		$("#vendasta-iframe").hide();
-		$("retry-cont").show();
-	}
-}
