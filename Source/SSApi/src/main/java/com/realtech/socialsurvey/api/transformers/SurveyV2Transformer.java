@@ -8,28 +8,31 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.realtech.socialsurvey.api.models.ReviewVO;
-import com.realtech.socialsurvey.api.models.ServiceProviderInfo;
-import com.realtech.socialsurvey.api.models.SurveyGetVO;
-import com.realtech.socialsurvey.api.models.SurveyResponseVO;
-import com.realtech.socialsurvey.api.models.TransactionInfoGetVO;
+import com.realtech.socialsurvey.api.models.v2.ReviewV2VO;
+import com.realtech.socialsurvey.api.models.v2.ServiceProviderInfoV2;
+import com.realtech.socialsurvey.api.models.v2.SurveyGetV2VO;
+import com.realtech.socialsurvey.api.models.v2.SurveyResponseV2VO;
+import com.realtech.socialsurvey.api.models.v2.TransactionInfoGetV2VO;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.CommonUtils;
 
 
 @Component
-public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails, SurveyGetVO>
+public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDetails, SurveyGetV2VO>
 {
+
+    private String dateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     @Autowired
     UserManagementService userManagementService;
 
 
     @Override
-    public SurveyDetails transformApiRequestToDomainObject( SurveyGetVO a, Object... objects )
+    public SurveyDetails transformApiRequestToDomainObject( SurveyGetV2VO a, Object... objects ) throws InvalidInputException
     {
         // TODO Auto-generated method stub
         return null;
@@ -37,15 +40,15 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
 
 
     @Override
-    public SurveyGetVO transformDomainObjectToApiResponse( SurveyDetails d, Object... objects )
+    public SurveyGetV2VO transformDomainObjectToApiResponse( SurveyDetails d, Object... objects )
     {
 
         SurveyPreInitiation surveyPreInitiation;
-        TransactionInfoGetVO transactionInfo = new TransactionInfoGetVO();
-        ServiceProviderInfo serviceProviderInfo = new ServiceProviderInfo();
-        ReviewVO review = new ReviewVO();
-        SurveyGetVO survey = new SurveyGetVO();
-        List<SurveyResponseVO> surveyResponses = new ArrayList<SurveyResponseVO>();
+        TransactionInfoGetV2VO transactionInfo = new TransactionInfoGetV2VO();
+        ServiceProviderInfoV2 serviceProviderInfo = new ServiceProviderInfoV2();
+        ReviewV2VO review = new ReviewV2VO();
+        SurveyGetV2VO survey = new SurveyGetV2VO();
+        List<SurveyResponseV2VO> surveyResponses = new ArrayList<SurveyResponseV2VO>();
 
         if ( d != null ) {
             transactionInfo.setCustomerEmail( d.getCustomerEmail() );
@@ -55,29 +58,30 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
             transactionInfo.setTransactionCity( d.getCity() );
             transactionInfo.setTransactionState( d.getState() );
             if ( d.getSurveyTransactionDate() != null )
-                transactionInfo.setTransactionDate( String.valueOf( d.getSurveyTransactionDate() ) );
+                transactionInfo
+                    .setTransactionDateTime( CommonUtils.formatDate( d.getSurveyTransactionDate(), dateTimeFormat ) );
             transactionInfo.setTransactionRef( d.getSourceId() );
             if ( objects[0] != null && objects[0] instanceof SurveyPreInitiation )
-                transactionInfo.setSurveySentDateTime( CommonUtils
-                    .formatDate( ( (SurveyPreInitiation) objects[0] ).getLastReminderTime(), "yyyy-MM-dd'T'HH:mm:ss.SSSZ" ) );
+                transactionInfo.setSurveySentDateTime(
+                    CommonUtils.formatDate( ( (SurveyPreInitiation) objects[0] ).getLastReminderTime(), dateTimeFormat ) );
             serviceProviderInfo.setServiceProviderEmail( d.getAgentEmailId() );
             serviceProviderInfo.setServiceProviderName( d.getAgentName() );
             survey.setReviewId( d.get_id() );
             review.setSummary( d.getSummary() );
             review.setDescription( d.getReview() );
             review.setRating( String.valueOf( d.getScore() ) );
-            review.setReviewDate( d.getModifiedOn().toString() );
+            review.setReviewCompletedDateTime( CommonUtils.formatDate( d.getModifiedOn(), dateTimeFormat ) );
             review.setRetakeSurvey( d.isRetakeSurvey() );
             if ( d.getModifiedOn() != null ) {
-                review.setReviewUpdatedDateTime( CommonUtils.formatDate( d.getModifiedOn(), "yyyy-MM-dd'T'HH:mm:ss.SSSZ" ) );
+                review.setReviewUpdatedDateTime( CommonUtils.formatDate( d.getModifiedOn(), dateTimeFormat ) );
             }
             review.setSource( d.getSource() );
             review.setAgreedToShare( Boolean.parseBoolean( d.getAgreedToShare() ) );
-            review.setIsReportedAbusive( d.isAbusive() );
+            review.setReportedAbusive( d.isAbusive() );
 
             if ( d.getSurveyResponse() != null ) {
                 for ( SurveyResponse response : d.getSurveyResponse() ) {
-                    SurveyResponseVO responseVO = new SurveyResponseVO();
+                    SurveyResponseV2VO responseVO = new SurveyResponseV2VO();
                     if ( Pattern.matches( "sb-range.*", response.getQuestionType() ) ) {
                         responseVO.setType( "Numeric" );
                     } else {
@@ -88,19 +92,18 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
                     surveyResponses.add( responseVO );
                 }
             }
-            SurveyResponseVO responseVO = new SurveyResponseVO();
+            SurveyResponseV2VO responseVO = new SurveyResponseV2VO();
             responseVO.setType( "Experience" );
             responseVO.setQuestion( "How would you rate your overall experience?" );
             responseVO.setAnswer( d.getMood() );
             surveyResponses.add( responseVO );
             review.setSurveyResponses( surveyResponses );
-            review.setReview( d.getReview() );
             boolean isCRMVerified = false;
             if ( d.getSource() != null )
                 if ( d.getSource().equalsIgnoreCase( "encompass" ) || d.getSource().equalsIgnoreCase( "DOTLOOP" )
                     || d.getSource().equalsIgnoreCase( "FTP" ) || d.getSource().equalsIgnoreCase( "LONEWOLF" ) )
                     isCRMVerified = true;
-            review.setIsCRMVerified( isCRMVerified );
+            review.setVerifiedCustomer( isCRMVerified );
 
         }
 
@@ -123,8 +126,9 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
                 transactionInfo.setTransactionCity( surveyPreInitiation.getCity() );
             if ( StringUtils.isBlank( transactionInfo.getTransactionState() ) )
                 transactionInfo.setTransactionState( surveyPreInitiation.getState() );
-            if ( StringUtils.isBlank( transactionInfo.getTransactionDate() ) )
-                transactionInfo.setTransactionDate( String.valueOf( surveyPreInitiation.getEngagementClosedTime() ) );
+            if ( StringUtils.isBlank( transactionInfo.getTransactionDateTime() ) )
+                transactionInfo.setTransactionDateTime(
+                    CommonUtils.formatDate( surveyPreInitiation.getEngagementClosedTime(), dateTimeFormat ) );
             if ( StringUtils.isBlank( transactionInfo.getTransactionRef() ) )
                 transactionInfo.setTransactionRef( surveyPreInitiation.getSurveySourceId() );
 
