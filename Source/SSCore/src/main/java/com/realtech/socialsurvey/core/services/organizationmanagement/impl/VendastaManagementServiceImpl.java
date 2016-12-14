@@ -54,7 +54,7 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
             + vendastaReputationManagementSettings );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_VENDASTA_RM_SETTINGS, vendastaReputationManagementSettings, unitSettings,
-            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            collectionName );
         LOG.debug( "Updated the record successfully" );
 
         return true;

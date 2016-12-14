@@ -527,9 +527,6 @@ public interface UserManagementService
     public UserProfile getAgentUserProfileForUserId( long userId ) throws InvalidInputException;
 
 
-    public List<User> getUsersByEmailId( String emailId ) throws InvalidInputException;
-
-
     public void restoreDeletedUser( long userId, boolean restoreSocial ) throws InvalidInputException, SolrException;
 
 

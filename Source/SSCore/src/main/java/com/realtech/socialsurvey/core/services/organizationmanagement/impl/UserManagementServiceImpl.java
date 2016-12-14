@@ -875,27 +875,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
-    /**
-     * Method to get a list of users having the same email ID
-     * @param emailId
-     * @return
-     * @throws InvalidInputException
-     */
-    @Transactional
-    @Override
-    public List<User> getUsersByEmailId( String emailId ) throws InvalidInputException
-    {
-        LOG.debug( "Method getUsersByEmailId started for emailId : " + emailId );
-        if ( emailId == null || emailId.isEmpty() ) {
-            throw new InvalidInputException( "Email ID is empty" );
-        }
-        List<User> users = userDao.findByColumn( User.class, CommonConstants.EMAIL_ID, emailId );
-
-        LOG.debug( "Method getUsersByEmailId finished for emailId : " + emailId );
-        return users;
-    }
-
-
     // Method to return user with provided email and company
     @Transactional
     @Override
