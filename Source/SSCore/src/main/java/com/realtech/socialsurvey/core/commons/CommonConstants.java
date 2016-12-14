@@ -1233,5 +1233,7 @@ public interface CommonConstants
     public static final Object ZILLOW_REVIEWS = "Zillow Reviews";
     public static final Object ABUSIVE_REVIEWS = "Abusive Reviews";
     public static final Object THIRD_PARTY_REVIEWS = "3rd Party Reviews";
-
+    
+    //vendasta constants
+    public static final String VENDASTA_ACCESS = "vendastaAccessible";
 }

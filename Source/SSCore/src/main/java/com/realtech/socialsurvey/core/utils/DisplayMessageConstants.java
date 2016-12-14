@@ -251,5 +251,9 @@ public final class DisplayMessageConstants
     public static final String LONEWOLF_ENABLE_SUCCESSFUL = "LONEWOLF_ENABLE_SUCCESSFUL";
     public static final String LONEWOLF_DISABLE_SUCCESSFUL = "LONEWOLF_DISABLE_SUCCESSFUL";
     public static final String LONEWOLF_GENERATE_REPORT_SUCCESSFUL = "LONEWOLF_GENERATE_REPORT_SUCCESSFUL";
+    
+    //vendasta message constants
+    public static final String UPDATING_VENDASTA_SETTINGS_SUCCESSFUL = "UPDATING_VENDASTA_SETTINGS_SUCCESSFUL";
+    public static final String INVALID_ACCOUNT_ID = "INVALID_ACCOUNT_ID";
 }
 
