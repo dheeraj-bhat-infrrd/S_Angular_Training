@@ -1088,7 +1088,7 @@ public class ProfileManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testFindProfileMailIdAndSendMailWithNullProfileName() throws InvalidInputException, NoRecordsFetchedException,
-        UndeliveredEmailException
+        UndeliveredEmailException, ProfileNotFoundException
     {
         profileManagementServiceImpl.findProfileMailIdAndSendMail( null, TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING );
@@ -1097,7 +1097,7 @@ public class ProfileManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testFindProfileMailIdAndSendMailWithEmptyProfileName() throws InvalidInputException, NoRecordsFetchedException,
-        UndeliveredEmailException
+        UndeliveredEmailException, ProfileNotFoundException
     {
         profileManagementServiceImpl.findProfileMailIdAndSendMail( TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
@@ -1106,7 +1106,7 @@ public class ProfileManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testFindProfileMailIdAndSendMailWithNullMessage() throws InvalidInputException, NoRecordsFetchedException,
-        UndeliveredEmailException
+        UndeliveredEmailException, ProfileNotFoundException
     {
         profileManagementServiceImpl.findProfileMailIdAndSendMail( TestConstants.TEST_STRING, null, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING );
@@ -1115,7 +1115,7 @@ public class ProfileManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testFindProfileMailIdAndSendMailWithEmptyMessage() throws InvalidInputException, NoRecordsFetchedException,
-        UndeliveredEmailException
+        UndeliveredEmailException, ProfileNotFoundException
     {
         profileManagementServiceImpl.findProfileMailIdAndSendMail( TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
@@ -1124,7 +1124,7 @@ public class ProfileManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testFindProfileMailIdAndSendMailWithNullSenderName() throws InvalidInputException, NoRecordsFetchedException,
-        UndeliveredEmailException
+        UndeliveredEmailException, ProfileNotFoundException
     {
         profileManagementServiceImpl.findProfileMailIdAndSendMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING, null,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING );
@@ -1133,7 +1133,7 @@ public class ProfileManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testFindProfileMailIdAndSendMailWithEmptySenderName() throws InvalidInputException, NoRecordsFetchedException,
-        UndeliveredEmailException
+        UndeliveredEmailException, ProfileNotFoundException
     {
         profileManagementServiceImpl.findProfileMailIdAndSendMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
@@ -1142,7 +1142,7 @@ public class ProfileManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testFindProfileMailIdAndSendMailWithNullSenderMailId() throws InvalidInputException, NoRecordsFetchedException,
-        UndeliveredEmailException
+        UndeliveredEmailException, ProfileNotFoundException
     {
         profileManagementServiceImpl.findProfileMailIdAndSendMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, null, TestConstants.TEST_STRING );
@@ -1151,7 +1151,7 @@ public class ProfileManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testFindProfileMailIdAndSendMailWithEmptySenderMailId() throws InvalidInputException,
-        NoRecordsFetchedException, UndeliveredEmailException
+        NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
         profileManagementServiceImpl.findProfileMailIdAndSendMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING );
@@ -1160,7 +1160,7 @@ public class ProfileManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testFindProfileMailIdAndSendMailWithNullProfileType() throws InvalidInputException, NoRecordsFetchedException,
-        UndeliveredEmailException
+        UndeliveredEmailException, ProfileNotFoundException
     {
         profileManagementServiceImpl.findProfileMailIdAndSendMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING, null );
@@ -1169,7 +1169,7 @@ public class ProfileManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testFindProfileMailIdAndSendMailWithEmptyProfileType() throws InvalidInputException, NoRecordsFetchedException,
-        UndeliveredEmailException
+        UndeliveredEmailException, ProfileNotFoundException
     {
         profileManagementServiceImpl.findProfileMailIdAndSendMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
@@ -1178,7 +1178,7 @@ public class ProfileManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testFindProfileMailIdAndSendMailWithInvalidProfileType() throws InvalidInputException,
-        NoRecordsFetchedException, UndeliveredEmailException
+        NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
         profileManagementServiceImpl.findProfileMailIdAndSendMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
