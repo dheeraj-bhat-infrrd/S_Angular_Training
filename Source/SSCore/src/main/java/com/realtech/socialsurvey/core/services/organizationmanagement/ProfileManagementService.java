@@ -93,8 +93,8 @@ public interface ProfileManagementService
         throws InvalidInputException;
 
 
-    public LockSettings updateLockSettings( String collection, OrganizationUnitSettings unitSettings, LockSettings lockSettings )
-        throws InvalidInputException;
+    public LockSettings updateLockSettings( String collection, OrganizationUnitSettings unitSettings,
+        LockSettings lockSettings ) throws InvalidInputException;
 
 
     /**
@@ -174,8 +174,8 @@ public interface ProfileManagementService
      * @param mediaTokens
      * @throws InvalidInputException
      */
-    public void updateSocialMediaTokens( String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens )
-        throws InvalidInputException;
+    public void updateSocialMediaTokens( String collection, OrganizationUnitSettings unitSettings,
+        SocialMediaTokens mediaTokens ) throws InvalidInputException;
 
 
     /**
@@ -235,8 +235,8 @@ public interface ProfileManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public List<AgentSettings> getIndividualsByRegionId( long regionId ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    public List<AgentSettings> getIndividualsByRegionId( long regionId )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     /**
@@ -247,8 +247,8 @@ public interface ProfileManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public List<AgentSettings> getIndividualsByRegionIds( Set<Long> regionIds ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    public List<AgentSettings> getIndividualsByRegionIds( Set<Long> regionIds )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     /**
@@ -259,8 +259,8 @@ public interface ProfileManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public List<AgentSettings> getIndividualsForCompany( String companyProfileName ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException;
+    public List<AgentSettings> getIndividualsForCompany( String companyProfileName )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 
     /**
@@ -306,16 +306,16 @@ public interface ProfileManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public OrganizationUnitSettings getIndividualByProfileName( String profileName ) throws ProfileNotFoundException,
-        InvalidInputException, NoRecordsFetchedException;
+    public OrganizationUnitSettings getIndividualByProfileName( String profileName )
+        throws ProfileNotFoundException, InvalidInputException, NoRecordsFetchedException;
 
 
     public SocialMediaTokens aggregateSocialProfiles( OrganizationUnitSettings unitSettings, String entity )
         throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public User getUserByProfileName( String profileName, boolean checkStatus ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException;
+    public User getUserByProfileName( String profileName, boolean checkStatus )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 
     /**
@@ -440,7 +440,8 @@ public interface ProfileManagementService
      * @throws UndeliveredEmailException
      */
     public void findProfileMailIdAndSendMail( String agentProfileName, String message, String senderName, String senderMailId,
-        String profileType ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+        String profileType )
+        throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException;
 
 
     public void addSocialPosts( User user, long entityId, String entityType, String postText ) throws InvalidInputException;
@@ -496,7 +497,8 @@ public interface ProfileManagementService
         throws InvalidInputException;
 
 
-    public void updateProfileStages( List<ProfileStage> profileStages, OrganizationUnitSettings settings, String collectionName );
+    public void updateProfileStages( List<ProfileStage> profileStages, OrganizationUnitSettings settings,
+        String collectionName );
 
 
     public void setAgentProfileUrlForReview( List<SurveyDetails> reviews ) throws InvalidInputException;
@@ -524,24 +526,24 @@ public interface ProfileManagementService
     public void updateIndividualEmail( long userId, String emailId ) throws InvalidInputException;
 
 
-    public List<AgentRankingReport> getAgentReport( long iden, String profileLevel, Date startDate, Date endDate, Object object )
-        throws InvalidInputException;
+    public List<AgentRankingReport> getAgentReport( long iden, String profileLevel, Date startDate, Date endDate,
+        Object object ) throws InvalidInputException;
 
 
-    public List<BreadCrumb> getIndividualsBreadCrumb( Long userId ) throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException;
+    public List<BreadCrumb> getIndividualsBreadCrumb( Long userId )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 
-    public List<BreadCrumb> getRegionsBreadCrumb( OrganizationUnitSettings regionProfile ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    public List<BreadCrumb> getRegionsBreadCrumb( OrganizationUnitSettings regionProfile )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public List<BreadCrumb> getBranchsBreadCrumb( OrganizationUnitSettings branchProfile ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    public List<BreadCrumb> getBranchsBreadCrumb( OrganizationUnitSettings branchProfile )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public List<OrganizationUnitSettings> getCompanyList( String verticalName ) throws InvalidInputException,
-        ProfileNotFoundException;
+    public List<OrganizationUnitSettings> getCompanyList( String verticalName )
+        throws InvalidInputException, ProfileNotFoundException;
 
 
     public Map<String, String> findNamesfromProfileName( String profileName );
@@ -594,8 +596,8 @@ public interface ProfileManagementService
     public void deleteSocialPost( String postMongoId ) throws InvalidInputException;
 
 
-    Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException,
-        ProfileNotFoundException;
+    Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId )
+        throws InvalidInputException, ProfileNotFoundException;
 
 
     LockSettings fetchHierarchyLockSettings( long companyId, long branchId, long regionId, String entityType )
@@ -613,31 +615,34 @@ public interface ProfileManagementService
         boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException;
 
 
-    public double getAverageRatings( long companyId, String profileLevel, boolean aggregateAbusive, boolean includeZillow, long zillowTotalScore, long zillowReviewCount ) throws InvalidInputException;
+    public double getAverageRatings( long companyId, String profileLevel, boolean aggregateAbusive, boolean includeZillow,
+        long zillowTotalScore, long zillowReviewCount ) throws InvalidInputException;
 
 
     public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
         boolean notRecommended, boolean includeZillow, long zillowReviewCount ) throws InvalidInputException;
 
 
-    public List<AgentSettings> getIndividualsForCompany( long companyId ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException;
+    public List<AgentSettings> getIndividualsForCompany( long companyId )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 
     public Map<String, Long> getZillowTotalScoreAndReviewCountForProfileLevel( String profileLevel, long iden );
 
 
     public List<SurveyDetails> buildSurveyDetailsFromReviewMap( List<HashMap<String, Object>> reviews, String collectionName,
-        OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException;
+        OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage )
+        throws InvalidInputException;
 
 
-    public List<SurveyDetails> getReviewsForReports( long iden, double startScore, double limitScore, int startIndex, int numOfRows,
-        String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
+    public List<SurveyDetails> getReviewsForReports( long iden, double startScore, double limitScore, int startIndex,
+        int numOfRows, String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
         throws InvalidInputException;
 
 
     void removeTokensFromProfile( OrganizationUnitSettings profile );
-    
+
+
     /**
      * 
      * @param mailIds
@@ -649,6 +654,7 @@ public interface ProfileManagementService
      */
     void generateAndSendEmailVerificationRequestLinkToAdmin( List<MiscValues> mailIds, long companyId, String entityType,
         OrganizationUnitSettings entitySettings ) throws InvalidInputException, UndeliveredEmailException;
+
 
     public void imageLoader();
 }
