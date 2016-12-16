@@ -180,15 +180,16 @@ public class VendastaManagementController
             if ( columnName != null && columnValue != null ) {
                 if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
                     unitSettings = organizationManagementService.getCompanySettings( columnValue );
-
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
                 } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
                     unitSettings = organizationManagementService.getRegionSettings( columnValue );
-
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
                 } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
                     unitSettings = organizationManagementService.getBranchSettingsDefault( columnValue );
-
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
                 } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
                     unitSettings = organizationManagementService.getAgentSettings( columnValue );
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                 } else {
                     throw new InvalidInputException( "Invalid Collection Type" );
                 }
