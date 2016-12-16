@@ -9207,10 +9207,12 @@ function disconnectSocialMedia(event, socialMedia, isAutoLogin) {
 
 	function deleteFeed() {
 		// delete feed function
+		showOverlay();
 		processSocialMediaDisconnect(true);
 	}
 
 	function keepFeed() {
+		showOverlay();
 		processSocialMediaDisconnect(false);
 	}
 
@@ -9225,9 +9227,11 @@ function disconnectSocialMedia(event, socialMedia, isAutoLogin) {
 				$('div[data-social="' + socialMedia + '"]').html('');
 				$('div[data-social="' + socialMedia + '"]').parent().find('.social-media-disconnect').addClass('social-media-disconnect-disabled').removeAttr("onclick").removeAttr("title");
 				$('#overlay-toast').html('Successfully disconnected ' + socialMedia);
+				hideOverlay();
 				showToast();
 			} else {
 				$('#overlay-toast').html('Some error occurred while disconnecting ' + socialMedia);
+				hideOverlay();
 				showToast();
 			}
 		}, payload, true);
