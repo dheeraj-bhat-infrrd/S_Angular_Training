@@ -613,5 +613,8 @@ public interface UserManagementService
     public void updateStatusOfUserApiKey( long userApiKeyId, int status ) throws NoRecordsFetchedException;
 
     public List<Long> getExcludedUserIds();
+
+
+    public Set<Long> getUserIdsUnderAdmin( User adminUser ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

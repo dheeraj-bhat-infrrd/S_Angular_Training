@@ -134,6 +134,12 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
 
         }
 
+        if(d != null && d.getStage() == -1){
+        	survey.setReviewStatus("completed");
+        }else{
+        	survey.setReviewStatus("incompleted");
+        }
+        
         survey.setReview( review );
         survey.setTransactionInfo( transactionInfo );
         survey.setServiceProviderInfo( serviceProviderInfo );

@@ -294,7 +294,7 @@ public interface SurveyDetailsDao
      * @param stage
      * @return
      */
-    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId  , String status , String mood , Date startReviewDate , Date startTransactionDate , List<Long> userIds );
+    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId  , String status , String mood , Long startSurveyID , Date startReviewDate , Date startTransactionDate , List<Long> userIds );
 
     /**
      * 
@@ -302,7 +302,7 @@ public interface SurveyDetailsDao
      * @param status
      * @return
      */
-    public Long getFilteredSurveyCount( long companyId , String status , String mood , Date startReviewDate , Date startTransactionDate , List<Long> userIds );
+    public Long getFilteredSurveyCount( long companyId , String status , String mood ,  Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds );
 
 
     void insertApiRequestDetails( ApiRequestDetails apiRequestDetails );
@@ -330,4 +330,7 @@ public interface SurveyDetailsDao
 
 
     void updateZillowSourceIdInExistingSurveyDetails( SurveyDetails surveyDetails );
+
+
+    void updateTransactionDateInExistingSurveyDetails( SurveyDetails surveyDetails );
 }

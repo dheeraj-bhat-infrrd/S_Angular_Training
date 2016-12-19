@@ -12,9 +12,20 @@ public class SurveyGetV2VO
     private TransactionInfoGetV2VO transactionInfo;
     private ServiceProviderInfoV2 serviceProviderInfo;
     private ReviewV2VO review;
+    private String reviewStatus;
 
 
-    public String getReviewId()
+    public String getReviewStatus() {
+		return reviewStatus;
+	}
+
+
+	public void setReviewStatus(String reviewStatus) {
+		this.reviewStatus = reviewStatus;
+	}
+
+
+	public String getReviewId()
     {
         return reviewId;
     }
