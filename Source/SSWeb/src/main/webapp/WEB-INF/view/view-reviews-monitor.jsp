@@ -17,14 +17,15 @@
 		</div>
 	</div>
 	<div class="vendasta-container">
-		<iframe id="vendasta-iframe" height="600px" width="102%">
+		<iframe id="vendasta-iframe" height="600px" width="100%">
 			Vendasta Integration </iframe>
-		<div id="alternate" class="access-cont hide">You do not have
-			access to this resource.</div>
+		<div id="error-msg-vendasta" class="access-cont hide">You do not
+			have access to this resource.</div>
 	</div>
 	<script>
 		var url = "";
 		$(document).ready(function() {
+			$(document).attr("title", "Reviews Monitor");
 			loadVendastaIframe();
 		});
 		//load Reviews monitor Iframe with Vendasta product URL
@@ -32,7 +33,7 @@
 			url = fetchVendastaUrl();
 			if (url == "" || url == undefined) {
 				$('#vendasta-iframe').hide();
-				$('#alternate').show();
+				$('#error-msg-vendasta').show();
 			} else {
 				$("#vendasta-iframe").attr("src", url);
 			}

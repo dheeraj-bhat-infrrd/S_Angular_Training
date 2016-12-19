@@ -1237,4 +1237,18 @@ public interface CommonConstants
     
     //vendasta constants
     public static final String VENDASTA_ACCESS = "vendastaAccessible";
+    public static final String VENDASTA_REPUTATION_MANAGEMENT_ID = "RM";
+    public static final String VENDASTA_SSO_TICKET_ID_COLUMN = "vendastaSingleSignOnTicketId";
+    public static final String VENDASTA_SSO_TICKET_COLUMN = "vendastaSingleSignOnTicket";
+    public static final String VENDASTA_SSO_TOKEN_COLUMN = "vendastaSingleSignOnToken";
+    public static final String VENDASTA_PRODUCT_ID_COLUMN = "productId";
+    public static final String VENDASTA_STATUS_COLUMN = "status";
+    public static final String VENDASTA = "vendasta";
+    
+    //vendasta batch constants
+    public static final String BATCH_TYPE_PROCESSED_SSO_TICKET_REMOVER = "ssoTicketRemover";
+    public static final String BATCH_NAME_PROCESSED_SSO_TICKET_REMOVER = "remove used vendasta sso tickets";
+    public static final int VENDASTA_TICKET_EXPIRED = 1;
+
+
 }
