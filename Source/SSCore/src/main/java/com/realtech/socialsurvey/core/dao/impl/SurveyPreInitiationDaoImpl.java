@@ -816,7 +816,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
     
     @Override
-    public List<SurveyPreInitiation> getPreInitiatedSurveyForCompanyByCriteria( int start, int row, List<Long> userIds  , Timestamp startEngagementClosedTime , long companyId )
+    public List<SurveyPreInitiation> getPreInitiatedSurveyForCompanyByCriteria( int start, int row, List<Long> userIds  , Long startSurveyPreinitiationId, Timestamp startEngagementClosedTime , long companyId )
     {
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
 
@@ -835,6 +835,10 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         
         if(startEngagementClosedTime != null){
             criteria.add( Restrictions.ge( CommonConstants.ENGAGEMENT_CLOSED_TIME, startEngagementClosedTime ) );
+        }
+        
+        if(startSurveyPreinitiationId != null && startSurveyPreinitiationId > 0){
+            criteria.add( Restrictions.ge( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, startSurveyPreinitiationId ) );
         }
         
         criteria.addOrder( Order.desc( CommonConstants.MODIFIED_ON_COLUMN ) );
