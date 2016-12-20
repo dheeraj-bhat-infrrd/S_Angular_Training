@@ -38,9 +38,9 @@
 		function loadVendastaIframe() {
 			url = fetchVendastaUrl();
 			if (url == "" || url == undefined) {
-				$('#vendasta-iframe').hide();
-				$('#overlay-vendasta').hide();
-				$('#error-msg-vendasta').show();
+				document.getElementById("vendasta-loader").style.display = "none";
+				document.getElementById("vendasta-iframe").style.display = "none";
+				document.getElementById("error-msg-vendasta").style.display = "block";
 			} else {
 				$("#vendasta-iframe").attr("src", url);
 			}
