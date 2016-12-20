@@ -3,8 +3,10 @@ package com.realtech.socialsurvey.api.controllers;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -91,6 +93,15 @@ public class SurveyApiV2Controller
         String state = request.getParameter( "state" );
         String userEmailAddress = request.getParameter( "user" );
         String includeManagedTeamStr = request.getParameter( "includeManagedTeam" );
+        
+        Set<String> inputRequestParameters = request.getParameterMap().keySet();
+        List<String> fixReqParameters =  Arrays.asList("count" , "start" , "status" , "startSurveyID" , "startReviewDate" ,  "startTransactionDate" , "state" , "user" , "includeManagedTeam");
+        for(String currParameter : inputRequestParameters){
+        	if( ! fixReqParameters.contains(currParameter)){
+        		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Invalid Request. Wrong filter parameter used : " + currParameter , null, null,
+                        request );
+        	}
+        }
 
         int count = 1000;
         int start = 0;
@@ -131,9 +142,9 @@ public class SurveyApiV2Controller
         
         
         Long startSurveyID = null;
-		if (!StringUtils.isEmpty(startReviewDateStr)) {
+		if (!StringUtils.isEmpty(startSurveyIDStr)) {
 			try {
-				startSurveyID = Long.parseLong("startSurveyIDStr");
+				startSurveyID = Long.parseLong(startSurveyIDStr);
 			} catch (NumberFormatException e) {
 				return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter startReviewDate is invalid", null,null, request);
 			}
@@ -149,6 +160,7 @@ public class SurveyApiV2Controller
             }
         }
 
+        //startTransactionDate
         Date startTransactionDate = null;
         if ( startTransactionDateStr != null && !startTransactionDateStr.isEmpty() ) {
             try {
@@ -160,9 +172,20 @@ public class SurveyApiV2Controller
         }
         
         
+        //includeManagedTeam
         Boolean includeManagedTeam = null;
         if( ! StringUtils.isEmpty(includeManagedTeamStr)){
-            includeManagedTeam = Boolean.parseBoolean(includeManagedTeamStr);
+        	try{
+                includeManagedTeam = Boolean.parseBoolean(includeManagedTeamStr);
+        	}catch(NumberFormatException e){
+        		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter includeManagedTeam is invalid",
+                        null, null, request );
+        	}
+        	
+        	if(StringUtils.isEmpty( userEmailAddress )){
+        		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter userEmailAddress can not be empty if includeManagedTeam is used ",
+                        null, null, request );
+        	}
         }
 
         //get user
@@ -180,7 +203,7 @@ public class SurveyApiV2Controller
                 }
                 
             } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter user is invalid", null, null,
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter user "  + userEmailAddress + " is invalid", null, null,
                     request );
             }
         }
