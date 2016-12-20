@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -3740,7 +3741,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             Timestamp startEngagementClosedTime = null;
             if(startTransactionDate != null)
                 startEngagementClosedTime = new Timestamp( startTransactionDate.getTime() );
-            preInitiatedSurveys = surveyPreInitiationDao.getPreInitiatedSurveyForCompanyByCriteria( sqlStartIndex, sqlBatch, userIds , startEngagementClosedTime , companyId );
+            preInitiatedSurveys = surveyPreInitiationDao.getPreInitiatedSurveyForCompanyByCriteria( sqlStartIndex, sqlBatch, userIds , startSurveyID , startEngagementClosedTime , companyId );
         }else{
             preInitiatedSurveys = new ArrayList<SurveyPreInitiation>();
         }
@@ -3805,7 +3806,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyDetails> surveyDetails )
     {
         LOG.debug( "method getPreinititatedSurveyForMongoSurveyDetail started" );
-        Map<SurveyDetails, SurveyPreInitiation> surveyReviewMap = new HashMap<SurveyDetails, SurveyPreInitiation>();
+        Map<SurveyDetails, SurveyPreInitiation> surveyReviewMap = new LinkedHashMap<SurveyDetails, SurveyPreInitiation>();
         List<Long> surveyPreinitiationIds = new ArrayList<Long>();
 
         for ( SurveyDetails surveyDetail : surveyDetails ) {
