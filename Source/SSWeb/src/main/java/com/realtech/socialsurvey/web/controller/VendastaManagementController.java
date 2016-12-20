@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.VendastaProductSettings;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -45,13 +44,15 @@ public class VendastaManagementController
 
     @Autowired
     OrganizationManagementService organizationManagementService;
-    
+
     @Autowired
     VendastaManagementService vendastaManagementService;
 
     @Autowired
     MessageUtils messageUtils;
 
+
+    // updates the boolean value vendastaAccessible in mongo for every hierarchy
 
     @RequestMapping ( value = "/updatevendastaaccesssetting", method = RequestMethod.POST)
     @ResponseBody
@@ -61,7 +62,6 @@ public class VendastaManagementController
         HttpSession session = request.getSession();
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-
         try {
             String hasVendastaAcess = request.getParameter( "hasVendastaAcess" );
             boolean isVendastaAcessible = false;
@@ -70,26 +70,10 @@ public class VendastaManagementController
 
             if ( hasVendastaAcess != null && !hasVendastaAcess.isEmpty() ) {
                 isVendastaAcessible = Boolean.parseBoolean( hasVendastaAcess );
-
-                if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
-                    unitSettings = organizationManagementService.getCompanySettings( entityId );
-
-                } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
-                    unitSettings = organizationManagementService.getRegionSettings( entityId );
-
-                } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
-                    unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
-
-                } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
-                    unitSettings = organizationManagementService.getAgentSettings( entityId );
-
-                } else {
-                    throw new InvalidInputException( "Invalid Collection Type" );
-                }
+                Map<String, Object> hierarchyDetails = vendastaManagementService.getUnitSettingsForAHierarchy( entityType,
+                    entityId );
+                unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
+                collectionName = (String) hierarchyDetails.get( "collectionName" );
                 if ( unitSettings == null )
                     throw new Exception();
                 else {
@@ -111,6 +95,7 @@ public class VendastaManagementController
     }
 
 
+    //method to prepare jsp to add or update vendasta account Id
     @RequestMapping ( value = "/showvendastasettings")
     public String showVendastaSettings( Model model, HttpServletRequest request )
     {
@@ -130,20 +115,9 @@ public class VendastaManagementController
             try {
                 OrganizationUnitSettings unitSettings = null;
                 if ( columnName != null && columnValue != null ) {
-                    if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
-                        unitSettings = organizationManagementService.getCompanySettings( columnValue );
-
-                    } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
-                        unitSettings = organizationManagementService.getRegionSettings( columnValue );
-
-                    } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
-                        unitSettings = organizationManagementService.getBranchSettingsDefault( columnValue );
-
-                    } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
-                        unitSettings = organizationManagementService.getAgentSettings( columnValue );
-                    } else {
-                        throw new InvalidInputException( "Invalid Collection Type" );
-                    }
+                    Map<String, Object> hierarchyDetails = vendastaManagementService.getUnitSettingsForAHierarchy( columnName,
+                        columnValue );
+                    unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
                     if ( unitSettings.getVendasta_rm_settings() != null
                         && unitSettings.getVendasta_rm_settings().getAccountId() != null )
                         model.addAttribute( "accountId", unitSettings.getVendasta_rm_settings().getAccountId() );
@@ -164,6 +138,7 @@ public class VendastaManagementController
     }
 
 
+    // method to add or update vendasta accountId from the jsp entered in the browser    
     @RequestMapping ( value = "/updatevendastasettings", method = RequestMethod.POST)
     @ResponseBody
     public String updateVendastaSettings( HttpServletRequest request )
@@ -178,21 +153,10 @@ public class VendastaManagementController
             Long columnValue = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             OrganizationUnitSettings unitSettings = null;
             if ( columnName != null && columnValue != null ) {
-                if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
-                    unitSettings = organizationManagementService.getCompanySettings( columnValue );
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
-                } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
-                    unitSettings = organizationManagementService.getRegionSettings( columnValue );
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
-                } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
-                    unitSettings = organizationManagementService.getBranchSettingsDefault( columnValue );
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
-                } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
-                    unitSettings = organizationManagementService.getAgentSettings( columnValue );
-                    collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
-                } else {
-                    throw new InvalidInputException( "Invalid Collection Type" );
-                }
+                Map<String, Object> hierarchyDetails = vendastaManagementService.getUnitSettingsForAHierarchy( columnName,
+                    columnValue );
+                unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
+                collectionName = (String) hierarchyDetails.get( "collectionName" );
                 String accountId = request.getParameter( "accountId" );
                 VendastaProductSettings settings = new VendastaProductSettings();
                 if ( accountId != null && !accountId.isEmpty() ) {
@@ -217,6 +181,7 @@ public class VendastaManagementController
     }
 
 
+    //method to check if a perticular hierarchy entity has  vendasta access for the session
     @RequestMapping ( value = "/isvendastaaccessibleforthesession")
     @ResponseBody
     public String isVendastaAccessible( Model model, HttpServletRequest request )
@@ -237,6 +202,7 @@ public class VendastaManagementController
     }
 
 
+    // method to fetch vendasata product url from mongo for a perticular hierarchy entity
     @RequestMapping ( value = "/fetchvendastaurl")
     @ResponseBody
     public String fetchVendastaUrl( Model model, HttpServletRequest request )
@@ -257,21 +223,9 @@ public class VendastaManagementController
             try {
                 OrganizationUnitSettings unitSettings = null;
                 if ( columnName != null && columnValue != null ) {
-                    if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
-                        unitSettings = organizationManagementService.getCompanySettings( columnValue );
-
-                    } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
-                        unitSettings = organizationManagementService.getRegionSettings( columnValue );
-
-                    } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
-                        unitSettings = organizationManagementService.getBranchSettingsDefault( columnValue );
-
-                    } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
-                        unitSettings = organizationManagementService.getAgentSettings( columnValue );
-                    } else {
-                        throw new InvalidInputException( "Invalid Collection Type" );
-                    }
-
+                    Map<String, Object> hierarchyDetails = vendastaManagementService.getUnitSettingsForAHierarchy( columnName,
+                        columnValue );
+                    unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
                     responseMap.put( "url", productUrl );
                     responseMap.put( "ssoToken", unitSettings.getVendasta_rm_settings().getAccountId() );
                     responseMap.put( "status", "success" );

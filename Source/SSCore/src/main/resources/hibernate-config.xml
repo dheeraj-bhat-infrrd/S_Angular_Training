@@ -86,6 +86,7 @@
 				<value>com.realtech.socialsurvey.core.entities.CrmBatchTrackerHistory</value>
 				<value>com.realtech.socialsurvey.core.entities.Event</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyHiddenNotification</value>
+				<value>com.realtech.socialsurvey.core.entities.VendastaSingleSignOnTicket</value>
 			</list>
 		</property>
 	</bean>
