@@ -10,10 +10,10 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 
-public class SurveySourceIdUpdater extends QuartzJobBean
+public class SurveyTransactionDateUpdater extends QuartzJobBean
 {
 
-    public static final Logger LOG = LoggerFactory.getLogger( SurveySourceIdUpdater.class );
+    public static final Logger LOG = LoggerFactory.getLogger( SurveyTransactionDateUpdater.class );
 
     private SurveyHandler surveyHandler;
 
@@ -23,7 +23,7 @@ public class SurveySourceIdUpdater extends QuartzJobBean
     {
         LOG.info( "Survey Source Id updater started" );
         initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
-        surveyHandler.updateSurveySourceIdInMongo();
+        surveyHandler.updateSurveyTransactionDateInMongo();
         LOG.info( "Survey Source Id updater finished" );
     }
 

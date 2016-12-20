@@ -3705,12 +3705,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     @Transactional
-    public SurveysAndReviewsVO getSurveysByFilterCriteria( String status,  String mood , Date startReviewDate , Date startTransactionDate,  List<Long> userIds ,  int startIndex, int count, long companyId )
+    public SurveysAndReviewsVO getSurveysByFilterCriteria( String status,  String mood ,  Long startSurveyID, Date startReviewDate , Date startTransactionDate,  List<Long> userIds ,  int startIndex, int count, long companyId )
     {
         LOG.debug( "method getSurveysByStatus started for companyId " + companyId );
 
         //get mongo survey count
-        int mongoSurveyCount = getSurveyCountForCompanyBySurveyStatus( companyId, status , mood , startReviewDate , startTransactionDate , userIds );
+        int mongoSurveyCount = getSurveyCountForCompanyBySurveyStatus( companyId, status , mood , startSurveyID , startReviewDate , startTransactionDate , userIds );
         int endIndex = startIndex + count;
 
         //get start index and batch size for mongo and sql get survey query
@@ -3724,7 +3724,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         //get survey from mongo
         List<SurveyDetails> surveyDetails = null;
         if ( mongoBatch > 0 )
-            surveyDetails = getSurveysForCompanyBySurveyStatus( companyId, status, monogStartIndex, mongoBatch , mood , startReviewDate , startTransactionDate , userIds );
+            surveyDetails = getSurveysForCompanyBySurveyStatus( companyId, status, monogStartIndex, mongoBatch , mood , startSurveyID , startReviewDate , startTransactionDate , userIds );
         else
             surveyDetails = new ArrayList<SurveyDetails>();
 
@@ -3764,11 +3764,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @param userIds
      * @return
      */
-    private int getSurveyCountForCompanyBySurveyStatus( long companyId, String status , String mood , Date startReviewDate , Date startTransactionDate , List<Long> userIds  )
+    private int getSurveyCountForCompanyBySurveyStatus( long companyId, String status , String mood ,  Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds  )
     {
         LOG.debug( "method getSurveyCountForCompanyBySurveyStatus started for companyId %s , status %s ", companyId, status );
 
-        long mongoSurveyCount = surveyDetailsDao.getFilteredSurveyCount( companyId , status , mood, startReviewDate , startTransactionDate , userIds);
+        long mongoSurveyCount = surveyDetailsDao.getFilteredSurveyCount( companyId , status , mood, startSurveyID , startReviewDate , startTransactionDate , userIds);
         
         LOG.debug( "method getSurveyCountForCompanyBySurveyStatus ended for companyId %s , status %s ", companyId, status );
 
@@ -3784,11 +3784,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @param batchSize
      * @return
      */
-    private List<SurveyDetails> getSurveysForCompanyBySurveyStatus( long companyId, String status, int start, int batchSize , String mood , Date startReviewDate , Date startTransactionDate, List<Long> userIds   )
+    private List<SurveyDetails> getSurveysForCompanyBySurveyStatus( long companyId, String status, int start, int batchSize , String mood , Long startSurveyID , Date startReviewDate , Date startTransactionDate, List<Long> userIds   )
     {
         LOG.debug("method getSurveysForCompanyBySurveyStatus started for companyId %s , startIndex %s , batchSize %s , status %s ",
             companyId, start, batchSize, status );
-        List<SurveyDetails> surveyDetails = surveyDetailsDao.getFilteredSurveys( start, batchSize, companyId , status, mood, startReviewDate , startTransactionDate , userIds);
+        List<SurveyDetails> surveyDetails = surveyDetailsDao.getFilteredSurveys( start, batchSize, companyId , status, mood, startSurveyID , startReviewDate , startTransactionDate , userIds);
          
         LOG.debug( "method getSurveysForCompanyBySurveyStatus ended for companyId %s , startIndex %s , batchSize %s , status %s ",
             companyId, start, batchSize, status );
@@ -3897,7 +3897,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     @Transactional
-    public void updateSurveySourceIdInMongo()
+    public void updateSurveyTransactionDateInMongo()
     {
         try {
             int batch = 1000;
@@ -3927,10 +3927,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
                     for ( SurveyDetails survey : surveys1 ) {
                         if ( surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ) != null ) {
-                            String sourceId = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getSurveySourceId();
-                            if ( !StringUtils.isEmpty( sourceId ) && StringUtils.isEmpty( survey.getSourceId() ) ) {
-                                survey.setSourceId( sourceId );
-                                surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( survey );
+                            Timestamp engagementClosedTime = surveyPreInitiations.get( survey.getSurveyPreIntitiationId() ).getEngagementClosedTime();
+                            if ( engagementClosedTime != null  ) {
+                                survey.setSurveyTransactionDate( engagementClosedTime );
+                                surveyDetailsDao.updateTransactionDateInExistingSurveyDetails( survey );
                             }
                         }
                     }
@@ -3941,10 +3941,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     List<SurveyPreInitiation> spis = surveyPreInitiationDao
                         .getSurveyByAgentIdAndCustomeEmail( survey.getAgentId(), survey.getCustomerEmail() );
                     if ( spis.size() == 1 ) {
-                        if ( !StringUtils.isEmpty( spis.get( 0 ).getSurveySourceId() )
-                            && StringUtils.isEmpty( survey.getSourceId() ) ) {
-                            survey.setSourceId( spis.get( 0 ).getSurveySourceId() );
-                            surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( survey );
+                        if ( spis.get( 0 ).getSurveySourceId() != null) {
+                            survey.setSurveyTransactionDate( spis.get( 0 ).getEngagementClosedTime() );
+                            surveyDetailsDao.updateTransactionDateInExistingSurveyDetails( survey );
                         }
                     }
                 }

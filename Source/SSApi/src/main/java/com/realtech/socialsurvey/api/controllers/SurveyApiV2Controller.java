@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -84,10 +85,12 @@ public class SurveyApiV2Controller
         String countStr = request.getParameter( "count" );
         String startStr = request.getParameter( "start" );
         String status = request.getParameter( "status" );
+        String startSurveyIDStr = request.getParameter("startSurveyID");
         String startReviewDateStr = request.getParameter( "startReviewDate" );
         String startTransactionDateStr = request.getParameter( "startTransactionDate" );
         String state = request.getParameter( "state" );
         String userEmailAddress = request.getParameter( "user" );
+        String includeManagedTeamStr = request.getParameter( "includeManagedTeam" );
 
         int count = 1000;
         int start = 0;
@@ -125,7 +128,17 @@ public class SurveyApiV2Controller
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter state is invalid", null, null,
                 request );
         }
-
+        
+        
+        Long startSurveyID = null;
+		if (!StringUtils.isEmpty(startReviewDateStr)) {
+			try {
+				startSurveyID = Long.parseLong("startSurveyIDStr");
+			} catch (NumberFormatException e) {
+				return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter startReviewDate is invalid", null,null, request);
+			}
+		}
+        
         Date startReviewDate = null;
         if ( startReviewDateStr != null && !startReviewDateStr.isEmpty() ) {
             try {
@@ -145,6 +158,12 @@ public class SurveyApiV2Controller
                     null, null, request );
             }
         }
+        
+        
+        Boolean includeManagedTeam = null;
+        if( ! StringUtils.isEmpty(includeManagedTeamStr)){
+            includeManagedTeam = Boolean.parseBoolean(includeManagedTeamStr);
+        }
 
         //get user
         List<Long> userIds = null;
@@ -153,6 +172,13 @@ public class SurveyApiV2Controller
                 User user = userManagementService.getUserByEmail( userEmailAddress );
                 userIds = new ArrayList<Long>();
                 userIds.add( user.getUserId() );
+                
+                //if includeManagedTeam is present than get all the users under the given user 
+                if(includeManagedTeam != null && includeManagedTeam == true){
+                	Set<Long> agentIds = userManagementService.getUserIdsUnderAdmin(user);
+                	userIds.addAll(agentIds);
+                }
+                
             } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter user is invalid", null, null,
                     request );
@@ -160,7 +186,7 @@ public class SurveyApiV2Controller
         }
 
         //get data from database
-        SurveysAndReviewsVO surveysAndReviewsVO = surveyHandler.getSurveysByFilterCriteria( status, state, startReviewDate,
+        SurveysAndReviewsVO surveysAndReviewsVO = surveyHandler.getSurveysByFilterCriteria( status, state, startSurveyID , startReviewDate,
             startTransactionDate, userIds, start, count, companyId );
 
         //create vo object
