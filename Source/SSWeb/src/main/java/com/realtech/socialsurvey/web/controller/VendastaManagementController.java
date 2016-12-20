@@ -227,8 +227,13 @@ public class VendastaManagementController
                         columnValue );
                     unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
                     responseMap.put( "url", productUrl );
-                    responseMap.put( "ssoToken", unitSettings.getVendasta_rm_settings().getAccountId() );
-                    responseMap.put( "status", "success" );
+                    if ( unitSettings.getVendasta_rm_settings() != null
+                        && unitSettings.getVendasta_rm_settings().getAccountId() != null ) {
+                        responseMap.put( "ssoToken", unitSettings.getVendasta_rm_settings().getAccountId() );
+                        responseMap.put( "status", "success" );
+                    } else {
+                        responseMap.put( "status", "failed" );
+                    }
                 }
             } catch ( InvalidInputException | NoRecordsFetchedException error ) {
                 responseMap.put( "status", "failed" );
