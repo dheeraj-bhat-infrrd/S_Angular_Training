@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2822,15 +2823,48 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * Method to fetch survey details on the basis of agentId and customer email.
      */
     @Override
-    public List<SurveyDetails> getCompletedSurveyByStartIndexAndBatchSize( int start, int batchSize, long companyId )
+    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId , String status, String mood , Long startSurveyID , Date startReviewDate , Date startTransactionDate , List<Long> userIds )
     {
         LOG.debug( "Method getSurveyByStartIndexAndStatus() started." );
+        
         Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        //add company id criteria
+        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+
+        
+        // add status criteria
+        if ( status.equals( "complete" ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ));
+        } else if ( status.equals( "incomplete" ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        } else if ( status.equals( "all" ) ) {
+
+        }
+        
+        //add mood criteria
+        if( ! StringUtils.isEmpty( mood )){
+            query.addCriteria( Criteria.where( CommonConstants.MOOD_COLUMN ).is( mood ));
+        }
+        
+        //add survey id criteria
+        if(startSurveyID != null && startSurveyID > 0l)
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN).gte( startSurveyID));
+
+        
+        // review date criteria
+        if(startReviewDate != null)
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startReviewDate ) );
+        
+        // transaction date criteria
+        if(startTransactionDate != null)
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_TRANSACTION_DATE_COLUMN ).gte( startTransactionDate ) );
+        
+        //user id criteria
+        if(userIds != null)
+            query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).in( userIds));
 
         //get the oldest record
-        query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
-        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+        query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
 
         if ( start > 0 )
             query.skip( start );
@@ -2846,98 +2880,52 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public List<SurveyDetails> getIncompleteSurveyByStartIndexAndBatchSize( int start, int batchSize, long companyId )
-    {
-        LOG.debug( "Method getSurveyByStartIndexAndStatus() started." );
-        Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
-
-        //get the oldest record
-        query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
-
-        if ( start > 0 )
-            query.skip( start );
-
-        if ( batchSize > 0 )
-            query.limit( batchSize );
-
-        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
-
-        LOG.debug( "Method getSurveyByStartIndexAndStage() " );
-        return surveys;
-    }
-
-
-    @Override
-    public List<SurveyDetails> getSurveysForCompanyByStartIndex( int start, int batchSize, long companyId )
-    {
-        LOG.debug( "Method getSurveyByStartIndexAndStatus() started." );
-        Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
-
-        //get the oldest record
-        query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
-
-        if ( start > 0 )
-            query.skip( start );
-
-        if ( batchSize > 0 )
-            query.limit( batchSize );
-
-        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
-
-        LOG.debug( "Method getSurveyByStartIndexAndStage() " );
-        return surveys;
-    }
-
-
-    @Override
-    public Long getCompletedSurveyCount( long companyId )
+    public Long getFilteredSurveyCount( long companyId  , String status  , String mood,  Long startSurveyID, Date startReviewDate , Date startTransactionDate ,List<Long> userIds )
     {
         LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );
 
-        Query query = new Query( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-
+        Query query = new Query( );
+        //add company id criteria
         query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
 
+        
+        // add status criteria
+        if(status != null){
+            if ( status.equals( "complete" ) ) {
+                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ));
+            } else if ( status.equals( "incomplete" ) ) {
+                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+            } else if ( status.equals( "all" ) ) {
 
+            }
+        }
+                
+        //add mood criteria
+        if( ! StringUtils.isEmpty( mood )){
+            query.addCriteria( Criteria.where( CommonConstants.MOOD_COLUMN ).is( mood ));
+        }
+        
+        //add survey id criteria
+        if(startSurveyID != null && startSurveyID > 0l)
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN).gte( startSurveyID));
+
+        // transaction date criteria
+        if(startTransactionDate != null)
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_TRANSACTION_DATE_COLUMN ).gte( startTransactionDate ) );
+
+        // review date criteria
+        if(startReviewDate != null)
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN).gte( startReviewDate ) );
+
+        //user id criteria
+        if(userIds != null)
+            query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).in( userIds));
+        
         LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished." );
         return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
 
     }
 
-
-    @Override
-    public Long getSurveysCountForCompany( long companyId )
-    {
-        LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );
-
-        Query query = new Query();
-
-        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
-
-
-        LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished." );
-        return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
-
-    }
-
-
-    @Override
-    public Long getIncompleteSurveyCount( long companyId )
-    {
-        LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );
-
-        Query query = new Query( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-
-        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
-
-
-        LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished." );
-        return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
-
-    }
 
 
     @Override
@@ -3089,8 +3077,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.limit( rows );
         }
         query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN )
-            .nin( Arrays.asList( "Zillow", "admin", "customer", "agent", "user", "SocialSurvey", "upload" ) ) );
-        query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_ID_COLUMN ).is( null ) );
+            .nin( Arrays.asList( "Zillow" ) ) );
+       // query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_ID_COLUMN ).is( null ) );
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
 
         return surveys;
@@ -3107,4 +3095,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.SURVEY_SOURCE_ID_COLUMN, survey.getSourceId() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
     }
+    
+    
+    
+    @Override
+    public void updateTransactionDateInExistingSurveyDetails( SurveyDetails surveyDetails )
+    {
+        String surveyMongoId = surveyDetails.get_id();
+        LOG.info( "Method updateTransactionDateInExistingSurveyDetails() to update source id started " );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
+        Update update = new Update();
+        update.set( CommonConstants.SURVEY_TRANSACTION_DATE_COLUMN, surveyDetails.getSurveyTransactionDate());
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateTransactionDateInExistingSurveyDetails finished." );
+    }
+    
 }

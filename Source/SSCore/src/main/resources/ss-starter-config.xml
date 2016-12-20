@@ -289,6 +289,18 @@
 		<property name="durability" value="true" />
 	</bean>
 
+	<!-- vendasta ticket job detail -->
+	<bean id="deleteUsedVendastaTickets"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.UsedVendastaTicketRemover" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="vendastaManagementService" value-ref="vendastaManagementService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- Setting dotloop job detail -->
 	<bean id="dotloopjobdetail"
@@ -412,7 +424,7 @@
 	<bean id="surveysourceidupdater"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.SurveySourceIdUpdater" />
+			value="com.realtech.socialsurvey.core.starter.SurveyTransactionDateUpdater" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="surveyHandler" value-ref="surveyHandler" />
@@ -641,6 +653,12 @@
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
 	</bean>
+	
+	<bean id="deleteUsedVendastaTicketscron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="deleteUsedVendastaTickets" />
+		<property name="cronExpression" value="0 0 0/1 1/1 * ?" />
+	</bean>
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -670,10 +688,11 @@
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<ref bean="zillowreviewprocessandautopostjobdetail" />
 				<ref bean="surveyimporterjobdetail" />
+				<!-- <ref bean="deleteUsedVendastaTickets" />-->
 				<!-- <ref bean="remaxEntitiesTransfer" /> -->
 				<!-- <ref bean="updateExistingCompanyPrice" /> -->
 				<!-- <ref bean="hideUsersFromSearch" />	-->
-				<!-- <ref bean="surveysourceidupdater" />-->			
+				<ref bean="surveysourceidupdater" />			
 			</list>
 		</property>
 
@@ -707,7 +726,8 @@
 				<!-- <ref bean="remaxEntitiesTransfercron" /> -->
 				<!-- <ref bean="updateExistingCompanyPricecron" /> -->
 				<!-- <ref bean="hideUsersFromSearchcron" /> -->
-				<!-- <ref bean="surveysourceidupdatercron" /> -->
+				<!--  <ref bean="deleteUsedVendastaTicketscron" />-->	
+				 <ref bean="surveysourceidupdatercron" /> 
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -831,4 +851,9 @@
 	<!-- Image processing bean -->
 	<bean id="imageProcessor"
 		class="com.realtech.socialsurvey.core.utils.images.impl.ImageProcessorImpl" />
+	
+	<!-- dependency for deleteUsedVendastaTickets -->	
+	<bean id="vendastaManagementService" 
+		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.VendastaManagementServiceImpl" />
+		
 </beans>

@@ -527,9 +527,6 @@ public interface UserManagementService
     public UserProfile getAgentUserProfileForUserId( long userId ) throws InvalidInputException;
 
 
-    public List<User> getUsersByEmailId( String emailId ) throws InvalidInputException;
-
-
     public void restoreDeletedUser( long userId, boolean restoreSocial ) throws InvalidInputException, SolrException;
 
 
@@ -616,5 +613,8 @@ public interface UserManagementService
     public void updateStatusOfUserApiKey( long userApiKeyId, int status ) throws NoRecordsFetchedException;
 
     public List<Long> getExcludedUserIds();
+
+
+    public Set<Long> getUserIdsUnderAdmin( User adminUser ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

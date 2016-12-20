@@ -7,11 +7,12 @@
 <script src="${initParam.resourcesPath}/resources/js/jquery.cookie.js"></script>
 <script type="text/javascript">
 var hiddenSection = false;
+var vendastaAccess = false;
 $(document).ready(function() {
 	callAjaxGetWithPayloadData("/ishiddensection.do", function(data) {
 		hiddenSection = data;
 	});
-	
+		
 	// Show popup if any active session found
 	var activeSessionFound = "${activeSessionFound}";
 	if (activeSessionFound == "true") {
@@ -19,6 +20,11 @@ $(document).ready(function() {
 	} else {
 		landingFlow();
 	}
+	callAjaxGetWithPayloadData("/isvendastaaccessibleforthesession.do", function(data) {
+		vendastaAccess = data;
+		showOrHideReviewsMonitor( vendastaAccess );
+		showOrHideVendastaProductSettings( vendastaAccess );
+	});
 });
 
 function landingFlow() {

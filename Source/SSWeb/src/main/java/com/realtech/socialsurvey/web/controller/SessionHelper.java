@@ -22,15 +22,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.UserProfileComparator;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
@@ -521,6 +525,7 @@ public class SessionHelper {
 			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, CommonConstants.PROFILE_AGENT_VIEW);
 			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.AGENT_ID_COLUMN);
 			session.setAttribute(CommonConstants.USER_ASSIGNMENTS, assignments);
+			session.setAttribute( MongoOrganizationUnitSettingDaoImpl.KEY_VENDASTA_ACCESS, false );
 			return assignments;
 		}
 
@@ -611,32 +616,44 @@ public class SessionHelper {
 			assignments.setRegions(regionsMapUser);
 			assignments.setBranches(branchesMapUser);
 		}
-
+		
 		if (user.isAgent()) {
 			Map<Long, String> agents = new HashMap<Long, String>();
 			agents.put(user.getUserId(), CommonConstants.PROFILE_AGENT_VIEW);
 			assignments.setAgents(agents);
-
+			
 			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, user.getUserId());
 			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, CommonConstants.PROFILE_AGENT_VIEW);
 			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.AGENT_ID_COLUMN);
+			
+	        OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );             
+	        session.setAttribute(CommonConstants.VENDASTA_ACCESS, agentSettings.isVendastaAccessible() ); 
 		}
 		else if (user.isCompanyAdmin()) {
 			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, company.getCompanyId());
 			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, company.getCompany());
 			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.COMPANY_ID_COLUMN);
+			
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( company.getCompanyId() );
+	        session.setAttribute(CommonConstants.VENDASTA_ACCESS, companySettings.isVendastaAccessible() ); 
 		}
 		else if (assignments.getRegions() != null && !assignments.getRegions().isEmpty()) {
 			Map.Entry<String, String> entry = (Map.Entry<String, String>) assignments.getRegions().entrySet().toArray()[0];
 			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entry.getKey());
 			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entry.getValue());
 			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.REGION_ID_COLUMN);
+			
+			OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( Long.parseLong( entry.getKey() ) );
+	        session.setAttribute(CommonConstants.VENDASTA_ACCESS, regionSettings.isVendastaAccessible() ); 
 		}
 		else if (assignments.getBranches() != null && !assignments.getBranches().isEmpty()) {
 			Map.Entry<String, String> entry = (Map.Entry<String, String>) assignments.getBranches().entrySet().toArray()[0];
 			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entry.getKey());
 			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entry.getValue());
 			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.BRANCH_ID_COLUMN);
+			
+	        BranchSettings branchSettings = organizationManagementService.getBranchSettings( Long.parseLong( entry.getKey() ) );
+	        session.setAttribute(CommonConstants.VENDASTA_ACCESS, branchSettings.getOrganizationUnitSettings().isVendastaAccessible() ); 
 		}
 		session.setAttribute(CommonConstants.USER_ASSIGNMENTS, assignments);
 
@@ -646,22 +663,36 @@ public class SessionHelper {
 
 	public void updateSelectedProfile(HttpSession session, long entityId, String entityType) {
 		String entityName = "";
+		OrganizationUnitSettings unitSettings = null;
 		UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
-		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-			entityName = assignments.getCompanies().get(entityId);
-		}
-		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-			entityName = assignments.getRegions().get(entityId);
-		}
-		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-			entityName = assignments.getBranches().get(entityId);
-		}
-		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
-			entityName = assignments.getAgents().get(entityId);
+		
+		try{
+    		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+    			entityName = assignments.getCompanies().get(entityId);
+    			unitSettings = organizationManagementService.getCompanySettings( entityId );
+    		}
+    		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+    			entityName = assignments.getRegions().get(entityId);
+    	        unitSettings = organizationManagementService.getRegionSettings( entityId );
+    
+    		}
+    		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+    			entityName = assignments.getBranches().get(entityId);
+    	        unitSettings = organizationManagementService.getBranchSettings( entityId ).getOrganizationUnitSettings();
+    		}
+    		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+    			entityName = assignments.getAgents().get(entityId);
+    	        unitSettings = organizationManagementService.getAgentSettings( entityId );
+    		}
+		}catch( Exception error ){
+		      session.setAttribute( CommonConstants.VENDASTA_ACCESS, false );
 		}
 
 		session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, entityType);
 		session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entityId);
 		session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entityName);
+		if( unitSettings != null ){
+		    session.setAttribute( CommonConstants.VENDASTA_ACCESS, unitSettings.isVendastaAccessible() );
+		}
 	}
 }

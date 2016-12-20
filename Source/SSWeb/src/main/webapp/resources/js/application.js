@@ -1848,6 +1848,11 @@ $(document).on('click', '.da-dd-item', function(e) {
 		showDashOverlay('#social-media-dash');
 		var selectedTab = window.location.hash.split("#")[1];
 		showMainContent('./' + selectedTab + '.do');
+		callAjaxGetWithPayloadData("/isvendastaaccessibleforthesession.do", function(data) {
+			vendastaAccess = JSON.parse(data);
+			showOrHideReviewsMonitor( vendastaAccess );
+			showOrHideVendastaProductSettings( vendastaAccess );
+		});
 	});
 });
 
@@ -4425,6 +4430,17 @@ function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disabl
 	};
 	
 	callAjaxPostWithPayloadData("./updateautopostlinktousersiteforsurvey.do",function(data) {
+		if (data == "success") $('#overlay-toast').html("Content updated successfully");
+	}, payload, true, disableEle);
+	
+}
+
+function updateVendastaAccessSetting(hasVendastaAcess, disableEle) {
+	var payload = {
+		"hasVendastaAcess" : hasVendastaAcess
+	};
+	
+	callAjaxPostWithPayloadData("./updatevendastaaccesssetting.do",function(data) {
 		if (data == "success") $('#overlay-toast').html("Content updated successfully");
 	}, payload, true, disableEle);
 	
@@ -9084,6 +9100,23 @@ $(document).on('click', '.hdr-link-item-dropdown-item', function(e) {
 	showOverlay();
 });
 
+$(document).on('click', '#hdr-sm-settings-dropdown', function(e) {
+	$('#hdr-link-item-dropdown-sm').toggle();
+});
+
+$(document).on('mouseover', '#hdr-link-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').show();
+});
+
+$(document).on('mouseout', '#hdr-link-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').hide();
+});
+
+$(document).on('click', '.hdr-link-item-dropdown-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').hide();
+	showOverlay();
+});
+
 // Help page onclick function
 $(document).on('click', '#send-help-mail-button', function() {
 	var subject = "";
@@ -9793,6 +9826,48 @@ $('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
 		updateAutoPostLinkToUserSiteSetting(false, '#atpst-lnk-usr-ste-chk-box');
 	}
 });
+
+$('body').on('click', '#vndsta-access-chk-box', function() {
+	if ($('#vndsta-access-chk-box').hasClass('bd-check-img-checked')) {
+		$('#vndsta-access-chk-box').removeClass('bd-check-img-checked');
+		showOrHideReviewsMonitor( true );
+		showOrHideVendastaProductSettings( true );
+		updateVendastaAccessSetting(true, '#vndsta-access-chk-box');
+	} else {
+		$('#vndsta-access-chk-box').addClass('bd-check-img-checked');
+		showOrHideReviewsMonitor( false );
+		showOrHideVendastaProductSettings( false );
+		updateVendastaAccessSetting(false, '#vndsta-access-chk-box');
+	}
+});
+
+function showOrHideReviewsMonitor(vendastaAccess)
+{
+	if( vendastaAccess == true || vendastaAccess == "true" )
+		{
+		$("#reviews-monitor-main").show();
+		$("#reviews-monitor-slider").show();
+		}
+	else{
+		$("#reviews-monitor-main").hide();
+		$("#reviews-monitor-slider").hide();
+	}
+}
+
+function showOrHideVendastaProductSettings(flag)
+{	
+	if( flag == true || flag == "true" )
+	{
+		$("#vndsta-setting-one").show();
+		$("#vndsta-setting-two").show();
+		$("#vndsta-setting-three").show();
+	}
+	else{
+		$("#vndsta-setting-one").hide();
+		$("#vndsta-setting-two").hide();
+		$("#vndsta-setting-three").hide();
+	}	
+}
 
 // Dashboard fb and twitter share
 function getDashboardImageandCaption(loop) {

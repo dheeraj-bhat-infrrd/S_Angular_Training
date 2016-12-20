@@ -21,7 +21,7 @@ public class SecurityConfig extends ResourceServerConfigurerAdapter {
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-
+	    
 		http.addFilterBefore(new SimpleCORSFilter(), ChannelProcessingFilter.class).authorizeRequests()
 				.antMatchers("/**").permitAll();
 	}
