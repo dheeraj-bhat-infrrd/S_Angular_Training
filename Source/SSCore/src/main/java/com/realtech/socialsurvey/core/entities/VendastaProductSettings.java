@@ -6,7 +6,6 @@ package com.realtech.socialsurvey.core.entities;
 public class VendastaProductSettings
 {
 
-    public static final String PRODUCT_ID = "RM";
     private String accountId;
 
 

@@ -74,7 +74,7 @@
 								<div class="float-left bd-check-txt">Allow autopost link to the user's website</div>
 							</div>
 							</c:if>
-							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName != 'agentId' }">
+							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName != 'agentId' and accountMasterId != 1 }">
 							<div>
 								<div id="vndsta-access-chk-box" class="float-left bd-check-img"></div>
 								<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
