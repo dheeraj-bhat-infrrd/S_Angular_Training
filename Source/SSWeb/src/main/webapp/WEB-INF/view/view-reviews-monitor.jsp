@@ -27,8 +27,8 @@
 		var url = "";
 		$(document).ready(function() {
 			$(document).attr("title", "Reviews Monitor");
-			var myIframe = document.getElementById('vendasta-iframe');
-			myIframe.addEventListener("load", function() {
+			var iframe = document.getElementById('vendasta-iframe');
+			iframe.addEventListener("load", function() {
 				showFrame();
 			});
 			loadVendastaIframe();
