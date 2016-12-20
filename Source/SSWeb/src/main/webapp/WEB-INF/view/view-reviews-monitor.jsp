@@ -17,7 +17,8 @@
 		</div>
 	</div>
 	<div class="vendasta-container">
-		<iframe id="vendasta-iframe" height="600px" width="100%">
+		<div id="vendasta-loader" class="overlay-vendasta"></div>
+		<iframe id="vendasta-iframe" height="600px" width="100%" class="hide">
 			Vendasta Integration </iframe>
 		<div id="error-msg-vendasta" class="access-cont hide">You do not
 			have access to this resource.</div>
@@ -26,13 +27,19 @@
 		var url = "";
 		$(document).ready(function() {
 			$(document).attr("title", "Reviews Monitor");
+			var myIframe = document.getElementById('vendasta-iframe');
+			myIframe.addEventListener("load", function() {
+				showFrame();
+			});
 			loadVendastaIframe();
 		});
+
 		//load Reviews monitor Iframe with Vendasta product URL
 		function loadVendastaIframe() {
 			url = fetchVendastaUrl();
 			if (url == "" || url == undefined) {
 				$('#vendasta-iframe').hide();
+				$('#overlay-vendasta').hide();
 				$('#error-msg-vendasta').show();
 			} else {
 				$("#vendasta-iframe").attr("src", url);
@@ -50,5 +57,11 @@
 				}
 			}, payload, false);
 			return url;
+		}
+
+		function showFrame() {
+			document.getElementById("vendasta-loader").style.display = "none";
+			document.getElementById("error-msg-vendasta").style.display = "none";
+			document.getElementById("vendasta-iframe").style.display = "block";
 		}
 	</script>
