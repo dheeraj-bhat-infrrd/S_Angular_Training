@@ -174,7 +174,7 @@ public interface EmailServices
      * @throws InvalidInputException
      */
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
-        String surveyDetail, String customerName, String rating, String logoUrl )
+        String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink )
         throws InvalidInputException, UndeliveredEmailException;
 
 

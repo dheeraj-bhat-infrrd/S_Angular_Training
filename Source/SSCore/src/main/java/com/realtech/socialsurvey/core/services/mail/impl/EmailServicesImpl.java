@@ -1056,7 +1056,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
-        String surveyDetail, String customerName, String rating, String logoUrl )
+        String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink )
         throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -1081,11 +1081,13 @@ public class EmailServicesImpl implements EmailServices
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY );
 
         if ( logoUrl == null || logoUrl.isEmpty() ) {
-            messageBodyReplacements
-                .setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, recipientMailId, surveyDetail ) );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, customerName, rating,
+                agentName, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
+                String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         } else {
-            messageBodyReplacements
-                .setReplacementArgs( Arrays.asList( logoUrl, recipientName, recipientMailId, surveyDetail ) );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName,
+                surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
+                String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         }
 
 
