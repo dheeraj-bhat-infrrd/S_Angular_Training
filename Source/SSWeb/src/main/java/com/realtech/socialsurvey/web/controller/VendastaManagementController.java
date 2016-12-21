@@ -242,7 +242,9 @@ public class VendastaManagementController
                     unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
                     responseMap.put( "url", productUrl );
                     if ( unitSettings.getVendasta_rm_settings() != null
-                        && unitSettings.getVendasta_rm_settings().getAccountId() != null ) {
+                        && !StringUtils.isEmpty( unitSettings.getVendasta_rm_settings().getAccountId() )
+                        && !StringUtils.isEmpty( unitSettings.getVendasta_rm_settings().getApiUser() )
+                        && !StringUtils.isEmpty( unitSettings.getVendasta_rm_settings().getApiKey() ) ) {
                         responseMap.put( "ssoToken", unitSettings.getVendasta_rm_settings().getAccountId() );
                         responseMap.put( "status", "success" );
                     } else {
