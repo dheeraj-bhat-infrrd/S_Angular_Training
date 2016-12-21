@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,9 +120,11 @@ public class VendastaManagementController
                         columnValue );
                     unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
                     if ( unitSettings.getVendasta_rm_settings() != null
-                        && unitSettings.getVendasta_rm_settings().getAccountId() != null )
+                        && unitSettings.getVendasta_rm_settings().getAccountId() != null ) {
                         model.addAttribute( "accountId", unitSettings.getVendasta_rm_settings().getAccountId() );
-
+                        model.addAttribute( "apiUser", unitSettings.getVendasta_rm_settings().getApiUser() );
+                        model.addAttribute( "apiKey", unitSettings.getVendasta_rm_settings().getApiKey() );
+                    }
                 }
             } catch ( NonFatalException error ) {
                 LOG.error( "NonfatalException while showing vendasta settings. Reason: " + error.getMessage(), error );
@@ -158,13 +161,24 @@ public class VendastaManagementController
                 unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
                 collectionName = (String) hierarchyDetails.get( "collectionName" );
                 String accountId = request.getParameter( "accountId" );
+                String apiUser = request.getParameter( "apiUser" );
+                String apiKey = request.getParameter( "apiKey" );
                 VendastaProductSettings settings = new VendastaProductSettings();
-                if ( accountId != null && !accountId.isEmpty() ) {
-                    settings.setAccountId( accountId );
-                    if ( vendastaManagementService.updateVendastaRMSettings( collectionName, unitSettings, settings ) ) {
-                        LOG.info( "Updated Vendasta Product settings" );
-                        message = messageUtils.getDisplayMessage( DisplayMessageConstants.UPDATING_VENDASTA_SETTINGS_SUCCESSFUL,
-                            DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                if ( !StringUtils.isEmpty( accountId ) && !StringUtils.isEmpty( apiUser ) && !StringUtils.isEmpty( apiKey ) ) {
+                    if ( vendastaManagementService.isAccountExistInVendasta( accountId, apiUser, apiKey ) ) {
+                        settings.setAccountId( accountId );
+                        settings.setApiUser( apiUser );
+                        settings.setApiKey( apiKey );
+                        if ( vendastaManagementService.updateVendastaRMSettings( collectionName, unitSettings, settings ) ) {
+                            LOG.info( "Updated Vendasta Product settings" );
+                            message = messageUtils
+                                .getDisplayMessage( DisplayMessageConstants.UPDATING_VENDASTA_SETTINGS_SUCCESSFUL,
+                                    DisplayMessageType.SUCCESS_MESSAGE )
+                                .getMessage();
+                        }
+                    } else {
+                        message = accountId + " account does not exist in vendasta for apiUser - " + apiUser
+                            + ". Please provide valid vendasta account details.";
                     }
                 } else {
                     message = messageUtils

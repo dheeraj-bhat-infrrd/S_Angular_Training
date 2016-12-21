@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.hibernate.criterion.Criterion;
@@ -27,12 +28,16 @@ import com.realtech.socialsurvey.core.entities.VendastaProductSettings;
 import com.realtech.socialsurvey.core.entities.VendastaSingleSignOnTicket;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.integration.pos.errorhandlers.VendastaAccessException;
+import com.realtech.socialsurvey.core.integration.vendasta.VendastaApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.VendastaManagementService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
+
+import retrofit.client.Response;
 
 
 @DependsOn ( "generic")
@@ -64,6 +69,9 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
 
     @Autowired
     private EncryptionHelper encryptionHelper;
+
+    @Autowired
+    private VendastaApiIntegrationBuilder vendastaApiIntegrationBuilder;
 
 
     //the method that actually interacts with data layer objects to update the boolean VendastaAccessible
@@ -378,5 +386,20 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
                 LOG.error( "Error while sending report excption mail to admin " );
             }
         }
+    }
+
+
+    @Override
+    public boolean isAccountExistInVendasta( String accountId, String apiUser, String apiKey )
+    {
+        boolean status = false;
+        try {
+            Response response = vendastaApiIntegrationBuilder.getIntegrationApi().getAccountById( apiUser, apiKey, accountId );
+            if ( response != null && response.getStatus() == HttpStatus.SC_OK )
+                status = true;
+        } catch ( VendastaAccessException ex ) {
+            LOG.error( "Error connecting to vendasta. " + ex.getMessage() );
+        }
+        return status;
     }
 }

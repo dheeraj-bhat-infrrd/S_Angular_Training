@@ -44,4 +44,7 @@ public interface VendastaManagementService
 
     public void usedVendastaTicketRemover();
 
+
+    public boolean isAccountExistInVendasta( String accountId, String apiUser, String apiKey );
+
 }
