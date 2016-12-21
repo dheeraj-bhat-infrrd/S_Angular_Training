@@ -76,6 +76,7 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
+import com.realtech.socialsurvey.core.utils.CommonUtils;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -308,7 +309,7 @@ public class SurveyManagementController
                     ? ( agent.getFirstName() + " " + agent.getLastName() ) : agent.getFirstName();
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
-                        surveyDetail, customerName, surveyScore, logoUrl );
+                        surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl() );
                 }
 
                 OrganizationUnitSettings companySettings = organizationManagementService
@@ -358,48 +359,42 @@ public class SurveyManagementController
     private String generateSurveyTextForMail( String customerName, String mood, SurveyDetails survey, boolean isAbusive,
         boolean allowCheckBox )
     {
-        StringBuilder surveyDetail = new StringBuilder( customerName ).append( " Complete Survey Response for " )
-            .append( survey.getAgentName() );
-        surveyDetail.append( "<br />" ).append( "Date Sent: " ).append( survey.getCreatedOn().toString() );
-        surveyDetail.append( "<br />" ).append( "Date Completed: " ).append( survey.getModifiedOn().toString() );
-        surveyDetail.append( "<br />" ).append( "Average Score: " ).append( String.valueOf( survey.getScore() ) );
 
-        int count = 1;
-        surveyDetail.append( "<br />" );
+        final int tableOneFirstColumnWidth = 150;
+        final int tableTwoFirstColumnWidth = 350;
+
+        final String tableStart = "<table>";
+        final String tableEnd = "</table>";
+        final String paragraph = "<p>";
+        final String tableBreak = "<TR/>";
+        final String tableOneRowStart = "<TR><TD width=" + tableOneFirstColumnWidth + "px>";
+        final String tableTwoRowStart = "<TR><TD width=" + tableTwoFirstColumnWidth + "px>";
+        final String tableRowMiddle = "</TD><TD><strong>";
+        final String tableRowEnd = "</strong></TD></TR>";
+
+        StringBuilder surveyDetail = new StringBuilder( tableStart );
+
+        surveyDetail.append( tableOneRowStart ).append( "Date:" ).append( tableRowMiddle )
+            .append( CommonUtils.formatDate( survey.getCreatedOn(), "MM/dd/yyyy" ) ).append( tableRowEnd );
+        surveyDetail.append( tableOneRowStart ).append( "Overall Experience:" ).append( tableRowMiddle ).append( mood )
+            .append( tableRowEnd );
+        surveyDetail.append( tableOneRowStart ).append( "Agreed to Share:" ).append( tableRowMiddle )
+            .append( ( allowCheckBox ) ? "Yes" : "No" ).append( tableRowEnd );
+        surveyDetail.append( tableOneRowStart ).append( "Abusive Words:" ).append( tableRowMiddle )
+            .append( ( isAbusive ) ? "Yes" : "No" ).append( tableRowEnd );
+
+
+        surveyDetail.append( tableBreak ).append( tableOneRowStart ).append( "Comment:" ).append( tableRowMiddle )
+            .append( survey.getReview() ).append( tableRowEnd ).append( tableEnd );
+
+        surveyDetail.append( paragraph ).append( tableStart );
+
         for ( SurveyResponse response : survey.getSurveyResponse() ) {
-            surveyDetail.append( "<br />" ).append( "Question " + count + ": " ).append( response.getQuestion() );
-            surveyDetail.append( "<br />" ).append( "Response to Q" + count + ": " ).append( response.getAnswer() );
-            count++;
+            surveyDetail.append( tableTwoRowStart ).append( response.getQuestion() ).append( tableRowMiddle )
+                .append( response.getAnswer() ).append( tableRowEnd );
         }
 
-        surveyDetail.append( "<br />" );
-        surveyDetail.append( "<br />" ).append( "Gateway Question: " ).append( gatewayQuestion );
-        surveyDetail.append( "<br />" ).append( "Response to GQ: " ).append( mood );
-        surveyDetail.append( "<br />" ).append( "Customer Comments: " ).append( survey.getReview() );
-
-        surveyDetail.append( "<br />" );
-        if ( allowCheckBox && mood.equalsIgnoreCase( "Great" ) && survey.getAgreedToShare() != null
-            && survey.getAgreedToShare().equalsIgnoreCase( "true" ) ) {
-            surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "Yes" );
-            if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
-                surveyDetail.append( "<br />" ).append( "Shared on: " )
-                    .append( StringUtils.join( survey.getSharedOn(), ", " ) );
-            }
-        } else {
-            surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "No" );
-        }
-
-        surveyDetail.append( "<br />" );
-        if ( isAbusive ) {
-            surveyDetail.append( "<br />" ).append( "Contains abusive words : " ).append( "Yes" );
-        } else {
-            surveyDetail.append( "<br />" ).append( "Contains abusive words: " ).append( "No" );
-        }
-
-        surveyDetail.append( "<br />" );
-        if ( survey.getSourceId() != null && !survey.getSourceId().isEmpty() ) {
-            surveyDetail.append( "<br />" ).append( "Transaction Ref Id: " ).append( survey.getSourceId() );
-        }
+        surveyDetail.append( tableEnd ).append( paragraph );
 
         // update survey details with values
         String surveyDetailStr = surveyDetail.toString();
