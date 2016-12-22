@@ -140,10 +140,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     private OrganizationManagementService organizationManagementService;
 
     @Autowired
-    SurveyPreInitiationDao surveyPreInitiationDao;
+    private SurveyPreInitiationDao surveyPreInitiationDao;
 
     @Autowired
-    ProfileManagementService profileManagementService;
+    private ProfileManagementService profileManagementService;
 
     @Autowired
     private EmailServices emailServices;
