@@ -107,7 +107,7 @@ public interface JspResolver {
 	public static final String REVIEWS_UNDER_RESOLUTION_REPORTS = "reviewsunderresolution";
 	public static final String ABUSIVE_REVIEWS_REPORTS = "abusivereviewsreports";
 	public static final String SHOW_WIDGET = "show_widget";
-	public static final String VENDASTA_SETTINGS = "vendastaProductSettings";
+	public static final String VENDASTA_SETTINGS = "reviewsMonitorSettings";
 	
 	//Help Settings
 	public static final String HELP_EDIT="help";

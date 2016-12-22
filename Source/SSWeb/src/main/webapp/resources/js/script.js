@@ -715,11 +715,11 @@ function validateURL(elementId) {
 	}
 }
 
-//Function to validate Lone Wolf Input
+// Function to validate Lone Wolf Input
 function validateLoneWolf(elementId) {
 	var msg;
-	if(elementId=='lone-client'){
-		msg="Please enter Client Code.";
+	if (elementId == 'lone-client') {
+		msg = "Please enter Client Code.";
 	}
 	if ($(window).width() < 768) {
 		if ($('#' + elementId).val() != "") {
@@ -1508,8 +1508,8 @@ function bindEventForCorruptRecordPage() {
 	$('#corrupt-paginate-btn').on('blur', '#sel-page-corrupt-list', function(e) {
 		var batch = parseInt($('#corrupt-paginate-btn').attr("data-batch"));
 		var pageNoVal = parseInt($('#sel-page-corrupt-list').val());
-		if(isNaN(pageNoVal)){
-			pageNoVal=1;
+		if (isNaN(pageNoVal)) {
+			pageNoVal = 1;
 		}
 		UnmatchedUserStartIndex = (pageNoVal - 1) * batch;
 		$('#corrupt-paginate-btn').attr("data-start", UnmatchedUserStartIndex);
@@ -1564,8 +1564,8 @@ function bindEventForMappedUserPage() {
 	$('#mapped-paginate-btn').on('blur', '#sel-page-mapped-list', function(e) {
 		var batch = parseInt($('#mapped-paginate-btn').attr("data-batch"));
 		var pageNoVal = parseInt($('#sel-page-mapped-list').val());
-		if(isNaN(pageNoVal)){
-			pageNoVal=1;
+		if (isNaN(pageNoVal)) {
+			pageNoVal = 1;
 		}
 		MappedUserStartIndex = (pageNoVal - 1) * batch;
 		$('#mapped-paginate-btn').attr("data-start", MappedUserStartIndex);
@@ -1620,8 +1620,8 @@ function bindEventForUnmatchedUserPage() {
 	$('#un-new-paginate-btn').on('blur', '#sel-page-un-new-list', function(e) {
 		var batch = parseInt($('#un-new-paginate-btn').attr("data-batch"));
 		var pageNoVal = parseInt($('#sel-page-un-new-list').val());
-		if(isNaN(pageNoVal)){
-			pageNoVal=1;
+		if (isNaN(pageNoVal)) {
+			pageNoVal = 1;
 		}
 		UnmatchedUserStartIndex = (pageNoVal - 1) * batch;
 		$('#un-new-paginate-btn').attr("data-start", UnmatchedUserStartIndex);
@@ -1684,8 +1684,8 @@ function bindEventsForProcessUserPage() {
 	$('#un-processed-paginate-btn').on('blur', '#sel-page-un-processed-list', function(e) {
 		var batch = parseInt($('#un-processed-paginate-btn').attr("data-batch"));
 		var pageNoVal = parseInt($('#sel-page-un-processed-list').val());
-		if(isNaN(pageNoVal)){
-			pageNoVal=1;
+		if (isNaN(pageNoVal)) {
+			pageNoVal = 1;
 		}
 		ProcessedUserStartIndex = (pageNoVal - 1) * batch;
 		$('#un-processed-paginate-btn').attr("data-start", ProcessedUserStartIndex);
@@ -1711,7 +1711,7 @@ function fetchUsers(newIndex) {
 		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
 		formData.append("find-pro-start-index", newIndex);
 		formData.append("find-pro-row-size", rowSize);
-		if(findProCompanyProfileName != undefined ){
+		if (findProCompanyProfileName != undefined) {
 			formData.append("find-pro-profile-name", findProCompanyProfileName);
 		}
 
@@ -1852,8 +1852,8 @@ function updatePaginationBtnsForMappedUser() {
 		$('#mapped-prev').removeClass('paginate-button');
 		pageNo = 1;
 	}
-	if(pageNo==0){
-		pageNo=1;
+	if (pageNo == 0) {
+		pageNo = 1;
 	}
 	$('#sel-page-mapped-list').val(pageNo);
 }
@@ -1889,8 +1889,8 @@ function updatePaginationBtnsForUnmatchedUser() {
 		$('#un-new-prev').removeClass('paginate-button');
 		pageNo = 1;
 	}
-	if(pageNo==0){
-		pageNo=1;
+	if (pageNo == 0) {
+		pageNo = 1;
 	}
 	$('#sel-page-un-new-list').val(pageNo);
 }
@@ -1926,8 +1926,8 @@ function updatePaginationBtnsForCorruptRecords() {
 		$('#corrupt-prev').removeClass('paginate-button');
 		pageNo = 1;
 	}
-	if(pageNo==0){
-		pageNo=1;
+	if (pageNo == 0) {
+		pageNo = 1;
 	}
 	$('#sel-page-corrupt-list').val(pageNo);
 }
@@ -1963,8 +1963,8 @@ function updatePaginationBtnsForProcessedUser() {
 		$('#un-processed-prev').removeClass('paginate-button');
 		pageNoProcess = 1;
 	}
-	if(pageNoProcess==0){
-		pageNoProcess=1;
+	if (pageNoProcess == 0) {
+		pageNoProcess = 1;
 	}
 	$('#sel-page-un-processed-list').val(pageNoProcess);
 }
@@ -2476,7 +2476,7 @@ function paintProcessedUser(usersList) {
 					if (arrayItem.user != undefined && arrayItem.user.loginName != undefined && arrayItem.user.loginName != "")
 						action += "<br><span title=" + arrayItem.user.loginName + ">" + arrayItem.user.loginName + "</span> "
 				}
-				
+
 				var engagementClosedate = new Date(arrayItem.engagementClosedTime);
 				var engagementClosedatePart = engagementClosedate.toDateString();
 				unprocess += '<div class="un-row">' + '						<div style="width:15%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:15%" class="float-left unmatchtab ss-date" title="' + undefinedval(engagementClosedatePart) + '">' + undefinedval(engagementClosedatePart) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab" >' + action + '</div>' + '						</div>';
@@ -3764,4 +3764,37 @@ function escapeHtml(unsafe) {
 
 function downloadCompanyHierarchyReport() {
 	window.location.href = "/downloadcompanyhierarchyreport.do?columnName=" + colName + "&columnValue=" + colValue;
+}
+
+function validateVendastaApiUser(elementId) {
+	if ($('#' + elementId).val() != "") {
+		$('#' + elementId).next('.hm-item-err-2').hide();
+		return true;
+	} else {
+		$('#' + elementId).next('.hm-item-err-2').html('Please enter Api User field.');
+		$('#' + elementId).next('.hm-item-err-2').show();
+		return false;
+	}
+}
+
+function validateVendastaApiKey(elementId) {
+	if ($('#' + elementId).val() != "") {
+		$('#' + elementId).next('.hm-item-err-2').hide();
+		return true;
+	} else {
+		$('#' + elementId).next('.hm-item-err-2').html('Please enter Api Key field.');
+		$('#' + elementId).next('.hm-item-err-2').show();
+		return false;
+	}
+}
+
+function validateVendastaAccountId(elementId) {
+	if ($('#' + elementId).val() != "") {
+		$('#' + elementId).next('.hm-item-err-2').hide();
+		return true;
+	} else {
+		$('#' + elementId).next('.hm-item-err-2').html('Please enter Account ID.');
+		$('#' + elementId).next('.hm-item-err-2').show();
+		return false;
+	}
 }
