@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.VendastaProductSettings;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -97,7 +98,7 @@ public class VendastaManagementController
 
 
     //method to prepare jsp to add or update vendasta account Id
-    @RequestMapping ( value = "/showvendastasettings")
+    @RequestMapping ( value = "/showreviewsmonitorsettings")
     public String showVendastaSettings( Model model, HttpServletRequest request )
     {
 
@@ -148,7 +149,7 @@ public class VendastaManagementController
     {
 
         LOG.info( "Updating Vendasta Product settings" );
-        String message = "";
+        DisplayMessage message = null;
         String collectionName = "";
         try {
             HttpSession session = request.getSession( false );
@@ -171,27 +172,25 @@ public class VendastaManagementController
                         settings.setApiKey( apiKey );
                         if ( vendastaManagementService.updateVendastaRMSettings( collectionName, unitSettings, settings ) ) {
                             LOG.info( "Updated Vendasta Product settings" );
-                            message = messageUtils
-                                .getDisplayMessage( DisplayMessageConstants.UPDATING_VENDASTA_SETTINGS_SUCCESSFUL,
-                                    DisplayMessageType.SUCCESS_MESSAGE )
-                                .getMessage();
+                            message = messageUtils.getDisplayMessage(
+                                DisplayMessageConstants.UPDATING_VENDASTA_SETTINGS_SUCCESSFUL,
+                                DisplayMessageType.SUCCESS_MESSAGE );
                         }
                     } else {
-                        message = accountId + " account does not exist in vendasta for apiUser - " + apiUser
-                            + ". Please provide valid vendasta account details.";
+                        message = messageUtils.getDisplayMessage( DisplayMessageConstants.ACCOUNT_DOESNT_EXIST,
+                            DisplayMessageType.ERROR_MESSAGE );
                     }
                 } else {
-                    message = messageUtils
-                        .getDisplayMessage( DisplayMessageConstants.INVALID_ACCOUNT_ID, DisplayMessageType.ERROR_MESSAGE )
-                        .getMessage();
+                    message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_VALUES,
+                        DisplayMessageType.ERROR_MESSAGE );
                 }
             }
         } catch ( NonFatalException error ) {
             LOG.error( "NonFatalException while updating Vendasta Product settings. Reason : " + error.getMessage(), error );
-            message = messageUtils.getDisplayMessage( error.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            message = messageUtils.getDisplayMessage( error.getErrorCode(), DisplayMessageType.ERROR_MESSAGE );
         }
-
-        return message;
+        String messageJson = new Gson().toJson( message );
+        return messageJson;
     }
 
 

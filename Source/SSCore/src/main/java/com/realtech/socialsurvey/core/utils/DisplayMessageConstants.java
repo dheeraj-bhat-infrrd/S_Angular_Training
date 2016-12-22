@@ -231,7 +231,7 @@ public final class DisplayMessageConstants
     //Realtech admin module
     public static final String COMPANY_NOT_REGISTERD = "COMPANY_NOT_REGISTERD";
     public static final String SS_ADMIN_DELETE_SUCCESSFUL = "SS_ADMIN_DELETE_SUCCESSFUL";
-    
+
     public static final String API_STATUS_UPDATE_SUCCESSFUL = "API_STATUS_UPDATE_SUCCESSFUL";
 
 
@@ -251,9 +251,10 @@ public final class DisplayMessageConstants
     public static final String LONEWOLF_ENABLE_SUCCESSFUL = "LONEWOLF_ENABLE_SUCCESSFUL";
     public static final String LONEWOLF_DISABLE_SUCCESSFUL = "LONEWOLF_DISABLE_SUCCESSFUL";
     public static final String LONEWOLF_GENERATE_REPORT_SUCCESSFUL = "LONEWOLF_GENERATE_REPORT_SUCCESSFUL";
-    
+
     //vendasta message constants
     public static final String UPDATING_VENDASTA_SETTINGS_SUCCESSFUL = "UPDATING_VENDASTA_SETTINGS_SUCCESSFUL";
-    public static final String INVALID_ACCOUNT_ID = "INVALID_ACCOUNT_ID";
+    public static final String INVALID_VALUES = "INVALID_VALUES";
+    public static final String ACCOUNT_DOESNT_EXIST = "ACCOUNT_DOESNT_EXIST";
 }
 

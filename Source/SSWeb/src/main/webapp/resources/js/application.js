@@ -840,7 +840,7 @@ function updateDashboardProfileEvents() {
 	$('#pro-cmplt-stars').on('click', '#dsh-btn0', function(e) {
 		e.stopPropagation();
 		var buttonId = 'dsh-btn0';
-		//getSocialMediaToFix
+		// getSocialMediaToFix
 		var payload = {
 				"columnName" : colName,
 				"columnValue" : colValue
@@ -875,7 +875,7 @@ function paintFixSocialMedia(data){
 		$('#dsh-btn0').addClass("hide");
 	}
 	
-//	e.stopPropagation();
+// e.stopPropagation();
 	$('#overlay-continue').html("");
 	$('#overlay-cancel').html("");
 	$('#overlay-header').html("Reconnect Social Media");
@@ -3895,7 +3895,7 @@ function saveTestLoneDetailsCallBack(response) {
 	var savedClassificationsByCode = map.savedClassificationsByCode;
 	
 	if (map.status == true) {
-		//show classification list
+		// show classification list
 		for (var i = 0; i < classificationsList.length; i++) {
 		    var classification = classificationsList[i];
 		    var $classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="B" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
@@ -3980,10 +3980,10 @@ function bindClickToClassificationTypeButton(){
 	$('.bd-cust-rad-img').click(function(e) {
 		$(this).parent().parent().find('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
 		$(this).toggleClass('bd-cust-rad-img-checked');
-		//update type in row
+		// update type in row
 		$(this).parent().parent().attr('data-type', $(this).data('type'));
 		var curIndex = $(this).parent().parent().attr('index');
-		//update classification list
+		// update classification list
 		( classificationsList[curIndex]).loneWolfTransactionParticipantsType = $(this).data('type');
 	});
 
@@ -7534,7 +7534,7 @@ $('body').on('click', '#prof-edit-social-link .icn-yelp', function(e) {
 $(document).on('click',function(){
 	$('#social-token-text').hide();
 });
-//hide input textbox for link
+// hide input textbox for link
 $(document).on('click','#social-token-text',function(e){
 	e.stopPropagation();
 });
@@ -11082,8 +11082,8 @@ function showLoneWolfButtons() {
 	var state = $("#lone-state").val();
 	if (state == 'dryrun') {
 		$('#lone-dry-enable').show();
-		//TODO : uncooment the generate report show code when back end is ready
-	//	$('#lone-generate-report').show();
+		// TODO : uncooment the generate report show code when back end is ready
+	// $('#lone-generate-report').show();
 		$('#lone-disconnect').hide();
 	} else if (state == 'prod') {
 		$('#lone-disconnect').show();
@@ -11375,3 +11375,33 @@ $(document).on('click','ul.accordion li',function(){
 $(document).on('click','.email-content',function(event){
 	event.stopPropagation();
 });
+
+var isVendastaValid;
+function validateVendastaFields(){
+	isVendastaValid = true;
+	var isFocussed = false;
+
+	if (!validateVendastaApiUser('api-user')) {
+		isVendastaValid = false;
+		if (!isFocussed) {
+			$('#api-user').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateVendastaApiKey('api-key')) {
+		isVendastaValid = false;
+		if (!isFocussed) {
+			$('#api-key').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateVendastaAccountId('account-iden')) {
+		isVendastaValid = false;
+		if (!isFocussed) {
+			$('#account-iden').focus();
+			isFocussed = true;
+		}
+	}
+
+	return isVendastaValid;
+}
