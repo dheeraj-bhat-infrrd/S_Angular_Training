@@ -17,7 +17,7 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 @EnableAspectJAutoProxy
-@ComponentScan ( basePackages = { "com.realtech.socialsurvey.api" })
+@ComponentScan ( basePackages = { "com.realtech.socialsurvey.api" } , lazyInit = true)
 @Import ( { SwaggerConfig.class, SecurityConfig.class })
 @ImportResource ( { "classpath:sscore-beans.xml" })
 public class ApiConfig extends WebMvcConfigurerAdapter

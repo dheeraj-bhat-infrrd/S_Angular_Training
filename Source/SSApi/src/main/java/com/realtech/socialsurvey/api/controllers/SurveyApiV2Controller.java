@@ -98,7 +98,7 @@ public class SurveyApiV2Controller
         List<String> fixReqParameters =  Arrays.asList("count" , "start" , "status" , "startSurveyID" , "startReviewDate" ,  "startTransactionDate" , "state" , "user" , "includeManagedTeam");
         for(String currParameter : inputRequestParameters){
         	if( ! fixReqParameters.contains(currParameter)){
-        		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Invalid Request. Wrong filter parameter used : " + currParameter , null, null,
+        		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Unsupported filter parameter : " + currParameter , null, null,
                         request );
         	}
         }
