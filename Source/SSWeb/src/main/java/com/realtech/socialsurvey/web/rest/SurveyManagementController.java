@@ -361,14 +361,14 @@ public class SurveyManagementController
     {
 
         final int tableOneFirstColumnWidth = 150;
-        final int tableTwoFirstColumnWidth = 350;
+        final String tableTwoFirstColumnWidth = "50%";
 
         final String tableStart = "<table>";
         final String tableEnd = "</table>";
         final String paragraph = "<p>";
         final String tableBreak = "<TR/>";
         final String tableOneRowStart = "<TR><TD width=" + tableOneFirstColumnWidth + "px>";
-        final String tableTwoRowStart = "<TR><TD width=" + tableTwoFirstColumnWidth + "px>";
+        final String tableTwoRowStart = "<TR><TD width=" + tableTwoFirstColumnWidth;
         final String tableRowMiddle = "</TD><TD><strong>";
         final String tableRowEnd = "</strong></TD></TR>";
 
