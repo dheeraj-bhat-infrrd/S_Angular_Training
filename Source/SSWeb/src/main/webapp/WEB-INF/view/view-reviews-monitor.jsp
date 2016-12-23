@@ -42,7 +42,17 @@
 				document.getElementById("vendasta-iframe").style.display = "none";
 				document.getElementById("error-msg-vendasta").style.display = "block";
 			} else {
-				$("#vendasta-iframe").attr("src", url);
+				var payload = {
+						"url" : url
+				};
+				callAjaxGetWithPayloadData("/testvendastaurl.do", function(data) {
+					if ( data == "success") {
+						loadVendastaUrl(url);
+					}
+					else {
+						loadVendastaUrl("/vendastaError.do");
+					}
+				}, payload, true);
 			}
 		}
 
@@ -58,7 +68,11 @@
 			}, payload, false);
 			return url;
 		}
-
+		
+		function loadVendastaUrl(url){
+			$("#vendasta-iframe").attr("src", url);
+		}
+		
 		function showFrame() {
 			document.getElementById("vendasta-loader").style.display = "none";
 			document.getElementById("error-msg-vendasta").style.display = "none";

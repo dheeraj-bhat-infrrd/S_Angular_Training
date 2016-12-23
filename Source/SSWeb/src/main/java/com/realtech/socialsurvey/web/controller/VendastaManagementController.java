@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +32,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.VendastaManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 
@@ -52,6 +55,9 @@ public class VendastaManagementController
 
     @Autowired
     MessageUtils messageUtils;
+
+    @Autowired
+    UrlValidationHelper urlValidationHelper;
 
 
     // updates the boolean value vendastaAccessible in mongo for every hierarchy
@@ -261,6 +267,31 @@ public class VendastaManagementController
         }
         LOG.info( "Method fetchVendastaUrl() finished." );
         return new Gson().toJson( responseMap );
+    }
+
+
+    @RequestMapping ( value = "/testvendastaurl")
+    @ResponseBody
+    public String testVendastaUrl( HttpServletRequest request )
+    {
+        LOG.info( "VendastaManagementController.testVendastaUrl started" );
+        String url = request.getParameter( "url" );
+        if ( url == null ) {
+            return "failed";
+        }
+        try {
+            urlValidationHelper.validateUrl( url );
+            return "success";
+        } catch ( Exception error ) {
+            return "failed";
+        }
+    }
+
+
+    @RequestMapping ( value = "/vendastaError")
+    public String vendastaErrorPage( HttpServletRequest request )
+    {
+        return JspResolver.VENDASTA_SSO_ERROR;
     }
 
 }

@@ -33,9 +33,10 @@ public class VendastaLoginController
 
     @Autowired
     private VendastaManagementService vendastaManagementSerivce;
-    
+
     @Autowired
     private SessionHelper sessionHelper;
+
 
     // method to authorize the user to access vendasta by creating sso ticket with an accountId and ssotoken
     @RequestMapping ( value = "/authorization")
@@ -43,41 +44,57 @@ public class VendastaLoginController
     {
 
         LOG.info( "VendastaLoginController.Authorizer started" );
-        HttpSession session = request.getSession( false );
-        User user = sessionHelper.getCurrentUser();
-        if ( session != null ) {
-            boolean vendastaAccessible = (boolean) session.getAttribute( CommonConstants.VENDASTA_ACCESS );
-            if ( vendastaAccessible ) {
-                String nextUrl = request.getParameter( "next" );
-                String productId = request.getParameter( "product_id" );
-                if ( nextUrl != null && productId != null && !nextUrl.isEmpty() && !productId.isEmpty() ) {
+        try {
+            if ( request.getParameterMap().size() == 0 ) {
+                LOG.error( "VendastaLoginController.Authorizer sso process failure" );
+                response.sendRedirect( "/vendastaError.do" );
+                return;
+            }
+            HttpSession session = request.getSession( false );
+            User user = sessionHelper.getCurrentUser();
+            if ( session != null ) {
+                boolean vendastaAccessible = (boolean) session.getAttribute( CommonConstants.VENDASTA_ACCESS );
+                if ( vendastaAccessible ) {
+                    String nextUrl = request.getParameter( "next" );
+                    String productId = request.getParameter( "product_id" );
+                    if ( nextUrl != null && productId != null && !nextUrl.isEmpty() && !productId.isEmpty() ) {
 
-                    long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-                    String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+                        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+                        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
-                    try {
-                        String ssoToken = vendastaManagementSerivce.fetchSSOTokenForReputationManagementAccount( entityType,
-                            entityId, productId );
-                        String validateUrl = vendastaManagementSerivce.validateUrlGenerator( user, nextUrl, productId, ssoToken );
-                        response.sendRedirect( validateUrl );
-                        LOG.info( "VendastaLoginController.Authorizer finished" );
+                        try {
+                            String ssoToken = vendastaManagementSerivce.fetchSSOTokenForReputationManagementAccount( entityType,
+                                entityId, productId );
+                            String validateUrl = vendastaManagementSerivce.validateUrlGenerator( user, nextUrl, productId,
+                                ssoToken );
+                            response.sendRedirect( validateUrl );
+                            LOG.info( "VendastaLoginController.Authorizer finished" );
 
-                    } catch ( InvalidInputException | NoRecordsFetchedException error ) {
-                        LOG.error( "Insufficeint data to parse a response" );
-                    } catch ( IOException error ) {
-                        LOG.error( "Failed to respond with validate Url to vendasta" );
+                        } catch ( InvalidInputException | NoRecordsFetchedException error ) {
+                            LOG.error( "Insufficeint data to parse a response" );
+                            response.sendRedirect( "/vendastaError.do" );
+                        } catch ( IOException error ) {
+                            LOG.error( "Failed to redirect with validate Url to vendasta" );
+                            response.sendRedirect( "/vendastaError.do" );
+                        }
+                    } else {
+                        LOG.error( "Required one or more valid parameters" );
+                        response.sendRedirect( "/vendastaError.do" );
                     }
                 } else {
-                    LOG.error( "Required one or more valid parameters" );
+                    LOG.info( "Insufficient permission to access Vendasta" );
+                    response.sendRedirect( "/vendastaError.do" );
                 }
-            } else {
-                LOG.info( "Insufficient permission to access Vendasta" );
-            }
 
-        } else {
-            LOG.error( "Unauthorized request to access Vendasta accounts" );
+            } else {
+                LOG.error( "Unauthorized request to access Vendasta accounts" );
+                response.sendRedirect( "/vendastaError.do" );
+            }
+        } catch ( IOException e ) {
+            LOG.error( "VendastaLoginController.Authorizer not able to redirect to vedensta error page" );
         }
     }
+
 
     //method to validate a ssoticket by checking if the ticket is stored in vendasta_sso_ticket table
     @RequestMapping ( value = "/validation")
