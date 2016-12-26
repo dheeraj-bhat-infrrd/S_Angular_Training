@@ -65,7 +65,7 @@ public class VendastaManagementController
     public String updateVendastaAccessSettings( HttpServletRequest request )
     {
         LOG.info( "Method to update Vendasta Access Settings started" );
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession( false );
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         try {
@@ -76,13 +76,13 @@ public class VendastaManagementController
 
             if ( hasVendastaAcess != null && !hasVendastaAcess.isEmpty() ) {
                 isVendastaAcessible = Boolean.parseBoolean( hasVendastaAcess );
-                session.setAttribute( "hasVendastaAcess", String.valueOf( isVendastaAcessible ) );
+                session.setAttribute( CommonConstants.VENDASTA_ACCESS, String.valueOf( isVendastaAcessible ) );
                 Map<String, Object> hierarchyDetails = vendastaManagementService.getUnitSettingsForAHierarchy( entityType,
                     entityId );
                 unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
                 collectionName = (String) hierarchyDetails.get( "collectionName" );
                 if ( unitSettings == null )
-                    throw new Exception("unitSettings can't be null");
+                    throw new Exception( "unitSettings can't be null" );
                 else {
                     unitSettings.setVendastaAccess( isVendastaAcessible );
                     if ( vendastaManagementService.updateVendastaAccess( collectionName, unitSettings ) ) {
