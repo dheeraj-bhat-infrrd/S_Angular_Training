@@ -359,17 +359,17 @@ public class SurveyManagementController
     private String generateSurveyTextForMail( String customerName, String mood, SurveyDetails survey, boolean isAbusive,
         boolean allowCheckBox )
     {
-
-        final int tableOneFirstColumnWidth = 150;
+        final String tableOneFirstColumnWidth = "150px";
         final String tableTwoFirstColumnWidth = "50%";
 
-        final String tableStart = "<table>";
+        final String tableStart = "<table class=\"table\">";
         final String tableEnd = "</table>";
         final String paragraph = "<p>";
         final String tableBreak = "<TR/>";
-        final String tableOneRowStart = "<TR><TD width=" + tableOneFirstColumnWidth + "px>";
-        final String tableTwoRowStart = "<TR><TD width=" + tableTwoFirstColumnWidth;
-        final String tableRowMiddle = "</TD><TD><strong>";
+        final String tableOneRowStart = "<TR><TD width=" + tableOneFirstColumnWidth + ">";
+        final String tableTwoRowStart = "<TR><TD style=\" border-top:0px; word-wrap:break-word;\" width="
+            + tableTwoFirstColumnWidth + ">";
+        final String tableRowMiddle = "</TD><TD style=\"padding-left: 10px; border-top:0px; word-wrap:break-word;\"><strong>";
         final String tableRowEnd = "</strong></TD></TR>";
 
         StringBuilder surveyDetail = new StringBuilder( tableStart );
