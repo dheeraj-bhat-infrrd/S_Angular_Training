@@ -1,7 +1,5 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.net.URI;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,12 +76,13 @@ public class VendastaManagementController
 
             if ( hasVendastaAcess != null && !hasVendastaAcess.isEmpty() ) {
                 isVendastaAcessible = Boolean.parseBoolean( hasVendastaAcess );
+                session.setAttribute( "hasVendastaAcess", String.valueOf( isVendastaAcessible ) );
                 Map<String, Object> hierarchyDetails = vendastaManagementService.getUnitSettingsForAHierarchy( entityType,
                     entityId );
                 unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
                 collectionName = (String) hierarchyDetails.get( "collectionName" );
                 if ( unitSettings == null )
-                    throw new Exception();
+                    throw new Exception("unitSettings can't be null");
                 else {
                     unitSettings.setVendastaAccess( isVendastaAcessible );
                     if ( vendastaManagementService.updateVendastaAccess( collectionName, unitSettings ) ) {
