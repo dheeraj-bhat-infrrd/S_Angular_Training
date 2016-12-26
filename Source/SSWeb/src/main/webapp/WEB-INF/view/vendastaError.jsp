@@ -23,7 +23,7 @@
 <body>
 	<div class="vendasta-container">
 		<div id="error-msg-vendasta" class="access-cont">Sorry, Could
-			not load Vendasta Dashboard</div>
+			not load Reviews Monitor</div>
 	</div>
 </body>
 </html>
