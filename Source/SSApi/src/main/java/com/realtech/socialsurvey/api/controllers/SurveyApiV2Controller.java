@@ -76,11 +76,11 @@ public class SurveyApiV2Controller
 
         //authorize request
         String authorizationHeader = request.getHeader( "Authorization" );
-        long companyId;
+        long companyId = 0;
         try {
             companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
         } catch ( AuthorizationException e1 ) {
-            return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request );
+            return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request , companyId );
         }
 
         //parse request parameters from request
@@ -99,7 +99,7 @@ public class SurveyApiV2Controller
         for(String currParameter : inputRequestParameters){
         	if( ! fixReqParameters.contains(currParameter)){
         		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Unsupported filter parameter : " + currParameter , null, null,
-                        request );
+                        request , companyId  );
         	}
         }
 
@@ -110,7 +110,7 @@ public class SurveyApiV2Controller
                 count = Integer.parseInt( countStr );
             } catch ( NumberFormatException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter count is invalid", null, null,
-                    request );
+                    request , companyId  );
             }
         }
 
@@ -119,7 +119,7 @@ public class SurveyApiV2Controller
                 start = Integer.parseInt( startStr );
             } catch ( NumberFormatException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter start is invalid", null, null,
-                    request );
+                    request , companyId  );
             }
         }
 
@@ -127,7 +127,7 @@ public class SurveyApiV2Controller
             status = "all";
         } else if ( !status.equalsIgnoreCase( "complete" ) && !status.equalsIgnoreCase( "incomplete" ) ) {
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter status is invalid", null, null,
-                request );
+                request , companyId  );
         }
 
         List<String> validState = new ArrayList<String>();
@@ -137,7 +137,7 @@ public class SurveyApiV2Controller
 
         if ( state != null && !validState.contains( state ) ) {
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter state is invalid", null, null,
-                request );
+                request , companyId  );
         }
         
         
@@ -146,7 +146,7 @@ public class SurveyApiV2Controller
 			try {
 				startSurveyID = Long.parseLong(startSurveyIDStr);
 			} catch (NumberFormatException e) {
-				return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter startReviewDate is invalid", null,null, request);
+				return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, "Passed parameter startReviewDate is invalid", null,null, request , companyId );
 			}
 		}
         
@@ -156,7 +156,7 @@ public class SurveyApiV2Controller
                 startReviewDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startReviewDateStr );
             } catch ( ParseException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter startReviewDate is invalid",
-                    null, null, request );
+                    null, null, request , companyId  );
             }
         }
 
@@ -167,7 +167,7 @@ public class SurveyApiV2Controller
                 startTransactionDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startTransactionDateStr );
             } catch ( ParseException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter startReviewDate is invalid",
-                    null, null, request );
+                    null, null, request , companyId  );
             }
         }
         
@@ -179,12 +179,12 @@ public class SurveyApiV2Controller
                 includeManagedTeam = Boolean.parseBoolean(includeManagedTeamStr);
         	}catch(NumberFormatException e){
         		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter includeManagedTeam is invalid",
-                        null, null, request );
+                        null, null, request , companyId  );
         	}
         	
         	if(StringUtils.isEmpty( userEmailAddress )){
         		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter userEmailAddress can not be empty if includeManagedTeam is used ",
-                        null, null, request );
+                        null, null, request , companyId  );
         	}
         }
 
@@ -204,7 +204,7 @@ public class SurveyApiV2Controller
                 
             } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter user "  + userEmailAddress + " is invalid", null, null,
-                    request );
+                    request  , companyId );
             }
         }
 
@@ -218,6 +218,6 @@ public class SurveyApiV2Controller
         LOGGER.info( "SurveyApiController.getSurveyTransaction completed successfully" );
 
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", "surveys", surveyVOs,
-            request );
+            request  , companyId  );
     }
 }
