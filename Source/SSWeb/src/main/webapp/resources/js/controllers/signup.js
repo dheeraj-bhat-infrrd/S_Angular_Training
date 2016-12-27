@@ -174,7 +174,9 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 				if (error.data.indexOf("already exists") > -1 && error.data.indexOf("User with Email") > -1) {
 					$scope.isEmailIdExist = true;
 					$scope.isNewRecaptcha=true;
-					grecaptcha.reset();
+					if($scope.isCaptchaEnabled()){
+						grecaptcha.reset();
+					}
 					$scope.activate = 0;
 					hideOverlay();
 				} else {
