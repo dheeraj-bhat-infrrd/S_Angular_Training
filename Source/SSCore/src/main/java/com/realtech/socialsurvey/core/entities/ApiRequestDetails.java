@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.Date;
+
 public class ApiRequestDetails
 {
     
@@ -7,6 +9,31 @@ public class ApiRequestDetails
     
     private ApiResponseEntity response;
     
+    private Long companyId ;
+    
+    private Date createdOn;
+
+    
+    public Long getCompanyId()
+    {
+        return companyId;
+    }
+
+    public void setCompanyId( Long companyId )
+    {
+        this.companyId = companyId;
+    }
+    
+
+    public Date getCreatedOn()
+    {
+        return createdOn;
+    }
+
+    public void setCreatedOn( Date createdOn )
+    {
+        this.createdOn = createdOn;
+    }
 
     public ApiRequestEntity getRequest()
     {
