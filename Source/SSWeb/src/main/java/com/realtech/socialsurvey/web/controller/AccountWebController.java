@@ -124,6 +124,8 @@ public class AccountWebController
     @Value ( "${CDN_PATH}")
     private String amazonEndpoint;
 
+    @Value ( "${ENABLE_CAPTCHA}")
+    private String enableCaptcha;
 
     @Autowired
     public AccountWebController( SSApiIntergrationBuilder apiBuilder, RequestUtils requestUtils, TokenHandler tokenHandler,
@@ -156,11 +158,13 @@ public class AccountWebController
         SSApiIntegration api = apiBuilder.getIntegrationApi();
 
         // validate captcha
-        CaptchaAPIRequest captchaRequest = new CaptchaAPIRequest();
-        captchaRequest.setRemoteAddress( request.getRemoteAddr() );
-        captchaRequest.setCaptchaResponse( account.getCaptchaResponse() );
-        api.validateCaptcha( captchaRequest );
-
+        if(enableCaptcha.equalsIgnoreCase( "Y" )){
+            CaptchaAPIRequest captchaRequest = new CaptchaAPIRequest();
+            captchaRequest.setRemoteAddress( request.getRemoteAddr() );
+            captchaRequest.setCaptchaResponse( account.getCaptchaResponse() );
+            api.validateCaptcha( captchaRequest );
+        }
+        
         // initiate registration
         AccountRegistrationAPIRequest accountRequest = new AccountRegistrationAPIRequest();
         accountRequest.setFirstName( account.getFirstName() );

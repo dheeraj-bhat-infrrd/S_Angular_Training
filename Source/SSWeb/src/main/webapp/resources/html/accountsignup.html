@@ -50,12 +50,14 @@
 					<p ng-show="submitted && isEmailIdExist" class="help-block-reg">User with Email: {{accountRegistration.email}} already exists. Please check your email for instruction.</p>
 				</div>
 				<div class="reg-pswd-info col-lg-12 col-md-12 col-sm-12 col-xs-12">(Don't worry about setting a password right now, we'll email you a link to create one)</div>
-				<div class="clearfix reg-captcha-wrapper reg-item" style="width: 305px; margin: auto;">
+				
+				
+				- <div class="clearfix reg-captcha-wrapper reg-item" style="width: 305px; margin: auto;"  ng-if="(isCaptchaEnabled())">
 					<div vc-recaptcha key="model.key" on-create="setWidgetId(widgetId)" on-success="setResponse(response);newRecaptcha()" on-expire="cbExpiration()"></div>
 					<p ng-show="(submitted && !response)|| isNewRecaptcha" class="help-block-reg">Let's make sure you are a real person, please check the box beside I'm not a robot!</p>
-				</div>
+				</div> 
 				<div style="width: 125; margin: 25px auto;">
-					<button class="reg-next" ng-init="activate=0" type="submit" ng-class="{'regen':activate == 1 && signInForm.$valid}" ng-click="submitted=true">
+					<button class="reg-next" ng-init="activate=0" type="submit" ng-class="{'regen':(activate == 1 || ! isCaptchaEnabled()) && signInForm.$valid}" ng-click="submitted=true">
 						Next <span style="font-size: 12px;"><i class="fa fa-arrow-right" aria-hidden="true"></i></span>
 					</button>
 				</div>

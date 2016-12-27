@@ -35,6 +35,7 @@
 	var setPassword = '${setPassword}';
 	var planId = '${planId}';
 	var newUser = '${newUser}';
+	var enableCaptcha = '${enableCaptcha}';
 </script>
 <body ng-app="SocialSurvey" ng-controller="newSignupController">
 	<div class="overlay-loader hide"></div>
