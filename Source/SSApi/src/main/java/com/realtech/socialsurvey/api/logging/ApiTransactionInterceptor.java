@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.api.logging;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,10 +48,21 @@ public class ApiTransactionInterceptor extends HandlerInterceptorAdapter
         
         ResponseEntity<Map<String, Object>> responseObj =  (ResponseEntity<Map<String, Object>>) request.getAttribute( "output" );
         request.removeAttribute( "output" );
-                
+        
+        long companyId = 0;
+        try{
+        	if(request.getAttribute( "companyId" ) != null)
+        		companyId = (long) request.getAttribute( "companyId" );
+
+        }catch(Exception e){
+        	LOG.error("Error while getting companyId from the request : " + e.getMessage());
+        }
+        		
+        
         ApiRequestEntity apiRequestEntity = new ApiRequestEntity();
         apiRequestEntity.setUrl( getFullURL( request ) );
         apiRequestEntity.setBody(data);
+        apiRequestEntity.setRequestMethod(request.getMethod());
         
         ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
         apiResponseEntity.setStatusCode(responseObj.getStatusCode().toString());
@@ -62,6 +74,10 @@ public class ApiTransactionInterceptor extends HandlerInterceptorAdapter
         ApiRequestDetails apiRequestDetails = new ApiRequestDetails();
         apiRequestDetails.setRequest(apiRequestEntity);
         apiRequestDetails.setResponse(apiResponseEntity);
+        apiRequestDetails.setCreatedOn( new Date(System.currentTimeMillis()));
+        
+        apiRequestDetails.setCompanyId(companyId);
+        request.removeAttribute( "companyId" );
         
         ApiLoggingProcessorThread thread = (ApiLoggingProcessorThread) getContext().getBean( "apiLoggingProcessorThread" ); 
         thread.setApiRequestDetails(apiRequestDetails);

@@ -7,6 +7,8 @@ public class ApiRequestEntity
     
     String url;
     
+    String requestMethod;
+    
     String statusCode;
     
     String body;
@@ -31,6 +33,16 @@ public class ApiRequestEntity
         this.url = url;
     }
 
+    public String getRequestMethod()
+    {
+        return requestMethod;
+    }
+
+    public void setRequestMethod( String requestMethod )
+    {
+        this.requestMethod = requestMethod;
+    }
+    
     public String getStatusCode()
     {
         return statusCode;
