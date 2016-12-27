@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class RestUtils {
 
 	
-	public ResponseEntity<Map<String , Object>> getRestResponseEntity(HttpStatus httpStatus , String responseMsg, String dataKey , Object dataObject , HttpServletRequest request ){
+	public ResponseEntity<Map<String , Object>> getRestResponseEntity(HttpStatus httpStatus , String responseMsg, String dataKey , Object dataObject , HttpServletRequest request , long companyId ){
 		
 		Map<String,Object> responseMap = new LinkedHashMap<String, Object>();
 		
@@ -37,6 +37,7 @@ public class RestUtils {
 		
 		ResponseEntity<Map<String , Object>> responseEntity = new ResponseEntity<Map<String,Object>>(responseMap , httpStatus);
         request.setAttribute( "output" , responseEntity );
+        request.setAttribute( "companyId" , companyId );
 		return responseEntity;
 	}
 }
