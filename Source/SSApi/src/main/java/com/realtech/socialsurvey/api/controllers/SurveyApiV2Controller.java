@@ -108,6 +108,10 @@ public class SurveyApiV2Controller
         if ( countStr != null ) {
             try {
                 count = Integer.parseInt( countStr );
+                // default count is 1000
+                if ( count > 1000 ) {
+                    count = 1000;
+                }
             } catch ( NumberFormatException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter count is invalid", null, null,
                     request , companyId  );
