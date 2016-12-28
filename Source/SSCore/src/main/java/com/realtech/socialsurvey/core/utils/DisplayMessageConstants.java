@@ -242,6 +242,7 @@ public final class DisplayMessageConstants
     public static final String INVALID_COMPANY_ID = "INVALID_COMPANY_ID";
     public static final String INVALID_SURVEY_JSON = "INVALID_SURVEY_JSON";
     public static final String INVALID_AUTHORIZATION_HEADER = "INVALID_AUTHORIZATION_HEADER";
+    public static final String INACTIVE_COMPANY_ID = "INACTIVE_COMPANY_ID";
 
     public static final String INVALID_SOCIAL_POST_REMINDER_ERROR = "INVALID_SOCIAL_POST_REMINDER_ERROR";
     public static final String SUCCESSFULLY_CREATED_SS_ADMIN = "SUCCESSFULLY_CREATED_SS_ADMIN";
