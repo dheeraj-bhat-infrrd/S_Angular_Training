@@ -880,7 +880,7 @@ public class AdminController
         long companyId;
 
         if ( companyIdStr == null || companyIdStr.isEmpty() ) {
-            return DisplayMessageConstants.INVALID_COMPANY_ID;
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
 
 
@@ -888,7 +888,15 @@ public class AdminController
             companyId = Long.valueOf( companyIdStr );
         } catch ( NumberFormatException e ) {
             LOG.error( "Invalid Company Id " );
-            return DisplayMessageConstants.INVALID_COMPANY_ID;
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+            
+        Company company = userManagementService.getCompanyById( companyId );
+        if(company == null ){
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        if(company.getStatus() != CommonConstants.STATUS_ACTIVE ){
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.INACTIVE_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
 
         try {
@@ -899,7 +907,7 @@ public class AdminController
 
             accessToken =  encryptionHelper.encryptAES( userApiKey.getApiKey() + ":" + userApiKey.getApiSecret(), "" );
         } catch ( InvalidInputException e ) {
-            return DisplayMessageConstants.TRY_AGAIN;
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.TRY_AGAIN, DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
 
         return accessToken;

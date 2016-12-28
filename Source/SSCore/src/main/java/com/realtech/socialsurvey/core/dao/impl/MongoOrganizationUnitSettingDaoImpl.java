@@ -798,8 +798,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         if ( imageType.equals( CommonConstants.IMAGE_TYPE_PROFILE ) ) {
             query
-                .addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR )
-                    .regex( StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) )
+                /*.addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR )
+                    .regex( StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) )*/
+            .addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR ).ne( null ) )
                 .addCriteria( Criteria.where( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN ).is( false ) );
         } else if ( imageType.equals( CommonConstants.IMAGE_TYPE_LOGO ) ) {
             query
