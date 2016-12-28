@@ -59,6 +59,9 @@ public class ImageProcessorImpl implements ImageProcessor {
 		// process thumbnail
 		LOG.info("Processing image for thumbnail " + imageFileName);
 		String extension = imageFileName.substring(imageFileName.lastIndexOf(".") + 1).toLowerCase();
+		if(imageFileName.contains( "media.licdn.com" )){
+		    extension = "jpg";
+		}
 		File processedImage = processImage(sourceImage, THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, extension);
 		// name the file that needs to be uploaded
 		String thumbnailImageName = getThumbnailImageName(imageFileName, extension);
@@ -144,9 +147,16 @@ public class ImageProcessorImpl implements ImageProcessor {
         LOG.debug( "Getting thumbnail name for " + originalImageName );
         String thumbnailImg = "";
         try {
-            thumbnailImg = originalImageName.substring( originalImageName.lastIndexOf( "/" ) + 1,
-                originalImageName.lastIndexOf( "." + extension ) )
-                + "-th." + extension;
+            if(thumbnailImg.contains( "." + extension  )){
+                thumbnailImg = originalImageName.substring( originalImageName.lastIndexOf( "/" ) + 1,
+                    originalImageName.lastIndexOf( "." + extension ) )
+                    + "-th." + extension;
+            }else{
+                thumbnailImg = originalImageName.substring( originalImageName.lastIndexOf( "/" ) + 1,
+                    originalImageName.length() -1 )
+                    + "-th." + extension;
+            }
+            
         } catch ( StringIndexOutOfBoundsException e ) {
             throw new InvalidInputException( "Error. Unable to generate thumbnail image name for fileName : "
                 + originalImageName + ".", e );
