@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.api.transformers.SurveyPreinitiationTransformer
 import com.realtech.socialsurvey.api.transformers.SurveyTransformer;
 import com.realtech.socialsurvey.api.transformers.SurveysAndReviewsVOTransformer;
 import com.realtech.socialsurvey.api.utils.RestUtils;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.exception.AuthorizationException;
@@ -77,7 +78,7 @@ public class SurveyApiController
         LOGGER.info( "SurveyApiController.postSurveyTransaction started" );
         request.setAttribute( "input", surveyModel );
 
-        String authorizationHeader = request.getHeader( "Authorization" );
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         long companyId = 0;
         //authorize request
         try {
@@ -120,7 +121,7 @@ public class SurveyApiController
 
         //authorize request
         long companyId = 0;
-        String authorizationHeader = request.getHeader( "Authorization" );
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         try {
             companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
         } catch ( AuthorizationException e1 ) {
@@ -160,7 +161,7 @@ public class SurveyApiController
         LOGGER.info( "SurveyApiController.getSurveyTransactions started" );
 
         //authorize request
-        String authorizationHeader = request.getHeader( "Authorization" );
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         long companyId = 0;
         try {
             companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
@@ -173,14 +174,14 @@ public class SurveyApiController
         String startStr = request.getParameter( "start" );
         String status = request.getParameter( "status" );
 
-        int count = 1000;
+        int count = CommonConstants.SURVEY_API_DEFAUAT_BATCH_SIZE;
         int start = 0;
         if ( countStr != null ) {
             try {
                 count = Integer.parseInt( countStr );
                 // default count is 1000
-                if ( count > 1000 ) {
-                    count = 1000;
+                if ( count > CommonConstants.SURVEY_API_DEFAUAT_BATCH_SIZE ) {
+                    count = CommonConstants.SURVEY_API_DEFAUAT_BATCH_SIZE;
                 }
             } catch ( NumberFormatException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter count is invalid", null, null,

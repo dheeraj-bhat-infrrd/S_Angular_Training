@@ -75,7 +75,7 @@ public class SurveyApiV2Controller
         LOGGER.info( "SurveyApiController.getSurveyTransactions started" );
 
         //authorize request
-        String authorizationHeader = request.getHeader( "Authorization" );
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         long companyId = 0;
         try {
             companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
@@ -103,14 +103,14 @@ public class SurveyApiV2Controller
         	}
         }
 
-        int count = 1000;
+        int count = CommonConstants.SURVEY_API_DEFAUAT_BATCH_SIZE;
         int start = 0;
         if ( countStr != null ) {
             try {
                 count = Integer.parseInt( countStr );
                 // default count is 1000
-                if ( count > 1000 ) {
-                    count = 1000;
+                if ( count > CommonConstants.SURVEY_API_DEFAUAT_BATCH_SIZE ) {
+                    count = CommonConstants.SURVEY_API_DEFAUAT_BATCH_SIZE;
                 }
             } catch ( NumberFormatException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter count is invalid", null, null,

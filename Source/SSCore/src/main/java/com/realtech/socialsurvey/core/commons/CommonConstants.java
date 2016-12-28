@@ -1249,6 +1249,10 @@ public interface CommonConstants
     public static final String BATCH_TYPE_PROCESSED_SSO_TICKET_REMOVER = "ssoTicketRemover";
     public static final String BATCH_NAME_PROCESSED_SSO_TICKET_REMOVER = "remove used vendasta sso tickets";
     public static final int VENDASTA_TICKET_EXPIRED = 1;
+    
+    //survey API
+    public static final String SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION = "Authorization";
+    public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
 
 
 }
