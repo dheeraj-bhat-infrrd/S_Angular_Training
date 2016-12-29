@@ -628,8 +628,10 @@ public class RegistrationController
     @ResponseBody
     @RequestMapping ( value = "/generateregistrationurl")
     public String geerateRegistrationUrlForManualCompanyCreation( @RequestParam ( "firstName") String firstName,
-        @RequestParam ( "lastName") String lastName, @RequestParam ( "emailId") String emailId )
+        @RequestParam ( "lastName") String lastName, @RequestParam ( "customer-emailId") String customerEmailId,
+        @RequestParam ( "specified-emailId") String specifiedEmailId )
     {
+        String emailId = ( specifiedEmailId != null && !specifiedEmailId.isEmpty() )? specifiedEmailId : customerEmailId;
         LOG.info( "Creating invitation url for " + firstName + " " + lastName + " and email " + emailId );
         String result = null;
 
