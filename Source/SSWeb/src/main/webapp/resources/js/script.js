@@ -3766,27 +3766,6 @@ function downloadCompanyHierarchyReport() {
 	window.location.href = "/downloadcompanyhierarchyreport.do?columnName=" + colName + "&columnValue=" + colValue;
 }
 
-function validateVendastaApiUser(elementId) {
-	if ($('#' + elementId).val() != "") {
-		$('#' + elementId).next('.hm-item-err-2').hide();
-		return true;
-	} else {
-		$('#' + elementId).next('.hm-item-err-2').html('Please enter Api User field.');
-		$('#' + elementId).next('.hm-item-err-2').show();
-		return false;
-	}
-}
-
-function validateVendastaApiKey(elementId) {
-	if ($('#' + elementId).val() != "") {
-		$('#' + elementId).next('.hm-item-err-2').hide();
-		return true;
-	} else {
-		$('#' + elementId).next('.hm-item-err-2').html('Please enter Api Key field.');
-		$('#' + elementId).next('.hm-item-err-2').show();
-		return false;
-	}
-}
 
 function validateVendastaAccountId(elementId) {
 	if ($('#' + elementId).val() != "") {
