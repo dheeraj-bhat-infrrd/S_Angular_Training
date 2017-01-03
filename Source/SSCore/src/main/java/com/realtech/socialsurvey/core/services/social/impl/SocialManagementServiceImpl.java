@@ -2288,7 +2288,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
-    @Transactional
     @Override
     public void updateAgentIdOfSurveyPreinitiationRecordsForEmail( User user, String emailAddress ) throws InvalidInputException
     {
@@ -2303,7 +2302,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
-    @Transactional
     @Override
     public void updateSurveyPreinitiationRecordsAsIgnored( String emailAddress ) throws InvalidInputException
     {
