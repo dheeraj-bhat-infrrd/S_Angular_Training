@@ -285,7 +285,7 @@
 									<spring:message code="label.appsettings.key" />
 								</div>
 							</c:if>
-							<c:if test="true">
+							<c:if test="${ not empty realTechAdminId }">
 								<div id="vndsta-setting-two" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showreviewsmonitorsettings.do');">
 									<spring:message code="label.vendastaproductsettings.key" />
 								</div>
@@ -319,7 +319,7 @@
 									<spring:message code="label.appsettings.key" />
 								</div>
 							</c:if>
-							<c:if test="true">
+							<c:if test="${ not empty realTechAdminId }">
 								<div id="vndsta-setting-three" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showreviewsmonitorsettings.do');">
 									<spring:message code="label.vendastaproductsettings.key" />
 								</div>
