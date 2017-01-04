@@ -199,7 +199,7 @@
 				<c:if test="${!hiddenSectionDashboard}">
 					<div class="header-links-item" onclick="showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></div>
 				</c:if>
-				<c:if test="true">
+				<c:if test="${ not empty realTechAdminId }">
 					<div id="vndsta-setting-one" class="header-links-item hide" onclick="showMainContent('./showreviewsmonitorsettings.do')"><spring:message code="label.vendastaproductsettings.key" /></div>
 				</c:if>
 				</c:if>
@@ -285,7 +285,7 @@
 									<spring:message code="label.appsettings.key" />
 								</div>
 							</c:if>
-							<c:if test="true">
+							<c:if test="${ not empty realTechAdminId }">
 								<div id="vndsta-setting-two" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showreviewsmonitorsettings.do');">
 									<spring:message code="label.vendastaproductsettings.key" />
 								</div>
@@ -319,7 +319,7 @@
 									<spring:message code="label.appsettings.key" />
 								</div>
 							</c:if>
-							<c:if test="true">
+							<c:if test="${ not empty realTechAdminId }">
 								<div id="vndsta-setting-three" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showreviewsmonitorsettings.do');">
 									<spring:message code="label.vendastaproductsettings.key" />
 								</div>
