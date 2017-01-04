@@ -37,35 +37,26 @@ import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 
-@RestController
-@RequestMapping ( "/api/v1.2")
+//@RestController
+//@RequestMapping ( "/api/v1.2")
 public class SurveyApiV2Controller
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SurveyApiV2Controller.class );
 
-
+    @Autowired
     private SurveysAndReviewsV2VOTransformer surveysAndReviewsV2VOTransformer;
 
+    @Autowired
     private SurveyHandler surveyHandler;
 
+    @Autowired
     private AdminAuthenticationService adminAuthenticationService;
 
+    @Autowired
     private RestUtils restUtils;
 
-    private UserManagementService userManagementService;
-
-
     @Autowired
-    public SurveyApiV2Controller( SurveyHandler surveyHandler, AdminAuthenticationService adminAuthenticationService,
-        RestUtils restUtils, UserManagementService userManagementService,
-        SurveysAndReviewsV2VOTransformer surveysAndReviewsV2VOTransformer )
-    {
-        this.surveyHandler = surveyHandler;
-        this.adminAuthenticationService = adminAuthenticationService;
-        this.restUtils = restUtils;
-        this.userManagementService = userManagementService;
-        this.surveysAndReviewsV2VOTransformer = surveysAndReviewsV2VOTransformer;
-    }
+    private UserManagementService userManagementService;
 
 
     @RequestMapping ( value = "/survey", method = RequestMethod.GET)
