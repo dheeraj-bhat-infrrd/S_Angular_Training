@@ -1,8 +1,6 @@
 package com.realtech.socialsurvey.api.transformers;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -19,6 +17,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.utils.CommonUtils;
 
 
 @Component
@@ -59,8 +58,8 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
                 transactionInfo.setTransactionDate( String.valueOf( d.getSurveyTransactionDate() ) );
             transactionInfo.setTransactionRef( d.getSourceId() );
             if ( objects[0] != null && objects[0] instanceof SurveyPreInitiation )
-                transactionInfo.setSurveySentDateTime(
-                    formatDate( ( (SurveyPreInitiation) objects[0] ).getLastReminderTime(), "yyyy-MM-dd'T'HH:mm:ss.SSSZ" ) );
+                transactionInfo.setSurveySentDateTime( CommonUtils
+                    .formatDate( ( (SurveyPreInitiation) objects[0] ).getLastReminderTime(), "yyyy-MM-dd'T'HH:mm:ss.SSSZ" ) );
             serviceProviderInfo.setServiceProviderEmail( d.getAgentEmailId() );
             serviceProviderInfo.setServiceProviderName( d.getAgentName() );
             survey.setReviewId( d.get_id() );
@@ -69,8 +68,8 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
             review.setRating( String.valueOf( d.getScore() ) );
             review.setReviewDate( d.getModifiedOn().toString() );
             review.setRetakeSurvey( d.isRetakeSurvey() );
-            if( d.getModifiedOn() != null ){
-                review.setReviewUpdatedDateTime( formatDate( d.getModifiedOn(), "yyyy-MM-dd'T'HH:mm:ss.SSSZ" ) );
+            if ( d.getModifiedOn() != null ) {
+                review.setReviewUpdatedDateTime( CommonUtils.formatDate( d.getModifiedOn(), "yyyy-MM-dd'T'HH:mm:ss.SSSZ" ) );
             }
             review.setSource( d.getSource() );
             review.setAgreedToShare( Boolean.parseBoolean( d.getAgreedToShare() ) );
@@ -96,10 +95,10 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
             surveyResponses.add( responseVO );
             review.setSurveyResponses( surveyResponses );
             review.setReview( d.getReview() );
-            //review.setIsCRMVerified(surveyPreInitiation);
             boolean isCRMVerified = false;
             if ( d.getSource() != null )
-                if ( d.getSource().equals( "encompass" ) || d.getSource().equals( "DOTLOOP" ) )
+                if ( d.getSource().equalsIgnoreCase( "encompass" ) || d.getSource().equalsIgnoreCase( "DOTLOOP" )
+                    || d.getSource().equalsIgnoreCase( "FTP" ) || d.getSource().equalsIgnoreCase( "LONEWOLF" ) )
                     isCRMVerified = true;
             review.setIsCRMVerified( isCRMVerified );
 
@@ -136,18 +135,6 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
         survey.setServiceProviderInfo( serviceProviderInfo );
 
         return survey;
-    }
-
-
-    public String formatDate( Date date, String format )
-    {
-        if ( date == null ) {
-            return "";
-        } else if ( format == null || format.isEmpty() ) {
-            return date.toString();
-        } else {
-            return new SimpleDateFormat( format ).format( date );
-        }
     }
 
 }

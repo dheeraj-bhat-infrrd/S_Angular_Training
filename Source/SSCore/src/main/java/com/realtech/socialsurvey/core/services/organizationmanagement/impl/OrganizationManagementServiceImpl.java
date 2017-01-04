@@ -1502,7 +1502,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public void addDisabledAccount( long companyId, boolean forceDisable, long userId )
         throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
-        LOG.debug( "Adding the disabled account to the database for company id : " + companyId );
+        LOG.info( "Adding the disabled account to the database for company id : " + companyId );
         if ( companyId <= 0 ) {
             LOG.error( "addDisabledAccount : Invalid companyId has been given." );
             throw new InvalidInputException( "addDisabledAccount : Invalid companyId has been given." );
@@ -1546,7 +1546,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Adding the Disabled Account entity to the database" );
         disabledAccountDao.save( disabledAccount );
-        LOG.debug( "Added Disabled Account entity to the database." );
+        LOG.info( "Added Disabled Account entity to the database." );
     }
 
 

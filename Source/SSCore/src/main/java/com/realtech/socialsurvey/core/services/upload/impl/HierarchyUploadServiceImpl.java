@@ -1033,15 +1033,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             return true;
         } else if ( uploadedUser.getSourceUserId() == null || uploadedUser.getSourceUserId().isEmpty() ) {
             return true;
-        } else if ( uploadedUser.getEmailId() != null && !uploadedUser.getEmailId().isEmpty() ) {
-            UserUploadVO curUser = uploadedUsers.get( uploadedUsers.indexOf( uploadedUser ) );
-            if ( curUser.getEmailId() != null && !curUser.getEmailId().isEmpty() ) {
-                if ( !curUser.getEmailId().equalsIgnoreCase( uploadedUser.getEmailId() ) ) {
-                    return true;
-                }
-            }
-        }
-        {
+        } else {
             return false;
         }
     }

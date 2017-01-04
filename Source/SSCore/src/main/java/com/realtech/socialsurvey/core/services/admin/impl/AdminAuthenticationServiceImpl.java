@@ -67,4 +67,21 @@ public class AdminAuthenticationServiceImpl implements AdminAuthenticationServic
         
     }
 
+    @Override
+    public boolean validateSSOTuple( String productId, String ssoToken, String ssoTicket )
+    {
+        /*if( productId != "RM" ){
+            return false;
+        }
+        if( !ssoToken.isEmpty() ){
+            long ticket = Long.parseLong( ssoTicket );
+            ticket += 60;
+            if( ticket <= System.currentTimeMillis() ){
+                return true;
+            }
+            else
+                return false;
+        }*/
+        return true;
+    }
 }

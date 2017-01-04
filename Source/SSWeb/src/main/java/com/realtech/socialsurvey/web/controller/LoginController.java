@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,6 +66,9 @@ public class LoginController
     private AuthenticationService authenticationService;
     @Autowired
     private OrganizationManagementService organizationManagementService;
+    
+    @Value ( "${ENABLE_CAPTCHA}")
+    private String enableCaptcha;
 
 
     // Redirects user to Landing Page if session is active
@@ -110,6 +114,8 @@ public class LoginController
         attributes.addFlashAttribute( "firstName", map.get( "firstName" ) );
         attributes.addFlashAttribute( "lastName", map.get( "lastName" ) );
         attributes.addFlashAttribute( "setPassword", map.get( "setPassword" ) );
+        
+        attributes.addFlashAttribute( "enableCaptcha", enableCaptcha );
         return "redirect:/accountsignup.do";
     }
 

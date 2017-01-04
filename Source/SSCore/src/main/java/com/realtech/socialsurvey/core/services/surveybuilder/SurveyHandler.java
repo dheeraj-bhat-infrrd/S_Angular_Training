@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -347,7 +348,7 @@ public interface SurveyHandler
     SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
 
 
-    SurveysAndReviewsVO getSurveysByStatus( String status, int startIndex, int count , long companyId);
+    SurveysAndReviewsVO getSurveysByFilterCriteria( String status, String mood , Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds ,  int startIndex, int count , long companyId);
 
 
     public void prepareAndSendInvitationMail( SurveyPreInitiation survey ) throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
@@ -355,7 +356,7 @@ public interface SurveyHandler
 
     void sendSurveyReminderEmail( SurveyPreInitiation survey ) throws InvalidInputException, ProfileNotFoundException;
     
-    public void updateSurveySourceIdInMongo();
+    public void updateSurveyTransactionDateInMongo();
 
 
     void updateZillowSourceIdInExistingSurveyDetails( SurveyDetails surveyDetails );

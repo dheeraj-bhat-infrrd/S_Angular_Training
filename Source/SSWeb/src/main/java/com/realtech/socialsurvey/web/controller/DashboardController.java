@@ -236,7 +236,6 @@ public class DashboardController
         return String.valueOf( hiddenSection );
     }
 
-
     /*
      * Method to get profile details for displaying
      */

@@ -289,6 +289,7 @@ public interface CommonConstants
     public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
     public static final String USER_ENCRYPTED_ID = "userEncryptedId";
     public static final String SURVEY_COMPLETED_DATE_COLUMN = "surveyCompletedDate";
+    public static final String SURVEY_TRANSACTION_DATE_COLUMN = "surveyTransactionDate";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -1233,5 +1234,25 @@ public interface CommonConstants
     public static final Object ZILLOW_REVIEWS = "Zillow Reviews";
     public static final Object ABUSIVE_REVIEWS = "Abusive Reviews";
     public static final Object THIRD_PARTY_REVIEWS = "3rd Party Reviews";
+    
+    //vendasta constants
+    public static final String VENDASTA_ACCESS = "vendastaAccessible";
+    public static final String VENDASTA_REPUTATION_MANAGEMENT_ID = "RM";
+    public static final String VENDASTA_SSO_TICKET_ID_COLUMN = "vendastaSingleSignOnTicketId";
+    public static final String VENDASTA_SSO_TICKET_COLUMN = "vendastaSingleSignOnTicket";
+    public static final String VENDASTA_SSO_TOKEN_COLUMN = "vendastaSingleSignOnToken";
+    public static final String VENDASTA_PRODUCT_ID_COLUMN = "productId";
+    public static final String VENDASTA_STATUS_COLUMN = "status";
+    public static final String VENDASTA = "vendasta";
+    
+    //vendasta batch constants
+    public static final String BATCH_TYPE_PROCESSED_SSO_TICKET_REMOVER = "ssoTicketRemover";
+    public static final String BATCH_NAME_PROCESSED_SSO_TICKET_REMOVER = "remove used vendasta sso tickets";
+    public static final int VENDASTA_TICKET_EXPIRED = 1;
+    
+    //survey API
+    public static final String SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION = "Authorization";
+    public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
+
 
 }

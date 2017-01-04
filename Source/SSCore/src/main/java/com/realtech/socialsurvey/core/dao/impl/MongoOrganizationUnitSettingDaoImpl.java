@@ -61,6 +61,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_ACCOUNT_DISABLED = "isAccountDisabled";
     public static final String KEY_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
     public static final String KEY_SEO_CONTENT_MODIFIED = "isSeoContentModified";
+    public static final String KEY_VENDASTA_ACCESS = "vendastaAccessible";
     public static final String KEY_CONTACT_DETAIL_SETTINGS = "contact_details";
     public static final String KEY_LOCK_SETTINGS = "lockSettings";
     public static final String KEY_LINKEDIN_PROFILEDATA = "linkedInProfileData";
@@ -103,6 +104,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_POSTIONS = "positions";
     public static final String KEY_STATUS = "status";
     public static final String KEY_USER_ENCRYPTED_ID = "userEncryptedId";
+    public static final String KEY_VENDASTA_RM_SETTINGS = "vendasta_rm_settings";
+
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
@@ -795,8 +798,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         if ( imageType.equals( CommonConstants.IMAGE_TYPE_PROFILE ) ) {
             query
-                .addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR )
-                    .regex( StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) )
+                /*.addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR )
+                    .regex( StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) )*/
+            .addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR ).ne( null ) )
                 .addCriteria( Criteria.where( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN ).is( false ) );
         } else if ( imageType.equals( CommonConstants.IMAGE_TYPE_LOGO ) ) {
             query

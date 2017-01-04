@@ -840,7 +840,7 @@ function updateDashboardProfileEvents() {
 	$('#pro-cmplt-stars').on('click', '#dsh-btn0', function(e) {
 		e.stopPropagation();
 		var buttonId = 'dsh-btn0';
-		//getSocialMediaToFix
+		// getSocialMediaToFix
 		var payload = {
 				"columnName" : colName,
 				"columnValue" : colValue
@@ -875,7 +875,7 @@ function paintFixSocialMedia(data){
 		$('#dsh-btn0').addClass("hide");
 	}
 	
-//	e.stopPropagation();
+// e.stopPropagation();
 	$('#overlay-continue').html("");
 	$('#overlay-cancel').html("");
 	$('#overlay-header').html("Reconnect Social Media");
@@ -1848,6 +1848,11 @@ $(document).on('click', '.da-dd-item', function(e) {
 		showDashOverlay('#social-media-dash');
 		var selectedTab = window.location.hash.split("#")[1];
 		showMainContent('./' + selectedTab + '.do');
+		callAjaxGetWithPayloadData("/isvendastaaccessibleforthesession.do", function(data) {
+			vendastaAccess = JSON.parse(data);
+			showOrHideReviewsMonitor( vendastaAccess );
+			showOrHideVendastaProductSettings( vendastaAccess );
+		});
 	});
 });
 
@@ -3890,7 +3895,7 @@ function saveTestLoneDetailsCallBack(response) {
 	var savedClassificationsByCode = map.savedClassificationsByCode;
 	
 	if (map.status == true) {
-		//show classification list
+		// show classification list
 		for (var i = 0; i < classificationsList.length; i++) {
 		    var classification = classificationsList[i];
 		    var $classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="B" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
@@ -3975,10 +3980,10 @@ function bindClickToClassificationTypeButton(){
 	$('.bd-cust-rad-img').click(function(e) {
 		$(this).parent().parent().find('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
 		$(this).toggleClass('bd-cust-rad-img-checked');
-		//update type in row
+		// update type in row
 		$(this).parent().parent().attr('data-type', $(this).data('type'));
 		var curIndex = $(this).parent().parent().attr('index');
-		//update classification list
+		// update classification list
 		( classificationsList[curIndex]).loneWolfTransactionParticipantsType = $(this).data('type');
 	});
 
@@ -4425,6 +4430,17 @@ function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disabl
 	};
 	
 	callAjaxPostWithPayloadData("./updateautopostlinktousersiteforsurvey.do",function(data) {
+		if (data == "success") $('#overlay-toast').html("Content updated successfully");
+	}, payload, true, disableEle);
+	
+}
+
+function updateVendastaAccessSetting(hasVendastaAcess, disableEle) {
+	var payload = {
+		"hasVendastaAcess" : hasVendastaAcess
+	};
+	
+	callAjaxPostWithPayloadData("./updatevendastaaccesssetting.do",function(data) {
 		if (data == "success") $('#overlay-toast').html("Content updated successfully");
 	}, payload, true, disableEle);
 	
@@ -7518,7 +7534,7 @@ $('body').on('click', '#prof-edit-social-link .icn-yelp', function(e) {
 $(document).on('click',function(){
 	$('#social-token-text').hide();
 });
-//hide input textbox for link
+// hide input textbox for link
 $(document).on('click','#social-token-text',function(e){
 	e.stopPropagation();
 });
@@ -9084,6 +9100,23 @@ $(document).on('click', '.hdr-link-item-dropdown-item', function(e) {
 	showOverlay();
 });
 
+$(document).on('click', '#hdr-sm-settings-dropdown', function(e) {
+	$('#hdr-link-item-dropdown-sm').toggle();
+});
+
+$(document).on('mouseover', '#hdr-link-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').show();
+});
+
+$(document).on('mouseout', '#hdr-link-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').hide();
+});
+
+$(document).on('click', '.hdr-link-item-dropdown-item-sm', function(e) {
+	$('#hdr-link-item-dropdown-sm').hide();
+	showOverlay();
+});
+
 // Help page onclick function
 $(document).on('click', '#send-help-mail-button', function() {
 	var subject = "";
@@ -9174,10 +9207,12 @@ function disconnectSocialMedia(event, socialMedia, isAutoLogin) {
 
 	function deleteFeed() {
 		// delete feed function
+		showOverlay();
 		processSocialMediaDisconnect(true);
 	}
 
 	function keepFeed() {
+		showOverlay();
 		processSocialMediaDisconnect(false);
 	}
 
@@ -9192,9 +9227,11 @@ function disconnectSocialMedia(event, socialMedia, isAutoLogin) {
 				$('div[data-social="' + socialMedia + '"]').html('');
 				$('div[data-social="' + socialMedia + '"]').parent().find('.social-media-disconnect').addClass('social-media-disconnect-disabled').removeAttr("onclick").removeAttr("title");
 				$('#overlay-toast').html('Successfully disconnected ' + socialMedia);
+				hideOverlay();
 				showToast();
 			} else {
 				$('#overlay-toast').html('Some error occurred while disconnecting ' + socialMedia);
+				hideOverlay();
 				showToast();
 			}
 		}, payload, true);
@@ -9789,6 +9826,48 @@ $('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
 		updateAutoPostLinkToUserSiteSetting(false, '#atpst-lnk-usr-ste-chk-box');
 	}
 });
+
+$('body').on('click', '#vndsta-access-chk-box', function() {
+	if ($('#vndsta-access-chk-box').hasClass('bd-check-img-checked')) {
+		$('#vndsta-access-chk-box').removeClass('bd-check-img-checked');
+		showOrHideReviewsMonitor( true );
+		showOrHideVendastaProductSettings( true );
+		updateVendastaAccessSetting(true, '#vndsta-access-chk-box');
+	} else {
+		$('#vndsta-access-chk-box').addClass('bd-check-img-checked');
+		showOrHideReviewsMonitor( false );
+		showOrHideVendastaProductSettings( false );
+		updateVendastaAccessSetting(false, '#vndsta-access-chk-box');
+	}
+});
+
+function showOrHideReviewsMonitor(vendastaAccess)
+{
+	if( vendastaAccess == true || vendastaAccess == "true" )
+		{
+		$("#reviews-monitor-main").show();
+		$("#reviews-monitor-slider").show();
+		}
+	else{
+		$("#reviews-monitor-main").hide();
+		$("#reviews-monitor-slider").hide();
+	}
+}
+
+function showOrHideVendastaProductSettings(flag)
+{	
+	if( flag == true || flag == "true" )
+	{
+		$("#vndsta-setting-one").show();
+		$("#vndsta-setting-two").show();
+		$("#vndsta-setting-three").show();
+	}
+	else{
+		$("#vndsta-setting-one").hide();
+		$("#vndsta-setting-two").hide();
+		$("#vndsta-setting-three").hide();
+	}	
+}
 
 // Dashboard fb and twitter share
 function getDashboardImageandCaption(loop) {
@@ -11003,8 +11082,8 @@ function showLoneWolfButtons() {
 	var state = $("#lone-state").val();
 	if (state == 'dryrun') {
 		$('#lone-dry-enable').show();
-		//TODO : uncooment the generate report show code when back end is ready
-	//	$('#lone-generate-report').show();
+		// TODO : uncooment the generate report show code when back end is ready
+	// $('#lone-generate-report').show();
 		$('#lone-disconnect').hide();
 	} else if (state == 'prod') {
 		$('#lone-disconnect').show();
@@ -11296,3 +11375,33 @@ $(document).on('click','ul.accordion li',function(){
 $(document).on('click','.email-content',function(event){
 	event.stopPropagation();
 });
+
+var isVendastaValid;
+function validateVendastaFields(){
+	isVendastaValid = true;
+	var isFocussed = false;
+
+	if (!validateVendastaApiUser('api-user')) {
+		isVendastaValid = false;
+		if (!isFocussed) {
+			$('#api-user').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateVendastaApiKey('api-key')) {
+		isVendastaValid = false;
+		if (!isFocussed) {
+			$('#api-key').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateVendastaAccountId('account-iden')) {
+		isVendastaValid = false;
+		if (!isFocussed) {
+			$('#account-iden').focus();
+			isFocussed = true;
+		}
+	}
+
+	return isVendastaValid;
+}

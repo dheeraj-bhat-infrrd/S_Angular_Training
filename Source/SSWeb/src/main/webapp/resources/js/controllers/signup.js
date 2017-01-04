@@ -120,6 +120,7 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 	$scope.widgetId = null;
 	$scope.isEmailIdExist = false;
     $scope.isNewRecaptcha=false;
+    $scope.enableCaptcha = enableCaptcha;
 	$scope.model = {
 		key : '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'
 	};
@@ -136,17 +137,31 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 		$scope.activate = 1;
 	}
 
+	
+	$scope.isCaptchaEnabled=function(){
+		if($scope.enableCaptcha=='Y')
+			return true;
+		else
+			return false;
+	}
+	
 	$scope.submitLogin = function() {
 		if($scope.isEmailIdExist== true){
 			return;
 		}
-		$scope.recaptcha=vcRecaptchaService.getResponse();
-		if($scope.recaptcha==""){
-			return;
+		
+		
+		if($scope.isCaptchaEnabled()){
+			if(vcRecaptchaService.getResponse()==""){
+				return;
+			}
 		}
+		
 		if ($scope.signInForm.$valid) {
 			showOverlay();
-			$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
+			if($scope.isCaptchaEnabled()){
+				$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();				
+			}
 			$scope.accountRegistration.phone = getPhoneNumber("reg-phone");
 			$scope.accountRegistration.planId = planId;
 			LoginService.signup($scope.accountRegistration).then(function(response) {
@@ -159,7 +174,9 @@ app.controller('accountSignupController', [ '$cookies', '$scope', '$location', '
 				if (error.data.indexOf("already exists") > -1 && error.data.indexOf("User with Email") > -1) {
 					$scope.isEmailIdExist = true;
 					$scope.isNewRecaptcha=true;
-					grecaptcha.reset();
+					if($scope.isCaptchaEnabled()){
+						grecaptcha.reset();
+					}
 					$scope.activate = 0;
 					hideOverlay();
 				} else {

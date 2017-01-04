@@ -875,27 +875,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
-    /**
-     * Method to get a list of users having the same email ID
-     * @param emailId
-     * @return
-     * @throws InvalidInputException
-     */
-    @Transactional
-    @Override
-    public List<User> getUsersByEmailId( String emailId ) throws InvalidInputException
-    {
-        LOG.debug( "Method getUsersByEmailId started for emailId : " + emailId );
-        if ( emailId == null || emailId.isEmpty() ) {
-            throw new InvalidInputException( "Email ID is empty" );
-        }
-        List<User> users = userDao.findByColumn( User.class, CommonConstants.EMAIL_ID, emailId );
-
-        LOG.debug( "Method getUsersByEmailId finished for emailId : " + emailId );
-        return users;
-    }
-
-
     // Method to return user with provided email and company
     @Transactional
     @Override
@@ -4605,6 +4584,63 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 userIds.add( user.getUserId() );
             }
         }
+        return userIds;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService#getUserIdsUnderAdmin(com.realtech.socialsurvey.core.entities.User)
+     */
+    @Override
+    public Set<Long> getUserIdsUnderAdmin(User adminUser) throws InvalidInputException{
+        
+        if(adminUser == null){
+            throw new InvalidInputException("Passed parameter adminUser is null");
+        }
+        
+        LOG.info( "Method getUserIdsUnderAdmin started for adminUserId " +   adminUser.getUserId() );
+        
+        Set<Long> userIds = new HashSet<Long>();
+        List<UserProfile> adminUserProfiles = getAllUserProfilesForUser( adminUser );
+        
+        ProfilesMaster agentProfileMaster =  profilesMasterDao.findById( ProfilesMaster.class, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
+        
+        for(UserProfile userProfile : adminUserProfiles){
+            if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID){
+                Map<String, Object> queries = new HashMap<>();
+                queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+                queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
+                queries.put( CommonConstants.BRANCH_ID_COLUMN, userProfile.getBranchId() );
+                List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+                
+                for(UserProfile agentProfile : userProfiles){
+                    userIds.add( agentProfile.getAgentId() );
+                }
+            }
+            else if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID){
+                Map<String, Object> queries = new HashMap<>();
+                queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+                queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
+                queries.put( CommonConstants.REGION_ID_COLUMN, userProfile.getRegionId() );
+                List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+                
+                for(UserProfile agentProfile : userProfiles){
+                    userIds.add( agentProfile.getAgentId() );
+                }
+            }
+            else if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID){
+                Map<String, Object> queries = new HashMap<>();
+                queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+                queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
+                queries.put( CommonConstants.COMPANY_COLUMN, userProfile.getCompany() );
+                List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+                
+                for(UserProfile agentProfile : userProfiles){
+                    userIds.add( agentProfile.getAgentId() );
+                }
+            }
+        }
+        
         return userIds;
     }
 }
