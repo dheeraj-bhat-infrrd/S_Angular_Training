@@ -15,6 +15,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
@@ -72,6 +73,12 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
 
     @Autowired
     private VendastaApiIntegrationBuilder vendastaApiIntegrationBuilder;
+    
+    @Value("${API_USER}")
+    private String apiUser;
+    
+    @Value("${API_KEY}")
+    private String apiKey;
 
 
     //the method that actually interacts with data layer objects to update the boolean VendastaAccessible
@@ -390,7 +397,7 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
 
 
     @Override
-    public boolean isAccountExistInVendasta( String accountId, String apiUser, String apiKey )
+    public boolean isAccountExistInVendasta( String accountId )
     {
         boolean status = false;
         try {

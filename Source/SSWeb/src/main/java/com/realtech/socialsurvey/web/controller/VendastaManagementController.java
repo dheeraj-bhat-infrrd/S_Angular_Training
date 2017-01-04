@@ -77,6 +77,7 @@ public class VendastaManagementController
             if ( hasVendastaAcess != null && !hasVendastaAcess.isEmpty() ) {
                 isVendastaAcessible = Boolean.parseBoolean( hasVendastaAcess );
                 session.setAttribute( CommonConstants.VENDASTA_ACCESS, String.valueOf( isVendastaAcessible ) );
+                session.setAttribute( "vendastaAccess", String.valueOf( isVendastaAcessible ) );
                 Map<String, Object> hierarchyDetails = vendastaManagementService.getUnitSettingsForAHierarchy( entityType,
                     entityId );
                 unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
@@ -128,8 +129,6 @@ public class VendastaManagementController
                     if ( unitSettings.getVendasta_rm_settings() != null
                         && unitSettings.getVendasta_rm_settings().getAccountId() != null ) {
                         model.addAttribute( "accountId", unitSettings.getVendasta_rm_settings().getAccountId() );
-                        model.addAttribute( "apiUser", unitSettings.getVendasta_rm_settings().getApiUser() );
-                        model.addAttribute( "apiKey", unitSettings.getVendasta_rm_settings().getApiKey() );
                     }
                 }
             } catch ( NonFatalException error ) {
@@ -167,14 +166,10 @@ public class VendastaManagementController
                 unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
                 collectionName = (String) hierarchyDetails.get( "collectionName" );
                 String accountId = request.getParameter( "accountId" );
-                String apiUser = request.getParameter( "apiUser" );
-                String apiKey = request.getParameter( "apiKey" );
                 VendastaProductSettings settings = new VendastaProductSettings();
-                if ( !StringUtils.isEmpty( accountId ) && !StringUtils.isEmpty( apiUser ) && !StringUtils.isEmpty( apiKey ) ) {
-                    if ( vendastaManagementService.isAccountExistInVendasta( accountId, apiUser, apiKey ) ) {
+                if ( !StringUtils.isEmpty( accountId ) ) {
+                    if ( vendastaManagementService.isAccountExistInVendasta( accountId ) ) {
                         settings.setAccountId( accountId );
-                        settings.setApiUser( apiUser );
-                        settings.setApiKey( apiKey );
                         if ( vendastaManagementService.updateVendastaRMSettings( collectionName, unitSettings, settings ) ) {
                             LOG.info( "Updated Vendasta Product settings" );
                             message = messageUtils.getDisplayMessage(
@@ -246,9 +241,7 @@ public class VendastaManagementController
                     unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
                     responseMap.put( "url", productUrl );
                     if ( unitSettings.getVendasta_rm_settings() != null
-                        && !StringUtils.isEmpty( unitSettings.getVendasta_rm_settings().getAccountId() )
-                        && !StringUtils.isEmpty( unitSettings.getVendasta_rm_settings().getApiUser() )
-                        && !StringUtils.isEmpty( unitSettings.getVendasta_rm_settings().getApiKey() ) ) {
+                        && !StringUtils.isEmpty( unitSettings.getVendasta_rm_settings().getAccountId() ) ) {
                         responseMap.put( "ssoToken", unitSettings.getVendasta_rm_settings().getAccountId() );
                         responseMap.put( "status", "success" );
                     } else {

@@ -19,45 +19,7 @@
 			<div class="row">
 				<div class="um-top-row cleafix">
 					<div class="clearfix um-top-form-wrapper">
-						<form id="vendasta-settings-form" method="post">
-							<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
-								<div class="hm-item-row item-row-OR clearfix float-left">
-									<div class="um-item-row-left text-right">
-										<spring:message code="label.apiuser.key" />
-									</div>
-									<div class="clearfix float-right st-username-icons">
-										<div class="um-item-row-icon margin-left-0"></div>
-										<div class="um-item-row-icon margin-left-0"></div>
-									</div>
-									<div
-										class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
-										<div class="rfr_icn icn-fname en-icn-fname"></div>
-										<input id="api-user" name="api-user"
-											class="um-item-row-txt um-item-row-txt-OR en-form-align-left"
-											placeholder="<spring:message code="label.vendasta.apiuser.key" />">
-										<div id="vendasta-api-user-error" class="hm-item-err-2"></div>
-									</div>
-								</div>
-							</div>
-							<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
-								<div class="hm-item-row item-row-OR clearfix float-left">
-									<div class="um-item-row-left text-right">
-										<spring:message code="label.apikey.key" />
-									</div>
-									<div class="clearfix float-right st-password-icons">
-										<div class="um-item-row-icon margin-left-0"></div>
-										<div class="um-item-row-icon margin-left-0"></div>
-									</div>
-									<div
-										class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
-										<div class="rfr_icn icn-password en-icn-pswd"></div>
-										<input id="api-key" name="api-key"
-											class="um-item-row-txt um-item-row-txt-OR en-form-align-left"
-											placeholder="<spring:message code="label.vendasta.apikey.key" />">
-										<div id="vendasta-api-key-error" class="hm-item-err-2"></div>
-									</div>
-								</div>
-							</div>
+						<form id="vendasta-settings-form" method="post">						
 							<div
 								class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding">
 								<div class="hm-item-row item-row-OR clearfix float-left">
@@ -94,20 +56,12 @@
 		if ("${accountId}" != "") {
 			$('#account-iden').val('${accountId}');
 		}
-		if ("${apiUser}" != "") {
-			$('#api-user').val('${apiUser}');
-		}
-		if ("${apiKey}" != "") {
-			$('#api-key').val('${apiKey}');
-		}
 		$(document).on('click', '#vndsta-form-submit', function(e) {
 			e.stopPropagation();
 			if (validateVendastaFields()) {
 				showOverlay();
 				var formData = {
-					"accountId" : $('#account-iden').val(),
-					"apiUser" : $('#api-user').val(),
-					"apiKey" : $('#api-key').val()
+					"accountId" : $('#account-iden').val()
 				};
 				callAjaxPostWithPayloadData("/updatevendastasettings.do", function(data) {
 					hideOverlay();

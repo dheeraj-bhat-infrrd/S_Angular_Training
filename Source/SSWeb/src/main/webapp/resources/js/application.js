@@ -11381,20 +11381,6 @@ function validateVendastaFields(){
 	isVendastaValid = true;
 	var isFocussed = false;
 
-	if (!validateVendastaApiUser('api-user')) {
-		isVendastaValid = false;
-		if (!isFocussed) {
-			$('#api-user').focus();
-			isFocussed = true;
-		}
-	}
-	if (!validateVendastaApiKey('api-key')) {
-		isVendastaValid = false;
-		if (!isFocussed) {
-			$('#api-key').focus();
-			isFocussed = true;
-		}
-	}
 	if (!validateVendastaAccountId('account-iden')) {
 		isVendastaValid = false;
 		if (!isFocussed) {
