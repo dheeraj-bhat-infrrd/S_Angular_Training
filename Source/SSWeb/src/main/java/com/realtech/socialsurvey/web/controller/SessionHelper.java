@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -643,7 +645,8 @@ public class SessionHelper {
 			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entry.getValue());
 			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.REGION_ID_COLUMN);
 			
-			OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( Long.parseLong( entry.getKey() ) );
+			String regionId = String.valueOf( entry.getKey());
+			OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( Long.parseLong(regionId) );
 	        session.setAttribute(CommonConstants.VENDASTA_ACCESS, regionSettings.isVendastaAccessible() ); 
 		}
 		else if (assignments.getBranches() != null && !assignments.getBranches().isEmpty()) {
@@ -652,7 +655,8 @@ public class SessionHelper {
 			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entry.getValue());
 			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.BRANCH_ID_COLUMN);
 			
-	        BranchSettings branchSettings = organizationManagementService.getBranchSettings( Long.parseLong( entry.getKey() ) );
+			String branchId = String.valueOf( entry.getKey());
+	        BranchSettings branchSettings = organizationManagementService.getBranchSettings( Long.parseLong( branchId ) );
 	        session.setAttribute(CommonConstants.VENDASTA_ACCESS, branchSettings.getOrganizationUnitSettings().isVendastaAccessible() ); 
 		}
 		session.setAttribute(CommonConstants.USER_ASSIGNMENTS, assignments);
