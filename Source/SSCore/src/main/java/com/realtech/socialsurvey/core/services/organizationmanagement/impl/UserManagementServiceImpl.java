@@ -85,7 +85,6 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
-import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -101,9 +100,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSe
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
-import com.realtech.socialsurvey.core.utils.FileOperations;
 import com.realtech.socialsurvey.core.vo.UserList;
 
 
@@ -122,8 +119,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private String companyAdminEnabled;
     private String adminEmailId;
     private String adminName;
-    
-    
+
+
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
 
@@ -231,12 +228,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
 
-    @Autowired
-    private UrlService urlService;
-
-    @Autowired
-    private FileOperations fileOperations;
-
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     private String paramOrderTakeSurveyReminder;
 
@@ -245,10 +236,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_SUBJECT}")
     String paramOrderTakeSurveySubject;
-
-
-    @Autowired
-    private EmailFormatHelper emailFormatHelper;
 
     @Value ( "${APPLICATION_LOGO_URL}")
     private String applicationLogoUrl;
@@ -3064,6 +3051,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             "Finished adding a record in user count modification notification table for company " + company.getCompany() );
     }
 
+
     /*
      * Method to get company admin for the company given.
      */
@@ -3511,13 +3499,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         return valid;
     }
-    
+
+
     /**
      * 
      */
     @Override
     @Transactional
-    public UserApiKey getUserApiKeyForCompany(  long companyId ) throws InvalidInputException
+    public UserApiKey getUserApiKeyForCompany( long companyId ) throws InvalidInputException
     {
         LOG.debug( "method getUserApiKeyForCompany started for companyId " + companyId );
 
@@ -3525,15 +3514,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         queryMap.put( CommonConstants.COMPANY_ID_COLUMN, companyId );
         queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         List<UserApiKey> apiKeys = apiKeyDao.findByKeyValue( UserApiKey.class, queryMap );
-        
+
         LOG.debug( "method getUserApiKeyForCompany ended for companyId " + companyId );
-        
-        if(apiKeys != null && apiKeys.size() > 0)
+
+        if ( apiKeys != null && apiKeys.size() > 0 )
             return apiKeys.get( CommonConstants.INITIAL_INDEX );
-        else 
-            return null;        
+        else
+            return null;
     }
-    
+
+
     /**
      * 
      * @param apiKey
@@ -3549,62 +3539,64 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "method saveUserApiKey started " );
 
         UserApiKey userApiKey = new UserApiKey();
-        
+
         OrganizationUnitSettings settings = organizationManagementService.getCompanySettings( companyId );
-        String apiKey =  settings.getProfileName();
-        String apiSecret = String.valueOf( companyId ) + "_" + String.valueOf(System.currentTimeMillis() );
-        
+        String apiKey = settings.getProfileName();
+        String apiSecret = String.valueOf( companyId ) + "_" + String.valueOf( System.currentTimeMillis() );
+
         userApiKey.setApiKey( apiKey );
         userApiKey.setApiSecret( apiSecret );
         userApiKey.setCompanyId( companyId );
         userApiKey.setStatus( CommonConstants.STATUS_ACTIVE );
-        userApiKey.setCreatedOn( new Timestamp( System.currentTimeMillis()) );
-        userApiKey.setModifiedOn( new Timestamp( System.currentTimeMillis()) );
+        userApiKey.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        userApiKey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
         userApiKey = apiKeyDao.save( userApiKey );
-        LOG.debug( "method saveUserApiKey ended");
-        
-        return userApiKey;        
+        LOG.debug( "method saveUserApiKey ended" );
+
+        return userApiKey;
     }
-    
-    
+
+
     @Override
     @Transactional
-    public void updateStatusOfUserApiKey( long userApiKeyId , int status ) throws NoRecordsFetchedException  
+    public void updateStatusOfUserApiKey( long userApiKeyId, int status ) throws NoRecordsFetchedException
     {
         LOG.debug( "method updateStatusOfUserApiKey started " );
 
         UserApiKey userApiKey = apiKeyDao.findById( UserApiKey.class, userApiKeyId );
-        if(userApiKey == null){
-            throw new NoRecordsFetchedException("No Api key found with id " + userApiKeyId );
+        if ( userApiKey == null ) {
+            throw new NoRecordsFetchedException( "No Api key found with id " + userApiKeyId );
         }
-      
+
         userApiKey.setStatus( status );
         apiKeyDao.update( userApiKey );
-        LOG.debug( "method updateStatusOfUserApiKey ended");
-              
+        LOG.debug( "method updateStatusOfUserApiKey ended" );
+
     }
-    
+
+
     @Override
     @Transactional
-    public List<UserApiKey> getActiveUserApiKeys(){
+    public List<UserApiKey> getActiveUserApiKeys()
+    {
         LOG.debug( "method getActiveUserApiKeys started " );
         Map<String, Object> queryMap = new HashMap<String, Object>();
         queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         List<UserApiKey> apiKeys = apiKeyDao.findByKeyValue( UserApiKey.class, queryMap );
-        
+
         Set<Long> companyIds = new HashSet<Long>();
-        for(UserApiKey apiKey : apiKeys){
+        for ( UserApiKey apiKey : apiKeys ) {
             companyIds.add( apiKey.getCompanyId() );
         }
-        
-        Map<Long , Company> companiesById = companyDao.getCompaniesByIds( companyIds );
-        for(UserApiKey apiKey : apiKeys){
+
+        Map<Long, Company> companiesById = companyDao.getCompaniesByIds( companyIds );
+        for ( UserApiKey apiKey : apiKeys ) {
             Company currCompany = companiesById.get( apiKey.getCompanyId() );
-            if(currCompany != null)
+            if ( currCompany != null )
                 apiKey.setCompanyName( currCompany.getCompany() );
         }
-        
+
         LOG.debug( "method getActiveUserApiKeys ended " );
         return apiKeys;
     }
@@ -3891,7 +3883,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
-    @Transactional
     @Override
     public User saveEmailUserMapping( String emailId, long userId ) throws InvalidInputException, NoRecordsFetchedException
     {
@@ -3921,7 +3912,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
-    @Transactional
     @Override
     public CompanyIgnoredEmailMapping saveIgnoredEmailCompanyMapping( String emailId, long companyId )
         throws InvalidInputException, NoRecordsFetchedException
@@ -4280,7 +4270,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 excelCreated = false;
             } finally {
                 try {
-                    if(fileOutput != null){
+                    if ( fileOutput != null ) {
                         fileOutput.close();
                     }
                     if ( inputStream != null ) {
@@ -4525,8 +4515,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
-    
-
     /**
      * Method to check if agent is deleted and mark the corresponding survey as corrupted, if it is.
      *
@@ -4586,61 +4574,84 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         return userIds;
     }
-    
+
+
     /*
      * (non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService#getUserIdsUnderAdmin(com.realtech.socialsurvey.core.entities.User)
      */
     @Override
-    public Set<Long> getUserIdsUnderAdmin(User adminUser) throws InvalidInputException{
-        
-        if(adminUser == null){
-            throw new InvalidInputException("Passed parameter adminUser is null");
+    public Set<Long> getUserIdsUnderAdmin( User adminUser ) throws InvalidInputException
+    {
+
+        if ( adminUser == null ) {
+            throw new InvalidInputException( "Passed parameter adminUser is null" );
         }
-        
-        LOG.info( "Method getUserIdsUnderAdmin started for adminUserId " +   adminUser.getUserId() );
-        
+
+        LOG.info( "Method getUserIdsUnderAdmin started for adminUserId " + adminUser.getUserId() );
+
         Set<Long> userIds = new HashSet<Long>();
         List<UserProfile> adminUserProfiles = getAllUserProfilesForUser( adminUser );
-        
-        ProfilesMaster agentProfileMaster =  profilesMasterDao.findById( ProfilesMaster.class, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
-        
-        for(UserProfile userProfile : adminUserProfiles){
-            if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID){
+
+        ProfilesMaster agentProfileMaster = profilesMasterDao.findById( ProfilesMaster.class,
+            CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
+
+        for ( UserProfile userProfile : adminUserProfiles ) {
+            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
                 Map<String, Object> queries = new HashMap<>();
                 queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
                 queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
                 queries.put( CommonConstants.BRANCH_ID_COLUMN, userProfile.getBranchId() );
                 List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
-                
-                for(UserProfile agentProfile : userProfiles){
+
+                for ( UserProfile agentProfile : userProfiles ) {
                     userIds.add( agentProfile.getAgentId() );
                 }
-            }
-            else if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID){
+            } else if ( userProfile.getProfilesMaster()
+                .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                 Map<String, Object> queries = new HashMap<>();
                 queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
                 queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
                 queries.put( CommonConstants.REGION_ID_COLUMN, userProfile.getRegionId() );
                 List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
-                
-                for(UserProfile agentProfile : userProfiles){
+
+                for ( UserProfile agentProfile : userProfiles ) {
                     userIds.add( agentProfile.getAgentId() );
                 }
-            }
-            else if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID){
+            } else if ( userProfile.getProfilesMaster()
+                .getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
                 Map<String, Object> queries = new HashMap<>();
                 queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
                 queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
                 queries.put( CommonConstants.COMPANY_COLUMN, userProfile.getCompany() );
                 List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
-                
-                for(UserProfile agentProfile : userProfiles){
+
+                for ( UserProfile agentProfile : userProfiles ) {
                     userIds.add( agentProfile.getAgentId() );
                 }
             }
         }
-        
+
         return userIds;
+    }
+
+
+    @Override
+    @Transactional ( rollbackFor = Exception.class)
+    public void saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( String emailId, long userId )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        User user = this.saveEmailUserMapping( emailId, userId );
+        socialManagementService.updateAgentIdOfSurveyPreinitiationRecordsForEmail( user, emailId );
+    }
+
+
+    @Override
+    @Transactional ( rollbackFor = Exception.class)
+    public void saveIgnoredEmailCompanyMappingAndUpdateSurveyPreinitiation( String emailId, long companyId )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        this.saveIgnoredEmailCompanyMapping( emailId, companyId );
+        socialManagementService.updateSurveyPreinitiationRecordsAsIgnored( emailId );
     }
 }

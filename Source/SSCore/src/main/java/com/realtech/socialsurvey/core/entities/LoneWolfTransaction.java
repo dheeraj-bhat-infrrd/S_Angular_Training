@@ -13,6 +13,8 @@ public class LoneWolfTransaction
     private String CloseDate;
     private String Number;
     private LoneWolfClassification Classification;
+    private LoneWolfAddress MLSAddress;
+
 
     public String getId()
     {
@@ -24,6 +26,7 @@ public class LoneWolfTransaction
     {
         Id = id;
     }
+
 
     public LoneWolfClassification getClassification()
     {
@@ -107,4 +110,17 @@ public class LoneWolfTransaction
     {
         Tiers = tiers;
     }
+
+
+    public LoneWolfAddress getMLSAddress()
+    {
+        return MLSAddress;
+    }
+
+
+    public void setMLSAddress( LoneWolfAddress mLSAddress )
+    {
+        MLSAddress = mLSAddress;
+    }
+
 }

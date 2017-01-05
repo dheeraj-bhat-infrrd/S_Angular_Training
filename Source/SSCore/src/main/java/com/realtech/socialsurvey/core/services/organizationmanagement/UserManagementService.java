@@ -391,6 +391,7 @@ public interface UserManagementService
 
     public void sendVerificationLink( User user ) throws InvalidInputException, UndeliveredEmailException;
 
+
     public User getCompanyAdmin( long companyId ) throws InvalidInputException;
 
 
@@ -612,9 +613,19 @@ public interface UserManagementService
 
     public void updateStatusOfUserApiKey( long userApiKeyId, int status ) throws NoRecordsFetchedException;
 
+
     public List<Long> getExcludedUserIds();
 
 
     public Set<Long> getUserIdsUnderAdmin( User adminUser ) throws InvalidInputException;
+
+
+    public void saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( String emailId, long userId )
+        throws InvalidInputException, NoRecordsFetchedException;
+
+
+    public void saveIgnoredEmailCompanyMappingAndUpdateSurveyPreinitiation( String emailId, long companyId )
+        throws InvalidInputException, NoRecordsFetchedException;
+
 }
 // JIRA SS-34 BY RM02 BOC

@@ -43,31 +43,23 @@ public class SurveyApiController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SurveyApiController.class );
 
+    @Autowired
     private SurveyPreinitiationTransformer surveyPreinitiationTransformer;
 
+    @Autowired
     private SurveyTransformer surveyTransformer;
 
+    @Autowired
     private SurveysAndReviewsVOTransformer surveysAndReviewsVOTransformer;
 
+    @Autowired
     private SurveyHandler surveyHandler;
 
+    @Autowired
     private AdminAuthenticationService adminAuthenticationService;
 
-    private RestUtils restUtils;
-
-
     @Autowired
-    public SurveyApiController( SurveyPreinitiationTransformer surveyPreinitiationTransformer, SurveyHandler surveyHandler,
-        SurveyTransformer surveyTransformer, SurveysAndReviewsVOTransformer surveysAndReviewsVOTransformer,
-        AdminAuthenticationService adminAuthenticationService, RestUtils restUtils )
-    {
-        this.surveyPreinitiationTransformer = surveyPreinitiationTransformer;
-        this.surveyHandler = surveyHandler;
-        this.surveyTransformer = surveyTransformer;
-        this.surveysAndReviewsVOTransformer = surveysAndReviewsVOTransformer;
-        this.adminAuthenticationService = adminAuthenticationService;
-        this.restUtils = restUtils;
-    }
+    private RestUtils restUtils;
 
 
     @RequestMapping ( value = "/survey", method = RequestMethod.PUT)
