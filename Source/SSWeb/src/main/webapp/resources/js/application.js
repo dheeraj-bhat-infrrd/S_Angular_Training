@@ -3889,7 +3889,6 @@ function saveEncompassDetailsCallBack(response) {
 
 }
 function saveTestLoneDetailsCallBack(response) {
-
 	var map = $.parseJSON(response);
 	classificationsList = map.classifications;
 	var savedClassificationsByCode = map.savedClassificationsByCode;
@@ -3902,7 +3901,7 @@ function saveTestLoneDetailsCallBack(response) {
 			var $classificationTypeSeller = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="S" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Seller</div></div>';
 			var $classificationTypeBoth = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="SB" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">Both</div></div>';
 			var $classificationTypeNone = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="N" class="margin-right-o float-left bd-cust-rad-img"></div><div class="float-left bd-cust-rad-txt">None</div></div>';
-		    if(savedClassificationsByCode[classification.Code] != null){
+		    if(savedClassificationsByCode != null && savedClassificationsByCode != undefined && savedClassificationsByCode[classification.Code] != null){
 		    	classification.loneWolfTransactionParticipantsType = savedClassificationsByCode[classification.Code];
 		    	if(classification.loneWolfTransactionParticipantsType == "B"){
 		    		$classificationTypeBuyer = '<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix"><div data-type="B" class="margin-right-o float-left bd-cust-rad-img bd-cust-rad-img-checked"></div><div class="float-left bd-cust-rad-txt">Buyer</div></div>';
