@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -59,11 +60,16 @@ public class DisabledAccountDaoImpl extends GenericDaoImpl<DisabledAccount, Long
     public List<DisabledAccount> getAccountsForPurge( int graceSpan )
     {
         try {
+            
+            List<Integer> elgibleStatus = new ArrayList<Integer>();
+            elgibleStatus.add( CommonConstants.STATUS_COMPANY_DISABLED );
+            elgibleStatus.add( CommonConstants.STATUS_INACTIVE);
+            
             Criteria criteria = getSession().createCriteria( DisabledAccount.class );
             Date maxDateForPurge = getNdaysBackDate( graceSpan );
             Criterion rest1 = Restrictions.eq( "isForceDelete", true );
             Criterion rest2 = Restrictions.and( Restrictions.lt( CommonConstants.MODIFIED_ON_COLUMN, maxDateForPurge ),
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE ),
+                Restrictions.in( CommonConstants.STATUS_COLUMN, elgibleStatus ),
                 Restrictions.lt( "disableDate", maxDateForPurge ) );
             criteria.add( Restrictions.or( rest1, rest2 ) );
             return criteria.list();

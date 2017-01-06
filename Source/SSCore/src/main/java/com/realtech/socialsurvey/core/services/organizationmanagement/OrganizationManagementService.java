@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 
@@ -1413,5 +1414,8 @@ public interface OrganizationManagementService
 
 
     void askFbToRescrapePagesForSettings( Set<Long> entityIds, String collectionName );
+
+
+    void unsubscribeCompany( Company company ) throws SubscriptionCancellationUnsuccessfulException, InvalidInputException;
 
 }

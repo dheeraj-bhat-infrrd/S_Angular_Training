@@ -128,6 +128,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UtilitySer
 import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
@@ -234,6 +235,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private ImageProcessor imageProcessor;
+    
+    @Autowired
+    private Payment payment;
 
     @Autowired
     private GenericDao<LicenseDetail, Long> licenseDetailDao;
@@ -4888,13 +4892,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         LOG.debug( "Method getDisabledAccounts started." );
         try {
-
             List<DisabledAccount> disabledAccounts = disabledAccountDao.disableAccounts( maxDisableDate );
-            for ( DisabledAccount account : disabledAccounts ) {
-                Company company = companyDao.findById( Company.class, account.getCompany().getCompanyId() );
-                company.setStatus( CommonConstants.STATUS_COMPANY_DISABLED );
-                companyDao.update( company );
-            }
             LOG.debug( "Method getDisabledAccounts finished." );
             return disabledAccounts;
         } catch ( DatabaseException e ) {
@@ -6887,7 +6885,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             List<DisabledAccount> disabledAccounts = disableAccounts( new Date() );
             for ( DisabledAccount account : disabledAccounts ) {
                 try {
-                    sendAccountDisabledNotificationMail( account );
+                    Company company = account.getCompany();
+                    unsubscribeCompany( company );
+                    sendAccountDeletedNotificationMail( account );
+                    purgeCompanyDetails( company );
                 } catch ( InvalidInputException e ) {
                     LOG.error( "Invalid Input Exception caught while sending email to the company admin. Nested exception is ",
                         e );
@@ -6995,8 +6996,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             List<DisabledAccount> disabledAccounts = getAccountsForPurge( maxDaysToPurgeAccount );
             for ( DisabledAccount account : disabledAccounts ) {
                 try {
+                    Company company = account.getCompany();
                     sendAccountDeletedNotificationMail( account );
-                    purgeCompanyDetails( account.getCompany() );
+                    purgeCompanyDetails( company );
                 } catch ( InvalidInputException e ) {
                     LOG.error( "Invalid Input Exception caught while sending email to the company admin. Nested exception is ",
                         e );
@@ -7921,6 +7923,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         LOG.info( "Method askFbToRescrapePagesForSettings finished" );
+    }
+    
+    
+    @Override
+    public void unsubscribeCompany(Company company) throws SubscriptionCancellationUnsuccessfulException, InvalidInputException{
+        
+        LOG.info( "method unsubscribeCompany started"  );
+        if(company == null){
+            throw new InvalidInputException( "Passed parameter company is null" );
+        }
+        List<LicenseDetail> licenseDetails = company.getLicenseDetails();
+        if ( licenseDetails.size() > 0 ) {
+            // Unsubscribing company from braintree
+            LicenseDetail licenseDetail = licenseDetails.get( 0 );
+            if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
+                LOG.debug( "Unsubscribing company from braintree " );
+                payment.unsubscribe( licenseDetail.getSubscriptionId() );
+            }
+        }
+        LOG.info( "method unsubscribeCompany finished"  );
     }
 }
 // JIRA: SS-27: By RM05: EOC
