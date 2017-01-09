@@ -9760,7 +9760,7 @@ $('body').on('click', '#st-settings-account-on', function(e) {
 $('body').on('click', '#st-settings-account-off', function(e) {
 	e.stopPropagation();
 	$('#other-account').val('true');
-	createPopupConfirm("Disable Account", "You will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
+	createPopupConfirm("Cancel Your Subscription", "You will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
 	overlayAccount();
 });
 

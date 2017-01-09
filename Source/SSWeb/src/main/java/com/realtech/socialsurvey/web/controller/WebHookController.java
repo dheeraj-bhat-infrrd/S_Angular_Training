@@ -3,8 +3,10 @@ package com.realtech.socialsurvey.web.controller;
 // JIRA: SS-15: By RM03
 
 import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.braintreegateway.WebhookNotification;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.CoreCommon;
@@ -22,7 +25,10 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 
 /**
@@ -40,6 +46,7 @@ public class WebHookController {
 
 	@Autowired
 	private CoreCommon commonServices;
+	
 
 	private static final Logger LOG = LoggerFactory.getLogger(WebHookController.class);
 
@@ -117,8 +124,7 @@ public class WebHookController {
 				sampleNotification = gateway.getGatewayInstance().webhookTesting()
 						.sampleNotification(WebhookNotification.Kind.SUBSCRIPTION_CHARGED_SUCCESSFULLY, subscriptionId);
 			}else if (kind.equals(WebhookNotification.Kind.SUBSCRIPTION_CANCELED.toString())){
-				// TODO: Implement
-				
+			 	
 			}else if (kind.equals(WebhookNotification.Kind.SUBSCRIPTION_EXPIRED.toString())){
 				// TODO: Implement
 				
@@ -160,6 +166,9 @@ public class WebHookController {
 				// gateway.checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt(webhookNotification.getSubscription());
 				gateway.intimateUser(webhookNotification.getSubscription(), CommonConstants.SUBSCRIPTION_CHARGED_SUCCESSFULLY);
 			}
+			else if(webhookNotification.getKind() == WebhookNotification.Kind.SUBSCRIPTION_CANCELED){
+			    gateway.intimateUser(webhookNotification.getSubscription(), CommonConstants.SUBSCRIPTION_CHARGED_SUCCESSFULLY);
+			}
 		}
 		catch (InvalidInputException e) {
 			LOG.error("WebHookController getSubscriptionNotifications() : InvalidInputException thrown : " + e.getMessage());
@@ -177,10 +186,18 @@ public class WebHookController {
 			return "WebHookController getSubscriptionNotifications() : NoRecordsFetchedException thrown : " + e.getMessage();
 		}
 		catch (DatabaseException e) {
-			LOG.error("WebHookController getSubscriptionNotifications() : NoRecordsFetchedException thrown : " + e.getMessage());
+			LOG.error("WebHookController getSubscriptionNotifications() : DatabaseException thrown : " + e.getMessage());
 			commonServices.sendFailureMail(e);
-			return "WebHookController getSubscriptionNotifications() : NoRecordsFetchedException thrown : " + e.getMessage();
-		}
+			return "WebHookController getSubscriptionNotifications() : DatabaseException thrown : " + e.getMessage();
+		} catch ( PaymentException e ) {
+		    LOG.error("WebHookController getSubscriptionNotifications() : PaymentException thrown : " + e.getMessage());
+            commonServices.sendFailureMail(e);
+            return "WebHookController getSubscriptionNotifications() : PaymentException thrown : " + e.getMessage();
+        } catch ( SolrException e ) {
+            LOG.error("WebHookController getSubscriptionNotifications() : SolrException thrown : " + e.getMessage());
+            commonServices.sendFailureMail(e);
+            return "WebHookController getSubscriptionNotifications() : SolrException thrown : " + e.getMessage();
+        }
 
 		LOG.info("Subscription Notification handled!");
 		return new ResponseEntity<String>("Notification recieved and processed!", HttpStatus.OK);

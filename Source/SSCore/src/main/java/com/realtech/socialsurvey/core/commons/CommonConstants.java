@@ -721,6 +721,8 @@ public interface CommonConstants
     public static final int SUBSCRIPTION_WENT_PAST_DUE = 1;
     public static final int SUBSCRIPTION_CHARGED_UNSUCCESSFULLY = 2;
     public static final int SUBSCRIPTION_CHARGED_SUCCESSFULLY = 3;
+    public static final int SUBSCRIPTION_CANCELED = 4;
+    
 
     // Subscription price modification result constants
     public static final String SUBSCRIPTION_PRICE_CHANGED = "SUBSCRIPTION_PRICE_CHANGED";

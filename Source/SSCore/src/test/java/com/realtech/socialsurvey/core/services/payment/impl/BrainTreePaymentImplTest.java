@@ -449,7 +449,7 @@ public class BrainTreePaymentImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testIntimateUserForNullSubscription() throws InvalidInputException, NoRecordsFetchedException,
-        UndeliveredEmailException
+        UndeliveredEmailException, PaymentException, SolrException
     {
         brainTreePaymentImpl.intimateUser( null, 10 );
     }

@@ -1729,7 +1729,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
     @Transactional
     @Override
     public void intimateUser( Subscription subscription, int notificationType )
-        throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException
+        throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException, PaymentException, SolrException
     {
         if ( subscription == null ) {
             throw new InvalidInputException( "Subscription passed is null" );
@@ -1771,6 +1771,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
         } else if ( notificationType == CommonConstants.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY ) {
             LOG.debug( "Sending charge unsuccessful mail" );
             emailServices.sendRetryChargeEmail( user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
+                user.getLoginName() );
+        } else if ( notificationType == CommonConstants.SUBSCRIPTION_CANCELED ){
+         // subscription cancelled deactive the company
+            organizationManagementService.addDisabledAccount( licenseDetail.getCompany().getCompanyId(), false, CommonConstants.REALTECH_ADMIN_ID );
+            organizationManagementService.purgeCompany( licenseDetail.getCompany() );
+            emailServices.sendRetryExhaustedEmail( user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
                 user.getLoginName() );
         }
     }
