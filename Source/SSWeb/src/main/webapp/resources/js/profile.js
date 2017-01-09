@@ -755,10 +755,12 @@ function paintReviews(result){
 				reviewsHtml +='<div class="unverified-badge  verify-image-ss float-right"></div>'
 			}
 		reviewsHtml += '		<div class=" ppl-header-left review-detail-profile review-sm-screen" >';   
-		if(reviewItem.surveyCompletedDate!=null){
-			reviewsHtml += '<div class="ppl-head-2 float-left">' + new Date(reviewItem.surveyCompletedDate).toString("MMMM d yyyy")+'</div>'
+		if(reviewItem.surveyUpdatedDate != null){
+			reviewsHtml += '<div class="ppl-head-2 review-detail-profile float-left"> Updated on </div><div class="ppl-head-2 float-left">' + new Date(reviewItem.surveyUpdatedDate).toString("MMMM d, yyyy")+'</div>'
+		}else if(reviewItem.surveyCompletedDate != null){
+			reviewsHtml += '<div class="ppl-head-2 review-detail-profile float-left"> Completed on </div><div class="ppl-head-2 float-left">' + new Date(reviewItem.surveyCompletedDate).toString("MMMM d, yyyy")+'</div>'
 		}else{
-			reviewsHtml += '<div class="ppl-head-2 float-left">' + new Date(reviewItem.modifiedOn).toString("MMMM d, yyyy")+'</div>'
+			reviewsHtml += '<div class="ppl-head-2 review-detail-profile float-left"> Modified on </div><div class="ppl-head-2 float-left">' + new Date(reviewItem.modifiedOn).toString("MMMM d, yyyy")+'</div>'
 		}
 		
 		
