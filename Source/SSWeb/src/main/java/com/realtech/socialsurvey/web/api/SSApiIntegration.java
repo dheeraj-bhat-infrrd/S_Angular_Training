@@ -8,95 +8,97 @@ import com.realtech.socialsurvey.web.entities.PersonalProfile;
 
 import retrofit.client.Response;
 import retrofit.http.Body;
+import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
+import retrofit.http.Query;
 
 
 public interface SSApiIntegration
 {
-    @POST ( "/utils/nocaptcha/validate")
+    @POST ( "/v1/nocaptcha")
     Response validateCaptcha( @Body CaptchaAPIRequest captchaRequest );
 
 
-    @POST ( "/account/register/init")
+    @POST ( "/v1/companies/register")
     Response initateRegistration( @Body AccountRegistrationAPIRequest registrationRequest );
 
 
-    @GET ( "/users/profile/details/{userId}")
+    @GET ( "/v1/users/{userId}")
     Response getUserProfile( @Path ( "userId") String userId );
 
 
-    @PUT ( "/users/profile/update/{userId}")
+    @PUT ( "/v1/users/{userId}")
     Response updateUserProfile( @Body PersonalProfile personalProfile, @Path ( "userId") String userId );
 
 
-    @PUT ( "/users/profile/stage/update/{userId}/{stage}")
+    @PUT ( "/v1/users/{userId}/stage/{stage}")
     Response updateUserProfileStage( @Path ( "userId") String userId, @Path ( "stage") String stage );
 
 
-    @GET ( "/account/company/profile/details/{companyId}")
+    @GET ( "/v1/companies/{companyId}")
     Response getCompanyProfile( @Path ( "companyId") String companyId );
 
 
-    @PUT ( "/account/company/profile/update/{companyId}/{userId}")
+    @PUT ( "/v1/companies/{companyId}")
     Response updateCompanyProfile( @Body CompanyProfile companyProfile, @Path ( "companyId") String companyId,
-        @Path ( "userId") String userId );
+        @Query ( "userId") String userId );
 
 
-    @PUT ( "/account/company/profile/stage/update/{companyId}/{stage}")
+    @PUT ( "/v1/companies/{companyId}/stage/{stage}")
     Response updateCompanyProfileStage( @Path ( "companyId") String companyId, @Path ( "stage") String stage );
 
 
-    @GET ( "/account/company/profile/industries")
+    @GET ( "/v1/industries")
     Response getVerticals();
 
 
-    @GET ( "/account/payment/plans")
+    @GET ( "/v1/payment/plans")
     Response getPaymentPlans();
 
 
-    @GET ( "/users/profile/stage/{userId}")
+    @GET ( "/v1/users/{userId}/stage")
     Response getUserStage( @Path ( "userId") String userId );
 
 
-    @GET ( "/account/company/profile/stage/{companyId}")
+    @GET ( "/v1/companies/{companyId}/stage")
     Response getCompanyStage( @Path ( "companyId") String companyId );
 
 
-    @PUT ( "/account/company/profile/profileimage/update/{companyId}/{userId}")
-    Response updateCompanyLogo( @Path ( "companyId") String companyId, @Path ( "userId") String userId, @Body String logoUrl );
+    @PUT ( "/v1/companies/{companyId}/profileimage")
+    Response updateCompanyLogo( @Path ( "companyId") String companyId, @Query ( "userId") String userId, @Body String logoUrl );
 
 
-    @PUT ( "/account/company/profile/profileimage/remove/{companyId}/{userId}")
-    Response removeCompanyLogo( @Path ( "companyId") String companyId, @Path ( "userId") String userId );
+    @DELETE ( "/v1/companies/{companyId}/profileimage")
+    Response removeCompanyLogo( @Path ( "companyId") String companyId, @Query ( "userId") String userId );
 
 
-    @PUT ( "/users/profile/profileimage/update/{userId}")
+    @PUT ( "/v1/users/{userId}/profileimage")
     Response updateUserProfileImage( @Path ( "userId") String userId, @Body String imageUrl );
 
 
-    @PUT ( "/users/profile/profileimage/remove/{userId}")
+    @DELETE ( "/v1/users/{userId}/profileimage")
     Response removeUserProfileImage( @Path ( "userId") String userId );
 
 
-    @POST ( "/account/company/generate/hierarchy/{companyId}")
+    @POST ( "/v1/companies/{companyId}/hierarchy")
     Response generateDefaultHierarchy( @Path ( "companyId") String companyId );
 
 
-    @POST ( "/account/payment/company/{companyId}/plan/{planId}")
+    @POST ( "/v1/companies/{companyId}/plan/{planId}/payment")
     Response makePayment( @Path ( "companyId") String companyId, @Path ( "planId") String planId, @Body Payment payment );
 
 
-    @PUT ( "/users/profile/password/update/{userId}")
+    @PUT ( "/v1/users/{userId}/password")
     Response savePassword( @Path ( "userId") String userId, @Body String password );
 
 
-    @GET ( "/account/company/usstates")
+    @GET ( "/v1/usstates")
     Response getUsStates();
 
 
-    @POST ( "/users/profile/webaddress/validate")
+    @POST ( "/v1/webaddress")
     Response validateWebAddress( @Body String webAddress );
 }

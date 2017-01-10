@@ -25,7 +25,7 @@ import javax.validation.Valid;
  */
 
 @RestController
-@RequestMapping ( "/utils")
+@RequestMapping ( "/v1")
 public class UtilitiesController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( UtilitiesController.class );
@@ -50,7 +50,7 @@ public class UtilitiesController
         binder.setValidator( captchaValidator );
     }
 
-    @RequestMapping ( value = "/nocaptcha/validate", method = RequestMethod.POST)
+    @RequestMapping ( value = "/nocaptcha", method = RequestMethod.POST)
     @ApiOperation ( value = "Validates the google no-captcha")
     public ResponseEntity<?> validateNoCaptcha(@Valid @RequestBody CaptchaRequest captchaRequest) throws InvalidInputException{
         LOGGER.info( "Validating captcha" );

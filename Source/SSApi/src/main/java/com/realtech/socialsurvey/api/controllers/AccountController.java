@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
@@ -40,7 +41,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 
 
 @RestController
-@RequestMapping ( "/account")
+@RequestMapping ( "/v1")
 public class AccountController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( AccountController.class );
@@ -88,7 +89,7 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/register/init", method = RequestMethod.POST)
+    @RequestMapping ( value = "/companies/register", method = RequestMethod.POST)
     @ApiOperation ( value = "Initiate account registration")
     public ResponseEntity<?> initAccountRegsitration(
         @Valid @RequestBody AccountRegistrationRequest accountRegistrationRequest ) throws SSApiException
@@ -110,7 +111,7 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/details/{companyId}", method = RequestMethod.GET)
+    @RequestMapping ( value = "/companies/{companyId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Get company profile details")
     public ResponseEntity<?> getCompanyProfile( @PathVariable ( "companyId") String companyId ) throws SSApiException
     {
@@ -126,10 +127,10 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/update/{companyId}/{userId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/companies/{companyId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update company profile details")
     public ResponseEntity<?> updateCompanyProfile( @Valid @RequestBody CompanyProfile companyProfile,
-        @PathVariable ( "companyId") String companyId, @PathVariable ( "userId") String userId ) throws SSApiException
+        @PathVariable ( "companyId") String companyId, @RequestParam ( "userId") String userId ) throws SSApiException
     {
         try {
             LOGGER.info( "AccountController.updateCompanyProfile started" );
@@ -148,10 +149,10 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/profileimage/remove/{companyId}/{userId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/companies/{companyId}/profileimage", method = RequestMethod.DELETE)
     @ApiOperation ( value = "Delete company profile image")
     public ResponseEntity<?> deleteCompanyProfileImage( @PathVariable ( "companyId") String companyId,
-        @PathVariable ( "userId") String userId ) throws SSApiException
+        @RequestParam ( "userId") String userId ) throws SSApiException
     {
         try {
             LOGGER.info( "AccountController.deleteCompanyProfileImage started" );
@@ -164,10 +165,10 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/profileimage/update/{companyId}/{userId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/companies/{companyId}/profileimage", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update company profile image")
     public ResponseEntity<?> updateCompanyProfileImage( @PathVariable ( "companyId") String companyId,
-        @PathVariable ( "userId") String userId, @RequestBody String logoUrl ) throws SSApiException
+        @RequestParam ( "userId") String userId, @RequestBody String logoUrl ) throws SSApiException
     {
         try {
             LOGGER.info( "AccountController.updateCompanyProfileImage started" );
@@ -180,7 +181,7 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/stage/update/{companyId}/{stage}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/companies/{companyId}/stage/{stage}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update stage")
     public ResponseEntity<?> updateStage( @PathVariable ( "companyId") String companyId, @PathVariable ( "stage") String stage )
     {
@@ -191,7 +192,7 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/industries", method = RequestMethod.GET)
+    @RequestMapping ( value = "/industries", method = RequestMethod.GET)
     @ApiOperation ( value = "Get industries drop down data")
     public ResponseEntity<?> getIndustries()
     {
@@ -213,7 +214,7 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/stage/{companyId}", method = RequestMethod.GET)
+    @RequestMapping ( value = "/companies/{companyId}/stage", method = RequestMethod.GET)
     @ApiOperation ( value = "Get company profile stage")
     public ResponseEntity<?> getCompanyStage( @PathVariable ( "companyId") String companyId )
     {
@@ -222,7 +223,7 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/payment/company/{companyId}/plan/{planId}", method = RequestMethod.POST)
+    @RequestMapping ( value = "/companies/{companyId}/plan/{planId}/payment", method = RequestMethod.POST)
     @ApiOperation ( value = "Payment for company for a particular plan")
     public ResponseEntity<?> payForPlan( @Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long companyId,
         @PathVariable int planId ) throws SSApiException
@@ -238,7 +239,7 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/generate/hierarchy/{companyId}", method = RequestMethod.POST)
+    @RequestMapping ( value = "/companies/{companyId}/hierarchy", method = RequestMethod.POST)
     @ApiOperation ( value = "Generate default company heirarchy")
     public ResponseEntity<?> generateDefaultHierarchyForCompany( @PathVariable ( "companyId") String companyId )
         throws SSApiException
@@ -255,7 +256,7 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/usstates", method = RequestMethod.GET)
+    @RequestMapping ( value = "/usstates", method = RequestMethod.GET)
     @ApiOperation ( value = "Get US states list")
     public ResponseEntity<?> getUsStateList()
     {
