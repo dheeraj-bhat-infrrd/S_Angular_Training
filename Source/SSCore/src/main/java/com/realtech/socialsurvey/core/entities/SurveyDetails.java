@@ -57,6 +57,7 @@ public class SurveyDetails
     
     private Date surveySentDate;
     private Date surveyCompletedDate;
+    private Date surveyUpdatedDate;
     private Date surveyTransactionDate;
     private String surveyGeoLocation;
     private String surveyType;
@@ -720,4 +721,17 @@ public class SurveyDetails
 	{
 		this.state = state;
 	}
+
+
+    public Date getSurveyUpdatedDate()
+    {
+        return surveyUpdatedDate;
+    }
+
+
+    public void setSurveyUpdatedDate( Date surveyUpdatedDate )
+    {
+        this.surveyUpdatedDate = surveyUpdatedDate;
+    }
+	
 }

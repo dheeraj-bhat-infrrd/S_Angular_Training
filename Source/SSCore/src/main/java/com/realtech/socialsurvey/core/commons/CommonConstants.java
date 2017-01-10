@@ -289,6 +289,7 @@ public interface CommonConstants
     public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
     public static final String USER_ENCRYPTED_ID = "userEncryptedId";
     public static final String SURVEY_COMPLETED_DATE_COLUMN = "surveyCompletedDate";
+    public static final String SURVEY_UPDATED_DATE_COLUMN = "surveyUpdatedDate";
     public static final String SURVEY_TRANSACTION_DATE_COLUMN = "surveyTransactionDate";
 
     /**
