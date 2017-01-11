@@ -72,7 +72,7 @@
 				<c:set value="${fn:escapeXml(feedback.review)}" var="review"></c:set>
 
 					<c:choose>
-					<c:when test="${ not empty feedback.surveyUpdatedDate}">
+					<c:when test="${ not empty feedback.surveyUpdatedDate and feedback.surveyUpdatedDate != feedback.surveyCompletedDate }">
 					        <div class="ppl-head-2 review-detail-profile float-left"> Updated on </div>
 							<div class="ppl-head-2 review-detail-profile float-left"
 								data-modified="false"

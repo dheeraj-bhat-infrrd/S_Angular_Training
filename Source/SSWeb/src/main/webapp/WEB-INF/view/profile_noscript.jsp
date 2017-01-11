@@ -886,12 +886,11 @@
 					</c:choose> --%>
 													<c:choose>
 														<c:when
-															test="${ not empty reviewItem.surveyUpdatedDate}">
+															test="${ not empty reviewItem.surveyUpdatedDate and reviewItem.surveyUpdatedDate != reviewItem.surveyCompletedDate }">
 															<div class="ppl-head-2 review-detail-profile float-left"> Updated on </div> 
 															<div class="ppl-head-2 review-detail-profile float-left"
 																data-modified="false"
-																data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
-						value="${reviewItem.surveyUpdatedDate}" />">
+																data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY" value="${reviewItem.surveyUpdatedDate}" />">
 																<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
 																	value="${reviewItem.surveyUpdatedDate}" />
 															</div>
