@@ -1232,7 +1232,7 @@ function updateEventOnDashboardPageForReviews() {
 		var month = dateSplit[0];
 		var day = dateSplit[1];
 		var year = dateSplit[2];
-		var reviewDay = month + " " + day + "," + year;
+		var reviewDay = month + " " + day + ", " + year;
 		$(this).html(reviewDay).attr("data-modified", "true");
 	});
 	$('.completedOn[data-modified="false"]').each(function(index, currentElement) {

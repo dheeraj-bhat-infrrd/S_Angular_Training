@@ -75,7 +75,7 @@
 				</c:choose>
 				<div class="ppl-header-left review-sm-screen " >
 				<c:choose>
-						<c:when test="${ not empty reviewItem.surveyUpdatedDate}">
+						<c:when test="${not empty reviewItem.surveyUpdatedDate and reviewItem.surveyUpdatedDate != reviewItem.surveyCompletedDate }">
 						 	<div class="ppl-head-2 review-detail-profile float-left"> Updated on </div> 
 							<div class="ppl-head-2 review-detail-profile float-left"
 								data-modified="false"
