@@ -382,7 +382,12 @@ public class SurveyManagementController
             .append( ( allowCheckBox ) ? "Yes" : "No" ).append( tableRowEnd );
         surveyDetail.append( tableOneRowStart ).append( "Abusive Words:" ).append( tableRowMiddle )
             .append( ( isAbusive ) ? "Yes" : "No" ).append( tableRowEnd );
-
+        //adding transaction ref id
+        if(! StringUtils.isEmpty( survey.getSourceId() )){
+            surveyDetail.append( tableOneRowStart ).append( "Transaction Ref Id:" ).append( tableRowMiddle ).append( survey.getSourceId() )
+            .append( tableRowEnd );
+        }
+            
 
         surveyDetail.append( tableBreak ).append( tableOneRowStart ).append( "Comment:" ).append( tableRowMiddle )
             .append( survey.getReview() ).append( tableRowEnd ).append( tableEnd );
