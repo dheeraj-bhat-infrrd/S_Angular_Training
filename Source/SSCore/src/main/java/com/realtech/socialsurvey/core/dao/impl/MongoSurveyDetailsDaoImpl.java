@@ -230,7 +230,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( "review", review );
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, isAbusive );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
-        update.set( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN, new Date() );
+        SurveyDetails details = getSurveyBySurveyMongoId( surveyId );
+        if( details != null && details.getSurveyCompletedDate() != null ){
+            update.set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, new Date() );
+        } else {
+            Date date = new Date();
+            update.set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, date );
+            update.set( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN, date );
+        }
         update.set( CommonConstants.EDITABLE_SURVEY_COLUMN, false );
         update.set( CommonConstants.AGREE_SHARE_COLUMN, agreedToShare );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
@@ -977,7 +984,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.limit( rows );
         }
 
-        query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
+        query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_UPDATED_DATE_COLUMN ) );
 
         /*if ( sortCriteria != null && sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DATE ) )
             query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );

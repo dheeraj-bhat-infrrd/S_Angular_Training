@@ -75,14 +75,24 @@
 				</c:choose>
 				<div class="ppl-header-left review-sm-screen " >
 				<c:choose>
-						<c:when test="${ not empty reviewItem.surveyCompletedDate}">
+						<c:when test="${not empty reviewItem.surveyUpdatedDate and reviewItem.surveyUpdatedDate != reviewItem.surveyCompletedDate }">
+						 	<div class="ppl-head-2 review-detail-profile float-left"> Updated on </div> 
 							<div class="ppl-head-2 review-detail-profile float-left"
 								data-modified="false"
 								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
-						value="${reviewItem.surveyCompletedDate}" />">
+						value="${reviewItem.surveyUpdatedDate}" />"> 
+							</div>
+						</c:when>
+						<c:when test="${ not empty reviewItem.surveyCompletedDate}">
+						    <div class="ppl-head-2 review-detail-profile float-left"> Completed on </div>
+							<div class="ppl-head-2 review-detail-profile float-left"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${reviewItem.surveyCompletedDate}" />"> 
 							</div>
 						</c:when>
 						<c:otherwise>
+							<div class="ppl-head-2 review-detail-profile float-left"> Modified on </div> 				
 							<div class="ppl-head-2 review-detail-profile float-left"
 								data-modified="false"
 								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"

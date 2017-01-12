@@ -43,7 +43,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 
 
 @RestController
-@RequestMapping ( "/users")
+@RequestMapping ( "/v1")
 public class UserController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( UserController.class );
@@ -123,7 +123,7 @@ public class UserController
     }
 
 
-    @RequestMapping ( value = "/profile/stage/update/{userId}/{stage}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/users/{userId}/stage/{stage}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update stage")
     public ResponseEntity<?> updateStage( @PathVariable ( "userId") String userId, @PathVariable ( "stage") String stage )
     {
@@ -134,7 +134,7 @@ public class UserController
     }
 
 
-    @RequestMapping ( value = "/profile/update/{userId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/users/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update user profile")
     public ResponseEntity<?> updateUserProfile( @Valid @RequestBody PersonalProfile personalProfile,
         @PathVariable ( "userId") String userId ) throws SSApiException
@@ -155,7 +155,7 @@ public class UserController
     }
 
 
-    @RequestMapping ( value = "/profile/details/{userId}", method = RequestMethod.GET)
+    @RequestMapping ( value = "/users/{userId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Get user profile")
     public ResponseEntity<?> getUserProfile( @PathVariable ( "userId") String userId ) throws SSApiException
     {
@@ -171,7 +171,7 @@ public class UserController
     }
 
 
-    @RequestMapping ( value = "/profile/profileimage/remove/{userId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/users/{userId}/profileimage", method = RequestMethod.DELETE)
     @ApiOperation ( value = "Delete user profile image")
     public ResponseEntity<?> deleteUserProfileImage( @PathVariable ( "userId") String userId ) throws SSApiException
     {
@@ -186,7 +186,7 @@ public class UserController
     }
 
 
-    @RequestMapping ( value = "/profile/profileimage/update/{userId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/users/{userId}/profileimage", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update user profile image")
     public ResponseEntity<?> updateUserProfileImage( @PathVariable ( "userId") String userId, @RequestBody String imageUrl )
         throws SSApiException
@@ -202,7 +202,7 @@ public class UserController
     }
 
 
-    @RequestMapping ( value = "/profile/stage/{userId}", method = RequestMethod.GET)
+    @RequestMapping ( value = "/users/{userId}/stage", method = RequestMethod.GET)
     @ApiOperation ( value = "Get user profile stage")
     public ResponseEntity<?> getUserStage( @PathVariable ( "userId") String userId ) throws SSApiException
     {
@@ -215,7 +215,7 @@ public class UserController
     }
 
 
-    @RequestMapping ( value = "/profile/password/update/{userId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/users/{userId}/password", method = RequestMethod.PUT)
     @ApiOperation ( value = "Save password")
     public ResponseEntity<?> savePassword( @PathVariable ( "userId") String userId, @RequestBody String password )
         throws InvalidInputException
@@ -225,7 +225,7 @@ public class UserController
     }
 
 
-    @RequestMapping ( value = "/profile/webaddress/validate", method = RequestMethod.POST)
+    @RequestMapping ( value = "/webaddress", method = RequestMethod.POST)
     @ApiOperation ( value = "Validates the provided web address")
     public ResponseEntity<?> validateWebAddress( @RequestBody String webAddress ) throws SSApiException
     {

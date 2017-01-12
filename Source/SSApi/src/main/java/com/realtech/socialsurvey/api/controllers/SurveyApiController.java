@@ -38,7 +38,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 
 
 @RestController
-@RequestMapping ( "/api")
+@RequestMapping ( "/v1")
 public class SurveyApiController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SurveyApiController.class );
@@ -62,7 +62,7 @@ public class SurveyApiController
     private RestUtils restUtils;
 
 
-    @RequestMapping ( value = "/survey", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/surveys", method = RequestMethod.PUT)
     @ApiOperation ( value = "Post Survey Transaction")
     public ResponseEntity<?> postSurveyTransaction( @Valid @RequestBody SurveyPutVO surveyModel, HttpServletRequest request )
         throws SSApiException
@@ -104,7 +104,7 @@ public class SurveyApiController
     }
 
 
-    @RequestMapping ( value = "/survey/{surveyId}", method = RequestMethod.GET)
+    @RequestMapping ( value = "/surveys/{surveyId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Get Survey Transaction")
     public ResponseEntity<?> getSurveyTransaction( @PathVariable ( "surveyId") String surveyId, HttpServletRequest request )
         throws SSApiException
@@ -146,7 +146,7 @@ public class SurveyApiController
     }
 
 
-    @RequestMapping ( value = "/survey", method = RequestMethod.GET)
+    @RequestMapping ( value = "/surveys", method = RequestMethod.GET)
     @ApiOperation ( value = "Get Survey Transactions")
     public ResponseEntity<?> getSurveyTransactions( HttpServletRequest request ) throws SSApiException
     {
