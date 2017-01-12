@@ -24,6 +24,7 @@ import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
@@ -46,6 +47,9 @@ public class WebHookController {
 
 	@Autowired
 	private CoreCommon commonServices;
+	
+	@Autowired
+    private EmailServices emailServices;
 	
 
 	private static final Logger LOG = LoggerFactory.getLogger(WebHookController.class);
@@ -152,6 +156,16 @@ public class WebHookController {
 					+ " | Subscription: " + webhookNotification.getSubscription().getId());
 
 		}
+		
+		
+		//TODO remove this code. this is just for testing
+		try {
+		      String body = "Webhook notification has been received with kind " + webhookNotification.getKind() + " " +  request.getParameter("kind") + " and subscription id " + request.getParameter("subscription_id");
+            emailServices.sendCustomMail( "Admin" , "patidar@infrrd.ai", "Webhook Notification", body, null );
+        } catch ( Exception e1 ) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
 		try {
 			if (webhookNotification.getKind() == WebhookNotification.Kind.SUBSCRIPTION_WENT_PAST_DUE) {
@@ -167,7 +181,7 @@ public class WebHookController {
 				gateway.intimateUser(webhookNotification.getSubscription(), CommonConstants.SUBSCRIPTION_CHARGED_SUCCESSFULLY);
 			}
 			else if(webhookNotification.getKind() == WebhookNotification.Kind.SUBSCRIPTION_CANCELED){
-			    gateway.intimateUser(webhookNotification.getSubscription(), CommonConstants.SUBSCRIPTION_CHARGED_SUCCESSFULLY);
+			    gateway.intimateUser(webhookNotification.getSubscription(), CommonConstants.SUBSCRIPTION_CANCELED);
 			}
 		}
 		catch (InvalidInputException e) {

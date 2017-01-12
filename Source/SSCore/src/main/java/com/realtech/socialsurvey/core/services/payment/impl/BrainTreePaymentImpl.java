@@ -130,6 +130,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
 
     @Value ( "${ALLOW_MULTIPLE_SUBSCRIPTION_FOR_SAME_CUSTOMER}")
     private String allowMultipleSubscription;
+    
+    @Value ( "${APPLICATION_SUPPORT_EMAIL}")
+    private String applicationSupportEmail;
+
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String applicationAdminEmail;
 
     private static final Logger LOG = LoggerFactory.getLogger( BrainTreePaymentImpl.class );
 
@@ -1778,6 +1784,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
             organizationManagementService.purgeCompany( licenseDetail.getCompany() );
             emailServices.sendRetryExhaustedEmail( user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
                 user.getLoginName() );
+            emailServices.sendPaymentFailedAlertEmail( applicationSupportEmail, applicationAdminEmail, licenseDetail.getCompany().getCompany() );
         }
     }
 
