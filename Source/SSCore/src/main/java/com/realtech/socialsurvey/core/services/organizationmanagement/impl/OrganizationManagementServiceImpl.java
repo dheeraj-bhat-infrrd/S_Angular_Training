@@ -1530,27 +1530,59 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LicenseDetail licenseDetail = licenseDetails.get( CommonConstants.INITIAL_INDEX );
 
-        LOG.debug( "Preparing the DisabledAccount entity to be saved in the database." );
-        DisabledAccount disabledAccount = new DisabledAccount();
-        disabledAccount.setCompany( company );
-        disabledAccount.setLicenseDetail( licenseDetail );
-        if ( forceDisable ) {
-            disabledAccount.setDisableDate( new Timestamp( System.currentTimeMillis() ) );
-            disabledAccount.setStatus( CommonConstants.STATUS_INACTIVE );
-        } else {
-            disabledAccount.setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
-            disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
-        }
-        disabledAccount.setCreatedBy(
-            userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
-        disabledAccount.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        disabledAccount.setModifiedBy(
-            userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
-        disabledAccount.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        //check if already an entry in database
+        HashMap<String, Object> queriesForDisableAccount = new HashMap<>();
+        queriesForDisableAccount.put( CommonConstants.COMPANY_COLUMN, company );
+        List<DisabledAccount> disabledAccounts = disabledAccountDao.findByKeyValue( DisabledAccount.class, queriesForDisableAccount );
+        if(disabledAccounts != null && disabledAccounts.size() > 0){
+            LOG.debug( "Found existing entry in the database." );
+            DisabledAccount disabledAccount = disabledAccounts.get( CommonConstants.INITIAL_INDEX );
+            disabledAccount.setLicenseDetail( licenseDetail );
+            if ( forceDisable ) {
+                disabledAccount.setDisableDate( new Timestamp( System.currentTimeMillis() ) );
+                disabledAccount.setStatus( CommonConstants.STATUS_INACTIVE );
+            } else {
+                if(licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO )){
+                    disabledAccount.setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
+                    disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
+                }else{
+                    disabledAccount.setDisableDate( licenseDetail.getNextInvoiceBillingDate() );
+                    disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
+                }
+            }
+            disabledAccount.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            LOG.debug( "Updating the Disabled Account entity to the database" );
+            disabledAccountDao.update( disabledAccount );
 
-        LOG.debug( "Adding the Disabled Account entity to the database" );
-        disabledAccountDao.save( disabledAccount );
-        LOG.info( "Added Disabled Account entity to the database." );
+        }else{
+            LOG.debug( "Preparing the DisabledAccount entity to be saved in the database." );
+            DisabledAccount disabledAccount = new DisabledAccount();
+            disabledAccount.setCompany( company );
+            disabledAccount.setLicenseDetail( licenseDetail );
+            if ( forceDisable ) {
+                disabledAccount.setDisableDate( new Timestamp( System.currentTimeMillis() ) );
+                disabledAccount.setStatus( CommonConstants.STATUS_INACTIVE );
+            } else {
+                if(licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO )){
+                    disabledAccount.setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
+                    disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
+                }else{
+                    disabledAccount.setDisableDate( licenseDetail.getNextInvoiceBillingDate() );
+                    disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
+                }
+            }
+            disabledAccount.setCreatedBy(
+                userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
+            disabledAccount.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+            disabledAccount.setModifiedBy(
+                userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
+            disabledAccount.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+
+            LOG.debug( "Adding the Disabled Account entity to the database" );
+            disabledAccountDao.save( disabledAccount );
+            LOG.info( "Added Disabled Account entity to the database." );
+        }
+        
     }
 
 

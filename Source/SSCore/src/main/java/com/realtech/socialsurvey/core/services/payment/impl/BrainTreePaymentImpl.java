@@ -1740,6 +1740,16 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
         if ( subscription == null ) {
             throw new InvalidInputException( "Subscription passed is null" );
         }
+        
+      //TODO remove this code. this is just for testing
+        try {
+              String body = "Webhook notification has been received with kind " + notificationType + " " +   " and subscription id " + subscription.getId();
+            emailServices.sendCustomMail( "Admin" , "patidar@infrrd.ai", "Webhook Notification", body, null );
+        } catch ( Exception e1 ) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        
         LOG.info( "Initmating user for subscription type : " + subscription.toString() + " with notification type: "
             + notificationType );
         // get the user from subscription
