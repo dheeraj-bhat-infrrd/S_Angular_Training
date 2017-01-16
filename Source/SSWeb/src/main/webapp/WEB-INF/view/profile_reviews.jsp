@@ -77,7 +77,7 @@
 				<c:choose>
 						<c:when test="${not empty reviewItem.surveyUpdatedDate and reviewItem.surveyUpdatedDate != reviewItem.surveyCompletedDate }">
 						 	<div class="ppl-head-2 review-detail-profile float-left"> Updated on </div> 
-							<div class="ppl-head-2 review-detail-profile float-left"
+							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
 								data-modified="false"
 								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
 						value="${reviewItem.surveyUpdatedDate}" />"> 
@@ -85,7 +85,7 @@
 						</c:when>
 						<c:when test="${ not empty reviewItem.surveyCompletedDate}">
 						    <div class="ppl-head-2 review-detail-profile float-left"> Completed on </div>
-							<div class="ppl-head-2 review-detail-profile float-left"
+							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
 								data-modified="false"
 								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
 						value="${reviewItem.surveyCompletedDate}" />"> 
@@ -93,7 +93,7 @@
 						</c:when>
 						<c:otherwise>
 							<div class="ppl-head-2 review-detail-profile float-left"> Modified on </div> 				
-							<div class="ppl-head-2 review-detail-profile float-left"
+							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
 								data-modified="false"
 								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
 						value="${reviewItem.modifiedOn}" />">
