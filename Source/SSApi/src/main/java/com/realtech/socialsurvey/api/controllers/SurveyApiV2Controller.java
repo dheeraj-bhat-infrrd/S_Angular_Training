@@ -26,11 +26,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
-import com.realtech.socialsurvey.api.models.SurveyGetVO;
 import com.realtech.socialsurvey.api.models.SurveyPutVO;
 import com.realtech.socialsurvey.api.models.v2.SurveyGetV2VO;
 import com.realtech.socialsurvey.api.transformers.SurveyPreinitiationTransformer;
-import com.realtech.socialsurvey.api.transformers.SurveyTransformer;
+import com.realtech.socialsurvey.api.transformers.SurveyV2Transformer;
 import com.realtech.socialsurvey.api.transformers.SurveysAndReviewsV2VOTransformer;
 import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -73,7 +72,7 @@ public class SurveyApiV2Controller
     private SurveyPreinitiationTransformer surveyPreinitiationTransformer;
 
     @Autowired
-    private SurveyTransformer surveyTransformer;
+    private SurveyV2Transformer surveyV2Transformer;
 
 
     @RequestMapping ( value = "/surveys", method = RequestMethod.PUT)
@@ -152,7 +151,7 @@ public class SurveyApiV2Controller
         }
 
         //create vo object
-        SurveyGetVO surveyVO = surveyTransformer.transformDomainObjectToApiResponse( review, surveyPreInitiation );
+        SurveyGetV2VO surveyVO = surveyV2Transformer.transformDomainObjectToApiResponse( review, surveyPreInitiation );
         LOGGER.info( "SurveyApiController.getSurveyTransaction completed successfully" );
 
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", "survey", surveyVO, request,
