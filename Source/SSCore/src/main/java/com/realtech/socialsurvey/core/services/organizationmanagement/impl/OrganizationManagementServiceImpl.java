@@ -7848,9 +7848,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         cal.setTimeInMillis( tokenCreatedOn );
         Date createdOn = cal.getTime();
 
-        // adding 7 days to created on time
-        cal.add( Calendar.HOUR, 168 );
-        Date createdOnPlusSeven = cal.getTime();
+        
+        Calendar curDateCal = Calendar.getInstance();
+        // adding 7 days to current time
+        curDateCal.add( Calendar.HOUR, 168 );
+        Date curDatePlusSeven = curDateCal.getTime();
 
         Calendar cal2 = Calendar.getInstance();
         cal2.setTimeInMillis( createdOn.getTime() );
@@ -7858,7 +7860,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         cal2.add( Calendar.HOUR, (int) expiryHours );
         Date expiresOn = cal2.getTime();
 
-        if ( createdOnPlusSeven.after( expiresOn ) )
+        if ( curDatePlusSeven.after( expiresOn ) )
             return true;
 
         return false;
