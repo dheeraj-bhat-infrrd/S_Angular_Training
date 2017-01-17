@@ -760,7 +760,7 @@ function paintReviews(result){
 		}else if(reviewItem.surveyCompletedDate != null){
 			reviewsHtml += '<div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div><div class="ppl-head-2 float-left" style="margin-left: 5px;">' + new Date(reviewItem.surveyCompletedDate).toString("MMMM d, yyyy")+'</div>'
 		}else{
-			reviewsHtml += '<div class="ppl-head-2 review-detail-profile float-left"> Survey modified on </div><div class="ppl-head-2 float-left" style="margin-left: 5px;">' + new Date(reviewItem.modifiedOn).toString("MMMM d, yyyy")+'</div>'
+			reviewsHtml += '<div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div><div class="ppl-head-2 float-left" style="margin-left: 5px;">' + new Date(reviewItem.modifiedOn).toString("MMMM d, yyyy")+'</div>'
 		}
 		
 		
