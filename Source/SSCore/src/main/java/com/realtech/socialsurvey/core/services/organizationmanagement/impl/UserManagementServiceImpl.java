@@ -4654,4 +4654,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         this.saveIgnoredEmailCompanyMapping( emailId, companyId );
         socialManagementService.updateSurveyPreinitiationRecordsAsIgnored( emailId );
     }
+    
+    
+    @Override
+    @Transactional
+    public void temporaryInactiveCompanyAdmin(long companyId){
+        LOG.info( "method temporaryInactiveCompanyAdmin started for companyId : " + companyId );
+        User admin = getAdminUserByCompanyId( companyId );
+        if(admin != null){
+            admin.setStatus( CommonConstants.STATUS_TEMPORARILY_INACTIVE );    
+            admin.setLoginName( admin.getEmailId() );
+            updateUser( admin );
+        }
+        LOG.info( "method temporaryInactiveCompanyAdmin finished for companyId : " + companyId );
+
+    }
 }

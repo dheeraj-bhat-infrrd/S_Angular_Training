@@ -158,15 +158,6 @@ public class WebHookController {
 		}
 		
 		
-		//TODO remove this code. this is just for testing
-		try {
-		      String body = "Webhook notification has been received with kind " + webhookNotification.getKind() + " " +  request.getParameter("kind") + " and subscription id " + request.getParameter("subscription_id");
-            emailServices.sendCustomMail( "Admin" , "patidar@infrrd.ai", "Webhook Notification", body, null );
-        } catch ( Exception e1 ) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
 		try {
 			if (webhookNotification.getKind() == WebhookNotification.Kind.SUBSCRIPTION_WENT_PAST_DUE) {
 				// gateway.changeLicenseToPastDue(webhookNotification.getSubscription());
@@ -211,6 +202,11 @@ public class WebHookController {
             LOG.error("WebHookController getSubscriptionNotifications() : SolrException thrown : " + e.getMessage());
             commonServices.sendFailureMail(e);
             return "WebHookController getSubscriptionNotifications() : SolrException thrown : " + e.getMessage();
+        }
+		catch (Exception e ) {
+            LOG.error("WebHookController getSubscriptionNotifications() : Exception thrown : " + e.getMessage());
+            commonServices.sendFailureMail(e);
+            return "WebHookController getSubscriptionNotifications() : Exception thrown : " + e.getMessage();
         }
 
 		LOG.info("Subscription Notification handled!");

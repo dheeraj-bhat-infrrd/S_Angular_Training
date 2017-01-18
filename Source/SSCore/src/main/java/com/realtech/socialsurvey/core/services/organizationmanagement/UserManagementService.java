@@ -627,5 +627,8 @@ public interface UserManagementService
     public void saveIgnoredEmailCompanyMappingAndUpdateSurveyPreinitiation( String emailId, long companyId )
         throws InvalidInputException, NoRecordsFetchedException;
 
+
+    void temporaryInactiveCompanyAdmin( long companyId );
+
 }
 // JIRA SS-34 BY RM02 BOC
