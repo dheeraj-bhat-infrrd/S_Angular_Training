@@ -203,6 +203,11 @@ public class WebHookController {
             commonServices.sendFailureMail(e);
             return "WebHookController getSubscriptionNotifications() : SolrException thrown : " + e.getMessage();
         }
+		catch (Exception e ) {
+            LOG.error("WebHookController getSubscriptionNotifications() : Exception thrown : " + e.getMessage());
+            commonServices.sendFailureMail(e);
+            return "WebHookController getSubscriptionNotifications() : Exception thrown : " + e.getMessage();
+        }
 
 		LOG.info("Subscription Notification handled!");
 		return new ResponseEntity<String>("Notification recieved and processed!", HttpStatus.OK);

@@ -866,7 +866,7 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws SolrException
      */
-    public void deleteCompany( Company company, User loggedInUser ) throws InvalidInputException, SolrException;
+    public void deleteCompany( Company company, User loggedInUser , int status ) throws InvalidInputException, SolrException;
 
 
     /**

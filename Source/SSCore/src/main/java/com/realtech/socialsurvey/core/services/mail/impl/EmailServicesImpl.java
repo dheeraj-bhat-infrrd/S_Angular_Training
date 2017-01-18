@@ -80,9 +80,6 @@ public class EmailServicesImpl implements EmailServices
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
-    @Value ( "${MAX_PAYMENT_RETRIES}")
-    private int maxPaymentRetries;
-
     @Value ( "${SENDER_EMAIL_DOMAIN}")
     private String defaultEmailDomain;
 
