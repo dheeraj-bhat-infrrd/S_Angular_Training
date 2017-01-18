@@ -23,8 +23,8 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 @Component
 public class CoreCommon {
 	
-	@Value("${ADMIN_EMAIL_ID}")
-	private String recipientMailId;
+	@Value("${APPLICATION_ADMIN_EMAIL}")
+	private String applicationAdminMailId;
 	
 	@Autowired
 	private EmailServices emailServices;
@@ -40,13 +40,13 @@ public class CoreCommon {
 	 */
 	public void sendFailureMail(Exception e) {
 
-		LOG.debug("Sending failure mail to recpient : " + recipientMailId);
+		LOG.debug("Sending failure mail to recpient : " + applicationAdminMailId);
 		String stackTrace = ExceptionUtils.getFullStackTrace(e);
 		// replace all dollars in the stack trace with \$
 		stackTrace = stackTrace.replace("$", "\\$");
 
 		try {
-			emailServices.sendFatalExceptionEmail(recipientMailId, stackTrace);
+			emailServices.sendFatalExceptionEmail(applicationAdminMailId, stackTrace);
 			LOG.debug("Failure mail sent to admin.");
 		}
 		catch (InvalidInputException | UndeliveredEmailException e1) {
@@ -63,13 +63,13 @@ public class CoreCommon {
 	 */
 	public void sendEmailSendingFailureMail(String destinationMailId,String displayName,Exception e) {
 
-		LOG.debug("Sending failure mail to recpient : " + recipientMailId);
+		LOG.debug("Sending failure mail to recpient : " + applicationAdminMailId);
 		String stackTrace = ExceptionUtils.getFullStackTrace(e);
 		// replace all dollars in the stack trace with \$
 		stackTrace = stackTrace.replace("$", "\\$");
 
 		try {
-			emailServices.sendEmailSendingFailureMail(recipientMailId, destinationMailId, displayName, stackTrace);;
+			emailServices.sendEmailSendingFailureMail(applicationAdminMailId, destinationMailId, displayName, stackTrace);;
 			LOG.debug("Failure mail sent to admin.");
 		}
 		catch (InvalidInputException | UndeliveredEmailException e1) {
