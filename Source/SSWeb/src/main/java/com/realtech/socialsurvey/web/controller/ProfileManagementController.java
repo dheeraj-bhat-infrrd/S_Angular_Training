@@ -4851,18 +4851,23 @@ public class ProfileManagementController
             int numRows = Integer.parseInt( request.getParameter( "numOfRows" ) );
             boolean hiddenSection = Boolean.parseBoolean( request.getParameter( "hiddenSection" ) );
 
+            long companyId = user.getCompany().getCompanyId();
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                reviewItems = profileManagementService.getReviews( user.getCompany().getCompanyId(), minScore, maxScore,
-                    startIndex, numRows, CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive, null, null, null );
+                reviewItems = profileManagementService.getReviews( companyId, minScore, maxScore, startIndex, numRows,
+                    CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive, null, null,
+                    profileManagementService.processSortCriteria( companyId, null ) );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( entityId, minScore, maxScore, startIndex, numRows,
-                    CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive, null, null, null );
+                    CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive, null, null,
+                    profileManagementService.processSortCriteria( companyId, null ) );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( entityId, minScore, maxScore, startIndex, numRows,
-                    CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive, null, null, null );
+                    CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive, null, null,
+                    profileManagementService.processSortCriteria( companyId, null ) );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( user.getUserId(), minScore, maxScore, startIndex, numRows,
-                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, null, null, null );
+                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, null, null,
+                    profileManagementService.processSortCriteria( companyId, null ) );
             }
 
             // Setting agent's profile URL in each of the review.
