@@ -106,6 +106,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_STATUS = "status";
     public static final String KEY_USER_ENCRYPTED_ID = "userEncryptedId";
     public static final String KEY_VENDASTA_RM_SETTINGS = "vendasta_rm_settings";
+    public static final String KEY_REVIEW_SORT_CRITERIA = "reviewSortCriteria";
+
 
 
     @Value ( "${CDN_PATH}")

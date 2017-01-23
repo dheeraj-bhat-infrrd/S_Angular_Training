@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
+import org.jsoup.Connection.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
+import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -69,6 +71,7 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
@@ -113,6 +116,9 @@ public class OrganizationManagementController
 
     @Autowired
     private UserManagementService userManagementService;
+
+    @Autowired
+    private ProfileManagementService profileManagementService;
 
     @Autowired
     private Payment gateway;
@@ -743,6 +749,10 @@ public class OrganizationManagementController
             model.addAttribute( "autoPostEnabled", false );
             model.addAttribute( "autoPostLinkToUserSite", false );
             model.addAttribute( "vendastaAccess", unitSettings.isVendastaAccessible() );
+
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+            model.addAttribute( "reviewSortCriteria", profileManagementService.processSortCriteria( companySettings.getIden(),
+                companySettings.getReviewSortCriteria() ) );
 
             //REALTECH_USER_ID is set only for real tech and SS admin
             boolean isRealTechOrSSAdmin = false;
@@ -3487,6 +3497,49 @@ public class OrganizationManagementController
         fineNameMap.put( CommonConstants.MAPPED_USER_TABID, "Mapped-Survey-Report" );
         fineNameMap.put( CommonConstants.CORRUPT_USER_TABID, "Corrupt-Survey-Report" );
         return fineNameMap;
+    }
+
+
+    @RequestMapping ( value = "/updatesortcriteria", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSortCriteria( HttpServletRequest request )
+    {
+        LOG.info( "Method UpdateSortCriteria of OrganizationManagementController called" );
+        DisplayMessage message = null;
+        try {
+            HttpSession session = request.getSession( false );
+            OrganizationUnitSettings companySettings = null;
+            String sortCriteria = (String) request.getParameter( "sortCriteria" );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            if ( entityType.equals( "companyId" ) ) {
+                try {
+                    companySettings = organizationManagementService.getCompanySettings( entityId );
+                    User user = sessionHelper.getCurrentUser();
+                    if ( companySettings == null ) {
+                        message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID,
+                            DisplayMessageType.ERROR_MESSAGE );
+                    } else if ( user != null && ( user.isCompanyAdmin() || user.isSuperAdmin() ) ) {
+                        organizationManagementService.updateSortCriteriaForCompany( companySettings, sortCriteria );
+                        message = messageUtils.getDisplayMessage( DisplayMessageConstants.SORT_CRITERIA_SUCCESSFULLY_UPDATED,
+                            DisplayMessageType.SUCCESS_MESSAGE );
+                    } else {
+                        message = messageUtils.getDisplayMessage( DisplayMessageConstants.INSUFFICIENT_USER_PERMISSION,
+                            DisplayMessageType.ERROR_MESSAGE );
+                    }
+                } catch ( InvalidInputException error ) {
+                    LOG.error( "unable to update sort criteria, company doesnt exist" );
+                    message = messageUtils.getDisplayMessage( error.getErrorCode(), DisplayMessageType.ERROR_MESSAGE );
+                }
+
+            }
+        } catch ( Exception globalError ) {
+            LOG.error( "unable to update sort criteria" );
+            message = messageUtils.getDisplayMessage( ( (NonFatalException) globalError ).getErrorCode(),
+                DisplayMessageType.ERROR_MESSAGE );
+        }
+        LOG.info( "Method UpdateSortCriteria of OrganizationManagementController finished" );
+        return new Gson().toJson( message );
     }
 }
 // JIRA: SS-24 BY RM02 EOC

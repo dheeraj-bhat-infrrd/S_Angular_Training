@@ -1856,6 +1856,26 @@ $(document).on('click', '.da-dd-item', function(e) {
 	});
 });
 
+function setUpListenerForSortCriteriaDropdown(){
+	$("#sort-criteria-sel").on('change',function(event){
+		var payload = {
+			"sortCriteria" : $("#sort-criteria-sel").val()
+		};
+		
+		callAjaxPostWithPayloadData( "./updatesortcriteria.do", function(data){
+				var message = JSON.parse(data);
+				if (message.type != "ERROR_MESSAGE") {
+					$('#overlay-toast').html(message.message + ' to ' + $("#sort-criteria-sel").find(":selected").attr('data-sort'));
+					showToast();
+				}
+				else {
+					$('#overlay-toast').html(message.message);
+					showToast();
+				}
+			}, payload, false);
+	});
+}
+
 $(document).click(function(e) {
 	e.stopPropagation();
 	if ($('#da-dd-wrapper-profiles').css('display') == "block") {

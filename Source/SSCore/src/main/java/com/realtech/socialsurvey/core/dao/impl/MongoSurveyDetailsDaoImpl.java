@@ -971,10 +971,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         //    query
         //        .addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
         // }
-
-        if ( startScore > -1 && limitScore > -1 ) {
-            query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ),
-                Criteria.where( CommonConstants.SCORE_COLUMN ).lte( limitScore ) ) );
+        
+        if( sortCriteria != null && sortCriteria.equals( CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE ) ){
+            if ( startScore > -1 && limitScore > -1 ) {
+                query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ),
+                    Criteria.where( CommonConstants.SCORE_COLUMN ).lte( limitScore ) ) );
+            }
         }
 
         if ( start > -1 ) {
