@@ -723,7 +723,7 @@ public interface CommonConstants
     public static final int SUBSCRIPTION_CHARGED_UNSUCCESSFULLY = 2;
     public static final int SUBSCRIPTION_CHARGED_SUCCESSFULLY = 3;
     public static final int SUBSCRIPTION_CANCELED = 4;
-    
+
 
     // Subscription price modification result constants
     public static final String SUBSCRIPTION_PRICE_CHANGED = "SUBSCRIPTION_PRICE_CHANGED";
@@ -1237,7 +1237,7 @@ public interface CommonConstants
     public static final Object ZILLOW_REVIEWS = "Zillow Reviews";
     public static final Object ABUSIVE_REVIEWS = "Abusive Reviews";
     public static final Object THIRD_PARTY_REVIEWS = "3rd Party Reviews";
-    
+
     //vendasta constants
     public static final String VENDASTA_ACCESS = "vendastaAccessible";
     public static final String VENDASTA_REPUTATION_MANAGEMENT_ID = "RM";
@@ -1247,15 +1247,16 @@ public interface CommonConstants
     public static final String VENDASTA_PRODUCT_ID_COLUMN = "productId";
     public static final String VENDASTA_STATUS_COLUMN = "status";
     public static final String VENDASTA = "vendasta";
-    
+
     //vendasta batch constants
     public static final String BATCH_TYPE_PROCESSED_SSO_TICKET_REMOVER = "ssoTicketRemover";
     public static final String BATCH_NAME_PROCESSED_SSO_TICKET_REMOVER = "remove used vendasta sso tickets";
     public static final int VENDASTA_TICKET_EXPIRED = 1;
-    
+
     //survey API
     public static final String SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION = "Authorization";
     public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
+    public static final String SURVEY_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
 
 }
