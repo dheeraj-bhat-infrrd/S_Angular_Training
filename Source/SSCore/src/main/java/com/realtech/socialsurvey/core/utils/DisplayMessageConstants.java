@@ -257,5 +257,9 @@ public final class DisplayMessageConstants
     public static final String UPDATING_VENDASTA_SETTINGS_SUCCESSFUL = "UPDATING_VENDASTA_SETTINGS_SUCCESSFUL";
     public static final String INVALID_VALUES = "INVALID_VALUES";
     public static final String ACCOUNT_DOESNT_EXIST = "ACCOUNT_DOESNT_EXIST";
+    
+    //sort criteria settings constants
+    public static final String INSUFFICIENT_USER_PERMISSION = "INSUFFICIENT_USER_PERMISSION";
+    public static final String SORT_CRITERIA_SUCCESSFULLY_UPDATED = "SORT_CRITERIA_SUCCESSFULLY_UPDATED";
 }
 
