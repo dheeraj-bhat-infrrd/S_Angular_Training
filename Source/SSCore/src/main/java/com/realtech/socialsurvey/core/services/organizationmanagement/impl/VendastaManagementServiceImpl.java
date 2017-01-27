@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -39,6 +41,7 @@ import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 
 import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 
 @DependsOn ( "generic")
@@ -396,15 +399,24 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
     }
 
 
+    @SuppressWarnings ( "unchecked")
     @Override
     public boolean isAccountExistInVendasta( String accountId )
     {
         boolean status = false;
         try {
             Response response = vendastaApiIntegrationBuilder.getIntegrationApi().getAccountById( apiUser, apiKey, accountId );
-            if ( response != null && response.getStatus() == HttpStatus.SC_OK )
-                status = true;
-        } catch ( VendastaAccessException ex ) {
+            if ( response != null && response.getStatus() == HttpStatus.SC_OK ) {
+                String responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+
+                Map<String, Object> ResponseMap = new ObjectMapper().readValue( responseString,
+                    new TypeReference<HashMap<String, Object>>() {} );
+                HashMap<String, Object> data = (HashMap<String, Object>)ResponseMap.get( "data" );
+                if ( data != null && data.size() != 0 ) {
+                    status = true;
+                }
+            }
+        } catch ( VendastaAccessException | IOException ex ) {
             LOG.error( "Error connecting to vendasta. " + ex.getMessage() );
         }
         return status;
