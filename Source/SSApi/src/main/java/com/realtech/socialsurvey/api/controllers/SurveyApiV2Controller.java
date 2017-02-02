@@ -293,7 +293,7 @@ public class SurveyApiV2Controller
         List<Long> userIds = null;
         if ( !StringUtils.isEmpty( userEmailAddress ) ) {
             try {
-                User user = userManagementService.getUserByEmail( userEmailAddress );
+                User user = userManagementService.getUserByEmailAndCompany(companyId, userEmailAddress);
                 userIds = new ArrayList<Long>();
                 userIds.add( user.getUserId() );
 
@@ -303,10 +303,13 @@ public class SurveyApiV2Controller
                     userIds.addAll( agentIds );
                 }
 
-            } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            } catch ( InvalidInputException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
                     "Passed parameter user " + userEmailAddress + " is invalid", null, null, request, companyId );
-            }
+            } catch (NoRecordsFetchedException e) {
+            	return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "User not registered or you do not have access to this account.",
+                        null, null, request , companyId  );
+			}
         }
 
         //get data from database
