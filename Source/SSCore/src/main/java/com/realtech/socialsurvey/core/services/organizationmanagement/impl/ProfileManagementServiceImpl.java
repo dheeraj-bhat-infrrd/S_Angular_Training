@@ -129,7 +129,6 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
@@ -182,9 +181,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     private GenericDao<User, Long> userDao;
 
     @Autowired
-    private GenericDao<VerticalsMaster, Long> verticalsMasterDao;
-
-    @Autowired
     private SurveyDetailsDao surveyDetailsDao;
 
     @Autowired
@@ -218,9 +214,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Autowired
     private SettingsLocker settingsLocker;
-
-    @Autowired
-    private UrlValidationHelper urlValidationHelper;
 
     @Autowired
     private ZillowIntergrationApiBuilder zillowIntegrationApiBuilder;
@@ -1829,39 +1822,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             fetchAbusive, startDate, endDate, sortCriteria );
 
         //TODO : remove this . Temporary fix for Zillow review URl
-        for ( SurveyDetails review : surveyDetails ) {
-            if ( review.getSource().equals( "Zillow" ) ) {
-                if ( StringUtils.isEmpty( review.getSourceId() ) ) {
-                    review.setSourceId( review.getCompleteProfileUrl() );
+        if ( surveyDetails != null && surveyDetails.size() > 0 ) {
+            for ( SurveyDetails review : surveyDetails ) {
+                if ( review != null && "Zillow".equalsIgnoreCase( review.getSource() ) ) {
+                    if ( StringUtils.isEmpty( review.getSourceId() ) ) {
+                        review.setSourceId( review.getCompleteProfileUrl() );
+                    }
                 }
             }
         }
-
-        // This is not needed. Commenting out
-        /*for (SurveyDetails review : surveyDetails) {
-            OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
-            if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
-                SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
-        
-                // adding yelpUrl
-                if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
-                    review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
-                }
-        
-                // adding zillowUrl
-                if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
-                    review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
-                }
-        
-                // adding lendingTreeUrl
-                if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
-                    review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
-                }
-                if (mediaTokens.getRealtorToken() != null && mediaTokens.getRealtorToken().getRealtorProfileLink() != null) {
-                    review.setRealtorProfileUrl(mediaTokens.getRealtorToken().getRealtorProfileLink());
-                }
-            }
-        }*/
 
         return surveyDetails;
     }
@@ -2336,7 +2305,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     @Override
     public void findProfileMailIdAndSendMail( String profileName, String message, String senderName, String senderMailId,
-        String profileType ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
+        String profileType )
+        throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
         if ( profileName == null || profileName.isEmpty() ) {
             LOG.error( "contactAgent : profileName parameter is empty or null!" );
