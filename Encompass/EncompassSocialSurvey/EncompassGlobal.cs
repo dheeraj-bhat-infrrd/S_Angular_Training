@@ -74,8 +74,8 @@ namespace EncompassSocialSurvey
                 fieldIds.Add("69");    // Co-BorrowerLastName
                 fieldIds.Add("1268");  // Co-BorrowerEmailId
                 fieldIds.Add("748"); // closed date
-                fieldIds.Add("Loan.State"); // State
-                fieldIds.Add("Loan.City"); // City
+                fieldIds.Add("14"); // State
+                fieldIds.Add("12"); // City
             }
             return fieldIds;
         }
