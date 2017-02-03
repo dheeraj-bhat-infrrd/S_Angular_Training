@@ -66,6 +66,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialMonitorData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -1812,66 +1813,14 @@ public class SocialManagementController
                     map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
                 }
 
-                Map<String, Object> responseMap = new HashMap<String, Object>();
-                Map<String, Object> messageMap = new HashMap<String, Object>();
-                Map<String, Object> resultMap = new HashMap<String, Object>();
-                Map<String, Object> proInfoMap = new HashMap<String, Object>();
-                Map<String, Object> proReviews = new HashMap<String, Object>();
-                List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-                if ( map != null ) {
-                    responseMap = (HashMap<String, Object>) map.get( "response" );
-                    messageMap = (HashMap<String, Object>) map.get( "message" );
-                    String code = (String) messageMap.get( "code" );
-                    if ( code.equalsIgnoreCase( "7" ) ) {
-                        String errorMessage = (String) messageMap.get( "text" );
-                        int count = socialManagementService.fetchZillowCallCount();
-                        if ( count != 0 ) {
-                            LOG.debug( "Zillow API call count exceeded limit. Sending mail to admin." );
-                            try {
-                                emailServices.sendZillowCallExceededMailToAdmin( count );
-                                socialManagementService.resetZillowCallCount();
-                            } catch ( InvalidInputException e ) {
-                                LOG.error( "Sending the mail to the admin failed due to invalid input. Reason : ", e );
-                            } catch ( UndeliveredEmailException e ) {
-                                LOG.error( "The email failed to get delivered. Reason : ", e );
-                            }
-                        }
-                        throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
-                    } else if ( !code.equalsIgnoreCase( "0" ) ) {
-                        String errorMessage = (String) messageMap.get( "text" );
-                        throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
-                    } else {
-                        socialManagementService.updateZillowCallCount();
-                    }
-
-                    if ( responseMap != null ) {
-                        resultMap = (HashMap<String, Object>) responseMap.get( "results" );
-                        if ( resultMap != null ) {
-                            proInfoMap = (HashMap<String, Object>) resultMap.get( "proInfo" );
-                            if ( proInfoMap != null ) {
-                                profileLink = (String) proInfoMap.get( "profileURL" );
-                            }
-                            proReviews = (HashMap<String, Object>) resultMap.get( "proReviews" );
-                            if ( proReviews != null ) {
-                                reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
-                                if ( reviews != null ) {
-                                    // for ( HashMap<String, Object> review : reviews ) {
-                                    // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                                    // String rating = (String) review.get( "rating" );
-                                    // if ( rating != null && !rating.isEmpty() ) {
-                                    //     if ( Double.valueOf( rating ) != Double.NaN ) {
-                                    //         zillowReviewCount++;
-                                    //         zillowTotalScore += Double.valueOf( rating );
-                                    //     }
-                                    // }
-                                    organizationManagementService.pushZillowReviews( reviews, collectionName, profileSettings,
-                                        user.getCompany().getCompanyId() );
-                                    // }
-                                }
-                            }
-                        }
-                    }
-                }
+               if(map != null){
+                   profileManagementService.modifyZillowCallCount( map );
+                   List<SurveyDetails> surveyDetailsList =  profileManagementService.buildSurveyDetailFromZillowAgentReviewMap( map );
+                   organizationManagementService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings,
+                            user.getCompany().getCompanyId() );
+               }
+                
+                
                 int accountMasterId = accountType.getValue();
                 if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                     OrganizationUnitSettings companySettings = organizationManagementService

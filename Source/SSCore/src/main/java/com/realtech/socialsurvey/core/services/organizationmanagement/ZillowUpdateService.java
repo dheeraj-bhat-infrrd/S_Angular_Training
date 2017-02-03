@@ -2,7 +2,9 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.HashMap;
 import java.util.List;
+
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 public interface ZillowUpdateService
@@ -14,6 +16,6 @@ public interface ZillowUpdateService
         double zillowAverage );
 
 
-    public void pushZillowReviews( List<HashMap<String, Object>> reviews, String collectionName,
+    public void pushZillowReviews( List<SurveyDetails> surveyDetailsList, String collectionName,
         OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException;
 }
