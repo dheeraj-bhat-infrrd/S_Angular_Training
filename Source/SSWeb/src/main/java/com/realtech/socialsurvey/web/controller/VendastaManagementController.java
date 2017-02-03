@@ -104,7 +104,7 @@ public class VendastaManagementController
 
 
     //method to prepare jsp to add or update vendasta account Id
-    @RequestMapping ( value = "/showreviewsmonitorsettings")
+    @RequestMapping ( value = "/showlistingsmanagersettings")
     public String showVendastaSettings( Model model, HttpServletRequest request )
     {
 

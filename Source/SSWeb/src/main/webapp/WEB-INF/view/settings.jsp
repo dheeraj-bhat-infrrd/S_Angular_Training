@@ -78,7 +78,7 @@
 							<div>
 								<div id="vndsta-access-chk-box" class="float-left bd-check-img"></div>
 								<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
-								<div class="float-left bd-check-txt">Allow access to Reviews Monitor</div>
+								<div class="float-left bd-check-txt">Allow access to Listings Manager</div>
 							</div>
 							</c:if>
 						</div>
