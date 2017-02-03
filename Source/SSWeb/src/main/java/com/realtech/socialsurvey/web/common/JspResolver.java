@@ -109,7 +109,7 @@ public interface JspResolver
     public static final String REVIEWS_UNDER_RESOLUTION_REPORTS = "reviewsunderresolution";
     public static final String ABUSIVE_REVIEWS_REPORTS = "abusivereviewsreports";
     public static final String SHOW_WIDGET = "show_widget";
-    public static final String VENDASTA_SETTINGS = "reviewsMonitorSettings";
+    public static final String VENDASTA_SETTINGS = "listingsManagerSettings";
 
     //Help Settings
     public static final String HELP_EDIT = "help";
@@ -165,8 +165,8 @@ public interface JspResolver
     //Social Monitor
     public static final String SOCIAL_MONITOR = "view-social-monitor";
 
-    //Reviews Monitor
-    public static final String REVIEWS_MONITOR = "view-reviews-monitor";
+    //Listings Manager
+    public static final String LISTINGS_MANAGER = "view-listings-manager";
 
     //social media
     public static final String POST_ON_SOCIAL_MEDIA_SUCCESS = "post-on-social-media-success";

@@ -22,7 +22,7 @@ $(document).ready(function() {
 		
 	callAjaxGetWithPayloadData("/isvendastaaccessibleforthesession.do", function(data) {
 		vendastaAccess = data;
-		showOrHideReviewsMonitor( vendastaAccess );
+		showOrHideListingsManager( vendastaAccess );
 		showOrHideVendastaProductSettings( vendastaAccess );
 	});
 });

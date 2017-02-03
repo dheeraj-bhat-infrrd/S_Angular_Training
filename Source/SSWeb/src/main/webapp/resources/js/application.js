@@ -1850,7 +1850,7 @@ $(document).on('click', '.da-dd-item', function(e) {
 		showMainContent('./' + selectedTab + '.do');
 		callAjaxGetWithPayloadData("/isvendastaaccessibleforthesession.do", function(data) {
 			vendastaAccess = JSON.parse(data);
-			showOrHideReviewsMonitor( vendastaAccess );
+			showOrHideListingsManager( vendastaAccess );
 			showOrHideVendastaProductSettings( vendastaAccess );
 		});
 	});
@@ -9829,27 +9829,27 @@ $('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
 $('body').on('click', '#vndsta-access-chk-box', function() {
 	if ($('#vndsta-access-chk-box').hasClass('bd-check-img-checked')) {
 		$('#vndsta-access-chk-box').removeClass('bd-check-img-checked');
-		showOrHideReviewsMonitor( true );
+		showOrHideListingsManager( true );
 		showOrHideVendastaProductSettings( true );
 		updateVendastaAccessSetting(true, '#vndsta-access-chk-box');
 	} else {
 		$('#vndsta-access-chk-box').addClass('bd-check-img-checked');
-		showOrHideReviewsMonitor( false );
+		showOrHideListingsManager( false );
 		showOrHideVendastaProductSettings( false );
 		updateVendastaAccessSetting(false, '#vndsta-access-chk-box');
 	}
 });
 
-function showOrHideReviewsMonitor(vendastaAccess)
+function showOrHideListingsManager(vendastaAccess)
 {
 	if( vendastaAccess == true || vendastaAccess == "true" )
 		{
-		$("#reviews-monitor-main").show();
-		$("#reviews-monitor-slider").show();
+		$("#listings-manager-main").show();
+		$("#listings-manager-slider").show();
 		}
 	else{
-		$("#reviews-monitor-main").hide();
-		$("#reviews-monitor-slider").hide();
+		$("#listings-manager-main").hide();
+		$("#listings-manager-slider").hide();
 	}
 }
 

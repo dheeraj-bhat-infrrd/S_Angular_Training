@@ -2534,16 +2534,16 @@ public class SocialManagementController
         return false;
     }
     /**
-     * Method to show the reviews monitor page
+     * Method to show the Listings Manager page
      * 
      * @param model
      * @param request
      * @return
      */
-    @RequestMapping ( value = "/showreviewsmonitorpage", method = RequestMethod.GET)
-    public String initReviewsMonitorPage( Model model, HttpServletRequest request )
+    @RequestMapping ( value = "/showlistingsmanagerpage", method = RequestMethod.GET)
+    public String initListingsManagerPage( Model model, HttpServletRequest request )
     {
-        LOG.info( "reviews Monitor page started" );
+        LOG.info( "Listings Manager page started" );
         User user = sessionHelper.getCurrentUser();
 
         //Validate user
@@ -2553,17 +2553,17 @@ public class SocialManagementController
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
             if ( user.getStatus() != CommonConstants.STATUS_ACTIVE ) {
-                LOG.error( "Inactive or unauthorized users can not access reviews monitor page" );
+                LOG.error( "Inactive or unauthorized users can not access Listings Manager page" );
                 model.addAttribute( "message", messageUtils.getDisplayMessage(
                     DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE ) );
             }
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException in while showing reviews monitor. Reason : " + nonFatalException.getMessage(),
+            LOG.error( "NonFatalException in while showing Listings Manager. Reason : " + nonFatalException.getMessage(),
                 nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
-        return JspResolver.REVIEWS_MONITOR;
+        return JspResolver.LISTINGS_MANAGER;
     }
    
 }
