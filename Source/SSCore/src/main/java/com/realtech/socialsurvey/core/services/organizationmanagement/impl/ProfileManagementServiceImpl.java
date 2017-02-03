@@ -46,6 +46,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -112,7 +113,8 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBody;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationLenderApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -231,6 +233,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Value ( "${ZILLOW_WEBSERVICE_ID}")
     private String zwsId;
+    
+    @Value ( "${ZILLOW_PARTNER_ID}")
+    private String zillowPartnerId;
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
@@ -263,8 +268,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
 
-    @Value ( "${ZILLOW_ENDPOINT}")
-    private String zillowEndpoint;
+    @Value ( "${ZILLOW_AGENT_API_ENDPOINT}")
+    private String zillowAgentApiEndpoint;
+    
+    @Value ( "${ZILLOW_LENDER_API_ENDPOINT}")
+    private String zillowLenderApiEndpoint;
 
     @Value ( "${AMAZON_IMAGE_BUCKET}")
     private String amazonImageBucket;
@@ -4369,7 +4377,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             SocialMediaTokens token = profile.getSocialMediaTokens();
             if ( token != null ) {
                 if ( token.getZillowToken() != null ) {
-                    ZillowIntegrationApi zillowIntegrationApi = zillowIntegrationApiBuilder.getZellowIntegrationApi();
+                    
                     String responseString = null;
                     ZillowToken zillowToken = token.getZillowToken();
                     String zillowScreenName = zillowToken.getZillowScreenName();
@@ -4379,16 +4387,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     
                     if( ! StringUtils.isEmpty( zillowLenderId ) ){
                         FetchZillowReviewBody fetchZillowReviewBody = new FetchZillowReviewBody();
-                        fetchZillowReviewBody.setLenderId( zillowToken.getZillowLenderId() );
-                        fetchZillowReviewBody.setPartnerId( "RD-SNHKMRN" );
-                        response = zillowIntegrationApi.fetchZillowReviewsByLenderId( fetchZillowReviewBody );
+                        fetchZillowReviewBody.setLenderId( zillowLenderId );
+                        fetchZillowReviewBody.setPartnerId( zillowPartnerId );
+                        ZillowIntegrationLenderApi zillowIntegrationLenderApi = zillowIntegrationApiBuilder.getZillowIntegrationLenderApi();
+                        response = zillowIntegrationLenderApi.fetchZillowReviewsByLenderId( fetchZillowReviewBody );
                         
                         if ( response != null ) {
                             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
                         }
                         
                         //save to api call details
-                        saveExternalAPICallDetailForZillow( zillowScreenName ,  responseString);
+                        Gson gson = new Gson();
+                        String requestBody = gson.toJson( fetchZillowReviewBody );
+                        saveExternalAPICallDetailForZillowLender( requestBody ,  responseString);
                         
                         if ( responseString != null ) {
                             Map<String, Object> map = null;
@@ -4413,7 +4424,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         try {
                             // Replace - with spaces in zillow screen name
                             zillowScreenName = zillowScreenName.replaceAll( "-", " " );
-                            response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
+                            ZillowIntegrationAgentApi zillowIntegrationAgentApi = zillowIntegrationApiBuilder.getZillowIntegrationAgentApi();
+                            response = zillowIntegrationAgentApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
                                 zillowScreenName );
                             
                             
@@ -4430,7 +4442,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         }
                         
                         //save to api call details
-                        saveExternalAPICallDetailForZillow( zillowScreenName ,  responseString);
+                        saveExternalAPICallDetailForZillowAgent( zillowScreenName ,  responseString);
                         
                         if ( responseString != null ) {
                             Map<String, Object> map = null;
@@ -4632,11 +4644,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * @param responseString
      * @throws InvalidInputException
      */
-    private void saveExternalAPICallDetailForZillow(String zillowScreenName , String responseString) throws InvalidInputException{
+    private void saveExternalAPICallDetailForZillowAgent(String zillowScreenName , String responseString) throws InvalidInputException{
         
         ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
         zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_GET );
-        zillowAPICallDetails.setRequest( zillowEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id="
+        zillowAPICallDetails.setRequest( zillowAgentApiEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id="
             + zwsId + "&screenname=" + zillowScreenName );
 
         
@@ -4647,6 +4659,26 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         //Store this record in mongo
         externalApiCallDetailsDao.insertApiCallDetails( zillowAPICallDetails );
     }
+    
+    /**
+    * 
+    * @param zillowScreenName
+    * @param responseString
+    * @throws InvalidInputException
+    */
+   private void saveExternalAPICallDetailForZillowLender(String requestBody , String responseString) throws InvalidInputException{
+       
+       ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
+       zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_POST );
+       zillowAPICallDetails.setRequest( zillowLenderApiEndpoint + "/getPublishedLenderReviews" );
+       zillowAPICallDetails.setRequestBody( requestBody );
+       
+       zillowAPICallDetails.setResponse( responseString );
+       zillowAPICallDetails.setRequestTime( new Date( System.currentTimeMillis() ) );
+       zillowAPICallDetails.setSource( CommonConstants.ZILLOW_SOCIAL_SITE );
+       //Store this record in mongo
+       externalApiCallDetailsDao.insertApiCallDetails( zillowAPICallDetails );
+   }
 
     @Override
     public Date convertStringToDate( String dateString )
@@ -5043,6 +5075,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 //update surveydetail in list
                 surveyDetailsList.set( i, surveyDetails );
 
+                latestSurveyIdList.add( surveyDetails.get_id() );
                 // Commented as Zillow reviews are saved in Social Survey, SS-307
                 // if ( zillowReviewScoreTotal == -1 )
                 //    zillowReviewScoreTotal = surveyDetails.getScore();
@@ -5058,6 +5091,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyHandler.updateZillowSourceIdInExistingSurveyDetails( existingSurveyDetails );
                 //update surveydetail in list
                 surveyDetailsList.set( i, existingSurveyDetails );
+                latestSurveyIdList.add( existingSurveyDetails.get_id() );
             } else if ( existingSurveyDetails.getSourceId() == null || existingSurveyDetails.getSourceId().isEmpty() ) {
 
             }
@@ -5070,7 +5104,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
 
            
-            latestSurveyIdList.add( surveyDetails.get_id() );
+            
         }
         if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
             long reviewCount = getReviewsCount( profile.getIden(), -1, -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false,
@@ -5092,8 +5126,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             LOG.error( "Exception occurred while resetting showSurveyOnUI property for review ids not in list :"
                 + latestSurveyIdList + ". Reason :", e );
         }
-        SurveyDetails fS = surveyDetailsList.get( 0 );
-        String name = fS.getAgentName();
         return surveyDetailsList;
     }
 

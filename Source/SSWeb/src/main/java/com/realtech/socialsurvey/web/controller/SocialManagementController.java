@@ -77,7 +77,7 @@ import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -217,8 +217,13 @@ public class SocialManagementController
 
     private final static int SOLR_BATCH_SIZE = 20;
 
-    @Value ( "${ZILLOW_ENDPOINT}")
-    private String zillowEndpoint;
+    @Value ( "${ZILLOW_AGENT_API_ENDPOINT}")
+    private String zillowAgentApiEndpoint;
+    
+    @Value ( "${ZILLOW_LENDER_API_ENDPOINT}")
+    private String zillowLenderApiEndpoint;
+    
+    
 
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
@@ -1720,7 +1725,7 @@ public class SocialManagementController
     {
         LOG.info( "Method saveZillowDetails() called from SocialManagementController" );
         HttpSession session = request.getSession( false );
-        ZillowIntegrationApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZellowIntegrationApi();
+        ZillowIntegrationAgentApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZillowIntegrationAgentApi();
         User user = sessionHelper.getCurrentUser();
         String zillowScreenName = request.getParameter( "zillowProfileName" );
         SocialMediaTokens mediaTokens = null;
@@ -1801,7 +1806,7 @@ public class SocialManagementController
                 //Store the API call details
                 ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
                 zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_GET );
-                zillowAPICallDetails.setRequest( zillowEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id="
+                zillowAPICallDetails.setRequest( zillowAgentApiEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id="
                     + zillowWebserviceId + "&screenname=" + zillowScreenName );
                 zillowAPICallDetails.setResponse( jsonString );
                 zillowAPICallDetails.setRequestTime( new Date( System.currentTimeMillis() ) );

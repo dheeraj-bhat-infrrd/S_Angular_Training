@@ -14,7 +14,7 @@ import retrofit.http.Query;
  * API methods to integrate with Zillow
  *
  */
-public interface ZillowIntegrationApi
+public interface ZillowIntegrationAgentApi
 {
 
 
@@ -33,8 +33,7 @@ public interface ZillowIntegrationApi
     @GET ( "/webservice/ProReviews.htm?output=json")
     public Response fetchZillowReviewsByEmail( @Query ( "zws-id") String zwsId, @Query ( "email") String email );
     
-    @POST( "/getPublishedLenderReviews")
-    public Response fetchZillowReviewsByLenderId( @Body FetchZillowReviewBody fetchZillowReviewBody );
+    
     
 
 }

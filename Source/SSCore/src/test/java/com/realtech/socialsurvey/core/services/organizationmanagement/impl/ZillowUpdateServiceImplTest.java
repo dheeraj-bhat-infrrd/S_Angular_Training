@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 public class ZillowUpdateServiceImplTest
@@ -57,15 +58,14 @@ public class ZillowUpdateServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testPushZillowReviewsWithEmptyReviewsMap() throws InvalidInputException
     {
-        zillowUpdateServiceImpl.pushZillowReviews( new ArrayList<HashMap<String, Object>>(), null, null, 0 );
+        zillowUpdateServiceImpl.pushZillowReviews( new ArrayList<SurveyDetails>(), null, null, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testPushZillowReviewsWithNullCollectionName() throws InvalidInputException
     {
-        List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-        reviews.add( new HashMap<String, Object>() );
+        List<SurveyDetails> reviews =  new ArrayList<SurveyDetails>();
         zillowUpdateServiceImpl.pushZillowReviews( reviews, null, null, 0 );
     }
 
@@ -73,8 +73,7 @@ public class ZillowUpdateServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testPushZillowReviewsWithEmptyCollectionName() throws InvalidInputException
     {
-        List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-        reviews.add( new HashMap<String, Object>() );
+        List<SurveyDetails> reviews =  new ArrayList<SurveyDetails>();
         zillowUpdateServiceImpl.pushZillowReviews( reviews, "", null, 0 );
     }
 
@@ -82,8 +81,7 @@ public class ZillowUpdateServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testPushZillowReviewsWithNullProfileSettings() throws InvalidInputException
     {
-        List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-        reviews.add( new HashMap<String, Object>() );
+        List<SurveyDetails> reviews =  new ArrayList<SurveyDetails>();
         zillowUpdateServiceImpl.pushZillowReviews( reviews, "test", null, 0 );
     }
 
@@ -91,8 +89,7 @@ public class ZillowUpdateServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testPushZillowReviewsWithInvalidCompanyId() throws InvalidInputException
     {
-        List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-        reviews.add( new HashMap<String, Object>() );
+        List<SurveyDetails> reviews =  new ArrayList<SurveyDetails>();
         zillowUpdateServiceImpl.pushZillowReviews( reviews, "test", new OrganizationUnitSettings(), 0 );
     }
 }
