@@ -52,7 +52,7 @@
 </div>
 <script>
 	$(document).ready(function() {
-		$(document).attr("title", "Reviews Monitor Settings");
+		$(document).attr("title", "Listings Manager Settings");
 		if ("${accountId}" != "") {
 			$('#account-iden').val('${accountId}');
 		}
