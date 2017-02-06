@@ -4508,10 +4508,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 String sourceId = (String) review.get( "reviewId" );
                 String reviewDescription = (String) review.get( "content" );
                 String summary = (String) review.get( "title" );
-                String createdDate = (String) review.get( "created" );
+                String createdDateStr = (String) review.get( "created" );
+                String dateOfServiceStr = (String) review.get( "dateOfService" );
                 String completeProfileUrl = (String) review.get( "reviewerLink" );
                 Double score =  ((Integer) review.get( "rating" )).doubleValue() ;
                 boolean isAbusive = false;
+                Date createdDate = convertStringToDateForZillowLenders( createdDateStr );
+                Date dateOfService = convertStringToDateForZillowLenders( dateOfServiceStr );
                 
                 SurveyDetails surveyDetails = new SurveyDetails();
                 surveyDetails.setCompleteProfileUrl( completeProfileUrl );
@@ -4522,14 +4525,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setScore( score );
                 surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
                 surveyDetails.setSourceId( sourceId );
-                surveyDetails.setModifiedOn( convertStringToDate( createdDate ) );
-                surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
+                surveyDetails.setModifiedOn( createdDate );
+                surveyDetails.setCreatedOn( createdDate );
                 surveyDetails.setAgreedToShare( "true" );
                 surveyDetails.setAbusive( isAbusive );
                 surveyDetails.setAbuseRepByUser( false );
                 surveyDetails.setShowSurveyOnUI( true );
-                surveyDetails.setSurveyCompletedDate( convertStringToDate( createdDate ) );
-
+                surveyDetails.setSurveyCompletedDate( createdDate );
+                surveyDetails.setSurveyTransactionDate( dateOfService );
+                
                 // saving zillow review summary
                 surveyDetails.setSummary( summary );
                 
@@ -4579,7 +4583,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
                             surveyDetails.setScore( score );
                             surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
-                            surveyDetails.setSourceId( sourceId );
+                            surveyDetails.setSourceId( null );
                             surveyDetails.setModifiedOn( convertStringToDate( createdDate ) );
                             surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
                             surveyDetails.setAgreedToShare( "true" );
@@ -4693,6 +4697,22 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         return date;
     }
+    
+    
+    public Date convertStringToDateForZillowLenders( String dateString )
+    {
+
+        DateFormat format = new SimpleDateFormat( "yyyy-MM-dd", Locale.ENGLISH );
+        Date date;
+        try {
+            date = format.parse( dateString );
+        } catch ( ParseException e ) {
+            return null;
+        }
+        return date;
+    }
+    
+    
 
 
     @Override
