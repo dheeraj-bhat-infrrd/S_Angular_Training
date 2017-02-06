@@ -4599,7 +4599,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         for ( UserProfile userProfile : adminUserProfiles ) {
             if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
                 Map<String, Object> queries = new HashMap<>();
-                queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
                 queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
                 queries.put( CommonConstants.BRANCH_ID_COLUMN, userProfile.getBranchId() );
                 List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
@@ -4610,7 +4609,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             } else if ( userProfile.getProfilesMaster()
                 .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                 Map<String, Object> queries = new HashMap<>();
-                queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
                 queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
                 queries.put( CommonConstants.REGION_ID_COLUMN, userProfile.getRegionId() );
                 List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
@@ -4621,7 +4619,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             } else if ( userProfile.getProfilesMaster()
                 .getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
                 Map<String, Object> queries = new HashMap<>();
-                queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
                 queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
                 queries.put( CommonConstants.COMPANY_COLUMN, userProfile.getCompany() );
                 List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );

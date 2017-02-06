@@ -168,6 +168,8 @@ public class SurveyApiV2Controller
         //authorize request
         String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         long companyId = 0;
+        SimpleDateFormat sdf = new SimpleDateFormat( CommonConstants.SURVEY_API_DATE_FORMAT );
+        sdf.setLenient(false);
         try {
             companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
         } catch ( AuthorizationException e1 ) {
@@ -178,7 +180,7 @@ public class SurveyApiV2Controller
         String countStr = request.getParameter( "count" );
         String startStr = request.getParameter( "start" );
         String status = request.getParameter( "status" );
-        String startSurveyIDStr = request.getParameter( "startSurveyID" );
+        String startSurveyIDStr = request.getParameter( "startSurveyId" );
         String startReviewDateStr = request.getParameter( "startReviewDateTime" );
         String startTransactionDateStr = request.getParameter( "startTransactionDateTime" );
         String state = request.getParameter( "state" );
@@ -186,7 +188,7 @@ public class SurveyApiV2Controller
         String includeManagedTeamStr = request.getParameter( "includeManagedTeam" );
 
         Set<String> inputRequestParameters = request.getParameterMap().keySet();
-        List<String> fixReqParameters = Arrays.asList( "count", "start", "status", "startSurveyID", "startReviewDateTime",
+        List<String> fixReqParameters = Arrays.asList( "count", "start", "status", "startSurveyId", "startReviewDateTime",
             "startTransactionDateTime", "state", "user", "includeManagedTeam" );
         for ( String currParameter : inputRequestParameters ) {
             if ( !fixReqParameters.contains( currParameter ) ) {
@@ -252,7 +254,7 @@ public class SurveyApiV2Controller
         Date startReviewDate = null;
         if ( startReviewDateStr != null && !startReviewDateStr.isEmpty() ) {
             try {
-                startReviewDate = new SimpleDateFormat( CommonConstants.SURVEY_API_DATE_FORMAT ).parse( startReviewDateStr );
+                startReviewDate = sdf.parse( startReviewDateStr );
             } catch ( ParseException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
                     "Passed parameter startReviewDateTime is invalid", null, null, request, companyId );
@@ -263,8 +265,7 @@ public class SurveyApiV2Controller
         Date startTransactionDate = null;
         if ( startTransactionDateStr != null && !startTransactionDateStr.isEmpty() ) {
             try {
-                startTransactionDate = new SimpleDateFormat( CommonConstants.SURVEY_API_DATE_FORMAT )
-                    .parse( startTransactionDateStr );
+                startTransactionDate = sdf.parse( startTransactionDateStr );
             } catch ( ParseException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
                     "Passed parameter startTransactionDateTime is invalid", null, null, request, companyId );

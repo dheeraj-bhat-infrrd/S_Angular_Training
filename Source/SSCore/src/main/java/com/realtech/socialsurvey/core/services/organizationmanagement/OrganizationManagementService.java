@@ -1331,7 +1331,7 @@ public interface OrganizationManagementService
         boolean holdSendingMail, boolean sendMail ) throws InvalidInputException;
 
 
-    public void pushZillowReviews( List<HashMap<String, Object>> reviews, String collectionName,
+    public void pushZillowReviews( List<SurveyDetails> surveyDetailsList, String collectionName,
         OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException;
 
 

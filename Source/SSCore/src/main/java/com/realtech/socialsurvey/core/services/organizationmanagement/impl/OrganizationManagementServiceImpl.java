@@ -94,6 +94,7 @@ import com.realtech.socialsurvey.core.entities.RetriedTransaction;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.UploadStatus;
@@ -6899,10 +6900,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public void pushZillowReviews( List<HashMap<String, Object>> reviews, String collectionName,
+    public void pushZillowReviews( List<SurveyDetails> surveyDetailsList, String collectionName,
         OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException
     {
-        zillowUpdateService.pushZillowReviews( reviews, collectionName, profileSettings, companyId );
+        zillowUpdateService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings, companyId );
     }
 
 
