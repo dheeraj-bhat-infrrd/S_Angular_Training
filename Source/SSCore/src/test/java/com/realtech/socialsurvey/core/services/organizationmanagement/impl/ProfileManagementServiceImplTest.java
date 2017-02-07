@@ -1802,35 +1802,35 @@ public class ProfileManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testPushToZillowPostTempWithNullProfile() throws InvalidInputException
     {
-        profileManagementServiceImpl.pushToZillowPostTemp( null, null, null, null );
+        profileManagementServiceImpl.pushToZillowPostTemp( null, null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testPushToZillowPostTempWithNullCollectionName() throws InvalidInputException
     {
-        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), null, null, null );
+        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testPushToZillowPostTempWithEmptyCollectionName() throws InvalidInputException
     {
-        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), "", null, null );
+        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), "", null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testPushToZillowPostTempWithNullSurveyDetails() throws InvalidInputException
     {
-        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), "test", null, null );
+        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), "test", null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testPushToZillowPostTempWithNullReviewMap() throws InvalidInputException
     {
-        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), "test", new SurveyDetails(), null );
+        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), "test", null );
     }
 
 

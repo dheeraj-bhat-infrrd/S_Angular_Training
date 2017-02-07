@@ -28,7 +28,7 @@ import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -120,7 +120,7 @@ public class ZillowReviewProcessor extends QuartzJobBean
             SocialMediaTokens token = ingestionEntity.getSocialMediaTokens();
             if ( token != null ) {
                 if ( token.getZillowToken() != null ) {
-                    ZillowIntegrationApi zillowIntegrationApi = zillowIntegrationApiBuilder.getZellowIntegrationApi();
+                    ZillowIntegrationAgentApi zillowIntegrationApi = zillowIntegrationApiBuilder.getZillowIntegrationAgentApi();
                     String responseString = null;
                     ZillowToken zillowToken = token.getZillowToken();
                     String zillowScreenName = zillowToken.getZillowScreenName();

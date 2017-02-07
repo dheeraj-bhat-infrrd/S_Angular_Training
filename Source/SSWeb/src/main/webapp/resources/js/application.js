@@ -1232,7 +1232,7 @@ function updateEventOnDashboardPageForReviews() {
 		var month = dateSplit[0];
 		var day = dateSplit[1];
 		var year = dateSplit[2];
-		var reviewDay = month + " " + day + "," + year;
+		var reviewDay = month + " " + day + ", " + year;
 		$(this).html(reviewDay).attr("data-modified", "true");
 	});
 	$('.completedOn[data-modified="false"]').each(function(index, currentElement) {
@@ -1850,7 +1850,7 @@ $(document).on('click', '.da-dd-item', function(e) {
 		showMainContent('./' + selectedTab + '.do');
 		callAjaxGetWithPayloadData("/isvendastaaccessibleforthesession.do", function(data) {
 			vendastaAccess = JSON.parse(data);
-			showOrHideReviewsMonitor( vendastaAccess );
+			showOrHideListingsManager( vendastaAccess );
 			showOrHideVendastaProductSettings( vendastaAccess );
 		});
 	});
@@ -9760,7 +9760,7 @@ $('body').on('click', '#st-settings-account-on', function(e) {
 $('body').on('click', '#st-settings-account-off', function(e) {
 	e.stopPropagation();
 	$('#other-account').val('true');
-	createPopupConfirm("Disable Account", "You will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
+	createPopupConfirm("Cancel Your Subscription", "By cancelling your subscription, you will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
 	overlayAccount();
 });
 
@@ -9829,27 +9829,27 @@ $('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
 $('body').on('click', '#vndsta-access-chk-box', function() {
 	if ($('#vndsta-access-chk-box').hasClass('bd-check-img-checked')) {
 		$('#vndsta-access-chk-box').removeClass('bd-check-img-checked');
-		showOrHideReviewsMonitor( true );
+		showOrHideListingsManager( true );
 		showOrHideVendastaProductSettings( true );
 		updateVendastaAccessSetting(true, '#vndsta-access-chk-box');
 	} else {
 		$('#vndsta-access-chk-box').addClass('bd-check-img-checked');
-		showOrHideReviewsMonitor( false );
+		showOrHideListingsManager( false );
 		showOrHideVendastaProductSettings( false );
 		updateVendastaAccessSetting(false, '#vndsta-access-chk-box');
 	}
 });
 
-function showOrHideReviewsMonitor(vendastaAccess)
+function showOrHideListingsManager(vendastaAccess)
 {
 	if( vendastaAccess == true || vendastaAccess == "true" )
 		{
-		$("#reviews-monitor-main").show();
-		$("#reviews-monitor-slider").show();
+		$("#listings-manager-main").show();
+		$("#listings-manager-slider").show();
 		}
 	else{
-		$("#reviews-monitor-main").hide();
-		$("#reviews-monitor-slider").hide();
+		$("#listings-manager-main").hide();
+		$("#listings-manager-slider").hide();
 	}
 }
 

@@ -188,6 +188,7 @@ public class OrganizationManagementController
     @Autowired
     private WorkbookData workbookData;
 
+
     /**
      * Method to upload logo image for a company
      * 
@@ -3191,12 +3192,10 @@ public class OrganizationManagementController
                         "The email addresss " + emailAddress + " is already present in our database." );
             } catch ( NoRecordsFetchedException e ) {
                 if ( ignoredEmail ) {
-                    userManagementService.saveIgnoredEmailCompanyMapping( emailAddress,
+                    userManagementService.saveIgnoredEmailCompanyMappingAndUpdateSurveyPreinitiation( emailAddress,
                         loggedInUser.getCompany().getCompanyId() );
-                    socialManagementService.updateSurveyPreinitiationRecordsAsIgnored( emailAddress );
                 } else {
-                    User user = userManagementService.saveEmailUserMapping( emailAddress, agentId );
-                    socialManagementService.updateAgentIdOfSurveyPreinitiationRecordsForEmail( user, emailAddress );
+                    userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailAddress, agentId );
                 }
             }
 
@@ -3396,8 +3395,7 @@ public class OrganizationManagementController
                         throw new UserAlreadyExistsException(
                             "The email addresss " + emailId + " is already present in our database." );
                 } catch ( NoRecordsFetchedException e ) {
-                    User user = userManagementService.saveEmailUserMapping( emailId, agentId );
-                    socialManagementService.updateAgentIdOfSurveyPreinitiationRecordsForEmail( user, emailId );
+                    userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailId, agentId );
 
                 }
             }

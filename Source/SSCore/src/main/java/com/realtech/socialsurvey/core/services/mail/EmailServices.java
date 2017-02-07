@@ -482,4 +482,8 @@ public interface EmailServices
 
     void sendSocialMediaTokenExpiryEmail( String displayName, String recipientMailId, String updateConnectionUrl,
         String appLoginUrl, String socialMediaType ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    void sendPaymentFailedAlertEmail( String recipientMailId, String displayName, String companyName )
+        throws InvalidInputException, UndeliveredEmailException;
 }

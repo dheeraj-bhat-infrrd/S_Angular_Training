@@ -6,6 +6,7 @@ import java.util.Date;
 public class ExternalAPICallDetails
 {
     private String request;
+    private String requestBody;
     private String response;
     private String httpMethod;
     private String source;
@@ -29,6 +30,19 @@ public class ExternalAPICallDetails
         this.request = request;
     }
 
+    public String getRequestBody()
+    {
+        return requestBody;
+    }
+
+
+    public void setRequestBody( String requestBody )
+    {
+        this.requestBody = requestBody;
+    }
+
+
+    
 
     /**
      * @return the httpMethod

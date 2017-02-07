@@ -58,6 +58,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.ActiveSubscriptionFoundException;
 import com.realtech.socialsurvey.core.services.payment.exception.CardUpdateUnsuccessfulException;
@@ -130,6 +131,16 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
 
     @Value ( "${ALLOW_MULTIPLE_SUBSCRIPTION_FOR_SAME_CUSTOMER}")
     private String allowMultipleSubscription;
+    
+    @Value ( "${APPLICATION_SUPPORT_EMAIL}")
+    private String applicationSupportEmail;
+
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String applicationAdminEmail;
+    
+    @Value ( "${APPLICATION_ADMIN_NAME}")
+    private String applicationAdminName;
+
 
     private static final Logger LOG = LoggerFactory.getLogger( BrainTreePaymentImpl.class );
 
@@ -140,6 +151,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
     @Autowired
     private OrganizationManagementService organizationManagementService;
 
+    @Autowired
+    private UserManagementService userManagementService;
 
     /**
      * Returns the the Braintree gateway.
@@ -1729,11 +1742,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
     @Transactional
     @Override
     public void intimateUser( Subscription subscription, int notificationType )
-        throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException
+        throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException, PaymentException, SolrException
     {
         if ( subscription == null ) {
             throw new InvalidInputException( "Subscription passed is null" );
         }
+        
         LOG.info( "Initmating user for subscription type : " + subscription.toString() + " with notification type: "
             + notificationType );
         // get the user from subscription
@@ -1770,8 +1784,21 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
             // TODO: implement
         } else if ( notificationType == CommonConstants.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY ) {
             LOG.debug( "Sending charge unsuccessful mail" );
-            emailServices.sendRetryChargeEmail( user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
+            
+        } else if ( notificationType == CommonConstants.SUBSCRIPTION_CANCELED ){
+            // subscription cancelled deactivate the company
+            organizationManagementService.addDisabledAccount( licenseDetail.getCompany().getCompanyId(), true, CommonConstants.REALTECH_ADMIN_ID );
+            User realtechAdmin = userManagementService.getUserObjByUserId( CommonConstants.REALTECH_ADMIN_ID );
+            //soft delete the company. set status deleted 
+            organizationManagementService.deleteCompany( licenseDetail.getCompany(), realtechAdmin , CommonConstants.STATUS_COMPANY_DISABLED );
+            //temporary inactive the admin so he can login and get notification about deactivation
+            userManagementService.temporaryInactiveCompanyAdmin( licenseDetail.getCompany().getCompanyId() );
+            //send mail to user about subscription canceled and deactivation
+            emailServices.sendRetryExhaustedEmail( user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
                 user.getLoginName() );
+            //send mail to application support email
+            emailServices.sendPaymentFailedAlertEmail( applicationSupportEmail, applicationAdminName, licenseDetail.getCompany().getCompany() );
+           
         }
     }
 
