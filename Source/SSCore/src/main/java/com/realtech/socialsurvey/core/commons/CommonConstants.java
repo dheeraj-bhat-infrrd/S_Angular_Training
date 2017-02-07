@@ -1123,6 +1123,9 @@ public interface CommonConstants
 
     public static final String ZILLOW_CALL_REQUEST = "webservice/ProReviews.htm?output=json&returncompletecontent=true&count=50";
 
+    
+    public static final String ZILLOW_PROFILE_URL = "http://zillow.com/profile/";
+    
     // Zillow Temp Post Table column names
     public static final String ZILLOW_REVIEW_URL_COLUMN = "zillowReviewUrl";
     public static final String ENTITY_COLUMN_NAME_COLUMN = "entityColumnName";

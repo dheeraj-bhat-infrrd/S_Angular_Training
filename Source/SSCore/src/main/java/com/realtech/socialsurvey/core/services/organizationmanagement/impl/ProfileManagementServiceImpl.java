@@ -4475,6 +4475,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     customerFirstName = (String) reviewerName.get( "screenName" );
                 }
                 
+                
+                String profileName = null;
+                String zillowProfileUrl = CommonConstants.ZILLOW_PROFILE_URL;
+                if(individualReviewee != null){
+                    profileName = (String) individualReviewee.get("screenName");
+                    zillowProfileUrl  += profileName;
+                }
+                
+                
                 String sourceId = (String) review.get( "reviewId" );
                 String reviewDescription = (String) review.get( "content" );
                 String summary = (String) review.get( "title" );
@@ -4494,7 +4503,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
                 surveyDetails.setScore( score );
                 surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
-                surveyDetails.setSourceId( sourceId );
+                surveyDetails.setSourceId( zillowProfileUrl );
+                surveyDetails.setCompleteProfileUrl( zillowProfileUrl );
                 surveyDetails.setModifiedOn( createdDate );
                 surveyDetails.setCreatedOn( createdDate );
                 surveyDetails.setAgreedToShare( "true" );
@@ -4553,7 +4563,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
                             surveyDetails.setScore( score );
                             surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
-                            surveyDetails.setSourceId( null );
+                            surveyDetails.setSourceId( sourceId );
                             surveyDetails.setModifiedOn( convertStringToDate( createdDate ) );
                             surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
                             surveyDetails.setAgreedToShare( "true" );
