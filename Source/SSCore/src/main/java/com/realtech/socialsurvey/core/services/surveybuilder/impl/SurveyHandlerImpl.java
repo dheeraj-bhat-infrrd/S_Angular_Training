@@ -3942,7 +3942,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     List<SurveyPreInitiation> spis = surveyPreInitiationDao
                         .getSurveyByAgentIdAndCustomeEmail( survey.getAgentId(), survey.getCustomerEmail() );
                     if ( spis.size() == 1 ) {
-                        if ( spis.get( 0 ).getSurveySourceId() != null) {
+                        if ( spis.get( 0 ).getEngagementClosedTime() != null) {
                             survey.setSurveyTransactionDate( spis.get( 0 ).getEngagementClosedTime() );
                             surveyDetailsDao.updateTransactionDateInExistingSurveyDetails( survey );
                         }

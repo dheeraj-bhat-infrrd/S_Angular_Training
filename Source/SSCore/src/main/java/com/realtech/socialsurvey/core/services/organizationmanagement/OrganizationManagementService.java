@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 
@@ -865,7 +866,7 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws SolrException
      */
-    public void deleteCompany( Company company, User loggedInUser ) throws InvalidInputException, SolrException;
+    public void deleteCompany( Company company, User loggedInUser , int status ) throws InvalidInputException, SolrException;
 
 
     /**
@@ -1330,7 +1331,7 @@ public interface OrganizationManagementService
         boolean holdSendingMail, boolean sendMail ) throws InvalidInputException;
 
 
-    public void pushZillowReviews( List<HashMap<String, Object>> reviews, String collectionName,
+    public void pushZillowReviews( List<SurveyDetails> surveyDetailsList, String collectionName,
         OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException;
 
 
@@ -1413,5 +1414,8 @@ public interface OrganizationManagementService
 
 
     void askFbToRescrapePagesForSettings( Set<Long> entityIds, String collectionName );
+
+
+    void unsubscribeCompany( Company company ) throws SubscriptionCancellationUnsuccessfulException, InvalidInputException;
 
 }

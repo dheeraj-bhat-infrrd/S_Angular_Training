@@ -7,6 +7,7 @@ public class ZillowToken {
 	private String zillowScreenName;
 	private String zillowEmailAddress;
 	private String lastUpdated;
+	private String zillowLenderId;
 
 	public String getLastUpdated() {
 		return lastUpdated;
@@ -50,6 +51,16 @@ public class ZillowToken {
     public void setZillowEmailAddress( String zillowEmailAddress )
     {
         this.zillowEmailAddress = zillowEmailAddress;
+    }
+
+    public String getZillowLenderId()
+    {
+        return zillowLenderId;
+    }
+
+    public void setZillowLenderId( String zillowLenderId )
+    {
+        this.zillowLenderId = zillowLenderId;
     }
 
     @Override

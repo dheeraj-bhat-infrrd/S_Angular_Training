@@ -72,15 +72,25 @@
 				<c:set value="${fn:escapeXml(feedback.review)}" var="review"></c:set>
 
 					<c:choose>
+					<c:when test="${ not empty feedback.surveyUpdatedDate and feedback.surveyUpdatedDate != feedback.surveyCompletedDate }">
+					        <div class="ppl-head-2 review-detail-profile float-left"> Survey updated on </div>
+							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${feedback.surveyUpdatedDate}" />">
+							</div>
+						</c:when>
 						<c:when test="${ not empty feedback.surveyCompletedDate}">
-							<div class="ppl-head-2 review-detail-profile float-left"
+						    <div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div>
+							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
 								data-modified="false"
 								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
 						value="${feedback.surveyCompletedDate}" />">
 							</div>
 						</c:when>
 						<c:otherwise>
-							<div class="ppl-head-2 review-detail-profile float-left"
+							<div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div> 					
+							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
 								data-modified="false"
 								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
 						value="${feedback.modifiedOn}" />">

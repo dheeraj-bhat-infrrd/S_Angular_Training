@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.api.models.v2.ServiceProviderInfoV2;
 import com.realtech.socialsurvey.api.models.v2.SurveyGetV2VO;
 import com.realtech.socialsurvey.api.models.v2.SurveyResponseV2VO;
 import com.realtech.socialsurvey.api.models.v2.TransactionInfoGetV2VO;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -24,8 +25,6 @@ import com.realtech.socialsurvey.core.utils.CommonUtils;
 @Component
 public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDetails, SurveyGetV2VO>
 {
-
-    private String dateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     @Autowired
     UserManagementService userManagementService;
@@ -58,22 +57,24 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
             transactionInfo.setTransactionCity( d.getCity() );
             transactionInfo.setTransactionState( d.getState() );
             if ( d.getSurveyTransactionDate() != null )
-                transactionInfo
-                    .setTransactionDateTime( CommonUtils.formatDate( d.getSurveyTransactionDate(), dateTimeFormat ) );
+                transactionInfo.setTransactionDateTime(
+                    CommonUtils.formatDate( d.getSurveyTransactionDate(), CommonConstants.SURVEY_API_DATE_FORMAT ) );
             transactionInfo.setTransactionRef( d.getSourceId() );
             if ( objects[0] != null && objects[0] instanceof SurveyPreInitiation )
-                transactionInfo.setSurveySentDateTime(
-                    CommonUtils.formatDate( ( (SurveyPreInitiation) objects[0] ).getLastReminderTime(), dateTimeFormat ) );
+                transactionInfo.setSurveySentDateTime( CommonUtils.formatDate(
+                    ( (SurveyPreInitiation) objects[0] ).getLastReminderTime(), CommonConstants.SURVEY_API_DATE_FORMAT ) );
             serviceProviderInfo.setServiceProviderEmail( d.getAgentEmailId() );
             serviceProviderInfo.setServiceProviderName( d.getAgentName() );
             survey.setReviewId( d.get_id() );
             review.setSummary( d.getSummary() );
             review.setDescription( d.getReview() );
             review.setRating( String.valueOf( d.getScore() ) );
-            review.setReviewCompletedDateTime( CommonUtils.formatDate( d.getModifiedOn(), dateTimeFormat ) );
+            review.setReviewCompletedDateTime(
+                CommonUtils.formatDate( d.getModifiedOn(), CommonConstants.SURVEY_API_DATE_FORMAT ) );
             review.setRetakeSurvey( d.isRetakeSurvey() );
             if ( d.getModifiedOn() != null ) {
-                review.setReviewUpdatedDateTime( CommonUtils.formatDate( d.getModifiedOn(), dateTimeFormat ) );
+                review.setReviewUpdatedDateTime(
+                    CommonUtils.formatDate( d.getModifiedOn(), CommonConstants.SURVEY_API_DATE_FORMAT ) );
             }
             review.setSource( d.getSource() );
             review.setAgreedToShare( Boolean.parseBoolean( d.getAgreedToShare() ) );
@@ -127,19 +128,19 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
             if ( StringUtils.isBlank( transactionInfo.getTransactionState() ) )
                 transactionInfo.setTransactionState( surveyPreInitiation.getState() );
             if ( StringUtils.isBlank( transactionInfo.getTransactionDateTime() ) )
-                transactionInfo.setTransactionDateTime(
-                    CommonUtils.formatDate( surveyPreInitiation.getEngagementClosedTime(), dateTimeFormat ) );
+                transactionInfo.setTransactionDateTime( CommonUtils.formatDate( surveyPreInitiation.getEngagementClosedTime(),
+                    CommonConstants.SURVEY_API_DATE_FORMAT ) );
             if ( StringUtils.isBlank( transactionInfo.getTransactionRef() ) )
                 transactionInfo.setTransactionRef( surveyPreInitiation.getSurveySourceId() );
 
         }
 
-        if(d != null && d.getStage() == -1){
-        	survey.setReviewStatus("completed");
-        }else{
-        	survey.setReviewStatus("incompleted");
+        if ( d != null && d.getStage() == -1 ) {
+            survey.setReviewStatus( "completed" );
+        } else {
+            survey.setReviewStatus( "incomplete" );
         }
-        
+
         survey.setReview( review );
         survey.setTransactionInfo( transactionInfo );
         survey.setServiceProviderInfo( serviceProviderInfo );
