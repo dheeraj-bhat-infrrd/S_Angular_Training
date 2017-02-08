@@ -767,6 +767,8 @@
 		defer="defer"></script>
 	<script>
 		var hiddenSection = "${profile.hiddenSection}";
+		var reviewsSortBy = "${reviewSortCriteria}";
+		var showAllReviews = false;
 		$(document).ready(function() {
 			if ($('#social-token-container').children('.social-item-icon').length == 0) {
 				$('#social-token-container').remove();
@@ -774,6 +776,11 @@
 				$('#social-token-container').show();
 			}
 
+			if ( reviewsSortBy  != "feature" ){
+				showAllReviews = true;
+				$("#profile-fetch-info").attr("fetch-all-reviews","true");
+			}
+			
 			profileJson = ${profileJson};
 			
 			var gaLabel;

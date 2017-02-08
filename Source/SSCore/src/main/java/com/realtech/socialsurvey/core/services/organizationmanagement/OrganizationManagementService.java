@@ -1418,4 +1418,8 @@ public interface OrganizationManagementService
 
     void unsubscribeCompany( Company company ) throws SubscriptionCancellationUnsuccessfulException, InvalidInputException;
 
+
+    public void updateSortCriteriaForCompany( OrganizationUnitSettings companySettings, String sortCriteria )
+        throws InvalidInputException;
+
 }
