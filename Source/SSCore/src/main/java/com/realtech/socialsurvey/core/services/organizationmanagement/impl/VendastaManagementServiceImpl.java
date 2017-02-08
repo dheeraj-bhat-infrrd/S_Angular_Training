@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,11 +77,11 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
 
     @Autowired
     private VendastaApiIntegrationBuilder vendastaApiIntegrationBuilder;
-    
-    @Value("${API_USER}")
+
+    @Value ( "${API_USER}")
     private String apiUser;
-    
-    @Value("${API_KEY}")
+
+    @Value ( "${API_KEY}")
     private String apiKey;
 
 

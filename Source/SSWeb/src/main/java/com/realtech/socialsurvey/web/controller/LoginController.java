@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -318,9 +319,10 @@ public class LoginController
                 session.setAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType );
 
                 LOG.debug( "Checking if the account is disabled because of payment failure" );
-                if ( user.getCompany().getStatus() == CommonConstants.STATUS_PAYMENT_FAILED ) {
+                if ( user.getCompany().getStatus() == CommonConstants.STATUS_COMPANY_DISABLED ) {
                     LOG.debug( "Payment has failed. Returning account disabled page" );
-                    setSession( session );
+                    session.invalidate();
+                    SecurityContextHolder.clearContext();
                     model.addAttribute( CommonConstants.DISABLED_ACCOUNT_FLAG, CommonConstants.YES );
                     return JspResolver.ACCOUNT_DISABLED_PAGE;
                 }

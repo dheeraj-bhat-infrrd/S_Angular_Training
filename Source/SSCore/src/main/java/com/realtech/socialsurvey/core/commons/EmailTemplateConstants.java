@@ -159,5 +159,8 @@ public final class EmailTemplateConstants {
     
 	public static final String SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_SUBJECT = "SocialMediaTokenExpiryMail.txt";
     public static final String SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_BODY = "SocialMediaTokenExpiryMail.html";
+    
+    public static final String PAYMENT_RETRIES_FAILED_MAIL_SUBJECT = "PaymentRetriesFailedAlertMailSubject.txt";
+    public static final String PAYMENT_RETRIES_FAILED_MAIL_BODY = "PaymentRetriesFailedAlertMailBody.html";
 
 }

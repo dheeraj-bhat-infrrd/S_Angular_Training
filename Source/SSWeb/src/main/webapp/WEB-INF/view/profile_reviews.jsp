@@ -75,15 +75,25 @@
 				</c:choose>
 				<div class="ppl-header-left review-sm-screen " >
 				<c:choose>
-						<c:when test="${ not empty reviewItem.surveyCompletedDate}">
-							<div class="ppl-head-2 review-detail-profile float-left"
+						<c:when test="${not empty reviewItem.surveyUpdatedDate and reviewItem.surveyUpdatedDate != reviewItem.surveyCompletedDate }">
+						 	<div class="ppl-head-2 review-detail-profile float-left"> Survey updated on </div> 
+							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
 								data-modified="false"
 								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
-						value="${reviewItem.surveyCompletedDate}" />">
+						value="${reviewItem.surveyUpdatedDate}" />"> 
+							</div>
+						</c:when>
+						<c:when test="${ not empty reviewItem.surveyCompletedDate}">
+						    <div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div>
+							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${reviewItem.surveyCompletedDate}" />"> 
 							</div>
 						</c:when>
 						<c:otherwise>
-							<div class="ppl-head-2 review-detail-profile float-left"
+							<div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div> 				
+							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
 								data-modified="false"
 								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
 						value="${reviewItem.modifiedOn}" />">

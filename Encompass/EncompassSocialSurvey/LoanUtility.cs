@@ -192,7 +192,6 @@ namespace EncompassSocialSurvey
                             loanOfficer = encompassGlobal.EncompassLoginSession.Users.GetUser(runningLoan.LoanOfficerID);
 
                         LoanViewModel forLoanVM_Borrower = new LoanViewModel();
-
                         forLoanVM_Borrower.SurveySource = EncompassSocialSurveyConstant.SURVEY_SOURCE;
                         Logger.Debug("EngagementClosedTime for loan is : " + fieldValues[8]);
                         //check if engagement closed time is greater than current time
@@ -218,6 +217,7 @@ namespace EncompassSocialSurvey
                         forLoanVM_Borrower.CustomerLastName = fieldValues[3];
                         forLoanVM_Borrower.State = fieldValues[9];
                         forLoanVM_Borrower.City = fieldValues[10];
+                        Logger.Info("State is  " + fieldValues[9] + " and city is " + fieldValues[10]);
                         string agentEmailId = (loanOfficer != null) ? loanOfficer.Email : "";
                         string emailId = fieldValues[4];
 
@@ -276,7 +276,9 @@ namespace EncompassSocialSurvey
                             forLoanVM_Co_Borrower.LastReminderTime = EncompassSocialSurveyConstant.LAST_REMINDER_TIME;
                             forLoanVM_Co_Borrower.EngagementClosedTime = fieldValues[8];
                             forLoanVM_Co_Borrower.Status = EncompassSocialSurveyConstant.STATUS;
-
+                            forLoanVM_Co_Borrower.State = fieldValues[9];
+                            forLoanVM_Co_Borrower.City = fieldValues[10];
+                        
                             returnLoansViewModel.Add(forLoanVM_Co_Borrower);
                         }
 

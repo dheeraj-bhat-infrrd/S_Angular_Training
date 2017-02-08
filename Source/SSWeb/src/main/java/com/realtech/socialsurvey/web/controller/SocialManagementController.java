@@ -66,6 +66,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialMonitorData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -76,7 +77,7 @@ import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -216,8 +217,13 @@ public class SocialManagementController
 
     private final static int SOLR_BATCH_SIZE = 20;
 
-    @Value ( "${ZILLOW_ENDPOINT}")
-    private String zillowEndpoint;
+    @Value ( "${ZILLOW_AGENT_API_ENDPOINT}")
+    private String zillowAgentApiEndpoint;
+    
+    @Value ( "${ZILLOW_LENDER_API_ENDPOINT}")
+    private String zillowLenderApiEndpoint;
+    
+    
 
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
@@ -1719,7 +1725,7 @@ public class SocialManagementController
     {
         LOG.info( "Method saveZillowDetails() called from SocialManagementController" );
         HttpSession session = request.getSession( false );
-        ZillowIntegrationApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZellowIntegrationApi();
+        ZillowIntegrationAgentApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZillowIntegrationAgentApi();
         User user = sessionHelper.getCurrentUser();
         String zillowScreenName = request.getParameter( "zillowProfileName" );
         SocialMediaTokens mediaTokens = null;
@@ -1800,7 +1806,7 @@ public class SocialManagementController
                 //Store the API call details
                 ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
                 zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_GET );
-                zillowAPICallDetails.setRequest( zillowEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id="
+                zillowAPICallDetails.setRequest( zillowAgentApiEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id="
                     + zillowWebserviceId + "&screenname=" + zillowScreenName );
                 zillowAPICallDetails.setResponse( jsonString );
                 zillowAPICallDetails.setRequestTime( new Date( System.currentTimeMillis() ) );
@@ -1812,66 +1818,14 @@ public class SocialManagementController
                     map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
                 }
 
-                Map<String, Object> responseMap = new HashMap<String, Object>();
-                Map<String, Object> messageMap = new HashMap<String, Object>();
-                Map<String, Object> resultMap = new HashMap<String, Object>();
-                Map<String, Object> proInfoMap = new HashMap<String, Object>();
-                Map<String, Object> proReviews = new HashMap<String, Object>();
-                List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-                if ( map != null ) {
-                    responseMap = (HashMap<String, Object>) map.get( "response" );
-                    messageMap = (HashMap<String, Object>) map.get( "message" );
-                    String code = (String) messageMap.get( "code" );
-                    if ( code.equalsIgnoreCase( "7" ) ) {
-                        String errorMessage = (String) messageMap.get( "text" );
-                        int count = socialManagementService.fetchZillowCallCount();
-                        if ( count != 0 ) {
-                            LOG.debug( "Zillow API call count exceeded limit. Sending mail to admin." );
-                            try {
-                                emailServices.sendZillowCallExceededMailToAdmin( count );
-                                socialManagementService.resetZillowCallCount();
-                            } catch ( InvalidInputException e ) {
-                                LOG.error( "Sending the mail to the admin failed due to invalid input. Reason : ", e );
-                            } catch ( UndeliveredEmailException e ) {
-                                LOG.error( "The email failed to get delivered. Reason : ", e );
-                            }
-                        }
-                        throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
-                    } else if ( !code.equalsIgnoreCase( "0" ) ) {
-                        String errorMessage = (String) messageMap.get( "text" );
-                        throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
-                    } else {
-                        socialManagementService.updateZillowCallCount();
-                    }
-
-                    if ( responseMap != null ) {
-                        resultMap = (HashMap<String, Object>) responseMap.get( "results" );
-                        if ( resultMap != null ) {
-                            proInfoMap = (HashMap<String, Object>) resultMap.get( "proInfo" );
-                            if ( proInfoMap != null ) {
-                                profileLink = (String) proInfoMap.get( "profileURL" );
-                            }
-                            proReviews = (HashMap<String, Object>) resultMap.get( "proReviews" );
-                            if ( proReviews != null ) {
-                                reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
-                                if ( reviews != null ) {
-                                    // for ( HashMap<String, Object> review : reviews ) {
-                                    // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                                    // String rating = (String) review.get( "rating" );
-                                    // if ( rating != null && !rating.isEmpty() ) {
-                                    //     if ( Double.valueOf( rating ) != Double.NaN ) {
-                                    //         zillowReviewCount++;
-                                    //         zillowTotalScore += Double.valueOf( rating );
-                                    //     }
-                                    // }
-                                    organizationManagementService.pushZillowReviews( reviews, collectionName, profileSettings,
-                                        user.getCompany().getCompanyId() );
-                                    // }
-                                }
-                            }
-                        }
-                    }
-                }
+               if(map != null){
+                   profileManagementService.modifyZillowCallCount( map );
+                   List<SurveyDetails> surveyDetailsList =  profileManagementService.buildSurveyDetailFromZillowAgentReviewMap( map );
+                   organizationManagementService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings,
+                            user.getCompany().getCompanyId() );
+               }
+                
+                
                 int accountMasterId = accountType.getValue();
                 if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                     OrganizationUnitSettings companySettings = organizationManagementService
@@ -2580,16 +2534,16 @@ public class SocialManagementController
         return false;
     }
     /**
-     * Method to show the reviews monitor page
+     * Method to show the Listings Manager page
      * 
      * @param model
      * @param request
      * @return
      */
-    @RequestMapping ( value = "/showreviewsmonitorpage", method = RequestMethod.GET)
-    public String initReviewsMonitorPage( Model model, HttpServletRequest request )
+    @RequestMapping ( value = "/showlistingsmanagerpage", method = RequestMethod.GET)
+    public String initListingsManagerPage( Model model, HttpServletRequest request )
     {
-        LOG.info( "reviews Monitor page started" );
+        LOG.info( "Listings Manager page started" );
         User user = sessionHelper.getCurrentUser();
 
         //Validate user
@@ -2599,17 +2553,17 @@ public class SocialManagementController
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
             if ( user.getStatus() != CommonConstants.STATUS_ACTIVE ) {
-                LOG.error( "Inactive or unauthorized users can not access reviews monitor page" );
+                LOG.error( "Inactive or unauthorized users can not access Listings Manager page" );
                 model.addAttribute( "message", messageUtils.getDisplayMessage(
                     DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE ) );
             }
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException in while showing reviews monitor. Reason : " + nonFatalException.getMessage(),
+            LOG.error( "NonFatalException in while showing Listings Manager. Reason : " + nonFatalException.getMessage(),
                 nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
-        return JspResolver.REVIEWS_MONITOR;
+        return JspResolver.LISTINGS_MANAGER;
     }
    
 }

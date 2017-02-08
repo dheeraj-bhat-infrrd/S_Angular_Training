@@ -223,8 +223,10 @@ public interface Payment {
 	 * @param notificationType
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
+	 * @throws PaymentException 
+	 * @throws SolrException 
 	 */
-	public void intimateUser(Subscription subscription, int notificationType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+	public void intimateUser(Subscription subscription, int notificationType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException, PaymentException, SolrException;
 	
 	/**
 	 * Updates the subscription with the new amount
