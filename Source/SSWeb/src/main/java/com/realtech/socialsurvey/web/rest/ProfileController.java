@@ -729,12 +729,10 @@ public class ProfileController
             if ( numRows == null ) {
                 numRows = -1;
             }
-            if ( sortCriteria == null ) {
-                sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE;
-            }
             try {
                 List<SurveyDetails> reviews = profileManagementService.getReviews( companyId, minScore, maxScore, start,
-                    numRows, CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, sortCriteria );
+                    numRows, CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null,
+                    profileManagementService.processSortCriteria( companyId, sortCriteria ) );
                 //This is added to get the agent's app ID and profile URL 
                 //DO NOT REMOVE!
                 profileManagementService.setAgentProfileUrlForReview( reviews );
@@ -796,9 +794,7 @@ public class ProfileController
             if ( numRows == null ) {
                 numRows = -1;
             }
-            if ( sortCriteria == null ) {
-                sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE;
-            }
+
             try {
 
 
@@ -827,8 +823,9 @@ public class ProfileController
                     minScore = (double) regionProfile.getSurvey_settings().getShow_survey_above_score();
                 }
 
-                List<SurveyDetails> reviews = profileManagementService.getReviews( regionId, minScore, maxScore, start,
-                    numRows, CommonConstants.PROFILE_LEVEL_REGION, false, null, null, sortCriteria );
+                List<SurveyDetails> reviews = profileManagementService.getReviews( regionId, minScore, maxScore, start, numRows,
+                    CommonConstants.PROFILE_LEVEL_REGION, false, null, null, profileManagementService.processSortCriteria(
+                        userManagementService.getRegionById( regionId ).getCompany().getCompanyId(), sortCriteria ) );
                 //This is added to get the agent's app ID and profile URL 
                 //DO NOT REMOVE!
                 profileManagementService.setAgentProfileUrlForReview( reviews );
@@ -1166,9 +1163,6 @@ public class ProfileController
             if ( numRows == null ) {
                 numRows = -1;
             }
-            if ( sortCriteria == null ) {
-                sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE;
-            }
             try {
 
                 branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
@@ -1196,8 +1190,9 @@ public class ProfileController
                 if ( minScore != 0.0 ) {
                     minScore = (double) branchProfile.getSurvey_settings().getShow_survey_above_score();
                 }
-                List<SurveyDetails> reviews = profileManagementService.getReviews( branchId, minScore, maxScore, start,
-                    numRows, CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, sortCriteria );
+                List<SurveyDetails> reviews = profileManagementService.getReviews( branchId, minScore, maxScore, start, numRows,
+                    CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, profileManagementService.processSortCriteria(
+                        userManagementService.getBranchById( branchId ).getCompany().getCompanyId(), sortCriteria ) );
                 //This is added to get the agent's app ID and profile URL 
                 //DO NOT REMOVE!
                 profileManagementService.setAgentProfileUrlForReview( reviews );
@@ -1341,7 +1336,7 @@ public class ProfileController
                     CommonConstants.SERVICE_CODE_REGION_REVIEWS, "Agent id is invalid" ),
                     "agent id is not valid while fetching all reviews for an agent" );
             }
-            if ( minScore == null || sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DATE ) ) {
+            if ( minScore == null ) {
                 minScore = CommonConstants.MIN_RATING_SCORE;
             }
             if ( maxScore == null ) {
@@ -1352,9 +1347,6 @@ public class ProfileController
             }
             if ( numRows == null ) {
                 numRows = -1;
-            }
-            if ( sortCriteria == null || sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DEFAULT ) ) {
-                sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE;
             }
             agentProfile = organizationManagementService.getAgentSettings( agentId );
 
@@ -1382,7 +1374,8 @@ public class ProfileController
                 minScore = (double) agentProfile.getSurvey_settings().getShow_survey_above_score();
             }
             List<SurveyDetails> reviews = profileManagementService.getReviews( agentId, minScore, maxScore, start, numRows,
-                CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, sortCriteria );
+                CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, profileManagementService.processSortCriteria(
+                    userManagementService.getUserByUserId( agentId ).getCompany().getCompanyId(), sortCriteria ) );
             profileManagementService.setAgentProfileUrlForReview( reviews );
             String json = new Gson().toJson( reviews );
             LOG.debug( "reviews json : " + json );
