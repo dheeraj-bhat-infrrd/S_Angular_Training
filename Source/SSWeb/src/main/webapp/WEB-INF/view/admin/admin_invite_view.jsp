@@ -8,7 +8,7 @@
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left text-center">
-				<spring:message code="label.sendinvite.header.key" />
+				<spring:message code="label.sendinvite.content.header.key" />
 			</div>
 		</div>
 	</div>
