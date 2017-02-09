@@ -1819,6 +1819,22 @@ public class SocialManagementController
                 }
 
                if(map != null){
+                   //get Profile url
+                   Map<String, Object> responseMap = new HashMap<String, Object>();
+                   Map<String, Object> resultMap = new HashMap<String, Object>();
+                   Map<String, Object> proReviews = new HashMap<String, Object>();
+                   Map<String, Object> proInfoMap = new HashMap<String, Object>();
+                   responseMap = (HashMap<String, Object>) map.get( "response" );
+                   if ( responseMap != null ) {
+                       resultMap = (HashMap<String, Object>) responseMap.get( "results" );
+                       if ( resultMap != null ) {
+                           proInfoMap = (HashMap<String, Object>) resultMap.get( "proInfo" );
+                           if ( proInfoMap != null ) {
+                               profileLink = (String) proInfoMap.get( "profileURL" );
+                           }
+                       }
+                   }    
+                   //update zillow count
                    profileManagementService.modifyZillowCallCount( map );
                    List<SurveyDetails> surveyDetailsList =  profileManagementService.buildSurveyDetailFromZillowAgentReviewMap( map );
                    organizationManagementService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings,
