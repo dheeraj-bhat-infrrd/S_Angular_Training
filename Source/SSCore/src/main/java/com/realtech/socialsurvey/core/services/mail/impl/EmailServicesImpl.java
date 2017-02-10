@@ -20,7 +20,9 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.dao.ForwardMailDetailsDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
@@ -106,6 +108,9 @@ public class EmailServicesImpl implements EmailServices
 
     @Autowired
     private UserManagementService userManagementService;
+    
+    @Autowired
+    private GenericDao<User, Long> userDao;
 
 
     /**
@@ -1825,6 +1830,18 @@ public class EmailServicesImpl implements EmailServices
         }
         //JIRA SS-700 end
         //JIRA SS-60 //pass stored encrypted id in mongo for the user
+        
+        //get companyId
+        User user = userDao.findById( User.class,  agentSettings.getIden());
+        long companyId = user.getCompany().getCompanyId();
+        //get company settings
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+            companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        //get sendemailthrough
+        String sendEmailThrough=companySettings.getSendEmailThrough();
+        
+        emailEntity.setSendEmailThrough( sendEmailThrough );
+        
         emailEntity.setSenderEmailId( "u-" + agentSettings.getUserEncryptedId() + "@" + defaultEmailDomain );
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );
 

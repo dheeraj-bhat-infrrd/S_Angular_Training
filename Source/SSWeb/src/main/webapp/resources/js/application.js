@@ -1876,6 +1876,26 @@ function setUpListenerForSortCriteriaDropdown(){
 	});
 }
 
+function setUpListenerForEmailOptionDropdown(){
+	$("#email-sel").on('change',function(event){
+		var payload = {
+			"sendEmailThrough" : $("#email-sel").val()
+		};
+		
+		callAjaxPostWithPayloadData( "./updatesendemailthrough.do", function(data){
+				var message = JSON.parse(data);
+				if (message.type != "ERROR_MESSAGE") {
+					$('#overlay-toast').html(message.message + ' to ' + $("#email-sel").find(":selected").attr('email-option'));
+					showToast();
+				}
+				else {
+					$('#overlay-toast').html(message.message);
+					showToast();
+				}
+			}, payload, false);
+	});
+}
+
 $(document).click(function(e) {
 	e.stopPropagation();
 	if ($('#da-dd-wrapper-profiles').css('display') == "block") {

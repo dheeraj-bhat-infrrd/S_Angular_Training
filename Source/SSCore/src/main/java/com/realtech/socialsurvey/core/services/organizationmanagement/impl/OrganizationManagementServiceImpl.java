@@ -7996,5 +7996,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Updated the isAccountDisabled successfully" );
     }
+    
+    @Override
+    public void updateSendEmailThroughForCompany( OrganizationUnitSettings companySettings, String sendEmailThrough )
+        throws InvalidInputException
+    {
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings cannot be null." );
+        }
+
+        LOG.debug( "Updating companySettings: " + companySettings + " with sendEmailThrough: " + sendEmailThrough );
+        //Set sendemailthrough in mongo
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_SEND_EMAIL_THROUGH, sendEmailThrough, companySettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        LOG.debug( "Updated the sendemailthrough successfully" );
+    }
 }
 // JIRA: SS-27: By RM05: EOC

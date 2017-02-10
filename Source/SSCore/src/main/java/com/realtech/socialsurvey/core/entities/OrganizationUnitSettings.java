@@ -59,6 +59,7 @@ public class OrganizationUnitSettings
     private boolean hiddenSection;
     private boolean sendEmailFromCompany;
     private String reviewSortCriteria;
+    private String sendEmailThrough;
     
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
@@ -606,6 +607,16 @@ public class OrganizationUnitSettings
     public void setReviewSortCriteria( String reviewSortCriteria )
     {
         this.reviewSortCriteria = reviewSortCriteria;
+    }
+    
+    public String getSendEmailThrough()
+    {
+        return sendEmailThrough;
+    }
+    
+    public void setSendEmailThrough ( String sendEmailThrough )
+    {
+        this.sendEmailThrough = sendEmailThrough;
     }
 
 

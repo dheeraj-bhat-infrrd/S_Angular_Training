@@ -20,7 +20,9 @@ public interface CommonConstants
     public static final String SENDGRID_SENDER_USERNAME = "SENDGRID_SENDER_USERNAME";
     public static final String SENDGRID_SENDER_NAME = "SENDGRID_SENDER_NAME";
     public static final String SENDGRID_SENDER_PASSWORD = "SENDGRID_SENDER_PASSWORD";
-
+    public static final String SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME = "SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME";
+    public static final String SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD = "SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD";
+    public static final String SENDGRID_SENDER_SOCIALSURVEYUS_NAME = "SENDGRID_SENDER_SOCIALSURVEYUS_NAME";
     /**
      * Default constants
      */
@@ -341,6 +343,9 @@ public interface CommonConstants
     public static final String CITY = "city";
     public static final String CRM_SOURCE = "crm_source";
     public static final String VERTICAL = "vertical";
+    public static final String SEND_EMAIL_THROUGH_SOCIALSURVEY_ME = "socialsurvey.me";
+    public static final String SEND_EMAIL_THROUGH_SOCIALSURVEY_US = "socialsurvey.us";
+    
     // JIRA - SS-536: Added for manual registration via invite
     public static final String BILLING_MODE_COLUMN = "billingMode";
     public static final String VERTICAL_COLUMN = "verticalsMaster";
