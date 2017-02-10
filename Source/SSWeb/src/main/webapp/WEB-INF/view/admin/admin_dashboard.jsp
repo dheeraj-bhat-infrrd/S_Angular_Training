@@ -14,13 +14,19 @@
 	<div class="dash-container container">
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
 			<div class="dash-sub-head float-left">Company Report</div>
-			<div class="dwnl-bnt-col float-right clear-both-sm">
-				<div id="dsh-ind-rep-bnt" class="float-right dash-btn-dl-sd btn-wid-sm">
-					<div class="dsh-dwnld-btn float-left cursor-pointer" onclick="downloadCompanyReport()">Download Report</div>
-					<input id="comp-start-date" data-date-type="startDate"
-						class="dsh-date-picker picker-sm" placeholder="Start Date"> <span>-</span>
-					<input id="comp-end-date" data-date-type="endDate"
-						class="dsh-date-picker picker-sm" placeholder="End Date">
+			<div id="dsh-company-report-div" class="clearfix ">
+				<div class="float-left dash-sel-lbl"><spring:message code="label.email.key" /></div>
+				<div class="dsh-inp-wrapper float-left" style="margin-bottom: 10px;">
+					<input id="dsh-company-report-mail-id" class="dash-sel-item" type="text" placeholder='<spring:message code="label.username.key"/>' >
+				</div>
+				<div class="dwnl-bnt-col float-right clear-both-sm">
+					<div id="dsh-ind-rep-bnt" class="float-right dash-btn-dl-sd btn-wid-sm">
+						<div class="dsh-dwnld-btn float-left cursor-pointer" onclick="downloadCompanyReport()">Generate Report</div>
+						<input id="comp-start-date" data-date-type="startDate"
+							class="dsh-date-picker picker-sm" placeholder="Start Date"> <span>-</span>
+						<input id="comp-end-date" data-date-type="endDate"
+							class="dsh-date-picker picker-sm" placeholder="End Date">
+					</div>
 				</div>
 			</div>
 		</div>

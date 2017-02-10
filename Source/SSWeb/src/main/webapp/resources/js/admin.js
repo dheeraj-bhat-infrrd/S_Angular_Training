@@ -429,8 +429,17 @@ function bindDatePickerForCompanyReport() {
 function downloadCompanyReport() {
 	var startDate = $('#comp-start-date').val();
 	var endDate = $('#comp-end-date').val();
-	window.location.href = "/downloadcompanyregistrationreport.do?startDate="
-			+ startDate + "&endDate=" + endDate;
+	var mailId = $("#dsh-company-report-mail-id").val();
+	if (emailRegex.test(mailId) || mailId == "") {
+		payload = { "mailid" : mailId, "startDate":startDate, "endDate":endDate };
+		callAjaxGetWithPayloadData("./downloadcompanyregistrationreport.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, payload, true);
+	} else {
+		$('#overlay-toast').html('Please enter a valid email address');
+		showToast();
+	}
 }
 
 function downloadBillingReport() {

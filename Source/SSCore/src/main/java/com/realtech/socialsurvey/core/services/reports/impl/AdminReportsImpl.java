@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.reports.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,15 +32,15 @@ public class AdminReportsImpl implements AdminReports
 
     @Autowired
     private CompanyDao companyDao;
-    
+
     @Autowired
     private GenericDao<FileUpload, Long> fileUploadDao;
 
 
     @Override
     @Transactional ( readOnly = true)
-    public List<Company> companyCreationReports( CompanyReportsSearch search ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public List<Company> companyCreationReports( CompanyReportsSearch search )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         List<Company> companyList = new ArrayList<Company>();
         if ( search != null ) {
@@ -96,7 +97,7 @@ public class AdminReportsImpl implements AdminReports
         }
         return companyList;
     }
-    
+
 
     /**
      * Method to create an entry in the file upload table for billing report
@@ -125,7 +126,7 @@ public class AdminReportsImpl implements AdminReports
             } else {
                 entity.setFileName( mailId );
             }
-           Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+            Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
             entity.setCreatedOn( currentTime );
             entity.setModifiedOn( currentTime );
             fileUploadDao.save( entity );
@@ -144,8 +145,8 @@ public class AdminReportsImpl implements AdminReports
         }
         LOG.info( "Method createEntryInFileUploadForBillingReport() finished" );
     }
-    
-    
+
+
     /**
      * Method to create an entry in the file upload table for company user report
      * @throws InvalidInputException 
@@ -167,7 +168,7 @@ public class AdminReportsImpl implements AdminReports
         entity.setAdminUserId( CommonConstants.REALTECH_ADMIN_ID );
         entity.setCompany( company );
         entity.setStatus( CommonConstants.STATUS_ACTIVE );
-        entity.setUploadType( CommonConstants.FILE_UPLOAD_COMPANY_USERS_REPORT);
+        entity.setUploadType( CommonConstants.FILE_UPLOAD_COMPANY_USERS_REPORT );
         if ( mailId == null || mailId.isEmpty() ) {
             entity.setFileName( "" );
         } else {
@@ -180,7 +181,7 @@ public class AdminReportsImpl implements AdminReports
 
         LOG.info( "Method createEntryInFileUploadForCompanyUserReport() finished" );
     }
-    
+
 
     /**
      * Method to create an entry in the file upload table for company hierarchy report
@@ -216,7 +217,41 @@ public class AdminReportsImpl implements AdminReports
 
         LOG.info( "Method createEntryInFileUploadForCompanyHierarchyReport() finished" );
     }
-    
-    
+
+
+    @Override
+    public void createEntryInFileUploadForCompanyRegistrationReport( String mailId, Date startDate, Date endDate )
+    {
+        LOG.info( "Method createEntryInFileUploadForCompanyReport() started" );
+        FileUpload entity = new FileUpload();
+        entity.setAdminUserId( CommonConstants.REALTECH_ADMIN_ID );
+        entity.setCompany( companyDao.findById( Company.class, CommonConstants.DEFAULT_COMPANY_ID ) );
+        entity.setStatus( CommonConstants.STATUS_ACTIVE );
+        entity.setUploadType( CommonConstants.FILE_UPLOAD_COMPANY_REGISTRATION_REPORT );
+        
+        if ( mailId == null || mailId.isEmpty() ) {
+            entity.setFileName( "" );
+        } else {
+            entity.setFileName( mailId );
+        }
+        
+        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+        entity.setCreatedOn( currentTime );
+        entity.setModifiedOn( currentTime );
+        
+        if ( startDate != null ) {
+            Timestamp startTime = new Timestamp( startDate.getTime() );
+            entity.setStartDate( startTime );
+        }
+
+        if ( endDate != null ) {
+            Timestamp endTime = new Timestamp( endDate.getTime() );
+            entity.setEndDate( endTime );
+        }
+        
+        fileUploadDao.save( entity );
+
+        LOG.info( "Method createEntryInFileUploadForCompanyReport() finished" );
+    }
 }
 

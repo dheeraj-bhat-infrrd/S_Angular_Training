@@ -726,6 +726,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_BILLING_REPORT );
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_USERS_REPORT );
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_HIERARCHY_REPORT );
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_REGISTRATION_REPORT );
         Criterion fileUploadTypeCriteria = Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, uploadTypeList );
         List<Integer> statusList = new ArrayList<Integer>();
         //get only active records
@@ -1820,6 +1821,73 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
         LOG.info( "method generateCompanyHierarchyReportAndMail ended" );
 
+    }
+
+
+    @Override
+    public void generateCompanyRegistrationReportAndMail( Timestamp startDate, Timestamp endDate, String recipientMailId,
+        String recipientName ) throws InvalidInputException, UndeliveredEmailException
+    {
+        List<Company> companyList = organizationManagementService.getCompaniesByDateRange( startDate, endDate );
+        String fileName = "Company_Registration_Report-" + String.valueOf( Calendar.getInstance().getTimeInMillis() )
+            + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = organizationManagementService.downloadCompanyReport( companyList );
+
+        // Create file and write report into it
+        boolean excelCreated = false;
+        FileOutputStream fileOutput = null;
+        InputStream inputStream = null;
+        File file = null;
+        String filePath = null;
+        try {
+            file = new File( fileDirectoryLocation + File.separator + fileName );
+            fileOutput = new FileOutputStream( file );
+            file.createNewFile();
+            workbook.write( fileOutput );
+            filePath = file.getPath();
+            excelCreated = true;
+        } catch ( FileNotFoundException fe ) {
+            LOG.error( "Exception caught while generateCompanyRegistrationReportAndMail " + fe.getMessage() );
+            excelCreated = false;
+        } catch ( IOException e ) {
+            LOG.error( "Exception caught while generateCompanyRegistrationReportAndMail " + e.getMessage() );
+            excelCreated = false;
+        } finally {
+            try {
+                if ( fileOutput != null )
+                    fileOutput.close();
+                if ( inputStream != null ) {
+                    inputStream.close();
+                }
+            } catch ( IOException e ) {
+                LOG.error( "Exception caught while generateCompanyRegistrationReportAndMail " + e.getMessage() );
+                excelCreated = false;
+            }
+        }
+
+        // Mail the report to the admin
+        if ( excelCreated ) {
+            Map<String, String> attachmentsDetails = new HashMap<String, String>();
+            attachmentsDetails.put( fileName, filePath );
+            String mailId = null;
+            if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+                mailId = adminEmailId;
+            } else {
+                mailId = recipientMailId;
+            }
+
+            String name = null;
+            if ( recipientName == null || recipientName.isEmpty() ) {
+                name = adminName;
+            } else {
+                name = recipientName;
+            }
+
+            LOG.debug( "sending mail to : " + name + " at : " + mailId );
+            String subject = "Company Registration Report";
+            String body = "Here is the company registration report you requested. Please refer to the attachment for the report";
+            emailServices.sendCustomMail( name, recipientMailId, subject, body, attachmentsDetails );
+        }
     }
 
 }
