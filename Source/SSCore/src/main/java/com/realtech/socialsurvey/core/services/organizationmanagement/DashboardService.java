@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -26,38 +27,42 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
  */
 public interface DashboardService
 {
-	/**
-	 * Gets all survey count
-	 * @param columnName
-	 * @param columnValue
-	 * @param numberOfDays
-	 * @return
-	 * @throws InvalidInputException
-	 */
-    public long getAllSurveyCount( String columnName, long columnValue, int numberOfDays )
+    /**
+     * Gets all survey count
+     * @param columnName
+     * @param columnValue
+     * @param numberOfDays
+     * @return
+     * @throws InvalidInputException
+     */
+    public long getAllSurveyCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException;
+
+
+    /**
+     * Gets completed survey count
+     * @param columnName
+     * @param columnValue
+     * @param numberOfDays
+     * @return
+     * @throws InvalidInputException
+     */
+    public long getCompleteSurveyCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException;
+
+
+    public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays )
         throws InvalidInputException;
-	
-	/**
-	 * Gets completed survey count
-	 * @param columnName
-	 * @param columnValue
-	 * @param numberOfDays
-	 * @return
-	 * @throws InvalidInputException
-	 */
-	public long getCompleteSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException;
-	
-    public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException;
 
 
-    public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin ) throws InvalidInputException;
+    public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin )
+        throws InvalidInputException;
 
 
     public int getProfileCompletionPercentage( User user, String columnName, long columnValue,
         OrganizationUnitSettings unitSettings ) throws InvalidInputException;
 
 
-    public int getBadges( double surveyScore, int surveyCount, int socialPosts, int profileCompleteness ) throws InvalidInputException;
+    public int getBadges( double surveyScore, int surveyCount, int socialPosts, int profileCompleteness )
+        throws InvalidInputException;
 
 
     public Map<String, Map<Integer, Integer>> getSurveyDetailsForGraph( String columnName, long columnValue, int numberOfDays,
@@ -71,21 +76,24 @@ public interface DashboardService
     public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName ) throws InvalidInputException;
 
 
-    public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileName, String profileLevel, long companyId )
-        throws IOException, InvalidInputException;
+    public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileName,
+        String profileLevel, long companyId ) throws IOException, InvalidInputException;
 
 
     public XSSFWorkbook downloadAgentRankingData( List<AgentRankingReport> agentDetails, String fileLocation )
         throws IOException, InvalidInputException;
 
 
-    public long getSocialPostsForPastNdaysWithHierarchy( String coumnName, long columnValue, int numberOfDays ) throws InvalidInputException;
+    public long getSocialPostsForPastNdaysWithHierarchy( String coumnName, long columnValue, int numberOfDays )
+        throws InvalidInputException;
 
 
-    public XSSFWorkbook downloadUserAdoptionReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
+    public XSSFWorkbook downloadUserAdoptionReportData( long companyId )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     public List<FileUpload> getReportsToBeSent() throws NoRecordsFetchedException;
+
 
     /**
      * Method to delete surveys from mongo given the survey preinitiation details
@@ -93,7 +101,9 @@ public interface DashboardService
      */
     void deleteSurveyDetailsByPreInitiation( List<SurveyPreInitiation> surveys );
 
-    public XSSFWorkbook downloadCompanyHierarchyReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
+
+    public XSSFWorkbook downloadCompanyHierarchyReportData( long companyId )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     public long getZillowImportCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException;
@@ -106,7 +116,9 @@ public interface DashboardService
     public long getSocialPostsForPastNdaysWithHierarchyForStatistics( String columnName, long columnValue, int numberOfDays )
         throws InvalidInputException;
 
-	public long get3rdPartyImportCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException;
+
+    public long get3rdPartyImportCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException;
+
 
     /**
      * 
@@ -116,10 +128,13 @@ public interface DashboardService
      * @throws NoRecordsFetchedException
      * @throws ProfileNotFoundException
      */
-    Map<Integer, List<Object>> downloadCompanyUsersReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
+    Map<Integer, List<Object>> downloadCompanyUsersReportData( long companyId )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
-    void generateCompanyReportAndMail( Map<Integer, List<Object>> usersData, String recipientMailId, String recipientName , Company company )
-        throws InvalidInputException, UndeliveredEmailException;
+
+    void generateCompanyReportAndMail( Map<Integer, List<Object>> usersData, String recipientMailId, String recipientName,
+        Company company ) throws InvalidInputException, UndeliveredEmailException;
+
 
     List<FileUpload> getActiveBillingReports() throws NoRecordsFetchedException;
 
@@ -135,5 +150,9 @@ public interface DashboardService
      */
     public void generateCompanyHierarchyReportAndMail( long companyId, String recipientMailId, String recipientName )
         throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+
+
+    public void generateCompanyRegistrationReportAndMail( Timestamp startDate, Timestamp endDate, String recipientMailId,
+        String recipientName ) throws InvalidInputException, UndeliveredEmailException;
 }
 // JIRA SS-137 BY RM05:EOC

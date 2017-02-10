@@ -237,6 +237,8 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USERS_REPORT = "Company user report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_HIERARCHY_REPORT = "Hierarchy report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REGISTRATION_REPORT = "Company registration report";
+
 
     /**
      * Mongo entities and column name constants
@@ -893,6 +895,7 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_BILLING_REPORT = 3;
     public static final int FILE_UPLOAD_COMPANY_USERS_REPORT = 4;
     public static final int FILE_UPLOAD_COMPANY_HIERARCHY_REPORT = 5;
+    public static final int FILE_UPLOAD_COMPANY_REGISTRATION_REPORT = 6;
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
