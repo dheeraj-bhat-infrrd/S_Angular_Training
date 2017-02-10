@@ -3547,6 +3547,7 @@ public class OrganizationManagementController
         return new Gson().toJson( message );
     }
     
+    //JIRA SS-975
     @RequestMapping ( value = "/updatesendemailthrough", method = RequestMethod.POST)
     @ResponseBody
     public String updateSendEmailThrough( HttpServletRequest request )

@@ -47,7 +47,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
     private static final Logger LOG = LoggerFactory.getLogger( SendGridEmailSenderImpl.class );
 
-
+    //FOR DEFAULT SENDGRID ACCOUNT 
     @Value ( "${SENDGRID_SENDER_NAME}")
     private String defaultSendName;
 
@@ -57,6 +57,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
     @Value ( "${SENDGRID_SENDER_PASSWORD}")
     private String sendGridPassword;
     
+    //FOR SOCIALSURVEY.US SENDGRID ACCOUNT
     @Value ( "${SENDGRID_SENDER_SOCIALSURVEYUS_NAME}")
     private String socialSurveyUsSendName;
     
@@ -87,6 +88,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
     @Autowired
     private EmailFormatHelper emailFormatHelper;
 
+    //since we have two diff sendGrid accounts
     private SendGrid sendGrid1;
     
     private SendGrid sendGrid2;
@@ -117,12 +119,14 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         if ( emailEntity.getSubject() == null || emailEntity.getSubject().isEmpty() ) {
             throw new InvalidInputException( "Email subject is blank." );
         }
+        //setting default if null and actual value if it exists in mongo
         if ( emailEntity.getSendEmailThrough() == null || emailEntity.getSendEmailThrough().isEmpty()){
             sendEmailThrough = CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME;
             
         }else{
             sendEmailThrough = emailEntity.getSendEmailThrough();
             if(sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US )){
+                //setting username for socialsurvey.us
                 emailEntity.setSenderName( socialSurveyUsSendName );
             }  
         }
@@ -185,6 +189,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         Response response = null;
         try {
             LOG.debug( "About to send mail. " + emailEntity.toString() );
+            //sets credentials according to account selected
             if(sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US )){
                 response = sendGrid2.send( email );
             }else{
@@ -384,7 +389,8 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
     public void afterPropertiesSet() throws Exception
     {
         LOG.info( "Settings Up sendGrid gateway" );
-
+        
+        //assign both credentials
         if ( sendGrid1 == null || sendGrid2 == null) {
             LOG.info( "Initialising Sendgrid gateway with " + sendGridUserName + " and " + sendGridPassword +"or" + sendGridSocialSurveyUsUserName + " and " + sendGridSocialSurveyUsPassword );
             sendGrid1 = new SendGrid( sendGridUserName, sendGridPassword );

@@ -1830,7 +1830,8 @@ public class EmailServicesImpl implements EmailServices
         }
         //JIRA SS-700 end
         //JIRA SS-60 //pass stored encrypted id in mongo for the user
-        
+
+        //JIRA SS-975
         //get companyId
         User user = userDao.findById( User.class,  agentSettings.getIden());
         long companyId = user.getCompany().getCompanyId();
@@ -1841,6 +1842,8 @@ public class EmailServicesImpl implements EmailServices
         String sendEmailThrough=companySettings.getSendEmailThrough();
         
         emailEntity.setSendEmailThrough( sendEmailThrough );
+        
+        //JIRA SS-975 end
         
         emailEntity.setSenderEmailId( "u-" + agentSettings.getUserEncryptedId() + "@" + defaultEmailDomain );
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );

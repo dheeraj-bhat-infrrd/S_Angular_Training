@@ -17,9 +17,11 @@ public interface CommonConstants
      */
     public static final String CONFIG_PROPERTIES_FILE = "config.properties";
     public static final String MESSAGE_PROPERTIES_FILE = "displaymessage.properties";
+    //default email settings 
     public static final String SENDGRID_SENDER_USERNAME = "SENDGRID_SENDER_USERNAME";
     public static final String SENDGRID_SENDER_NAME = "SENDGRID_SENDER_NAME";
     public static final String SENDGRID_SENDER_PASSWORD = "SENDGRID_SENDER_PASSWORD";
+    //email settings for socialsurvey.us
     public static final String SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME = "SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME";
     public static final String SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD = "SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD";
     public static final String SENDGRID_SENDER_SOCIALSURVEYUS_NAME = "SENDGRID_SENDER_SOCIALSURVEYUS_NAME";

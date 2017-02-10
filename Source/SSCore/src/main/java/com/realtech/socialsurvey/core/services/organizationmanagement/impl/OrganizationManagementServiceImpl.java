@@ -7997,6 +7997,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Updated the isAccountDisabled successfully" );
     }
     
+    //JIRA SS-975
     @Override
     public void updateSendEmailThroughForCompany( OrganizationUnitSettings companySettings, String sendEmailThrough )
         throws InvalidInputException
@@ -8013,5 +8014,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Updated the sendemailthrough successfully" );
     }
+    //END JIRA SS-975
 }
 // JIRA: SS-27: By RM05: EOC
