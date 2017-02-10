@@ -4513,6 +4513,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setShowSurveyOnUI( true );
                 surveyDetails.setSurveyCompletedDate( createdDate );
                 surveyDetails.setSurveyTransactionDate( dateOfService );
+                surveyDetails.setSurveyUpdatedDate( createdDate );
+
                 
                 // saving zillow review summary
                 surveyDetails.setSummary( summary );
@@ -4571,6 +4573,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             surveyDetails.setAbuseRepByUser( false );
                             surveyDetails.setShowSurveyOnUI( true );
                             surveyDetails.setSurveyCompletedDate( convertStringToDate( createdDate ) );
+                            surveyDetails.setSurveyUpdatedDate( convertStringToDate( createdDate ) );
+                            surveyDetails.setSurveyTransactionDate( convertStringToDate( createdDate ) );
 
                             // saving zillow review summary
                             surveyDetails.setSummary( summary );
