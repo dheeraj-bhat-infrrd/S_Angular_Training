@@ -406,8 +406,12 @@ function bindDatePickerForCompanyReport() {
 		autoclose: true
 	})
 	.on('changeDate', function(selected){
-        startDate = new Date(selected.date.valueOf());
-        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		if(selected.date != undefined){
+	        startDate = new Date(selected.date.valueOf());
+	        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		}else{
+			startDate = null;
+		}
         $("input[data-date-type='endDate']").datepicker('setStartDate', startDate);
     });
 	
@@ -420,8 +424,12 @@ function bindDatePickerForCompanyReport() {
 		autoclose: true
 	})
 	.on('changeDate', function(selected){
-        fromEndDate = new Date(selected.date.valueOf());
-        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+		if(selected.date != undefined){
+	        fromEndDate = new Date(selected.date.valueOf());
+	        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+		}else{
+			fromEndDate = null;
+		}
         $("input[data-date-type='startDate']").datepicker('setEndDate', fromEndDate);
     });
 }
