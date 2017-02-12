@@ -40,9 +40,37 @@ public class FileUpload
     private Timestamp startDate;
     @Column ( name = "END_DATE")
     private Timestamp endDate;
+    @Column ( name = "PROFILE_LEVEL")
+    private String profileLevel;
+    @Column ( name = "PROFILE_VALUE")
+    private long profileValue;
     @ManyToOne ( fetch = FetchType.LAZY)
     @JoinColumn ( name = "COMPANY_ID")
     private Company company;
+
+
+    public String getProfileLevel()
+    {
+        return profileLevel;
+    }
+
+
+    public void setProfileLevel( String profileLevel )
+    {
+        this.profileLevel = profileLevel;
+    }
+
+
+    public long getProfileValue()
+    {
+        return profileValue;
+    }
+
+
+    public void setProfileValue( long profileValue )
+    {
+        this.profileValue = profileValue;
+    }
 
 
     public Timestamp getStartDate()

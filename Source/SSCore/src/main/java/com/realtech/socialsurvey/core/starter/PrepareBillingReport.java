@@ -82,6 +82,10 @@ public class PrepareBillingReport implements Runnable
                         } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_COMPANY_REGISTRATION_REPORT ) {
                             dashboardService.generateCompanyRegistrationReportAndMail( fileUpload.getStartDate(),
                                 fileUpload.getEndDate(), recipientMailId, null );
+                        } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SURVEY_DATA_REPORT ) {
+                            dashboardService.generateSurveyDataReportAndMail( fileUpload.getStartDate(),
+                                fileUpload.getEndDate(), fileUpload.getProfileLevel(), fileUpload.getProfileValue(),
+                                fileUpload.getAdminUserId(), fileUpload.getCompany().getCompanyId(), recipientMailId, null );
                         }
 
                         // update the status to be processed
@@ -101,6 +105,8 @@ public class PrepareBillingReport implements Runnable
                             } else if ( fileUpload
                                 .getUploadType() == CommonConstants.FILE_UPLOAD_COMPANY_REGISTRATION_REPORT ) {
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REGISTRATION_REPORT;
+                            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SURVEY_DATA_REPORT ) {
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_SURVEY_DATA_REPORT;
                             }
                             String batchName = CommonConstants.BATCH_NAME_FILE_UPLOAD_REPORTS_GENERATOR + " For " + reportType;
 

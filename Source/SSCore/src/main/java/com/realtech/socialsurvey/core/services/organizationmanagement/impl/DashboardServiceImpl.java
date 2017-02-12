@@ -65,6 +65,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
@@ -141,6 +142,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private WorkbookData workbookData;
+
+    @Autowired
+    private ProfileManagementService profileManagementService;
 
 
     @Transactional
@@ -727,6 +731,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_USERS_REPORT );
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_HIERARCHY_REPORT );
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_REGISTRATION_REPORT );
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_SURVEY_DATA_REPORT );
         Criterion fileUploadTypeCriteria = Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, uploadTypeList );
         List<Integer> statusList = new ArrayList<Integer>();
         //get only active records
@@ -1828,8 +1833,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public void generateCompanyRegistrationReportAndMail( Timestamp startDate, Timestamp endDate, String recipientMailId,
         String recipientName ) throws InvalidInputException, UndeliveredEmailException
     {
+        Date date = new Date();
         List<Company> companyList = organizationManagementService.getCompaniesByDateRange( startDate, endDate );
-        String fileName = "Company_Registration_Report-" + String.valueOf( Calendar.getInstance().getTimeInMillis() )
+        String fileName = "Company_Registration_Report-" + ( new Timestamp( date.getTime() ) )
             + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = organizationManagementService.downloadCompanyReport( companyList );
 
@@ -1886,9 +1892,81 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             LOG.debug( "sending mail to : " + name + " at : " + mailId );
             String subject = "Company Registration Report";
             String body = "Here is the company registration report you requested. Please refer to the attachment for the report";
-            emailServices.sendCustomMail( name, recipientMailId, subject, body, attachmentsDetails );
+            emailServices.sendCustomMail( name, mailId, subject, body, attachmentsDetails );
         }
     }
 
+
+    @Override
+    public void generateSurveyDataReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel, long profileValue,
+        long userId, long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, IOException, UndeliveredEmailException
+    {
+        Date date = new Date();
+        boolean fetchAbusive = false;
+        List<SurveyDetails> surveyDetails = new ArrayList<>();
+        surveyDetails = profileManagementService.getReviewsForReports( profileValue, -1, -1, -1, -1, profileLevel, fetchAbusive,
+            startDate, endDate, null );
+        User user = userDao.findById( User.class, userId );
+        String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+            + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadCustomerSurveyResultsData( surveyDetails, fileName, profileLevel, companyId );
+
+        // Create file and write report into it
+        boolean excelCreated = false;
+        FileOutputStream fileOutput = null;
+        InputStream inputStream = null;
+        File file = null;
+        String filePath = null;
+        try {
+            file = new File( fileDirectoryLocation + File.separator + fileName );
+            fileOutput = new FileOutputStream( file );
+            file.createNewFile();
+            workbook.write( fileOutput );
+            filePath = file.getPath();
+            excelCreated = true;
+        } catch ( FileNotFoundException fe ) {
+            LOG.error( "Exception caught while generateSurveyDataReportAndMail " + fe.getMessage() );
+            excelCreated = false;
+        } catch ( IOException e ) {
+            LOG.error( "Exception caught while generateSurveyDataReportAndMail " + e.getMessage() );
+            excelCreated = false;
+        } finally {
+            try {
+                if ( fileOutput != null )
+                    fileOutput.close();
+                if ( inputStream != null ) {
+                    inputStream.close();
+                }
+            } catch ( IOException e ) {
+                LOG.error( "Exception caught while generateSurveyDataReportAndMail " + e.getMessage() );
+                excelCreated = false;
+            }
+        }
+
+        // Mail the report to the admin
+        if ( excelCreated ) {
+            Map<String, String> attachmentsDetails = new HashMap<String, String>();
+            attachmentsDetails.put( fileName, filePath );
+            String mailId = null;
+            if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+                mailId = adminEmailId;
+            } else {
+                mailId = recipientMailId;
+            }
+
+            String name = null;
+            if ( recipientName == null || recipientName.isEmpty() ) {
+                name = adminName;
+            } else {
+                name = recipientName;
+            }
+
+            LOG.debug( "sending mail to : " + name + " at : " + mailId );
+            String subject = "Survey Data Report";
+            String body = "Here is the survey data report you requested. Please refer to the attachment for the report";
+            emailServices.sendCustomMail( name, mailId, subject, body, attachmentsDetails );
+        }
+    }
 }
 // JIRA SS-137 BY RM05:EOC
