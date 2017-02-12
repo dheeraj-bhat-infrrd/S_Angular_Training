@@ -395,7 +395,6 @@ function retakeSurveyReminderMail(element) {
 		$('#overlay-toast').html('Mail sent to ' + firstName + ' ' + ' to retake the survey for you.');
 		showToast();
 		$('#overlay-cancel').click();
-		$(element).parent().parent().parent().parent().remove();
 		getIncompleteSurveyCount(colName, colValue);
 	}, payload, true);
 }
