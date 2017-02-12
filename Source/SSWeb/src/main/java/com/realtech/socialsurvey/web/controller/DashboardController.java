@@ -1510,6 +1510,93 @@ public class DashboardController
     }
 
 
+    @ResponseBody
+    @RequestMapping ( value = "/generatecustomersurveyresults")
+    public String generateCustomerSurveyResultsFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method to get file containg customer survey results generateCustomerSurveyResultsFile() started." );
+        User user = sessionHelper.getCurrentUser();
+        boolean realTechAdmin = user.isSuperAdmin();
+        String message = "";
+
+        try {
+            String mailId = request.getParameter( "mailid" );
+
+            String columnName = request.getParameter( "columnName" );
+            if ( !realTechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
+                LOG.error( "Invalid value (null/empty) passed for profile level." );
+                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            }
+
+            Date startDate = null;
+            String startDateStr = request.getParameter( "startDate" );
+            if ( startDateStr != null && !startDateStr.isEmpty() ) {
+                try {
+                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
+                } catch ( ParseException e ) {
+                    LOG.error(
+                        "ParseException caught in generateCustomerSurveyResultsFile() while parsing startDate. Nested exception is ",
+                        e );
+                }
+            }
+
+            Date endDate = Calendar.getInstance().getTime();
+            String endDateStr = request.getParameter( "endDate" );
+            if ( endDateStr != null && !endDateStr.isEmpty() ) {
+                try {
+                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
+                } catch ( ParseException e ) {
+                    LOG.error(
+                        "ParseException caught in generateCustomerSurveyResultsFile() while parsing startDate. Nested exception is ",
+                        e );
+                }
+            }
+
+            String profileLevel = getProfileLevel( columnName );
+            long iden = 0;
+
+            if ( realTechAdmin ) {
+                String columnValue = request.getParameter( "columnValue" );
+                if ( columnValue != null && !columnValue.isEmpty() ) {
+                    try {
+                        iden = Long.parseLong( columnValue );
+                    } catch ( NumberFormatException e ) {
+                        LOG.error(
+                            "NumberFormatException caught while parsing columnValue in generateCustomerSurveyResultsFile(). Nested exception is ",
+                            e );
+                        throw e;
+                    }
+                }
+            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+                iden = user.getCompany().getCompanyId();
+            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+                iden = user.getUserId();
+            } else {
+                String columnValue = request.getParameter( "columnValue" );
+                if ( columnValue != null && !columnValue.isEmpty() ) {
+                    try {
+                        iden = Long.parseLong( columnValue );
+                    } catch ( NumberFormatException e ) {
+                        LOG.error(
+                            "NumberFormatException caught while parsing columnValue in generateCustomerSurveyResultsFile(). Nested exception is ",
+                            e );
+                        throw e;
+                    }
+                }
+            }
+
+            adminReport.createEntryInFileUploadForSurveyDataReport( mailId, startDate, endDate, iden, profileLevel,
+                user.getUserId(), user.getCompany() );
+            message = "The Survey Data Report will be mailed to you shortly";
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
+            message = "Error while generating survey data report request";
+        }
+        LOG.info( "Method getCustomerSurveyResultsFile() finished." );
+        return message;
+    }
+
+
     /*
      * Method to download file containing incomplete surveys
      */
@@ -2318,7 +2405,6 @@ public class DashboardController
     @RequestMapping ( value = "/downloadcompanyregistrationreport")
     public String getCompanyRegistrationReport( HttpServletRequest request, HttpServletResponse response )
     {
-
         LOG.info( "Method called to generate the company registration report" );
         String message = "";
         try {

@@ -131,48 +131,43 @@
 					</div>
 				</div>
 			</div>
+		</div>
 
-			<div class="dash-panels-wrapper">
-				<div class="row">
-					<div class="clearfix admin-report-dwn-row">
-						<div class="admin-report-sel-col float-left">
-							<div class="clearfix dash-sel-wrapper">
-								<div class="float-left dash-sel-lbl">
-									<spring:message code="label.choose.key" />
-								</div>
-								<select id="report-sel" class="float-left dash-sel-item">
-									<option value="displayName">Individual</option>
-									<option value="branchName">Branch</option>
-									<option value="regionName">Region</option>
-									<option value="company">Company</option>
-								</select>
-							</div>
-						</div>
-						<div class="admin-report-val-col float-left">
-							<div id="dsh-srch-survey-div" class="clearfix dash-sel-wrapper"
-								style="display: block;">
-								<div class="float-left dash-sel-lbl">Choose</div>
-								<div class="dsh-inp-wrapper float-left">
-									<input id="admin-report-dwn" class="dash-sel-item" type="text"
-										placeholder="Start typing..." data-prev-val="" data-search-target='reports'>
-									<div id="dsh-srch-report" class="dsh-sel-dropdwn-cont"></div>
-								</div>
-							</div>
-						</div>
-						<div class="dwnl-bnt-col float-right">
-							
-
-							<div id="dsh-ind-rep-bnt" class="float-right dash-btn-dl-sd">
-								<div id="dsh-ind-report-dwn-btn"
-									class="dsh-dwnld-btn float-left cursor-pointer">
-									<spring:message code="label.downloadsurveydata.key" />
-								</div>
-								<input id="indv-dsh-start-date" data-date-type="startDate" class="dsh-date-picker"
-									placeholder="<spring:message code="label.startdate.key" />">
-								<span>-</span> <input id="indv-dsh-end-date" data-date-type="endDate" class="dsh-date-picker"
-									placeholder="<spring:message code="label.enddate.key" />">
-							</div>
-						</div>
+		<div class="dash-stats-wrapper bord-bot-dc clearfix">
+			<div class="dash-sub-head">Survey Data Report</div>
+			<div class="clearfix dash-sel-wrapper">
+				<div class="float-left dash-sel-lbl">
+					<spring:message code="label.choose.key" />
+				</div>
+				<select id="report-sel" class="float-left dash-sel-item">
+					<option value="displayName">Individual</option>
+					<option value="branchName">Branch</option>
+					<option value="regionName">Region</option>
+					<option value="company">Company</option>
+				</select>
+			</div>
+			<div id="dsh-srch-survey-div" class="clearfix dash-sel-wrapper"
+				style="display: block;">
+				<div class="float-left dash-sel-lbl">Choose</div>
+				<div class="dsh-inp-wrapper float-left">
+					<input id="admin-report-dwn" class="dash-sel-item" type="text"
+						placeholder="Start typing..." data-prev-val="" data-search-target='reports'>
+					<div id="dsh-srch-report" class="dsh-sel-dropdwn-cont"></div>
+				</div>
+			</div>
+			
+			<div class="clearfix ">
+				<div class="float-left dash-sel-lbl"><spring:message code="label.email.key" /></div>
+				<div class="dsh-inp-wrapper float-left" style="margin-bottom: 10px;">
+					<input id="dsh-survey-report-mail-id" class="dash-sel-item" type="text" placeholder='<spring:message code="label.username.key"/>' >
+				</div>
+				<div class="dwnl-bnt-col float-right clear-both-sm">
+					<div id="dsh-ind-rep-bnt" class="float-right dash-btn-dl-sd btn-wid-sm">
+						<div id="dsh-ind-report-dwn-btn" class="dsh-dwnld-btn float-left cursor-pointer"><spring:message code="label.downloadsurveydata.key" /></div>
+						<input id="indv-dsh-start-date" data-date-type="startDate"
+							class="dsh-date-picker picker-sm" placeholder="Start Date"> <span>-</span>
+						<input id="indv-dsh-end-date" data-date-type="endDate"
+							class="dsh-date-picker picker-sm" placeholder="End Date">
 					</div>
 				</div>
 			</div>

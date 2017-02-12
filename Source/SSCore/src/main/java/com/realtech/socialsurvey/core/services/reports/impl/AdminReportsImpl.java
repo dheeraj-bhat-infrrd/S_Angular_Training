@@ -228,17 +228,17 @@ public class AdminReportsImpl implements AdminReports
         entity.setCompany( companyDao.findById( Company.class, CommonConstants.DEFAULT_COMPANY_ID ) );
         entity.setStatus( CommonConstants.STATUS_ACTIVE );
         entity.setUploadType( CommonConstants.FILE_UPLOAD_COMPANY_REGISTRATION_REPORT );
-        
+
         if ( mailId == null || mailId.isEmpty() ) {
             entity.setFileName( "" );
         } else {
             entity.setFileName( mailId );
         }
-        
+
         Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
         entity.setCreatedOn( currentTime );
         entity.setModifiedOn( currentTime );
-        
+
         if ( startDate != null ) {
             Timestamp startTime = new Timestamp( startDate.getTime() );
             entity.setStartDate( startTime );
@@ -248,10 +248,49 @@ public class AdminReportsImpl implements AdminReports
             Timestamp endTime = new Timestamp( endDate.getTime() );
             entity.setEndDate( endTime );
         }
-        
+
         fileUploadDao.save( entity );
 
         LOG.info( "Method createEntryInFileUploadForCompanyReport() finished" );
+    }
+
+
+    @Override
+    public void createEntryInFileUploadForSurveyDataReport( String mailId, Date startDate, Date endDate, long iden,
+        String profileLevel, long userId, Company company )
+    {
+        LOG.info( "Method createEntryInFileUploadForSurveyDataReport() started" );
+        FileUpload entity = new FileUpload();
+        entity.setAdminUserId( userId );
+        entity.setCompany( company );
+        entity.setStatus( CommonConstants.STATUS_ACTIVE );
+        entity.setUploadType( CommonConstants.FILE_UPLOAD_SURVEY_DATA_REPORT );
+        entity.setProfileLevel( profileLevel );
+        entity.setProfileValue( iden );
+
+        if ( mailId == null || mailId.isEmpty() ) {
+            entity.setFileName( "" );
+        } else {
+            entity.setFileName( mailId );
+        }
+
+        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+        entity.setCreatedOn( currentTime );
+        entity.setModifiedOn( currentTime );
+
+        if ( startDate != null ) {
+            Timestamp startTime = new Timestamp( startDate.getTime() );
+            entity.setStartDate( startTime );
+        }
+
+        if ( endDate != null ) {
+            Timestamp endTime = new Timestamp( endDate.getTime() );
+            entity.setEndDate( endTime );
+        }
+
+        fileUploadDao.save( entity );
+
+        LOG.info( "Method createEntryInFileUploadForSurveyDataReport() finished" );
     }
 }
 

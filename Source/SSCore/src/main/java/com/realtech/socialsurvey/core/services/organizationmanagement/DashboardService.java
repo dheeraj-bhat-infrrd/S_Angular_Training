@@ -154,5 +154,10 @@ public interface DashboardService
 
     public void generateCompanyRegistrationReportAndMail( Timestamp startDate, Timestamp endDate, String recipientMailId,
         String recipientName ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void generateSurveyDataReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel, long profileValue,
+        long userId, long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, IOException, UndeliveredEmailException;
 }
 // JIRA SS-137 BY RM05:EOC

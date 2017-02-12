@@ -10,11 +10,24 @@ $(document).on('click','#dsh-ind-report-dwn-btn',function(e){
 	var endDate = $("#indv-dsh-end-date").val();
 	var idenVal = $('#report-sel').attr('data-idenVal');
 	var selectedProf = $('#report-sel').attr('data-iden');
+	var mailId = $("#dsh-survey-report-mail-id").val();
+	
 	if(idenVal == undefined || idenVal == "") {
+		$('#overlay-toast').html('Please select a valid profile value.');
+		showToast();
 		return;
 	}
-	window.location.href = "./downloadcustomersurveyresults.do?columnName="
-			+ selectedProf + "&columnValue=" + idenVal + "&startDate=" + startDate + "&endDate=" + endDate;
+	
+	if (emailRegex.test(mailId) || mailId == "") {
+		payload = { "mailid" : mailId, "startDate":startDate, "endDate":endDate, "columnValue" : idenVal, "columnName": selectedProf};
+		callAjaxGetWithPayloadData("./generatecustomersurveyresults.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, payload, true);
+	} else {
+		$('#overlay-toast').html('Please enter a valid email address.');
+		showToast();
+	}
 });
 
 $(document).on('click','#dsh-admin-report-dwn-btn',function(){

@@ -58,4 +58,18 @@ public interface AdminReports
      * @throws InvalidInputException
      */
     public void createEntryInFileUploadForCompanyHierarchyReport( String mailId, long companyId ) throws InvalidInputException;
+
+
+    /**
+     * Method to create an entry in the file upload table for survey data report
+     * @param mailId
+     * @param startDate
+     * @param endDate
+     * @param iden
+     * @param profileLevel
+     * @param company 
+     * @param userId 
+     */
+    public void createEntryInFileUploadForSurveyDataReport( String mailId, Date startDate, Date endDate, long iden,
+        String profileLevel, long userId, Company company );
 }
