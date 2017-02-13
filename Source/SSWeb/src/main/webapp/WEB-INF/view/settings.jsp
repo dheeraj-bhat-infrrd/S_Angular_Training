@@ -48,6 +48,7 @@
 				<div class="clearfix st-score-wrapper">
 					<div class="float-left st-score-txt stng-padng">
 					<spring:message code="label.scorepost.desc.key" />
+					<c:if test="false">
 					<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
 						<div class="review-sort-sel-col">
 								<div class="clearfix setting-sel-wrapper">
@@ -60,7 +61,8 @@
 									</select>
 								</div>
 							</div>
-					</c:if>		
+					</c:if>	
+					</c:if>	
 					</div>
 					<form id="rating-settings-form">
 						<input type="hidden" name="ratingcategory" id="ratingcategory">
