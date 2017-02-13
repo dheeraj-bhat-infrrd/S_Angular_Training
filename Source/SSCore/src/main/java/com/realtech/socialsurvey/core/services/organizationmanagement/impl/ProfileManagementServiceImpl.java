@@ -5417,9 +5417,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     public String processSortCriteria( long companyId, String sortCriteria )
     {
-        if ( sortCriteria == null ) return CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
+        if ( sortCriteria == null ) return CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE;
+        else return sortCriteria;
         
-        switch ( sortCriteria ) {      
+        /*switch ( sortCriteria ) {      
             case CommonConstants.REVIEWS_SORT_CRITERIA_DEFAULT: {
                 String sortSettings = null;
                 if ( companyId > 0 ) {
@@ -5441,6 +5442,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             case CommonConstants.REVIEWS_SORT_CRITERIA_DATE: return sortCriteria;
                 
             default: return CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
-        }
+        }*/
     }
 }
