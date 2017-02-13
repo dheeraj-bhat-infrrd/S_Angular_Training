@@ -8,7 +8,7 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
-				<spring:message code="label.header.dashboard.key" />
+				<spring:message code="label.downloadreport.header.key" />
 			</div>
 		</div>
 	</div>
