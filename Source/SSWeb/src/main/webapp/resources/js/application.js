@@ -8719,8 +8719,12 @@ function bindDatePickerforIndividualSurveyDownload() {
 		clearBtn : true,
 		autoclose : true
 	}).on('changeDate', function(selected) {
-		startDate = new Date(selected.date.valueOf());
-		startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		if(selected.date != undefined){
+			startDate = new Date(selected.date.valueOf());
+			startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		}else{
+			startDate = null;
+		}
 		$('#indv-dsh-end-date').datepicker('setStartDate', startDate);
 	});
 
@@ -8732,8 +8736,12 @@ function bindDatePickerforIndividualSurveyDownload() {
 		clearBtn : true,
 		autoclose : true
 	}).on('changeDate', function(selected) {
-		fromEndDate = new Date(selected.date.valueOf());
-		fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+		if(selected.date != undefined){
+			fromEndDate = new Date(selected.date.valueOf());
+			fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+		}else{
+			fromEndDate = null;
+		}
 		$('#indv-dsh-start-date').datepicker('setEndDate', fromEndDate);
 	});
 }

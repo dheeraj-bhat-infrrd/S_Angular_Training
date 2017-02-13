@@ -4535,14 +4535,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         Map<String, Object> responseMap = new HashMap<String, Object>();
         Map<String, Object> resultMap = new HashMap<String, Object>();
         Map<String, Object> proReviews = new HashMap<String, Object>();
+        Map<String, Object> proInfoMap = new HashMap<String, Object>();
         List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
        
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
         
+        String profileLink = null;
         responseMap = (HashMap<String, Object>) map.get( "response" );
         if ( responseMap != null ) {
             resultMap = (HashMap<String, Object>) responseMap.get( "results" );
             if ( resultMap != null ) {
+                proInfoMap = (HashMap<String, Object>) resultMap.get( "proInfo" );
+                if ( proInfoMap != null ) {
+                    profileLink = (String) proInfoMap.get( "profileURL" );
+                }
                 proReviews = (HashMap<String, Object>) resultMap.get( "proReviews" );
                 if ( proReviews != null ) {
                     reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
@@ -4552,13 +4558,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             String reviewDescription = (String) review.get( "description" );
                             String summary = (String) review.get( "reviewSummary" );
                             String createdDate = (String) review.get( "reviewDate" );
-                            String completeProfileUrl = (String) review.get( "reviewerLink" );
+                            String reviewerProfileUrl = (String) review.get( "reviewerLink" );
                             String customerFirstName = (String) review.get( "reviewer" );
                             Double score = Double.valueOf( (String) review.get( "rating" ) );
                             boolean isAbusive = false;
                             
                             SurveyDetails surveyDetails = new SurveyDetails();
-                            surveyDetails.setCompleteProfileUrl( completeProfileUrl );
+                            surveyDetails.setCompleteProfileUrl( profileLink );
                             surveyDetails.setCustomerFirstName( customerFirstName );
                             surveyDetails.setReview( reviewDescription );
                             surveyDetails.setEditable( false );

@@ -237,6 +237,9 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USERS_REPORT = "Company user report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_HIERARCHY_REPORT = "Hierarchy report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REGISTRATION_REPORT = "Company registration report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_SURVEY_DATA_REPORT = "Survey data report";
+
 
     /**
      * Mongo entities and column name constants
@@ -893,6 +896,8 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_BILLING_REPORT = 3;
     public static final int FILE_UPLOAD_COMPANY_USERS_REPORT = 4;
     public static final int FILE_UPLOAD_COMPANY_HIERARCHY_REPORT = 5;
+    public static final int FILE_UPLOAD_COMPANY_REGISTRATION_REPORT = 6;
+    public static final int FILE_UPLOAD_SURVEY_DATA_REPORT = 7;
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
@@ -1123,9 +1128,9 @@ public interface CommonConstants
 
     public static final String ZILLOW_CALL_REQUEST = "webservice/ProReviews.htm?output=json&returncompletecontent=true&count=50";
 
-    
+
     public static final String ZILLOW_PROFILE_URL = "http://zillow.com/profile/";
-    
+
     // Zillow Temp Post Table column names
     public static final String ZILLOW_REVIEW_URL_COLUMN = "zillowReviewUrl";
     public static final String ENTITY_COLUMN_NAME_COLUMN = "entityColumnName";

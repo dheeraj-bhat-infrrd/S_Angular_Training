@@ -236,7 +236,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private ImageProcessor imageProcessor;
-    
+
     @Autowired
     private Payment payment;
 
@@ -285,7 +285,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Value ( "${CDN_PATH}")
     String cdnPath;
-    
+
     @Autowired
     private ProfileCompletionList profileCompletionList;
 
@@ -1534,8 +1534,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         //check if already an entry in database
         HashMap<String, Object> queriesForDisableAccount = new HashMap<>();
         queriesForDisableAccount.put( CommonConstants.COMPANY_COLUMN, company );
-        List<DisabledAccount> disabledAccounts = disabledAccountDao.findByKeyValue( DisabledAccount.class, queriesForDisableAccount );
-        if(disabledAccounts != null && disabledAccounts.size() > 0){
+        List<DisabledAccount> disabledAccounts = disabledAccountDao.findByKeyValue( DisabledAccount.class,
+            queriesForDisableAccount );
+        if ( disabledAccounts != null && disabledAccounts.size() > 0 ) {
             LOG.debug( "Found existing entry in the database." );
             DisabledAccount disabledAccount = disabledAccounts.get( CommonConstants.INITIAL_INDEX );
             disabledAccount.setLicenseDetail( licenseDetail );
@@ -1543,10 +1544,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 disabledAccount.setDisableDate( new Timestamp( System.currentTimeMillis() ) );
                 disabledAccount.setStatus( CommonConstants.STATUS_INACTIVE );
             } else {
-                if(licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO )){
-                    disabledAccount.setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
+                if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
+                    disabledAccount
+                        .setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
                     disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
-                }else{
+                } else {
                     disabledAccount.setDisableDate( licenseDetail.getNextInvoiceBillingDate() );
                     disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
                 }
@@ -1555,7 +1557,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.debug( "Updating the Disabled Account entity to the database" );
             disabledAccountDao.update( disabledAccount );
 
-        }else{
+        } else {
             LOG.debug( "Preparing the DisabledAccount entity to be saved in the database." );
             DisabledAccount disabledAccount = new DisabledAccount();
             disabledAccount.setCompany( company );
@@ -1564,10 +1566,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 disabledAccount.setDisableDate( new Timestamp( System.currentTimeMillis() ) );
                 disabledAccount.setStatus( CommonConstants.STATUS_INACTIVE );
             } else {
-                if(licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO )){
-                    disabledAccount.setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
+                if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
+                    disabledAccount
+                        .setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
                     disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
-                }else{
+                } else {
                     disabledAccount.setDisableDate( licenseDetail.getNextInvoiceBillingDate() );
                     disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
                 }
@@ -1583,7 +1586,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             disabledAccountDao.save( disabledAccount );
             LOG.info( "Added Disabled Account entity to the database." );
         }
-        
+
     }
 
 
@@ -5121,7 +5124,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public void deleteCompany( Company company, User loggedInUser , int status ) throws InvalidInputException, SolrException
+    public void deleteCompany( Company company, User loggedInUser, int status ) throws InvalidInputException, SolrException
     {
         LOG.debug( "Method deleteCompany started." );
         try {
@@ -5134,9 +5137,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( company.getUsers() != null && !company.getUsers().isEmpty() ) {
                 for ( User user : company.getUsers() ) {
                     if ( CommonConstants.STATUS_INACTIVE != user.getStatus() ) {
-                         userManagementService.deleteUserDataFromAllSources( loggedInUser, user.getUserId(),
-                               CommonConstants.STATUS_COMPANY_DELETED );     
-                        
+                        userManagementService.deleteUserDataFromAllSources( loggedInUser, user.getUserId(),
+                            CommonConstants.STATUS_COMPANY_DELETED );
+
                     }
                 }
             }
@@ -5564,7 +5567,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public XSSFWorkbook downloadCompanyReport( List<Company> companies, String fileName )
+    public XSSFWorkbook downloadCompanyReport( List<Company> companies )
     {
         Map<Integer, List<Object>> data = workbookData.getCompanyReportDataToBeWrittenInSheet( companies );
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data, "d-mm-yyyy" );
@@ -7500,8 +7503,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         // update the values to company
         updateCompany( company );
     }
-    
-    
+
+
     @Override
     public void imageProcessorStarter()
     {
@@ -7520,7 +7523,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
                         updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
-                       
+
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7534,16 +7537,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         }
                     }
                 }
-                
-              //ask fb to rescrape pages with new thumbnail
+
+                //ask fb to rescrape pages with new thumbnail
                 askFbToRescrapePagesForSettings( images.keySet(), CommonConstants.COMPANY_SETTINGS_COLLECTION );
             }
-            
-            
 
-           
-           
-           
+
             // get unprocessed region profile images
             images = getUnprocessedProfileImages( CommonConstants.REGION_SETTINGS_COLLECTION );
             if ( images != null ) {
@@ -7565,13 +7564,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         }
                     }
                 }
-                
-              //ask fb to rescrape pages with new thumbnail
+
+                //ask fb to rescrape pages with new thumbnail
                 askFbToRescrapePagesForSettings( images.keySet(), CommonConstants.REGION_SETTINGS_COLLECTION );
             }
-            
-            
-            
+
+
             // get unprocessed branch profile images
             images = getUnprocessedProfileImages( CommonConstants.BRANCH_SETTINGS_COLLECTION );
             if ( images != null ) {
@@ -7593,14 +7591,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         }
                     }
                 }
-                
-              //ask fb to rescrape pages with new thumbnail
+
+                //ask fb to rescrape pages with new thumbnail
                 askFbToRescrapePagesForSettings( images.keySet(), CommonConstants.BRANCH_SETTINGS_COLLECTION );
-                
+
             }
-            
-            
-            
+
+
             // get unprocessed agent profile images
             images = getUnprocessedProfileImages( CommonConstants.AGENT_SETTINGS_COLLECTION );
             if ( images != null ) {
@@ -7622,13 +7619,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         }
                     }
                 }
-                
-              //ask fb to rescrape pages with new thumbnail
+
+                //ask fb to rescrape pages with new thumbnail
                 askFbToRescrapePagesForSettings( images.keySet(), CommonConstants.AGENT_SETTINGS_COLLECTION );
             }
-            
-            
-          
+
 
             // get unprocessed company logo images
             images = getUnprocessedLogoImages( CommonConstants.COMPANY_SETTINGS_COLLECTION );
@@ -7884,7 +7879,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         cal.setTimeInMillis( tokenCreatedOn );
         Date createdOn = cal.getTime();
 
-        
+
         Calendar curDateCal = Calendar.getInstance();
         // adding 7 days to current time
         curDateCal.add( Calendar.HOUR, 168 );
@@ -7933,6 +7928,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "updated the company hidden notification record." );
     }
 
+
     @Override
     @Transactional
     public List<Company> getCompaniesByBillingModeAuto()
@@ -7940,18 +7936,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<Company> companyList = companyDao.getCompaniesByBillingModeAuto();
         return companyList;
     }
-    
+
+
     /**
      * 
      * @param entityIds
      * @param collectionName
      */
     @Override
-    public void askFbToRescrapePagesForSettings(Set<Long> entityIds , String collectionName){
+    public void askFbToRescrapePagesForSettings( Set<Long> entityIds, String collectionName )
+    {
         LOG.info( "Method askFbToRescrapePagesForSettings started" );
-        List<OrganizationUnitSettings> settingsList = organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds( entityIds, collectionName );
-        for(OrganizationUnitSettings settings : settingsList){
-          //ask facebook to rescrape image
+        List<OrganizationUnitSettings> settingsList = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsForMultipleIds( entityIds, collectionName );
+        for ( OrganizationUnitSettings settings : settingsList ) {
+            //ask facebook to rescrape image
             try {
                 socialManagementService.askFaceBookToReScrapePage( settings.getCompleteProfileUrl() );
             } catch ( InvalidInputException e ) {
@@ -7960,13 +7959,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "Method askFbToRescrapePagesForSettings finished" );
     }
-    
-    
+
+
     @Override
-    public void unsubscribeCompany(Company company) throws SubscriptionCancellationUnsuccessfulException, InvalidInputException{
-        
-        LOG.info( "method unsubscribeCompany started"  );
-        if(company == null){
+    public void unsubscribeCompany( Company company )
+        throws SubscriptionCancellationUnsuccessfulException, InvalidInputException
+    {
+
+        LOG.info( "method unsubscribeCompany started" );
+        if ( company == null ) {
             throw new InvalidInputException( "Passed parameter company is null" );
         }
         List<LicenseDetail> licenseDetails = company.getLicenseDetails();
@@ -7978,7 +7979,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 payment.unsubscribe( licenseDetail.getSubscriptionId() );
             }
         }
-        LOG.info( "method unsubscribeCompany finished"  );
+        LOG.info( "method unsubscribeCompany finished" );
     }
     
     @Override
