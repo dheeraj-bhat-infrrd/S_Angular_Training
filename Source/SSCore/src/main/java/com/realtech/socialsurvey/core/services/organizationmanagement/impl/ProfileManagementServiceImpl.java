@@ -4515,8 +4515,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setSurveyCompletedDate( createdDate );
                 surveyDetails.setSurveyUpdatedDate( createdDate );
                 surveyDetails.setSurveyTransactionDate( dateOfService );
-                surveyDetails.setSurveyUpdatedDate( createdDate );
-
                 
                 // saving zillow review summary
                 surveyDetails.setSummary( summary );
