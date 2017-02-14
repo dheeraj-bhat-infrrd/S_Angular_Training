@@ -3111,6 +3111,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( surveyDetails );
     }
+    
+    @Override
+    public void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails )
+    {
+        surveyDetailsDao.updateZillowSurveyUpdatedDateInExistingSurveyDetails( surveyDetails );
+    }
+    
 
 
     @Override

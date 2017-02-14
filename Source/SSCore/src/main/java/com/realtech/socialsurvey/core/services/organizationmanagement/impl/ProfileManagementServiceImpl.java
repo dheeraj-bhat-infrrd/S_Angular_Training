@@ -95,6 +95,7 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveyUploadVO;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
@@ -4512,6 +4513,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setAbuseRepByUser( false );
                 surveyDetails.setShowSurveyOnUI( true );
                 surveyDetails.setSurveyCompletedDate( createdDate );
+                surveyDetails.setSurveyUpdatedDate( createdDate );
                 surveyDetails.setSurveyTransactionDate( dateOfService );
                 
                 // saving zillow review summary
@@ -4577,6 +4579,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             surveyDetails.setAbuseRepByUser( false );
                             surveyDetails.setShowSurveyOnUI( true );
                             surveyDetails.setSurveyCompletedDate( convertStringToDate( createdDate ) );
+                            surveyDetails.setSurveyUpdatedDate( convertStringToDate( createdDate ) );
+                            surveyDetails.setSurveyTransactionDate( convertStringToDate( createdDate ) );
 
                             // saving zillow review summary
                             surveyDetails.setSummary( summary );
@@ -5080,7 +5084,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyHandler.insertSurveyDetails( surveyDetails );
                 //update surveydetail in list
                 surveyDetailsList.set( i, surveyDetails );
-
                 latestSurveyIdList.add( surveyDetails.get_id() );
                 // Commented as Zillow reviews are saved in Social Survey, SS-307
                 // if ( zillowReviewScoreTotal == -1 )
@@ -5100,6 +5103,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 latestSurveyIdList.add( existingSurveyDetails.get_id() );
             } else if ( existingSurveyDetails.getSourceId() == null || existingSurveyDetails.getSourceId().isEmpty() ) {
 
+            }else if(existingSurveyDetails.getSurveyUpdatedDate() == null){
+                existingSurveyDetails.setSurveyUpdatedDate( existingSurveyDetails.getSurveyCompletedDate() );
+                surveyHandler.updateZillowSurveyUpdatedDateInExistingSurveyDetails( existingSurveyDetails );
             }
             
 
