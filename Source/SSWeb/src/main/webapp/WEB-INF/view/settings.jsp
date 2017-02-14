@@ -46,7 +46,24 @@
 			<div class="um-top-container">
 				<div class="um-header margin-top-25"><spring:message code="label.scorepost.key" /></div>
 				<div class="clearfix st-score-wrapper">
-					<div class="float-left st-score-txt stng-padng"><spring:message code="label.scorepost.desc.key" /></div>
+					<div class="float-left st-score-txt stng-padng">
+					<spring:message code="label.scorepost.desc.key" />
+					<c:if test="false">
+					<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
+						<div class="review-sort-sel-col">
+								<div class="clearfix setting-sel-wrapper">
+									<div class="float-left setting-sel-lbl">
+										<spring:message code="label.review.sort.criteria.key" />
+									</div>
+									<select id="sort-criteria-sel" class="float-left review-sort-sel-item">
+										<option data-sort="Feature" value="feature">Feature</option>
+										<option data-sort="Date" value="date">Date</option>
+									</select>
+								</div>
+							</div>
+					</c:if>	
+					</c:if>	
+					</div>
 					<form id="rating-settings-form">
 						<input type="hidden" name="ratingcategory" id="ratingcategory">
 						<div class="clearfix float-right st-score-rt pos-relative">
@@ -220,11 +237,12 @@
 <script>
 $(document).ready(function() {
 	$(document).attr("title", "Edit Settings");
-	
+	$("#sort-criteria-sel").val("${reviewSortCriteria}");	
+
 	//social media urls
 	loadSocialMediaUrlInSettingsPage();
 	updateViewAsScroll();
-	
+	setUpListenerForSortCriteriaDropdown();
 	if("${autoPostEnabled}" == "false"){
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 	}

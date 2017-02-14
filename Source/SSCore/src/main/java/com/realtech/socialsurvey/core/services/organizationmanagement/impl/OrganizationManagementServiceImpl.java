@@ -7981,5 +7981,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "method unsubscribeCompany finished" );
     }
+    
+    @Override
+    public void updateSortCriteriaForCompany( OrganizationUnitSettings companySettings, String sortCriteria )
+        throws InvalidInputException
+    {
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings cannot be null." );
+        }
+
+        LOG.debug( "Updating companySettings: " + companySettings + " with sortCriteria: " + sortCriteria );
+        //Set isAccountDisabled in mongo
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_REVIEW_SORT_CRITERIA, sortCriteria, companySettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        LOG.debug( "Updated the isAccountDisabled successfully" );
+    }
 }
 // JIRA: SS-27: By RM05: EOC

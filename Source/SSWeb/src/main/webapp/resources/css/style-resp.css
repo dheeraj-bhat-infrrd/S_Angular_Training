@@ -984,6 +984,12 @@
         line-height: 22px;
         padding-left: 22px;
     }
+    .setting-sel-lbl {
+        width: 100%;
+        text-align: left;
+        line-height: 22px;
+        padding-left: 22px;
+    }
     .util-gph-item{
         margin-left: 0;
         width: 90%;
@@ -1038,7 +1044,7 @@
     .resp-adj{
         padding: 0;
     }
-    .dash-sel-wrapper {
+    .dash-sel-wrapper,.setting-sel-wrapper {
         margin-bottom: 10px;
     }
     .dash-lp-item{
@@ -1743,10 +1749,9 @@
  .st-subject-input-cont{
 	 width:45%;
 	}
-	
- 
 
 }
+
 @media (min-width: 992px){
 	.hide-header{
 	   display:block !important;
@@ -1889,10 +1894,11 @@
         width: 100%;
         float: none;
     }
-    .dash-sel-item{
+    .dash-sel-item,.review-sort-sel-item{
         width: 250px;
         margin-left: 10px;
     }
+    
     .stats-right {
         clear: both;
         width: 53%;
@@ -1922,7 +1928,7 @@
     .util-gph-item{
         width: 100%;
     }
-    .dash-sel-wrapper{
+    .dash-sel-wrapper,.setting-sel-wrapper {
         width: 50%;
         float: left;
         margin-bottom: 15px;

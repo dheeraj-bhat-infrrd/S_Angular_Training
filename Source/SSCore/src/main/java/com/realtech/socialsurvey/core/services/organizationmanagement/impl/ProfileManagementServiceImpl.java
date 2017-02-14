@@ -4515,6 +4515,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setSurveyCompletedDate( createdDate );
                 surveyDetails.setSurveyUpdatedDate( createdDate );
                 surveyDetails.setSurveyTransactionDate( dateOfService );
+                surveyDetails.setSurveyUpdatedDate( createdDate );
+
                 
                 // saving zillow review summary
                 surveyDetails.setSummary( summary );
@@ -5412,5 +5414,38 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         return cdnUrl + CommonConstants.FILE_SEPARATOR + amazonImageBucket + CommonConstants.FILE_SEPARATOR + fileName;
 
+    }
+
+
+    //method that returns sort criteria for a company
+    @Override
+    public String processSortCriteria( long companyId, String sortCriteria )
+    {
+        if ( sortCriteria == null ) return CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE;
+        else return sortCriteria;
+        
+        /*switch ( sortCriteria ) {      
+            case CommonConstants.REVIEWS_SORT_CRITERIA_DEFAULT: {
+                String sortSettings = null;
+                if ( companyId > 0 ) {
+                    try {
+                        sortSettings = organizationManagementService.getCompanySettings( companyId ).getReviewSortCriteria();
+                    } catch ( InvalidInputException error ) {
+                        LOG.error( "company not found, choosing alternate sort criteria" );
+                    }
+                }
+                if ( sortSettings != "default" ) {
+                    return processSortCriteria( companyId, sortSettings );
+                }
+                else {
+                    return CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
+                }
+            }
+            case CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE:
+                
+            case CommonConstants.REVIEWS_SORT_CRITERIA_DATE: return sortCriteria;
+                
+            default: return CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
+        }*/
     }
 }

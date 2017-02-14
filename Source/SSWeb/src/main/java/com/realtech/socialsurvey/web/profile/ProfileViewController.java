@@ -136,6 +136,9 @@ public class ProfileViewController
             String json = new Gson().toJson( companyProfile );
             model.addAttribute( "profileJson", json );
 
+            model.addAttribute( "reviewSortCriteria", profileManagementService.processSortCriteria( companyProfile.getIden(),
+                companyProfile.getReviewSortCriteria() ) );
+
             Long companyId = companyProfile.getIden();
             double averageRating = profileManagementService.getAverageRatings( companyId, CommonConstants.PROFILE_LEVEL_COMPANY,
                 false, false, 0, 0 );
@@ -150,7 +153,7 @@ public class ProfileViewController
             if ( isBotRequest ) {
                 List<SurveyDetails> reviews = profileManagementService.getReviews( companyId, -1, -1, -1,
                     CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null,
-                    CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+                    profileManagementService.processSortCriteria( companyId, null ) );
                 model.addAttribute( "reviews", reviews );
 
                 List<SocialPost> posts = profileManagementService.getSocialPosts( companyProfile.getIden(),
@@ -268,6 +271,9 @@ public class ProfileViewController
             String json = new Gson().toJson( regionProfile );
             model.addAttribute( "profileJson", json );
 
+            model.addAttribute( "reviewSortCriteria", profileManagementService.processSortCriteria( companyProfile.getIden(),
+                companyProfile.getReviewSortCriteria() ) );
+
             Long regionId = regionProfile.getIden();
             double averageRating = profileManagementService.getAverageRatings( regionId, CommonConstants.PROFILE_LEVEL_REGION,
                 false, false, 0, 0 );
@@ -280,7 +286,7 @@ public class ProfileViewController
             if ( isBotRequest ) {
                 List<SurveyDetails> reviews = profileManagementService.getReviews( regionId, -1, -1, -1,
                     CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_REGION, false, null, null,
-                    CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+                    profileManagementService.processSortCriteria( companyProfile.getIden(), null ) );
                 model.addAttribute( "reviews", reviews );
 
                 List<SocialPost> posts = profileManagementService.getSocialPosts( regionProfile.getIden(),
@@ -404,6 +410,9 @@ public class ProfileViewController
             String json = new Gson().toJson( branchProfile );
             model.addAttribute( "profileJson", json );
 
+            model.addAttribute( "reviewSortCriteria", profileManagementService.processSortCriteria( companyProfile.getIden(),
+                companyProfile.getReviewSortCriteria() ) );
+
             Long branchId = branchProfile.getIden();
             double averageRating = profileManagementService.getAverageRatings( branchId, CommonConstants.PROFILE_LEVEL_BRANCH,
                 false, false, 0, 0 );
@@ -416,7 +425,7 @@ public class ProfileViewController
             if ( isBotRequest ) {
                 List<SurveyDetails> reviews = profileManagementService.getReviews( branchId, -1, -1, -1,
                     CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null,
-                    CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+                    profileManagementService.processSortCriteria( companyProfile.getIden(), null ) );
                 model.addAttribute( "reviews", reviews );
 
                 List<SocialPost> posts = profileManagementService.getSocialPosts( branchProfile.getIden(),
@@ -635,6 +644,9 @@ public class ProfileViewController
                 String json = new Gson().toJson( individualProfile );
                 model.addAttribute( "profileJson", json );
 
+                model.addAttribute( "reviewSortCriteria", profileManagementService
+                    .processSortCriteria( companyProfile.getIden(), companyProfile.getReviewSortCriteria() ) );
+
                 long agentId = user.getUserId();
                 double averageRating = profileManagementService.getAverageRatings( agentId,
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, 0, 0 );
@@ -647,7 +659,7 @@ public class ProfileViewController
                 if ( isBotRequest ) {
                     List<SurveyDetails> reviews = profileManagementService.getReviews( agentId, -1, -1, -1,
                         CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null,
-                        CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+                        profileManagementService.processSortCriteria( companyProfile.getIden(), null ) );
                     model.addAttribute( "reviews", reviews );
 
                     List<SocialPost> posts = profileManagementService.getSocialPosts( individualProfile.getIden(),

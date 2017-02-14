@@ -58,6 +58,8 @@ public class OrganizationUnitSettings
     private String status;
     private boolean hiddenSection;
     private boolean sendEmailFromCompany;
+    private String reviewSortCriteria;
+    
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
 
@@ -594,6 +596,19 @@ public class OrganizationUnitSettings
         this.vendasta_rm_settings = vendasta_rm_settings;
     }
     
+    
+    public String getReviewSortCriteria()
+    {
+        return reviewSortCriteria;
+    }
+
+
+    public void setReviewSortCriteria( String reviewSortCriteria )
+    {
+        this.reviewSortCriteria = reviewSortCriteria;
+    }
+
+
     @Override
     public String toString()
     {

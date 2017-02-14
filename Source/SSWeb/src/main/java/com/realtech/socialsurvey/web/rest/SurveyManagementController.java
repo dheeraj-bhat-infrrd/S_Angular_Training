@@ -471,6 +471,30 @@ public class SurveyManagementController
     {
         LOG.info( "Method to start survey initiateSurveyWithUrl() started." );
         String param = request.getParameter( "q" );
+        try {
+            Map<String, String> urlParams = urlGenerator.decryptParameters( param );
+            if ( urlParams != null ) {
+                long agentId = Long.parseLong( urlParams.get( CommonConstants.AGENT_ID_COLUMN ) );
+                String customerEmail = urlParams.get( CommonConstants.CUSTOMER_EMAIL_COLUMN );
+                String custFirstName = urlParams.get( CommonConstants.FIRST_NAME );
+                String custLastName = urlParams.get( CommonConstants.LAST_NAME );
+
+                boolean retakeSurvey = false;
+                String retakeSurveyString = urlParams.get( CommonConstants.URL_PARAM_RETAKE_SURVEY );
+                if ( retakeSurveyString != null && !retakeSurveyString.isEmpty() ) {
+                    retakeSurvey = Boolean.parseBoolean( retakeSurveyString );
+                }
+
+                SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName,
+                    custLastName );
+                if ( surveyDetails != null && surveyDetails.getReview() != null && surveyDetails.getStage() != -1 && !retakeSurvey ) {
+                    return JspResolver.SURVEY_LINK_INVALID;
+                }
+
+            }
+        } catch ( InvalidInputException error ) {
+            return JspResolver.SURVEY_LINK_INVALID;
+        }
         model.addAttribute( "q", param );
         LOG.info( "Method to start survey initiateSurveyWithUrl() finished." );
         return JspResolver.SHOW_SURVEY_QUESTIONS;
