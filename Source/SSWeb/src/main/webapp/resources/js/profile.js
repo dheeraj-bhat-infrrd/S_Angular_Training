@@ -8,8 +8,6 @@ var publicPostNumRows = 5;
 var currentProfileName;
 var doStopPublicPostPagination = false;
 var isPublicPostAjaxRequestRunning = false;
-var reviewsSortBy = 'default';
-var showAllReviews = false;
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
 		"Sep", "Oct", "Nov", "Dec" ];
 var profileJson;
@@ -230,8 +228,15 @@ function fetchCompanyProfile() {
 	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
 		minScore = result.survey_settings.show_survey_above_score;
 	}
-	fetchReviewsCountBasedOnProfileLevel('COMPANY',result.iden,paintHiddenReviewsCount,0,minScore, true);
-	fetchReviewsBasedOnProfileLevel('COMPANY', result.iden,startIndex,numOfRows,minScore , true);
+	
+	if( showAllReviews == true ){
+		fetchReviewsBasedOnProfileLevel('COMPANY', result.iden, startIndex, numOfRows, 0 , true);
+	}
+	else {
+		fetchReviewsBasedOnProfileLevel('COMPANY', result.iden, startIndex, numOfRows, minScore , true);
+	}
+	
+	fetchReviewsCountBasedOnProfileLevel('COMPANY',result.iden, paintHiddenReviewsCount, 0, minScore, true);
 	// Commented as zillow reviews are to be fetched after the last batch of social survey reviews fetched, SS-1277
 	// fetchZillowReviewsBasedOnProfile('COMPANY',result.iden);
 }
@@ -1316,6 +1321,10 @@ function paintHiddenReviewsCount(data) {
 			.attr("data-nr-review-count", responseJson.entity)
 			.html(reviewsSizeHtml);
 			
+			if ( showAllReviews == true ){
+				$("#prof-hidden-review-count").hide();
+			}
+			
 			/*$("#prof-hidden-review-count").click(function(){
 				$('#prof-review-item').html('');
 				$(this).hide();
@@ -1369,7 +1378,14 @@ function fetchRegionProfile() {
 		minScore = result.survey_settings.show_survey_above_score;
 	}
 	startIndex = 0;
-	fetchReviewsBasedOnProfileLevel('REGION', result.iden,startIndex,numOfRows,minScore , true);
+	
+	if( showAllReviews == true ){
+		fetchReviewsBasedOnProfileLevel('REGION', result.iden, startIndex, numOfRows, 0 , true);
+	}
+	else {
+		fetchReviewsBasedOnProfileLevel('REGION', result.iden, startIndex, numOfRows, minScore , true);
+	}
+	
 	fetchReviewsCountBasedOnProfileLevel('REGION',result.iden, paintHiddenReviewsCount, 0, minScore, true);
 	// Commented as zillow reviews are to be fetched after the last batch of social survey reviews fetched, SS-1277
 	// fetchZillowReviewsBasedOnProfile('REGION',result.iden);
@@ -1384,7 +1400,14 @@ function fetchBranchProfile() {
 		minScore = result.survey_settings.show_survey_above_score;
 	}
 	startIndex = 0;
-	fetchReviewsBasedOnProfileLevel('BRANCH', result.iden, startIndex, numOfRows, minScore);
+	
+	if( showAllReviews == true ){
+		fetchReviewsBasedOnProfileLevel('BRANCH', result.iden, startIndex, numOfRows, 0 , true);
+	}
+	else {
+		fetchReviewsBasedOnProfileLevel('BRANCH', result.iden, startIndex, numOfRows, minScore , true);
+	}
+	
 	fetchReviewsCountBasedOnProfileLevel('BRANCH',result.iden, paintHiddenReviewsCount, 0, minScore, true);
 	// Commented as zillow reviews are to be fetched after the last batch of social survey reviews fetched, SS-1277
 	// fetchZillowReviewsBasedOnProfile('BRANCH',result.iden);
@@ -1522,7 +1545,14 @@ function fetchAgentProfile(){
 		minScore = result.survey_settings.show_survey_above_score;
 	}
 	startIndex = 0;
-	fetchReviewsBasedOnProfileLevel('INDIVIDUAL', result.iden, startIndex, numOfRows, minScore , true);
+	
+	if( showAllReviews == true ){
+	fetchReviewsBasedOnProfileLevel('INDIVIDUAL', result.iden, startIndex, numOfRows, 0 , true);
+	}
+	else {
+		fetchReviewsBasedOnProfileLevel('INDIVIDUAL', result.iden, startIndex, numOfRows, minScore , true);
+	}
+	
 	fetchReviewsCountBasedOnProfileLevel('INDIVIDUAL',result.iden, paintHiddenReviewsCount, 0, minScore, true);
 	// Commented as zillow reviews are to be fetched after the last batch of social survey reviews fetched, SS-1277
 	// fetchZillowReviewsBasedOnProfile('INDIVIDUAL',result.iden);
