@@ -98,6 +98,19 @@
 								<div class="float-left bd-check-txt">Allow access to Listings Manager</div>
 							</div>
 							</c:if>
+							<c:if test="${ realTechAdminId == 1 }">
+								<div class="send-email-sel-col">
+									<div class="clearfix email-sel-wrapper">
+										<div class="float-left email-setting-sel-lbl">
+											<spring:message code="label.send.email.via.key" />
+										</div>
+										<select id="email-sel" class="float-left email-sel-item">
+											<option email-option="socialsurvey.me" value="socialsurvey.me">socialsurvey.me</option>
+											<option email-option="socialsurvey.us" value="socialsurvey.us">socialsurvey.us</option>
+										</select>
+									</div>
+								</div>
+						</c:if>
 						</div>
 					</div>
 					</form>
@@ -298,5 +311,11 @@ $(document).ready(function() {
 		paintTextForMood(happyTxt, nuTxt,sadTxt,happyTxtComplete, nuTxtComplete,sadTxtComplete);		
 	}
 	
+});
+
+$(document).ready(function() {
+	$(document).attr("title", "Edit email Settings");
+	$("#email-sel").val("${sendEmailThrough}");
+	setUpListenerForEmailOptionDropdown();
 });
 </script>
