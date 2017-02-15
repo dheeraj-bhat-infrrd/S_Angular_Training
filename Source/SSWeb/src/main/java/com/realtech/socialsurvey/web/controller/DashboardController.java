@@ -1516,10 +1516,15 @@ public class DashboardController
     {
         LOG.info( "Method to get file containg customer survey results generateCustomerSurveyResultsFile() started." );
         User user = sessionHelper.getCurrentUser();
-        boolean realTechAdmin = user.isSuperAdmin();
         String message = "";
 
         try {
+            boolean realTechAdmin = user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( user.getUserId() );
+
+            if ( !( realTechAdmin ) ) {
+                throw new UnsupportedOperationException( "User is not authorized to perform this action" );
+            }
+
             String mailId = request.getParameter( "mailid" );
 
             String columnName = request.getParameter( "columnName" );
@@ -2408,6 +2413,11 @@ public class DashboardController
         LOG.info( "Method called to generate the company registration report" );
         String message = "";
         try {
+            User user = sessionHelper.getCurrentUser();
+            if ( !( user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) ) {
+                throw new UnsupportedOperationException( "User is not authorized to perform this action" );
+            }
+
             Date startDate = null;
             String startDateStr = request.getParameter( "startDate" );
             if ( startDateStr != null && !startDateStr.isEmpty() ) {
