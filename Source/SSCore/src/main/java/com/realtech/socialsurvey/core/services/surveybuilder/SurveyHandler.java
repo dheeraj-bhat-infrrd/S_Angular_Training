@@ -360,4 +360,7 @@ public interface SurveyHandler
 
 
     void updateZillowSourceIdInExistingSurveyDetails( SurveyDetails surveyDetails );
+
+
+    void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails );
 }

@@ -2776,6 +2776,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method updateZillowSourceIdInExistingSurveyDetails finished." );
     }
     
+    
+    @Override
+    public void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails )
+    {
+        String surveyMongoId = surveyDetails.get_id();
+        LOG.info( "Method updateZillowSurveyUpdatedDateInExistingSurveyDetails() to update source id started " );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
+        Update update = new Update();
+        update.set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, surveyDetails.getSurveyUpdatedDate());
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateZillowSurveyUpdatedDateInExistingSurveyDetails finished." );
+    }
+    
     /**
      * 
      * @param companyId

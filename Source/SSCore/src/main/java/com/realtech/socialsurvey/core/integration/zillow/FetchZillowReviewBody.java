@@ -8,7 +8,7 @@ public class FetchZillowReviewBody
     
     private String[] fields = {"closeDateSatisfaction","closingCostsSatisfaction","content","dateOfService","details","interestRateSatisfaction","loanPurpose","loanProgram","loanType","rating","serviceProvided","title","zipCode","companyReviewee","created","individualReviewee","response","reviewerName","reviewId","updated"};
     
-    private int pageSize = 10;
+    private int pageSize = 50;
 
     public String getPartnerId()
     {
