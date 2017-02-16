@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -28,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
@@ -181,18 +183,15 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
 
     @Async
     @Override
-    public void pushZillowReviews( List<HashMap<String, Object>> reviews, String collectionName,
+    public void pushZillowReviews( List<SurveyDetails> surveyDetailsList, String collectionName,
         OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException
     {
-        if ( reviews == null || reviews.isEmpty() ) {
-            LOG.error( "zillow reviews map passed is be null or empty in pushZillowReviews()" );
-            throw new InvalidInputException( "zillow reviews map passed is be null or empty in pushZillowReviews()" );
-        }
+        
         if ( collectionName == null || collectionName.isEmpty() ) {
             LOG.error( "Collection name passed is be null or empty in pushZillowReviews()" );
             throw new InvalidInputException( "Collection name passed is be null or empty in pushZillowReviews()" );
         }
-        if ( reviews == null || reviews.isEmpty() ) {
+        if ( surveyDetailsList == null || surveyDetailsList.isEmpty() ) {
             LOG.error( "zillow reviews map passed is be null or empty in pushZillowReviews()" );
             throw new InvalidInputException( "zillow reviews map passed is be null or empty in pushZillowReviews()" );
         }
@@ -200,7 +199,7 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
             LOG.error( "Invalid companyId passed as argument in pushZillowReviews()" );
             throw new InvalidInputException( "Invalid companyId passed as argument in pushZillowReviews()" );
         }
-        profileManagementService.buildSurveyDetailsFromReviewMap( reviews, collectionName, profileSettings, companyId, false,
+        profileManagementService.fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName, profileSettings, companyId, false,
             false );
     }
 }

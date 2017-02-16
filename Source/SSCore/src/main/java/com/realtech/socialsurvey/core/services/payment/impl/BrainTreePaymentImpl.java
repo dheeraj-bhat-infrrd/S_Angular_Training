@@ -137,6 +137,10 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
+    
+    @Value ( "${APPLICATION_ADMIN_NAME}")
+    private String applicationAdminName;
+
 
     private static final Logger LOG = LoggerFactory.getLogger( BrainTreePaymentImpl.class );
 
@@ -1784,7 +1788,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
         } else if ( notificationType == CommonConstants.SUBSCRIPTION_CANCELED ){
             // subscription cancelled deactivate the company
             organizationManagementService.addDisabledAccount( licenseDetail.getCompany().getCompanyId(), true, CommonConstants.REALTECH_ADMIN_ID );
-            User realtechAdmin = userManagementService.getUserByUserId( CommonConstants.REALTECH_ADMIN_ID );
+            User realtechAdmin = userManagementService.getUserObjByUserId( CommonConstants.REALTECH_ADMIN_ID );
             //soft delete the company. set status deleted 
             organizationManagementService.deleteCompany( licenseDetail.getCompany(), realtechAdmin , CommonConstants.STATUS_COMPANY_DISABLED );
             //temporary inactive the admin so he can login and get notification about deactivation
@@ -1793,7 +1797,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
             emailServices.sendRetryExhaustedEmail( user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
                 user.getLoginName() );
             //send mail to application support email
-            emailServices.sendPaymentFailedAlertEmail( applicationSupportEmail, applicationAdminEmail, licenseDetail.getCompany().getCompany() );
+            emailServices.sendPaymentFailedAlertEmail( applicationSupportEmail, applicationAdminName, licenseDetail.getCompany().getCompany() );
            
         }
     }

@@ -799,13 +799,13 @@ function paintReviews(result){
                     if(reviewsHtml.surveyTransactionDate !=null){
                         reviewsHtml +=' <span>'+ new Date(reviewItem.surveyTransactionDate).toString("MMMM  yyyy")+'</span>';
                         if(reviewItem.city !=null && reviewItem.state!=null){
-                        reviewsHtml +='<span> in '+reviewItem.city+','+reviewItem.state+'.</span>';
+                        reviewsHtml +='<span> in '+reviewItem.city+', '+reviewItem.state+'.</span>';
                         }
                         reviewsHtml +='</div>';
                     }else{
                         reviewsHtml +=' <span>'+new Date(reviewItem.modifiedOn).toString("MMMM  yyyy")+'</span>';
                         if(reviewItem.city !=null && reviewItem.state!=null){
-                            reviewsHtml +='<span> in '+reviewItem.city+','+reviewItem.state+'.</span>';
+                            reviewsHtml +='<span> in '+reviewItem.city+', '+reviewItem.state+'.</span>';
                             }
                             reviewsHtml +='</div>';                    }
 				}

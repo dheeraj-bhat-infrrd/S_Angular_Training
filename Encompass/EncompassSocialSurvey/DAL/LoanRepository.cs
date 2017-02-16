@@ -79,6 +79,8 @@ namespace EncompassSocialSurvey.DAL
                                         , CREATED_ON
                                         , MODIFIED_ON
 										, COLLECTION_NAME
+                                        , STATE
+                                        , CITY
                                           )
                                         VALUES(
                                           ?SURVEY_SOURCE
@@ -98,6 +100,8 @@ namespace EncompassSocialSurvey.DAL
                                         , ?CREATED_ON
                                         , ?MODIFIED_ON
 										, ?COLLECTION_NAME
+                                        , ?STATE
+                                        , ?CITY
                                         ) ;";
 
         

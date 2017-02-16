@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.api.models.ServiceProviderInfo;
 import com.realtech.socialsurvey.api.models.SurveyGetVO;
 import com.realtech.socialsurvey.api.models.SurveyResponseVO;
 import com.realtech.socialsurvey.api.models.TransactionInfoGetVO;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -58,8 +59,8 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
                 transactionInfo.setTransactionDate( String.valueOf( d.getSurveyTransactionDate() ) );
             transactionInfo.setTransactionRef( d.getSourceId() );
             if ( objects[0] != null && objects[0] instanceof SurveyPreInitiation )
-                transactionInfo.setSurveySentDateTime( CommonUtils
-                    .formatDate( ( (SurveyPreInitiation) objects[0] ).getLastReminderTime(), "yyyy-MM-dd'T'HH:mm:ss.SSSZ" ) );
+                transactionInfo.setSurveySentDateTime( CommonUtils.formatDate(
+                    ( (SurveyPreInitiation) objects[0] ).getLastReminderTime(), CommonConstants.SURVEY_API_DATE_FORMAT ) );
             serviceProviderInfo.setServiceProviderEmail( d.getAgentEmailId() );
             serviceProviderInfo.setServiceProviderName( d.getAgentName() );
             survey.setReviewId( d.get_id() );
@@ -69,7 +70,8 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
             review.setReviewDate( d.getModifiedOn().toString() );
             review.setRetakeSurvey( d.isRetakeSurvey() );
             if ( d.getModifiedOn() != null ) {
-                review.setReviewUpdatedDateTime( CommonUtils.formatDate( d.getModifiedOn(), "yyyy-MM-dd'T'HH:mm:ss.SSSZ" ) );
+                review.setReviewUpdatedDateTime(
+                    CommonUtils.formatDate( d.getModifiedOn(), CommonConstants.SURVEY_API_DATE_FORMAT ) );
             }
             review.setSource( d.getSource() );
             review.setAgreedToShare( Boolean.parseBoolean( d.getAgreedToShare() ) );

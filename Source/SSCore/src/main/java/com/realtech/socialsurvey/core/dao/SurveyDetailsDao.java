@@ -333,4 +333,7 @@ public interface SurveyDetailsDao
 
 
     void updateTransactionDateInExistingSurveyDetails( SurveyDetails surveyDetails );
+
+
+    void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails );
 }

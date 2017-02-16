@@ -4,16 +4,42 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.realtech.socialsurvey.core.entities.*;
-
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
+import com.realtech.socialsurvey.core.entities.CRMInfo;
+import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
+import com.realtech.socialsurvey.core.entities.DisabledAccount;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
+import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
+import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.StateLookup;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
+import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -866,7 +892,7 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws SolrException
      */
-    public void deleteCompany( Company company, User loggedInUser , int status ) throws InvalidInputException, SolrException;
+    public void deleteCompany( Company company, User loggedInUser, int status ) throws InvalidInputException, SolrException;
 
 
     /**
@@ -1005,7 +1031,7 @@ public interface OrganizationManagementService
      * @param fileName
      * @return
      */
-    public XSSFWorkbook downloadCompanyReport( List<Company> companies, String fileName );
+    public XSSFWorkbook downloadCompanyReport( List<Company> companies );
 
 
     /**
@@ -1323,7 +1349,8 @@ public interface OrganizationManagementService
 
 
     public List<OrganizationUnitSettings> fetchUnitSettingsConnectedToZillow( String collectionName, List<Long> ids );
-    
+
+
     public List<OrganizationUnitSettings> fetchUnitSettingsForSocialMediaTokens( String collectionName );
 
 
@@ -1331,7 +1358,7 @@ public interface OrganizationManagementService
         boolean holdSendingMail, boolean sendMail ) throws InvalidInputException;
 
 
-    public void pushZillowReviews( List<HashMap<String, Object>> reviews, String collectionName,
+    public void pushZillowReviews( List<SurveyDetails> surveyDetailsList, String collectionName,
         OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException;
 
 
@@ -1347,13 +1374,14 @@ public interface OrganizationManagementService
 
     public void forceDeleteDisabledAccount( long companyId, long userId );
 
+
     /**
      * Returns agent social media tokens
      * @param iden
      * @return
      * @throws InvalidInputException
      */
-    public SocialMediaTokens getAgentSocialMediaTokens(long iden) throws InvalidInputException;
+    public SocialMediaTokens getAgentSocialMediaTokens( long iden ) throws InvalidInputException;
 
 
     public List<AgentSettings> getAllAgentsFromMongo();
@@ -1386,6 +1414,7 @@ public interface OrganizationManagementService
      */
     public Company activateCompany( Company company ) throws InvalidInputException;
 
+
     /**
      * 
      * @param columnName
@@ -1394,16 +1423,18 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public List<String> getExpiredSocailMedia( String columnName, long columnValue ) throws InvalidInputException, NoRecordsFetchedException;
-    
+    public List<String> getExpiredSocailMedia( String columnName, long columnValue )
+        throws InvalidInputException, NoRecordsFetchedException;
+
+
     /**
      * 
      * @param CollectionName
      * @return
      */
     public List<Long> fetchEntityIdsWithHiddenAttribute( String CollectionName );
-    
-    
+
+
     public List<CompanyHiddenNotification> getCompaniesWithHiddenSectionEnabled();
 
 
@@ -1420,6 +1451,10 @@ public interface OrganizationManagementService
 
 
     public void updateSortCriteriaForCompany( OrganizationUnitSettings companySettings, String sortCriteria )
+        throws InvalidInputException;
+    
+   
+    void updateSendEmailThroughForCompany( OrganizationUnitSettings companySettings, String sendEmailThrough )
         throws InvalidInputException;
 
 }

@@ -392,8 +392,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         LOG.debug(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
-        surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare );
         surveyDetailsDao.updateFinalScore( surveyId );
+        surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare );
         LOG.debug(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
     }
@@ -3111,6 +3111,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         surveyDetailsDao.updateZillowSourceIdInExistingSurveyDetails( surveyDetails );
     }
+    
+    @Override
+    public void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails )
+    {
+        surveyDetailsDao.updateZillowSurveyUpdatedDateInExistingSurveyDetails( surveyDetails );
+    }
+    
 
 
     @Override

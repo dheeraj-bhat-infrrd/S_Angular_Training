@@ -11,7 +11,7 @@
 		<div class="container">
 			<div class="hm-header-row hm-header-row-main clearfix">
 				<div class="float-left hm-header-row-left text-center">
-					<spring:message code="label.reviewsmonitor.key" />
+					<spring:message code="label.listingsmanager.key" />
 				</div>
 			</div>
 		</div>
@@ -26,7 +26,7 @@
 	<script>
 		var url = "";
 		$(document).ready(function() {
-			$(document).attr("title", "Reviews Monitor");
+			$(document).attr("title", "Listings Manager");
 			var iframe = document.getElementById('vendasta-iframe');
 			iframe.addEventListener("load", function() {
 				showFrame();

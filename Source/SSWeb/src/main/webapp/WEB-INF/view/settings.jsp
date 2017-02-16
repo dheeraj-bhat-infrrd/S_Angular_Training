@@ -48,6 +48,8 @@
 				<div class="clearfix st-score-wrapper">
 					<div class="float-left st-score-txt stng-padng">
 					<spring:message code="label.scorepost.desc.key" />
+
+					<c:if test="false">
 					<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
 						<div class="review-sort-sel-col">
 								<div class="clearfix setting-sel-wrapper">
@@ -60,7 +62,8 @@
 									</select>
 								</div>
 							</div>
-					</c:if>		
+					</c:if>	
+					</c:if>	
 					</div>
 					<form id="rating-settings-form">
 						<input type="hidden" name="ratingcategory" id="ratingcategory">
@@ -93,9 +96,22 @@
 							<div>
 								<div id="vndsta-access-chk-box" class="float-left bd-check-img"></div>
 								<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
-								<div class="float-left bd-check-txt">Allow access to Reviews Monitor</div>
+								<div class="float-left bd-check-txt">Allow access to Listings Manager</div>
 							</div>
 							</c:if>
+							<c:if test="${ realTechAdminId == 1 }">
+								<div class="send-email-sel-col">
+									<div class="clearfix email-sel-wrapper">
+										<div class="float-left email-setting-sel-lbl">
+											<spring:message code="label.send.email.via.key" />
+										</div>
+										<select id="email-sel" class="float-left email-sel-item">
+											<option email-option="socialsurvey.me" value="socialsurvey.me">socialsurvey.me</option>
+											<option email-option="socialsurvey.us" value="socialsurvey.us">socialsurvey.us</option>
+										</select>
+									</div>
+								</div>
+						</c:if>
 						</div>
 					</div>
 					</form>
@@ -296,5 +312,11 @@ $(document).ready(function() {
 		paintTextForMood(happyTxt, nuTxt,sadTxt,happyTxtComplete, nuTxtComplete,sadTxtComplete);		
 	}
 	
+});
+
+$(document).ready(function() {
+	$(document).attr("title", "Edit email Settings");
+	$("#email-sel").val("${sendEmailThrough}");
+	setUpListenerForEmailOptionDropdown();
 });
 </script>

@@ -18,8 +18,8 @@ namespace EncompassSocialSurvey.Entity
         public string CustomerLastName { get; set; }
         public string CustomerEmailId { get; set; }
         public string CustomerInteractionDetails { get; set; }
-        public string City { get; set; }
         public string State { get; set; }
+        public string City { get; set; }
 
         //
         public DateTime EngagementClosedTime { get; set; }
