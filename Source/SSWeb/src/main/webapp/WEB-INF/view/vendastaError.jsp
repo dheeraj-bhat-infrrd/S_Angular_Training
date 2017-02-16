@@ -23,7 +23,7 @@
 <body>
 	<div class="vendasta-container">
 		<div id="error-msg-vendasta" class="access-cont">Sorry, Could
-			not load Reviews Monitor</div>
+			not load Listings Manager</div>
 	</div>
 </body>
 </html>

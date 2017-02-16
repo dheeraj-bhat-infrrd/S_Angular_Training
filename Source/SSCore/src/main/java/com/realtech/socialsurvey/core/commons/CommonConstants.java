@@ -17,10 +17,14 @@ public interface CommonConstants
      */
     public static final String CONFIG_PROPERTIES_FILE = "config.properties";
     public static final String MESSAGE_PROPERTIES_FILE = "displaymessage.properties";
+    //default email settings 
     public static final String SENDGRID_SENDER_USERNAME = "SENDGRID_SENDER_USERNAME";
     public static final String SENDGRID_SENDER_NAME = "SENDGRID_SENDER_NAME";
     public static final String SENDGRID_SENDER_PASSWORD = "SENDGRID_SENDER_PASSWORD";
-
+    //email settings for socialsurvey.us
+    public static final String SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME = "SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME";
+    public static final String SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD = "SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD";
+    public static final String SENDGRID_SENDER_SOCIALSURVEYUS_NAME = "SENDGRID_SENDER_SOCIALSURVEYUS_NAME";
     /**
      * Default constants
      */
@@ -237,6 +241,9 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USERS_REPORT = "Company user report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_HIERARCHY_REPORT = "Hierarchy report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REGISTRATION_REPORT = "Company registration report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_SURVEY_DATA_REPORT = "Survey data report";
+
 
     /**
      * Mongo entities and column name constants
@@ -341,6 +348,9 @@ public interface CommonConstants
     public static final String CITY = "city";
     public static final String CRM_SOURCE = "crm_source";
     public static final String VERTICAL = "vertical";
+    public static final String SEND_EMAIL_THROUGH_SOCIALSURVEY_ME = "socialsurvey.me";
+    public static final String SEND_EMAIL_THROUGH_SOCIALSURVEY_US = "socialsurvey.us";
+    
     // JIRA - SS-536: Added for manual registration via invite
     public static final String BILLING_MODE_COLUMN = "billingMode";
     public static final String VERTICAL_COLUMN = "verticalsMaster";
@@ -723,7 +733,7 @@ public interface CommonConstants
     public static final int SUBSCRIPTION_CHARGED_UNSUCCESSFULLY = 2;
     public static final int SUBSCRIPTION_CHARGED_SUCCESSFULLY = 3;
     public static final int SUBSCRIPTION_CANCELED = 4;
-    
+
 
     // Subscription price modification result constants
     public static final String SUBSCRIPTION_PRICE_CHANGED = "SUBSCRIPTION_PRICE_CHANGED";
@@ -893,6 +903,8 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_BILLING_REPORT = 3;
     public static final int FILE_UPLOAD_COMPANY_USERS_REPORT = 4;
     public static final int FILE_UPLOAD_COMPANY_HIERARCHY_REPORT = 5;
+    public static final int FILE_UPLOAD_COMPANY_REGISTRATION_REPORT = 6;
+    public static final int FILE_UPLOAD_SURVEY_DATA_REPORT = 7;
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
@@ -1123,6 +1135,9 @@ public interface CommonConstants
 
     public static final String ZILLOW_CALL_REQUEST = "webservice/ProReviews.htm?output=json&returncompletecontent=true&count=50";
 
+
+    public static final String ZILLOW_PROFILE_URL = "http://zillow.com/profile/";
+
     // Zillow Temp Post Table column names
     public static final String ZILLOW_REVIEW_URL_COLUMN = "zillowReviewUrl";
     public static final String ENTITY_COLUMN_NAME_COLUMN = "entityColumnName";
@@ -1237,7 +1252,7 @@ public interface CommonConstants
     public static final Object ZILLOW_REVIEWS = "Zillow Reviews";
     public static final Object ABUSIVE_REVIEWS = "Abusive Reviews";
     public static final Object THIRD_PARTY_REVIEWS = "3rd Party Reviews";
-    
+
     //vendasta constants
     public static final String VENDASTA_ACCESS = "vendastaAccessible";
     public static final String VENDASTA_REPUTATION_MANAGEMENT_ID = "RM";
@@ -1247,15 +1262,16 @@ public interface CommonConstants
     public static final String VENDASTA_PRODUCT_ID_COLUMN = "productId";
     public static final String VENDASTA_STATUS_COLUMN = "status";
     public static final String VENDASTA = "vendasta";
-    
+
     //vendasta batch constants
     public static final String BATCH_TYPE_PROCESSED_SSO_TICKET_REMOVER = "ssoTicketRemover";
     public static final String BATCH_NAME_PROCESSED_SSO_TICKET_REMOVER = "remove used vendasta sso tickets";
     public static final int VENDASTA_TICKET_EXPIRED = 1;
-    
+
     //survey API
     public static final String SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION = "Authorization";
     public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
+    public static final String SURVEY_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
 
 }

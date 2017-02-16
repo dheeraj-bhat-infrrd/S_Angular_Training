@@ -944,7 +944,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         /**
          * fetching only completed surveys
          */
-        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        query.addCriteria( Criteria.where( CommonConstants.REVIEW_COLUMN ).exists( true ).nin( "" ) );
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
@@ -2774,6 +2774,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.SURVEY_SOURCE_ID_COLUMN, surveyDetails.getSourceId());
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateZillowSourceIdInExistingSurveyDetails finished." );
+    }
+    
+    
+    @Override
+    public void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails )
+    {
+        String surveyMongoId = surveyDetails.get_id();
+        LOG.info( "Method updateZillowSurveyUpdatedDateInExistingSurveyDetails() to update source id started " );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
+        Update update = new Update();
+        update.set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, surveyDetails.getSurveyUpdatedDate());
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateZillowSurveyUpdatedDateInExistingSurveyDetails finished." );
     }
     
     /**

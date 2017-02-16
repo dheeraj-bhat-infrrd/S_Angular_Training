@@ -631,7 +631,7 @@ public interface ProfileManagementService
     public Map<String, Long> getZillowTotalScoreAndReviewCountForProfileLevel( String profileLevel, long iden );
 
 
-    public List<SurveyDetails> buildSurveyDetailsFromReviewMap( List<HashMap<String, Object>> reviews, String collectionName,
+    public List<SurveyDetails> fillSurveyDetailsFromReviewMap( List<SurveyDetails> surveyDetailsList, String collectionName,
         OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage )
         throws InvalidInputException;
 
@@ -660,5 +660,15 @@ public interface ProfileManagementService
     public void imageLoader();
 
 
+    List<SurveyDetails> buildSurveyDetailFromZillowAgentReviewMap( Map<String, Object> map );
+
+
+    List<SurveyDetails> buildSurveyDetailFromZillowLenderReviewMap( Map<String, Object> map );
+
+
+    void modifyZillowCallCount( Map<String, Object> map );
+
+
     public String processSortCriteria( long companyId, String sortCriteria );
+
 }

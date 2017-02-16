@@ -1,14 +1,7 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Type;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,12 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +46,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -123,7 +113,7 @@ public class AdminController
 
         if ( company != null && company.getCompanyId() > 0 ) {
             List<LicenseDetail> licenseDetails = company.getLicenseDetails();
-            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE  ) {
+            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE ) {
                 try {
                     if ( licenseDetails.size() > 0 ) {
                         // Unsubscribing company from braintree
@@ -138,18 +128,18 @@ public class AdminController
                     LOG.error( "Exception Caught " + e.getMessage() );
                     message = CommonConstants.ERROR;
                 }
-                
+
                 // Deleting company from MySQL
                 company.setStatus( CommonConstants.STATUS_COMPANY_DELETED );
                 organizationManagementService.updateCompany( company );
-	            try {
-		            organizationManagementService.purgeCompany( company );
-	            } catch ( InvalidInputException e ) {
-		            LOG.error( "An error occurred while purging company : " + companyId + ". Reason : ", e );
-	            } catch ( SolrException e ) {
-		            LOG.error( "An error occurred while purging company : " + companyId + ". Reason : ", e );
-	            }
-                
+                try {
+                    organizationManagementService.purgeCompany( company );
+                } catch ( InvalidInputException e ) {
+                    LOG.error( "An error occurred while purging company : " + companyId + ". Reason : ", e );
+                } catch ( SolrException e ) {
+                    LOG.error( "An error occurred while purging company : " + companyId + ". Reason : ", e );
+                }
+
                 // marking comapny to be deleted forcefully during purge batch
                 //organizationManagementService.forceDeleteDisabledAccount( company.getCompanyId(), loggedInUser.getUserId() );
             }
@@ -609,64 +599,6 @@ public class AdminController
     }
 
 
-    @RequestMapping ( value = "/downloadcompanyregistrationreport")
-    public void downloadCompanyRegistrationReport( HttpServletRequest request, HttpServletResponse response )
-    {
-
-        LOG.info( "Method called to download the company registration report" );
-
-        try {
-            Date startDate = null;
-            String startDateStr = request.getParameter( "startDate" );
-            if ( startDateStr != null && !startDateStr.isEmpty() ) {
-                try {
-                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
-                } catch ( ParseException e ) {
-                    throw new InvalidInputException(
-                        "ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e );
-                }
-            }
-
-            Date endDate = Calendar.getInstance().getTime();
-            String endDateStr = request.getParameter( "endDate" );
-            if ( endDateStr != null && !endDateStr.isEmpty() ) {
-                try {
-                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
-                } catch ( ParseException e ) {
-                    throw new InvalidInputException(
-                        "ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e );
-                }
-            }
-
-            List<Company> companyList = organizationManagementService.getCompaniesByDateRange( startDate, endDate );
-            String fileName = "Company_Registration_Report" + CommonConstants.EXCEL_FILE_EXTENSION;
-
-            XSSFWorkbook workbook = organizationManagementService.downloadCompanyReport( companyList, fileName );
-            response.setContentType( CommonConstants.EXCEL_FORMAT );
-            String headerKey = CommonConstants.CONTENT_DISPOSITION_HEADER;
-            String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
-            response.setHeader( headerKey, headerValue );
-
-            // write into file
-            OutputStream responseStream = null;
-            try {
-                responseStream = response.getOutputStream();
-                workbook.write( responseStream );
-            } catch ( IOException e ) {
-                throw new NonFatalException( "IOException caught in getIncompleteSurveyFile(). Nested exception is ", e );
-            } finally {
-                try {
-                    responseStream.close();
-                } catch ( IOException e ) {
-                    throw new NonFatalException( "IOException caught in getIncompleteSurveyFile(). Nested exception is ", e );
-                }
-            }
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception occured while downloading the company report , reason " + e.getMessage() );
-        }
-    }
-
-
     @RequestMapping ( value = "/showabusereports", method = RequestMethod.GET)
     public String showAbuseReports()
     {
@@ -730,8 +662,8 @@ public class AdminController
                     String serverBaseUrl = requestUtils.getRequestServerName( request );
                     socialManagementService.postToSocialMedia( surveyDetails.getAgentName(), user.getProfileUrl(),
                         surveyDetails.getCustomerFirstName(), surveyDetails.getCustomerLastName(), surveyDetails.getAgentId(),
-                        surveyDetails.getScore(), surveyDetails.get_id(), surveyDetails.getReview(), false,
-                        serverBaseUrl, false );
+                        surveyDetails.getScore(), surveyDetails.get_id(), surveyDetails.getReview(), false, serverBaseUrl,
+                        false );
                 }
             }
 
@@ -748,8 +680,6 @@ public class AdminController
         return JspResolver.MESSAGE_HEADER;
     }
 
-
-    
 
     @ResponseBody
     @RequestMapping ( value = "/createsocialsurveyadmin", method = RequestMethod.POST)
@@ -868,9 +798,8 @@ public class AdminController
             DisplayMessageType.SUCCESS_MESSAGE ) );
         return JspResolver.MESSAGE_HEADER;
     }
-    
-    
-    
+
+
     @RequestMapping ( value = "/generateaccesstoken", method = RequestMethod.GET)
     public @ResponseBody String generateAccessToken( Model model, HttpServletRequest request )
     {
@@ -880,7 +809,8 @@ public class AdminController
         long companyId;
 
         if ( companyIdStr == null || companyIdStr.isEmpty() ) {
-            return messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            return messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
 
 
@@ -888,15 +818,19 @@ public class AdminController
             companyId = Long.valueOf( companyIdStr );
         } catch ( NumberFormatException e ) {
             LOG.error( "Invalid Company Id " );
-            return messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            return messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
-            
+
         Company company = userManagementService.getCompanyById( companyId );
-        if(company == null ){
-            return messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        if ( company == null ) {
+            return messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
-        if(company.getStatus() != CommonConstants.STATUS_ACTIVE ){
-            return messageUtils.getDisplayMessage( DisplayMessageConstants.INACTIVE_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        if ( company.getStatus() != CommonConstants.STATUS_ACTIVE ) {
+            return messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INACTIVE_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage();
         }
 
         try {
@@ -905,29 +839,29 @@ public class AdminController
                 userApiKey = userManagementService.generateAndSaveUserApiKey( companyId );
             }
 
-            accessToken =  encryptionHelper.encryptAES( userApiKey.getApiKey() + ":" + userApiKey.getApiSecret(), "" );
+            accessToken = encryptionHelper.encryptAES( userApiKey.getApiKey() + ":" + userApiKey.getApiSecret(), "" );
         } catch ( InvalidInputException e ) {
-            return messageUtils.getDisplayMessage( DisplayMessageConstants.TRY_AGAIN, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.TRY_AGAIN, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage();
         }
 
         return accessToken;
     }
 
-    
+
     @RequestMapping ( value = "/getallcompanieswithapikeys", method = RequestMethod.GET)
     public @ResponseBody String getAllCompaniesWithApiKeys( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to get getAllCompaniesWithApiKeys() started." );
-      
+
         List<UserApiKey> userApiKeys = userManagementService.getActiveUserApiKeys();
-        LOG.info( "Method to get getAllCompaniesWithApiKeys() ended." );  
+        LOG.info( "Method to get getAllCompaniesWithApiKeys() ended." );
         return new Gson().toJson( userApiKeys );
     }
-    
-    
+
 
     @RequestMapping ( value = "/updateuserapikeystatus", method = RequestMethod.GET)
-    public  String updateUserApiKeyStatus( Model model, HttpServletRequest request )
+    public String updateUserApiKeyStatus( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to get updateUserApiKeyStatus() started." );
 
@@ -949,7 +883,7 @@ public class AdminController
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
-        
+
         model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.API_STATUS_UPDATE_SUCCESSFUL,
             DisplayMessageType.SUCCESS_MESSAGE ) );
         return JspResolver.MESSAGE_HEADER;

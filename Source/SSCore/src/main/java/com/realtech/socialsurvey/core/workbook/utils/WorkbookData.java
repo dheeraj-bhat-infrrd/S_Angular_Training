@@ -339,6 +339,11 @@ public class WorkbookData
                 } else {
                     surveyDetailsToPopulate.add( "" );
                 }
+                if ( survey.getSurveyResponse().size() < max ) {
+                    for ( int i = survey.getSurveyResponse().size() + 1; i <= max; i++ ) {
+                        surveyDetailsToPopulate.add( "" );
+                    }
+                }
                 surveyDetailsToPopulate.add( survey.getMood() );
                 surveyDetailsToPopulate.add( survey.getReview() );
                 if ( survey.getMood() != null && survey.getMood().equals( CommonConstants.SURVEY_MOOD_GREAT )

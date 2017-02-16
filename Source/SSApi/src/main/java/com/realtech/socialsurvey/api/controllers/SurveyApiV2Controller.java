@@ -168,6 +168,8 @@ public class SurveyApiV2Controller
         //authorize request
         String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         long companyId = 0;
+        SimpleDateFormat sdf = new SimpleDateFormat( CommonConstants.SURVEY_API_DATE_FORMAT );
+        sdf.setLenient(false);
         try {
             companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
         } catch ( AuthorizationException e1 ) {
@@ -178,16 +180,16 @@ public class SurveyApiV2Controller
         String countStr = request.getParameter( "count" );
         String startStr = request.getParameter( "start" );
         String status = request.getParameter( "status" );
-        String startSurveyIDStr = request.getParameter( "startSurveyID" );
-        String startReviewDateStr = request.getParameter( "startReviewDate" );
-        String startTransactionDateStr = request.getParameter( "startTransactionDate" );
+        String startSurveyIDStr = request.getParameter( "startSurveyId" );
+        String startReviewDateStr = request.getParameter( "startReviewDateTime" );
+        String startTransactionDateStr = request.getParameter( "startTransactionDateTime" );
         String state = request.getParameter( "state" );
         String userEmailAddress = request.getParameter( "user" );
         String includeManagedTeamStr = request.getParameter( "includeManagedTeam" );
 
         Set<String> inputRequestParameters = request.getParameterMap().keySet();
-        List<String> fixReqParameters = Arrays.asList( "count", "start", "status", "startSurveyID", "startReviewDate",
-            "startTransactionDate", "state", "user", "includeManagedTeam" );
+        List<String> fixReqParameters = Arrays.asList( "count", "start", "status", "startSurveyId", "startReviewDateTime",
+            "startTransactionDateTime", "state", "user", "includeManagedTeam" );
         for ( String currParameter : inputRequestParameters ) {
             if ( !fixReqParameters.contains( currParameter ) ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
@@ -226,23 +228,25 @@ public class SurveyApiV2Controller
                 request, companyId );
         }
 
-        List<String> validState = new ArrayList<String>();
-        validState.add( CommonConstants.SURVEY_MOOD_GREAT );
-        validState.add( CommonConstants.SURVEY_MOOD_OK );
-        validState.add( CommonConstants.SURVEY_MOOD_UNPLEASANT );
-
-        if ( state != null && !validState.contains( state ) ) {
-            return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter state is invalid", null, null,
-                request, companyId );
+        if ( state != null ) {
+            if ( CommonConstants.SURVEY_MOOD_GREAT.equalsIgnoreCase( state ) ) {
+                state = CommonConstants.SURVEY_MOOD_GREAT;
+            } else if ( CommonConstants.SURVEY_MOOD_OK.equalsIgnoreCase( state ) ) {
+                state = CommonConstants.SURVEY_MOOD_OK;
+            } else if ( CommonConstants.SURVEY_MOOD_UNPLEASANT.equalsIgnoreCase( state ) ) {
+                state = CommonConstants.SURVEY_MOOD_UNPLEASANT;
+            } else {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter state is invalid", null, null,
+                    request, companyId );
+            }
         }
-
 
         Long startSurveyID = null;
         if ( !StringUtils.isEmpty( startSurveyIDStr ) ) {
             try {
                 startSurveyID = Long.parseLong( startSurveyIDStr );
             } catch ( NumberFormatException e ) {
-                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter startReviewDate is invalid",
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter startSurveyID is invalid",
                     null, null, request, companyId );
             }
         }
@@ -250,10 +254,10 @@ public class SurveyApiV2Controller
         Date startReviewDate = null;
         if ( startReviewDateStr != null && !startReviewDateStr.isEmpty() ) {
             try {
-                startReviewDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startReviewDateStr );
+                startReviewDate = sdf.parse( startReviewDateStr );
             } catch ( ParseException e ) {
-                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter startReviewDate is invalid",
-                    null, null, request, companyId );
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Passed parameter startReviewDateTime is invalid", null, null, request, companyId );
             }
         }
 
@@ -261,10 +265,10 @@ public class SurveyApiV2Controller
         Date startTransactionDate = null;
         if ( startTransactionDateStr != null && !startTransactionDateStr.isEmpty() ) {
             try {
-                startTransactionDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startTransactionDateStr );
+                startTransactionDate = sdf.parse( startTransactionDateStr );
             } catch ( ParseException e ) {
-                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter startReviewDate is invalid",
-                    null, null, request, companyId );
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Passed parameter startTransactionDateTime is invalid", null, null, request, companyId );
             }
         }
 
@@ -290,7 +294,7 @@ public class SurveyApiV2Controller
         List<Long> userIds = null;
         if ( !StringUtils.isEmpty( userEmailAddress ) ) {
             try {
-                User user = userManagementService.getUserByEmail( userEmailAddress );
+                User user = userManagementService.getUserByEmailAndCompany(companyId, userEmailAddress);
                 userIds = new ArrayList<Long>();
                 userIds.add( user.getUserId() );
 
@@ -300,10 +304,13 @@ public class SurveyApiV2Controller
                     userIds.addAll( agentIds );
                 }
 
-            } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            } catch ( InvalidInputException e ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
                     "Passed parameter user " + userEmailAddress + " is invalid", null, null, request, companyId );
-            }
+            } catch (NoRecordsFetchedException e) {
+            	return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "User not registered or you do not have access to this account.",
+                        null, null, request , companyId  );
+			}
         }
 
         //get data from database

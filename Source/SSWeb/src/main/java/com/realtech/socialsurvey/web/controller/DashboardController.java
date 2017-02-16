@@ -24,7 +24,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
-import org.omg.CORBA.OMGVMCID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +73,6 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
@@ -117,9 +115,6 @@ public class DashboardController
 
     @Autowired
     private SurveyPreInitiationService surveyPreInitiationService;
-
-    @Autowired
-    private EmailFormatHelper emailFormatHelper;
 
     @Autowired
     BatchTrackerService batchTrackerService;
@@ -206,13 +201,13 @@ public class DashboardController
         model.addAttribute( "userId", user.getUserId() );
         model.addAttribute( "emailId", user.getEmailId() );
         model.addAttribute( "profileName", profileName );
-        
+
         //get detail of expire social media
         boolean isSocialMediaExpired = false;
-        if(organizationManagementService.getExpiredSocailMedia( entityType, entityId ).size() > 0){
-            isSocialMediaExpired = true;                            
+        if ( organizationManagementService.getExpiredSocailMedia( entityType, entityId ).size() > 0 ) {
+            isSocialMediaExpired = true;
         }
-        session.setAttribute( "isSocialMediaExpired" , isSocialMediaExpired );
+        session.setAttribute( "isSocialMediaExpired", isSocialMediaExpired );
 
         return JspResolver.DASHBOARD;
     }
@@ -235,6 +230,7 @@ public class DashboardController
         }
         return String.valueOf( hiddenSection );
     }
+
 
     /*
      * Method to get profile details for displaying
@@ -1090,11 +1086,11 @@ public class DashboardController
                 throw new InvalidInputException( "Invalid surveyPreInitiationIdStr passed", e.getMessage(), e );
             }
             SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurveyById( surveyPreInitiationId );
-          
-          if ( survey != null ) {
+
+            if ( survey != null ) {
                 surveyHandler.sendSurveyReminderEmail( survey );
-            }else{
-                new InvalidInputException( "Invalid surveyPreInitiationIdStr passed");
+            } else {
+                new InvalidInputException( "Invalid surveyPreInitiationIdStr passed" );
             }
 
             // Increasing value of reminder count by 1.
@@ -1511,6 +1507,98 @@ public class DashboardController
             LOG.error( "Non fatal exception caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
         }
         LOG.info( "Method getCustomerSurveyResultsFile() finished." );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/generatecustomersurveyresults")
+    public String generateCustomerSurveyResultsFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method to get file containg customer survey results generateCustomerSurveyResultsFile() started." );
+        User user = sessionHelper.getCurrentUser();
+        String message = "";
+
+        try {
+            boolean realTechAdmin = user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( user.getUserId() );
+
+            if ( !( realTechAdmin ) ) {
+                throw new UnsupportedOperationException( "User is not authorized to perform this action" );
+            }
+
+            String mailId = request.getParameter( "mailid" );
+
+            String columnName = request.getParameter( "columnName" );
+            if ( !realTechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
+                LOG.error( "Invalid value (null/empty) passed for profile level." );
+                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            }
+
+            Date startDate = null;
+            String startDateStr = request.getParameter( "startDate" );
+            if ( startDateStr != null && !startDateStr.isEmpty() ) {
+                try {
+                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
+                } catch ( ParseException e ) {
+                    LOG.error(
+                        "ParseException caught in generateCustomerSurveyResultsFile() while parsing startDate. Nested exception is ",
+                        e );
+                }
+            }
+
+            Date endDate = Calendar.getInstance().getTime();
+            String endDateStr = request.getParameter( "endDate" );
+            if ( endDateStr != null && !endDateStr.isEmpty() ) {
+                try {
+                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
+                } catch ( ParseException e ) {
+                    LOG.error(
+                        "ParseException caught in generateCustomerSurveyResultsFile() while parsing startDate. Nested exception is ",
+                        e );
+                }
+            }
+
+            String profileLevel = getProfileLevel( columnName );
+            long iden = 0;
+
+            if ( realTechAdmin ) {
+                String columnValue = request.getParameter( "columnValue" );
+                if ( columnValue != null && !columnValue.isEmpty() ) {
+                    try {
+                        iden = Long.parseLong( columnValue );
+                    } catch ( NumberFormatException e ) {
+                        LOG.error(
+                            "NumberFormatException caught while parsing columnValue in generateCustomerSurveyResultsFile(). Nested exception is ",
+                            e );
+                        throw e;
+                    }
+                }
+            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+                iden = user.getCompany().getCompanyId();
+            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+                iden = user.getUserId();
+            } else {
+                String columnValue = request.getParameter( "columnValue" );
+                if ( columnValue != null && !columnValue.isEmpty() ) {
+                    try {
+                        iden = Long.parseLong( columnValue );
+                    } catch ( NumberFormatException e ) {
+                        LOG.error(
+                            "NumberFormatException caught while parsing columnValue in generateCustomerSurveyResultsFile(). Nested exception is ",
+                            e );
+                        throw e;
+                    }
+                }
+            }
+
+            adminReport.createEntryInFileUploadForSurveyDataReport( mailId, startDate, endDate, iden, profileLevel,
+                user.getUserId(), user.getCompany() );
+            message = "The Survey Data Report will be mailed to you shortly";
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
+            message = "Error while generating survey data report request";
+        }
+        LOG.info( "Method getCustomerSurveyResultsFile() finished." );
+        return message;
     }
 
 
@@ -1967,8 +2055,7 @@ public class DashboardController
         return new Gson().toJson( stagesAndColumn );
     }
 
-    
-    
+
     @ResponseBody
     @RequestMapping ( value = "/socialmediatofix", method = RequestMethod.GET)
     public String socialMediaTofFix( HttpServletRequest request )
@@ -1984,7 +2071,7 @@ public class DashboardController
             if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 settings = organizationManagementService.getCompanySettings( user );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
-                settings =  organizationManagementService.getRegionSettings( columnValue );
+                settings = organizationManagementService.getRegionSettings( columnValue );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 settings = organizationManagementService.getBranchSettingsDefault( columnValue );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
@@ -1993,16 +2080,16 @@ public class DashboardController
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching badge details. Reason :" + e.getMessage(), e );
         }
-       
-        
+
+
         List<String> socialMedias = new ArrayList<String>();
         try {
             socialMedias = organizationManagementService.getExpiredSocailMedia( columnName, columnValue );
-        }catch ( InvalidInputException | NoRecordsFetchedException e ) {
+        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching badge details. Reason :" + e.getMessage(), e );
         }
-        
-        
+
+
         Map<String, Object> stagesAndColumn = new HashMap<>();
         stagesAndColumn.put( "columnName", columnName );
         stagesAndColumn.put( "columnValue", columnValue );
@@ -2011,9 +2098,7 @@ public class DashboardController
         LOG.info( "Method sendMultipleSurveyInvitations() finished from DashboardController." );
         return new Gson().toJson( stagesAndColumn );
     }
-    
-    
-    
+
 
     private String getProfileLevel( String columnName )
     {
@@ -2317,6 +2402,55 @@ public class DashboardController
             message = "Error while generating billing report request";
         }
         LOG.info( "Method to get billing report file getBillingReportFile() finished." );
+        return message;
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/downloadcompanyregistrationreport")
+    public String getCompanyRegistrationReport( HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method called to generate the company registration report" );
+        String message = "";
+        try {
+            User user = sessionHelper.getCurrentUser();
+            if ( !( user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) ) {
+                throw new UnsupportedOperationException( "User is not authorized to perform this action" );
+            }
+
+            Date startDate = null;
+            String startDateStr = request.getParameter( "startDate" );
+            if ( startDateStr != null && !startDateStr.isEmpty() ) {
+                try {
+                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
+                } catch ( ParseException e ) {
+                    throw new InvalidInputException(
+                        "ParseException caught in getCompanyRegistrationReport() while parsing startDate. Nested exception is ",
+                        e );
+                }
+            }
+
+            Date endDate = Calendar.getInstance().getTime();
+            String endDateStr = request.getParameter( "endDate" );
+            if ( endDateStr != null && !endDateStr.isEmpty() ) {
+                try {
+                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
+                } catch ( ParseException e ) {
+                    throw new InvalidInputException(
+                        "ParseException caught in getCompanyRegistrationReport() while parsing startDate. Nested exception is ",
+                        e );
+                }
+            }
+
+            String mailId = request.getParameter( "mailid" );
+
+            adminReport.createEntryInFileUploadForCompanyRegistrationReport( mailId, startDate, endDate );
+            message = "The Company Registration Report will be mailed to you shortly";
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonfatalException caught in getCompanyRegistrationReport(). Nested exception is ", e );
+            message = "Error while generating company registration report request";
+        }
+        LOG.info( "Method to get company registration report file getCompanyRegistrationReport() finished." );
         return message;
     }
 

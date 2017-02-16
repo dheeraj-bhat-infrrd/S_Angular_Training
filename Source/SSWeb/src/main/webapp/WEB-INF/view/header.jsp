@@ -200,7 +200,7 @@
 					<div class="header-links-item" onclick="showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></div>
 				</c:if>
 				<c:if test="${ not empty realTechAdminId }">
-					<div id="vndsta-setting-one" class="header-links-item hide" onclick="showMainContent('./showreviewsmonitorsettings.do')"><spring:message code="label.vendastaproductsettings.key" /></div>
+					<div id="vndsta-setting-one" class="header-links-item hide" onclick="showMainContent('./showlistingsmanagersettings.do')"><spring:message code="label.vendastaproductsettings.key" /></div>
 				</c:if>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
@@ -214,8 +214,8 @@
 				</c:if>
 				<c:if test="${ highestrole == 1 }">
 					<div class="header-links-item" onclick="showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></div>
-					<div id="reviews-monitor-slider" class="hide">
-					<div class="header-links-item" onclick="showMainContent('./showreviewsmonitorpage.do')"><spring:message code="label.reviewsmonitor.key" /></div>
+					<div id="listings-manager-slider" class="hide">
+					<div class="header-links-item" onclick="showMainContent('./showlistingsmanagerpage.do')"><spring:message code="label.listingsmanager.key" /></div>
 					</div>					
 				</c:if>
 				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
@@ -286,7 +286,7 @@
 								</div>
 							</c:if>
 							<c:if test="${ not empty realTechAdminId }">
-								<div id="vndsta-setting-two" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showreviewsmonitorsettings.do');">
+								<div id="vndsta-setting-two" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showlistingsmanagersettings.do');">
 									<spring:message code="label.vendastaproductsettings.key" />
 								</div>
 							</c:if>
@@ -320,7 +320,7 @@
 								</div>
 							</c:if>
 							<c:if test="${ not empty realTechAdminId }">
-								<div id="vndsta-setting-three" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showreviewsmonitorsettings.do');">
+								<div id="vndsta-setting-three" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showlistingsmanagersettings.do');">
 									<spring:message code="label.vendastaproductsettings.key" />
 								</div>
 							</c:if>
@@ -331,14 +331,14 @@
 				<c:if test="${ highestrole == 1 }">
 					<div id="hdr-link-item-sm" class="hdr-link-item hdr-link-item-sm pos-relative">
 						<a href="javascript:showMainContent('./showsocialmonitortpage.do')" onclick="showOverlay();"><spring:message code="label.socialmonitor.key" /></a>
-						<div id="reviews-monitor-main" class="hide">
+						<div id="listings-manager-main" class="hide">
 							<div id="hdr-sm-settings-dropdown" class="hdr-link-item-dropdown-icn-sm"></div>
 							<div id="hdr-link-item-dropdown-sm" class="hdr-link-item-dropdown-sm hide">
 								<div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showsocialmonitortpage.do');">
 									<spring:message code="label.socialmonitor.key" />
 								</div>
-								<div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showreviewsmonitorpage.do');">
-									<spring:message code="label.reviewsmonitor.key" />
+								<div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showlistingsmanagerpage.do');">
+									<spring:message code="label.listingsmanager.key" />
 								</div>
 							</div>
 						</div>

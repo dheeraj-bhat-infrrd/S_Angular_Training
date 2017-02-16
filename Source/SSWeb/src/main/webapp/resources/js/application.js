@@ -395,7 +395,6 @@ function retakeSurveyReminderMail(element) {
 		$('#overlay-toast').html('Mail sent to ' + firstName + ' ' + ' to retake the survey for you.');
 		showToast();
 		$('#overlay-cancel').click();
-		$(element).parent().parent().parent().parent().remove();
 		getIncompleteSurveyCount(colName, colValue);
 	}, payload, true);
 }
@@ -1850,7 +1849,7 @@ $(document).on('click', '.da-dd-item', function(e) {
 		showMainContent('./' + selectedTab + '.do');
 		callAjaxGetWithPayloadData("/isvendastaaccessibleforthesession.do", function(data) {
 			vendastaAccess = JSON.parse(data);
-			showOrHideReviewsMonitor( vendastaAccess );
+			showOrHideListingsManager( vendastaAccess );
 			showOrHideVendastaProductSettings( vendastaAccess );
 		});
 	});
@@ -1866,6 +1865,26 @@ function setUpListenerForSortCriteriaDropdown(){
 				var message = JSON.parse(data);
 				if (message.type != "ERROR_MESSAGE") {
 					$('#overlay-toast').html(message.message + ' to ' + $("#sort-criteria-sel").find(":selected").attr('data-sort'));
+					showToast();
+				}
+				else {
+					$('#overlay-toast').html(message.message);
+					showToast();
+				}
+			}, payload, false);
+	});
+}
+
+function setUpListenerForEmailOptionDropdown(){
+	$("#email-sel").on('change',function(event){
+		var payload = {
+			"sendEmailThrough" : $("#email-sel").val()
+		};
+		
+		callAjaxPostWithPayloadData( "./updatesendemailthrough.do", function(data){
+				var message = JSON.parse(data);
+				if (message.type != "ERROR_MESSAGE") {
+					$('#overlay-toast').html(message.message + ' to ' + $("#email-sel").find(":selected").attr('email-option'));
 					showToast();
 				}
 				else {
@@ -8720,8 +8739,12 @@ function bindDatePickerforIndividualSurveyDownload() {
 		clearBtn : true,
 		autoclose : true
 	}).on('changeDate', function(selected) {
-		startDate = new Date(selected.date.valueOf());
-		startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		if(selected.date != undefined){
+			startDate = new Date(selected.date.valueOf());
+			startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		}else{
+			startDate = null;
+		}
 		$('#indv-dsh-end-date').datepicker('setStartDate', startDate);
 	});
 
@@ -8733,8 +8756,12 @@ function bindDatePickerforIndividualSurveyDownload() {
 		clearBtn : true,
 		autoclose : true
 	}).on('changeDate', function(selected) {
-		fromEndDate = new Date(selected.date.valueOf());
-		fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+		if(selected.date != undefined){
+			fromEndDate = new Date(selected.date.valueOf());
+			fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+		}else{
+			fromEndDate = null;
+		}
 		$('#indv-dsh-start-date').datepicker('setEndDate', fromEndDate);
 	});
 }
@@ -9849,27 +9876,27 @@ $('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
 $('body').on('click', '#vndsta-access-chk-box', function() {
 	if ($('#vndsta-access-chk-box').hasClass('bd-check-img-checked')) {
 		$('#vndsta-access-chk-box').removeClass('bd-check-img-checked');
-		showOrHideReviewsMonitor( true );
+		showOrHideListingsManager( true );
 		showOrHideVendastaProductSettings( true );
 		updateVendastaAccessSetting(true, '#vndsta-access-chk-box');
 	} else {
 		$('#vndsta-access-chk-box').addClass('bd-check-img-checked');
-		showOrHideReviewsMonitor( false );
+		showOrHideListingsManager( false );
 		showOrHideVendastaProductSettings( false );
 		updateVendastaAccessSetting(false, '#vndsta-access-chk-box');
 	}
 });
 
-function showOrHideReviewsMonitor(vendastaAccess)
+function showOrHideListingsManager(vendastaAccess)
 {
 	if( vendastaAccess == true || vendastaAccess == "true" )
 		{
-		$("#reviews-monitor-main").show();
-		$("#reviews-monitor-slider").show();
+		$("#listings-manager-main").show();
+		$("#listings-manager-slider").show();
 		}
 	else{
-		$("#reviews-monitor-main").hide();
-		$("#reviews-monitor-slider").hide();
+		$("#listings-manager-main").hide();
+		$("#listings-manager-slider").hide();
 	}
 }
 
