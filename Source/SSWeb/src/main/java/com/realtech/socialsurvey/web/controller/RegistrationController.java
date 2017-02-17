@@ -669,8 +669,8 @@ public class RegistrationController
             params.put( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID, URLEncoder.encode( creatorEmailId, "UTF-8" ) );
             params.put( CommonConstants.API_KEY_FROM_URL, apiKey );
             params.put( CommonConstants.COMPANY_ID, String.valueOf(key.getCompanyId() ));
-            
-            
+
+
             String url = urlGenerator.generateUrl( params, applicationBaseUrl + CommonConstants.MANUAL_REGISTRATION );
             emailServices.sendManualRegistrationLink( emailId, firstName, lastName, url );
             result = "Invitation sent successfully";
