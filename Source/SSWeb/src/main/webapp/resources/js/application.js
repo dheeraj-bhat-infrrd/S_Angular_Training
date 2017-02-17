@@ -8336,7 +8336,11 @@ $(document).on('click', '#dsh-dwnld-report-btn', function() {
 		window.location.href = "/downloadagentrankingreport.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	case 2:
-		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
+		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./generatecustomersurveyresults.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, payload, true);
 		break;
 	case 3:
 		window.location.href = "/downloaddashboardsocialmonitor.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;

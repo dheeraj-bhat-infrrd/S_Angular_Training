@@ -1521,11 +1521,10 @@ public class DashboardController
         try {
             boolean realTechAdmin = user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( user.getUserId() );
 
-            if ( !( realTechAdmin ) ) {
-                throw new UnsupportedOperationException( "User is not authorized to perform this action" );
-            }
-
             String mailId = request.getParameter( "mailid" );
+            if ( !realTechAdmin && ( mailId == null || mailId.isEmpty() ) ) {
+                mailId = user.getEmailId();
+            }
 
             String columnName = request.getParameter( "columnName" );
             if ( !realTechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
