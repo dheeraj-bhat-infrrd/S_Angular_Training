@@ -641,9 +641,9 @@ public class RegistrationController
             }
 
             if ( firstName == null || firstName.isEmpty() ) {
-                return "please enter a valid first name";
+                return "Please enter a valid first name.";
             } else if ( customerEmailId == null || customerEmailId.isEmpty() ) {
-                return "please enter a valid customer Email ID";
+                return "Please enter a valid customer email address.";
             }
 
             String apiKey = key.getApiKey();
@@ -651,9 +651,10 @@ public class RegistrationController
 
             //check if customer exists
             if ( userManagementService.userExists( customerEmailId ) ) {
-                return "Customer Already Exists";
+                return "Customer with email address " + customerEmailId + " already exists";
             }
-
+            
+            
 
             // generating the url
             Map<String, String> params = new HashMap<String, String>();
@@ -667,10 +668,12 @@ public class RegistrationController
             params.put( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID, URLEncoder.encode( creatorEmailId, "UTF-8" ) );
             params.put( CommonConstants.API_KEY_FROM_URL, apiKey );
             params.put( CommonConstants.COMPANY_ID, String.valueOf( key.getCompanyId() ) );
-
-
             String url = urlGenerator.generateUrl( params, applicationBaseUrl + CommonConstants.MANUAL_REGISTRATION );
-            emailServices.sendManualRegistrationLink( customerEmailId, firstName, lastName, url, specifiedEmailId );
+            if( specifiedEmailId != null && !specifiedEmailId.isEmpty() ){
+                emailServices.sendManualRegistrationLink( specifiedEmailId, firstName, lastName, url );
+            } else {
+                emailServices.sendManualRegistrationLink( customerEmailId, firstName, lastName, url );
+            }
             result = "Invitation sent successfully";
         } catch ( InvalidInputException | UndeliveredEmailException | UnsupportedEncodingException e ) {
             LOG.error( "Exception caught while sending mail to generating registration url", e );

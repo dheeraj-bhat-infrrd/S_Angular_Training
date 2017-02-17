@@ -1389,17 +1389,16 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendManualRegistrationLink( String customerEmailId, String customerFirstName, String customerLastName, String link, String senderEmailId )
+    public void sendManualRegistrationLink( String recipientEmailId, String firstName, String lastName, String link )
         throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Sending manual registration link for " + customerFirstName );
-        String recipientEmailId = ( senderEmailId == null || senderEmailId.isEmpty() ) ? customerEmailId : senderEmailId;
+        LOG.info( "Sending manual registration link for " + recipientEmailId );
 
         if ( recipientEmailId == null || recipientEmailId.isEmpty() ) {
             LOG.error( "Recipient id is not present" );
             throw new InvalidInputException( "Recipient id is not present" );
         }
-        if ( customerFirstName == null || customerFirstName.isEmpty() ) {
+        if ( firstName == null || firstName.isEmpty() ) {
             LOG.error( "firstName is not present" );
             throw new InvalidInputException( "firstName id is not present" );
         }
@@ -1418,19 +1417,14 @@ public class EmailServicesImpl implements EmailServices
             + EmailTemplateConstants.MANUAL_REGISTRATION_MAIL_SUBJECT;
 
         // Preparing full name of the recipient
-        String customerFullName = customerFirstName;
-        if ( customerLastName != null && !customerLastName.isEmpty() ) {
-            customerFullName = customerFirstName + " " + customerLastName;
+        String fullName = firstName;
+        if ( lastName != null && !lastName.isEmpty() ) {
+            fullName = firstName + " " + lastName;
         }
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName(
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.MANUAL_REGISTRATION_MAIL_BODY );
-         
-        if ( senderEmailId != null && !senderEmailId.isEmpty() ) {
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, senderEmailId, customerFullName, link, link, link ) );
-        } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerFullName, customerFullName, link, link, link ) );
-        }
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, fullName, fullName, link, link, link ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );

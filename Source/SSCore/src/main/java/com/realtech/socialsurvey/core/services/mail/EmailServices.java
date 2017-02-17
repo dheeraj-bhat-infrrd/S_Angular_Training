@@ -263,15 +263,14 @@ public interface EmailServices
     /**
      * Sends manual registration link
      * 
-     * @param customerEmailId
-     * @param customerFirstName
-     * @param customerLastName
+     * @param recipientMailId
+     * @param firstName
+     * @param lastName
      * @param link
-     * @param senderEmailId TODO
      * @throws InvalidInputException
      * @throws UndeliveredEmailException
      */
-    public void sendManualRegistrationLink( String customerEmailId, String customerFirstName, String customerLastName, String link, String senderEmailId )
+    public void sendManualRegistrationLink( String recipientMailId, String firstName, String lastName, String link )
         throws InvalidInputException, UndeliveredEmailException;
 
 
