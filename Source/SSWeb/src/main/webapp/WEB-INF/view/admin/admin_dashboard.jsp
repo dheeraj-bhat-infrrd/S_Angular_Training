@@ -20,7 +20,7 @@
 					<input id="dsh-company-report-mail-id" class="dash-sel-item" type="text" placeholder='<spring:message code="label.username.key"/>' >
 				</div>
 				<div class="dwnl-bnt-col float-right clear-both-sm">
-					<div id="dsh-ind-rep-bnt" class="float-right dash-btn-dl-sd btn-wid-sm">
+					<div class="float-right dash-btn-dl-sd btn-wid-sm">
 						<div class="dsh-dwnld-btn float-left cursor-pointer" onclick="downloadCompanyReport()">Generate Report</div>
 						<input id="comp-start-date" data-date-type="startDate"
 							class="dsh-date-picker picker-sm" placeholder="Start Date"> <span>-</span>
@@ -162,7 +162,7 @@
 					<input id="dsh-survey-report-mail-id" class="dash-sel-item" type="text" placeholder='<spring:message code="label.username.key"/>' >
 				</div>
 				<div class="dwnl-bnt-col float-right clear-both-sm">
-					<div id="dsh-ind-rep-bnt" class="float-right dash-btn-dl-sd btn-wid-sm">
+					<div class="float-right dash-btn-dl-sd btn-wid-sm">
 						<div id="dsh-ind-report-dwn-btn" class="dsh-dwnld-btn float-left cursor-pointer"><spring:message code="label.downloadsurveydata.key" /></div>
 						<input id="indv-dsh-start-date" data-date-type="startDate"
 							class="dsh-date-picker picker-sm" placeholder="Start Date"> <span>-</span>
