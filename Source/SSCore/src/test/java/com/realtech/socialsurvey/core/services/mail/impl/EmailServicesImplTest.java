@@ -1015,42 +1015,42 @@ public class EmailServicesImplTest
     @Test ( expected = InvalidInputException.class)
     public void sendManualRegistrationLinkTestRecipientIDNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendManualRegistrationLink( null, "test", "test", "test" );
+        emailServicesImpl.sendManualRegistrationLink( null, "test", "test", "test", null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendManualRegistrationLinkTestRecipientIDEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendManualRegistrationLink( "", "test", "test", "test" );
+        emailServicesImpl.sendManualRegistrationLink( "", "test", "test", "test", null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendManualRegistrationLinkTestFirstNameNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendManualRegistrationLink( "test", null, "test", "test" );
+        emailServicesImpl.sendManualRegistrationLink( "test", null, "test", "test", null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendManualRegistrationLinkTestFirstNameEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendManualRegistrationLink( "test", "", "test", "test" );
+        emailServicesImpl.sendManualRegistrationLink( "test", "", "test", "test", null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendManualRegistrationLinkTestLinkNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendManualRegistrationLink( "test", "test", "test", null );
+        emailServicesImpl.sendManualRegistrationLink( "test", "test", "test", null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendManualRegistrationLinkTestLinkEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendManualRegistrationLink( "test", "test", "test", "" );
+        emailServicesImpl.sendManualRegistrationLink( "test", "test", "test", "", null );
     }
 
 

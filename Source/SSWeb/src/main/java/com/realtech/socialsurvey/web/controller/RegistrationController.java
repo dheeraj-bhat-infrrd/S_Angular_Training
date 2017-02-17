@@ -631,8 +631,7 @@ public class RegistrationController
         @RequestParam ( "lastName") String lastName, @RequestParam ( "customer-emailId") String customerEmailId,
         @RequestParam ( "specified-emailId") String specifiedEmailId )
     {
-        String emailId = ( specifiedEmailId != null && !specifiedEmailId.isEmpty() )? specifiedEmailId : customerEmailId;
-        LOG.info( "Creating invitation url for " + firstName + " " + lastName + " and email " + emailId );
+        LOG.info( "Creating invitation url for " + firstName + " " + lastName + " and email " + customerEmailId );
         String result = null;
 
         try {
@@ -640,8 +639,21 @@ public class RegistrationController
             if ( key == null ) {
                 throw new InvalidInputException( "No active API key exists in the database!" );
             }
+
+            if ( firstName == null || firstName.isEmpty() ) {
+                return "please enter a valid first name";
+            } else if ( customerEmailId == null || customerEmailId.isEmpty() ) {
+                return "please enter a valid customer Email ID";
+            }
+
             String apiKey = key.getApiKey();
             String creatorEmailId = key.getApiSecret();
+
+            //check if customer exists
+            if ( userManagementService.userExists( customerEmailId ) ) {
+                return "Customer Already Exists";
+            }
+
 
             // generating the url
             Map<String, String> params = new HashMap<String, String>();
@@ -651,14 +663,14 @@ public class RegistrationController
             } else {
                 params.put( CommonConstants.LAST_NAME, URLEncoder.encode( "", "UTF-8" ) );
             }
-            params.put( CommonConstants.EMAIL_ID, URLEncoder.encode( emailId, "UTF-8" ) );
+            params.put( CommonConstants.EMAIL_ID, URLEncoder.encode( customerEmailId, "UTF-8" ) );
             params.put( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID, URLEncoder.encode( creatorEmailId, "UTF-8" ) );
             params.put( CommonConstants.API_KEY_FROM_URL, apiKey );
-            params.put( CommonConstants.COMPANY_ID, String.valueOf(key.getCompanyId() ));
+            params.put( CommonConstants.COMPANY_ID, String.valueOf( key.getCompanyId() ) );
 
 
             String url = urlGenerator.generateUrl( params, applicationBaseUrl + CommonConstants.MANUAL_REGISTRATION );
-            emailServices.sendManualRegistrationLink( emailId, firstName, lastName, url );
+            emailServices.sendManualRegistrationLink( customerEmailId, firstName, lastName, url, specifiedEmailId );
             result = "Invitation sent successfully";
         } catch ( InvalidInputException | UndeliveredEmailException | UnsupportedEncodingException e ) {
             LOG.error( "Exception caught while sending mail to generating registration url", e );

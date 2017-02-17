@@ -1389,15 +1389,17 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendManualRegistrationLink( String recipientId, String firstName, String lastName, String link )
+    public void sendManualRegistrationLink( String customerEmailId, String customerFirstName, String customerLastName, String link, String senderEmailId )
         throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Sending manual registration link to " + recipientId + " and name " + firstName );
-        if ( recipientId == null || recipientId.isEmpty() ) {
+        LOG.info( "Sending manual registration link for " + customerFirstName );
+        String recipientEmailId = ( senderEmailId == null || senderEmailId.isEmpty() ) ? customerEmailId : senderEmailId;
+
+        if ( recipientEmailId == null || recipientEmailId.isEmpty() ) {
             LOG.error( "Recipient id is not present" );
             throw new InvalidInputException( "Recipient id is not present" );
         }
-        if ( firstName == null || firstName.isEmpty() ) {
+        if ( customerFirstName == null || customerFirstName.isEmpty() ) {
             LOG.error( "firstName is not present" );
             throw new InvalidInputException( "firstName id is not present" );
         }
@@ -1405,25 +1407,30 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "link is not present" );
             throw new InvalidInputException( "link id is not present" );
         }
-
+        
         LOG.info( "Initiating URL Service to shorten the url " + link );
         link = urlService.shortenUrl( link );
         LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + link );
 
-        LOG.info( "Sending manual registration email to : " + recipientId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientId );
+        LOG.info( "Sending manual registration email to : " + recipientEmailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientEmailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.MANUAL_REGISTRATION_MAIL_SUBJECT;
 
         // Preparing full name of the recipient
-        String fullName = firstName;
-        if ( lastName != null && !lastName.isEmpty() ) {
-            fullName = firstName + " " + lastName;
+        String customerFullName = customerFirstName;
+        if ( customerLastName != null && !customerLastName.isEmpty() ) {
+            customerFullName = customerFirstName + " " + customerLastName;
         }
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName(
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.MANUAL_REGISTRATION_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, fullName, fullName, link, link, link ) );
+         
+        if ( senderEmailId != null && !senderEmailId.isEmpty() ) {
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, senderEmailId, customerFullName, link, link, link ) );
+        } else {
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerFullName, customerFullName, link, link, link ) );
+        }
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
