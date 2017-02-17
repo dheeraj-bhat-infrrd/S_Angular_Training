@@ -631,7 +631,8 @@ public class RegistrationController
         @RequestParam ( "lastName") String lastName, @RequestParam ( "customer-emailId") String customerEmailId,
         @RequestParam ( "specified-emailId") String specifiedEmailId )
     {
-        LOG.info( "Creating invitation url for " + firstName + " " + lastName + " and email " + customerEmailId );
+        String emailId = ( specifiedEmailId != null && !specifiedEmailId.isEmpty() )? specifiedEmailId : customerEmailId;
+        LOG.info( "Creating invitation url for " + firstName + " " + lastName + " and email " + emailId );
         String result = null;
 
         try {
@@ -667,13 +668,11 @@ public class RegistrationController
             params.put( CommonConstants.EMAIL_ID, URLEncoder.encode( customerEmailId, "UTF-8" ) );
             params.put( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID, URLEncoder.encode( creatorEmailId, "UTF-8" ) );
             params.put( CommonConstants.API_KEY_FROM_URL, apiKey );
-            params.put( CommonConstants.COMPANY_ID, String.valueOf( key.getCompanyId() ) );
+            params.put( CommonConstants.COMPANY_ID, String.valueOf(key.getCompanyId() ));
+            
+            
             String url = urlGenerator.generateUrl( params, applicationBaseUrl + CommonConstants.MANUAL_REGISTRATION );
-            if( specifiedEmailId != null && !specifiedEmailId.isEmpty() ){
-                emailServices.sendManualRegistrationLink( specifiedEmailId, firstName, lastName, url );
-            } else {
-                emailServices.sendManualRegistrationLink( customerEmailId, firstName, lastName, url );
-            }
+            emailServices.sendManualRegistrationLink( emailId, firstName, lastName, url );
             result = "Invitation sent successfully";
         } catch ( InvalidInputException | UndeliveredEmailException | UnsupportedEncodingException e ) {
             LOG.error( "Exception caught while sending mail to generating registration url", e );

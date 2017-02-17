@@ -1389,12 +1389,11 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendManualRegistrationLink( String recipientEmailId, String firstName, String lastName, String link )
+    public void sendManualRegistrationLink( String recipientId, String firstName, String lastName, String link )
         throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Sending manual registration link for " + recipientEmailId );
-
-        if ( recipientEmailId == null || recipientEmailId.isEmpty() ) {
+        LOG.info( "Sending manual registration link to " + recipientId + " and name " + firstName );
+        if ( recipientId == null || recipientId.isEmpty() ) {
             LOG.error( "Recipient id is not present" );
             throw new InvalidInputException( "Recipient id is not present" );
         }
@@ -1406,13 +1405,13 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "link is not present" );
             throw new InvalidInputException( "link id is not present" );
         }
-        
+
         LOG.info( "Initiating URL Service to shorten the url " + link );
         link = urlService.shortenUrl( link );
         LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + link );
 
-        LOG.info( "Sending manual registration email to : " + recipientEmailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientEmailId );
+        LOG.info( "Sending manual registration email to : " + recipientId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.MANUAL_REGISTRATION_MAIL_SUBJECT;
 
