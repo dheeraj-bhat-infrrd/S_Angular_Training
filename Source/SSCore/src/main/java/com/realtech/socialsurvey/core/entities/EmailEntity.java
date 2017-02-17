@@ -31,6 +31,7 @@ public class EmailEntity implements Serializable
     private String senderEmailId;
     private String senderName;
     private String senderPassword;
+    private String sendEmailThrough;
     
     private Map<String , String> attachmentDetail;
 
@@ -127,6 +128,17 @@ public class EmailEntity implements Serializable
     {
         this.senderPassword = senderPassword;
     }
+    
+    public String getSendEmailThrough()
+    {
+        return sendEmailThrough;
+    }
+    
+    public void setSendEmailThrough ( String sendEmailThrough )
+    {
+        this.sendEmailThrough = sendEmailThrough;
+    }
+
 
 
     @Override
