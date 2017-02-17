@@ -640,8 +640,22 @@ public class RegistrationController
             if ( key == null ) {
                 throw new InvalidInputException( "No active API key exists in the database!" );
             }
+
+            if ( firstName == null || firstName.isEmpty() ) {
+                return "Please enter a valid first name.";
+            } else if ( customerEmailId == null || customerEmailId.isEmpty() ) {
+                return "Please enter a valid customer email address.";
+            }
+
             String apiKey = key.getApiKey();
             String creatorEmailId = key.getApiSecret();
+
+            //check if customer exists
+            if ( userManagementService.userExists( customerEmailId ) ) {
+                return "Customer with email address " + customerEmailId + " already exists";
+            }
+            
+            
 
             // generating the url
             Map<String, String> params = new HashMap<String, String>();
@@ -651,7 +665,7 @@ public class RegistrationController
             } else {
                 params.put( CommonConstants.LAST_NAME, URLEncoder.encode( "", "UTF-8" ) );
             }
-            params.put( CommonConstants.EMAIL_ID, URLEncoder.encode( emailId, "UTF-8" ) );
+            params.put( CommonConstants.EMAIL_ID, URLEncoder.encode( customerEmailId, "UTF-8" ) );
             params.put( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID, URLEncoder.encode( creatorEmailId, "UTF-8" ) );
             params.put( CommonConstants.API_KEY_FROM_URL, apiKey );
             params.put( CommonConstants.COMPANY_ID, String.valueOf(key.getCompanyId() ));
