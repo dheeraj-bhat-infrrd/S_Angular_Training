@@ -8016,6 +8016,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Updated the sendemailthrough successfully" );
     }
+    
     //END JIRA SS-975
 }
 // JIRA: SS-27: By RM05: EOC

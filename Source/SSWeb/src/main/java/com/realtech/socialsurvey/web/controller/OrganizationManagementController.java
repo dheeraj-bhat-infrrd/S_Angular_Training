@@ -3584,7 +3584,7 @@ public class OrganizationManagementController
                             DisplayMessageType.ERROR_MESSAGE );
                     }
                 } catch ( InvalidInputException error ) {
-                    LOG.error( "unable to update sort criteria, company doesnt exist" );
+                    LOG.error( "unable to update email criteria, company doesnt exist" );
                     message = messageUtils.getDisplayMessage( error.getErrorCode(), DisplayMessageType.ERROR_MESSAGE );
                 }
 
@@ -3594,7 +3594,7 @@ public class OrganizationManagementController
             message = messageUtils.getDisplayMessage( ( (NonFatalException) globalError ).getErrorCode(),
                 DisplayMessageType.ERROR_MESSAGE );
         }
-        LOG.info( "Method UpdateSortCriteria of OrganizationManagementController finished" );
+        LOG.info( "Method updateSendEmailThrough of OrganizationManagementController finished" );
         return new Gson().toJson( message );
     }
 }

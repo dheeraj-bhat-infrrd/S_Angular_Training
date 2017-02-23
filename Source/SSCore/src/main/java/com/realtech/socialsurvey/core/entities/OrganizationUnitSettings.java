@@ -619,7 +619,6 @@ public class OrganizationUnitSettings
         this.sendEmailThrough = sendEmailThrough;
     }
 
-
     @Override
     public String toString()
     {
