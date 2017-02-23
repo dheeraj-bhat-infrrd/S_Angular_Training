@@ -159,5 +159,25 @@ public interface DashboardService
     public void generateSurveyDataReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel, long profileValue,
         long userId, long companyId, String recipientMailId, String recipientName )
         throws InvalidInputException, IOException, UndeliveredEmailException;
+
+
+    public void generateUserRankingReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel,
+        long profileValue, long adminUserId, long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, IOException, UndeliveredEmailException;
+
+
+    public void generateSocialMonitorReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel,
+        long profileValue, long adminUserId, long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+
+
+    public void generateIncompleteSurveyReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel,
+        long profileValue, long adminUserId, long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, IOException, UndeliveredEmailException;
+
+
+    public void generateUserAdoptionReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel,
+        long profileValue, long adminUserId, long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, IOException, UndeliveredEmailException;
 }
 // JIRA SS-137 BY RM05:EOC

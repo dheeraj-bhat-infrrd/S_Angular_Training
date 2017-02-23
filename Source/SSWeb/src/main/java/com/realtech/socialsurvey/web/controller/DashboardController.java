@@ -38,14 +38,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
@@ -1392,124 +1390,6 @@ public class DashboardController
     }
 
 
-    /*
-     * Method to download file containing incomplete surveys
-     */
-    @RequestMapping ( value = "/downloadcustomersurveyresults")
-    public void getCustomerSurveyResultsFile( Model model, HttpServletRequest request, HttpServletResponse response )
-    {
-        LOG.info( "Method to get file containg customer survey results getCustomerSurveyResultsFile() started." );
-        User user = sessionHelper.getCurrentUser();
-        boolean realTechAdmin = user.isSuperAdmin();
-        boolean fetchAbusive = false;
-        List<SurveyDetails> surveyDetails = new ArrayList<>();
-
-        try {
-            String columnName = request.getParameter( "columnName" );
-            if ( !realTechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
-            }
-
-            Date startDate = null;
-            String startDateStr = request.getParameter( "startDate" );
-            if ( startDateStr != null && !startDateStr.isEmpty() ) {
-                try {
-                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error(
-                        "ParseException caught in getCustomerSurveyResultsFile() while parsing startDate. Nested exception is ",
-                        e );
-                }
-            }
-
-            Date endDate = Calendar.getInstance().getTime();
-            String endDateStr = request.getParameter( "endDate" );
-            if ( endDateStr != null && !endDateStr.isEmpty() ) {
-                try {
-                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error(
-                        "ParseException caught in getCustomerSurveyResultsFile() while parsing startDate. Nested exception is ",
-                        e );
-                }
-            }
-
-            String profileLevel = getProfileLevel( columnName );
-            long iden = 0;
-
-            if ( realTechAdmin ) {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue != null && !columnValue.isEmpty() ) {
-                    try {
-                        iden = Long.parseLong( columnValue );
-                    } catch ( NumberFormatException e ) {
-                        LOG.error(
-                            "NumberFormatException caught while parsing columnValue in getCustomerSurveyResultsFile(). Nested exception is ",
-                            e );
-                        throw e;
-                    }
-                }
-            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
-                iden = user.getCompany().getCompanyId();
-            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
-                iden = user.getUserId();
-            } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue != null && !columnValue.isEmpty() ) {
-                    try {
-                        iden = Long.parseLong( columnValue );
-                    } catch ( NumberFormatException e ) {
-                        LOG.error(
-                            "NumberFormatException caught while parsing columnValue in getCustomerSurveyResultsFile(). Nested exception is ",
-                            e );
-                        throw e;
-                    }
-                }
-            }
-
-            try {
-                Date date = new Date();
-                long companyId = user.getCompany().getCompanyId();
-                surveyDetails = profileManagementService.getReviewsForReports( iden, -1, -1, -1, -1, profileLevel, fetchAbusive,
-                    startDate, endDate, null );
-                String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
-                    + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
-                XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData( surveyDetails, fileName,
-                    profileLevel, companyId );
-                response.setContentType( EXCEL_FORMAT );
-                String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
-                response.setHeader( headerKey, headerValue );
-
-                // write into file
-                OutputStream responseStream = null;
-                try {
-                    responseStream = response.getOutputStream();
-                    workbook.write( responseStream );
-                } catch ( IOException e ) {
-                    LOG.error( "IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
-                } finally {
-                    try {
-                        responseStream.close();
-                    } catch ( IOException e ) {
-                        LOG.error( "IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
-                    }
-                }
-                response.flushBuffer();
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
-                throw e;
-            } catch ( IOException e ) {
-                LOG.error( "IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
-            }
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
-        }
-        LOG.info( "Method getCustomerSurveyResultsFile() finished." );
-    }
-
-
     @ResponseBody
     @RequestMapping ( value = "/generatecustomersurveyresults")
     public String generateCustomerSurveyResultsFile( Model model, HttpServletRequest request, HttpServletResponse response )
@@ -1517,17 +1397,21 @@ public class DashboardController
         LOG.info( "Method to get file containg customer survey results generateCustomerSurveyResultsFile() started." );
         User user = sessionHelper.getCurrentUser();
         String message = "";
-
+        boolean isRealTechOrSSAdmin = false;
+        HttpSession session = request.getSession( false );
         try {
-            boolean realTechAdmin = user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( user.getUserId() );
-
+            Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            if ( adminUserid != null || user.isSuperAdmin()
+                || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) {
+                isRealTechOrSSAdmin = true;
+            }
             String mailId = request.getParameter( "mailid" );
-            if ( !realTechAdmin && ( mailId == null || mailId.isEmpty() ) ) {
+            if ( !isRealTechOrSSAdmin && ( mailId == null || mailId.isEmpty() ) ) {
                 mailId = user.getEmailId();
             }
 
             String columnName = request.getParameter( "columnName" );
-            if ( !realTechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
+            if ( !isRealTechOrSSAdmin && ( columnName == null || columnName.isEmpty() ) ) {
                 LOG.error( "Invalid value (null/empty) passed for profile level." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
             }
@@ -1559,7 +1443,7 @@ public class DashboardController
             String profileLevel = getProfileLevel( columnName );
             long iden = 0;
 
-            if ( realTechAdmin ) {
+            if ( isRealTechOrSSAdmin ) {
                 String columnValue = request.getParameter( "columnValue" );
                 if ( columnValue != null && !columnValue.isEmpty() ) {
                     try {
@@ -1601,20 +1485,28 @@ public class DashboardController
     }
 
 
-    /*
-     * Method to download file containing incomplete surveys
-     */
     @RequestMapping ( value = "/downloaddashboardsocialmonitor")
-    public void getSocialMonitorFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    @ResponseBody
+    public String getSocialMonitorFile( Model model, HttpServletRequest request, HttpServletResponse response )
     {
         LOG.info( "Method to get file containg Social Monitors list getSocialMonitorFile() started." );
         User user = sessionHelper.getCurrentUser();
-        boolean realTechAdmin = user.isSuperAdmin();
-        List<SocialPost> socialPosts = new ArrayList<>();
-
+        String message = null;
         try {
+            boolean isRealTechOrSSAdmin = false;
+            HttpSession session = request.getSession( false );
+            Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            if ( adminUserid != null || user.isSuperAdmin()
+                || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) {
+                isRealTechOrSSAdmin = true;
+            }
+            String mailId = null;
+            if ( !isRealTechOrSSAdmin ) {
+                mailId = user.getEmailId();
+            }
+
             String columnName = request.getParameter( "columnName" );
-            if ( !realTechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
+            if ( !isRealTechOrSSAdmin && ( columnName == null || columnName.isEmpty() ) ) {
                 LOG.error( "Invalid value (null/empty) passed for profile level." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
             }
@@ -1643,10 +1535,6 @@ public class DashboardController
 
             String profileLevel = getProfileLevel( columnName );
             long iden = 0;
-
-            if ( realTechAdmin ) {
-                profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
-            }
 
             if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
                 iden = user.getCompany().getCompanyId();
@@ -1659,50 +1547,22 @@ public class DashboardController
                         iden = Long.parseLong( columnValue );
                     } catch ( NumberFormatException e ) {
                         LOG.error(
-                            "NumberFormatExcept;ion caught while parsing columnValue in getSocialMonitorFile(). Nested exception is ",
+                            "NumberFormatException caught while parsing columnValue in getSocialMonitorFile(). Nested exception is ",
                             e );
                         throw e;
                     }
                 }
             }
+            adminReport.createEntryInFileUploadForSocialMonitorReport( mailId, startDate, endDate, iden, profileLevel,
+                user.getUserId(), user.getCompany() );
+            message = "The Social Monitor Report will be mailed to you shortly";
 
-            try {
-                Date date = new Date();
-                socialPosts = profileManagementService.getCumulativeSocialPosts( iden, columnName, -1, -1, profileLevel,
-                    startDate, endDate );
-                String fileName = "Social_Monitor-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
-                    + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
-                XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData( socialPosts, fileName );
-                response.setContentType( EXCEL_FORMAT );
-                String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
-                response.setHeader( headerKey, headerValue );
-
-                // write into file
-                OutputStream responseStream = null;
-                try {
-                    responseStream = response.getOutputStream();
-                    workbook.write( responseStream );
-                } catch ( IOException e ) {
-                    LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
-                } finally {
-                    try {
-                        responseStream.close();
-                    } catch ( IOException e ) {
-                        LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
-                    }
-                }
-                response.flushBuffer();
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException caught in getSocialMonitorFile(). Nested exception is ", e );
-                throw e;
-            } catch ( IOException e ) {
-                LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
-            }
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getSocialMonitorFile(). Nested exception is ", e );
+            message = "Error while generating social monitor report request";
         }
         LOG.info( "Method getSocialMonitorFile() finished." );
+        return message;
     }
 
 
@@ -1710,16 +1570,26 @@ public class DashboardController
      * Method to download file agent ranking report
      */
     @RequestMapping ( value = "/downloadagentrankingreport")
-    public void getAgentRankingFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    @ResponseBody
+    public String getAgentRankingFile( Model model, HttpServletRequest request, HttpServletResponse response )
     {
         LOG.info( "Method to get file containg Agent's data getAgentSurveyFile() started." );
         User user = sessionHelper.getCurrentUser();
-        List<AgentRankingReport> agentRanking = new ArrayList<>();
-        boolean realtechAdmin = user.isSuperAdmin();
-
+        String message = null;
         try {
+            boolean isRealTechOrSSAdmin = false;
+            HttpSession session = request.getSession( false );
+            Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            if ( adminUserid != null || user.isSuperAdmin()
+                || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) {
+                isRealTechOrSSAdmin = true;
+            }
+            String mailId = null;
+            if ( !isRealTechOrSSAdmin ) {
+                mailId = user.getEmailId();
+            }
             String columnName = request.getParameter( "columnName" );
-            if ( !realtechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
+            if ( !isRealTechOrSSAdmin && ( columnName == null || columnName.isEmpty() ) ) {
                 LOG.error( "Invalid value (null/empty) passed for profile level." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
             }
@@ -1749,9 +1619,6 @@ public class DashboardController
             String profileLevel = getProfileLevel( columnName );
             long iden = 0;
 
-            if ( realtechAdmin ) {
-                profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
-            }
             if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
                 iden = user.getCompany().getCompanyId();
             } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
@@ -1769,43 +1636,15 @@ public class DashboardController
                     }
                 }
             }
-
-            try {
-                Date date = new Date();
-                agentRanking = profileManagementService.getAgentReport( iden, columnName, startDate, endDate, null );
-                String fileName = "User_Ranking_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName()
-                    + "-" + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
-                XSSFWorkbook workbook = dashboardService.downloadAgentRankingData( agentRanking, fileName );
-                response.setContentType( EXCEL_FORMAT );
-                String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
-                response.setHeader( headerKey, headerValue );
-
-                // write into file
-                OutputStream responseStream = null;
-                try {
-                    responseStream = response.getOutputStream();
-                    workbook.write( responseStream );
-                } catch ( IOException e ) {
-                    LOG.error( "IOException caught in getAgentSurveyFile(). Nested exception is ", e );
-                } finally {
-                    try {
-                        responseStream.close();
-                    } catch ( IOException e ) {
-                        LOG.error( "IOException caught in getAgentSurveyFile(). Nested exception is ", e );
-                    }
-                }
-                response.flushBuffer();
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException caught in getAgentSurveyFile(). Nested exception is ", e );
-                throw e;
-            } catch ( IOException e ) {
-                LOG.error( "IOException caught in getAgentSurveyFile(). Nested exception is ", e );
-            }
+            adminReport.createEntryInFileUploadForAgentRankingReport( mailId, startDate, endDate, iden, profileLevel,
+                user.getUserId(), user.getCompany() );
+            message = "The User Ranking Report will be mailed to you shortly";
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getAgentSurveyFile(). Nested exception is ", e );
+            message = "Error while generating user ranking report request";
         }
         LOG.info( "Method to get file containg Agent's data getAgentSurveyFile() finished." );
+        return message;
     }
 
 
