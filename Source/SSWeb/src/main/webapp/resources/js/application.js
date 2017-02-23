@@ -1863,7 +1863,7 @@ function setUpListenerForEmailOptionDropdown(){
 		callAjaxPostWithPayloadData( "./updatesendemailthrough.do", function(data){
 				var message = JSON.parse(data);
 				if (message.type != "ERROR_MESSAGE") {
-					$('#overlay-toast').html(message.message + ' to ' + $("#email-sel").find(":selected").attr('email-option'));
+					$('#overlay-toast').html(message.message + ' to ' + $("#email-sel").find(":selected").attr('data-email-option'));
 					showToast();
 				}
 				else {

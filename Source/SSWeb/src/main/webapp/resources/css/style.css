@@ -970,3 +970,43 @@ display: inline-block;
 .stng-padng {
 	padding-right: 50px;
 }
+.customized-settings-wrapper {
+    margin-top: 25px;
+}
+
+.customized-settings-child {
+	border-right: 1px solid lightgrey;
+	width: 275px;
+	display: flex;
+    font-family: opensanslight;
+    font-weight: bold !important;
+    justify-content: flex-start;
+    padding-top: 16px;
+    height: 50px;
+    line-height: 16px;
+    flex-direction: column;
+    text-align: left;
+}
+
+.width-three-five-zero{
+	width: 350px;
+}
+
+.listing-access-txt {
+	width: 275px;
+    border-right: 1px solid lightgrey;
+    margin-bottom: 20px;
+    display: flex;
+    font-family: opensanslight;
+    font-weight: bold !important;
+    justify-content: flex-start;
+    padding-top: 16px;
+    height: 50px;
+    line-height: 16px;
+    flex-direction: column;
+    text-align: left;
+}
+
+.margin-top-twenty {
+	margin-top: 20px;
+}
