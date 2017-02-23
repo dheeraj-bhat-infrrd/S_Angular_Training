@@ -86,8 +86,7 @@ public interface AdminReports
         String profileLevel, long userId, Company company );
 
 
-    public void createEntryInFileUploadForUserAdoptionReport( String mailId, Date startDate, Date endDate, long iden,
-        String profileLevel, long userId, Company company );
+    public void createEntryInFileUploadForUserAdoptionReport( long iden, String profileLevel, long userId, Company company );
 
 
 }

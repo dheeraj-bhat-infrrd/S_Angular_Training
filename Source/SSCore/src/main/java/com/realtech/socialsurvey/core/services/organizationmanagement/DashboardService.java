@@ -178,6 +178,6 @@ public interface DashboardService
 
     public void generateUserAdoptionReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel,
         long profileValue, long adminUserId, long companyId, String recipientMailId, String recipientName )
-        throws InvalidInputException, IOException, UndeliveredEmailException;
+        throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 }
 // JIRA SS-137 BY RM05:EOC

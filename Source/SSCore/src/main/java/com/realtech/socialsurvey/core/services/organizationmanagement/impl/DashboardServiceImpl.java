@@ -1849,21 +1849,42 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Override
     public void generateIncompleteSurveyReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel,
-        long profileValue, long adminUserId, long companyId, String recipientMailId, String recipientName )
+        long profileValue, long userId, long companyId, String recipientMailId, String recipientName )
         throws InvalidInputException, IOException, UndeliveredEmailException
     {
-        // TODO Auto-generated method stub
-
+        Date date = new Date();
+        List<SurveyPreInitiation> surveyDetails = new ArrayList<>();
+        User user = userDao.findById( User.class, userId );
+        boolean realtechAdmin = recipientMailId == null || recipientMailId.isEmpty();
+        surveyDetails = profileManagementService.getIncompleteSurvey( profileValue, 0, 0, -1, -1, profileLevel, startDate,
+            endDate, realtechAdmin );
+        if ( !realtechAdmin ) {
+            recipientName = user.getFirstName() + " " + user.getLastName();
+        } else {
+            profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
+        }
+        String fileName = "Incomplete_Survey_" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+            + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadIncompleteSurveyData( surveyDetails, fileName );
+        String subject = "Incomplete Survey Report";
+        String body = "Here is the incomplete survey report you requested. Please refer to the attachment for the report";
+        createExcelFileAndMail( fileName, workbook, recipientMailId, recipientName, subject, body );
     }
 
 
     @Override
+    @Transactional
     public void generateUserAdoptionReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel,
-        long profileValue, long adminUserId, long companyId, String recipientMailId, String recipientName )
-        throws InvalidInputException, IOException, UndeliveredEmailException
+        long profileValue, long userId, long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
     {
-        // TODO Auto-generated method stub
-
+        User user = userDao.findById( User.class, userId );
+        String fileName = "User_Adoption_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+            + ( new Timestamp( new Date().getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadUserAdoptionReportData( profileValue );
+        String subject = "User Adoption Report";
+        String body = "Here is the user adoption report you requested. Please refer to the attachment for the report";
+        createExcelFileAndMail( fileName, workbook, recipientMailId, recipientName, subject, body );
     }
 
 

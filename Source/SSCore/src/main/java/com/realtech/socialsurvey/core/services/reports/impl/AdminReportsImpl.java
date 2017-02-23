@@ -412,8 +412,7 @@ public class AdminReportsImpl implements AdminReports
 
 
     @Override
-    public void createEntryInFileUploadForUserAdoptionReport( String mailId, Date startDate, Date endDate, long iden,
-        String profileLevel, long userId, Company company )
+    public void createEntryInFileUploadForUserAdoptionReport( long iden, String profileLevel, long userId, Company company )
     {
         LOG.info( "Method createEntryInFileUploadForUserAdoptionReport() started" );
         FileUpload entity = new FileUpload();
@@ -423,26 +422,11 @@ public class AdminReportsImpl implements AdminReports
         entity.setUploadType( CommonConstants.FILE_UPLOAD_USER_ADOPTION_REPORT );
         entity.setProfileLevel( profileLevel );
         entity.setProfileValue( iden );
-
-        if ( mailId == null || mailId.isEmpty() ) {
-            entity.setFileName( "" );
-        } else {
-            entity.setFileName( mailId );
-        }
+        entity.setFileName( "" );
 
         Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
         entity.setCreatedOn( currentTime );
         entity.setModifiedOn( currentTime );
-
-        if ( startDate != null ) {
-            Timestamp startTime = new Timestamp( startDate.getTime() );
-            entity.setStartDate( startTime );
-        }
-
-        if ( endDate != null ) {
-            Timestamp endTime = new Timestamp( endDate.getTime() );
-            entity.setEndDate( endTime );
-        }
 
         fileUploadDao.save( entity );
 
