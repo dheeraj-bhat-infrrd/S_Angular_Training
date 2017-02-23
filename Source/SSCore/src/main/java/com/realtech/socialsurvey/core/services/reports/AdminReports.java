@@ -72,4 +72,21 @@ public interface AdminReports
      */
     public void createEntryInFileUploadForSurveyDataReport( String mailId, Date startDate, Date endDate, long iden,
         String profileLevel, long userId, Company company );
+
+
+    public void createEntryInFileUploadForAgentRankingReport( String mailId, Date startDate, Date endDate, long iden,
+        String profileLevel, long userId, Company company );
+
+
+    public void createEntryInFileUploadForSocialMonitorReport( String mailId, Date startDate, Date endDate, long iden,
+        String profileLevel, long userId, Company company );
+
+
+    public void createEntryInFileUploadForIncompleteSurveyReport( String mailId, Date startDate, Date endDate, long iden,
+        String profileLevel, long userId, Company company );
+
+
+    public void createEntryInFileUploadForUserAdoptionReport( long iden, String profileLevel, long userId, Company company );
+
+
 }

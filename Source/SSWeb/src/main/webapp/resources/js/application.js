@@ -8333,22 +8333,46 @@ $(document).on('click', '#dsh-dwnld-report-btn', function() {
 	var key = parseInt(selectedValue);
 	switch (key) {
 	case 1:
-		window.location.href = "/downloadagentrankingreport.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
+		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./downloadagentrankingreport.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, payload, true);
 		break;
 	case 2:
-		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
+		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./generatecustomersurveyresults.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, payload, true);
 		break;
 	case 3:
-		window.location.href = "/downloaddashboardsocialmonitor.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
+		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./downloaddashboardsocialmonitor.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, payload, true);
 		break;
 	case 4:
-		window.location.href = "/downloaddashboardincompletesurvey.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
+		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./downloaddashboardincompletesurvey.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, payload, true);
 		break;
 	case 5:
-		window.location.href = "/downloaduseradoptionreport.do?columnName=" + colName + "&columnValue=" + colValue;
+		var payload = {"columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./downloaduseradoptionreport.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, payload, true);
 		break;
 	case 6:
-		window.location.href = "/downloadcompanyhierarchyreport.do?columnName=" + colName + "&columnValue=" + colValue;
+		var payload = {"columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./downloadcompanyhierarchyreport.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, payload, true);
 		break;
 	default:
 		break;
