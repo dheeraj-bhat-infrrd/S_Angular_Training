@@ -1570,13 +1570,6 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 				$('#admin-report-dwn').val($(this).html()).attr('data-prev-val', "");
 				$('#report-sel').attr('data-iden', columnName);
 				$('#report-sel').attr('data-idenVal', value);
-				if (searchColumn == "displayName") {
-					$('#dsh-ind-rep-bnt').show();
-					$('#dsh-admin-rep-bnt').hide();
-				} else {
-					$('#dsh-admin-rep-bnt').show();
-					$('#dsh-ind-rep-bnt').hide();
-				}
 			}
 			$('.dsh-res-display').hide();
 		});
@@ -1638,26 +1631,12 @@ function searchCompany(searchKeyword, flow) {
 				$('#admin-report-down').val($(this).html()).attr('data-prev-val', "");
 				$('#admin-report-down').attr('data-iden', columnName);
 				$('#admin-report-down').attr('data-idenVal', value);
-				if (searchColumn == "displayName") {
-					$('#dsh-ind-rep-bnt').show();
-					$('#dsh-admin-rep-bnt').hide();
-				} else {
-					$('#dsh-admin-rep-bnt').show();
-					$('#dsh-ind-rep-bnt').hide();
-				}
 			} else if (flow == 'hierarchy') {
 				// TODO: Replace this stuff
 				$('#dsh-srch-report').removeClass('dsh-sb-dd');
 				$('#hierarchy-report-down').val($(this).html()).attr('data-prev-val', "");
 				$('#hierarchy-report-down').attr('data-iden', columnName);
 				$('#hierarchy-report-down').attr('data-idenVal', value);
-				if (searchColumn == "displayName") {
-					$('#dsh-ind-rep-bnt').show();
-					$('#dsh-admin-rep-bnt').hide();
-				} else {
-					$('#dsh-admin-rep-bnt').show();
-					$('#dsh-ind-rep-bnt').hide();
-				}
 			}
 			$('.dsh-res-display').hide();
 		});
@@ -1884,7 +1863,7 @@ function setUpListenerForEmailOptionDropdown(){
 		callAjaxPostWithPayloadData( "./updatesendemailthrough.do", function(data){
 				var message = JSON.parse(data);
 				if (message.type != "ERROR_MESSAGE") {
-					$('#overlay-toast').html(message.message + ' to ' + $("#email-sel").find(":selected").attr('email-option'));
+					$('#overlay-toast').html(message.message + ' to ' + $("#email-sel").find(":selected").attr('data-email-option'));
 					showToast();
 				}
 				else {

@@ -46,14 +46,6 @@
 					<div data-type="replace" class="float-left bd-cust-rad-img"></div>
 					<div class="float-left bd-cust-rad-txt">Overwrite</div>
 				</div>
-				<div class="float-right hide" style="margin-right: 45px;">
-					<div id="dsh-ind-rep-bnt"
-						class="float-right dash-btn-dl-sd btn-wid-sm" style="width: 300px">
-						<div class="dsh-dwnld-btn float-left cursor-pointer"
-							style="width: 100%" onclick="downloadCompanyHierarchyReport()">Download
-							Company Hierarchy Report</div>
-					</div>
-				</div>
 			</td>
 		</tr>
 		<tr>
