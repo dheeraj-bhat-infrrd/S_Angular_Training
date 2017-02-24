@@ -49,7 +49,7 @@
 					<div class="float-left st-score-txt stng-padng">
 					<spring:message code="label.scorepost.desc.key" />
 						<div>
-							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
+							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' and columnName != 'agentId' }">
 								<div class="customized-settings-wrapper">
 									<div class="st-score-rt-top" style="">Customized Feature Settings:</div>
 									<div id="atpst-lnk-usr-ste-chk-box" class="float-left bd-check-img"></div>
@@ -71,7 +71,7 @@
 						<div class="clearfix float-right st-score-rt pos-relative">
 						<div id="config-setting-dash" class="hide" ></div>
 						<div class="float-left score-rt-post score-rt-post-OR score-rt-min">
-							<div class="st-score-rt-top width-three-five-zero email-sel-item-resp"><spring:message code="label.scorepost.min.key" /></div>
+							<div class="st-score-rt-top width-three-five-zero"><spring:message code="label.scorepost.min.key" /></div>
 							<div class="st-score-rt-line2 clearfix">
 								<div class="st-rating-wrapper settings-rating-wrapper float-left clearfix" id="rating-min-post-parent">
 								</div>
@@ -103,7 +103,7 @@
 						</div>
 					</div>
 					</form>
-					<c:if test="${ realTechAdminId == 1 }">
+					<c:if test="${ realTechAdminId == 1 and columnName == 'companyId' }">
 							<div class="send-email-sel-col">
 								<div class="clearfix email-sel-wrapper">
 									<div class="float-left st-score-rt-top email-setting-sel-lbl margin-top-twenty padding-left-ten-resp">
