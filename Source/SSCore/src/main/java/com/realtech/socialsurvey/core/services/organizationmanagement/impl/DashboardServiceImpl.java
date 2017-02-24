@@ -67,6 +67,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardS
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
@@ -145,6 +146,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private ProfileManagementService profileManagementService;
+
+    @Autowired
+    private UserManagementService userManagementService;
 
 
     @Transactional
@@ -732,6 +736,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_HIERARCHY_REPORT );
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_REGISTRATION_REPORT );
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_SURVEY_DATA_REPORT );
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_USER_RANKING_REPORT );
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_INCOMPLETE_SURVEY_REPORT );
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_REPORT );
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_USER_ADOPTION_REPORT );
         Criterion fileUploadTypeCriteria = Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, uploadTypeList );
         List<Integer> statusList = new ArrayList<Integer>();
         //get only active records
@@ -1689,70 +1697,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         String recipientName, Company company ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "method generateCompanyReportAndMail started" );
-
         if ( company == null ) {
             throw new InvalidInputException( "Passed parameter company is null" );
         }
-
+        String fileName = "Company_Users_Report-" + ( new Timestamp( new Date().getTime() ) )
+            + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = workbookOperations.createWorkbook( usersData );
-
-        // Create file and write report into it
-        boolean excelCreated = false;
-        String fileName = "Company_Users_Report-" + ( new Timestamp( new Date().getTime() ) );
-        FileOutputStream fileOutput = null;
-        InputStream inputStream = null;
-        File file = null;
-        String filePath = null;
-        try {
-            file = new File( fileDirectoryLocation + File.separator + fileName + ".xls" );
-            fileOutput = new FileOutputStream( file );
-            file.createNewFile();
-            workbook.write( fileOutput );
-            filePath = file.getPath();
-            excelCreated = true;
-        } catch ( FileNotFoundException fe ) {
-            LOG.error( "Exception caught while generateCompanyReportAndMail " + fe.getMessage() );
-            excelCreated = false;
-        } catch ( IOException e ) {
-            LOG.error( "Exception caught  while generateCompanyReportAndMail " + e.getMessage() );
-            excelCreated = false;
-        } finally {
-            try {
-                if ( fileOutput != null )
-                    fileOutput.close();
-                if ( inputStream != null ) {
-                    inputStream.close();
-                }
-            } catch ( IOException e ) {
-                LOG.error( "Exception caught  while generateCompanyReportAndMail " + e.getMessage() );
-                excelCreated = false;
-            }
-        }
-
-        // Mail the report to the admin
-        if ( excelCreated ) {
-            Map<String, String> attachmentsDetails = new HashMap<String, String>();
-            attachmentsDetails.put( fileName + ".xls", filePath );
-            String mailId = null;
-            if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-                mailId = adminEmailId;
-            } else {
-                mailId = recipientMailId;
-            }
-
-            String name = null;
-            if ( recipientName == null || recipientName.isEmpty() ) {
-                name = adminName;
-            } else {
-                name = recipientName;
-            }
-
-            LOG.debug( "sending mail to : " + name + " at : " + mailId );
-            String subject = CommonConstants.COMPANY_USERS_REPORT_MAIL_SUBJ + company.getCompany();
-            String body = CommonConstants.COMPANY_USERS_REPORT_MAIL_BODY;
-            emailServices.sendCustomMail( name, recipientMailId, subject, body, attachmentsDetails );
-        }
-
+        String subject = CommonConstants.COMPANY_USERS_REPORT_MAIL_SUBJ + company.getCompany();
+        String body = CommonConstants.COMPANY_USERS_REPORT_MAIL_BODY;
+        createExcelFileAndMail( fileName, workbook, recipientMailId, recipientName, subject, body );
         LOG.info( "method generateCompanyReportAndMail ended" );
     }
 
@@ -1763,67 +1716,16 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException
     {
         LOG.info( "Method generateCompanyHierarchyReportAndMail started" );
+        Date date = new Date();
+        String fileName = "Company_Hierarchy_Report-" + ( new Timestamp( date.getTime() ) )
+            + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = downloadCompanyHierarchyReportData( companyId );
         if ( workbook == null ) {
             throw new InvalidInputException( "unable to create workbook" );
         }
-        // Create file and write report into it
-        boolean excelCreated = false;
-        String fileName = "Company_Hierarchy_Report-" + ( new Timestamp( new Date().getTime() ) );
-        FileOutputStream fileOutput = null;
-        InputStream inputStream = null;
-        File file = null;
-        String filePath = null;
-        try {
-            file = new File( fileDirectoryLocation + File.separator + fileName + ".xlsx" );
-            fileOutput = new FileOutputStream( file );
-            file.createNewFile();
-            workbook.write( fileOutput );
-            filePath = file.getPath();
-            excelCreated = true;
-        } catch ( FileNotFoundException fe ) {
-            LOG.error( "Exception caught while generateCompanyHierarchyReportAndMail " + fe.getMessage() );
-            excelCreated = false;
-        } catch ( IOException e ) {
-            LOG.error( "Exception caught  while generateCompanyHierarchyReportAndMail " + e.getMessage() );
-            excelCreated = false;
-        } finally {
-            try {
-                if ( fileOutput != null )
-                    fileOutput.close();
-                if ( inputStream != null ) {
-                    inputStream.close();
-                }
-            } catch ( IOException e ) {
-                LOG.error( "Exception caught  while generateCompanyHierarchyReportAndMail " + e.getMessage() );
-                excelCreated = false;
-            }
-        }
-
-        // Mail the report to the admin
-        if ( excelCreated ) {
-            Map<String, String> attachmentsDetails = new HashMap<String, String>();
-            attachmentsDetails.put( fileName + ".xlsx", filePath );
-            String mailId = null;
-            if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-                mailId = adminEmailId;
-            } else {
-                mailId = recipientMailId;
-            }
-
-            String name = null;
-            if ( recipientName == null || recipientName.isEmpty() ) {
-                name = adminName;
-            } else {
-                name = recipientName;
-            }
-
-            LOG.debug( "sending mail to : " + name + " at : " + mailId );
-            String subject = "Company Hierarchy Report";
-            String body = "Here is the company hierarchy report you requested. Please refer to the attachment for the report";
-            emailServices.sendCustomMail( name, recipientMailId, subject, body, attachmentsDetails );
-        }
-
+        String subject = "Company Hierarchy Report";
+        String body = "Here is the company hierarchy report you requested. Please refer to the attachment for the report";
+        createExcelFileAndMail( fileName, workbook, recipientMailId, recipientName, subject, body );
         LOG.info( "method generateCompanyHierarchyReportAndMail ended" );
 
     }
@@ -1838,62 +1740,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         String fileName = "Company_Registration_Report-" + ( new Timestamp( date.getTime() ) )
             + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = organizationManagementService.downloadCompanyReport( companyList );
-
-        // Create file and write report into it
-        boolean excelCreated = false;
-        FileOutputStream fileOutput = null;
-        InputStream inputStream = null;
-        File file = null;
-        String filePath = null;
-        try {
-            file = new File( fileDirectoryLocation + File.separator + fileName );
-            fileOutput = new FileOutputStream( file );
-            file.createNewFile();
-            workbook.write( fileOutput );
-            filePath = file.getPath();
-            excelCreated = true;
-        } catch ( FileNotFoundException fe ) {
-            LOG.error( "Exception caught while generateCompanyRegistrationReportAndMail " + fe.getMessage() );
-            excelCreated = false;
-        } catch ( IOException e ) {
-            LOG.error( "Exception caught while generateCompanyRegistrationReportAndMail " + e.getMessage() );
-            excelCreated = false;
-        } finally {
-            try {
-                if ( fileOutput != null )
-                    fileOutput.close();
-                if ( inputStream != null ) {
-                    inputStream.close();
-                }
-            } catch ( IOException e ) {
-                LOG.error( "Exception caught while generateCompanyRegistrationReportAndMail " + e.getMessage() );
-                excelCreated = false;
-            }
-        }
-
-        // Mail the report to the admin
-        if ( excelCreated ) {
-            Map<String, String> attachmentsDetails = new HashMap<String, String>();
-            attachmentsDetails.put( fileName, filePath );
-            String mailId = null;
-            if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-                mailId = adminEmailId;
-            } else {
-                mailId = recipientMailId;
-            }
-
-            String name = null;
-            if ( recipientName == null || recipientName.isEmpty() ) {
-                name = adminName;
-            } else {
-                name = recipientName;
-            }
-
-            LOG.debug( "sending mail to : " + name + " at : " + mailId );
-            String subject = "Company Registration Report";
-            String body = "Here is the company registration report you requested. Please refer to the attachment for the report";
-            emailServices.sendCustomMail( name, mailId, subject, body, attachmentsDetails );
-        }
+        String subject = "Company Registration Report";
+        String body = "Here is the company registration report you requested. Please refer to the attachment for the report";
+        createExcelFileAndMail( fileName, workbook, recipientMailId, recipientName, subject, body );
     }
 
 
@@ -1911,7 +1760,137 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadCustomerSurveyResultsData( surveyDetails, fileName, profileLevel, companyId );
+        String subject = "Survey Data Report";
+        String body = "Here is the survey data report you requested. Please refer to the attachment for the report";
+        if ( recipientMailId != null && !recipientMailId.isEmpty() && !user.isSuperAdmin()
+            && !userManagementService.isUserSocialSurveyAdmin( userId ) ) {
+            recipientName = user.getFirstName() + " " + user.getLastName();
+        }
+        createExcelFileAndMail( fileName, workbook, recipientMailId, recipientName, subject, body );
+    }
 
+
+    @Override
+    public void generateUserRankingReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel,
+        long profileValue, long userId, long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, IOException, UndeliveredEmailException
+    {
+        Date date = new Date();
+        List<AgentRankingReport> agentRanking = new ArrayList<>();
+        String colmName = null;
+        switch ( profileLevel ) {
+            case CommonConstants.PROFILE_LEVEL_COMPANY:
+                colmName = CommonConstants.COMPANY_ID_COLUMN;
+                break;
+            case CommonConstants.PROFILE_LEVEL_REGION:
+                colmName = CommonConstants.REGION_ID_COLUMN;
+                break;
+            case CommonConstants.PROFILE_LEVEL_BRANCH:
+                colmName = CommonConstants.BRANCH_ID_COLUMN;
+                break;
+            case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
+                colmName = CommonConstants.AGENT_ID_COLUMN;
+                break;
+        }
+        agentRanking = profileManagementService.getAgentReport( profileValue, colmName, startDate, endDate, null );
+        User user = userDao.findById( User.class, userId );
+        if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
+            recipientName = user.getFirstName() + " " + user.getLastName();
+        } else {
+            profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
+        }
+        String fileName = "User_Ranking_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+            + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadAgentRankingData( agentRanking, fileName );
+        String subject = "User Ranking Report";
+        String body = "Here is the user ranking report you requested. Please refer to the attachment for the report";
+        createExcelFileAndMail( fileName, workbook, recipientMailId, recipientName, subject, body );
+    }
+
+
+    @Override
+    public void generateSocialMonitorReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel,
+        long profileValue, long userId, long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
+    {
+        Date date = new Date();
+        List<SocialPost> socialPosts = new ArrayList<>();
+        String colmName = null;
+        switch ( profileLevel ) {
+            case CommonConstants.PROFILE_LEVEL_COMPANY:
+                colmName = CommonConstants.COMPANY_ID_COLUMN;
+                break;
+            case CommonConstants.PROFILE_LEVEL_REGION:
+                colmName = CommonConstants.REGION_ID_COLUMN;
+                break;
+            case CommonConstants.PROFILE_LEVEL_BRANCH:
+                colmName = CommonConstants.BRANCH_ID_COLUMN;
+                break;
+            case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
+                colmName = CommonConstants.AGENT_ID_COLUMN;
+                break;
+        }
+        socialPosts = profileManagementService.getCumulativeSocialPosts( profileValue, colmName, -1, -1, profileLevel,
+            startDate, endDate );
+        User user = userDao.findById( User.class, userId );
+        if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
+            recipientName = user.getFirstName() + " " + user.getLastName();
+        } else {
+            profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
+        }
+        String fileName = "Social_Monitor-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+            + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadSocialMonitorData( socialPosts, fileName );
+        String subject = "Social Monitor Report";
+        String body = "Here is the social monitor report you requested. Please refer to the attachment for the report";
+        createExcelFileAndMail( fileName, workbook, recipientMailId, recipientName, subject, body );
+    }
+
+
+    @Override
+    public void generateIncompleteSurveyReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel,
+        long profileValue, long userId, long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, IOException, UndeliveredEmailException
+    {
+        Date date = new Date();
+        List<SurveyPreInitiation> surveyDetails = new ArrayList<>();
+        User user = userDao.findById( User.class, userId );
+        boolean realtechAdmin = recipientMailId == null || recipientMailId.isEmpty();
+        surveyDetails = profileManagementService.getIncompleteSurvey( profileValue, 0, 0, -1, -1, profileLevel, startDate,
+            endDate, realtechAdmin );
+        if ( !realtechAdmin ) {
+            recipientName = user.getFirstName() + " " + user.getLastName();
+        } else {
+            profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
+        }
+        String fileName = "Incomplete_Survey_" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+            + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadIncompleteSurveyData( surveyDetails, fileName );
+        String subject = "Incomplete Survey Report";
+        String body = "Here is the incomplete survey report you requested. Please refer to the attachment for the report";
+        createExcelFileAndMail( fileName, workbook, recipientMailId, recipientName, subject, body );
+    }
+
+
+    @Override
+    @Transactional
+    public void generateUserAdoptionReportAndMail( Timestamp startDate, Timestamp endDate, String profileLevel,
+        long profileValue, long userId, long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
+    {
+        User user = userDao.findById( User.class, userId );
+        String fileName = "User_Adoption_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+            + ( new Timestamp( new Date().getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadUserAdoptionReportData( profileValue );
+        String subject = "User Adoption Report";
+        String body = "Here is the user adoption report you requested. Please refer to the attachment for the report";
+        createExcelFileAndMail( fileName, workbook, recipientMailId, recipientName, subject, body );
+    }
+
+
+    private void createExcelFileAndMail( String fileName, XSSFWorkbook workbook, String recipientMailId, String recipientName,
+        String subject, String body ) throws InvalidInputException, UndeliveredEmailException
+    {
         // Create file and write report into it
         boolean excelCreated = false;
         FileOutputStream fileOutput = null;
@@ -1926,10 +1905,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             filePath = file.getPath();
             excelCreated = true;
         } catch ( FileNotFoundException fe ) {
-            LOG.error( "Exception caught while generateSurveyDataReportAndMail " + fe.getMessage() );
+            LOG.error( "Exception caught while generating report " + fileName + ": " + fe.getMessage() );
             excelCreated = false;
         } catch ( IOException e ) {
-            LOG.error( "Exception caught while generateSurveyDataReportAndMail " + e.getMessage() );
+            LOG.error( "Exception caught while generating report " + fileName + ": " + e.getMessage() );
             excelCreated = false;
         } finally {
             try {
@@ -1939,7 +1918,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                     inputStream.close();
                 }
             } catch ( IOException e ) {
-                LOG.error( "Exception caught while generateSurveyDataReportAndMail " + e.getMessage() );
+                LOG.error( "Exception caught while generating report " + fileName + ": " + e.getMessage() );
                 excelCreated = false;
             }
         }
@@ -1963,8 +1942,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             }
 
             LOG.debug( "sending mail to : " + name + " at : " + mailId );
-            String subject = "Survey Data Report";
-            String body = "Here is the survey data report you requested. Please refer to the attachment for the report";
             emailServices.sendCustomMail( name, mailId, subject, body, attachmentsDetails );
         }
     }

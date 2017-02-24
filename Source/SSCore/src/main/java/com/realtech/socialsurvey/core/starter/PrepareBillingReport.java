@@ -86,6 +86,22 @@ public class PrepareBillingReport implements Runnable
                             dashboardService.generateSurveyDataReportAndMail( fileUpload.getStartDate(),
                                 fileUpload.getEndDate(), fileUpload.getProfileLevel(), fileUpload.getProfileValue(),
                                 fileUpload.getAdminUserId(), fileUpload.getCompany().getCompanyId(), recipientMailId, null );
+                        } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_USER_RANKING_REPORT ) {
+                            dashboardService.generateUserRankingReportAndMail( fileUpload.getStartDate(),
+                                fileUpload.getEndDate(), fileUpload.getProfileLevel(), fileUpload.getProfileValue(),
+                                fileUpload.getAdminUserId(), fileUpload.getCompany().getCompanyId(), recipientMailId, null );
+                        } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_REPORT ) {
+                            dashboardService.generateSocialMonitorReportAndMail( fileUpload.getStartDate(),
+                                fileUpload.getEndDate(), fileUpload.getProfileLevel(), fileUpload.getProfileValue(),
+                                fileUpload.getAdminUserId(), fileUpload.getCompany().getCompanyId(), recipientMailId, null );
+                        } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_INCOMPLETE_SURVEY_REPORT ) {
+                            dashboardService.generateIncompleteSurveyReportAndMail( fileUpload.getStartDate(),
+                                fileUpload.getEndDate(), fileUpload.getProfileLevel(), fileUpload.getProfileValue(),
+                                fileUpload.getAdminUserId(), fileUpload.getCompany().getCompanyId(), recipientMailId, null );
+                        } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_USER_ADOPTION_REPORT ) {
+                            dashboardService.generateUserAdoptionReportAndMail( fileUpload.getStartDate(),
+                                fileUpload.getEndDate(), fileUpload.getProfileLevel(), fileUpload.getProfileValue(),
+                                fileUpload.getAdminUserId(), fileUpload.getCompany().getCompanyId(), recipientMailId, null );
                         }
 
                         // update the status to be processed
@@ -107,6 +123,14 @@ public class PrepareBillingReport implements Runnable
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REGISTRATION_REPORT;
                             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SURVEY_DATA_REPORT ) {
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_SURVEY_DATA_REPORT;
+                            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_USER_RANKING_REPORT ) {
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_RANKING_REPORT;
+                            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_REPORT ) {
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_SOCIAL_MONITOR_REPORT;
+                            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_INCOMPLETE_SURVEY_REPORT ) {
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_INCOMPLETE_SURVEY_REPORT;
+                            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_USER_ADOPTION_REPORT ) {
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT;
                             }
                             String batchName = CommonConstants.BATCH_NAME_FILE_UPLOAD_REPORTS_GENERATOR + " For " + reportType;
 
