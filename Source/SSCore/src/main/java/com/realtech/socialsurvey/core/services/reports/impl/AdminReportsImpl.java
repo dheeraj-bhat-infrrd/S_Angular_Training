@@ -292,5 +292,145 @@ public class AdminReportsImpl implements AdminReports
 
         LOG.info( "Method createEntryInFileUploadForSurveyDataReport() finished" );
     }
+
+
+    @Override
+    public void createEntryInFileUploadForAgentRankingReport( String mailId, Date startDate, Date endDate, long iden,
+        String profileLevel, long userId, Company company )
+    {
+        LOG.info( "Method createEntryInFileUploadForAgentRankingReport() started" );
+        FileUpload entity = new FileUpload();
+        entity.setAdminUserId( userId );
+        entity.setCompany( company );
+        entity.setStatus( CommonConstants.STATUS_ACTIVE );
+        entity.setUploadType( CommonConstants.FILE_UPLOAD_USER_RANKING_REPORT );
+        entity.setProfileLevel( profileLevel );
+        entity.setProfileValue( iden );
+
+        if ( mailId == null || mailId.isEmpty() ) {
+            entity.setFileName( "" );
+        } else {
+            entity.setFileName( mailId );
+        }
+
+        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+        entity.setCreatedOn( currentTime );
+        entity.setModifiedOn( currentTime );
+
+        if ( startDate != null ) {
+            Timestamp startTime = new Timestamp( startDate.getTime() );
+            entity.setStartDate( startTime );
+        }
+
+        if ( endDate != null ) {
+            Timestamp endTime = new Timestamp( endDate.getTime() );
+            entity.setEndDate( endTime );
+        }
+
+        fileUploadDao.save( entity );
+
+        LOG.info( "Method createEntryInFileUploadForAgentRankingReport() finished" );
+    }
+
+
+    @Override
+    public void createEntryInFileUploadForSocialMonitorReport( String mailId, Date startDate, Date endDate, long iden,
+        String profileLevel, long userId, Company company )
+    {
+        LOG.info( "Method createEntryInFileUploadForSocialMonitorReport() started" );
+        FileUpload entity = new FileUpload();
+        entity.setAdminUserId( userId );
+        entity.setCompany( company );
+        entity.setStatus( CommonConstants.STATUS_ACTIVE );
+        entity.setUploadType( CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_REPORT );
+        entity.setProfileLevel( profileLevel );
+        entity.setProfileValue( iden );
+
+        if ( mailId == null || mailId.isEmpty() ) {
+            entity.setFileName( "" );
+        } else {
+            entity.setFileName( mailId );
+        }
+
+        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+        entity.setCreatedOn( currentTime );
+        entity.setModifiedOn( currentTime );
+
+        if ( startDate != null ) {
+            Timestamp startTime = new Timestamp( startDate.getTime() );
+            entity.setStartDate( startTime );
+        }
+
+        if ( endDate != null ) {
+            Timestamp endTime = new Timestamp( endDate.getTime() );
+            entity.setEndDate( endTime );
+        }
+
+        fileUploadDao.save( entity );
+
+        LOG.info( "Method createEntryInFileUploadForSocialMonitorReport() finished" );
+    }
+
+
+    @Override
+    public void createEntryInFileUploadForIncompleteSurveyReport( String mailId, Date startDate, Date endDate, long iden,
+        String profileLevel, long userId, Company company )
+    {
+        LOG.info( "Method createEntryInFileUploadForIncompleteSurveyReport() started" );
+        FileUpload entity = new FileUpload();
+        entity.setAdminUserId( userId );
+        entity.setCompany( company );
+        entity.setStatus( CommonConstants.STATUS_ACTIVE );
+        entity.setUploadType( CommonConstants.FILE_UPLOAD_INCOMPLETE_SURVEY_REPORT );
+        entity.setProfileLevel( profileLevel );
+        entity.setProfileValue( iden );
+
+        if ( mailId == null || mailId.isEmpty() ) {
+            entity.setFileName( "" );
+        } else {
+            entity.setFileName( mailId );
+        }
+
+        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+        entity.setCreatedOn( currentTime );
+        entity.setModifiedOn( currentTime );
+
+        if ( startDate != null ) {
+            Timestamp startTime = new Timestamp( startDate.getTime() );
+            entity.setStartDate( startTime );
+        }
+
+        if ( endDate != null ) {
+            Timestamp endTime = new Timestamp( endDate.getTime() );
+            entity.setEndDate( endTime );
+        }
+
+        fileUploadDao.save( entity );
+
+        LOG.info( "Method createEntryInFileUploadForIncompleteSurveyReport() finished" );
+    }
+
+
+    @Override
+    public void createEntryInFileUploadForUserAdoptionReport( long iden, String profileLevel, long userId, Company company )
+    {
+        LOG.info( "Method createEntryInFileUploadForUserAdoptionReport() started" );
+        FileUpload entity = new FileUpload();
+        entity.setAdminUserId( userId );
+        entity.setCompany( company );
+        entity.setStatus( CommonConstants.STATUS_ACTIVE );
+        entity.setUploadType( CommonConstants.FILE_UPLOAD_USER_ADOPTION_REPORT );
+        entity.setProfileLevel( profileLevel );
+        entity.setProfileValue( iden );
+        entity.setFileName( "" );
+
+        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+        entity.setCreatedOn( currentTime );
+        entity.setModifiedOn( currentTime );
+
+        fileUploadDao.save( entity );
+
+        LOG.info( "Method createEntryInFileUploadForUserAdoptionReport() finished" );
+    }
 }
 

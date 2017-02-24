@@ -243,6 +243,10 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_HIERARCHY_REPORT = "Hierarchy report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REGISTRATION_REPORT = "Company registration report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_SURVEY_DATA_REPORT = "Survey data report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_RANKING_REPORT = "User ranking report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_SOCIAL_MONITOR_REPORT = "Social monitor report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_INCOMPLETE_SURVEY_REPORT = "Incomplete survey data report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT = "User adoption report";
 
 
     /**
@@ -905,6 +909,10 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_COMPANY_HIERARCHY_REPORT = 5;
     public static final int FILE_UPLOAD_COMPANY_REGISTRATION_REPORT = 6;
     public static final int FILE_UPLOAD_SURVEY_DATA_REPORT = 7;
+    public static final int FILE_UPLOAD_USER_RANKING_REPORT = 8;
+    public static final int FILE_UPLOAD_SOCIAL_MONITOR_REPORT = 9;
+    public static final int FILE_UPLOAD_INCOMPLETE_SURVEY_REPORT = 10;
+    public static final int FILE_UPLOAD_USER_ADOPTION_REPORT = 11;
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
@@ -1272,6 +1280,4 @@ public interface CommonConstants
     public static final String SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION = "Authorization";
     public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
     public static final String SURVEY_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-
-
 }
