@@ -790,3 +790,11 @@
 	border-right: 0px;
 	}
 }
+
+/* ============== ANTHING ABOVE TABLETS ==============*/
+@media (min-width: 992px) {
+	.margin-bottom-resp {
+	margin-bottom: 120px;
+	}
+	
+}
