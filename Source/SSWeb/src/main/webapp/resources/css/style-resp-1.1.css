@@ -793,3 +793,11 @@
 	width: 88%;
 	}
 }
+
+/* ============== ANTHING ABOVE TABLETS ==============*/
+@media (min-width: 992px) {
+	.margin-bottom-resp {
+	margin-bottom: 120px;
+	}
+	
+}

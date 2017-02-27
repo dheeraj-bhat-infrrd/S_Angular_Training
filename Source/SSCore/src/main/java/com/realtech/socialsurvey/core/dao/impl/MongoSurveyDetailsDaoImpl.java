@@ -1074,7 +1074,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         /**
          * fetching only completed surveys
          */
-        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        if( notRecommended ){
+            query.addCriteria( Criteria.where( CommonConstants.REVIEW_COLUMN ).exists( true ).nin( "" ) );
+        } else {
+            query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        }
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
