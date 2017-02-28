@@ -789,7 +789,12 @@
 	width: 200px;
 	border-right: 0px;
 	}
-	.email-sel-item-resp {
-	width: 88%;
+}
+
+/* ============== ANTHING ABOVE TABLETS ==============*/
+@media (min-width: 992px) {
+	.margin-bottom-resp {
+	margin-bottom: 120px;
 	}
+	
 }
