@@ -1796,8 +1796,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         User user = userDao.findById( User.class, userId );
         if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
             recipientName = user.getFirstName() + " " + user.getLastName();
-        } else {
-            profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
         }
         String fileName = "User_Ranking_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
@@ -1835,8 +1833,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         User user = userDao.findById( User.class, userId );
         if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
             recipientName = user.getFirstName() + " " + user.getLastName();
-        } else {
-            profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
         }
         String fileName = "Social_Monitor-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
@@ -1857,11 +1853,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         User user = userDao.findById( User.class, userId );
         boolean realtechAdmin = recipientMailId == null || recipientMailId.isEmpty();
         surveyDetails = profileManagementService.getIncompleteSurvey( profileValue, 0, 0, -1, -1, profileLevel, startDate,
-            endDate, realtechAdmin );
+            endDate, false );
         if ( !realtechAdmin ) {
             recipientName = user.getFirstName() + " " + user.getLastName();
-        } else {
-            profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
         }
         String fileName = "Incomplete_Survey_" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
