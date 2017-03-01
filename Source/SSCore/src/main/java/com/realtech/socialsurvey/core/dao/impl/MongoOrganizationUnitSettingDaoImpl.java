@@ -112,9 +112,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
-    
-    @Value ("#{'${ENCOMPASS_VERSIONS}'.split(',')}")
-    public List<String> encompassVersions;
 
     private static final Logger LOG = LoggerFactory.getLogger( MongoOrganizationUnitSettingDaoImpl.class );
 
@@ -712,7 +709,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         if ( encompassVersion == null || encompassVersion.isEmpty() ) {
             LOG.debug( " encompass version is not present to fetch encompass info list." );
             throw new InvalidInputException( "encompass version is not present to fetch encompass info list." );
-        } else if ( !encompassVersions.contains( encompassVersion ) ) {
+        } else if ( !CommonConstants.ENCOMPASS_VERSIONS.contains( encompassVersion ) ) {
             LOG.debug( "encompass version " + encompassVersion + " is not supported" );
             throw new InvalidInputException( "encompass version " + encompassVersion + " is not supported" );
         }
