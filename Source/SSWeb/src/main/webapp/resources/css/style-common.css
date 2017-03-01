@@ -4376,20 +4376,14 @@ img.prof-image {
 }
 
 .send-email-sel-col{
-	float: none;
-	margin-top: 22px;
-	height: 25px;
+    float: none;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    height: 25px;
 }
 
 .email-setting-sel-lbl {
-	text-align: right;
-	line-height: 36px;
-	padding-right: 5px;
-	display: flex;
-    font-family: opensanslight;
-    font-weight: bold !important;
-    justify-content: flex-start;
-    flex-direction: column;
+	padding-top: 15px;
 }
 
 .dash-stats-wrapper {
@@ -4423,14 +4417,13 @@ img.prof-image {
     border-radius: 3px;
     box-shadow: 0px 2px 2px 0px #e3e3e3;
     width: 255px;
-    height: 45px;
-    font-weight: bold !important;
+    height: 50px;
     margin-left: 0px;
 }
 
 .email-sel-item{
 	background-color: #fff;
-	height: 36px;
+	height: 50px;
 	width: 150px;
 	margin-left: 20px;
 	border: 1px solid #dcdcdc;
@@ -4440,7 +4433,6 @@ img.prof-image {
 	border: 1px solid #e3e3e3;
     border-radius: 3px;
     box-shadow: 0px 2px 2px 0px #e3e3e3;
-    font-weight: bold !important;
 	
 }
 

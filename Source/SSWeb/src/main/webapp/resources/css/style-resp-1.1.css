@@ -387,6 +387,9 @@
     border-radius: 3px;
     padding: 4px 10px 4px 10px;
     }
+    .email-resp-margin {
+		margin-left: 0px;
+	}
 }
 
 
@@ -513,6 +516,12 @@
     .admin-report-val-col{
      float:none !important;
     } 
+    .cust-resp {
+    	margin-top: 220px;
+    }
+    .sort-resp {
+    	width: 300px;
+    }
 }
 
 
@@ -792,6 +801,9 @@
 	.email-sel-item-resp {
 	width: 88%;
 	}
+	.email-resp{
+		width: 130px;
+	}
 }
 
 /* ============== ANTHING ABOVE TABLETS ==============*/
@@ -799,5 +811,7 @@
 	.margin-bottom-resp {
 	margin-bottom: 120px;
 	}
-	
+	.cust-div-resp {
+	margin-top: 40px;
+	}
 }

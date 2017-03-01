@@ -975,8 +975,6 @@ display: inline-block;
 }
 
 .customized-settings-child {
-	border-right: 1px solid lightgrey;
-	width: 275px;
 	display: flex;
     font-family: opensanslight;
     font-weight: bold !important;
@@ -993,8 +991,6 @@ display: inline-block;
 }
 
 .listing-access-txt {
-	width: 275px;
-    border-right: 1px solid lightgrey;
     margin-bottom: 20px;
     display: flex;
     font-family: opensanslight;
@@ -1009,4 +1005,20 @@ display: inline-block;
 
 .margin-top-twenty {
 	margin-top: 20px;
+}
+
+.margin-bottom-twenty {
+	margin-bottom: 20px;
+}
+
+.padding-bottom-twenty {
+	padding-bottom: 20px;
+}
+
+.padding-top-ten {
+	padding-top: 10px;
+}
+
+.margin-top-hundred {
+	margin-top: 100px;
 }

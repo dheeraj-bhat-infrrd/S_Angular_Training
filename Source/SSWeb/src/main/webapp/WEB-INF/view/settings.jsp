@@ -46,27 +46,8 @@
 			<div class="um-top-container">
 				<div class="um-header margin-top-25"><spring:message code="label.scorepost.key" /></div>
 				<div class="clearfix st-score-wrapper">
-					<div id="customized-setting-div" class="float-left st-score-txt stng-padng">
+					<div class="float-left st-score-txt stng-padng margin-bottom-twenty">
 					<spring:message code="label.scorepost.desc.key" />
-						<div>
-							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName != 'agentId' }">
-								<div class="st-score-rt-top margin-top-twenty" style="">Customized Feature Settings:</div>						
-								<c:if test="${ columnName == 'companyId' }">
-									<div class="customized-settings-wrapper">
-										<div id="atpst-lnk-usr-ste-chk-box" class="float-left bd-check-img"></div>
-										<input type="hidden" id="at-pst-lnk-usr-ste-cb" name="autopostlinktousersite" value="${autoPostLinkToUserSite}">
-										<div class="float-left customized-settings-child cust-resp-txt">Allow autopost link to the user's website</div>
-									</div>
-								</c:if>
-								<c:if test="${ columnName != 'agentId' and accountMasterId != 1 }">
-									<div class="width-three-five-zero">
-										<div id="vndsta-access-chk-box" class="float-left bd-check-img clear-both"></div>
-											<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
-										<div class="float-left listing-access-txt cust-resp-txt">Allow access to Listings Manager</div>
-									</div>
-								</c:if>
-							</c:if>
-						</div>
 					</div>
 					<form id="rating-settings-form">
 						<input type="hidden" name="ratingcategory" id="ratingcategory">
@@ -87,37 +68,50 @@
 								<div id="atpst-chk-box" class="float-left bd-check-img"></div>
 								<input type="hidden" id="at-pst-cb" name="autopost" value="${autoPostEnabled}">
 								<div class="float-left bd-check-txt">Allow user to autopost</div>
-							</div>
-							
+							</div>							
 							<c:if test="${ columnName == 'companyId' }">
 								<div class="review-sort-sel-col">
 									<div class="clearfix setting-sel-wrapper">
-										<div class="st-score-rt-top margin-top-twenty email-sel-item-resp">
+										<div class="st-score-rt-top margin-top-twenty email-sel-item-resp sort-resp">
 											<spring:message code="label.review.sort.criteria.key" />
 										</div>
 										<select id="sort-criteria-sel" class="float-left review-sort-sel-item email-sel-item-resp">
+											<option data-sort="Date" value="date">Sort responses by Date</option>										
 											<option data-sort="Featured Reviews" value="feature">Sort responses by Featured Reviews</option>
-											<option data-sort="Date" value="date">Sort responses by Date</option>
 										</select>
 									</div>
 								</div>
 							</c:if>	
-						</div>
-					</div>
-					</form>
-					<c:if test="${ realTechAdminId == 1 and columnName == 'companyId' }">
+							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName != 'agentId' }">
+								<div id="customized-setting-div" class="st-score-rt-top" style="">Customized Feature Settings:</div>						
+								<c:if test="${ columnName == 'companyId' }">
+									<div id="atpst-lnk-usr-ste-chk-box" class="float-left bd-check-img"></div>
+									<input type="hidden" id="at-pst-lnk-usr-ste-cb" name="autopostlinktousersite" value="${autoPostLinkToUserSite}">
+									<div class="float-left customized-settings-child cust-resp-txt">Allow autopost link to the user's website</div>
+								</c:if>
+								<c:if test="${ columnName != 'agentId' and accountMasterId != 1 }">
+									<div id="vndsta-access-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
+									<div class="float-left listing-access-txt cust-resp-txt">Allow access to Listings Manager</div>
+								</c:if>
+							</c:if>
+							<c:if test="${ realTechAdminId == 1 and columnName == 'companyId' }">
 							<div class="send-email-sel-col">
-								<div class="clearfix email-sel-wrapper">
-									<div class="float-left st-score-rt-top email-setting-sel-lbl margin-top-twenty padding-left-ten-resp">
+								<div class="clearfix padding-bottom-twenty">
+									<div class="float-left st-score-rt-top email-setting-sel-lbl">
 										<spring:message code="label.send.email.via.key" />
 									</div>
-									<select id="email-sel" class="float-left email-sel-item margin-top-twenty">
+									<select id="email-sel" class="float-left email-sel-item email-resp email-resp-margin">
 										<option data-email-option="socialsurvey.me" value="socialsurvey.me">socialsurvey.me</option>
 										<option data-email-option="socialsurvey.us" value="socialsurvey.us">socialsurvey.us</option>
 									</select>
 								</div>
 							</div>
 					</c:if>
+							
+						</div>
+					</div>
+					</form>
 				</div>
 			</div>
 		</c:if>
@@ -254,8 +248,12 @@
 <script>
 $(document).ready(function() {
 	$(document).attr("title", "Edit Settings");
-	if( "${columnName}" != "agentId" && "${isRealTechOrSSAdmin}" == "true" ){
-		$('#customized-setting-div').addClass('margin-bottom-resp');
+	if( "${columnName}" != "agentId" && "${columnName}" != "companyId" ){
+		$('#customized-setting-div').addClass('margin-top-hundred');
+	}
+	if( "${columnName}" == "companyId" ){
+		$('#customized-setting-div').addClass('cust-resp');
+		$('#customized-setting-div').addClass('cust-div-resp');
 	}
 	$("#sort-criteria-sel").val("${reviewSortCriteria}");
 	$("#email-sel").val("${sendEmailThrough}");
