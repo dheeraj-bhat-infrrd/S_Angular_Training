@@ -1,0 +1,240 @@
+{
+  "chart": {
+    "caption": "",
+    "subCaption": "",
+    "xAxisname": "",
+    "pYAxisName": "Average Review Rating",
+    "sYAxisName": "",
+    "numberPrefix": "",
+    "sNumberSuffix": "",
+    "sYAxisMaxValue": "240",
+    "paletteColors": "#FF0000,#C0C0C0,#00FF00,#FFFF00",
+    "bgColor": "#ffffff",
+    "borderAlpha": "20",
+    "showCanvasBorder": "0",
+    "usePlotGradientColor": "0",
+    "plotBorderAlpha": "10",
+    "legendBorderAlpha": "0",
+    "legendShadow": "0",
+    "legendBgAlpha": "0",
+    "valueFontColor": "white",
+    "showXAxisLine": "1",
+    "xAxisLineColor": "#999999",
+    "divlineColor": "#999999",
+    "divLineIsDashed": "1",
+    "showAlternateHGridColor": "0",
+    "subcaptionFontBold": "0",
+    "subcaptionFontSize": "14",
+    "showHoverEffect": "1"
+  },
+  "categories": [
+    {
+      "category": [
+        {
+          "label": "2016"
+        },
+        {
+          "label": "Feb"
+        },
+        {
+          "label": "Mar"
+        },
+        {
+          "label": "Apr"
+        },
+        {
+          "label": "May"
+        },
+        {
+          "label": "Jun"
+        },
+        {
+          "label": "Jul"
+        },
+        {
+          "label": "Aug"
+        },
+        {
+          "label": "Sep"
+        },
+        {
+          "label": "Oct"
+        },
+        {
+          "label": "Nov"
+        },
+        {
+          "label": "Dec"
+        }
+      ]
+    }
+  ],
+  "dataset": [
+    {
+
+      "data": [
+        {
+          "value": "2.10"
+        },
+        {
+          "value": "2.20"
+        },
+        {
+          "value": "2.20"
+        },
+        {
+          "value": "2.10"
+        },
+        {
+          "value": "2.20"
+        },
+        {
+          "value": "2.40"
+        },
+        {
+          "value": "2.50"
+        },
+        {
+          "value": "2.70"
+        },
+        {
+          "value": "2.60"
+        },
+        {
+          "value": "2.40"
+        },
+        {
+          "value": "2.20"
+        },
+        {
+          "value": "2.00"
+        }
+      ]
+    },{
+
+      "data": [
+        {
+          "value": "0.10"
+        },
+        {
+          "value": "0"
+        },
+        {
+          "value": "0.10"
+        },
+        {
+          "value": "0.10"
+        },
+        {
+          "value": "0"
+        },
+        {
+          "value": "0.10"
+        },
+        {
+          "value": "0.20"
+        },
+        {
+          "value": "0.15"
+        },
+        {
+          "value": "0.30"
+        },
+        {
+          "value": "0.20"
+        },
+        {
+          "value": "0.20"
+        },
+        {
+          "value": "0.10"
+        }
+      ]
+    },
+    {
+
+      "data": [
+        {
+          "value": "0.30"
+        },
+        {
+          "value": "0.20"
+        },
+        {
+          "value": "0.20"
+        },
+        {
+          "value": "0.20"
+        },
+        {
+          "value": "0.30"
+        },
+        {
+          "value": "0.20"
+        },
+        {
+          "value": "0.30"
+        },
+        {
+          "value": "0.20"
+        },
+        {
+          "value": "0.80"
+        },
+        {
+          "value": "1.30"
+        },
+        {
+          "value": "1.00"
+        },
+        {
+          "value": "1.00"
+        }
+      ]
+    },
+    {
+
+      "renderAs": "line",
+      "parentYAxis": "S",
+      "showValues": "0",
+      "data": [
+        {
+          "value": "100"
+        },
+        {
+          "value": "60"
+        },
+        {
+          "value": "50"
+        },
+        {
+          "value": "70"
+        },
+        {
+          "value": "80"
+        },
+        {
+          "value": "60"
+        },
+        {
+          "value": "60"
+        },
+        {
+          "value": "20"
+        },
+        {
+          "value": "120"
+        },
+        {
+          "value": "160"
+        },
+        {
+          "value": "160"
+        },
+        {
+          "value": "220"
+        }
+      ]
+    }
+  ]
+}

@@ -7,9 +7,32 @@ angular.module('socialSurvey.dashBoard',['ui.router'])
     templateUrl: 'dashBoard/dashBoard.html',
     controller: 'dashBoardCtrl'
   });
-  
+
 }])
 
 .controller('dashBoardCtrl',['$scope',function($scope){
 
+/*  FusionCharts.ready(function () {
+      var revenueChart = new FusionCharts({
+          type: 'stackedcolumn3dlinedy',
+          renderAt: 'barChartContainer',
+          width: '100%',
+          height: '350',
+          dataFormat: 'jsonUrl',
+          dataSource: 'resources/json/averageRating.json'
+      });
+      revenueChart.render();
+  });
+
+  FusionCharts.ready(function () {
+    var topStores = new FusionCharts({
+        type: 'bar2d',
+        renderAt: 'ratingsChartContainer',
+        width: '400',
+        height: '300',
+        dataFormat: 'jsonUrl',
+        dataSource: "resources/json/ratingsJson.json"
+    });
+    topStores.render();
+});*/
 }])

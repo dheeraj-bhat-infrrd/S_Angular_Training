@@ -1,8 +1,152 @@
-.colorLightBlue{
+.mainNav{
   background-color: #0C8DE4;
+  box-shadow: 4px 7px 5px lightblue;
+  border-bottom: 0;
 }
 
 .navbar-brand{
   box-sizing: border-box;
   padding: 13px;
+}
+
+#mainNavbar{
+  margin-left: 5%;
+  margin-top: 1%;
+}
+#mainNavbar a{
+  box-sizing: border-box;
+  padding: 5px 15px;
+  color: white;
+  font-size: 13px;
+}
+
+#mainNavbar a:hover{
+  box-sizing: border-box;
+  padding: 5px 15px;
+  color: gray;
+  font-size: 13px;
+}
+
+.navbar2{
+  border-bottom: 1px solid #C0C0C0;
+  background-color: #DCDCDC;
+}
+.navbar2 span{
+  text-align: center;
+  padding:13px;
+  box-sizing: border-box;
+  color: black;
+}
+
+.navbar2 a{
+  color: black
+}
+
+.navbar2 a:hover{
+  color:gray;
+  text-decoration: none;
+}
+
+.navbar2 a:focus{
+  color:gray;
+  text-decoration: none;
+}
+
+.navbar2 div{
+  display: inline-flex;
+  margin-left:75%;
+}
+.rightFloater{
+  float: right;
+}
+
+.rightButtons button{
+  min-width: 120px;
+  box-sizing: border-box;
+  max-height: 34px;
+  padding-left: 5px;
+}
+
+.detailsButton{
+  border-top-left-radius:0;
+  border-bottom-left-radius:0;
+}
+
+.summaryButton{
+  border-top-right-radius:0;
+  border-bottom-right-radius:0;
+}
+
+.rightButtons button:focus{
+  background-color: #0C8DE4;
+}
+
+.rightButtons button img{
+    height: 20px;
+    width: 20px;
+    margin-right: 10px;
+}
+
+.leftLinks a{
+  margin-left: 20px;
+  color: black;
+  font-size: 18px;
+}
+
+.leftLinks a:hover, .leftLinks a:focus{
+  margin-left: 20px;
+  color: #0C8DE4;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.divider{
+position: relative;
+border-bottom: 1px solid #C0C0C0  ;
+margin-bottom: 10px;
+margin-top: 10px;
+}
+
+.divider{
+position: relative;
+border-right: 1px solid #C0C0C0  ;
+margin-left: 10px;
+margin-right: 10px;
+}
+
+.responseLinks a{
+ color: #0C8DE4;
+}
+
+.responseLinks a:hover, .responseLinks a:focus{
+ color: lightblue;
+ text-decoration: none;
+}
+
+.questionsContainer{
+  background-color: white;
+}
+
+.questionsContainer span{
+  font-weight: bold;
+  color: black;
+}
+
+.questionsContainer span a{
+  color: #0C8DE4;
+}
+
+.labelContainer2{
+  display:block;
+  margin-top:30px
+}
+
+.labelImage{
+  width:80px;
+  height:25px
+}
+
+.boxShadows{
+  box-shadow: 4px 7px 5px #C0C0C0;
+  border-radius: 5px;
 }
