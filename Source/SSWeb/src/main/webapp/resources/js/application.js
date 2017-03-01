@@ -8355,43 +8355,37 @@ $(document).on('click', '#dsh-dwnld-report-btn', function() {
 	case 1:
 		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./downloadagentrankingreport.do", function(data) {
-			$('#overlay-toast').html(data);
-			showToast();
+			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
 		}, payload, true);
 		break;
 	case 2:
 		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./generatecustomersurveyresults.do", function(data) {
-			$('#overlay-toast').html(data);
-			showToast();
+			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
 		}, payload, true);
 		break;
 	case 3:
 		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./downloaddashboardsocialmonitor.do", function(data) {
-			$('#overlay-toast').html(data);
-			showToast();
+			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
 		}, payload, true);
 		break;
 	case 4:
 		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./downloaddashboardincompletesurvey.do", function(data) {
-			$('#overlay-toast').html(data);
-			showToast();
+			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
 		}, payload, true);
 		break;
 	case 5:
 		var payload = {"columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./downloaduseradoptionreport.do", function(data) {
-			$('#overlay-toast').html(data);
-			showToast();
+			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
 		}, payload, true);
 		break;
 	case 6:
 		var payload = {"columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./downloadcompanyhierarchyreport.do", function(data) {
-			$('#overlay-toast').html(data);
-			showToast();
+			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
 		}, payload, true);
 		break;
 	default:
@@ -11440,3 +11434,4 @@ function validateVendastaFields(){
 
 	return isVendastaValid;
 }
+

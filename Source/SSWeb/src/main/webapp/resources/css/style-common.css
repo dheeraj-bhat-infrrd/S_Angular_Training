@@ -8107,14 +8107,14 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .dash-download-sel-item {
 	background-color: #fff;
 	height: 30px;
-	width: 40%;
+	width: 35%;
 	border: none;
 	border-right: 1px solid #dcdcdc;
 	outline: none;
 }
 
 .dash-down-go-button {
-	width: 14.5%;
+	width: 22.5%;
 	float: right;
 	background-color: #009FE0;
 	color: white;
