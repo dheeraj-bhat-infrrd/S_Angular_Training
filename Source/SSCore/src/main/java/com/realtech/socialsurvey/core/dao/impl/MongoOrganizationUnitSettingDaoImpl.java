@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -113,6 +112,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
+    
+    @Value ("#{'${ENCOMPASS_VERSIONS}'.split(',')}")
+    public List<String> encompassVersions;
 
     private static final Logger LOG = LoggerFactory.getLogger( MongoOrganizationUnitSettingDaoImpl.class );
 
@@ -698,7 +700,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
      * @throws NoRecordsFetchedException
      */
     @Override
-    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state )
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state, String encompassVersion )
         throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "Getting Company list for encompass where state : " + state );
@@ -706,6 +708,15 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             LOG.debug( "state is not present to fetch encompass info list." );
             throw new InvalidInputException( "state is not present to fetch encompass info list." );
         }
+        
+        if ( encompassVersion == null || encompassVersion.isEmpty() ) {
+            LOG.debug( " encompass version is not present to fetch encompass info list." );
+            throw new InvalidInputException( "encompass version is not present to fetch encompass info list." );
+        } else if ( !encompassVersions.contains( encompassVersion ) ) {
+            LOG.debug( "encompass version " + encompassVersion + " is not supported" );
+            throw new InvalidInputException( "encompass version " + encompassVersion + " is not supported" );
+        }
+        
         List<OrganizationUnitSettings> organizationUnitsSettingsList = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_CRM_INFO ).exists( true ).and( KEY_CRM_INFO_SOURCE )
@@ -718,6 +729,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         } else {
             throw new InvalidInputException( "Invalid encompass crm info state : " + state );
         }
+
+        //filter out other versions of encompass info needed
+        query.addCriteria(
+            Criteria.where( KEY_CRM_INFO + "." + CommonConstants.ENCOMPASS_VERSION_COULMN ).is( encompassVersion ) );
 
         //Add criteria to make sure that it doesn't pick up companies that are deleted
         query.addCriteria( Criteria.where( KEY_STATUS ).ne( CommonConstants.STATUS_DELETED_MONGO ) );
