@@ -334,7 +334,7 @@ public class WorkbookData
                 surveyDetailsToPopulate.add( surveyHandler.getFormattedSurveyScore( survey.getScore() ) );
                 if ( survey.getSurveyResponse() != null && !survey.getSurveyResponse().isEmpty() ) {
                     for ( SurveyResponse response : survey.getSurveyResponse() ) {
-                        if ( StringUtils.isNumeric( response.getAnswer() ) ) {
+                        if ( !StringUtils.isEmpty( response.getAnswer() ) && StringUtils.isNumeric( response.getAnswer() ) ) {
                             Integer responseInt = Integer.parseInt( response.getAnswer() );
                             surveyDetailsToPopulate.add( responseInt );
                         } else {
