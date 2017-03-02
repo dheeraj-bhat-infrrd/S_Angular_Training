@@ -125,10 +125,10 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
             
         }else{
             sendEmailThrough = emailEntity.getSendEmailThrough();
-            if(sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US )){
+            /* if(sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US )){
                 //setting username for socialsurvey.us
                 emailEntity.setSenderName( socialSurveyUsSendName );
-            }  
+            }  */ // was used for testing the code 
         }
         List<String> recipients = emailEntity.getRecipients();
         if ( recipients == null || recipients.isEmpty() ) {
