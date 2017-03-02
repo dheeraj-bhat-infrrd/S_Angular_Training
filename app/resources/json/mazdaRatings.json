@@ -1,0 +1,72 @@
+{
+    "chart": {
+        "caption": "",
+        "subCaption": "",
+        "xAxisName": "",
+        "yAxisName": "",
+        "numberPrefix": "",
+        "paletteColors": "#0075c2,#0075c2,#00FF00,#00FF00,#FF0000,#FF0000,#0000FF,#0000FF,#C0C0C0,#C0C0C0",
+        "bgColor": "#ffffff",
+        "borderAlpha": "20",
+        "canvasBorderAlpha": "0",
+        "usePlotGradientColor": "0",
+        "plotBorderAlpha": "10",
+        "placevaluesInside": "1",
+        "rotatevalues": "0",
+        "valueFontColor": "#ffffff",
+        "showXAxisLine": "1",
+        "xAxisLineColor": "#999999",
+        "divlineColor": "#ffffff",
+        "divLineIsDashed": "0",
+        "showAlternateHGridColor": "0",
+        "subcaptionFontBold": "0",
+        "subcaptionFontSize": "14",
+        "showYAxisValues":"0"
+    },
+    "data": [
+        {
+            "label": "0 \n Not Likely",
+            "value": "501"
+        },
+        {
+            "label": "1",
+            "value": "144"
+        },
+        {
+            "label": "2",
+            "value": "48"
+        },
+        {
+            "label": "3",
+            "value": "33"
+        },
+        {
+            "label": "4",
+            "value": "22"
+        },
+        {
+            "label": "5",
+            "value": "52"
+        },
+        {
+            "label": "6",
+            "value": "100"
+        },
+        {
+            "label": "7 \n Neutral",
+            "value": "125"
+        },
+        {
+            "label": "8",
+            "value": "134"
+        },
+        {
+            "label": "9",
+            "value": "345"
+        },
+        {
+            "label": "10 \n Very Likely",
+            "value": "582"
+        }
+    ]
+}

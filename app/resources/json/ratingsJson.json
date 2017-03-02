@@ -25,7 +25,8 @@
         "toolTipBgColor": "#000000",
         "toolTipBgAlpha": "80",
         "toolTipBorderRadius": "2",
-        "toolTipPadding": "5"
+        "toolTipPadding": "5",
+        "showYAxisValues": "0"
     },
 
     "data": [

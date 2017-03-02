@@ -151,13 +151,18 @@ margin-right: 0 !important;
 }
 
 
+.responseLinks span{
+  font-weight: bold;
+}
 .responseLinks a{
  color: #0C8DE4;
+ font-weight: 600;
 }
 
 .responseLinks a:hover, .responseLinks a:focus{
  color: lightblue;
  text-decoration: none;
+ font-weight: 600;
 }
 
 .questionsContainer{
@@ -175,7 +180,7 @@ margin-right: 0 !important;
 
 .labelContainer2{
   display:block;
-  margin-top:25px;
+  margin-top:30px;
 }
 
 .labelImage{

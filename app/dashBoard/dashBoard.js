@@ -35,4 +35,16 @@ angular.module('socialSurvey.dashBoard',['ui.router'])
     });
     topStores.render();
 });
+
+FusionCharts.ready(function () {
+    var revenueChart = new FusionCharts({
+        type: 'column2d',
+        renderAt: 'mazdaCharts',
+        width: '100%',
+        height: '150',
+        dataFormat: 'jsonUrl',
+        dataSource: 'resources/json/mazdaRatings.json'
+    });
+    revenueChart.render();
+});
 }])
