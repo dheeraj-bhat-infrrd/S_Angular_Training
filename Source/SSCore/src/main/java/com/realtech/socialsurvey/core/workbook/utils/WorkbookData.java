@@ -420,6 +420,8 @@ public class WorkbookData
                         branchShared = branchShared.substring( 0, branchShared.lastIndexOf( "," ) );
                     surveyDetailsToPopulate.add( branchShared );
                 }
+                surveyDetailsToPopulate.add( branchesForCompany.get( survey.getBranchId() ) != null
+                    ? branchesForCompany.get( survey.getBranchId() ).getBranch() : "" );
                 data.put( ++counter, surveyDetailsToPopulate );
                 surveyDetailsToPopulate = new ArrayList<>();
             } else if ( survey.getSource().equalsIgnoreCase( CommonConstants.SURVEY_SOURCE_ZILLOW ) ) {
@@ -507,6 +509,9 @@ public class WorkbookData
                         }
                         surveyDetailsToPopulate.add( StringUtils.join( socialMedia, "," ) );
                     }
+
+                    surveyDetailsToPopulate.add( branchesForCompany.get( survey.getBranchId() ) != null
+                        ? branchesForCompany.get( survey.getBranchId() ).getBranch() : "" );
                     data.put( ++counter, surveyDetailsToPopulate );
                     surveyDetailsToPopulate = new ArrayList<>();
                 }
@@ -534,6 +539,7 @@ public class WorkbookData
         surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_AGENT );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_REGIONS );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_BRANCHES );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_BRANCH );
         data.put( 1, surveyDetailsToPopulate );
         return data;
     }
