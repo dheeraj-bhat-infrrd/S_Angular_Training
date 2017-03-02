@@ -1,44 +1,105 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>DashBoard</title>
-    <link rel="stylesheet" href="dashBoard/dashBoard.css">
-  </head>
-  <body>
-    <div class="container">
-      <nav class="navbar navbar-default navbar-fixed-top mainNav" data-target="#mainNavbar" data-toggle="collapse">
+<head>
+  <meta charset="utf-8">
+  <title>DashBoard</title>
+  <link rel="stylesheet" href="dashBoard/dashBoard.css">
+</head>
+<body>
+  <nav class="navbar navbar-default navbar-fixed-top mainNav" data-target="#mainNavbar" data-toggle="collapse">
 
-        <a href="#"> <img ng-src="resources/images/ssLogo.png" alt="SocialSurvey" class="navbar-brand"></a>
+    <a href="#"> <img ng-src="resources/images/ssLogo.png" alt="SocialSurvey" class="navbar-brand"></a>
 
-        <div class="navbar-right" style="margin-right:5px; float:right">
-          <a href="#"><img ng-src="resources/images/advantageLogo.png" alt="Advantage" style="max-height:50px; margin-right:10px"></a>
-          <a href="#"><img ng-src="resources/images/default-user.png" alt="User" style="max-height:40px"></a>
-        </div>
-
-        <div class="navbar-header"  >
-          <button class="navbar-toggle" style="float:left">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-        </div>
-
-        <div class="navbar-collapse collapse navbar-left" id="mainNavbar" >
-          <ul class="nav navbar-nav">
-            <li><a ui-sref="dashBoard" class="active">Dashboard</a></li>
-            <li><a href="#">Manage Team</a></li>
-            <li><a href="#">Edit Survey</a></li>
-            <li><a href="#">Configure</a></li>
-            <li><a href="#">Social Monitor</a></li>
-            <li><a href="#">Edit Profile</a></li>
-            <li><a href="#">Help</a></li>
-          </ul>
-        </div>
-
-
-
-      </nav>
+    <div class="navbar-right" style="margin-right:5px; float:right">
+      <a href="#"><img ng-src="resources/images/advantageLogo.png" alt="Advantage" style="max-height:50px; margin-right:10px"></a>
+      <a href="#"><img ng-src="resources/images/default-user.png" alt="User" style="max-height:40px"></a>
     </div>
-  </body>
+
+    <div class="navbar-header"  >
+      <button class="navbar-toggle" style="float:left">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+
+    <div class="navbar-collapse collapse navbar-left" id="mainNavbar" >
+      <ul class="nav navbar-nav">
+        <li><a ui-sref="dashBoard" class="active">Dashboard</a></li>
+        <li><a href="#">Manage Team</a></li>
+        <li><a href="#">Edit Survey</a></li>
+        <li><a href="#">Configure</a></li>
+        <li><a href="#">Social Monitor</a></li>
+        <li><a href="#">Edit Profile</a></li>
+        <li><a href="#">Help</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="navbar navbar2" style="margin-top:50px; width:100%">
+    <span>Dashboard</span>
+    <div class="rightFloater">
+      <span><a href="">View as</a></span>
+      <span><a href="">Advantage Rent A Car</a></span>
+    </div>
+  </div>
+
+  <div class="row contentContainer" >
+    <div style="">
+      <div class="leftLinks">
+        <span><a href="" class="active">All Surveys</a></span>
+        <span> > </span>
+        <span><a href="" class="active">Sales Survey</a></span>
+      </div>
+      <div class="rightButtons rightFloater">
+        <button type="button" name="summaryButton" class="summaryButton btn "><img ng-src="resources/images/statsicon.png" alt="">Summary</button>
+        <button type="button" name="detailsButton" class="detailsButton btn ">Details</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="col-md-4 leftContentContainer">
+
+      </div>
+      <div class="col-md-8 rightContentContainer" >
+        <div class="chartContainer boxShadows" style="background-color:white">
+          <div class="reviewRatingChartContainer" id="reviewRatingChart">
+          </div>
+        </div>
+
+        <div class="divider">
+        </div>
+
+        <div class="responseLinks">
+          <span>All Responses</span>
+          <div class="rightFloater">
+            <a href="">Expand All</a>
+            <span> | </span>
+            <a href="" style="margin-right:10px">Collapse All</a>
+            <button type="button" name="downloadButton" class="btn btn-primary downloadButton"><span class="glyphicon glyphicon-download-alt" style="margin-right:5px"></span>Download</button>
+          </div>
+
+        </div>
+
+        <div class="questionsContainer boxShadows" style="margin-top:30px;">
+          <span><span style="color:#0c9ce4">Question 1:</span>How would you rate your experience at our dealership?</span>
+          <div class="ratingsContainer" style="display:flex; margin-left:15%">
+            <div>
+              <div class="labelContainer2"><span>5 <img ng-src="resources/images/5stars.png" alt="5star" class="labelImage"></span></div>
+              <div class="labelContainer2"><span>4 <img ng-src="resources/images/4stars.png" alt="4star" class="labelImage"></span></div>
+              <div class="labelContainer2"><span>3 <img ng-src="resources/images/3stars.png" alt="3star" class="labelImage"></span></div>
+              <div class="labelContainer2"><span>2 <img ng-src="resources/images/2stars.png" alt="2star" class="labelImage"></span></div>
+              <div class="labelContainer2"><span>1 <img ng-src="resources/images/1star.png" alt="1star" class="labelImage"></span></div>
+            </div>
+            <div class="experienceChartContainer" id="experienceChart">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
 </html>

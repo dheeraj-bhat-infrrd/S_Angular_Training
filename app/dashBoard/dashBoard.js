@@ -12,10 +12,10 @@ angular.module('socialSurvey.dashBoard',['ui.router'])
 
 .controller('dashBoardCtrl',['$scope',function($scope){
 
-/*  FusionCharts.ready(function () {
+  FusionCharts.ready(function () {
       var revenueChart = new FusionCharts({
           type: 'stackedcolumn3dlinedy',
-          renderAt: 'barChartContainer',
+          renderAt: 'reviewRatingChart',
           width: '100%',
           height: '350',
           dataFormat: 'jsonUrl',
@@ -27,12 +27,12 @@ angular.module('socialSurvey.dashBoard',['ui.router'])
   FusionCharts.ready(function () {
     var topStores = new FusionCharts({
         type: 'bar2d',
-        renderAt: 'ratingsChartContainer',
+        renderAt: 'experienceChart',
         width: '400',
         height: '300',
         dataFormat: 'jsonUrl',
         dataSource: "resources/json/ratingsJson.json"
     });
     topStores.render();
-});*/
+});
 }])

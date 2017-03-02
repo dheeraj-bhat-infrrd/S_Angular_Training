@@ -30,6 +30,9 @@
 .navbar2{
   border-bottom: 1px solid #C0C0C0;
   background-color: #DCDCDC;
+  display: flex;
+  width: 100%;
+  box-shadow: 4px 3px 5px #C0C0C0;
 }
 .navbar2 span{
   text-align: center;
@@ -54,27 +57,60 @@
 
 .navbar2 div{
   display: inline-flex;
-  margin-left:75%;
+  margin-left:74%;
 }
 .rightFloater{
   float: right;
 }
+
+.contentContainer{
+    margin: 5%;
+    background-color:whitesmoke;
+    display:block;
+}
+
+.content{
+  margin: 2% 2%;
+  background-color:whitesmoke;
+  display:block;
+}
+.leftContentContainer{
+  width:24%;
+  background-color:gray;
+  margin-right: 10px;
+  height: 400px;
+}
+
+.rightContentContainer{
+  width:74%;
+  background-color:whitesmoke;"
+  margin-left: 10px;
+  padding: 0;
+}
+
 
 .rightButtons button{
   min-width: 120px;
   box-sizing: border-box;
   max-height: 34px;
   padding-left: 5px;
+  margin-top: -40px;
+  margin-right: 20px;
 }
 
 .detailsButton{
+  margin-left: 0;
   border-top-left-radius:0;
   border-bottom-left-radius:0;
+  margin-left: -4px;
+  border-left: 1px solid #C0C0C0;
 }
 
 .summaryButton{
+  margin-right: 0 !important;
   border-top-right-radius:0;
   border-bottom-right-radius:0;
+  margin-right: 0;
 }
 
 .rightButtons button:focus{
@@ -85,6 +121,10 @@
     height: 20px;
     width: 20px;
     margin-right: 10px;
+}
+
+.leftLinks{
+  margin-top:10px;
 }
 
 .leftLinks a{
@@ -103,16 +143,13 @@
 .divider{
 position: relative;
 border-bottom: 1px solid #C0C0C0  ;
+width: 100% !important;
 margin-bottom: 10px;
-margin-top: 10px;
+margin-top: 20px;
+margin-left: 5px !important;
+margin-right: 0 !important;
 }
 
-.divider{
-position: relative;
-border-right: 1px solid #C0C0C0  ;
-margin-left: 10px;
-margin-right: 10px;
-}
 
 .responseLinks a{
  color: #0C8DE4;
@@ -138,7 +175,7 @@ margin-right: 10px;
 
 .labelContainer2{
   display:block;
-  margin-top:30px
+  margin-top:25px;
 }
 
 .labelImage{
@@ -149,4 +186,12 @@ margin-right: 10px;
 .boxShadows{
   box-shadow: 4px 7px 5px #C0C0C0;
   border-radius: 5px;
+}
+
+.downloadButton{
+  background-color: #0c9ce4;
+}
+
+.downloadButton:focus, .downloadButton:hover{
+  background-color: #0C8DE4;
 }
