@@ -47,4 +47,16 @@ FusionCharts.ready(function () {
     });
     revenueChart.render();
 });
+
+FusionCharts.ready(function () {
+  var sSRatingChart = new FusionCharts({
+      type: 'bar2d',
+      renderAt: 'sSRatingChart',
+      width: '90%',
+      height: '50%',
+      dataFormat: 'jsonUrl',
+      dataSource: "resources/json/sSRatingsJson.json"
+  });
+  sSRatingChart.render();
+});
 }])

@@ -78,7 +78,7 @@
   width:24%;
   background-color:gray;
   margin-right: 10px;
- display: block;
+  display: block;
 }
 
 .rightContentContainer{
@@ -253,4 +253,14 @@ margin-right: 0 !important;
   border-radius: 3px;
   margin-left: auto;
   padding: 4px;
+}
+
+.socialSurveyRatings{
+  text-align:center;
+  margin:20px auto;
+  display: block;
+}
+
+.sSRatingContainer{
+  margin: 20px auto;
 }
