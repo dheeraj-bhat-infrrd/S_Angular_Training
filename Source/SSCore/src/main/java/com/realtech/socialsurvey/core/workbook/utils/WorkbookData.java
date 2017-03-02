@@ -334,7 +334,12 @@ public class WorkbookData
                 surveyDetailsToPopulate.add( surveyHandler.getFormattedSurveyScore( survey.getScore() ) );
                 if ( survey.getSurveyResponse() != null && !survey.getSurveyResponse().isEmpty() ) {
                     for ( SurveyResponse response : survey.getSurveyResponse() ) {
-                        surveyDetailsToPopulate.add( response.getAnswer() );
+                        if ( StringUtils.isNumeric( response.getAnswer() ) ) {
+                            Integer responseInt = Integer.parseInt( response.getAnswer() );
+                            surveyDetailsToPopulate.add( responseInt );
+                        } else {
+                            surveyDetailsToPopulate.add( response.getAnswer() );
+                        }
                     }
                 } else {
                     surveyDetailsToPopulate.add( "" );
@@ -420,6 +425,8 @@ public class WorkbookData
                         branchShared = branchShared.substring( 0, branchShared.lastIndexOf( "," ) );
                     surveyDetailsToPopulate.add( branchShared );
                 }
+                surveyDetailsToPopulate.add( branchesForCompany.get( survey.getBranchId() ) != null
+                    ? branchesForCompany.get( survey.getBranchId() ).getBranch() : "" );
                 data.put( ++counter, surveyDetailsToPopulate );
                 surveyDetailsToPopulate = new ArrayList<>();
             } else if ( survey.getSource().equalsIgnoreCase( CommonConstants.SURVEY_SOURCE_ZILLOW ) ) {
@@ -507,6 +514,9 @@ public class WorkbookData
                         }
                         surveyDetailsToPopulate.add( StringUtils.join( socialMedia, "," ) );
                     }
+
+                    surveyDetailsToPopulate.add( branchesForCompany.get( survey.getBranchId() ) != null
+                        ? branchesForCompany.get( survey.getBranchId() ).getBranch() : "" );
                     data.put( ++counter, surveyDetailsToPopulate );
                     surveyDetailsToPopulate = new ArrayList<>();
                 }
@@ -534,6 +544,7 @@ public class WorkbookData
         surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_AGENT );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_REGIONS );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_BRANCHES );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_BRANCH );
         data.put( 1, surveyDetailsToPopulate );
         return data;
     }
