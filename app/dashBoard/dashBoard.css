@@ -78,7 +78,7 @@
   width:24%;
   background-color:gray;
   margin-right: 10px;
-  height: 400px;
+ display: block;
 }
 
 .rightContentContainer{
@@ -103,7 +103,7 @@
   border-top-left-radius:0;
   border-bottom-left-radius:0;
   margin-left: -4px;
-  border-left: 1px solid #C0C0C0;
+
 }
 
 .summaryButton{
@@ -111,6 +111,7 @@
   border-top-right-radius:0;
   border-bottom-right-radius:0;
   margin-right: 0;
+  border-right: 1px solid #C0C0C0;
 }
 
 .rightButtons button:focus{
@@ -118,8 +119,8 @@
 }
 
 .rightButtons button img{
-    height: 20px;
-    width: 20px;
+    height: 17px;
+    width: 17px;
     margin-right: 10px;
 }
 
@@ -199,4 +200,57 @@ margin-right: 0 !important;
 
 .downloadButton:focus, .downloadButton:hover{
   background-color: #0C8DE4;
+}
+
+.fieldServiceBar{
+  display:flex;
+  height:20px;
+  background-color:black;
+  border-radius:5px
+}
+
+.detractors{
+  width:11.9%;
+  height:100%;
+  background-color:red;
+  border-top-left-radius:3px;
+  border-bottom-left-radius:3px
+}
+
+.passives{
+  width:43.3%;
+  height:100%;
+  background-color:orange;
+}
+
+.promotors{
+  width:44.8%;
+  height:100%;
+  background-color:green;
+  border-top-right-radius:3px;
+  border-bottom-right-radius:3px
+}
+
+.percentageDisplay{
+  display: flex !important;
+  margin-top: 20px;
+}
+
+.redColor{
+  background-color: red;
+}
+
+.orangeColor{
+  background-color: orange;
+}
+
+.greenColor{
+  background-color: green;
+}
+
+.perc{
+  color: white;
+  border-radius: 3px;
+  margin-left: auto;
+  padding: 4px;
 }
