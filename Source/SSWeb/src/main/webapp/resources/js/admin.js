@@ -30,29 +30,6 @@ $(document).on('click','#dsh-ind-report-dwn-btn',function(e){
 	}
 });
 
-$(document).on('click','#dsh-admin-report-dwn-btn',function(){
-	var selectedValue = $('#download-survey-reports').val();
-	var startDate = $('#dsh-start-date').val();
-	var endDate = $("#dsh-end-date").val();
-	var idenVal = $('#report-sel').attr('data-idenVal');
-	var selectedProf = $('#report-sel').attr('data-iden');
-	
-	var key = parseInt(selectedValue);
-	switch (key) {
-	case 1:
-		window.location.href = "/downloadagentrankingreport.do?columnName="+selectedProf+"&columnValue="+idenVal+"&startDate="+startDate+"&endDate="+endDate;
-		break;
-	case 2:
-		window.location.href = "/downloadcustomersurveyresults.do?columnName="+selectedProf+"&columnValue="+idenVal+"&startDate="+startDate+"&endDate="+endDate;
-		break;
-	case 3:
-		window.location.href = "/downloaddashboardsocialmonitor.do?columnName="+selectedProf+"&columnValue="+idenVal+"&startDate="+startDate+"&endDate="+endDate;
-		break;
-	default:
-		break;
-	}
-});
-
 $(document).on('keyup','#hr-comp-sel',function(e){
 	if(e.which == 13) {
 		var key = $(this).val();

@@ -387,6 +387,9 @@
     border-radius: 3px;
     padding: 4px 10px 4px 10px;
     }
+    .email-resp-margin {
+		margin-left: 0px;
+	}
 }
 
 
@@ -513,6 +516,12 @@
     .admin-report-val-col{
      float:none !important;
     } 
+    .cust-resp {
+    	margin-top: 220px;
+    }
+    .sort-resp {
+    	width: 300px;
+    }
 }
 
 
@@ -785,5 +794,24 @@
     margin-left: auto;
     margin-right: auto;
 	}
-	
+	.cust-resp-txt {
+	width: 200px;
+	border-right: 0px;
+	}
+	.email-sel-item-resp {
+	width: 88%;
+	}
+	.email-resp{
+		width: 130px;
+	}
+}
+
+/* ============== ANTHING ABOVE TABLETS ==============*/
+@media (min-width: 992px) {
+	.margin-bottom-resp {
+	margin-bottom: 120px;
+	}
+	.cust-div-resp {
+	margin-top: 40px;
+	}
 }

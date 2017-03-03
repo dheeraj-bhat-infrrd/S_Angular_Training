@@ -11,6 +11,19 @@ public class EncompassCrmInfo extends CRMInfo
     private int numberOfDays;
     private String emailAddressForReport;
     private boolean generateReport;
+    private String encompassVersion;
+
+
+    public String getEncompassVersion()
+    {
+        return encompassVersion;
+    }
+
+
+    public void setEncompassVersion( String encompassVersion )
+    {
+        this.encompassVersion = encompassVersion;
+    }
 
 
     public String getCrm_username()

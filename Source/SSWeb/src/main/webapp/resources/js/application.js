@@ -1854,6 +1854,26 @@ function setUpListenerForSortCriteriaDropdown(){
 	});
 }
 
+function setUpListenerForEmailOptionDropdown(){
+	$("#email-sel").on('change',function(event){
+		var payload = {
+			"sendEmailThrough" : $("#email-sel").val()
+		};
+		
+		callAjaxPostWithPayloadData( "./updatesendemailthrough.do", function(data){
+				var message = JSON.parse(data);
+				if (message.type != "ERROR_MESSAGE") {
+					$('#overlay-toast').html(message.message + ' to ' + $("#email-sel").find(":selected").attr('data-email-option'));
+					showToast();
+				}
+				else {
+					$('#overlay-toast').html(message.message);
+					showToast();
+				}
+			}, payload, false);
+	});
+}
+
 $(document).click(function(e) {
 	e.stopPropagation();
 	if ($('#da-dd-wrapper-profiles').css('display') == "block") {
@@ -8329,26 +8349,46 @@ $(document).on('click', '#dsh-dwnld-report-btn', function() {
 	var selectedValue = $('#download-survey-reports').val();
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
-
+	var emailId = $("#dsh-report-email-id").val();
+	var popupTitle = "Generate Report";
+	var popupMsg = "Your report has been submitted. We will send the report to email - " + emailId;
 	var key = parseInt(selectedValue);
 	switch (key) {
 	case 1:
-		window.location.href = "/downloadagentrankingreport.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
+		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./downloadagentrankingreport.do", function(data) {
+			createPopupInfo(popupTitle, popupMsg);
+		}, payload, true);
 		break;
 	case 2:
-		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
+		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./generatecustomersurveyresults.do", function(data) {
+			createPopupInfo(popupTitle, popupMsg);
+		}, payload, true);
 		break;
 	case 3:
-		window.location.href = "/downloaddashboardsocialmonitor.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
+		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./downloaddashboardsocialmonitor.do", function(data) {
+			createPopupInfo(popupTitle, popupMsg);
+		}, payload, true);
 		break;
 	case 4:
-		window.location.href = "/downloaddashboardincompletesurvey.do?columnName=" + colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
+		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./downloaddashboardincompletesurvey.do", function(data) {
+			createPopupInfo(popupTitle, popupMsg);
+		}, payload, true);
 		break;
 	case 5:
-		window.location.href = "/downloaduseradoptionreport.do?columnName=" + colName + "&columnValue=" + colValue;
+		var payload = {"columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./downloaduseradoptionreport.do", function(data) {
+			createPopupInfo(popupTitle, popupMsg);
+		}, payload, true);
 		break;
 	case 6:
-		window.location.href = "/downloadcompanyhierarchyreport.do?columnName=" + colName + "&columnValue=" + colValue;
+		var payload = {"columnValue" : colValue, "columnName": colName};
+		callAjaxGetWithPayloadData("./downloadcompanyhierarchyreport.do", function(data) {
+			createPopupInfo(popupTitle, popupMsg);
+		}, payload, true);
 		break;
 	default:
 		break;
@@ -11396,3 +11436,4 @@ function validateVendastaFields(){
 
 	return isVendastaValid;
 }
+

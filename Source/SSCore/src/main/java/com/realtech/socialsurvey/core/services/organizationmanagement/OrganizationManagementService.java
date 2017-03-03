@@ -1286,7 +1286,7 @@ public interface OrganizationManagementService
         int batch_size ) throws InvalidInputException;
 
 
-    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state )
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state, String encompassVersion )
         throws InvalidInputException, NoRecordsFetchedException;
 
 
@@ -1451,6 +1451,10 @@ public interface OrganizationManagementService
 
 
     public void updateSortCriteriaForCompany( OrganizationUnitSettings companySettings, String sortCriteria )
+        throws InvalidInputException;
+    
+   
+    void updateSendEmailThroughForCompany( OrganizationUnitSettings companySettings, String sendEmailThrough )
         throws InvalidInputException;
 
 }

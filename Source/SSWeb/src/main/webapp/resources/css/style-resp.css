@@ -1749,6 +1749,9 @@
  .st-subject-input-cont{
 	 width:45%;
 	}
+	.padding-left-ten-resp {
+	padding-left: 40px;
+	}
 
 }
 
@@ -1933,6 +1936,16 @@
         float: left;
         margin-bottom: 15px;
     }
+    .email-sel-wrapper {
+    	float: left;
+        margin-bottom: 10px;
+        margin-top: 200px;
+    }
+    .sort-sel-item-resp {
+	width: 88%;
+	
+	}
+	
     .util-gph-legend-item {
         float: left;
         width: 50%;

@@ -5840,12 +5840,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state )
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state, String encompassVersion )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.debug( "Getting list of encompass crm info for state : " + state );
+        LOG.debug( "Getting list of encompass crm info for state : " + state + " and version : " + encompassVersion );
         List<OrganizationUnitSettings> organizationUnitSettingsList = null;
-        organizationUnitSettingsList = organizationUnitSettingsDao.getCompanyListForEncompass( state );
+        organizationUnitSettingsList = organizationUnitSettingsDao.getCompanyListForEncompass( state, encompassVersion );
         LOG.debug( "Returning company settings list with provided crm list" );
         return organizationUnitSettingsList;
     }
@@ -7998,5 +7998,25 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Updated the isAccountDisabled successfully" );
     }
+    
+    //JIRA SS-975
+    @Override
+    public void updateSendEmailThroughForCompany( OrganizationUnitSettings companySettings, String sendEmailThrough )
+        throws InvalidInputException
+    {
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings cannot be null." );
+        }
+
+        LOG.debug( "Updating companySettings: " + companySettings + " with sendEmailThrough: " + sendEmailThrough );
+        //Set sendemailthrough in mongo
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_SEND_EMAIL_THROUGH, sendEmailThrough, companySettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        LOG.debug( "Updated the sendemailthrough successfully" );
+    }
+    
+    //END JIRA SS-975
 }
 // JIRA: SS-27: By RM05: EOC

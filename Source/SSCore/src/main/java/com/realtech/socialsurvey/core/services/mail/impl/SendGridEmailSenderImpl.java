@@ -47,15 +47,9 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
     private static final Logger LOG = LoggerFactory.getLogger( SendGridEmailSenderImpl.class );
 
-
+    //FOR DEFAULT SENDGRID ACCOUNT 
     @Value ( "${SENDGRID_SENDER_NAME}")
     private String defaultSendName;
-
-    @Value ( "${DEFAULT_EMAIL_FROM_ADDRESS}")
-    private String defaultFromAddress;
-
-    @Value ( "${SEND_MAIL}")
-    private String sendMail;
 
     @Value ( "${SENDGRID_SENDER_USERNAME}")
     private String sendGridUserName;
@@ -63,8 +57,27 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
     @Value ( "${SENDGRID_SENDER_PASSWORD}")
     private String sendGridPassword;
     
+    //FOR SOCIALSURVEY.US SENDGRID ACCOUNT
+    @Value ( "${SENDGRID_SENDER_SOCIALSURVEYUS_NAME}")
+    private String socialSurveyUsSendName;
+    
+    @Value ( "${SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME}")
+    private String sendGridSocialSurveyUsUserName;
+
+    @Value ( "${SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD}")
+    private String sendGridSocialSurveyUsPassword;
+
+  
+    @Value ( "${DEFAULT_EMAIL_FROM_ADDRESS}")
+    private String defaultFromAddress;
+
+    @Value ( "${SEND_MAIL}")
+    private String sendMail;
+    
     @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
     private String salesLeadEmail;
+    
+    private String sendEmailThrough;
 
     @Autowired
     private FileOperations fileOperations;
@@ -75,7 +88,10 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
     @Autowired
     private EmailFormatHelper emailFormatHelper;
 
-    private SendGrid sendGrid;
+    //since we have two diff sendGrid accounts
+    private SendGrid sendGrid1;
+    
+    private SendGrid sendGrid2;
 
     @Autowired
     private EmailDao emailDao;
@@ -102,6 +118,17 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         }
         if ( emailEntity.getSubject() == null || emailEntity.getSubject().isEmpty() ) {
             throw new InvalidInputException( "Email subject is blank." );
+        }
+        //setting default if null and actual value if it exists in mongo
+        if ( emailEntity.getSendEmailThrough() == null || emailEntity.getSendEmailThrough().isEmpty()){
+            sendEmailThrough = CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME;
+            
+        }else{
+            sendEmailThrough = emailEntity.getSendEmailThrough();
+            /* if(sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US )){
+                //setting username for socialsurvey.us
+                emailEntity.setSenderName( socialSurveyUsSendName );
+            }  */ // was used for testing the code 
         }
         List<String> recipients = emailEntity.getRecipients();
         if ( recipients == null || recipients.isEmpty() ) {
@@ -162,7 +189,13 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         Response response = null;
         try {
             LOG.debug( "About to send mail. " + emailEntity.toString() );
-            response = sendGrid.send( email );
+            //sets credentials according to account selected
+            if(sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US )){
+                response = sendGrid2.send( email );
+            }else{
+                response = sendGrid1.send( email );
+            }
+           
             LOG.debug( "Sent the mail. " + emailEntity.toString() );
         } catch ( SendGridException e ) {
             LOG.error( "Exception while sending the mail. " + emailEntity.toString(), e );
@@ -356,10 +389,12 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
     public void afterPropertiesSet() throws Exception
     {
         LOG.info( "Settings Up sendGrid gateway" );
-
-        if ( sendGrid == null ) {
-            LOG.info( "Initialising Sendgrid gateway with " + sendGridUserName + " and " + sendGridPassword );
-            sendGrid = new SendGrid( sendGridUserName, sendGridPassword );
+        
+        //assign both credentials
+        if ( sendGrid1 == null || sendGrid2 == null) {
+            LOG.info( "Initialising Sendgrid gateway with " + sendGridUserName + " and " + sendGridPassword +"or" + sendGridSocialSurveyUsUserName + " and " + sendGridSocialSurveyUsPassword );
+            sendGrid1 = new SendGrid( sendGridUserName, sendGridPassword );
+            sendGrid2 = new SendGrid( sendGridSocialSurveyUsUserName, sendGridSocialSurveyUsPassword );
             LOG.info( "Sendgrid gateway initialised!" );
         }
 
