@@ -8349,43 +8349,45 @@ $(document).on('click', '#dsh-dwnld-report-btn', function() {
 	var selectedValue = $('#download-survey-reports').val();
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
-
+	var emailId = $("#dsh-report-email-id").val();
+	var popupTitle = "Generate Report";
+	var popupMsg = "Your report has been submitted. We will send the report to email - " + emailId;
 	var key = parseInt(selectedValue);
 	switch (key) {
 	case 1:
 		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./downloadagentrankingreport.do", function(data) {
-			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
+			createPopupInfo(popupTitle, popupMsg);
 		}, payload, true);
 		break;
 	case 2:
 		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./generatecustomersurveyresults.do", function(data) {
-			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
+			createPopupInfo(popupTitle, popupMsg);
 		}, payload, true);
 		break;
 	case 3:
 		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./downloaddashboardsocialmonitor.do", function(data) {
-			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
+			createPopupInfo(popupTitle, popupMsg);
 		}, payload, true);
 		break;
 	case 4:
 		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./downloaddashboardincompletesurvey.do", function(data) {
-			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
+			createPopupInfo(popupTitle, popupMsg);
 		}, payload, true);
 		break;
 	case 5:
 		var payload = {"columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./downloaduseradoptionreport.do", function(data) {
-			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
+			createPopupInfo(popupTitle, popupMsg);
 		}, payload, true);
 		break;
 	case 6:
 		var payload = {"columnValue" : colValue, "columnName": colName};
 		callAjaxGetWithPayloadData("./downloadcompanyhierarchyreport.do", function(data) {
-			createPopupInfo("Generate Report", "Your report has been submitted. We will send you the report via email.");
+			createPopupInfo(popupTitle, popupMsg);
 		}, payload, true);
 		break;
 	default:
