@@ -57,7 +57,7 @@
 
 .navbar2 div{
   display: inline-flex;
-  margin-left:74%;
+  margin-left: auto;
 }
 .rightFloater{
   float: right;
