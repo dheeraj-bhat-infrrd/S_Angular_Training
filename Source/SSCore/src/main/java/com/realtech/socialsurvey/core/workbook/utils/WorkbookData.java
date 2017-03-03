@@ -334,7 +334,12 @@ public class WorkbookData
                 surveyDetailsToPopulate.add( surveyHandler.getFormattedSurveyScore( survey.getScore() ) );
                 if ( survey.getSurveyResponse() != null && !survey.getSurveyResponse().isEmpty() ) {
                     for ( SurveyResponse response : survey.getSurveyResponse() ) {
-                        surveyDetailsToPopulate.add( response.getAnswer() );
+                        if ( !StringUtils.isEmpty( response.getAnswer() ) && StringUtils.isNumeric( response.getAnswer() ) ) {
+                            Integer responseInt = Integer.parseInt( response.getAnswer() );
+                            surveyDetailsToPopulate.add( responseInt );
+                        } else {
+                            surveyDetailsToPopulate.add( response.getAnswer() );
+                        }
                     }
                 } else {
                     surveyDetailsToPopulate.add( "" );
@@ -358,6 +363,9 @@ public class WorkbookData
                     surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
                 }
 
+                surveyDetailsToPopulate.add( branchesForCompany.get( survey.getBranchId() ) != null
+                    ? branchesForCompany.get( survey.getBranchId() ).getBranch() : "" );
+                
                 if ( survey.getSocialMediaPostDetails() != null ) {
                     //for company
                     Set<String> companySocialMedia = new HashSet<>();
@@ -420,6 +428,7 @@ public class WorkbookData
                         branchShared = branchShared.substring( 0, branchShared.lastIndexOf( "," ) );
                     surveyDetailsToPopulate.add( branchShared );
                 }
+                
                 data.put( ++counter, surveyDetailsToPopulate );
                 surveyDetailsToPopulate = new ArrayList<>();
             } else if ( survey.getSource().equalsIgnoreCase( CommonConstants.SURVEY_SOURCE_ZILLOW ) ) {
@@ -475,6 +484,10 @@ public class WorkbookData
                     } else {
                         surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
                     }
+                    
+                    surveyDetailsToPopulate.add( branchesForCompany.get( survey.getBranchId() ) != null
+                        ? branchesForCompany.get( survey.getBranchId() ).getBranch() : "" );
+                    
                     if ( survey.getSocialMediaPostDetails() != null ) {
                         Set<String> socialMedia = new HashSet<>();
                         if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null
@@ -507,6 +520,7 @@ public class WorkbookData
                         }
                         surveyDetailsToPopulate.add( StringUtils.join( socialMedia, "," ) );
                     }
+
                     data.put( ++counter, surveyDetailsToPopulate );
                     surveyDetailsToPopulate = new ArrayList<>();
                 }
@@ -530,6 +544,7 @@ public class WorkbookData
         surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_GATEWAY );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_CUSTOMER_COMMENTS );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_AGREED_SHARE );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_BRANCH );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_COMPANY );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_AGENT );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_REGIONS );
