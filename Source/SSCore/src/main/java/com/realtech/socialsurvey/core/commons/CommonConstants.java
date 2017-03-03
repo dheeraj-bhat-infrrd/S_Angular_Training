@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.core.commons;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -525,7 +527,8 @@ public interface CommonConstants
     public static final String ENCOMPASS_PASSWORD_COLUMN = "password";
     public static final String ENCOMPASS_GENERATE_REPORT_COLUMN = "generateReport";
     public static final String ENCOMPASS_DEFAULT_FEILD_ID = "1997";
-
+    public static final String ENCOMPASS_VERSION_COULMN = "version";
+    public static final List<String> ENCOMPASS_VERSIONS = Arrays.asList( "16.2.0","16.3.2","17.1.0" );
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
