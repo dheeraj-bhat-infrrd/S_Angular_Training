@@ -1,7 +1,6 @@
-/* app css stylesheet */
-
 @media (max-width: 1050px) {
-    .navbar-header {
+
+  .navbar-header {
         float: none;
     }
     .navbar-left,.navbar-right {
@@ -35,27 +34,38 @@
     .collapse.in{
         display:block !important;
     }
-}
-.menu {
-  list-style: none;
-  border-bottom: 0.1em solid black;
-  margin-bottom: 2em;
-  padding: 0 0 0.5em;
+
+    #mainNavbar{
+      margin-left: 0 !important;
+    }
+
 }
 
-.menu:before {
-  content: "[";
+.mainNav{
+  background-color: #0C8DE4;
+  box-shadow: 4px 7px 5px lightblue;
+  border-bottom: 0;
 }
 
-.menu:after {
-  content: "]";
+.navbar-brand{
+  box-sizing: border-box;
+  padding: 13px;
 }
 
-.menu > li {
-  display: inline;
+#mainNavbar{
+  margin-left: 5%;
+  margin-top: 1%;
+}
+#mainNavbar a{
+  box-sizing: border-box;
+  padding: 5px 15px;
+  color: white;
+  font-size: 13px;
 }
 
-.menu > li + li:before {
-  content: "|";
-  padding-right: 0.3em;
+#mainNavbar a:hover{
+  box-sizing: border-box;
+  padding: 5px 15px;
+  color: gray;
+  font-size: 13px;
 }
