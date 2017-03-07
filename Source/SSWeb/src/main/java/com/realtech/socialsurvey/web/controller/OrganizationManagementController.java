@@ -3561,7 +3561,7 @@ public class OrganizationManagementController
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
-            String isRealTechAdmin = (String) session.getAttribute( CommonConstants.IS_REALTECH_ADMIN );
+            boolean isRealTechAdmin = (boolean) session.getAttribute( CommonConstants.IS_REALTECH_ADMIN );
             if ( entityType.equals( "companyId" ) ) {
                 try {
                     companySettings = organizationManagementService.getCompanySettings( entityId );
@@ -3569,7 +3569,7 @@ public class OrganizationManagementController
                     if ( companySettings == null ) {
                         message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID,
                             DisplayMessageType.ERROR_MESSAGE );
-                    } else if ( user != null &&  isRealTechAdmin == "true" ) {
+                    } else if ( user != null &&  isRealTechAdmin == true ) {
                         if(sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME)|| sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US)){
                             organizationManagementService.updateSendEmailThroughForCompany( companySettings, sendEmailThrough );
                             message = messageUtils.getDisplayMessage( DisplayMessageConstants.SEND_EMAIL_THROUGH_SUCCESSFULLY_UPDATED,
