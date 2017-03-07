@@ -1,0 +1,24 @@
+Logon to ec2-user@52.11.208.165
+
+Server  Restart:
+	Find the standalone process id
+	ps -ef | grep jboss
+	
+	Kill the standalone process
+	sudo kill -9 <process id>
+	
+	Start the standalone process
+	cd /var/lib/jboss-as/jboss-as-7.1.1.Final/bin/
+	sudo ./standalone.sh &
+	
+Batch Restart:
+	Find the batchStarter process id
+	ps -ef | grep java
+	
+	Kill the batchStarter process
+	sudo kill -9 <process id>
+	
+	Remove the lock file and start the batch
+	cd /var/lib/batch/bin/
+	sudo rm -f batchstarter.lock 
+	sudo ./batchstarter.sh &

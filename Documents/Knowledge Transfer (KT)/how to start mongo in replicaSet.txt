@@ -1,0 +1,20 @@
+//To start mongo in replicaset 
+sudo service mongo start
+
+//Mongo configuration file which tells where logs files get written and which replica is being used
+/etc/mongod.conf
+
+// "mongo" command sometimes gives an error then run export LC_ALL=C
+export LC_ALL = C
+
+// To start mongo console
+mongo
+
+// Tells the status of machines in replicaset. 
+rs.status()
+
+// script which runs daily to back up the mongo database
+~/backup/mongobackup.sh
+
+// tells us the scripts scheduled for daily run
+sudo crontab -l
