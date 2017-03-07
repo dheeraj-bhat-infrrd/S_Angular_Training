@@ -30,6 +30,10 @@
   display: inline-flex;
   margin-left: auto
 }
+
+.rightButtons{
+  display: flex;
+}
 .rightFloater{
   float: right;
 }
@@ -45,11 +49,39 @@
   background-color:whitesmoke;
   display:block;
 }
+
+@media (max-width: 1000px){
+
+  .content{
+    margin: 2% 2%;
+    background-color:whitesmoke;
+    width: 100%;
+    display: flex;
+  }
+
+  .leftContentContainer{
+    width:24%;
+    background-color:gray;
+    margin-right: 10px;
+    display: block;
+    box-sizing: border-box;
+  }
+
+  .rightContentContainer{
+    width:75%;
+    background-color:whitesmoke;"
+    margin-left: 10px;
+    padding: 0;
+  }
+
+
+}
 .leftContentContainer{
   width:24%;
   background-color:gray;
   margin-right: 10px;
   display: block;
+  box-sizing: border-box;
 }
 
 .rightContentContainer{
@@ -155,6 +187,12 @@ margin-right: 0 !important;
   margin-top:30px;
 }
 
+@media(min-width:500px)  {
+  .labelImage{
+    width: 40px !important;
+    height: 13px !important;
+  }
+}
 .labelImage{
   width:80px;
   height:25px
@@ -177,7 +215,7 @@ margin-right: 0 !important;
   display:flex;
   height:20px;
   background-color:black;
-  border-radius:5px
+  border-radius:5px;
 }
 
 .detractors{
@@ -205,6 +243,7 @@ margin-right: 0 !important;
 .percentageDisplay{
   display: flex !important;
   margin-top: 20px;
+  width: auto !important;
 }
 
 .redColor{
@@ -219,11 +258,25 @@ margin-right: 0 !important;
   background-color: green;
 }
 
+@media( max-width: 700px){
+  .percentageDisplay{
+    font-size: 10px;
+  }
+
+}
+
+@media( max-width: 500px){
+  .percentageDisplay{
+    font-size: 9px;
+  }
+
+}
+
 .perc{
   color: white;
   border-radius: 3px;
   margin-left: auto;
-  padding: 4px;
+  padding: 2px;
 }
 
 .socialSurveyRatings{

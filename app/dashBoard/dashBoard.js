@@ -28,7 +28,7 @@ angular.module('socialSurvey.dashBoard',['ui.router'])
     var topStores = new FusionCharts({
         type: 'bar2d',
         renderAt: 'experienceChart',
-        width: '400',
+        width: '70%',
         height: '300',
         dataFormat: 'jsonUrl',
         dataSource: "resources/json/ratingsJson.json"
