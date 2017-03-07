@@ -41,6 +41,13 @@
 
 }
 
+@media(max-width:410px){
+
+  .advantageLink{
+    display: none;
+  }
+}
+
 .mainNav{
   background-color: #0C8DE4;
   box-shadow: 4px 7px 5px lightblue;
