@@ -1,0 +1,58 @@
+Deploy web project
+
+Build project for demo profile
+copy war file to server
+  scp -i RareMile.pem /home/rohit/raremile-source/SocialSurvey/Source/SSWeb/target/SSWeb-1.0.war ec2-user@52.11.11.200:/home/ec2-user/deliverables/SSWeb-1.0.war
+  for windows:   
+  pscp -i D:\projects\socialsurvey\info-pem.ppk D:\projects\socialsurvey\repo\Source\SSWeb\target\SSWeb-1.0.war ec2-user@52.11.11.200:/home/ec2-user/deliverables/SSWeb-1.0.war
+  pscp -i D:\projects\socialsurvey\info-pem.ppk D:\projects\socialsurvey\repo\Source\SSApi\target\SSApi-1.0.war ec2-user@52.11.11.200:/home/ec2-user/deliverables/SSApi-1.0.war
+
+Login to server
+   ssh -i RareMile.pem ec2-user@52.11.11.200
+
+Kill server process
+  ps -ef | grep jboss
+
+move .war to jboss server
+	sudo cp ~/deliverables/SSWeb-1.0.war /var/lib/jboss-as/jboss-as-7.1.1.Final/standalone/deployments/SSWeb-1.0.war
+	sudo cp ~/deliverables/SSApi-1.0.war /var/lib/jboss-as/jboss-as-7.1.1.Final/standalone/deployments/SSApi-1.0.war
+
+start server
+	 cd /var/lib/jboss-as/jboss-as-7.1.1.Final/bin/
+	sudo ./standalone.sh &
+
+=========================================================================
+
+deploy batch
+
+build project
+copy jar file
+	scp -i RareMile.pem /home/rohit/raremile-source/SocialSurvey/Source/SSCore/target/SSCore-1.0.jar ec2-user@52.11.11.200:/var/lib/batch/lib/SSCore-1.0.jar
+	pscp -i D:\projects\socialsurvey\info-pem.ppk D:\projects\socialsurvey\repo\Source\SSCore\target\SSCore-1.0.jar ec2-user@52.11.11.200:/var/lib/batch/lib/SSCore-1.0.jar
+
+Login to server
+	ssh -i RareMile.pem ec2-user@52.11.11.200
+
+delete batch job process
+	ps -ef | grep java
+
+go to the bin folder
+	cd /var/lib/batch/bin/
+
+delete lock file
+	sudo rm -f batchstarter.lock 
+
+start batch process
+	sudo ./batchstarter.sh &
+
+===========================================================
+
+Connect to mongo server
+	ssh -i RareMile.pem ubuntu@52.10.26.72
+
+
+
+
+
+
+

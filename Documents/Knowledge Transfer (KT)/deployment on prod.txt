@@ -1,0 +1,62 @@
+1. Pull the latest code from master - From RareMile Repository
+2. Go-to web.filler.prod.properties. Increment the resources version
+3. Create a folder with the name of version in amazon s3 (/agent-survey/production)
+4. Delete the older folder for version (to keep the account clean)
+5. Build the project (mvn clean compile package -Pprod)
+6. Copy the resources folder into some other folder for uploading to S3 (make sure you dont switch the branch from master)
+7. Run amzon s3 client from the place where you have keys for prod(awsclient). Make sure that you install it.
+	a. aws s3 cp E:\raremile_projects\socialsurvey\deploy_resources s3://agent-survey/production/v1.57 --recursive --acl public-read --cache-control 2592000 --expires "Mon, 08 Aug 2016 05:30:00 GMT"	
+	b. Change '/Users/nishit/work/Social_Survey/deploy' to the folder that you created to copy resources
+	c. Change the verion number in the path
+	d. Change the Expires value (1 month from today)
+8. Deploy latest code to server
+	a. Open the AWS console and open the ssh port for your IP for web-server and web-server-secondary
+	b. Run the following 3 commands
+		b1. e-1.0.jarscp -i RareMile.pem /Users/nishit/work/Social_Survey/Source/SocialSurvey/Source/SSWeb/target/SSWeb-1.0.war ec2-user@52.11.208.165:/home/ec2-user/deliverables/SSWeb-1.0.war -  Copies war to web-survey deliverables folder
+		b2. scp -i RareMile.pem /Users/nishit/work/Social_Survey/Source/SocialSurvey/Source/SSCore/target/SSCore-1.0.jar ec2-user@52.11.208.165:/home/ec2-user/deliverables/SSCore-1.0.jar - Copies batch jar to deliverable folder in web-survey
+		b3. scp -i RareMile.pem /Users/nishit/work/Social_Survey/Source/SocialSurvey/Source/SSWeb/target/SSWeb-1.0.war ec2-user@52.26.180.213:/home/ec2-user/deliverables/SSWeb-1.0.war - Copies war to web-survey-secondary deliverables folder
+	c. ssh into the server.
+	d. make sure that the deliverables are present
+	e. take back up of existing deliverable
+		e1. sudo cp /var/lib/jboss-as/jboss-as-7.1.1.Final/standalone/deployments/SSWeb-1.0.war ~/deliverables/backup/SSWeb-1.0.war (Copy war)
+		e2. sudo cp /var/lib/batch/lib/SSCore-1.0.jar ~/deliverables/backup/SSCore-1.0.jar (in case if you are in the web-survey server)
+		e3. Remove the server that you are logged in from load balancer
+			e3a. Go to AWS console -> EC2 instances -> Load Balancers
+			e3b. Click on instances. Remove the web server
+			e3c. Open socialsurvey in web browser to chk that we have bot accidently removed the wrong server from load balancer
+		e4. Kill the jboss process. ps -ef | grep jboss 
+		e5. sudo kill -9 <pid>
+		e6. Execute cd /var/lib/jboss-as/jboss-as-7.1.1.Final/standalone/deployments/
+		e7. sudo mv ~/deliverables/SSWeb-1.0.war .
+		e8. Execute cd ../../bin
+		sudo java -jar /var/lib/jboss-as/jboss-as-7.1.1.Final/newrelic/newrelic.jar deployment
+		e9. run sudo ./standalone.sh &
+		e10. Make sure that server starts normally
+		e11. Atach the instance back to load balancer. Wait for it to get back in service
+		e12. Remove the other instance from the load balancer.
+		e13. Hit socialsurvey.me again on brwoser and got to developer tools -> Network. Check if the latest resources version is loading up
+		e14. Deploy batch.
+			e14a. Check if any batch is running. cd /var/lib/batch/standalone/log/
+			e14b. tail -f logfile.log and see if there is any batch running
+			e14c. Kill BatchStarter process
+			e14c. Remove lock file from ../../bin
+			e14d. sudo rm -f batchstarter.lock
+			e14e. Replace the jar from deliverables folder
+			e14f. sudo mv ~/deliverables/SSCore-1.0.jar /var/lib/batch/lib/SSCore-1.0.jar
+			e14g. Run batch. sudo ./batchstarter.sh &
+		e15. Do the same for the other server. (If web-seurvey-secondary, No need to deploy batch)
+		e16. Make sure that the instance is off the load balancer
+		e17. After repeating the deployment process, make sure that you add the server to load balancer. Once added, remove the other server from the load balancer. and run the e13 step
+		e18. Attach both servers to load balancer.
+		e19. Close the ports.
+
+
+
+
+
+Servers
+EC2 Instance name 													IP Address				User
+web-survey (Primary web server)										52.11.208.165			ec2-user
+web-survey-secondary (Secondary web server, Mongo arbitrator)		52.26.180.213			ec2-user
+nosql-survey (Mongo and SOLR)										52.24.71.27				ubuntu
+nosql-survey-secondary (Mongo)										52.26.22.72				ubuntu

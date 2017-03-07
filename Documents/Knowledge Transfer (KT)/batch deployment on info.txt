@@ -1,0 +1,32 @@
+1. Build project with demo profile
+	mvn clean compile package -Pdemo
+	
+2. Copy jar file
+	For Unix based OS:
+		scp -i RareMile.pem /home/rohit/raremile-source/SocialSurvey/Source/SSCore/target/SSCore-1.0.jar ec2-user@52.11.11.200:/var/lib/batch/lib/SSCore-1.0.jar
+	
+	For Windows OS:
+		pscp -i E:\raremile_projects\socialsurvey\info-pem.ppk E:\raremile_projects\socialsurvey\repo\Source\SSCore\target\SSCore-1.0.jar ec2-user@52.11.11.200:/var/lib/batch/lib/SSCore-1.0.jar
+
+3. Login to server
+	ssh -i RareMile.pem ec2-user@52.11.11.200
+
+4. Delete batch job process
+	ps -ef | grep java
+	sudo kill -9 <pid>
+
+5. Go to the bin folder
+	cd /var/lib/batch/bin/
+
+6. Delete lock file
+	sudo rm -f batchstarter.lock 
+
+7. Start batch process
+	sudo ./batchstarter.sh &
+
+
+
+
+
+
+

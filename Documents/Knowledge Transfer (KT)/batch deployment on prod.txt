@@ -1,0 +1,33 @@
+git branch -- To see current branch checkedout
+git remote -v -- To see remote versions
+git fetch upstream -- To fetch latest code of all branches
+git checkout master -- To checkout master branch
+git merge upstream/master -- To merge upstream master into your origin
+mvn clean compile package -Pprod
+
+******************
+Batch Deployment:
+******************
+Open the AWS console and open the ssh port for your IP for web-survey(ip - 52.11.208.165)
+
+Copy jar to the server
+	pscp -i E:\raremile_projects\socialsurvey\info-pem.ppk E:\raremile_projects\socialsurvey\repo\Source\SSCore\target\SSCore-1.0.jar ec2-user@52.11.208.165:/home/ec2-user/deliverables/SSCore-1.0.jar
+
+Login to prod using putty with user: ec2-user
+
+take the backup of the jar and then move the new jar 
+	sudo cp deliverables/SSCore-1.0.jar deliverables/backup/SSCore-1.0.jar_<todays date>
+	sudo mv deliverables/SSCore-1.0.jar /var/lib/batch/lib/SSCore-1.0.jar
+
+delete batch job process
+	ps -ef | grep java
+
+go to the bin folder
+	cd /var/lib/batch/bin/
+
+delete lock file
+	sudo rm -f batchstarter.lock 
+
+start batch process
+	sudo ./batchstarter.sh &
+
