@@ -1466,8 +1466,8 @@ public class DashboardController
                 || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) {
                 isRealTechOrSSAdmin = true;
             }
-            String mailId = null;
-            if ( !isRealTechOrSSAdmin ) {
+            String mailId = request.getParameter( "mailid" );
+            if ( !isRealTechOrSSAdmin && ( mailId == null || mailId.isEmpty() ) ) {
                 mailId = user.getEmailId();
             }
 
@@ -1550,10 +1550,11 @@ public class DashboardController
                 || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) {
                 isRealTechOrSSAdmin = true;
             }
-            String mailId = null;
-            if ( !isRealTechOrSSAdmin ) {
+            String mailId = request.getParameter( "mailid" );
+            if ( !isRealTechOrSSAdmin && ( mailId == null || mailId.isEmpty() ) ) {
                 mailId = user.getEmailId();
             }
+
             String columnName = request.getParameter( "columnName" );
             if ( !isRealTechOrSSAdmin && ( columnName == null || columnName.isEmpty() ) ) {
                 LOG.error( "Invalid value (null/empty) passed for profile level." );
@@ -2101,6 +2102,8 @@ public class DashboardController
         User user = sessionHelper.getCurrentUser();
         String message = null;
         try {
+            String mailId = request.getParameter( "mailid" );
+            
             String columnName = request.getParameter( "columnName" );
             if ( columnName == null || columnName.isEmpty() ) {
                 LOG.error( "Invalid value (null/empty) passed for column name." );
@@ -2121,7 +2124,7 @@ public class DashboardController
             }
 
             String profileLevel = getProfileLevel( columnName );
-            adminReport.createEntryInFileUploadForUserAdoptionReport( iden, profileLevel, user.getUserId(), user.getCompany() );
+            adminReport.createEntryInFileUploadForUserAdoptionReport( iden, profileLevel, user.getUserId(), user.getCompany(), mailId );
             message = "The User Adoption Report will be mailed to you shortly";
 
         } catch ( NonFatalException e ) {
