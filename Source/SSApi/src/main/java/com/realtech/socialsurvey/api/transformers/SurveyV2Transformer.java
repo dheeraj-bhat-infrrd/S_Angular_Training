@@ -132,6 +132,9 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
                     CommonConstants.SURVEY_API_DATE_FORMAT ) );
             if ( StringUtils.isBlank( transactionInfo.getTransactionRef() ) )
                 transactionInfo.setTransactionRef( surveyPreInitiation.getSurveySourceId() );
+            //if not updates in mongo then we update from sql
+            //but since we aren't updating the type feild in mongo we directly update 
+            transactionInfo.setTransactionType( surveyPreInitiation.getTransactionType() );
 
         }
 
