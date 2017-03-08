@@ -862,8 +862,6 @@ public interface CommonConstants
 
     public static final String SURVEY_SOURCE_ZILLOW = "Zillow";
     
-    public static final String IS_REALTECH_ADMIN = "isRealTechAdmin";
-
     //Excel constants
     public final String EXCEL_FORMAT = "application/vnd.ms-excel";
     public final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
