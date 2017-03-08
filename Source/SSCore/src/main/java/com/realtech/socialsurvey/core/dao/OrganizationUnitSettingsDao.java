@@ -240,7 +240,7 @@ public interface OrganizationUnitSettingsDao
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException;
 
 
-    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state, String encompassVersion )
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state )
         throws InvalidInputException, NoRecordsFetchedException;
 
 
