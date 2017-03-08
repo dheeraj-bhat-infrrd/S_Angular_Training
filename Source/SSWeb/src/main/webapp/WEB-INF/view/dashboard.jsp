@@ -120,10 +120,10 @@
 				</div>
 			</div>
 			<c:if test="${not empty realTechAdminId }">
-				<input id="dsh-report-email-id" type="hidden" value="admin@socialsurvey.me">
+				<input id="report-email-id" type="hidden" value="admin@socialsurvey.com">
 			</c:if>
 			<c:if test="${empty realTechAdminId }">
-				<input id="dsh-report-email-id" type="hidden" value="${emailId}">
+				<input id="report-email-id" type="hidden" value="${emailId}">
 			</c:if>
 			<c:choose>
 				<c:when test="${profilemasterid == 4 || accounttype == 'INDIVIDUAL' }">

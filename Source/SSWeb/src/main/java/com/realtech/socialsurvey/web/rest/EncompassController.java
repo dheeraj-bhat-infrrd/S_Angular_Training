@@ -60,8 +60,7 @@ public class EncompassController extends AbstractController
      */
     @ResponseBody
     @RequestMapping ( value = "/getcompanycredentials")
-    public List<CompanyEncompassInfo> getCompanyCredentials( @QueryParam ( value = "state") String state,
-        @QueryParam ( value = "version") String version )
+    public List<CompanyEncompassInfo> getCompanyCredentials( @QueryParam ( value = "state") String state )
     {
         List<CompanyEncompassInfo> crmInfoList = new ArrayList<CompanyEncompassInfo>();
         LOG.info( "Method to get the encompass credentials for all companies started." );
@@ -70,11 +69,7 @@ public class EncompassController extends AbstractController
                 throw new InvalidInputException( "The state parameter is empty" );
             }
 
-            if ( version == null || version.isEmpty() ) {
-                throw new InvalidInputException( "The version parameter is empty" );
-            }
-
-            List<OrganizationUnitSettings> companyList = organizationManagementService.getCompanyListForEncompass( state, version );
+            List<OrganizationUnitSettings> companyList = organizationManagementService.getCompanyListForEncompass( state );
 
 
             for ( OrganizationUnitSettings company : companyList ) {
