@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.core.commons;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -17,10 +19,14 @@ public interface CommonConstants
      */
     public static final String CONFIG_PROPERTIES_FILE = "config.properties";
     public static final String MESSAGE_PROPERTIES_FILE = "displaymessage.properties";
+    //default email settings 
     public static final String SENDGRID_SENDER_USERNAME = "SENDGRID_SENDER_USERNAME";
     public static final String SENDGRID_SENDER_NAME = "SENDGRID_SENDER_NAME";
     public static final String SENDGRID_SENDER_PASSWORD = "SENDGRID_SENDER_PASSWORD";
-
+    //email settings for socialsurvey.us
+    public static final String SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME = "SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME";
+    public static final String SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD = "SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD";
+    public static final String SENDGRID_SENDER_SOCIALSURVEYUS_NAME = "SENDGRID_SENDER_SOCIALSURVEYUS_NAME";
     /**
      * Default constants
      */
@@ -348,6 +354,9 @@ public interface CommonConstants
     public static final String CITY = "city";
     public static final String CRM_SOURCE = "crm_source";
     public static final String VERTICAL = "vertical";
+    public static final String SEND_EMAIL_THROUGH_SOCIALSURVEY_ME = "socialsurvey.me";
+    public static final String SEND_EMAIL_THROUGH_SOCIALSURVEY_US = "socialsurvey.us";
+    
     // JIRA - SS-536: Added for manual registration via invite
     public static final String BILLING_MODE_COLUMN = "billingMode";
     public static final String VERTICAL_COLUMN = "verticalsMaster";
@@ -518,7 +527,8 @@ public interface CommonConstants
     public static final String ENCOMPASS_PASSWORD_COLUMN = "password";
     public static final String ENCOMPASS_GENERATE_REPORT_COLUMN = "generateReport";
     public static final String ENCOMPASS_DEFAULT_FEILD_ID = "1997";
-
+    public static final String ENCOMPASS_VERSION_COULMN = "version";
+    public static final List<String> ENCOMPASS_VERSIONS = Arrays.asList( "16.2.0","16.3.2","17.1.0" );
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
@@ -851,6 +861,8 @@ public interface CommonConstants
     public static final String PATTERN_LAST = "patternLast";
 
     public static final String SURVEY_SOURCE_ZILLOW = "Zillow";
+    
+    public static final String IS_REALTECH_ADMIN = "isRealTechAdmin";
 
     //Excel constants
     public final String EXCEL_FORMAT = "application/vnd.ms-excel";

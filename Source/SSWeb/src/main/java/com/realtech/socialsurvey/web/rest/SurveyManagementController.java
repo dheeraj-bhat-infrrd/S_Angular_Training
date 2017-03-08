@@ -289,18 +289,23 @@ public class SurveyManagementController
                 double surveyScoreValue = survey.getScore();
                 boolean allowCheckBox = true;
                 OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings( agentId );
-                if ( agentSettings != null ) {
-                    SurveySettings surveySettings = agentSettings.getSurvey_settings();
-                    if ( surveySettings != null ) {
-                        float throttleScore = surveySettings.getShow_survey_above_score();
-                        if ( surveyScoreValue < throttleScore ) {
-                            allowCheckBox = false;
-                        }
-                    } else {
-                        if ( surveyScoreValue < CommonConstants.DEFAULT_AUTOPOST_SCORE ) {
-                            allowCheckBox = false;
-                        }
-                    }
+                
+                if(mood != null && ! mood.equalsIgnoreCase( "Great" )) {
+                	allowCheckBox = false;
+                } else {
+	                if ( agentSettings != null ) {
+	                    SurveySettings surveySettings = agentSettings.getSurvey_settings();
+	                    if ( surveySettings != null ) {
+	                        float throttleScore = surveySettings.getShow_survey_above_score();
+	                        if ( surveyScoreValue < throttleScore ) {
+	                            allowCheckBox = false;
+	                        }
+	                    } else {
+	                        if ( surveyScoreValue < CommonConstants.DEFAULT_AUTOPOST_SCORE ) {
+	                            allowCheckBox = false;
+	                        }
+	                    }
+	                }
                 }
                 // Generate the text as in mail
                 String surveyDetail = generateSurveyTextForMail( customerName, mood, survey, isAbusive, allowCheckBox );
@@ -378,10 +383,15 @@ public class SurveyManagementController
             .append( CommonUtils.formatDate( survey.getCreatedOn(), "MM/dd/yyyy" ) ).append( tableRowEnd );
         surveyDetail.append( tableOneRowStart ).append( "Overall Experience:" ).append( tableRowMiddle ).append( mood )
             .append( tableRowEnd );
-        surveyDetail.append( tableOneRowStart ).append( "Agreed to Share:" ).append( tableRowMiddle )
-            .append( ( allowCheckBox ) ? "Yes" : "No" ).append( tableRowEnd );
+        
+        if(allowCheckBox) {
+	        surveyDetail.append( tableOneRowStart ).append( "Agreed to Share:" ).append( tableRowMiddle )
+	            .append( survey.getAgreedToShare().equalsIgnoreCase("true") ? "Yes" : "No" ).append( tableRowEnd );
+        }
+        
         surveyDetail.append( tableOneRowStart ).append( "Abusive Words:" ).append( tableRowMiddle )
             .append( ( isAbusive ) ? "Yes" : "No" ).append( tableRowEnd );
+        
         //adding transaction ref id
         if(! StringUtils.isEmpty( survey.getSourceId() )){
             surveyDetail.append( tableOneRowStart ).append( "Transaction Ref Id:" ).append( tableRowMiddle ).append( survey.getSourceId() )

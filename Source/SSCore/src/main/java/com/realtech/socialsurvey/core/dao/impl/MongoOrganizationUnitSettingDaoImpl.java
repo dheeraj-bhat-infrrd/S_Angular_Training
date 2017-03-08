@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -107,6 +106,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_USER_ENCRYPTED_ID = "userEncryptedId";
     public static final String KEY_VENDASTA_RM_SETTINGS = "vendasta_rm_settings";
     public static final String KEY_REVIEW_SORT_CRITERIA = "reviewSortCriteria";
+    public static final String KEY_SEND_EMAIL_THROUGH = "sendEmailThrough";
 
 
 
@@ -705,6 +705,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             LOG.debug( "state is not present to fetch encompass info list." );
             throw new InvalidInputException( "state is not present to fetch encompass info list." );
         }
+        
+        
         List<OrganizationUnitSettings> organizationUnitsSettingsList = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_CRM_INFO ).exists( true ).and( KEY_CRM_INFO_SOURCE )
@@ -717,6 +719,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         } else {
             throw new InvalidInputException( "Invalid encompass crm info state : " + state );
         }
+
+        //filter out other versions of encompass info needed
+       /* query.addCriteria(
+            Criteria.where( KEY_CRM_INFO + "." + CommonConstants.ENCOMPASS_VERSION_COULMN ).is( encompassVersion ) );*/
 
         //Add criteria to make sure that it doesn't pick up companies that are deleted
         query.addCriteria( Criteria.where( KEY_STATUS ).ne( CommonConstants.STATUS_DELETED_MONGO ) );

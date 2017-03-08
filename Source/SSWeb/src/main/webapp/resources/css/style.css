@@ -970,3 +970,55 @@ display: inline-block;
 .stng-padng {
 	padding-right: 50px;
 }
+.customized-settings-wrapper {
+    margin-top: 25px;
+}
+
+.customized-settings-child {
+	display: flex;
+    font-family: opensanslight;
+    font-weight: bold !important;
+    justify-content: flex-start;
+    padding-top: 16px;
+    height: 50px;
+    line-height: 16px;
+    flex-direction: column;
+    text-align: left;
+}
+
+.width-three-five-zero{
+	width: 350px;
+}
+
+.listing-access-txt {
+    margin-bottom: 20px;
+    display: flex;
+    font-family: opensanslight;
+    font-weight: bold !important;
+    justify-content: flex-start;
+    padding-top: 16px;
+    height: 50px;
+    line-height: 16px;
+    flex-direction: column;
+    text-align: left;
+}
+
+.margin-top-twenty {
+	margin-top: 20px;
+}
+
+.margin-bottom-twenty {
+	margin-bottom: 20px;
+}
+
+.padding-bottom-twenty {
+	padding-bottom: 20px;
+}
+
+.padding-top-ten {
+	padding-top: 10px;
+}
+
+.margin-top-hundred {
+	margin-top: 100px;
+}

@@ -1452,5 +1452,9 @@ public interface OrganizationManagementService
 
     public void updateSortCriteriaForCompany( OrganizationUnitSettings companySettings, String sortCriteria )
         throws InvalidInputException;
+    
+   
+    void updateSendEmailThroughForCompany( OrganizationUnitSettings companySettings, String sendEmailThrough )
+        throws InvalidInputException;
 
 }

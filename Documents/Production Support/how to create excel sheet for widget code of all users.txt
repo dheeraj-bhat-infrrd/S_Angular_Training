@@ -1,0 +1,16 @@
+1. workbook of all users widget code for a particular company
+Workbook should contain
+Agent First Name
+Agent Last Name
+Agent Email
+Agent SocialSurvey URL
+Agent Widget Code
+
+resolution:
+fetch Agent First Name, Agent Last Name, Agent Email, user id from sql db
+SELECT U.USER_ID, U.FIRST_NAME, U.LAST_NAME, U.EMAIL_ID FROM USERS U , USER_PROFILE UP WHERE U.COMPANY_ID = 139 AND U.STATUS IN (1,2) AND UP.PROFILES_MASTER_ID = 4 AND U.USER_ID = UP.USER_ID GROUP BY U.USER_ID;
+
+fetch profile url from mongo db, run scripts/agent_profiles.js on production mongo server 
+sudo agent_profiles.js > agent_profiles.csv
+
+#VLOOKUP(A2,Sheet1!A2:B266,2,FALSE)

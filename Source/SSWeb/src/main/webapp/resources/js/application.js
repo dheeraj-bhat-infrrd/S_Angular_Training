@@ -1854,6 +1854,26 @@ function setUpListenerForSortCriteriaDropdown(){
 	});
 }
 
+function setUpListenerForEmailOptionDropdown(){
+	$("#email-sel").on('change',function(event){
+		var payload = {
+			"sendEmailThrough" : $("#email-sel").val()
+		};
+		
+		callAjaxPostWithPayloadData( "./updatesendemailthrough.do", function(data){
+				var message = JSON.parse(data);
+				if (message.type != "ERROR_MESSAGE") {
+					$('#overlay-toast').html(message.message + ' to ' + $("#email-sel").find(":selected").attr('data-email-option'));
+					showToast();
+				}
+				else {
+					$('#overlay-toast').html(message.message);
+					showToast();
+				}
+			}, payload, false);
+	});
+}
+
 $(document).click(function(e) {
 	e.stopPropagation();
 	if ($('#da-dd-wrapper-profiles').css('display') == "block") {
@@ -8325,54 +8345,78 @@ $(document).on('change', '#download-survey-reports', function() {
 	// var selectedValue =
 });
 
-$(document).on('click', '#dsh-dwnld-report-btn', function() {
+$(document).on('click', '#dsh-dwnld-report-btn', function(e) {
 	var selectedValue = $('#download-survey-reports').val();
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
-	var emailId = $("#dsh-report-email-id").val();
-	var popupTitle = "Generate Report";
-	var popupMsg = "Your report has been submitted. We will send the report to email - " + emailId;
-	var key = parseInt(selectedValue);
-	switch (key) {
-	case 1:
-		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
-		callAjaxGetWithPayloadData("./downloadagentrankingreport.do", function(data) {
-			createPopupInfo(popupTitle, popupMsg);
-		}, payload, true);
-		break;
-	case 2:
-		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
-		callAjaxGetWithPayloadData("./generatecustomersurveyresults.do", function(data) {
-			createPopupInfo(popupTitle, popupMsg);
-		}, payload, true);
-		break;
-	case 3:
-		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
-		callAjaxGetWithPayloadData("./downloaddashboardsocialmonitor.do", function(data) {
-			createPopupInfo(popupTitle, popupMsg);
-		}, payload, true);
-		break;
-	case 4:
-		var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName};
-		callAjaxGetWithPayloadData("./downloaddashboardincompletesurvey.do", function(data) {
-			createPopupInfo(popupTitle, popupMsg);
-		}, payload, true);
-		break;
-	case 5:
-		var payload = {"columnValue" : colValue, "columnName": colName};
-		callAjaxGetWithPayloadData("./downloaduseradoptionreport.do", function(data) {
-			createPopupInfo(popupTitle, popupMsg);
-		}, payload, true);
-		break;
-	case 6:
-		var payload = {"columnValue" : colValue, "columnName": colName};
-		callAjaxGetWithPayloadData("./downloadcompanyhierarchyreport.do", function(data) {
-			createPopupInfo(popupTitle, popupMsg);
-		}, payload, true);
-		break;
-	default:
-		break;
-	}
+	var popupMsg = '<div>We will mail you the report. Please specify email address to send report to: <br><br>'
+					+'	<input id="dsh-report-email-id" name="dsh-report-email-id" type="text" class="dash-sel-item" placeholder="Email Address">'
+					+'</div>';
+	
+	e.stopPropagation();
+	$('#overlay-continue').html("Submit");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Generate Report");
+	$('#overlay-text').html(popupMsg);
+	
+
+	$('#overlay-continue').click(function() {
+		var emailId = $("#dsh-report-email-id").val();
+		var reportEmailId = $("#report-email-id").val(); 
+		var emailIdMsg = (emailId != null && emailId != undefined && emailId != "") ? emailId : reportEmailId;
+		if(emailId == null || emailId == undefined || emailId == "" || validateEmailId("dsh-report-email-id", true)){
+			var key = parseInt(selectedValue);
+			switch (key) {
+			case 1:
+				var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName, "mailid": emailId};
+				callAjaxGetWithPayloadData("./downloadagentrankingreport.do", function(data) {
+					$('#overlay-main').hide();
+					showInfo("User Ranking Report will be mailed to: "+emailIdMsg+" shortly.");
+				}, payload, true);
+				break;
+			case 2:
+				var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName, "mailid": emailId};
+				callAjaxGetWithPayloadData("./generatecustomersurveyresults.do", function(data) {
+					$('#overlay-main').hide();
+					showInfo("Survey Results Report will be mailed to: "+emailIdMsg+" shortly.");
+				}, payload, true);
+				break;
+			case 3:
+				var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName, "mailid": emailId};
+				callAjaxGetWithPayloadData("./downloaddashboardsocialmonitor.do", function(data) {
+					$('#overlay-main').hide();
+					showInfo("Social Monitor Report will be mailed to: "+emailIdMsg+" shortly.");
+				}, payload, true);
+				break;
+			case 4:
+				var payload = { "startDate":startDate, "endDate":endDate, "columnValue" : colValue, "columnName": colName, "mailid": emailId};
+				callAjaxGetWithPayloadData("./downloaddashboardincompletesurvey.do", function(data) {
+					$('#overlay-main').hide();
+					showInfo("Incomplete Survey Report will be mailed to: "+emailIdMsg+" shortly.");
+				}, payload, true);
+				break;
+			case 5:
+				var payload = {"columnValue" : colValue, "columnName": colName, "mailid": emailId};
+				callAjaxGetWithPayloadData("./downloaduseradoptionreport.do", function(data) {
+					$('#overlay-main').hide();
+					showInfo("User Adoption Report will be mailed to: "+emailIdMsg+" shortly.");
+				}, payload, true);
+				break;
+			case 6:
+				var payload = {"columnValue" : colValue, "columnName": colName, "mailid": emailId};
+				callAjaxGetWithPayloadData("./downloadcompanyhierarchyreport.do", function(data) {
+					$('#overlay-main').hide();
+					showInfo("Company Hierarchy Report will be mailed to: "+emailIdMsg+" shortly.");
+				}, payload, true);
+				break;
+			default:
+				break;
+			}
+			$('#overlay-continue').unbind('click');
+			
+		}
+	});
+	$('#overlay-main').show();
 });
 
 // function to switch to admin

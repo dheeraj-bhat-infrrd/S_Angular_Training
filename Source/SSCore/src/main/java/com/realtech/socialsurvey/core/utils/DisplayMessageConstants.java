@@ -261,5 +261,11 @@ public final class DisplayMessageConstants
     //sort criteria settings constants
     public static final String INSUFFICIENT_USER_PERMISSION = "INSUFFICIENT_USER_PERMISSION";
     public static final String SORT_CRITERIA_SUCCESSFULLY_UPDATED = "SORT_CRITERIA_SUCCESSFULLY_UPDATED";
+    public static final String SEND_EMAIL_THROUGH_SUCCESSFULLY_UPDATED = "SEND_EMAIL_THROUGH_SUCCESSFULLY_UPDATED";
+    public static final String SEND_EMAIL_THROUGH_UNSUCCESSFULLY_UPDATED = "SEND_EMAIL_THROUGH_UNSUCCESSFULLY_UPDATED";
+    
+    //email criteria
+    public static final String INSUFFICIENT_SENDGRID_USER_PERMISSION="INSUFFICIENT_SENDGRID_USER_PERMISSION";
+    
 }
 

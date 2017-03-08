@@ -533,6 +533,11 @@ public class AdminController
             //Set the autologin attribute as true
             newSession.setAttribute( CommonConstants.IS_AUTO_LOGIN, "true" );
             newSession.setAttribute( CommonConstants.REALTECH_USER_ID, adminUser.getUserId() );
+            if(adminUser.isSuperAdmin()){
+                newSession.setAttribute( CommonConstants.IS_REALTECH_ADMIN, true );
+            }else{
+                newSession.setAttribute( CommonConstants.IS_REALTECH_ADMIN, false );
+            }
 
             sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
 

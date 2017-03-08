@@ -771,6 +771,11 @@ public class OrganizationManagementController
             surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
             model.addAttribute( "defaultSurveyProperties", surveySettings );
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
+            if(companySettings.getSendEmailThrough()== null){
+                model.addAttribute("sendEmailThrough",CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME);
+            }else{
+                model.addAttribute("sendEmailThrough",companySettings.getSendEmailThrough()); 
+            }
 
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
@@ -3539,6 +3544,58 @@ public class OrganizationManagementController
                 DisplayMessageType.ERROR_MESSAGE );
         }
         LOG.info( "Method UpdateSortCriteria of OrganizationManagementController finished" );
+        return new Gson().toJson( message );
+    }
+    
+    //JIRA SS-975
+    @RequestMapping ( value = "/updatesendemailthrough", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSendEmailThrough( HttpServletRequest request )
+    {
+        LOG.info( "Method UpdateSendEmailThrough of OrganizationManagementController called" );
+        DisplayMessage message = null;
+        try {
+            HttpSession session = request.getSession( false );
+            OrganizationUnitSettings companySettings = null;
+            String sendEmailThrough = (String) request.getParameter( "sendEmailThrough" );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            boolean isRealTechAdmin = (boolean) session.getAttribute( CommonConstants.IS_REALTECH_ADMIN );
+            if ( entityType.equals( "companyId" ) ) {
+                try {
+                    companySettings = organizationManagementService.getCompanySettings( entityId );
+                    User user = sessionHelper.getCurrentUser();
+                    if ( companySettings == null ) {
+                        message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID,
+                            DisplayMessageType.ERROR_MESSAGE );
+                    } else if ( user != null &&  isRealTechAdmin == true ) {
+                        if(sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME)|| sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US)){
+                            organizationManagementService.updateSendEmailThroughForCompany( companySettings, sendEmailThrough );
+                            message = messageUtils.getDisplayMessage( DisplayMessageConstants.SEND_EMAIL_THROUGH_SUCCESSFULLY_UPDATED,
+                                DisplayMessageType.SUCCESS_MESSAGE );
+                        }
+                        else{
+                            message = messageUtils.getDisplayMessage( DisplayMessageConstants.SEND_EMAIL_THROUGH_UNSUCCESSFULLY_UPDATED,
+                                DisplayMessageType.ERROR_MESSAGE );
+                        }
+                        
+                    } else {
+                        message = messageUtils.getDisplayMessage( DisplayMessageConstants.INSUFFICIENT_SENDGRID_USER_PERMISSION,
+                            DisplayMessageType.ERROR_MESSAGE );
+                    }
+                } catch ( InvalidInputException error ) {
+                    LOG.error( "unable to update email criteria, company doesnt exist" );
+                    message = messageUtils.getDisplayMessage( error.getErrorCode(), DisplayMessageType.ERROR_MESSAGE );
+                }
+
+            }
+        } catch ( Exception globalError ) {
+            LOG.error( "unable to update email criteria" );
+            message = messageUtils.getDisplayMessage( ( (NonFatalException) globalError ).getErrorCode(),
+                DisplayMessageType.ERROR_MESSAGE );
+        }
+        LOG.info( "Method updateSendEmailThrough of OrganizationManagementController finished" );
         return new Gson().toJson( message );
     }
 }
