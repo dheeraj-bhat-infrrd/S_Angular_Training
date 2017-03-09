@@ -782,21 +782,18 @@ public class DashboardController
     public String getIncompleteSurveyCount( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
-        List<SurveyPreInitiation> surveyDetails;
+        long count = 0l;
         User user = sessionHelper.getCurrentUser();
-        String realtechAdminStr = request.getParameter( "realtechAdmin" );
-        boolean realtechAdmin = false;
-        realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
 
         try {
-            surveyDetails = fetchIncompleteSurveys( request, user, realtechAdmin );
+            count = fetchIncompleteSurveyCountForDashboardAllTime( request, user );
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
             return e.getMessage();
         }
 
         LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
-        return String.valueOf( surveyDetails.size() );
+        return String.valueOf( count );
     }
 
 
@@ -881,6 +878,44 @@ public class DashboardController
         return new Gson().toJson( solrDocuments );
     }
 
+    // fetch the count of incomplete survey
+    private long fetchIncompleteSurveyCountForDashboardAllTime(HttpServletRequest request, User user) throws InvalidInputException{
+    	LOG.debug("Fetching incomplete survey count");
+    	long count = 0;
+    	String columnName = request.getParameter( "columnName" );
+        if ( columnName == null || columnName.isEmpty() ) {
+            LOG.error( "Invalid value (null/empty) passed for profile level." );
+            throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+        }
+        String profileLevel = getProfileLevel( columnName );
+
+        long iden = 0;
+        if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            iden = user.getCompany().getCompanyId();
+        } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+            iden = user.getUserId();
+        } else {
+            String columnValue = request.getParameter( "columnValue" );
+            if ( columnValue != null && !columnValue.isEmpty() ) {
+                try {
+                    iden = Long.parseLong( columnValue );
+                } catch ( NumberFormatException e ) {
+                    LOG.error( "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
+                        e );
+                    throw e;
+                }
+            }
+        }
+        
+        try {
+            count = profileManagementService.getIncompleteSurveyCount(iden, profileLevel, null, null);
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
+            throw e;
+        }
+        
+    	return count;
+    }
 
     /*
      * Fetches incomplete surveys based upon the criteria. Criteria can be

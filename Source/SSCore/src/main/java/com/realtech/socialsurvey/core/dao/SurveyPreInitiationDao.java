@@ -61,7 +61,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
      * @param agentIds
      * @return
      */
-    public long getIncompleteSurveyCount( long companyId, long agentId, int status, Timestamp startDate, Timestamp endDate,
+    public long getIncompleteSurveyCount( long companyId, long agentId, int[] status, Timestamp startDate, Timestamp endDate,
         Set<Long> agentIds );
 
 
