@@ -2,14 +2,20 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -253,7 +259,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
     @SuppressWarnings ( "unchecked")
     @Override
-    public long getIncompleteSurveyCount( long companyId, long agentId, int status, Timestamp startDate, Timestamp endDate,
+    public long getIncompleteSurveyCount( long companyId, long agentId, int[] status, Timestamp startDate, Timestamp endDate,
         Set<Long> agentIds )
     {
         LOG.info( "getting incomplete survey count" );
@@ -263,12 +269,21 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             queryBuilder.append( " COMPANY_ID = :companyId" );
             whereFlag = true;
         }
-        // Change the incomplete count for status 1 and 2 - Important! Needs to be modified later to accomodate status list in input
-        if ( whereFlag ) {
-            queryBuilder.append( " AND STATUS IN (0,1,2)" );
-        } else {
-            queryBuilder.append( " STATUS IN (0,1,2)" );
-            whereFlag = true;
+        if(status != null){
+        	StringBuilder statusCrit = new StringBuilder(" STATUS IN (");
+        	for(int i=0; i< status.length; i++){
+        		if(i != 0){
+        			statusCrit.append(",");
+        		}
+        		statusCrit.append(status[i]);
+        	}
+        	statusCrit.append("");
+	        if ( whereFlag ) {
+	        	queryBuilder.append( " AND").append(statusCrit.toString());
+	        } else {
+	            queryBuilder.append( statusCrit.toString());
+	            whereFlag = true;
+	        }
         }
         if ( startDate != null ) {
             if ( whereFlag ) {
