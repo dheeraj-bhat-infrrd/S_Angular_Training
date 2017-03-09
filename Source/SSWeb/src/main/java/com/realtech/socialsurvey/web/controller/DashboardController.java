@@ -129,10 +129,6 @@ public class DashboardController
     @Value ( "${APPLICATION_BASE_URL}")
     private String appBaseUrl;
 
-    private final String EXCEL_FORMAT = "application/vnd.ms-excel";
-    private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
-    private final String EXCEL_FILE_EXTENSION = ".xlsx";
-
 
     /*
      * Method to initiate dashboard
@@ -149,6 +145,7 @@ public class DashboardController
 
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
 
         boolean modelSet = false;
         if ( user.getCompany() != null && user.getCompany().getLicenseDetails() != null
@@ -191,7 +188,7 @@ public class DashboardController
         }
 
         model.addAttribute( "userId", user.getUserId() );
-        model.addAttribute( "emailId", user.getEmailId() );
+        model.addAttribute( "emailId", adminUserid != null ? applicationAdminEmail : user.getEmailId() );
         model.addAttribute( "profileName", profileName );
 
         //get detail of expire social media
@@ -2103,7 +2100,7 @@ public class DashboardController
         String message = null;
         try {
             String mailId = request.getParameter( "mailid" );
-            
+
             String columnName = request.getParameter( "columnName" );
             if ( columnName == null || columnName.isEmpty() ) {
                 LOG.error( "Invalid value (null/empty) passed for column name." );
@@ -2124,7 +2121,8 @@ public class DashboardController
             }
 
             String profileLevel = getProfileLevel( columnName );
-            adminReport.createEntryInFileUploadForUserAdoptionReport( iden, profileLevel, user.getUserId(), user.getCompany(), mailId );
+            adminReport.createEntryInFileUploadForUserAdoptionReport( iden, profileLevel, user.getUserId(), user.getCompany(),
+                mailId );
             message = "The User Adoption Report will be mailed to you shortly";
 
         } catch ( NonFatalException e ) {
