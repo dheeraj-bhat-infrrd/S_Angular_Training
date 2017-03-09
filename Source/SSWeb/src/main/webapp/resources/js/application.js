@@ -8349,8 +8349,9 @@ $(document).on('click', '#dsh-dwnld-report-btn', function(e) {
 	var selectedValue = $('#download-survey-reports').val();
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
+	var defaultEmailId = $("#default-email-id").val();
 	var popupMsg = '<div>We will mail you the report. Please specify email address to send report to: <br><br>'
-					+'	<input id="dsh-report-email-id" name="dsh-report-email-id" type="text" class="dash-sel-item" placeholder="Email Address">'
+					+'	<input id="dsh-report-email-id" name="dsh-report-email-id" type="text" class="dash-sel-item" placeholder="Email Address" value="'+defaultEmailId+'">'
 					+'</div>';
 	
 	e.stopPropagation();
@@ -8362,8 +8363,7 @@ $(document).on('click', '#dsh-dwnld-report-btn', function(e) {
 
 	$('#overlay-continue').click(function() {
 		var emailId = $("#dsh-report-email-id").val();
-		var reportEmailId = $("#report-email-id").val(); 
-		var emailIdMsg = (emailId != null && emailId != undefined && emailId != "") ? emailId : reportEmailId;
+		var emailIdMsg = (emailId != null && emailId != undefined && emailId != "") ? emailId : defaultEmailId;
 		if(emailId == null || emailId == undefined || emailId == "" || validateEmailId("dsh-report-email-id", true)){
 			var key = parseInt(selectedValue);
 			switch (key) {
