@@ -2278,7 +2278,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             startTime = new Timestamp( startDate.getTime() );
         if ( endDate != null )
             endTime = new Timestamp( endDate.getTime() );
-    	count = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, -1, startTime, endTime, agentIds);
+    	count = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, new int[]{CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED}, startTime, endTime, agentIds);
     	return count;
     }
 

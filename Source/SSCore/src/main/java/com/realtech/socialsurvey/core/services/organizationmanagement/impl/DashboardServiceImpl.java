@@ -201,7 +201,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         long incompleteSurveyCount = 0;
         if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
             incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount( companyId, agentId,
-                CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds );
+            		new int[]{CommonConstants.STATUS_SURVEYPREINITIATION_DELETED, CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED}, startDate, endDate, agentIds );
         }
         //JIRA SS-1350 end
         LOG.debug( "Completed survey: " + completedSurveyCount );
@@ -261,7 +261,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         long incompleteSurveyCount = 0;
         if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
             incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount( companyId, agentId,
-                CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds );
+            		new int[]{CommonConstants.STATUS_SURVEYPREINITIATION_DELETED, CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED}, startDate, endDate, agentIds );
         }
         //JIRA SS-1350 end
         LOG.debug( "Completed survey: " + completedSurveyCount );
