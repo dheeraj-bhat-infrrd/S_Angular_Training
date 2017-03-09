@@ -277,7 +277,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         		}
         		statusCrit.append(status[i]);
         	}
-        	statusCrit.append("");
+        	statusCrit.append(")");
 	        if ( whereFlag ) {
 	        	queryBuilder.append( " AND").append(statusCrit.toString());
 	        } else {
