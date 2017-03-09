@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +14,6 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.BreadCrumb;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
@@ -205,6 +203,17 @@ public interface ProfileManagementService
         throws InvalidInputException;
 
 
+    /**
+     * Gets count of incomplete surveys for all time
+     * @param iden
+     * @param profileLevel
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws InvalidInputException
+     */
+    public long getIncompleteSurveyCount(long iden, String profileLevel, Date startDate, Date endDate) throws InvalidInputException;
+    
     /**
      * Method to fetch all users for the list of branches specified
      * 
