@@ -12,11 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
@@ -32,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -87,14 +84,14 @@ import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.controller.SessionHelper;
 import com.realtech.socialsurvey.web.util.RequestUtils;
-
 import facebook4j.FacebookException;
 import twitter4j.TwitterException;
 
 // JIRA SS-119 by RM-05 : BOC
 @Controller
 @RequestMapping(value = "/survey")
-public class SurveyManagementController {
+public class SurveyManagementController
+{
 
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyManagementController.class);
 
@@ -222,7 +219,8 @@ public class SurveyManagementController {
 					throw new InvalidInputException("Null/empty value found for agentId in storeFeedback().");
 				}
 				agentId = Long.valueOf(agentIdStr);
-			} catch (NumberFormatException e) {
+			}
+			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException occurred in storeFeedback() while getting agentId.");
 			}
 
@@ -230,8 +228,7 @@ public class SurveyManagementController {
 			surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);
 			surveyHandler.increaseSurveyCountForAgent(agentId);
 			SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(surveyId);
-			SurveyPreInitiation surveyPreInitiation = surveyHandler
-					.getPreInitiatedSurvey(surveyDetails.getSurveyPreIntitiationId());
+			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(surveyDetails.getSurveyPreIntitiationId());
 			surveyHandler.deleteSurveyPreInitiationDetailsPermanently(surveyPreInitiation);
 
 			// update the modified time of hierarchy for seo
@@ -245,10 +242,9 @@ public class SurveyManagementController {
 
 			try {
 				solrDocument = solrSearchService.getUserByUniqueId(agentId);
-			} catch (SolrException e) {
-				LOG.error(
-						"SolrException occurred in storeFeedback() while fetching email id of agent. NEsted exception is ",
-						e);
+			}
+			catch (SolrException e) {
+				LOG.error("SolrException occurred in storeFeedback() while fetching email id of agent. NEsted exception is ", e);
 			}
 
 			if (solrDocument != null && !solrDocument.isEmpty()) {
@@ -268,18 +264,16 @@ public class SurveyManagementController {
 			// Sending email to the customer telling about successful completion
 			// of survey.
 			try {
-				String customerName = emailFormatHelper.getCustomerDisplayNameForEmail(survey.getCustomerFirstName(),
-						survey.getCustomerLastName());
+				String customerName = emailFormatHelper.getCustomerDisplayNameForEmail(survey.getCustomerFirstName(), survey.getCustomerLastName());
 				User agent = userManagementService.getUserByUserId(agentId);
 
 				String logoUrl = userManagementService.fetchAppropriateLogoUrlFromHierarchyForUser(agent.getUserId());
 				LOG.info("logourl is : " + logoUrl + " for user " + agent.getUserId());
 				if (survey.getMood().equalsIgnoreCase("Unpleasant")) {
-					surveyHandler.sendSurveyCompletionUnpleasantMail(customerEmail, survey.getCustomerFirstName(),
-							survey.getCustomerLastName(), agent);
+					surveyHandler.sendSurveyCompletionUnpleasantMail(customerEmail, survey.getCustomerFirstName(), survey.getCustomerLastName(),
+							agent);
 				} else {
-					surveyHandler.sendSurveyCompletionMail(customerEmail, survey.getCustomerFirstName(),
-							survey.getCustomerLastName(), agent);
+					surveyHandler.sendSurveyCompletionMail(customerEmail, survey.getCustomerFirstName(), survey.getCustomerLastName(), agent);
 				}
 
 				double surveyScoreValue = survey.getScore();
@@ -309,23 +303,19 @@ public class SurveyManagementController {
 				String agentName = (agent.getLastName() != null && !agent.getLastName().isEmpty())
 						? (agent.getFirstName() + " " + agent.getLastName()) : agent.getFirstName();
 				for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
-					emailServices.sendSurveyCompletionMailToAdminsAndAgent(agentName, admin.getValue(), admin.getKey(),
-							surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl());
+					emailServices.sendSurveyCompletionMailToAdminsAndAgent(agentName, admin.getValue(), admin.getKey(), surveyDetail, customerName,
+							surveyScore, logoUrl, agentSettings.getCompleteProfileUrl());
 				}
 
-				OrganizationUnitSettings companySettings = organizationManagementService
-						.getCompanySettings(survey.getCompanyId());
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(survey.getCompanyId());
 
 				if (companySettings == null)
 					throw new NonFatalException("Company settings cannot be found for id : " + survey.getCompanyId());
 
-				if (companySettings.getSurvey_settings() != null
-						&& companySettings.getSurvey_settings().getComplaint_res_settings() != null) {
-					ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings()
-							.getComplaint_res_settings();
+				if (companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getComplaint_res_settings() != null) {
+					ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings().getComplaint_res_settings();
 
-					if (complaintRegistrationSettings.isEnabled() && ((survey.getScore() > 0d
-							&& complaintRegistrationSettings.getRating() > 0d
+					if (complaintRegistrationSettings.isEnabled() && ((survey.getScore() > 0d && complaintRegistrationSettings.getRating() > 0d
 							&& survey.getScore() < complaintRegistrationSettings.getRating())
 							|| (!complaintRegistrationSettings.getMood().trim().isEmpty()
 									&& complaintRegistrationSettings.getMoodList().contains(mood.toLowerCase())))) {
@@ -337,27 +327,29 @@ public class SurveyManagementController {
 						String displayName = survey.getCustomerFirstName();
 						if (survey.getCustomerLastName() != null)
 							displayName = displayName + " " + survey.getCustomerLastName();
-						emailServices.sendComplaintHandleMail(complaintRegistrationSettings.getMailId(), displayName,
-								customerEmail, mood, surveyScore, surveyDetail);
+						emailServices.sendComplaintHandleMail(complaintRegistrationSettings.getMailId(), displayName, customerEmail, mood,
+								surveyScore, surveyDetail);
 					}
 
 				}
-			} catch (InvalidInputException e) {
+			}
+			catch (InvalidInputException e) {
 				LOG.error("Exception occurred while trying to send survey completion mail to : " + customerEmail);
 				throw e;
 			}
-		} catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in storeFeedback(). Nested exception is ", e);
 			return e.getMessage();
-		} catch (UnsupportedEncodingException e) {
+		}
+		catch (UnsupportedEncodingException e) {
 			LOG.error("An exception occured while changing the character encoding of the feedback");
 		}
 		LOG.info("Method storeFeedback() finished to store response of customer.");
 		return "Survey stored successfully";
 	}
 
-	private String generateSurveyTextForMail(String customerName, String mood, SurveyDetails survey, boolean isAbusive,
-			boolean allowCheckBox) {
+	private String generateSurveyTextForMail(String customerName, String mood, SurveyDetails survey, boolean isAbusive, boolean allowCheckBox) {
 		final String tableOneFirstColumnWidth = "150px";
 		final String tableTwoFirstColumnWidth = "50%";
 
@@ -366,8 +358,7 @@ public class SurveyManagementController {
 		final String paragraph = "<p>";
 		final String tableBreak = "<TR/>";
 		final String tableOneRowStart = "<TR><TD width=" + tableOneFirstColumnWidth + ">";
-		final String tableTwoRowStart = "<TR><TD style=\" border-top:0px; word-wrap:break-word;\" width="
-				+ tableTwoFirstColumnWidth + ">";
+		final String tableTwoRowStart = "<TR><TD style=\" border-top:0px; word-wrap:break-word;\" width=" + tableTwoFirstColumnWidth + ">";
 		final String tableRowMiddle = "</TD><TD style=\"padding-left: 10px; border-top:0px; word-wrap:break-word;\"><strong>";
 		final String tableRowEnd = "</strong></TD></TR>";
 
@@ -375,31 +366,29 @@ public class SurveyManagementController {
 
 		surveyDetail.append(tableOneRowStart).append("Date:").append(tableRowMiddle)
 				.append(CommonUtils.formatDate(survey.getCreatedOn(), "MM/dd/yyyy")).append(tableRowEnd);
-		surveyDetail.append(tableOneRowStart).append("Overall Experience:").append(tableRowMiddle).append(mood)
-				.append(tableRowEnd);
+		surveyDetail.append(tableOneRowStart).append("Overall Experience:").append(tableRowMiddle).append(mood).append(tableRowEnd);
 
 		if (allowCheckBox) {
 			surveyDetail.append(tableOneRowStart).append("Agreed to Share:").append(tableRowMiddle)
 					.append(survey.getAgreedToShare().equalsIgnoreCase("true") ? "Yes" : "No").append(tableRowEnd);
 		}
 
-		surveyDetail.append(tableOneRowStart).append("Abusive Words:").append(tableRowMiddle)
-				.append((isAbusive) ? "Yes" : "No").append(tableRowEnd);
+		surveyDetail.append(tableOneRowStart).append("Abusive Words:").append(tableRowMiddle).append((isAbusive) ? "Yes" : "No").append(tableRowEnd);
 
 		// adding transaction ref id
 		if (!StringUtils.isEmpty(survey.getSourceId())) {
-			surveyDetail.append(tableOneRowStart).append("Transaction Ref Id:").append(tableRowMiddle)
-					.append(survey.getSourceId()).append(tableRowEnd);
+			surveyDetail.append(tableOneRowStart).append("Transaction Ref Id:").append(tableRowMiddle).append(survey.getSourceId())
+					.append(tableRowEnd);
 		}
 
-		surveyDetail.append(tableBreak).append(tableOneRowStart).append("Comment:").append(tableRowMiddle)
-				.append(survey.getReview()).append(tableRowEnd).append(tableEnd);
+		surveyDetail.append(tableBreak).append(tableOneRowStart).append("Comment:").append(tableRowMiddle).append(survey.getReview())
+				.append(tableRowEnd).append(tableEnd);
 
 		surveyDetail.append(paragraph).append(tableStart);
 
 		for (SurveyResponse response : survey.getSurveyResponse()) {
-			surveyDetail.append(tableTwoRowStart).append(response.getQuestion()).append(tableRowMiddle)
-					.append(response.getAnswer()).append(tableRowEnd);
+			surveyDetail.append(tableTwoRowStart).append(response.getQuestion()).append(tableRowMiddle).append(response.getAnswer())
+					.append(tableRowEnd);
 		}
 
 		surveyDetail.append(tableEnd).append(paragraph);
@@ -431,7 +420,8 @@ public class SurveyManagementController {
 		long agentId = 0l;
 		try {
 			agentId = Long.parseLong(agentIdStr);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			LOG.error("Invalid agent Id passed. Error is : " + e);
 			return JspResolver.ERROR_PAGE;
 		}
@@ -445,13 +435,14 @@ public class SurveyManagementController {
 			if (agentSettings != null) {
 				agentName = agentSettings.getContact_details().getName();
 				agentEmail = agentSettings.getContact_details().getMail_ids().getWork();
-				profileImageUrl = (agentSettings.getProfileImageUrlThumbnail() != null
-						? agentSettings.getProfileImageUrlThumbnail() : agentSettings.getProfileImageUrl());
+				profileImageUrl = (agentSettings.getProfileImageUrlThumbnail() != null ? agentSettings.getProfileImageUrlThumbnail()
+						: agentSettings.getProfileImageUrl());
 				// get the proper logo url based on settings for the
 				// organization
 				logoUrl = getLogoBasedOnSettingsForUser(agentId, agentSettings);
 			}
-		} catch (InvalidInputException e) {
+		}
+		catch (InvalidInputException e) {
 			LOG.error("Error occurred while fetching details of agent. Error is : " + e);
 			return JspResolver.ERROR_PAGE;
 		}
@@ -483,15 +474,14 @@ public class SurveyManagementController {
 					retakeSurvey = Boolean.parseBoolean(retakeSurveyString);
 				}
 
-				SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(agentId, customerEmail, custFirstName,
-						custLastName);
-				if (surveyDetails != null && surveyDetails.getReview() != null && surveyDetails.getStage() != -1
-						&& !retakeSurvey) {
+				SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(agentId, customerEmail, custFirstName, custLastName);
+				if (surveyDetails != null && surveyDetails.getReview() != null && surveyDetails.getStage() != -1 && !retakeSurvey) {
 					return JspResolver.SURVEY_LINK_INVALID;
 				}
 
 			}
-		} catch (InvalidInputException error) {
+		}
+		catch (InvalidInputException error) {
 			return JspResolver.SURVEY_LINK_INVALID;
 		}
 		model.addAttribute("q", param);
@@ -500,13 +490,11 @@ public class SurveyManagementController {
 	}
 
 	/*
-	 * Method to retrieve survey questions for a survey based upon the company
-	 * id and agent id.
+	 * Method to retrieve survey questions for a survey based upon the company id and agent id.
 	 */
 	@RequestMapping(value = "/triggersurvey")
 	public String triggerSurvey(Model model, HttpServletRequest request) {
-		LOG.info(
-				"Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
+		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
 
 		long agentId = 0;
 		String customerEmail;
@@ -528,17 +516,16 @@ public class SurveyManagementController {
 			try {
 				String agentIdStr = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
 				agentId = Long.parseLong(agentIdStr);
-			} catch (NumberFormatException e) {
+			}
+			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
 				throw e;
 			}
 
 			if (validateCaptcha.equals(CommonConstants.YES_STRING)) {
-				if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), captchaSecretKey,
-						request.getParameter("g-recaptcha-response"))) {
+				if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), captchaSecretKey, request.getParameter("g-recaptcha-response"))) {
 					LOG.error("Captcha Validation failed!");
-					errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA,
-							DisplayMessageType.ERROR_MESSAGE).getMessage();
+					errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE).getMessage();
 					throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
 				}
 			}
@@ -554,24 +541,27 @@ public class SurveyManagementController {
 
 			try {
 				surveyHandler.initiateSurveyRequest(user.getUserId(), customerEmail, firstName, lastName, source);
-			} catch (SelfSurveyInitiationException e) {
-				errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.SELF_SURVEY_INITIATION,
-						DisplayMessageType.ERROR_MESSAGE).getMessage();
+			}
+			catch (SelfSurveyInitiationException e) {
+				errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.SELF_SURVEY_INITIATION, DisplayMessageType.ERROR_MESSAGE)
+						.getMessage();
 				throw new NonFatalException(e.getMessage(), e.getErrorCode());
-			} catch (DuplicateSurveyRequestException e) {
-				errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
-						DisplayMessageType.ERROR_MESSAGE).getMessage();
+			}
+			catch (DuplicateSurveyRequestException e) {
+				errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST, DisplayMessageType.ERROR_MESSAGE)
+						.getMessage();
 				throw new NonFatalException(e.getMessage(), e.getErrorCode());
 			}
 
-		} catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
 			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
 			if (errorMsg != null)
 				model.addAttribute("message", errorMsg);
 			else
-				model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA,
-						DisplayMessageType.ERROR_MESSAGE));
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE));
 			model.addAttribute("agentId", agentId);
 			model.addAttribute("agentName", agentName);
 			model.addAttribute("firstName", firstName);
@@ -580,8 +570,7 @@ public class SurveyManagementController {
 			model.addAttribute("relation", custRelationWithAgent);
 			return JspResolver.SHOW_SURVEY_FORM;
 		}
-		LOG.info(
-				"Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
+		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
 		return JspResolver.SURVEY_INVITE_SUCCESSFUL;
 	}
 
@@ -633,8 +622,7 @@ public class SurveyManagementController {
 					isOldRecord = false;
 					surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(surveyPreInitiationId);
 				} else {
-					surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, custFirstName,
-							custLastName);
+					surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, custFirstName, custLastName);
 				}
 
 				// if no old survey pre initiation entry found than insert in
@@ -644,8 +632,7 @@ public class SurveyManagementController {
 					surveySource = surveyPreInitiation.getSurveySource();
 				} else {
 					// get the survey from mmongo
-					SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(agentId, customerEmail, custFirstName,
-							custLastName);
+					SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(agentId, customerEmail, custFirstName, custLastName);
 					if (surveyDetails != null) {
 						surveySource = surveyDetails.getSource();
 					} else {
@@ -654,8 +641,7 @@ public class SurveyManagementController {
 				}
 
 				if (surveyPreInitiation == null) {
-					surveyPreInitiation = surveyHandler.preInitiateSurvey(user, customerEmail, custFirstName,
-							custLastName, 0, null, surveySource);
+					surveyPreInitiation = surveyHandler.preInitiateSurvey(user, customerEmail, custFirstName, custLastName, 0, null, surveySource);
 				}
 
 				String surveyURL = surveyHandler.composeLink(agentId, customerEmail, custFirstName, custLastName,
@@ -668,7 +654,8 @@ public class SurveyManagementController {
 					surveyHandler.markSurveyAsStarted(surveyPreInitiation);
 
 			}
-		} catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("NonFatalException caught in triggerSurveyWithUrl().");
 			ErrorResponse errorResponse = new ErrorResponse();
 			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
@@ -718,24 +705,24 @@ public class SurveyManagementController {
 				rating = Double.parseDouble(ratingStr);
 				isAbusive = Boolean.parseBoolean(isAbusiveStr);
 				onlyPostToSocialSurvey = Boolean.parseBoolean(onlyPostToSocialSurveyStr);
-			} catch (NumberFormatException | NullPointerException e) {
-				LOG.error(
-						"Number format/Null Pointer exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ",
+			}
+			catch (NumberFormatException | NullPointerException e) {
+				LOG.error("Number format/Null Pointer exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ",
 						e);
 				return e.getMessage();
 			}
 
-			if (socialManagementService.postToSocialMedia(agentName, agentProfileLink, custFirstName, custLastName,
-					agentId, rating, surveyId, feedback, isAbusive, serverBaseUrl, onlyPostToSocialSurvey)) {
+			if (socialManagementService.postToSocialMedia(agentName, agentProfileLink, custFirstName, custLastName, agentId, rating, surveyId,
+					feedback, isAbusive, serverBaseUrl, onlyPostToSocialSurvey)) {
 				return "Successfully posted to all the places in hierarchy";
 			}
 
-		} catch (NonFatalException e) {
-			LOG.error(
-					"Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ",
-					e);
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ", e);
 			return e.getMessage();
-		} catch (UnsupportedEncodingException e) {
+		}
+		catch (UnsupportedEncodingException e) {
 			LOG.error("An exception occured while changing the character encoding of the feedback");
 		}
 		LOG.info("Method to post feedback of customer to various pages of social networking sites finished.");
@@ -767,27 +754,21 @@ public class SurveyManagementController {
 			try {
 				agentId = Long.parseLong(agentIdStr);
 				rating = Double.parseDouble(ratingStr);
-			} catch (NumberFormatException e) {
-				LOG.error(
-						"Number format exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ",
-						e);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ", e);
 				return e.getMessage();
 			}
 
-			Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
-					.getSettingsForBranchesAndRegionsInHierarchy(agentId);
-			List<OrganizationUnitSettings> companySettings = settingsMap
-					.get(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
-			List<OrganizationUnitSettings> regionSettings = settingsMap
-					.get(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-			List<OrganizationUnitSettings> branchSettings = settingsMap
-					.get(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+			Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
+			List<OrganizationUnitSettings> companySettings = settingsMap.get(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+			List<OrganizationUnitSettings> regionSettings = settingsMap.get(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+			List<OrganizationUnitSettings> branchSettings = settingsMap.get(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 
-			SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(agentId, customerEmail, custFirstName,
-					custLastName);
-			SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey(
-					surveyDetails, companySettings.get(0), regionSettings, branchSettings);
+			SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(agentId, customerEmail, custFirstName, custLastName);
+			SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey(surveyDetails, companySettings.get(0),
+					regionSettings, branchSettings);
 
 			if (socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null) {
 				socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn(new ArrayList<String>());
@@ -795,14 +776,12 @@ public class SurveyManagementController {
 			if (socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn() == null) {
 				socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn(new ArrayList<String>());
 			}
-			for (BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails
-					.getBranchMediaPostDetailsList()) {
+			for (BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList()) {
 				if (branchMediaPostDetails.getSharedOn() == null) {
 					branchMediaPostDetails.setSharedOn(new ArrayList<String>());
 				}
 			}
-			for (RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails
-					.getRegionMediaPostDetailsList()) {
+			for (RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList()) {
 				if (regionMediaPostDetails.getSharedOn() == null) {
 					regionMediaPostDetails.setSharedOn(new ArrayList<String>());
 				}
@@ -811,9 +790,9 @@ public class SurveyManagementController {
 			List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
 			List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
 
-			String facebookMessage = surveyHandler.getFormattedSurveyScore(rating) + "-Star Survey Response from "
-					+ customerDisplayName + " for " + agentName + " on Social Survey - view at "
-					+ getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+			String facebookMessage = surveyHandler.getFormattedSurveyScore(rating) + "-Star Survey Response from " + customerDisplayName + " for "
+					+ agentName + " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+					+ agentProfileLink;
 			facebookMessage += "\n Feedback : " + feedback;
 
 			// TODO: Bad code: DELETE: BEGIN
@@ -821,67 +800,57 @@ public class SurveyManagementController {
 			User user = userManagementService.getUserObjByUserId(agentId);
 			try {
 				if (surveyHandler.canPostOnSocialMedia(agentSettings, rating)) {
-					if (!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage,
-							serverBaseUrl, user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
+					if (!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl,
+							user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
 						// TODO: Bad code: Remove the company id from the
 						// parameter: End
 						if (!agentSocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
 							agentSocialList.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
 					}
 				}
-			} catch (FacebookException e) {
-				LOG.error(
-						"FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
-						e);
+			}
+			catch (FacebookException e) {
+				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
 			}
 			for (OrganizationUnitSettings setting : companySettings) {
 				try {
 					if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
-						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage,
-								serverBaseUrl, user.getCompany().getCompanyId(),
-								agentSettings.getCompleteProfileUrl())) {
+						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl,
+								user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
 							if (!companySocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
 								companySocialList.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
 						}
 					}
-				} catch (FacebookException e) {
-					LOG.error(
-							"FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
-							e);
+				}
+				catch (FacebookException e) {
+					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
 				}
 			}
-			for (RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails
-					.getRegionMediaPostDetailsList()) {
+			for (RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList()) {
 				try {
-					OrganizationUnitSettings setting = organizationManagementService
-							.getRegionSettings(regionMediaPostDetails.getRegionId());
+					OrganizationUnitSettings setting = organizationManagementService.getRegionSettings(regionMediaPostDetails.getRegionId());
 					if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
-						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage,
-								serverBaseUrl, user.getCompany().getCompanyId(),
-								agentSettings.getCompleteProfileUrl())) {
+						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl,
+								user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
 							List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
 							if (!regionSocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
 								regionSocialList.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
 							regionMediaPostDetails.setSharedOn(regionSocialList);
 						}
 					}
-				} catch (FacebookException e) {
-					LOG.error(
-							"FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
-							e);
+				}
+				catch (FacebookException e) {
+					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
 				}
 			}
-			for (BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails
-					.getBranchMediaPostDetailsList()) {
+			for (BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList()) {
 				try {
-					OrganizationUnitSettings setting = organizationManagementService
-							.getBranchSettingsDefault(branchMediaPostDetails.getBranchId());
+					OrganizationUnitSettings setting = organizationManagementService.getBranchSettingsDefault(branchMediaPostDetails.getBranchId());
 					if (setting != null) {
 
 						if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
-							if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage,
-									serverBaseUrl, user.getCompany().getCompanyId(),
-									agentSettings.getCompleteProfileUrl())) {
+							if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl,
+									user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
 								List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
 								if (!branchSocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
 									branchSocialList.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
@@ -889,17 +858,17 @@ public class SurveyManagementController {
 							}
 						}
 					}
-				} catch (FacebookException e) {
-					LOG.error(
-							"FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
-							e);
+				}
+				catch (FacebookException e) {
+					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
 				}
 			}
 			socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn(agentSocialList);
 			socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn(companySocialList);
 			surveyDetails.setSocialMediaPostDetails(socialMediaPostDetails);
 			surveyHandler.updateSurveyDetails(surveyDetails);
-		} catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("NonFatalException caught in postToFacebook(). Nested exception is ", e);
 		}
 		LOG.info("Method to post feedback of customer to facebook finished.");
@@ -927,26 +896,20 @@ public class SurveyManagementController {
 			try {
 				agentId = Long.parseLong(agentIdStr);
 				rating = Double.parseDouble(ratingStr);
-			} catch (NumberFormatException e) {
-				LOG.error(
-						"Number format exception caught in postToTwitter() while trying to convert agent Id. Nested exception is ",
-						e);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception caught in postToTwitter() while trying to convert agent Id. Nested exception is ", e);
 				return e.getMessage();
 			}
 
-			Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
-					.getSettingsForBranchesAndRegionsInHierarchy(agentId);
-			List<OrganizationUnitSettings> companySettings = settingsMap
-					.get(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
-			List<OrganizationUnitSettings> regionSettings = settingsMap
-					.get(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-			List<OrganizationUnitSettings> branchSettings = settingsMap
-					.get(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+			Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
+			List<OrganizationUnitSettings> companySettings = settingsMap.get(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+			List<OrganizationUnitSettings> regionSettings = settingsMap.get(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+			List<OrganizationUnitSettings> branchSettings = settingsMap.get(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-			SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(agentId, customerEmail, custFirstName,
-					custLastName);
-			SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey(
-					surveyDetails, companySettings.get(0), regionSettings, branchSettings);
+			SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(agentId, customerEmail, custFirstName, custLastName);
+			SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey(surveyDetails, companySettings.get(0),
+					regionSettings, branchSettings);
 
 			if (socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null) {
 				socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn(new ArrayList<String>());
@@ -958,43 +921,37 @@ public class SurveyManagementController {
 			List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
 			List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
 
-			for (BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails
-					.getBranchMediaPostDetailsList()) {
+			for (BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList()) {
 				if (branchMediaPostDetails.getSharedOn() == null) {
 					branchMediaPostDetails.setSharedOn(new ArrayList<String>());
 				}
 			}
-			for (RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails
-					.getRegionMediaPostDetailsList()) {
+			for (RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList()) {
 				if (regionMediaPostDetails.getSharedOn() == null) {
 					regionMediaPostDetails.setSharedOn(new ArrayList<String>());
 				}
 			}
 
 			/*
-			 * String twitterMessage = rating + "-Star Survey Response from " +
-			 * customerDisplayName + " for " + agentName +
-			 * " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
+			 * String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName
+			 * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
 			 * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			 */
-			String twitterMessage = String.format(CommonConstants.TWITTER_MESSAGE,
-					surveyHandler.getFormattedSurveyScore(rating), customerDisplayName, agentName, "@SocialSurveyMe")
-					+ getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+			String twitterMessage = String.format(CommonConstants.TWITTER_MESSAGE, surveyHandler.getFormattedSurveyScore(rating), customerDisplayName,
+					agentName, "@SocialSurveyMe") + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			// TODO: Bad code: DELETE: BEGIN
 			// get the company id of the agent
 			User user = userManagementService.getUserObjByUserId(agentId);
 			try {
 				if (surveyHandler.canPostOnSocialMedia(agentSettings, rating)) {
-					if (!socialManagementService.tweet(agentSettings, twitterMessage,
-							user.getCompany().getCompanyId())) {
+					if (!socialManagementService.tweet(agentSettings, twitterMessage, user.getCompany().getCompanyId())) {
 						if (!agentSocialList.contains(CommonConstants.TWITTER_SOCIAL_SITE))
 							agentSocialList.add(CommonConstants.TWITTER_SOCIAL_SITE);
 					}
 				}
-			} catch (TwitterException e) {
-				LOG.error(
-						"TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ",
-						e);
+			}
+			catch (TwitterException e) {
+				LOG.error("TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e);
 			}
 			for (OrganizationUnitSettings setting : companySettings) {
 				try {
@@ -1004,18 +961,15 @@ public class SurveyManagementController {
 								companySocialList.add(CommonConstants.TWITTER_SOCIAL_SITE);
 						}
 					}
-				} catch (TwitterException e) {
-					LOG.error(
-							"TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ",
-							e);
+				}
+				catch (TwitterException e) {
+					LOG.error("TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e);
 				}
 			}
-			for (RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails
-					.getRegionMediaPostDetailsList()) {
+			for (RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList()) {
 				try {
 
-					OrganizationUnitSettings setting = organizationManagementService
-							.getRegionSettings(regionMediaPostDetails.getRegionId());
+					OrganizationUnitSettings setting = organizationManagementService.getRegionSettings(regionMediaPostDetails.getRegionId());
 					if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
 						if (!socialManagementService.tweet(setting, twitterMessage, user.getCompany().getCompanyId())) {
 							List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
@@ -1024,22 +978,18 @@ public class SurveyManagementController {
 							regionMediaPostDetails.setSharedOn(regionSocialList);
 						}
 					}
-				} catch (TwitterException e) {
-					LOG.error(
-							"TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ",
-							e);
+				}
+				catch (TwitterException e) {
+					LOG.error("TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e);
 				}
 			}
-			for (BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails
-					.getBranchMediaPostDetailsList()) {
+			for (BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList()) {
 				try {
-					OrganizationUnitSettings setting = organizationManagementService
-							.getBranchSettingsDefault(branchMediaPostDetails.getBranchId());
+					OrganizationUnitSettings setting = organizationManagementService.getBranchSettingsDefault(branchMediaPostDetails.getBranchId());
 					if (setting != null) {
 
 						if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
-							if (!socialManagementService.tweet(setting, twitterMessage,
-									user.getCompany().getCompanyId())) {
+							if (!socialManagementService.tweet(setting, twitterMessage, user.getCompany().getCompanyId())) {
 								List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
 								if (!branchSocialList.contains(CommonConstants.TWITTER_SOCIAL_SITE))
 									branchSocialList.add(CommonConstants.TWITTER_SOCIAL_SITE);
@@ -1047,17 +997,17 @@ public class SurveyManagementController {
 							}
 						}
 					}
-				} catch (TwitterException e) {
-					LOG.error(
-							"TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ",
-							e);
+				}
+				catch (TwitterException e) {
+					LOG.error("TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e);
 				}
 			}
 			socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn(agentSocialList);
 			socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn(companySocialList);
 			surveyDetails.setSocialMediaPostDetails(socialMediaPostDetails);
 			surveyHandler.updateSurveyDetails(surveyDetails);
-		} catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("NonFatalException caught in postToTwitter(). Nested exception is ", e);
 		}
 		LOG.info("Method to post feedback of customer to twitter finished.");
@@ -1080,7 +1030,8 @@ public class SurveyManagementController {
 
 		try {
 			agentId = Long.parseLong(agentIdStr);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			LOG.error("NumberFormatException caught in getDisplayPicLocationOfAgent() while getting agent id");
 			return e.getMessage();
 		}
@@ -1088,12 +1039,12 @@ public class SurveyManagementController {
 		try {
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			if (agentSettings != null) {
-				if (agentSettings.getProfileImageUrlThumbnail() != null
-						&& !agentSettings.getProfileImageUrlThumbnail().isEmpty()) {
+				if (agentSettings.getProfileImageUrlThumbnail() != null && !agentSettings.getProfileImageUrlThumbnail().isEmpty()) {
 					picLocation = agentSettings.getProfileImageUrlThumbnail();
 				}
 			}
-		} catch (InvalidInputException e) {
+		}
+		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException caught in getDisplayPicLocationOfAgent() while fetching image for agent.");
 			return e.getMessage();
 		}
@@ -1110,17 +1061,15 @@ public class SurveyManagementController {
 		try {
 			String agentIdStr = request.getParameter("agentId");
 			if (agentIdStr == null || agentIdStr.isEmpty()) {
-				throw new InvalidInputException(
-						"InvalidInputException caught in getYelpLinkRest(). Agent Id cannot be null or empty.");
+				throw new InvalidInputException("InvalidInputException caught in getYelpLinkRest(). Agent Id cannot be null or empty.");
 			}
 
 			long agentId = 0;
 			try {
 				agentId = Long.parseLong(agentIdStr);
-			} catch (NumberFormatException e) {
-				LOG.error(
-						"NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ",
-						e);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ", e);
 				throw e;
 			}
 
@@ -1132,14 +1081,15 @@ public class SurveyManagementController {
 				String validUrl = settings.getSocialMediaTokens().getYelpToken().getYelpPageLink();
 				try {
 					validUrl = urlValidationHelper.buildValidUrl(validUrl);
-				} catch (IOException ioException) {
-					throw new InvalidInputException("Yelp link passed was invalid",
-							DisplayMessageConstants.GENERAL_ERROR, ioException);
+				}
+				catch (IOException ioException) {
+					throw new InvalidInputException("Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
 				}
 
 				yelpUrl.put("relativePath", validUrl);
 			}
-		} catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("Exception occured in getYelpLink() while trying to post into Yelp.");
 			ErrorResponse response = new ErrorResponse();
 			response.setErrCode("Error while trying to post on Yelp.");
@@ -1159,25 +1109,22 @@ public class SurveyManagementController {
 			// if url is encrypted. in case of incomplete social post reminder
 			// mail
 			/*
-			 * String encryptedUrl = request.getRequestURI() +
-			 * request.getQueryString(); Map<String , String> urlparameters =
-			 * urlGenerator.decryptUrl( encryptedUrl ); String agentIdStr =
-			 * urlparameters.get( "agentId" );
+			 * String encryptedUrl = request.getRequestURI() + request.getQueryString(); Map<String
+			 * , String> urlparameters = urlGenerator.decryptUrl( encryptedUrl ); String agentIdStr
+			 * = urlparameters.get( "agentId" );
 			 */
 
 			String agentIdStr = request.getParameter("agentId");
 			if (agentIdStr == null || agentIdStr.isEmpty()) {
-				throw new InvalidInputException(
-						"InvalidInputException caught in getYelpLinkRest(). Agent Id cannot be null or empty.");
+				throw new InvalidInputException("InvalidInputException caught in getYelpLinkRest(). Agent Id cannot be null or empty.");
 			}
 
 			long agentId = 0;
 			try {
 				agentId = Long.parseLong(agentIdStr);
-			} catch (NumberFormatException e) {
-				LOG.error(
-						"NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ",
-						e);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ", e);
 				throw e;
 			}
 
@@ -1188,7 +1135,8 @@ public class SurveyManagementController {
 				googleUrl.put("profileServer", surveyHandler.getApplicationBaseUrl() + "pages");
 				googleUrl.put("relativePath", settings.getProfileUrl());
 			}
-		} catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("Exception occured in getGooglePlusLink() while trying to post into Google.");
 			ErrorResponse response = new ErrorResponse();
 			response.setErrCode("Error while trying to post on Google.");
@@ -1209,24 +1157,21 @@ public class SurveyManagementController {
 			String agentIdStr = urlParameters.get("agentId");
 			String customerEmail = urlParameters.get("customerEmail");
 			if (agentIdStr == null || agentIdStr.isEmpty()) {
-				throw new InvalidInputException(
-						"InvalidInputException caught in postOnGooglePlus(). Agent Id cannot be null or empty.");
+				throw new InvalidInputException("InvalidInputException caught in postOnGooglePlus(). Agent Id cannot be null or empty.");
 			}
 
 			long agentId = 0;
 			try {
 				agentId = Long.parseLong(agentIdStr);
-			} catch (NumberFormatException e) {
-				LOG.error(
-						"NumberFormatException caught while trying to convert agentId in postOnGooglePlus(). Nested exception is ",
-						e);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught while trying to convert agentId in postOnGooglePlus(). Nested exception is ", e);
 				throw e;
 			}
 
 			OrganizationUnitSettings settings = userManagementService.getUserSettings(agentId);
 			if (settings.getProfileUrl() != null) {
-				redirectUrl = surveyHandler.getGoogleShareUri() + surveyHandler.getApplicationBaseUrl() + "pages"
-						+ settings.getProfileUrl();
+				redirectUrl = surveyHandler.getGoogleShareUri() + surveyHandler.getApplicationBaseUrl() + "pages" + settings.getProfileUrl();
 			}
 
 			// update shared on
@@ -1252,7 +1197,8 @@ public class SurveyManagementController {
 			surveyDetails.setSocialMediaPostDetails(socialMediaPostDetails);
 			surveyHandler.updateSurveyDetails(surveyDetails);
 
-		} catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("Exception occured in postOnGooglePlus() while trying to post into Google.");
 			ErrorResponse response = new ErrorResponse();
 			response.setErrCode("Error while trying to post on Google.");
@@ -1273,17 +1219,15 @@ public class SurveyManagementController {
 			String agentIdStr = urlParameters.get("agentId");
 			String customerEmail = urlParameters.get("customerEmail");
 			if (agentIdStr == null || agentIdStr.isEmpty()) {
-				throw new InvalidInputException(
-						"InvalidInputException caught in postToYelp(). Agent Id cannot be null or empty.");
+				throw new InvalidInputException("InvalidInputException caught in postToYelp(). Agent Id cannot be null or empty.");
 			}
 
 			long agentId = 0;
 			try {
 				agentId = Long.parseLong(agentIdStr);
-			} catch (NumberFormatException e) {
-				LOG.error(
-						"NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ",
-						e);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ", e);
 				throw e;
 			}
 
@@ -1295,9 +1239,9 @@ public class SurveyManagementController {
 				String validUrl = settings.getSocialMediaTokens().getYelpToken().getYelpPageLink();
 				try {
 					validUrl = urlValidationHelper.buildValidUrl(validUrl);
-				} catch (IOException ioException) {
-					throw new InvalidInputException("Yelp link passed was invalid",
-							DisplayMessageConstants.GENERAL_ERROR, ioException);
+				}
+				catch (IOException ioException) {
+					throw new InvalidInputException("Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
 				}
 
 				redirectUrl = validUrl;
@@ -1325,7 +1269,8 @@ public class SurveyManagementController {
 				surveyDetails.setSocialMediaPostDetails(socialMediaPostDetails);
 				surveyHandler.updateSurveyDetails(surveyDetails);
 			}
-		} catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("Exception occured in postToYelp() while trying to post into Yelp.");
 			ErrorResponse response = new ErrorResponse();
 			response.setErrCode("Error while trying to post on Yelp.");
@@ -1346,17 +1291,15 @@ public class SurveyManagementController {
 			String customerEmail = request.getParameter("customerEmail");
 			String socialSite = request.getParameter("socialSite");
 			if (agentIdStr == null || agentIdStr.isEmpty()) {
-				throw new InvalidInputException(
-						"InvalidInputException caught in getYelpLinkRest(). Agent Id cannot be null or empty.");
+				throw new InvalidInputException("InvalidInputException caught in getYelpLinkRest(). Agent Id cannot be null or empty.");
 			}
 
 			long agentId = 0;
 			try {
 				agentId = Long.parseLong(agentIdStr);
-			} catch (NumberFormatException e) {
-				LOG.error(
-						"NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ",
-						e);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ", e);
 				throw e;
 			}
 
@@ -1386,7 +1329,8 @@ public class SurveyManagementController {
 			socialMediaPostDetails.setAgentMediaPostDetails(agentMediaPostDetails);
 			surveyDetails.setSocialMediaPostDetails(socialMediaPostDetails);
 			surveyHandler.updateSurveyDetails(surveyDetails);
-		} catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("Exception occured in updateSharedOn() while trying to post into Google.");
 			ErrorResponse response = new ErrorResponse();
 			response.setErrCode("");
@@ -1421,11 +1365,10 @@ public class SurveyManagementController {
 			User user = userManagementService.getUserByUserId(agentId);
 			Map<String, String> urlParams = urlGenerator.decryptUrl(survey.getUrl());
 			urlParams.put(CommonConstants.URL_PARAM_RETAKE_SURVEY, "true");
-			String updatedUrl = urlGenerator.generateUrl(urlParams,
-					getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL);
-			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustRelationWithAgent(),
-					user, updatedUrl);
-		} catch (NonFatalException e) {
+			String updatedUrl = urlGenerator.generateUrl(urlParams, getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL);
+			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user, updatedUrl);
+		}
+		catch (NonFatalException e) {
 			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
 		}
 	}
@@ -1451,11 +1394,10 @@ public class SurveyManagementController {
 			User user = userManagementService.getUserByUserId(agentId);
 			Map<String, String> urlParams = urlGenerator.decryptUrl(survey.getUrl());
 			urlParams.put(CommonConstants.URL_PARAM_RETAKE_SURVEY, "true");
-			String updatedUrl = urlGenerator.generateUrl(urlParams,
-					getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL);
-			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustRelationWithAgent(),
-					user, updatedUrl);
-		} catch (NonFatalException e) {
+			String updatedUrl = urlGenerator.generateUrl(urlParams, getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL);
+			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user, updatedUrl);
+		}
+		catch (NonFatalException e) {
 			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
 		}
 	}
@@ -1469,8 +1411,7 @@ public class SurveyManagementController {
 		return surveyHandler.getApplicationBaseUrl();
 	}
 
-	private Map<String, Object> getSurvey(User user, SurveyPreInitiation surveyPreInitiation, String url,
-			boolean isOldRecord, boolean retakeSurvey)
+	private Map<String, Object> getSurvey(User user, SurveyPreInitiation surveyPreInitiation, String url, boolean isOldRecord, boolean retakeSurvey)
 			throws InvalidInputException, SolrException, NoRecordsFetchedException {
 		LOG.info("Method getSurvey started.");
 		Integer stage = null;
@@ -1518,12 +1459,13 @@ public class SurveyManagementController {
 						branchSettings = organizationManagementService.getBranchSettings(userProfile.getBranchId());
 						regionSettings = organizationManagementService.getRegionSettings(userProfile.getRegionId());
 					}
-				} catch (Exception e) {
-					LOG.error("Exception occurred while fetching user profile for agent id " + user.getUserId()
-							+ ".Reason :", e);
+				}
+				catch (Exception e) {
+					LOG.error("Exception occurred while fetching user profile for agent id " + user.getUserId() + ".Reason :", e);
 				}
 			}
-		} catch (SolrException e) {
+		}
+		catch (SolrException e) {
 			LOG.error("SolrException caught in triggerSurvey(). Details are " + e);
 			throw e;
 		}
@@ -1539,16 +1481,17 @@ public class SurveyManagementController {
 
 		Map<SettingsForApplication, OrganizationUnit> mapPrimaryHierarchy = null;
 		try {
-			mapPrimaryHierarchy = profileManagementService.getPrimaryHierarchyByEntity(CommonConstants.AGENT_ID_COLUMN,
-					user.getUserId());
-		} catch (InvalidSettingsStateException e1) {
+			mapPrimaryHierarchy = profileManagementService.getPrimaryHierarchyByEntity(CommonConstants.AGENT_ID_COLUMN, user.getUserId());
+		}
+		catch (InvalidSettingsStateException e1) {
 			LOG.error("An Exception occurred while fetching logo url. Reason : ", e1);
-		} catch (ProfileNotFoundException e1) {
+		}
+		catch (ProfileNotFoundException e1) {
 			LOG.error("An Exception occurred while fetching logo url. Reason : ", e1);
 		}
 
-		String logo = surveyHandler.getLogoUrlWithSettings(user, (AgentSettings) unitSettings, companySettings,
-				regionSettings, bSetting, mapPrimaryHierarchy);
+		String logo = surveyHandler.getLogoUrlWithSettings(user, (AgentSettings) unitSettings, companySettings, regionSettings, bSetting,
+				mapPrimaryHierarchy);
 		LOG.info("Logo to be displayed: " + logo);
 		surveyAndStage.put("companyLogo", logo);
 
@@ -1557,15 +1500,14 @@ public class SurveyManagementController {
 			surveySettings.setAutoPostEnabled(true);
 			surveySettings.setShow_survey_above_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
 			surveySettings.setAuto_post_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
-			organizationManagementService.updateScoreForSurvey(
-					MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings, surveySettings);
+			organizationManagementService.updateScoreForSurvey(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings,
+					surveySettings);
 		} else {
 			if (unitSettings.getSurvey_settings().getShow_survey_above_score() <= 0) {
 				unitSettings.getSurvey_settings().setAutoPostEnabled(true);
 				unitSettings.getSurvey_settings().setShow_survey_above_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
 				unitSettings.getSurvey_settings().setAuto_post_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
-				organizationManagementService.updateScoreForSurvey(
-						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings,
+				organizationManagementService.updateScoreForSurvey(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings,
 						unitSettings.getSurvey_settings());
 			}
 		}
@@ -1583,51 +1525,39 @@ public class SurveyManagementController {
 		}
 
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-		Map<String, String> surveyMap = emailFormatHelper.fetchSurveySourceId(user.getUserId(),
-				survey.getCustomerEmail(), dateFormat.format(new Date()));
+		Map<String, String> surveyMap = emailFormatHelper.fetchSurveySourceId(user.getUserId(), survey.getCustomerEmail(),
+				dateFormat.format(new Date()));
 		if (companySettings != null && companySettings.getSurvey_settings() != null) {
 			LOG.info("Setting company specific values for surveyAndStage started");
 			SurveySettings surveySettings = companySettings.getSurvey_settings();
 			if (StringUtils.isNotEmpty(surveySettings.getHappyText())) {
-				surveyAndStage.put("happyText",
-						surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyText(), unitSettings, user,
-								companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting,
-								surveyMap));
+				surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyText(), unitSettings, user,
+						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 				isHappyTextSet = true;
 			}
 			if (StringUtils.isNotEmpty(surveySettings.getNeutralText())) {
-				surveyAndStage.put("neutralText",
-						surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralText(), unitSettings, user,
-								companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting,
-								surveyMap));
+				surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralText(), unitSettings, user,
+						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 				isNeutralTextSet = true;
 			}
 			if (StringUtils.isNotEmpty(surveySettings.getSadText())) {
-				surveyAndStage.put("sadText",
-						surveyHandler.replaceGatewayQuestionText(surveySettings.getSadText(), unitSettings, user,
-								companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting,
-								surveyMap));
+				surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadText(), unitSettings, user,
+						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 				isSadTextSet = true;
 			}
 			if (StringUtils.isNotEmpty(surveySettings.getHappyTextComplete())) {
-				surveyAndStage.put("happyTextComplete",
-						surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyTextComplete(), unitSettings,
-								user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting,
-								surveyMap));
+				surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyTextComplete(), unitSettings,
+						user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 				isHappyTextCompleteSet = true;
 			}
 			if (StringUtils.isNotEmpty(surveySettings.getNeutralTextComplete())) {
-				surveyAndStage.put("neutralTextComplete",
-						surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextComplete(), unitSettings,
-								user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting,
-								surveyMap));
+				surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextComplete(),
+						unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 				isNeutralTextCompleteSet = true;
 			}
 			if (StringUtils.isNotEmpty(surveySettings.getSadTextComplete())) {
-				surveyAndStage.put("sadTextComplete",
-						surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextComplete(), unitSettings,
-								user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting,
-								surveyMap));
+				surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextComplete(), unitSettings,
+						user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 				isSadTextCompleteSet = true;
 			}
 			LOG.info("Setting company specific values for surveyAndStage finished");
@@ -1635,52 +1565,38 @@ public class SurveyManagementController {
 
 		// If any of the texts are not set by the company, store default values
 		// for them.
-		if (!(isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet
-				&& isSadTextCompleteSet)) {
+		if (!(isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet)) {
 			LOG.info("Setting default values for surveyAndStage started");
 			SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
 			if (!isHappyTextSet) {
-				surveyAndStage.put("happyText",
-						surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getHappyText(), unitSettings,
-								user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting,
-								surveyMap));
+				surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getHappyText(), unitSettings, user,
+						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 			}
 			if (!isNeutralTextSet) {
-				surveyAndStage.put("neutralText",
-						surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getNeutralText(), unitSettings,
-								user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting,
-								surveyMap));
+				surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getNeutralText(), unitSettings, user,
+						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 			}
 			if (!isSadTextSet) {
-				surveyAndStage.put("sadText",
-						surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getSadText(), unitSettings, user,
-								companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting,
-								surveyMap));
+				surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getSadText(), unitSettings, user,
+						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 			}
 			if (!isHappyTextCompleteSet) {
-				surveyAndStage.put("happyTextComplete",
-						surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getHappyTextComplete(),
-								unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings,
-								bSetting, surveyMap));
+				surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getHappyTextComplete(),
+						unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 			}
 			if (isNeutralTextCompleteSet) {
-				surveyAndStage.put("neutralTextComplete",
-						surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getNeutralTextComplete(),
-								unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings,
-								bSetting, surveyMap));
+				surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getNeutralTextComplete(),
+						unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 			}
 			if (isSadTextCompleteSet) {
-				surveyAndStage.put("sadTextComplete",
-						surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getSadTextComplete(),
-								unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings,
-								bSetting, surveyMap));
+				surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getSadTextComplete(),
+						unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 			}
 			LOG.info("Setting default values for surveyAndStage finished");
 		}
 
 		// Fetching Yelp Url
-		surveyHandler.updateSurveyStageForYelp(unitSettings, branchSettings, regionSettings, companySettings,
-				surveyAndStage);
+		surveyHandler.updateSurveyStageForYelp(unitSettings, branchSettings, regionSettings, companySettings, surveyAndStage);
 
 		// Fetching Google Plus Url
 		try {
@@ -1689,32 +1605,28 @@ public class SurveyManagementController {
 				surveyAndStage.put("googleLink", unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink());
 			} else
 				surveyAndStage.put("googleEnabled", false);
-		} catch (NullPointerException e) {
+		}
+		catch (NullPointerException e) {
 			surveyAndStage.put("googleEnabled", false);
 		}
 
 		// zillow
-		surveyHandler.updateSurveyStageForZillow(unitSettings, branchSettings, regionSettings, companySettings,
-				surveyAndStage);
+		surveyHandler.updateSurveyStageForZillow(unitSettings, branchSettings, regionSettings, companySettings, surveyAndStage);
 
 		// Fetching LendingTree Url
-		surveyHandler.updateSurveyStageForLendingTree(unitSettings, branchSettings, regionSettings, companySettings,
-				surveyAndStage);
+		surveyHandler.updateSurveyStageForLendingTree(unitSettings, branchSettings, regionSettings, companySettings, surveyAndStage);
 
 		// realtor
-		surveyHandler.updateSurveyStageForRealtor(unitSettings, branchSettings, regionSettings, companySettings,
-				surveyAndStage);
+		surveyHandler.updateSurveyStageForRealtor(unitSettings, branchSettings, regionSettings, companySettings, surveyAndStage);
 
 		// Google Business Token
-		surveyHandler.updateSurveyStageForGoogleBusinessToken(unitSettings, branchSettings, regionSettings,
-				companySettings, surveyAndStage);
+		surveyHandler.updateSurveyStageForGoogleBusinessToken(unitSettings, branchSettings, regionSettings, companySettings, surveyAndStage);
 
 		// adding facebook and google plus api keys for customer share
 		surveyAndStage.put("fbAppId", facebookAppId);
 		surveyAndStage.put("googlePlusAppId", googlePlusId);
 
-		surveyAndStage.put("agentFullProfileLink",
-				getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + unitSettings.getProfileUrl());
+		surveyAndStage.put("agentFullProfileLink", getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + unitSettings.getProfileUrl());
 		surveyAndStage.put("agentProfileLink", unitSettings.getProfileUrl());
 		surveyAndStage.put("stage", stage);
 		surveyAndStage.put("survey", surveyQuestionDetails);
@@ -1740,9 +1652,11 @@ public class SurveyManagementController {
 			LOG.info("Sending bug mail to admin for the auto post failure");
 			emailServices.sendReportBugMailToAdmin(applicationAdminName, errorMsg, applicationAdminEmail);
 			LOG.info("Sent bug mail to admin for the auto post failure");
-		} catch (UndeliveredEmailException ude) {
+		}
+		catch (UndeliveredEmailException ude) {
 			LOG.error("error while sending report bug mail to admin ", ude);
-		} catch (InvalidInputException iie) {
+		}
+		catch (InvalidInputException iie) {
 			LOG.error("error while sending report bug mail to admin ", iie);
 		}
 	}
@@ -1771,7 +1685,8 @@ public class SurveyManagementController {
 					String[] keyValuePair = keyValuePairs[counter].split("=");
 					params.put(keyValuePair[0], keyValuePair[1]);
 				}
-			} catch (InvalidInputException e) {
+			}
+			catch (InvalidInputException e) {
 				message = DisplayMessageConstants.INVALID_AUTHORIZATION_HEADER;
 				error = true;
 			}
@@ -1794,8 +1709,7 @@ public class SurveyManagementController {
 		List<BulkSurveyDetail> bulkSurveyList = new ArrayList<BulkSurveyDetail>();
 
 		if (!error) {
-			bulkSurveyList = new Gson().fromJson(surveyJsonString, new TypeToken<List<BulkSurveyDetail>>() {
-			}.getType());
+			bulkSurveyList = new Gson().fromJson(surveyJsonString, new TypeToken<List<BulkSurveyDetail>>() {}.getType());
 			List<BulkSurveyDetail> list = surveyHandler.processBulkSurvey(bulkSurveyList, companyId);
 			message = new Gson().toJson(list);
 		}
@@ -1828,8 +1742,8 @@ public class SurveyManagementController {
 		String logoUrl = null;
 		try {
 			Map<String, Long> hierarchyMap = null;
-			Map<SettingsForApplication, OrganizationUnit> map = profileManagementService
-					.getPrimaryHierarchyByEntity(CommonConstants.AGENT_ID_COLUMN, agentId);
+			Map<SettingsForApplication, OrganizationUnit> map = profileManagementService.getPrimaryHierarchyByEntity(CommonConstants.AGENT_ID_COLUMN,
+					agentId);
 			hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile(agentSettings);
 
 			long companyId = hierarchyMap.get(CommonConstants.COMPANY_ID_COLUMN);
@@ -1838,22 +1752,20 @@ public class SurveyManagementController {
 			if (map != null) {
 				OrganizationUnit organizationUnit = map.get(SettingsForApplication.LOGO);
 				if (organizationUnit == OrganizationUnit.COMPANY) {
-					OrganizationUnitSettings companySettings = organizationManagementService
-							.getCompanySettings(companyId);
+					OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(companyId);
 					logoUrl = companySettings.getLogo();
 				} else if (organizationUnit == OrganizationUnit.REGION) {
 					OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(regionId);
 					logoUrl = regionSettings.getLogo();
 				} else if (organizationUnit == OrganizationUnit.BRANCH) {
-					OrganizationUnitSettings branchSettings = organizationManagementService
-							.getBranchSettingsDefault(branchId);
+					OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault(branchId);
 					logoUrl = branchSettings.getLogo();
 				} else if (organizationUnit == OrganizationUnit.AGENT) {
 					logoUrl = agentSettings.getLogo();
 				}
 			}
-		} catch (InvalidInputException | InvalidSettingsStateException | ProfileNotFoundException
-				| NoRecordsFetchedException e) {
+		}
+		catch (InvalidInputException | InvalidSettingsStateException | ProfileNotFoundException | NoRecordsFetchedException e) {
 			LOG.warn("Error while fetching logo url " + e.getMessage());
 		}
 		LOG.debug("Returning logo url: " + logoUrl);
