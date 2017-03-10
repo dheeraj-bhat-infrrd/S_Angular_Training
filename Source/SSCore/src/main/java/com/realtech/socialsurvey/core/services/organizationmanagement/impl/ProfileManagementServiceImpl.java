@@ -39,9 +39,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -95,7 +92,6 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.SurveyUploadVO;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
@@ -136,6 +132,9 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 
 @DependsOn ( "generic")
@@ -2253,6 +2252,34 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         List<SurveyPreInitiation> surveys = surveyPreInitiationDao.getIncompleteSurvey( startTime, endTime, startIndex,
             numOfRows, agentIds, isCompanyAdmin, iden, realtechAdmin );
         return surveys;
+    }
+    
+    @Override
+    @Transactional
+    public long getIncompleteSurveyCount(long iden, String profileLevel, Date startDate, Date endDate) throws InvalidInputException{
+    	LOG.debug("Getting incomplete survey count");
+    	long count = 0;
+    	if ( iden <= 0l ) {
+            throw new InvalidInputException( "iden is invalid while fetching incomplete reviews" );
+        }
+    	long companyId = -1;
+    	long agentId = -1;
+    	Timestamp startTime = null;
+        Timestamp endTime = null;
+    	Set<Long> agentIds = null;
+    	if(profileLevel.equalsIgnoreCase(CommonConstants.PROFILE_LEVEL_COMPANY)){
+    		companyId = iden;
+    	}else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+    		agentId = iden;
+    	}else{
+    		agentIds = getAgentIdsByProfileLevel( profileLevel, iden );
+    	}
+        if ( startDate != null )
+            startTime = new Timestamp( startDate.getTime() );
+        if ( endDate != null )
+            endTime = new Timestamp( endDate.getTime() );
+    	count = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, new int[]{CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED}, startTime, endTime, agentIds);
+    	return count;
     }
 
 
