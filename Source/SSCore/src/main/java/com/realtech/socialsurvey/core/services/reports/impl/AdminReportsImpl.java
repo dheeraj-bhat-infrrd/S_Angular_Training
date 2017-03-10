@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
@@ -412,7 +413,8 @@ public class AdminReportsImpl implements AdminReports
 
 
     @Override
-    public void createEntryInFileUploadForUserAdoptionReport( long iden, String profileLevel, long userId, Company company )
+    public void createEntryInFileUploadForUserAdoptionReport( long iden, String profileLevel, long userId, Company company,
+        String mailId )
     {
         LOG.info( "Method createEntryInFileUploadForUserAdoptionReport() started" );
         FileUpload entity = new FileUpload();
@@ -422,7 +424,7 @@ public class AdminReportsImpl implements AdminReports
         entity.setUploadType( CommonConstants.FILE_UPLOAD_USER_ADOPTION_REPORT );
         entity.setProfileLevel( profileLevel );
         entity.setProfileValue( iden );
-        entity.setFileName( "" );
+        entity.setFileName( !StringUtils.isEmpty( mailId ) ? mailId : "" );
 
         Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
         entity.setCreatedOn( currentTime );

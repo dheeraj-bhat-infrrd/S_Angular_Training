@@ -119,12 +119,7 @@
 					</div>
 				</div>
 			</div>
-			<c:if test="${not empty realTechAdminId }">
-				<input id="dsh-report-email-id" type="hidden" value="admin@socialsurvey.me">
-			</c:if>
-			<c:if test="${empty realTechAdminId }">
-				<input id="dsh-report-email-id" type="hidden" value="${emailId}">
-			</c:if>
+			<input id="default-email-id" type="hidden" value="${emailId}">
 			<c:choose>
 				<c:when test="${profilemasterid == 4 || accounttype == 'INDIVIDUAL' }">
 					<div class="float-right dash-btn-dl-sd dash-btn-dl-sd-admin">
