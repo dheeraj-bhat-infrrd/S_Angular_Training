@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +28,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VendastaProductSettings;
+import com.realtech.socialsurvey.core.entities.VendastaRmAccount;
 import com.realtech.socialsurvey.core.entities.VendastaSingleSignOnTicket;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -412,7 +412,7 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
 
                 Map<String, Object> ResponseMap = new ObjectMapper().readValue( responseString,
                     new TypeReference<HashMap<String, Object>>() {} );
-                HashMap<String, Object> data = (HashMap<String, Object>)ResponseMap.get( "data" );
+                HashMap<String, Object> data = (HashMap<String, Object>) ResponseMap.get( "data" );
                 if ( data != null && data.size() != 0 ) {
                     status = true;
                 }
@@ -421,5 +421,86 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
             LOG.error( "Error connecting to vendasta. " + ex.getMessage() );
         }
         return status;
+    }
+
+
+    @Override
+    public void createRmAccount( VendastaRmAccount vendastaRmAccount )
+    {
+        try {
+            Map<String, String> data = getVendastaRmAccountDataMap( vendastaRmAccount );
+            Response response = vendastaApiIntegrationBuilder.getIntegrationApi().createNewAccount( data );
+            if ( response != null && response.getStatus() == HttpStatus.SC_CREATED ) {
+                String responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+                Map<String, Object> responseMap = new ObjectMapper().readValue( responseString,
+                    new TypeReference<HashMap<String, Object>>() {} );
+                Map<String, Object> responseData = (HashMap<String, Object>) responseMap.get( "data" );
+                if ( responseData != null && responseData.size() > 0 ) {
+                    String customerIdentifier = (String) responseData.get( "customerIdentifier" );
+                    storeCustomerIdentifierInMongoForEntity( vendastaRmAccount.getEntityType(), vendastaRmAccount.getEntityId(),
+                        customerIdentifier );
+                }
+            }
+        } catch ( VendastaAccessException | IOException | InvalidInputException | NoRecordsFetchedException ex ) {
+            LOG.error( "Error connecting to vendasta. " + ex );
+
+        }
+    }
+
+
+    private void storeCustomerIdentifierInMongoForEntity( String entityType, long entityId, String customerIdentifier )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        Map<String, Object> hierarchyDetails = this.getUnitSettingsForAHierarchy( entityType, entityId );
+        OrganizationUnitSettings unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
+        String collectionName = (String) hierarchyDetails.get( "collectionName" );
+        VendastaProductSettings settings = new VendastaProductSettings();
+        settings.setAccountId( customerIdentifier );
+        this.updateVendastaRMSettings( collectionName, unitSettings, settings );
+    }
+
+
+    private Map<String, String> getVendastaRmAccountDataMap( VendastaRmAccount account )
+    {
+        Map<String, String> data = new HashMap<String, String>();
+        data.put( "apiKey", apiKey );
+        data.put( "apiUser", apiUser );
+        data.put( "address", account.getAddress() );
+        data.put( "city", account.getCity() );
+        data.put( "companyName", account.getCompanyName() );
+        data.put( "country", account.getCountry() );
+        data.put( "zip", account.getZip() );
+        data.put( "state", account.getState() );
+        data.put( "accountGroupId", account.getAccountGroupId() );
+        data.put( "adminNotes", account.getAdminNotes() );
+        data.put( "alternateEmail", account.getAlternateEmail() );
+        data.put( "billingCode", account.getBillingCode() );
+        data.put( "businessCategory", account.getBusinessCategory() );
+        data.put( "callTrackingNumber", account.getCallTrackingNumber() );
+        data.put( "cellNumber", account.getCellNumber() );
+        data.put( "commonCompanyName", account.getCommonCompanyName() );
+        data.put( "competitor", account.getCompetitor() );
+        data.put( "customerIdentifier", account.getCustomerIdentifier() );
+        data.put( "email", account.getEmail() );
+        data.put( "employee", account.getEmployee() );
+        data.put( "faxNumber", account.getFaxNumber() );
+        data.put( "firstName", account.getFirstName() );
+        data.put( "lastName", account.getLastName() );
+        data.put( "marketId", account.getMarketId() );
+        data.put( "salesPersonEmail", account.getSalesPersonEmail() );
+        data.put( "service", account.getService() );
+        data.put( "ssoToken", account.getSsoToken() );
+        data.put( "taxId", account.getTaxId() );
+        data.put( "twitterSearches", account.getTwitterSearches() );
+        data.put( "website", account.getWebsite() );
+        data.put( "welcomeMessage", account.getWelcomeMessage() );
+        data.put( "workNumber", account.getWorkNumber() );
+        data.put( "demoAccountFlag", account.getDemoAccountFlag() );
+        data.put( "sendAlertsFlag", account.getSendAlertsFlag() );
+        data.put( "sendReportsFlag", account.getSendReportsFlag() );
+        data.put( "sendTutorialsFlag", account.getSendTutorialsFlag() );
+        data.put( "latitude", account.getLatitude() );
+        data.put( "longitude", account.getLongitude() );
+        return data;
     }
 }

@@ -1,10 +1,13 @@
 package com.realtech.socialsurvey.core.integration.vendasta;
 
 
+import java.util.Map;
+
 import retrofit.client.Response;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Query;
+import retrofit.http.QueryMap;
 
 
 public interface VendastaApiIntegration
@@ -32,4 +35,8 @@ public interface VendastaApiIntegration
         @Query ( "demoAccountFlag") boolean demoAccountFlag, @Query ( "sendAlertsFlag") boolean sendAlertsFlag,
         @Query ( "sendReportsFlag") boolean sendReportsFlag, @Query ( "sendTutorialsFlag") boolean sendTutorialsFlag,
         @Query ( "latitude") float latitude, @Query ( "longitude") String longitude );
+
+
+    @POST ( "/api/v2/account/create/")
+    Response createNewAccount( @QueryMap Map<String, String> queryParams );
 }
