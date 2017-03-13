@@ -129,10 +129,6 @@ public class DashboardController
     @Value ( "${APPLICATION_BASE_URL}")
     private String appBaseUrl;
 
-    private final String EXCEL_FORMAT = "application/vnd.ms-excel";
-    private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
-    private final String EXCEL_FILE_EXTENSION = ".xlsx";
-
 
     /*
      * Method to initiate dashboard
@@ -149,6 +145,7 @@ public class DashboardController
 
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
 
         boolean modelSet = false;
         if ( user.getCompany() != null && user.getCompany().getLicenseDetails() != null
@@ -191,7 +188,7 @@ public class DashboardController
         }
 
         model.addAttribute( "userId", user.getUserId() );
-        model.addAttribute( "emailId", user.getEmailId() );
+        model.addAttribute( "emailId", adminUserid != null ? applicationAdminEmail : user.getEmailId() );
         model.addAttribute( "profileName", profileName );
 
         //get detail of expire social media
@@ -782,21 +779,18 @@ public class DashboardController
     public String getIncompleteSurveyCount( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
-        List<SurveyPreInitiation> surveyDetails;
+        long count = 0l;
         User user = sessionHelper.getCurrentUser();
-        String realtechAdminStr = request.getParameter( "realtechAdmin" );
-        boolean realtechAdmin = false;
-        realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
 
         try {
-            surveyDetails = fetchIncompleteSurveys( request, user, realtechAdmin );
+            count = fetchIncompleteSurveyCountForDashboardAllTime( request, user );
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
             return e.getMessage();
         }
 
         LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
-        return String.valueOf( surveyDetails.size() );
+        return String.valueOf( count );
     }
 
 
@@ -881,6 +875,44 @@ public class DashboardController
         return new Gson().toJson( solrDocuments );
     }
 
+    // fetch the count of incomplete survey
+    private long fetchIncompleteSurveyCountForDashboardAllTime(HttpServletRequest request, User user) throws InvalidInputException{
+    	LOG.debug("Fetching incomplete survey count");
+    	long count = 0;
+    	String columnName = request.getParameter( "columnName" );
+        if ( columnName == null || columnName.isEmpty() ) {
+            LOG.error( "Invalid value (null/empty) passed for profile level." );
+            throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+        }
+        String profileLevel = getProfileLevel( columnName );
+
+        long iden = 0;
+        if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            iden = user.getCompany().getCompanyId();
+        } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+            iden = user.getUserId();
+        } else {
+            String columnValue = request.getParameter( "columnValue" );
+            if ( columnValue != null && !columnValue.isEmpty() ) {
+                try {
+                    iden = Long.parseLong( columnValue );
+                } catch ( NumberFormatException e ) {
+                    LOG.error( "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
+                        e );
+                    throw e;
+                }
+            }
+        }
+        
+        try {
+            count = profileManagementService.getIncompleteSurveyCount(iden, profileLevel, null, null);
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
+            throw e;
+        }
+        
+    	return count;
+    }
 
     /*
      * Fetches incomplete surveys based upon the criteria. Criteria can be
@@ -1466,8 +1498,8 @@ public class DashboardController
                 || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) {
                 isRealTechOrSSAdmin = true;
             }
-            String mailId = null;
-            if ( !isRealTechOrSSAdmin ) {
+            String mailId = request.getParameter( "mailid" );
+            if ( !isRealTechOrSSAdmin && ( mailId == null || mailId.isEmpty() ) ) {
                 mailId = user.getEmailId();
             }
 
@@ -1550,10 +1582,11 @@ public class DashboardController
                 || userManagementService.isUserSocialSurveyAdmin( user.getUserId() ) ) {
                 isRealTechOrSSAdmin = true;
             }
-            String mailId = null;
-            if ( !isRealTechOrSSAdmin ) {
+            String mailId = request.getParameter( "mailid" );
+            if ( !isRealTechOrSSAdmin && ( mailId == null || mailId.isEmpty() ) ) {
                 mailId = user.getEmailId();
             }
+
             String columnName = request.getParameter( "columnName" );
             if ( !isRealTechOrSSAdmin && ( columnName == null || columnName.isEmpty() ) ) {
                 LOG.error( "Invalid value (null/empty) passed for profile level." );
@@ -2101,6 +2134,8 @@ public class DashboardController
         User user = sessionHelper.getCurrentUser();
         String message = null;
         try {
+            String mailId = request.getParameter( "mailid" );
+
             String columnName = request.getParameter( "columnName" );
             if ( columnName == null || columnName.isEmpty() ) {
                 LOG.error( "Invalid value (null/empty) passed for column name." );
@@ -2121,7 +2156,8 @@ public class DashboardController
             }
 
             String profileLevel = getProfileLevel( columnName );
-            adminReport.createEntryInFileUploadForUserAdoptionReport( iden, profileLevel, user.getUserId(), user.getCompany() );
+            adminReport.createEntryInFileUploadForUserAdoptionReport( iden, profileLevel, user.getUserId(), user.getCompany(),
+                mailId );
             message = "The User Adoption Report will be mailed to you shortly";
 
         } catch ( NonFatalException e ) {

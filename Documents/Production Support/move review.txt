@@ -1,0 +1,25 @@
+// Move single review from a particular customer of an agent to another agent
+SELECT * FROM `SURVEY_PRE_INITIATION` WHERE `AGENT_ID` IN (SELECT USER_ID FROM `USERS` WHERE `LOGIN_NAME` IN ('melissa@goldenmc.com')); -- agent_id can be found from USERS table using emailId
+db.SURVEY_DETAILS.find({"agentId":7965, "customerFirstName" : "", "customerLastName" : ""}).pretty();
+
+db.SURVEY_DETAILS.update({"agentId":7965, "customerFirstName" : "", "customerLastName" : "", "socialMediaPostDetails.agentMediaPostDetails" : {$exists:true}}, {$set:{"socialMediaPostDetails.agentMediaPostDetails.agentId":NumberLong(7879)}});
+db.SURVEY_DETAILS.update({"agentId":7965, "customerFirstName" : "", "customerLastName" : "", "socialMediaPostResponseDetails.agentMediaPostResponseDetails" : {$exists:true}}, {$set:{"socialMediaPostResponseDetails.agentMediaPostResponseDetails.agentId":NumberLong(7879)}});
+db.SURVEY_DETAILS.update({"agentId":7965, "customerFirstName" : "", "customerLastName" : ""}, {$set:{"agentId":NumberLong(7879), "agentName":"The Stork Group"}});
+UPDATE `SURVEY_PRE_INITIATION` SET `AGENT_ID` = 7879 WHERE `AGENT_ID` = 7965; -- update agent_name, agent_emailId as well
+
+
+// Move all reviews of multiple agents to another agent
+SELECT * FROM `SURVEY_PRE_INITIATION` WHERE `AGENT_ID` IN (SELECT USER_ID FROM `USERS` WHERE `LOGIN_NAME` IN ('melissa@goldenmc.com', 'steves@goldenmc.com')); -- agent_id can be found from USERS table using emailId
+db.SURVEY_DETAILS.find({"agentId":{$in:[7982,8026]}}).count();
+db.SURVEY_DETAILS.find({"agentId":{$in:[7982,8026]}}).count();
+db.SURVEY_DETAILS.find({"agentId":{$in:[7982,8026]}, "socialMediaPostDetails" : {$exists:true}}).count();
+db.SURVEY_DETAILS.find({"agentId":{$in:[7982,8026]}, "socialMediaPostDetails.agentMediaPostDetails" : {$exists:true}}).count();
+db.SURVEY_DETAILS.find({"agentId":{$in:[7982,8026]}, "socialMediaPostResponseDetails" : {$exists:true}}).count();
+db.SURVEY_DETAILS.find({"agentId":{$in:[7982,8026]}, "socialMediaPostResponseDetails.agentMediaPostResponseDetails" : {$exists:true}}).count();
+
+db.SURVEY_DETAILS.update({"agentId":{$in:[7982,8026]}, "socialMediaPostDetails.agentMediaPostDetails" : {$exists:true}}, {$set:{"socialMediaPostDetails.agentMediaPostDetails.agentId":NumberLong(7879)}});
+db.SURVEY_DETAILS.update({"agentId":{$in:[7982,8026]}, "socialMediaPostResponseDetails.agentMediaPostResponseDetails" : {$exists:true}}, {$set:{"socialMediaPostResponseDetails.agentMediaPostResponseDetails.agentId":NumberLong(7879)}});
+db.SURVEY_DETAILS.update({"agentId":{$in:[7982,8026]}}, {$set:{"agentId":NumberLong(7879), "agentName":"The Stork Group"}});
+UPDATE `SURVEY_PRE_INITIATION` SET `AGENT_ID` = 7879 WHERE `AGENT_ID` IN ( 7982,8026);
+
+
