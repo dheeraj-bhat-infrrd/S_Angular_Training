@@ -1,0 +1,39 @@
+{
+    "chart": {
+        "caption": "Field Service",
+        "subcaption": "",
+        "lowerLimit": "0",
+        "upperLimit": "100",
+        "numberSuffix": "",
+        "dataStreamUrl": "",
+        "refreshInterval": "10",
+        "bgColor": "#A9A9A9",
+        "showBorder" : "0",
+        "theme": "fint"
+    },
+    "colorRange": {
+        "color": [{
+            "minValue": "-90",
+            "maxValue": "10",
+            "label": "Low",
+            "code": "#c02d00"
+        }, {
+            "minValue": "11",
+            "maxValue": "70",
+            "label": "Moderate",
+            "code": "#f2c500"
+        }, {
+            "minValue": "70",
+            "maxValue": "100",
+            "label": "High",
+            "code": "#1aaf5d"
+        }]
+    },
+    "dials": {
+        "dial": [{
+            "id": "nps",
+            "value": "72.5",
+            "tooltext": "NPS : $value"
+        }]
+    }
+}

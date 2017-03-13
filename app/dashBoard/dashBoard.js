@@ -59,4 +59,18 @@ FusionCharts.ready(function () {
   });
   sSRatingChart.render();
 });
+
+FusionCharts.ready(function(){
+    var fusioncharts = new FusionCharts({
+    type: 'angulargauge',
+    renderAt: 'gaugeChartContainer',
+    id: 'cs-angular-gauge',
+    width: '100%',
+    height: '170',
+    dataFormat: 'jsonUrl',
+    dataSource: "resources/json/gaugeChart.json"
+}
+);
+    fusioncharts.render();
+});
 }])

@@ -31,9 +31,6 @@
   margin-left: auto
 }
 
-.rightButtons{
-  display: flex;
-}
 .rightFloater{
   float: right;
 }
@@ -61,7 +58,7 @@
 
   .leftContentContainer{
     width:24%;
-    background-color:gray;
+    background-color:darkgray;
     margin-right: 10px;
     display: block;
     box-sizing: border-box;
@@ -78,7 +75,7 @@
 }
 .leftContentContainer{
   width:24%;
-  background-color:gray;
+  background-color:#d3d3d3;
   margin-right: 10px;
   display: block;
   box-sizing: border-box;
@@ -106,14 +103,14 @@
   border-top-left-radius:0;
   border-bottom-left-radius:0;
   margin-left: -4px;
-
+  margin-bottom: 0 !important;
 }
 
 .summaryButton{
   margin-right: 0 !important;
   border-top-right-radius:0;
   border-bottom-right-radius:0;
-  margin-right: 0;
+  margin-bottom: 0 !important;
   border-right: 1px solid #C0C0C0;
 }
 
@@ -125,6 +122,23 @@
     height: 17px;
     width: 17px;
     margin-right: 10px;
+}
+
+@media (max-width:700px) {
+
+  .leftLinks a{
+    font-size: 12px !important;
+  }
+
+  .leftLinks a:hover, .leftLinks a:focus{
+    text-decoration: none;
+    font-size: 12px !important;
+  }
+
+  .rightButtons button{
+    font-size: 12px !important;
+    min-width: 90px !important;
+  }
 }
 
 .leftLinks{
@@ -287,4 +301,8 @@ margin-right: 0 !important;
 
 .sSRatingContainer{
   margin: 20px auto;
+}
+
+.gaugeChart{
+  margin: 10px auto;
 }
