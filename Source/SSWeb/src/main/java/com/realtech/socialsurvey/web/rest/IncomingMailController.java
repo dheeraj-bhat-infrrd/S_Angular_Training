@@ -100,7 +100,9 @@ public class IncomingMailController
         }
 
         LOG.info( "Proceeding to resolve mailTo : " + mailTo );
+        LOG.info( "subject:" +subject + "\n mailbody:" +mailBody+ "\n mailFrom:" + mailFrom + "\n mailTo:" +mailTo+ "\n header:" +headers);
         String resolvedMailto = resolveMailTo( mailTo );
+        LOG.info("\n resolvedMailto:" +resolvedMailto);
         if ( resolvedMailto == null || resolvedMailto.isEmpty() ) {
             LOG.error( "Resolved Mail id found null or empty" );
             return CommonConstants.SENDGRID_OK_STATUS;
