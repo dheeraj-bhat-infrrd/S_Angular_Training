@@ -50,6 +50,7 @@ public interface VendastaManagementService
     public boolean isAccountExistInVendasta( String accountId );
 
 
-    public void createRmAccount( VendastaRmAccount vendastaRmAccount );
+    public Map<String, Object> validateAndCreateRmAccount( VendastaRmAccount vendastaRmAccount, boolean isForced )
+        throws InvalidInputException;
 
 }

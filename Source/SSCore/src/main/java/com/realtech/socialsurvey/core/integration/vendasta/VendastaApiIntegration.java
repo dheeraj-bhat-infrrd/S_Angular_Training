@@ -4,7 +4,9 @@ package com.realtech.socialsurvey.core.integration.vendasta;
 import java.util.Map;
 
 import retrofit.client.Response;
+import retrofit.http.Body;
 import retrofit.http.GET;
+import retrofit.http.Headers;
 import retrofit.http.POST;
 import retrofit.http.Query;
 import retrofit.http.QueryMap;
@@ -17,26 +19,7 @@ public interface VendastaApiIntegration
         @Query ( "customerIdentifier") String customerIdentifier );
 
 
+    @Headers ( { "Content-Type: application/json" })
     @POST ( "/api/v2/account/create/")
-    Response createAccount( @Query ( "apiUser") String apiUser, @Query ( "apiKey") String apiKey,
-        @Query ( "address") String address, @Query ( "city") String city, @Query ( "companyName") String companyName,
-        @Query ( "country") String country, @Query ( "zip") String zip, @Query ( "state") String state,
-        @Query ( "accountGroupId") String accountGroupId, @Query ( "adminNotes") String adminNotes,
-        @Query ( "alternateEmail") String alternateEmail, @Query ( "billingCode") String billingCode,
-        @Query ( "businessCategory") String businessCategory, @Query ( "callTrackingNumber") String callTrackingNumber,
-        @Query ( "cellNumber") String cellNumber, @Query ( "commonCompanyName") String commonCompanyName,
-        @Query ( "competitor") String competitor, @Query ( "customerIdentifier") String customerIdentifier,
-        @Query ( "email") String email, @Query ( "employee") String employee, @Query ( "faxNumber") String faxNumber,
-        @Query ( "firstName") String firstName, @Query ( "lastName") String lastName, @Query ( "marketId") String marketId,
-        @Query ( "salesPersonEmail") String salesPersonEmail, @Query ( "service") String service,
-        @Query ( "ssoToken") String ssoToken, @Query ( "taxId") String taxId,
-        @Query ( "twitterSearches") String twitterSearches, @Query ( "website") String website,
-        @Query ( "welcomeMessage") String welcomeMessage, @Query ( "workNumber") String workNumber,
-        @Query ( "demoAccountFlag") boolean demoAccountFlag, @Query ( "sendAlertsFlag") boolean sendAlertsFlag,
-        @Query ( "sendReportsFlag") boolean sendReportsFlag, @Query ( "sendTutorialsFlag") boolean sendTutorialsFlag,
-        @Query ( "latitude") float latitude, @Query ( "longitude") String longitude );
-
-
-    @POST ( "/api/v2/account/create/")
-    Response createNewAccount( @QueryMap Map<String, String> queryParams );
+    Response createRmAccount( @QueryMap Map<String, String> queryParams, @Body Map<Object, Object> emptyMap );
 }

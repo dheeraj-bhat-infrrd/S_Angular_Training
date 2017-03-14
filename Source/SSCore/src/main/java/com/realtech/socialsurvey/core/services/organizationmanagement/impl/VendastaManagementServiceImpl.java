@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +42,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.VendastaMa
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 
+import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 
@@ -250,12 +252,13 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
                 collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getAgentSettings( entityId );
             } else {
-                throw new InvalidInputException( "Invalid Collection Type" );
+                throw new InvalidInputException( "Invalid EntityType: " + entityType
+                    + ". EntityType should be one of the following: [companyId, regionId, branchId, agentId]." );
             }
             details.put( "collectionName", collectionName );
             details.put( "unitSettings", unitSettings );
         } else {
-            throw new InvalidInputException( "Invalid Collection Id" );
+            throw new InvalidInputException( "Invalid EntityId: " + entityId + ". EntityId should be greater than 0." );
 
         }
         LOG.info( "VendastaManagementService.getUnitSettingsForAHierarchy finished" );
@@ -425,38 +428,96 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
 
 
     @Override
-    public void createRmAccount( VendastaRmAccount vendastaRmAccount )
+    public Map<String, Object> validateAndCreateRmAccount( VendastaRmAccount vendastaRmAccount, boolean isForced )
+        throws InvalidInputException
     {
+        String customerIdentifier = null;
+        boolean isAlreadyExistingAccount = false;
+        Map<String, Object> dataMap = new HashMap<>();
         try {
-            Map<String, String> data = getVendastaRmAccountDataMap( vendastaRmAccount );
-            Response response = vendastaApiIntegrationBuilder.getIntegrationApi().createNewAccount( data );
-            if ( response != null && response.getStatus() == HttpStatus.SC_CREATED ) {
-                String responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-                Map<String, Object> responseMap = new ObjectMapper().readValue( responseString,
-                    new TypeReference<HashMap<String, Object>>() {} );
-                Map<String, Object> responseData = (HashMap<String, Object>) responseMap.get( "data" );
-                if ( responseData != null && responseData.size() > 0 ) {
-                    String customerIdentifier = (String) responseData.get( "customerIdentifier" );
-                    storeCustomerIdentifierInMongoForEntity( vendastaRmAccount.getEntityType(), vendastaRmAccount.getEntityId(),
-                        customerIdentifier );
-                }
+            Map<String, Object> hierarchyDetails = this.getUnitSettingsForAHierarchy( vendastaRmAccount.getEntityType(),
+                vendastaRmAccount.getEntityId() );
+            OrganizationUnitSettings unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
+            if ( unitSettings == null ) {
+                throw new NoRecordsFetchedException( "Invalid EntityId: " + vendastaRmAccount.getEntityId()
+                    + " for EntityType: " + vendastaRmAccount.getEntityType() );
             }
-        } catch ( VendastaAccessException | IOException | InvalidInputException | NoRecordsFetchedException ex ) {
-            LOG.error( "Error connecting to vendasta. " + ex );
-
+            if ( !isForced ) {
+                if ( unitSettings != null && unitSettings.getVendasta_rm_settings() != null
+                    && !StringUtils.isEmpty( unitSettings.getVendasta_rm_settings().getAccountId() ) ) {
+                    if ( this.isAccountExistInVendasta( unitSettings.getVendasta_rm_settings().getAccountId() ) ) {
+                        customerIdentifier = unitSettings.getVendasta_rm_settings().getAccountId();
+                        isAlreadyExistingAccount = true;
+                    }
+                }
+                if ( !isAlreadyExistingAccount ) {
+                    customerIdentifier = createRmAccount( vendastaRmAccount, hierarchyDetails );
+                }
+            } else {
+                customerIdentifier = createRmAccount( vendastaRmAccount, hierarchyDetails );
+            }
+        } catch ( VendastaAccessException e ) {
+            LOG.error( "Error connecting to vendasta." );
+            try {
+                if ( e.getCause() instanceof RetrofitError ) {
+                    RetrofitError error = (RetrofitError) e.getCause();
+                    String responseString = new String( ( (TypedByteArray) error.getResponse().getBody() ).getBytes() );
+                    Map<String, Object> responseMap = new ObjectMapper().readValue( responseString,
+                        new TypeReference<HashMap<String, Object>>() {} );
+                    String message = (String) responseMap.get( "message" );
+                    throw new InvalidInputException( message );
+                }
+            } catch ( IOException ex ) {
+                LOG.error( "Error connecting to vendasta. " + ex );
+                throw new InvalidInputException( "Invalid json response received from Vendasta." + e.getMessage() );
+            }
+        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( "Error connecting to vendasta. " + e );
+            throw new InvalidInputException( e.getMessage() );
+        } catch ( IOException e ) {
+            LOG.error( "Error connecting to vendasta. " + e );
+            throw new InvalidInputException( "Invalid json response received from Vendasta." + e.getMessage() );
+        } catch ( Exception e ) {
+            throw new InvalidInputException( "Error in creating Vendasta RM account. " + e );
         }
+        dataMap.put( "customerIdentifier", customerIdentifier );
+        dataMap.put( "isAlreadyExistingAccount", isAlreadyExistingAccount );
+        return dataMap;
     }
 
 
-    private void storeCustomerIdentifierInMongoForEntity( String entityType, long entityId, String customerIdentifier )
-        throws InvalidInputException, NoRecordsFetchedException
+    private String createRmAccount( VendastaRmAccount vendastaRmAccount, Map<String, Object> hierarchyDetails )
+        throws IOException, InvalidInputException
     {
-        Map<String, Object> hierarchyDetails = this.getUnitSettingsForAHierarchy( entityType, entityId );
+        String customerIdentifier = null;
+        Map<String, String> data = getVendastaRmAccountDataMap( vendastaRmAccount );
+        Response response = vendastaApiIntegrationBuilder.getIntegrationApi().createRmAccount( data,
+            new HashMap<Object, Object>() );
+        if ( response != null && response.getStatus() == HttpStatus.SC_CREATED ) {
+            String responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+            Map<String, Object> responseMap = new ObjectMapper().readValue( responseString,
+                new TypeReference<HashMap<String, Object>>() {} );
+            Map<String, Object> responseData = (HashMap<String, Object>) responseMap.get( "data" );
+            if ( responseData != null && responseData.size() > 0 ) {
+                if ( storeCustomerIdentifierInMongoForEntity( hierarchyDetails,
+                    (String) responseData.get( "customerIdentifier" ) ) ) {
+                    customerIdentifier = (String) responseData.get( "customerIdentifier" );
+                }
+            }
+        }
+        return customerIdentifier;
+    }
+
+
+    private boolean storeCustomerIdentifierInMongoForEntity( Map<String, Object> hierarchyDetails, String customerIdentifier )
+        throws InvalidInputException
+    {
         OrganizationUnitSettings unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
         String collectionName = (String) hierarchyDetails.get( "collectionName" );
         VendastaProductSettings settings = new VendastaProductSettings();
         settings.setAccountId( customerIdentifier );
-        this.updateVendastaRMSettings( collectionName, unitSettings, settings );
+        boolean isStoredInMongo = this.updateVendastaRMSettings( collectionName, unitSettings, settings );
+        return isStoredInMongo;
     }
 
 

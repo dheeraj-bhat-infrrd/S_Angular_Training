@@ -25,9 +25,9 @@ public class VendastaRmAccountValidator implements Validator
     public void validate( Object target, Errors errors )
     {
         VendastaRmAccountVO request = (VendastaRmAccountVO) target;
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "entityType", "entityType.invalid", "entityType cannot be empty" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "entityType", "entityType.invalid", "entityType cannot be null or empty." );
         if ( request.getEntityId() <= 0 ) {
-            errors.rejectValue( "entityId", "entityId.invalid", "entityId cannot be empty" );
+            errors.rejectValue( "entityId", "entityId.invalid", "entityId cannot be empty or less than equal to 0." );
         }
         if ( errors.hasErrors() ) {
             throw new BadRequestException( "Validation errors", errors );

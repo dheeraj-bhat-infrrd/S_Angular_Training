@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.api.controllers;
 
+import java.util.Map;
+
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -12,13 +14,16 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
+import com.realtech.socialsurvey.api.models.VendastaRmAccountResponse;
 import com.realtech.socialsurvey.api.models.VendastaRmAccountVO;
 import com.realtech.socialsurvey.api.transformers.VendastaRmAccountTransformer;
 import com.realtech.socialsurvey.api.validators.VendastaRmAccountValidator;
 import com.realtech.socialsurvey.core.entities.VendastaRmAccount;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.VendastaManagementService;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -52,16 +57,42 @@ public class VendastaController
 
     @RequestMapping ( value = "/rm/account/create", method = RequestMethod.POST)
     @ApiOperation ( value = "Create vendasta rm account")
-    public ResponseEntity<?> createVendastaRmAccount( @Valid @RequestBody VendastaRmAccountVO vendastaRmAccountVO )
-        throws SSApiException
+    public ResponseEntity<?> createVendastaRmAccount( @Valid @RequestBody VendastaRmAccountVO vendastaRmAccountVO,
+        @RequestParam ( "isForced") boolean isForced ) throws SSApiException
     {
         try {
             Object obj = null;
             VendastaRmAccount vendastaRmAccount = vendastaRmAccountTransformer
                 .transformApiRequestToDomainObject( vendastaRmAccountVO, obj );
-            vendastaManagementService.createRmAccount( vendastaRmAccount );
-            return new ResponseEntity<Void>( HttpStatus.OK );
-        } catch ( Exception e ) {
+            Map<String, Object> dataMap = vendastaManagementService.validateAndCreateRmAccount( vendastaRmAccount, isForced );
+            String message = "Error in creating RM account.";
+            String customerIdentifier = null;
+            boolean isAlreadyExistingAccount = false;
+            HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            if ( dataMap != null && dataMap.size() > 0 ) {
+                if ( dataMap.get( "customerIdentifier" ) != null ) {
+                    customerIdentifier = (String) dataMap.get( "customerIdentifier" );
+                }
+                if ( dataMap.get( "isAlreadyExistingAccount" ) != null ) {
+                    isAlreadyExistingAccount = (boolean) dataMap.get( "isAlreadyExistingAccount" );
+                }
+                if ( customerIdentifier != null ) {
+                    if ( isForced ) {
+                        message = "Successfully created RM account.";
+                        httpStatus = HttpStatus.CREATED;
+                    } else if ( isAlreadyExistingAccount ) {
+                        message = "RM account already existing.";
+                        httpStatus = HttpStatus.OK;
+                    } else {
+                        message = "Successfully created RM account.";
+                        httpStatus = HttpStatus.CREATED;
+                    }
+                }
+            }
+            VendastaRmAccountResponse response = new VendastaRmAccountResponse( message, vendastaRmAccountVO.getEntityId(),
+                vendastaRmAccountVO.getEntityType(), customerIdentifier );
+            return new ResponseEntity<VendastaRmAccountResponse>( response, httpStatus );
+        } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e );
         }
     }
