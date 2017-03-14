@@ -7,6 +7,7 @@ import java.util.Map;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VendastaProductSettings;
+import com.realtech.socialsurvey.core.entities.VendastaRmAccount;
 import com.realtech.socialsurvey.core.entities.VendastaSingleSignOnTicket;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -22,7 +23,8 @@ public interface VendastaManagementService
         VendastaProductSettings vendastaReputationManagementSettings ) throws InvalidInputException;
 
 
-    public String validateUrlGenerator( User user, String nextUrl, String productId, String ssoToken ) throws IOException, InvalidInputException;
+    public String validateUrlGenerator( User user, String nextUrl, String productId, String ssoToken )
+        throws IOException, InvalidInputException;
 
 
     public boolean validateSSOTuple( String productId, String ssoToken, String ssoTicket );
@@ -46,5 +48,9 @@ public interface VendastaManagementService
 
 
     public boolean isAccountExistInVendasta( String accountId );
+
+
+    public Map<String, Object> validateAndCreateRmAccount( VendastaRmAccount vendastaRmAccount, boolean isForced )
+        throws InvalidInputException;
 
 }
