@@ -58,8 +58,10 @@ public class VendastaController
     @RequestMapping ( value = "/rm/account/create", method = RequestMethod.POST)
     @ApiOperation ( value = "Create vendasta rm account")
     public ResponseEntity<?> createVendastaRmAccount( @Valid @RequestBody VendastaRmAccountVO vendastaRmAccountVO,
-        @RequestParam ( "isForced") boolean isForced ) throws SSApiException
+        @RequestParam ( value = "isForced", defaultValue = "false") boolean isForced ) throws SSApiException
     {
+        LOGGER.info( "Creating Vendasta RM account for entityId: " + vendastaRmAccountVO.getEntityId() + ", entityType: "
+            + vendastaRmAccountVO.getEntityType() );
         try {
             Object obj = null;
             VendastaRmAccount vendastaRmAccount = vendastaRmAccountTransformer
