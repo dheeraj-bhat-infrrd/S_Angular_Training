@@ -147,9 +147,9 @@ public class IncomingMailController
         String emailDomain = splitEmail[1];
         if ( emailDomain == null || emailDomain.isEmpty() ) {
             return null;
-        } else if ( splitEmail[1] == defaultSendGridMeEmailDomain ) {
+        } else if ( splitEmail[1].equals( defaultSendGridMeEmailDomain ) ) {
             return defaultSendGridMeEmailDomain;
-        } else if ( splitEmail[1] == defaultSendGridUsEmailDomain ) {
+        } else if ( splitEmail[1].equals( defaultSendGridUsEmailDomain ) ) {
             return defaultSendGridUsEmailDomain;
         } else {
             return defaultSendGridMeEmailDomain;
