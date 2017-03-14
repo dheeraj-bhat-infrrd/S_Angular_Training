@@ -53,6 +53,8 @@ public class IncomingMailController
 	private static String NULL_USER_EMAIL_ADDRESS = "u-null@alert.socialsurvey.me";
 	private static String NULL_USER_EMAIL_ADDRESS_DEMO = "u-null@socialsurvey.me";
 
+	private String EMAIL_REGEX = ".*@([A-Za-z0-9\\.-]+)";
+    private Pattern EMAIL_REGEX_PATTERN = Pattern.compile( EMAIL_REGEX );
 
     /**
      *  Method to handle forwarding of customer reply to corresponding recipient based on below strategy :
@@ -143,13 +145,17 @@ public class IncomingMailController
             return null;
         }
         //check if the value after @ is either of the default values
-        String[] splitEmail = emailId.split( "@" );
-        String emailDomain = splitEmail[1];
+        String emailDomain = null ;
+        Matcher matcher = EMAIL_REGEX_PATTERN.matcher(emailId);
+        if(matcher.find()){
+         emailDomain = matcher.group(1);
+        }
+        
         if ( emailDomain == null || emailDomain.isEmpty() ) {
             return null;
-        } else if ( splitEmail[1].equals( defaultSendGridMeEmailDomain ) ) {
+        } else if ( emailDomain.equals( defaultSendGridMeEmailDomain ) ) {
             return defaultSendGridMeEmailDomain;
-        } else if ( splitEmail[1].equals( defaultSendGridUsEmailDomain ) ) {
+        } else if ( emailDomain.equals( defaultSendGridUsEmailDomain ) ) {
             return defaultSendGridUsEmailDomain;
         } else {
             return defaultSendGridMeEmailDomain;

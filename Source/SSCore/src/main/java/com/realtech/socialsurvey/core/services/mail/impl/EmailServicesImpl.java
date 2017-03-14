@@ -2176,7 +2176,7 @@ public class EmailServicesImpl implements EmailServices
         emailEntity.setSenderName( senderName );
         emailEntity.setSenderEmailId( senderEmailAddress );
         
-        if(sendUsingDomain != null && sendUsingDomain.equals(CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US)){
+        if(sendUsingDomain != null && sendUsingDomain.equals(defaultSendGridUsEmailDomain)){
             emailEntity.setSendEmailThrough(CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US);
         }
         
