@@ -1850,9 +1850,9 @@ public class EmailServicesImpl implements EmailServices
         
         //checking for the right defaultEmailDomain
         String defaultEmailDomain = null ;
-        if( sendEmailThrough == null || sendEmailThrough.isEmpty() || sendEmailThrough == CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME ){
+        if( sendEmailThrough == null || sendEmailThrough.isEmpty() || sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME ) ){
             defaultEmailDomain = defaultSendGridMeEmailDomain ;
-        }else if( sendEmailThrough == CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US ){
+        }else if( sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US  )){
             defaultEmailDomain = defaultSendGridUsEmailDomain ;
         }
         emailEntity.setSenderEmailId( "u-" + agentSettings.getUserEncryptedId() + "@" + defaultEmailDomain );

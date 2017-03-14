@@ -103,12 +103,10 @@ public class IncomingMailController
         }
 
         LOG.info( "Proceeding to resolve mailTo : " + mailTo );
-        LOG.info( "subject:" +subject + "\n mailbody:" +mailBody+ "\n mailFrom:" + mailFrom + "\n mailTo:" +mailTo+ "\n header:" +headers);
-        LOG.info( "calling getDefaultDomainFromTo" );
-        String sendUsingDomain = getDefaultDomainFromTo(mailTo);
+        LOG.info( "subject:" +subject + "\n mailFrom:" + mailFrom + "\n mailTo:" +mailTo+ "\n header:" +headers);
+        String sendUsingDomain = getDefaultDomainFromEmail(mailTo);
         LOG.info( "finished getDefaultDomainFromTo and the sendUsingDomain :" +sendUsingDomain );
         String resolvedMailto = resolveMailTo( mailTo ,sendUsingDomain );
-        LOG.info("\n resolvedMailto:" +resolvedMailto);
         if ( resolvedMailto == null || resolvedMailto.isEmpty() ) {
             LOG.error( "Resolved Mail id found null or empty" );
             return CommonConstants.SENDGRID_OK_STATUS;
@@ -137,9 +135,8 @@ public class IncomingMailController
     }
     
 
-    private String getDefaultDomainFromTo( String emailId )
+    private String getDefaultDomainFromEmail( String emailId )
     {
-        LOG.info( "starting getDefaultDomainFromTo" );
         //Get the domain from the email ID
         if ( emailId == null || emailId.isEmpty() ) {
             LOG.error( "Mail To passed cannot be null or empty" );
