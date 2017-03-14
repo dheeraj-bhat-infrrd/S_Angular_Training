@@ -85,7 +85,7 @@ public class EmailServicesImpl implements EmailServices
     @Value ( "${SOCIALSURVEYME_SENDER_EMAIL_DOMAIN}")
     private String defaultSendGridMeEmailDomain;
     
-    @Value ("${SENDGRID_US_SENDER_EMAIL_DOMAIN}")
+    @Value ("${SOCIALSURVEYUS_SENDER_EMAIL_DOMAIN}")
     private String defaultSendGridUsEmailDomain;
 
     @Value ( "${APPLICATION_BASE_URL}")
