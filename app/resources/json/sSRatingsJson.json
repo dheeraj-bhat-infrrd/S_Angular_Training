@@ -4,8 +4,8 @@
         "subCaption": "",
         "yAxisName": "",
         "numberPrefix": "",
-        "paletteColors": "#0c9ce4",
-        "bgColor": "#ffffff",
+        "paletteColors": "#0075c2",
+        "bgColor": "#A9A9A9",
         "showBorder": "0",
         "showCanvasBorder": "0",
         "usePlotGradientColor": "0",
@@ -38,7 +38,7 @@
             "value": "30"
         },
         {
-            "label": "3stars",
+           "label": "3stars",
             "value": "12"
         },
         {

@@ -53,7 +53,7 @@ FusionCharts.ready(function () {
       type: 'bar2d',
       renderAt: 'sSRatingChart',
       width: '90%',
-      height: '50%',
+      height: '150px',
       dataFormat: 'jsonUrl',
       dataSource: "resources/json/sSRatingsJson.json"
   });
