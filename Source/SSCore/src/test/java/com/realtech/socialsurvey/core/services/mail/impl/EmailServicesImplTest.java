@@ -1364,7 +1364,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailTestRecipientMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( null, TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
+            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
@@ -1372,7 +1372,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailTestRecipientMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
+            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
@@ -1380,7 +1380,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailTestSubjectNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, null, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
+            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
@@ -1388,7 +1388,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailTestSubjectEmpty() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING,
-            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
+            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
@@ -1396,7 +1396,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailTestMailBodyNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING, null,
-            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
+            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
@@ -1404,7 +1404,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailMailBodyEmpty() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
+            TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
@@ -1412,7 +1412,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailTestMailSenderNameNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, null, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
+            TestConstants.TEST_STRING, null, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
@@ -1420,7 +1420,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailSenderNameEmpty() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING );
+            TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
@@ -1428,7 +1428,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailTestMailSenderEmailAddressNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, TestConstants.TEST_STRING, null, TestConstants.TEST_STRING );
+            TestConstants.TEST_STRING, TestConstants.TEST_STRING, null, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
@@ -1436,7 +1436,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailSenderEmailAddressEmpty() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING );
+            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
@@ -1444,7 +1444,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailTestMailMessageIdNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, null );
+            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, null, TestConstants.TEST_EMPTY_STRING );
     }
 
 
@@ -1452,7 +1452,7 @@ public class EmailServicesImplTest
     public void forwardCustomerReplyMailMessageIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
+            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
