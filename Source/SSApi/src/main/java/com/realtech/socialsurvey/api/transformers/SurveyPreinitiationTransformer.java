@@ -79,6 +79,7 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
 		surveyPreInitiation.setSurveySourceId(transactionInfo.getTransactionRef());
 		surveyPreInitiation.setCity(transactionInfo.getTransactionCity());
 		surveyPreInitiation.setState(transactionInfo.getTransactionState());
+        surveyPreInitiation.setTransactionType(transactionInfo.getTransactionType());
 		 
 		surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
 		surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -103,6 +104,7 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
         	surveyPreInitiation2.setSurveySourceId(transactionInfo.getTransactionRef());
         	surveyPreInitiation2.setCity(transactionInfo.getTransactionCity());
         	surveyPreInitiation2.setState(transactionInfo.getTransactionState());
+        	surveyPreInitiation2.setTransactionType(transactionInfo.getTransactionType());
     		 
         	surveyPreInitiation2.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         	surveyPreInitiation2.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
