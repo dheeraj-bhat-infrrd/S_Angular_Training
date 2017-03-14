@@ -129,6 +129,9 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
                 transactionInfo.setTransactionDate( String.valueOf( surveyPreInitiation.getEngagementClosedTime() ) );
             if ( StringUtils.isBlank( transactionInfo.getTransactionRef() ) )
                 transactionInfo.setTransactionRef( surveyPreInitiation.getSurveySourceId() );
+            //if not updates in mongo then we update from sql
+            //but since we aren't updating the type feild in mongo we directly update 
+            transactionInfo.setTransactionType( surveyPreInitiation.getTransactionType() );
 
         }
 

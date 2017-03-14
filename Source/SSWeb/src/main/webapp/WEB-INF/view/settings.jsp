@@ -95,7 +95,7 @@
 									<div class="float-left listing-access-txt cust-resp-txt">Allow access to Listings Manager</div>
 								</c:if>
 							</c:if>
-							<c:if test="${ isRealTechAdmin == true and columnName == 'companyId' }">
+							<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 							<div class="send-email-sel-col">
 								<div class="clearfix padding-bottom-twenty">
 									<div class="float-left st-score-rt-top email-setting-sel-lbl">

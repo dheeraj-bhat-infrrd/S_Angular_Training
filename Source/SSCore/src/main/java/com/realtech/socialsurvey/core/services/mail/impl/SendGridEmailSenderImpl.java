@@ -48,13 +48,13 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
     private static final Logger LOG = LoggerFactory.getLogger( SendGridEmailSenderImpl.class );
 
     //FOR DEFAULT SENDGRID ACCOUNT 
-    @Value ( "${SENDGRID_SENDER_NAME}")
+    @Value ( "${SENDGRID_SENDER_SOCIALSURVEYME_NAME}")
     private String defaultSendName;
 
-    @Value ( "${SENDGRID_SENDER_USERNAME}")
+    @Value ( "${SENDGRID_SENDER_SOCIALSURVEYME_USERNAME}")
     private String sendGridUserName;
 
-    @Value ( "${SENDGRID_SENDER_PASSWORD}")
+    @Value ( "${SENDGRID_SENDER_SOCIALSURVEYME_PASSWORD}")
     private String sendGridPassword;
     
     //FOR SOCIALSURVEY.US SENDGRID ACCOUNT

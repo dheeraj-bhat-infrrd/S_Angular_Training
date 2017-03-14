@@ -385,7 +385,7 @@ public interface EmailServices
 
 
     void forwardCustomerReplyMail( String recipientMailId, String subject, String mailBody, String senderName,
-        String senderEmailAddress, String headers ) throws InvalidInputException, UndeliveredEmailException;
+        String senderEmailAddress, String headers, String sendUsingDomain ) throws InvalidInputException, UndeliveredEmailException;
 
 
     void sendReportBugMailToAdminForExceptionInBatch( String displayName, String batchName, String lastRunTime, String errorMsg,
