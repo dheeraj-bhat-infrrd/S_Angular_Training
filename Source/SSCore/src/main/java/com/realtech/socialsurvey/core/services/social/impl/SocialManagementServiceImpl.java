@@ -2252,7 +2252,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Transactional
     @Override
-    public SurveyPreInitiationList getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+    public SurveyPreInitiationList getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize , long count)
         throws InvalidInputException
     {
         LOG.debug( "method getUnmatchedPreInitiatedSurveys called for company id : " + companyId );
@@ -2264,14 +2264,19 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.getUnmatchedPreInitiatedSurveys( companyId,
             startIndex, batchSize );
         surveyPreInitiationListVO.setSurveyPreInitiationList( surveyPreInitiations );
-        surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getUnmatchedPreInitiatedSurveyCount( companyId ) );
+        //function shd be called only once
+        if(count == -1){
+            surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getUnmatchedPreInitiatedSurveyCount( companyId ) );
+        }else{
+            surveyPreInitiationListVO.setTotalRecord( count );
+        }
         return surveyPreInitiationListVO;
     }
 
 
     @Transactional
     @Override
-    public SurveyPreInitiationList getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+    public SurveyPreInitiationList getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize , long count)
         throws InvalidInputException
     {
         LOG.debug( "method getProcessedPreInitiatedSurveys called for company id : " + companyId );
@@ -2283,7 +2288,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.getProcessedPreInitiatedSurveys( companyId,
             startIndex, batchSize );
         surveyPreInitiationListVO.setSurveyPreInitiationList( surveyPreInitiations );
-        surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getProcessedPreInitiatedSurveyCount( companyId ) );
+        if( count == -1 ){
+            surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getProcessedPreInitiatedSurveyCount( companyId ) );
+        }else{
+            surveyPreInitiationListVO.setTotalRecord( count );
+        }
         return surveyPreInitiationListVO;
     }
 
@@ -2389,7 +2398,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Override
     @Transactional
-    public SurveyPreInitiationList getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+    public SurveyPreInitiationList getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize , long count )
         throws InvalidInputException
     {
         LOG.debug( "method getCorruptPreInitiatedSurveys called for company id : " + companyId );
@@ -2407,7 +2416,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 survey.setErrorCodeDescription( SurveyErrorCode.NOT_KNOWN.getValue() );
         }
         surveyPreInitiationListVO.setSurveyPreInitiationList( surveyPreInitiations );
-        surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getCorruptPreInitiatedSurveyCount( companyId ) );
+        if( count == -1 ){
+            surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getCorruptPreInitiatedSurveyCount( companyId ) );
+        }else{
+            surveyPreInitiationListVO.setTotalRecord( count );
+        }
         return surveyPreInitiationListVO;
     }
 
@@ -2421,17 +2434,17 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         Map<Integer, List<Object>> data = null;
         XSSFWorkbook workbook = null;
         if ( tabId == CommonConstants.UNMATCHED_USER_TABID ) {
-            surveyPreInitiationListVO = this.getUnmatchedPreInitiatedSurveys( companyId, -1, -1 );
+            surveyPreInitiationListVO = this.getUnmatchedPreInitiatedSurveys( companyId, -1, -1, -1 );
             data = workbookData.getUnmatchedOrProcessedSurveyDataToBeWrittenInSheet( surveyPreInitiationListVO );
         } else if ( tabId == CommonConstants.PROCESSED_USER_TABID ) {
-            surveyPreInitiationListVO = this.getProcessedPreInitiatedSurveys( companyId, -1, -1 );
+            surveyPreInitiationListVO = this.getProcessedPreInitiatedSurveys( companyId, -1, -1, -1 );
             data = workbookData.getUnmatchedOrProcessedSurveyDataToBeWrittenInSheet( surveyPreInitiationListVO );
         } else if ( tabId == CommonConstants.MAPPED_USER_TABID ) {
             UserList userList = new UserList();
-            userList = userManagementService.getUsersAndEmailMappingForCompany( companyId, -1, -1 );
+            userList = userManagementService.getUsersAndEmailMappingForCompany( companyId, -1, -1, -1 );
             data = workbookData.getMappedSurveyDataToBeWrittenInSheet( userList );
         } else if ( tabId == CommonConstants.CORRUPT_USER_TABID ) {
-            surveyPreInitiationListVO = this.getCorruptPreInitiatedSurveys( companyId, -1, -1 );
+            surveyPreInitiationListVO = this.getCorruptPreInitiatedSurveys( companyId, -1, -1 , -1 );
             data = workbookData.getCorruptSurveyDataToBeWrittenInSheet( surveyPreInitiationListVO );
         }
         workbook = workbookOperations.createWorkbook( data );
