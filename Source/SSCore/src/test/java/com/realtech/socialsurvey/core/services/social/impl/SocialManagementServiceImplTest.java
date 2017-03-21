@@ -374,13 +374,19 @@ public class SocialManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testgetUnmatchedPreInitiatedSurveysForInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.getUnmatchedPreInitiatedSurveys( 0, 1, 10 );
+        socialManagementServiceImpl.getUnmatchedPreInitiatedSurveys( 0, 1, 10 , -1 );
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testgetProcessedPreInitiatedSurveysForInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.getProcessedPreInitiatedSurveys( 0, 1, 10 );
+        socialManagementServiceImpl.getProcessedPreInitiatedSurveys( 0, 1, 10 , -1 );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testgetCorruptPreInitiatedSurveysForInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.getCorruptPreInitiatedSurveys( 0, 1 , 10, -1 );
     }
     
     
