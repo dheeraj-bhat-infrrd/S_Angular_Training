@@ -1850,7 +1850,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         int numOfRows, String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
         throws InvalidInputException
     {
-        LOG.debug( "Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore
+        LOG.info( "Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore
             + " startIndex:" + startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel );
         List<SurveyDetails> surveyDetails = null;
         if ( iden <= 0l ) {
@@ -1859,13 +1859,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         Calendar calendar = Calendar.getInstance();
         if ( startDate != null ) {
-            calendar.setTime( startDate );
-            calendar.add( Calendar.DATE, 0 );
+            calendar.setTime( startDate );            
+            calendar.set( Calendar.HOUR_OF_DAY, 0 );
+            calendar.set( Calendar.MINUTE, 0 );
+            calendar.set( Calendar.SECOND, 0 );
+            calendar.set( Calendar.MILLISECOND, 0 );     
             startDate = calendar.getTime();
         }
         if ( endDate != null ) {
             calendar.setTime( endDate );
-            calendar.add( Calendar.DATE, 1 );
+            calendar.set( Calendar.HOUR_OF_DAY, 23 );
+            calendar.set( Calendar.MINUTE, 59 );
+            calendar.set( Calendar.SECOND, 59 );
+            calendar.set( Calendar.MILLISECOND, 0 );
             endDate = calendar.getTime();
         }
 
@@ -2934,6 +2940,25 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( iden < 0 ) {
             throw new InvalidInputException( "Invalid value passed for iden of profile level." );
         }
+        
+        Calendar calendar = Calendar.getInstance();
+        if ( startDate != null ) {
+            calendar.setTime( startDate );            
+            calendar.set( Calendar.HOUR_OF_DAY, 0 );
+            calendar.set( Calendar.MINUTE, 0 );
+            calendar.set( Calendar.SECOND, 0 );
+            calendar.set( Calendar.MILLISECOND, 0 );     
+            startDate = calendar.getTime();
+        }
+        if ( endDate != null ) {
+            calendar.setTime( endDate );
+            calendar.set( Calendar.HOUR_OF_DAY, 23 );
+            calendar.set( Calendar.MINUTE, 59 );
+            calendar.set( Calendar.SECOND, 59 );
+            calendar.set( Calendar.MILLISECOND, 0 );
+            endDate = calendar.getTime();
+        }
+        
         Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
         // Generate entries for all active users in the company
         initializeAgentReportData( agentReportData, columnName, iden );
@@ -4367,15 +4392,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( collectionName == null || collectionName.isEmpty() ) {
             throw new InvalidInputException( "Collection name passed cannot be null or empty" );
         }
-        LOG.debug( "Fetching social feed for " + collectionName + " with iden: " + profile.getIden() );
+        LOG.info( "Method to Fetch social feed for " + collectionName + " with iden: " + profile.getIden() + " started" );
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
         if ( profile != null && profile.getSocialMediaTokens() != null ) {
-            LOG.debug( "Starting to fetch the feed." );
 
             SocialMediaTokens token = profile.getSocialMediaTokens();
             if ( token != null ) {
                 if ( token.getZillowToken() != null ) {
-                    
+                    LOG.info( "Starting to fetch the feed." );
                     String responseString = null;
                     ZillowToken zillowToken = token.getZillowToken();
                     String zillowScreenName = zillowToken.getZillowScreenName();
@@ -4384,6 +4408,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     
                     
                     if( ! StringUtils.isEmpty( zillowLenderId ) ){
+                        LOG.info( "LendeId found for enity. So getting records from lender API using lender id : " + zillowLenderId + " and screen name : " + zillowScreenName );
                         FetchZillowReviewBody fetchZillowReviewBody = new FetchZillowReviewBody();
                         fetchZillowReviewBody.setLenderId( zillowLenderId );
                         fetchZillowReviewBody.setPartnerId( zillowPartnerId );
@@ -4412,6 +4437,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             
                             if ( map != null ) {
                                 surveyDetailsList = buildSurveyDetailFromZillowLenderReviewMap( map );
+                                LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
                                 surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName,
                                        profile, companyId, fromBatch, fromPublicPage );
                                 
@@ -4420,6 +4446,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     }
                     else if ( ! StringUtils.isEmpty( zillowScreenName ) ) {
                         try {
+                            LOG.info( "LendeId not found for enity. So getting records from screen API using  screen name : " + zillowScreenName );
                             // Replace - with spaces in zillow screen name
                             zillowScreenName = zillowScreenName.replaceAll( "-", " " );
                             ZillowIntegrationAgentApi zillowIntegrationAgentApi = zillowIntegrationApiBuilder.getZillowIntegrationAgentApi();
@@ -4462,6 +4489,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                 //modify zillow call count
                                 modifyZillowCallCount( map );
                                 surveyDetailsList = buildSurveyDetailFromZillowAgentReviewMap( map );
+                                LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
                                 surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName,
                                        profile, companyId, fromBatch, fromPublicPage );
                                 
@@ -4477,6 +4505,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         } else {
             LOG.error( "No social media token present for " + collectionName + " with iden: " + profile.getIden() );
         }
+
+        LOG.info( "Method to Fetch social feed for " + collectionName + " with iden: " + profile.getIden() + " ended" );
 
         return surveyDetailsList;
     }
@@ -5039,6 +5069,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage )
         throws InvalidInputException
     {
+        LOG.info( "Method fillSurveyDetailsFromReviewMap " + collectionName + " with iden: " + profile.getIden() + " started" );
         String idenColumnName = "";
         if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
             idenColumnName = CommonConstants.COMPANY_ID_COLUMN;
@@ -5067,9 +5098,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 utils.checkReviewForSwearWords( surveyDetails.getReview(), surveyHandler.getSwearList() );
             }
             
+            LOG.info( "checking if survey already exist in database with review : " + surveyDetails.getReview());
             SurveyDetails existingSurveyDetails = surveyDetailsDao.getZillowReviewByQueryMap( queries );
-            
             if ( existingSurveyDetails == null ) {
+                LOG.info( "no survey found in database for current review");
                 if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
                     surveyDetails.setCompanyId( profile.getIden() );
                 } else if ( collectionName
@@ -5107,7 +5139,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
                 
                
-
+                LOG.info( "saving survey to database");
                 surveyHandler.insertSurveyDetails( surveyDetails );
                 //update surveydetail in list
                 surveyDetailsList.set( i, surveyDetails );
@@ -5117,8 +5149,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 //    zillowReviewScoreTotal = surveyDetails.getScore();
                 // else
                 //    zillowReviewScoreTotal += surveyDetails.getScore();
+                
+                
+                
             } else if ( ( existingSurveyDetails.getSummary() == null || existingSurveyDetails.getSummary().trim().length() == 0 )
                 && ( surveyDetails.getSummary() != null && surveyDetails.getSummary().length() > 0 ) ) {
+                LOG.info( "Existing survey found in database for current review");
                 existingSurveyDetails.setSummary( surveyDetails.getSummary() );
                 existingSurveyDetails.setReview( surveyDetails.getReview() );
                 surveyHandler.updateZillowSummaryInExistingSurveyDetails( existingSurveyDetails );
@@ -5136,6 +5172,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
             
 
+            LOG.info("Saving review in temp table");
             if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
                 && fromBatch ) {
                 postToTempTable( collectionName, profile, surveyDetails );
@@ -5157,14 +5194,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
         }
         try {
-            LOG.debug( "Resetting showSurveyOnUI property for review ids not in list :" + latestSurveyIdList );
+            LOG.info( "Resetting showSurveyOnUI property for review ids not in list :" + latestSurveyIdList );
             surveyDetailsDao.resetShowSurveyOnUIPropertyForNonLatestReviews( idenColumnName, profile.getIden(),
                 latestSurveyIdList );
-            LOG.debug( "Reset showSurveyOnUI property for review ids not in list successfull." );
+            LOG.info( "Reset showSurveyOnUI property for review ids not in list successfull." );
         } catch ( Exception e ) {
             LOG.error( "Exception occurred while resetting showSurveyOnUI property for review ids not in list :"
                 + latestSurveyIdList + ". Reason :", e );
         }
+        LOG.info( "Method fillSurveyDetailsFromReviewMap " + collectionName + " with iden: " + profile.getIden() + " ended" );
         return surveyDetailsList;
     }
 
@@ -5192,7 +5230,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         
 
-        LOG.debug( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp started" );
+        LOG.info( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp started" );
         String columnName = null;
         if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
             columnName = CommonConstants.COMPANY_ID_COLUMN;
@@ -5225,7 +5263,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         // Persisting Zillow Temp Post Object
         zillowTempPostDao.saveOrUpdateZillowTempPost( zillowTempPost );
 
-        LOG.debug( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp ended" );
+        LOG.info( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp ended" );
     }
 
 
