@@ -1416,6 +1416,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         BasicDBObject aggregationObject = new BasicDBObject( "aggregate", SURVEY_DETAILS_COLLECTION ).append( "pipeline",
             pipeline );
 
+        LOG.info( "aggregation for get completed survey for garph is :" + aggregationObject.toString() + " , " + aggregationObject );
         CommandResult aggregateResult = mongoTemplate.executeCommand( aggregationObject );
 
         List<BasicDBObject> aggregatedData = null;
@@ -2051,6 +2052,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             }
         }
 
+        LOG.info( "aggregation to get complete survey count for user ranking report is : "  + aggregation );
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
             SurveyDetails.class );
 
