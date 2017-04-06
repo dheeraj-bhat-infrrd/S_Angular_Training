@@ -1728,6 +1728,7 @@ public class SocialManagementController
         ZillowIntegrationAgentApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZillowIntegrationAgentApi();
         User user = sessionHelper.getCurrentUser();
         String zillowScreenName = request.getParameter( "zillowProfileName" );
+        String zillowProfileMapType = request.getParameter( "zillowProfileType" );
         SocialMediaTokens mediaTokens = null;
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
             .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
@@ -1755,6 +1756,7 @@ public class SocialManagementController
                 
                 //decode the zillow url
                 zillowScreenName = java.net.URLDecoder.decode(zillowScreenName, "UTF-8");
+                zillowProfileMapType = java.net.URLDecoder.decode(zillowScreenName, "UTF-8");
 
                 
                 // if user has changed his Zillow account, then delete existing Zillow reviews

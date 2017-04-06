@@ -21,8 +21,9 @@
 			<div class="text-center font-24">
 					<div style="padding: 0px 20px;" class="clearfix">
 						<div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
+						<form id="zillowForm">
 						<div>
-							<form id="zillowForm">
+							
 	 							<!--  <div class="zillow-input-container clearfix popupUrl">
 									<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
 									<div class="zillow-input-cont">
@@ -34,7 +35,7 @@
 								<div class="zillow-input-container clearfix popupUrl">
 									<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
 								</div>
-							</form>
+							
 							<div class="zillow-example-cont popupUrl">
 								
 								<!-- <div class="zillow-exm-url">
@@ -51,7 +52,7 @@
 										<span>Connect using your Zillow profile or NMLSID</span>
 									</div>
 									<div>
-										<select id="select-zillow-profile-or-nmsid" class="float-left dash-sel-item-sm">
+										<select id="select-zillow-profile-or-nmsid"  name="zillowProfileType" class="float-left dash-sel-item-sm">
 											<option value="profileName" data-entity="profileName">Profile Name</option>
 											<option value="nmls" data-entity="nmsid">NMLS</option>
 										</select>
@@ -61,6 +62,7 @@
 								
 							</div>
 						</div>
+						</form>
 						</div>
 					</div>
 					<div style="font-size: 11px; text-align: center;"></div>
