@@ -54,7 +54,7 @@
 									<div>
 										<select id="select-zillow-profile-or-nmsid"  name="zillowProfileType" class="float-left dash-sel-item-sm">
 											<option value="profileName" data-entity="profileName">Profile Name</option>
-											<option value="nmls" data-entity="nmsid">NMLS</option>
+											<option value="nmls" data-entity="nmls">NMLS</option>
 										</select>
 										<input id="zillow-profile-input" class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus" placeholder="Profile Name" >
 									</div>
