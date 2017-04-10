@@ -1739,7 +1739,7 @@ public class SocialManagementController
         String zillowScreenName = request.getParameter( "zillowProfileName" );
         String nmlsTemp = request.getParameter( "nmlsId" );
         Integer nmlsId = null;
-        if(nmlsTemp != null)
+        if(nmlsTemp != null && nmlsTemp.trim().length() > 0)
         	nmlsId = new Integer(nmlsTemp);
         SocialMediaTokens mediaTokens = null;
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
@@ -1840,6 +1840,7 @@ public class SocialManagementController
                     map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
                 }
 
+               String error = null;
                if(map != null){
                    //get Profile url
                    Map<String, Object> responseMap = new HashMap<String, Object>();
@@ -1861,9 +1862,16 @@ public class SocialManagementController
                    List<SurveyDetails> surveyDetailsList =  profileManagementService.buildSurveyDetailFromZillowAgentReviewMap( map );
                    organizationManagementService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings,
                             user.getCompany().getCompanyId() );
+                   
+                   Map<String, Object> messageRes = (HashMap<String, Object>) map.get( "message" );                   
+                   error = (String) messageRes.get( "code" );
+                   
                }
                 
-                
+               	if(error != null && !error.equals("0")) {//Zillow is returning 0 for successfull profile
+               		return CommonConstants.ERROR;
+               	}
+               	
                 int accountMasterId = accountType.getValue();
                 if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                     OrganizationUnitSettings companySettings = organizationManagementService
