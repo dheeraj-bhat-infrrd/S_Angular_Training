@@ -49,7 +49,7 @@
 								 
 								 <div class="zillow-exm-profile">
 								 	<div style="margin-bottom: 10px; font-size: 17px; text-align: center; padding: 0px 10px;">
-										<span>Connect using your Zillow profile or NMLSID</span>
+										<span><spring:message code="label.zillowconnect.nmls.header.key"/></span>
 									</div>
 									 <div class="zillow-input-container clearfix popupUrl">
 										<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
@@ -62,9 +62,9 @@
 									<div>
 										<select id="select-zillow-profile-or-nmsid"  name="zillowProfileType" class="float-left dash-sel-item-sm">
 											<!--   <option value="profileName" data-entity="profileName">Profile Name</option> -->
-											<option value="nmls" data-entity="nmls">NMLS</option>
+											<option value="nmls" data-entity="nmls"><spring:message code="label.zillowconnect.nmls.key"/></option>
 										</select>
-										<input id="zillow-profile-input" class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder="NMLS" value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }" />
+										<input id="zillow-profile-input" class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }" />
 									</div>
 								</div>
 								
