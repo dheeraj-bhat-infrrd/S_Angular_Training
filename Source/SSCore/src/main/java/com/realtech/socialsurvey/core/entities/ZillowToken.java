@@ -8,6 +8,7 @@ public class ZillowToken {
 	private String zillowEmailAddress;
 	private String lastUpdated;
 	private String zillowLenderId;
+	private LenderRef lenderRef;
 
 	public String getLastUpdated() {
 		return lastUpdated;
@@ -61,10 +62,21 @@ public class ZillowToken {
     public void setZillowLenderId( String zillowLenderId )
     {
         this.zillowLenderId = zillowLenderId;
-    }
+    }   
 
-    @Override
+    public LenderRef getLenderRef() 
+    {
+		return lenderRef;
+	}
+
+	public void setLenderRef(LenderRef lenderRef) {
+		this.lenderRef = lenderRef;
+	}
+
+	@Override
 	public String toString() {
-		return "ZillowToken [zillowId=" + zillowId + ", zillowProfileLink=" + zillowProfileLink + "]";
+		return "ZillowToken [zillowId=" + zillowId + ", zillowProfileLink=" + zillowProfileLink + ", zillowScreenName="
+				+ zillowScreenName + ", zillowEmailAddress=" + zillowEmailAddress + ", lastUpdated=" + lastUpdated
+				+ ", zillowLenderId=" + zillowLenderId + ", lenderRef=" + lenderRef + "]";
 	}
 }

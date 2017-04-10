@@ -4406,7 +4406,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     String zillowLenderId = zillowToken.getZillowLenderId();
                     Response response = null;
                     
-                    
+                   // if(nmls if is found, use it)
                     if( ! StringUtils.isEmpty( zillowLenderId ) ){
                         LOG.info( "LendeId found for enity. So getting records from lender API using lender id : " + zillowLenderId + " and screen name : " + zillowScreenName );
                         FetchZillowReviewBody fetchZillowReviewBody = new FetchZillowReviewBody();
