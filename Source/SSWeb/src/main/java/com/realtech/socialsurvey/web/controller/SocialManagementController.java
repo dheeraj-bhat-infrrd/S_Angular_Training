@@ -1370,7 +1370,7 @@ public class SocialManagementController
     }
 
 
-    private SocialMediaTokens updateZillow( SocialMediaTokens mediaTokens, String profileLink, String zillowScreenName, String nmlsId )
+    private SocialMediaTokens updateZillow( SocialMediaTokens mediaTokens, String profileLink, String zillowScreenName, Integer nmlsId )
     {
         LOG.debug( "Method updateGoogleToken() called from SocialManagementController" );
         if ( mediaTokens == null ) {
@@ -1737,8 +1737,10 @@ public class SocialManagementController
         ZillowIntegrationAgentApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZillowIntegrationAgentApi();
         User user = sessionHelper.getCurrentUser();
         String zillowScreenName = request.getParameter( "zillowProfileName" );
-        //String zillowProfileMapType = request.getParameter( "zillowProfileType" );
-        String nmlsId = request.getParameter( "nmlsId" );
+        String nmlsTemp = request.getParameter( "nmlsId" );
+        Integer nmlsId = null;
+        if(nmlsTemp != null)
+        	nmlsId = new Integer(nmlsTemp);
         SocialMediaTokens mediaTokens = null;
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
             .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
