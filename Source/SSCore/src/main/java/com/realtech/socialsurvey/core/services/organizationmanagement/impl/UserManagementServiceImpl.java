@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -769,7 +770,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //Update profileName and profileUrl if possible
         String profileNameForUpdate = null;
         String profileName = agentSettings.getProfileName();
-        String newProfileName = user.getFirstName().toLowerCase() + "-" + user.getLastName().toLowerCase();
+        String newProfileName = null;
+        if( ! StringUtils.isEmpty( user.getLastName() )){
+            newProfileName = user.getFirstName().toLowerCase() + "-" + user.getLastName().toLowerCase();
+        }else{
+            newProfileName = user.getFirstName().toLowerCase() + "-" + user.getUserId();
+        }
         user.setProfileName( profileName );
         user.setProfileUrl( "/" + profileName );
         if ( !profileName.equals( newProfileName ) ) {
