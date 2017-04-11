@@ -1754,8 +1754,20 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         Date date = new Date();
         boolean fetchAbusive = false;
         List<SurveyDetails> surveyDetails = new ArrayList<>();
-        surveyDetails = profileManagementService.getReviewsForReports( profileValue, -1, -1, -1, -1, profileLevel, fetchAbusive,
-            startDate, endDate, null );
+        List<SurveyDetails> surveyDetailsBatch = new ArrayList<>();
+        
+        final int batch = 1000;
+        int start = 0;
+        
+        do{
+            surveyDetailsBatch = profileManagementService.getReviewsForReports( profileValue, -1, -1, start, batch, profileLevel, fetchAbusive,
+                startDate, endDate, null );
+            surveyDetails.addAll( surveyDetailsBatch );
+            start += batch;
+            
+        }while(surveyDetailsBatch.size() == batch);
+        
+           
         User user = userDao.findById( User.class, userId );
         String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
