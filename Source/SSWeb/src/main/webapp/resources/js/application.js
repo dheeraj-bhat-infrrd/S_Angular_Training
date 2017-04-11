@@ -10721,7 +10721,7 @@ function validateprofileUrlEditForm() {
 		showToast();
 		return false;
 	}
-
+	
 	$.ajax({
 		url : "./updateprofileurl.do?searchKey=" + profileUrl,
 		type : "GET",
@@ -10811,7 +10811,18 @@ function validateZillowForm() {
 		showToast();
 		return false;
 	} else {
-		return true;
+		var nmlsId = $('input[name="nmlsId"]').val();
+		if (nmlsId != undefined || nmlsId != "" ) {
+			if (nmlsId !== "" && !$.isNumeric(nmlsId)) {
+				$('#overlay-toast').text("NMLS should be number only.");
+				showToast();
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			return true;
+		}
 	}
 }
 
