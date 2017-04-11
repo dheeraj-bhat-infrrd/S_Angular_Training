@@ -283,6 +283,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Value ( "${ACCOUNT_PERM_DELETE_SPAN}")
     String accountPermDeleteSpan;
 
+    
+    @Value ( "${APPLICATION_SUPPORT_EMAIL}")
+    private String applicationSupportEmail;
+
+    @Value ( "${APPLICATION_SUPPORT_NAME}")
+    private String applicationSupportName;
+    
     @Value ( "${CDN_PATH}")
     String cdnPath;
 
@@ -1504,7 +1511,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public void addDisabledAccount( long companyId, boolean forceDisable, long userId )
+    public DisabledAccount addDisabledAccount( long companyId, boolean forceDisable, long userId )
         throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
         LOG.info( "Adding the disabled account to the database for company id : " + companyId );
@@ -1536,63 +1543,48 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queriesForDisableAccount.put( CommonConstants.COMPANY_COLUMN, company );
         List<DisabledAccount> disabledAccounts = disabledAccountDao.findByKeyValue( DisabledAccount.class,
             queriesForDisableAccount );
+        DisabledAccount disabledAccount = null;
         if ( disabledAccounts != null && disabledAccounts.size() > 0 ) {
             LOG.debug( "Found existing entry in the database." );
-            DisabledAccount disabledAccount = disabledAccounts.get( CommonConstants.INITIAL_INDEX );
-            disabledAccount.setLicenseDetail( licenseDetail );
-            if ( forceDisable ) {
-                disabledAccount.setDisableDate( new Timestamp( System.currentTimeMillis() ) );
-                disabledAccount.setStatus( CommonConstants.STATUS_INACTIVE );
-            } else {
-                if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
-                    disabledAccount
-                        .setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
-                    disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
-                } else {
-                    disabledAccount.setDisableDate( licenseDetail.getNextInvoiceBillingDate() );
-                    disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
-                }
-            }
-            disabledAccount.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+             disabledAccount = disabledAccounts.get( CommonConstants.INITIAL_INDEX );
             LOG.debug( "Updating the Disabled Account entity to the database" );
-            disabledAccountDao.update( disabledAccount );
 
         } else {
             LOG.debug( "Preparing the DisabledAccount entity to be saved in the database." );
-            DisabledAccount disabledAccount = new DisabledAccount();
+             disabledAccount = new DisabledAccount();
             disabledAccount.setCompany( company );
-            disabledAccount.setLicenseDetail( licenseDetail );
-            if ( forceDisable ) {
-                disabledAccount.setDisableDate( new Timestamp( System.currentTimeMillis() ) );
-                disabledAccount.setStatus( CommonConstants.STATUS_INACTIVE );
-            } else {
-                if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
-                    disabledAccount
-                        .setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
-                    disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
-                } else {
-                    disabledAccount.setDisableDate( licenseDetail.getNextInvoiceBillingDate() );
-                    disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
-                }
-            }
-            disabledAccount.setCreatedBy(
-                userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
-            disabledAccount.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-            disabledAccount.setModifiedBy(
-                userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
-            disabledAccount.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-
+            disabledAccount.setCreatedBy( userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
+            disabledAccount.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );            
             LOG.debug( "Adding the Disabled Account entity to the database" );
-            disabledAccountDao.save( disabledAccount );
-            LOG.info( "Added Disabled Account entity to the database." );
         }
+        
+        
+        disabledAccount.setLicenseDetail( licenseDetail );
+        disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
 
+        if ( forceDisable ) {
+            disabledAccount.setDisableDate( new Timestamp( System.currentTimeMillis() ) );
+            disabledAccount.setForceDelete( true );
+        } else {
+            disabledAccount.setForceDelete( false );
+            if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
+                disabledAccount
+                    .setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
+            } else {
+                disabledAccount.setDisableDate( new Timestamp(System.currentTimeMillis()) );
+            }
+        }
+        disabledAccount.setModifiedBy(
+            userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
+        disabledAccount.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        disabledAccount = disabledAccountDao.saveOrUpdate( disabledAccount );
+        return disabledAccount;
     }
 
 
     @Override
     @Transactional
-    public void deleteDisabledAccount( long companyId ) throws InvalidInputException, NoRecordsFetchedException
+    public void inactiveDisabledAccount( long companyId ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "Deleting the Disabled Account pertaining to company id : " + companyId );
         if ( companyId <= 0 ) {
@@ -1624,6 +1616,39 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         // Perform soft delete of the record in the database
         disabledAccountDao.update( disabledAccount );
         LOG.debug( "Record successfully deleted from the database!" );
+    }
+
+    
+    
+    @Override
+    @Transactional
+    public void markDisabledAccountAsProcessed( Company company ) throws InvalidInputException
+    {
+        if (  company == null ) {
+            LOG.error( "addDisabledAccount : Invalid companyId has been given." );
+            throw new InvalidInputException( "addDisabledAccount : Invalid companyId has been given." );
+        }
+        
+        LOG.debug( "Marking the Disabled Account as processed for company id : " + company.getCompanyId() );
+        
+        List<DisabledAccount> disabledAccounts = null;
+
+        // Fetching the disabled account entity for the company
+        LOG.debug( "Fetching the Disabled Account from the database" );
+        HashMap<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.COMPANY_COLUMN, company );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        disabledAccounts = disabledAccountDao.findByKeyValue( DisabledAccount.class, queries );
+
+        if ( disabledAccounts != null && ! disabledAccounts.isEmpty() ) {
+            DisabledAccount disabledAccount = disabledAccounts.get( CommonConstants.INITIAL_INDEX );
+            disabledAccount.setStatus( CommonConstants.DISABLED_ACCOUNT_PROCESSED );
+            LOG.debug( "Marking the disabled account record with id : " + disabledAccount.getId() + " as processed" );
+            // Perform soft delete of the record in the database
+            disabledAccountDao.update( disabledAccount );
+        }
+        
+        LOG.debug( "Record successfully marked As Processed!" );
     }
 
 
@@ -4928,7 +4953,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         LOG.debug( "Method getDisabledAccounts started." );
         try {
-            List<DisabledAccount> disabledAccounts = disabledAccountDao.disableAccounts( maxDisableDate );
+            List<DisabledAccount> disabledAccounts = disabledAccountDao.getAccountsToDisable( maxDisableDate );
             LOG.debug( "Method getDisabledAccounts finished." );
             return disabledAccounts;
         } catch ( DatabaseException e ) {
@@ -5170,10 +5195,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             //Remove social media connections
             socialManagementService.disconnectAllSocialConnections( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
 
-            // Remove from disabled account
-            List<String> conditions = new ArrayList<>();
-            conditions.add( "company.companyId = " + company.getCompanyId() );
-            disabledAccountDao.deleteByCondition( "DisabledAccount", conditions );
+            // updating record in disabled account
+            markDisabledAccountAsProcessed( company );
 
             // Deleting company from MySQL
             company.setStatus( status );
@@ -6994,22 +7017,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    @Override
-    @Transactional
-    public void forceDeleteDisabledAccount( long companyId, long userId )
-    {
-        Map<String, Object> queries = new HashMap<String, Object>();
-        queries.put( "company.companyId", companyId );
-        List<DisabledAccount> accounts = disabledAccountDao.findByKeyValue( DisabledAccount.class, queries );
-        if ( accounts != null && !accounts.isEmpty() ) {
-            DisabledAccount account = accounts.get( 0 );
-            account.setForceDelete( true );
-            account.setModifiedBy(
-                userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
-            disabledAccountDao.update( account );
-        }
-    }
-
 
     @Override
     public void updateUserEncryptedIdOfSetting( AgentSettings agentSettings, String userEncryptedId )
@@ -7032,14 +7039,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             int maxDaysToPurgeAccount = Integer.parseInt( accountPermDeleteSpan );
             List<DisabledAccount> disabledAccounts = getAccountsForPurge( maxDaysToPurgeAccount );
             for ( DisabledAccount account : disabledAccounts ) {
-                try {
-                    Company company = account.getCompany();
-                    sendAccountDeletedNotificationMail( account );
-                    purgeCompanyDetails( company );
-                } catch ( InvalidInputException e ) {
-                    LOG.error( "Invalid Input Exception caught while sending email to the company admin. Nested exception is ",
-                        e );
-                }
+                Company company = account.getCompany();
+                purgeCompanyDetails( company );
+               
             }
 
             //updating last run time for batch in database
@@ -8018,5 +8020,68 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
     
     //END JIRA SS-975
+    
+    /**
+     * 
+     * @param companySettings
+     * @param isAccountDisabled
+     * @param userId
+     * @throws NonFatalException
+     */
+    @Override
+    public void processCancelSubscriptionRequest( OrganizationUnitSettings companySettings, boolean isAccountDisabled , long userId) throws NonFatalException{
+        
+        LOG.info( "processCancelSubscriptionRequest companySettings: " + companySettings + " with AccountDisabled: " + isAccountDisabled + " started");
+        try {
+            //Set isAccountDisabled in mongo
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_ACCOUNT_DISABLED, isAccountDisabled, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+            LOG.debug( "Updated the isAccountDisabled successfully" );
+            if ( isAccountDisabled ) {
+                addDisabledAccount( companySettings.getIden(), false, userId );
+                //send mail to support admin
+                emailServices.sendCancelSubscriptionRequestAlertMail( applicationSupportEmail, applicationSupportName, companySettings.getContact_details().getName() );
+            } else {
+                inactiveDisabledAccount( companySettings.getIden() );
+            }
+        } catch ( InvalidInputException | NoRecordsFetchedException | PaymentException e ) {
+            LOG.error( "Error while processing cancel subscription for  company " + companySettings.getIden() ,e );
+           throw new NonFatalException("Error while processing cancel subscription");
+        }
+        
+        LOG.info( "processCancelSubscriptionRequest companySettings: " + companySettings + " with AccountDisabled: " + isAccountDisabled + " finished");
+    }
+    
+    /**
+     * 
+     * @param company
+     * @throws NonFatalException 
+     */
+    @Override
+    public void processDeactivateCompany(Company company, long userId) throws NonFatalException
+    {
+        
+        LOG.info( "processDeactivateCompany company: " + company.getCompanyId() + " started");
+        company.setStatus( CommonConstants.STATUS_INACTIVE );
+        try{
+            //adding entry to disable account
+            DisabledAccount account = addDisabledAccount( company.getCompanyId(), true, userId );
+            //updating company in mysql
+            updateCompany( company );
+            //Update company settings to deleted
+            deactivateCompanyInMongo( company );
+            //Deactivate company in solr
+            deleteCompanyFromSolr( company );
+            //unsubscribeCompany
+            unsubscribeCompany(  company );
+            //send mail
+            sendAccountDeletedNotificationMail( account );
+        } catch ( InvalidInputException | NoRecordsFetchedException | PaymentException e ) {
+            LOG.error( "Error while Deativating company " + company.getCompanyId() ,e );
+            throw new NonFatalException("Error while processing Deactivate Company");
+         }
+        LOG.info( "processDeactivateCompany company: " + company.getCompanyId() + " finished");
+    }
 }
-// JIRA: SS-27: By RM05: EOC

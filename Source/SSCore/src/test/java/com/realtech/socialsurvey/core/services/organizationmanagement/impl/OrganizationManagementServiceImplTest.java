@@ -434,7 +434,7 @@ public class OrganizationManagementServiceImplTest
     public void testDeleteDisabledAccountWithInvalidCompanyId()
         throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
-        organizationManagementServiceImpl.deleteDisabledAccount( 0 );
+        organizationManagementServiceImpl.inactiveDisabledAccount( 0 );
     }
 
 
@@ -445,7 +445,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( new Company() );
         Mockito.when( disabledAccountDao.findByKeyValue( Mockito.eq( DisabledAccount.class ),
             Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( null );
-        organizationManagementServiceImpl.deleteDisabledAccount( 1 );
+        organizationManagementServiceImpl.inactiveDisabledAccount( 1 );
     }
 
 
@@ -456,7 +456,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( new Company() );
         Mockito.when( disabledAccountDao.findByKeyValue( Mockito.eq( DisabledAccount.class ),
             Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( new ArrayList<DisabledAccount>() );
-        organizationManagementServiceImpl.deleteDisabledAccount( 1 );
+        organizationManagementServiceImpl.inactiveDisabledAccount( 1 );
     }
 
 
