@@ -377,6 +377,7 @@ public interface CommonConstants
     public static final String USER_APP_SETTINGS = "appSettings";
     public static final String COMPLAIN_REG_SETTINGS = "complaintRegSettings";
     public static final String ERROR = "error";
+    public static final String ZILLOW_PROFILE_ERROR = "zillow-error";
     public static final String MESSAGE = "message";
     public static final String EMAIL_TYPE = "emailtype";
     public static final String EMAIL_TYPE_WORK = "work";

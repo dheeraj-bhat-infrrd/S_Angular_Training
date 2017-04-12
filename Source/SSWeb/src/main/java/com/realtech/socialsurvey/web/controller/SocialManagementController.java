@@ -1869,7 +1869,7 @@ public class SocialManagementController
                }
                 
                	if(error != null && !error.equals("0")) {//Zillow is returning 0 for successfull profile
-               		return CommonConstants.ERROR;
+               		return CommonConstants.ZILLOW_PROFILE_ERROR;
                	}
                	
                 int accountMasterId = accountType.getValue();

@@ -10797,6 +10797,9 @@ function saveZillowEmailAddress() {
 			loadSocialMediaUrlInPopup();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
+		} else if(data && data == "zillow-error"){
+			$('#overlay-toast').text("Invalid Zillow profile");
+			showToast();
 		} else {
 			$('#overlay-toast').text("Some problem occurred while saving zillow");
 			showToast();
