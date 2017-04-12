@@ -3965,7 +3965,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Transactional
     @Override
-    public UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize )
+    public UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize , long count)
         throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "Method to getUsersAndEmailMappingForCompant for  companyId : " + companyId + " started." );
@@ -4000,7 +4000,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             users.add( userVO );
         }
         userList.setUsers( users );
-        userList.setTotalRecord( userDao.getCountOfUsersAndEmailMappingForCompany( company ) );
+        if(count == -1){
+            userList.setTotalRecord( userDao.getCountOfUsersAndEmailMappingForCompany( company ) ); 
+        }else{
+            userList.setTotalRecord( count );
+        }
 
         return userList;
     }
