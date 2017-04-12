@@ -771,11 +771,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         String profileNameForUpdate = null;
         String profileName = agentSettings.getProfileName();
         String newProfileName = null;
-        if( ! StringUtils.isEmpty( user.getLastName() )){
-            newProfileName = user.getFirstName().toLowerCase() + "-" + user.getLastName().toLowerCase();
-        }else{
-            newProfileName = user.getFirstName().toLowerCase() + "-" + user.getUserId();
+        String fullName = null;
+        
+        
+        
+        if( ! StringUtils.isEmpty( user.getFirstName()) ){
+            fullName = user.getFirstName().toLowerCase();
+            if( ! StringUtils.isEmpty( user.getLastName() )){
+                fullName  +=  " " + user.getLastName().toLowerCase();
+            }
         }
+             
+        newProfileName = generateIndividualProfileName( user.getUserId(), fullName, user.getEmailId() );
+        
         user.setProfileName( profileName );
         user.setProfileUrl( "/" + profileName );
         if ( !profileName.equals( newProfileName ) ) {

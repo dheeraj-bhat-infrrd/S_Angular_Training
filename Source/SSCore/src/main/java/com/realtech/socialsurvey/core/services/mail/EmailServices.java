@@ -486,4 +486,8 @@ public interface EmailServices
 
     void sendPaymentFailedAlertEmail( String recipientMailId, String displayName, String companyName )
         throws InvalidInputException, UndeliveredEmailException;
+
+
+    void sendCancelSubscriptionRequestAlertMail( String recipientMailId, String displayName, String companyName )
+        throws InvalidInputException, UndeliveredEmailException;
 }

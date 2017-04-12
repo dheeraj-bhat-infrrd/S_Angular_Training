@@ -176,7 +176,12 @@ public class ReviseSubscriptionPrice
                     LOG.debug( "Fetching data for user modification record: "
                         + userModificationRecord.getUsercountModificationNotificationId() );
                     try {
-                        processChargeOnSubscription( userModificationRecord );
+                        Company company = userModificationRecord.getCompany();
+                        if(company.getStatus() == CommonConstants.STATUS_ACTIVE){
+                            processChargeOnSubscription( userModificationRecord );                            
+                        }else{
+                            LOG.warn( "Company is not active so not processing company with id : " + company.getCompanyId() );
+                        }
                     } catch ( NonFatalException e ) {
                         LOG.error( "Could not process subscription for " + userModificationRecord.getCompany(), e );
                     } catch ( Exception e ) {
