@@ -140,8 +140,6 @@ public class AdminController
                     LOG.error( "An error occurred while purging company : " + companyId + ". Reason : ", e );
                 }
 
-                // marking comapny to be deleted forcefully during purge batch
-                //organizationManagementService.forceDeleteDisabledAccount( company.getCompanyId(), loggedInUser.getUserId() );
             }
         }
         return message;

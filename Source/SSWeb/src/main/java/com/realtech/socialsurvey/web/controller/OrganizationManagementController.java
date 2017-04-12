@@ -1819,13 +1819,7 @@ public class OrganizationManagementController
                 boolean isAccountDisabled = Boolean.parseBoolean( request.getParameter( "other-account" ) );
 
                 // Calling services to update DB
-                organizationManagementService.updateAccountDisabled( companySettings, isAccountDisabled );
-                if ( isAccountDisabled ) {
-                    organizationManagementService.addDisabledAccount( companySettings.getIden(), false, user.getUserId() );
-                } else {
-                    organizationManagementService.deleteDisabledAccount( companySettings.getIden() );
-                }
-
+                organizationManagementService.processCancelSubscriptionRequest( companySettings, isAccountDisabled, user.getUserId() );
                 // set the updated settings value in session
                 companySettings.setAccountDisabled( isAccountDisabled );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.ACCOUNT_SETTINGS_UPDATE_SUCCESSFUL,
@@ -2326,27 +2320,9 @@ public class OrganizationManagementController
             if ( user != null && user.isCompanyAdmin() ) {
                 // Add an entry into Disabled_Accounts table with disable_date as current date
                 // and status as inactive.
-                try {
-                    organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true,
-                        user.getUserId() );
-                } catch ( NoRecordsFetchedException | PaymentException e ) {
-                    LOG.error(
-                        "Exception caught in deactivateCompany() of OrganizationManagementController. Nested exception is ",
-                        e );
-                    throw e;
-                }
-
-                // Modify the company status to inactive.
-                user.getCompany().setStatus( CommonConstants.STATUS_INACTIVE );
-
-                organizationManagementService.updateCompany( user.getCompany() );
-
-                //Update company settings to deleted
-                organizationManagementService.deactivateCompanyInMongo( user.getCompany() );
-
-                //Deactivate company in solr
-                organizationManagementService.deleteCompanyFromSolr( user.getCompany() );
-
+               
+                organizationManagementService.processDeactivateCompany( user.getCompany() ,  user.getUserId());
+                
                 LOG.info( "Company deactivated successfully, logging out now." );
                 request.getSession( false ).invalidate();
                 SecurityContextHolder.clearContext();
@@ -2354,7 +2330,7 @@ public class OrganizationManagementController
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).toString();
             }
-        } catch ( InvalidInputException e ) {
+        } catch ( NonFatalException e ) {
             LOG.error( "InvalidInputException caught in deactivateCompany(). Nested exception is ", e );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )

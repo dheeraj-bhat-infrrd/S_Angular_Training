@@ -127,6 +127,7 @@ public interface CommonConstants
     public static final double MAX_RATING_SCORE = 5;
     public static final String YES_STRING = "Y";
     public static final String NO_STRING = "N";
+    public static final int DISABLED_ACCOUNT_PROCESSED = 2;
 
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
@@ -308,6 +309,8 @@ public interface CommonConstants
     public static final String SURVEY_COMPLETED_DATE_COLUMN = "surveyCompletedDate";
     public static final String SURVEY_UPDATED_DATE_COLUMN = "surveyUpdatedDate";
     public static final String SURVEY_TRANSACTION_DATE_COLUMN = "surveyTransactionDate";
+    public static final String ACCOUNT_DISABLE_DATE_COLUMN = "disableDate";
+    public static final String IS_FORCE_DELETE_COLUMN = "isForceDelete";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -614,7 +617,7 @@ public interface CommonConstants
     public static final String PAYMENT_CHANGE_FLAG = "paymentChange";
     public static final int STATUS_PAYMENT_FAILED = 2;
     public static final String DISABLED_ACCOUNT_FLAG = "disabled";
-    public static final int PAYMENT_RETRIES = 2;
+    public static final int PAYMENT_RETRIES = 1;
 
     // Survey Constants
     public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
