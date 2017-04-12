@@ -10815,15 +10815,23 @@ function validateZillowForm() {
 		return false;
 	} else {
 		var nmlsId = $('input[name="nmlsId"]').val();
-		if (nmlsId != undefined || nmlsId != "" ) {
-			if (nmlsId !== "" && !$.isNumeric(nmlsId)) {
+		if (nmlsId != undefined || nmlsId != "") {
+			if (nmlsId != "" && !$.isNumeric(nmlsId)) {				
 				$('#overlay-toast').text("NMLS should be number only.");
 				showToast();
-				return false;
+				return false;				
+			} if (nmlsId != "" && $.isNumeric(nmlsId)) { 
+				if(nmlsId > 99999999) {
+					$('#overlay-toast').text("NMLS should be 8 digits number only");
+					showToast();
+					return false;
+				} else {
+					return true;
+				}
 			} else {
 				return true;
 			}
-		} else {
+		}  else {
 			return true;
 		}
 	}

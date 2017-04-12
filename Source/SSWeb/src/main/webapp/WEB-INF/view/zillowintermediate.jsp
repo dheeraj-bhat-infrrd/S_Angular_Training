@@ -65,7 +65,7 @@
 										</select>-->
 										<div style="margin-bottom: 10px; font-size: 14px; text-align: center; padding: 0px 10px;">
 											<span><spring:message code="label.zillowconnect.nmls.header.key"/></span>
-											<input id="zillow-profile-input" class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }" />								
+											<input id="zillow-profile-input" class="zillow-input" name="nmlsId" type="text" maxlength="8" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }" />								
 										</div>
 										</div>
 								</div>
