@@ -1819,13 +1819,7 @@ public class OrganizationManagementController
                 boolean isAccountDisabled = Boolean.parseBoolean( request.getParameter( "other-account" ) );
 
                 // Calling services to update DB
-                organizationManagementService.updateAccountDisabled( companySettings, isAccountDisabled );
-                if ( isAccountDisabled ) {
-                    organizationManagementService.addDisabledAccount( companySettings.getIden(), false, user.getUserId() );
-                } else {
-                    organizationManagementService.deleteDisabledAccount( companySettings.getIden() );
-                }
-
+                organizationManagementService.processCancelSubscriptionRequest( companySettings, isAccountDisabled, user.getUserId() );
                 // set the updated settings value in session
                 companySettings.setAccountDisabled( isAccountDisabled );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.ACCOUNT_SETTINGS_UPDATE_SUCCESSFUL,
@@ -2326,27 +2320,9 @@ public class OrganizationManagementController
             if ( user != null && user.isCompanyAdmin() ) {
                 // Add an entry into Disabled_Accounts table with disable_date as current date
                 // and status as inactive.
-                try {
-                    organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true,
-                        user.getUserId() );
-                } catch ( NoRecordsFetchedException | PaymentException e ) {
-                    LOG.error(
-                        "Exception caught in deactivateCompany() of OrganizationManagementController. Nested exception is ",
-                        e );
-                    throw e;
-                }
-
-                // Modify the company status to inactive.
-                user.getCompany().setStatus( CommonConstants.STATUS_INACTIVE );
-
-                organizationManagementService.updateCompany( user.getCompany() );
-
-                //Update company settings to deleted
-                organizationManagementService.deactivateCompanyInMongo( user.getCompany() );
-
-                //Deactivate company in solr
-                organizationManagementService.deleteCompanyFromSolr( user.getCompany() );
-
+               
+                organizationManagementService.processDeactivateCompany( user.getCompany() ,  user.getUserId());
+                
                 LOG.info( "Company deactivated successfully, logging out now." );
                 request.getSession( false ).invalidate();
                 SecurityContextHolder.clearContext();
@@ -2354,7 +2330,7 @@ public class OrganizationManagementController
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).toString();
             }
-        } catch ( InvalidInputException e ) {
+        } catch ( NonFatalException e ) {
             LOG.error( "InvalidInputException caught in deactivateCompany(). Nested exception is ", e );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )
@@ -3047,15 +3023,17 @@ public class OrganizationManagementController
         LOG.info( "Method to get getUnmatchedPreinitiatedSurveys started" );
         String startIndexStr = request.getParameter( "startIndex" );
         String batchSizeStr = request.getParameter( "batchSize" );
+        String countStr = request.getParameter( "count" );
 
-        if ( startIndexStr == null || batchSizeStr == null ) {
-            LOG.error( "Null value found for startIndex or batch size." );
-            return "Null value found for startIndex or batch size.";
+        if ( startIndexStr == null || batchSizeStr == null || countStr == null ) {
+            LOG.error( "Null value found for startIndex , batch size or countStr." );
+            return "Null value found for startIndex or batch size or countStr.";
         }
 
         SurveyPreInitiationList surveyPreInitiationList = new SurveyPreInitiationList();
         int startIndex;
         int batchSize;
+        long count;
         try {
 
             User user = sessionHelper.getCurrentUser();
@@ -3066,6 +3044,7 @@ public class OrganizationManagementController
             try {
                 startIndex = Integer.parseInt( startIndexStr );
                 batchSize = Integer.parseInt( batchSizeStr );
+                count = Long.parseLong( countStr );
             } catch ( NumberFormatException e ) {
                 LOG.error(
                     "NumberFormatException caught while trying to convert startIndex or batchSize or companyId  Nested exception is ",
@@ -3075,7 +3054,7 @@ public class OrganizationManagementController
 
 
             surveyPreInitiationList = socialManagementService.getUnmatchedPreInitiatedSurveys( user.getCompany().getCompanyId(),
-                startIndex, batchSize );
+                startIndex, batchSize ,count );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
             return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
@@ -3093,11 +3072,13 @@ public class OrganizationManagementController
         LOG.info( "Method to get getProcessedPreInitiatedSurveys started" );
         String startIndexStr = request.getParameter( "startIndex" );
         String batchSizeStr = request.getParameter( "batchSize" );
+        String countStr = request.getParameter( "count" );
         SurveyPreInitiationList surveyPreInitiationList = new SurveyPreInitiationList();
         int startIndex;
         int batchSize;
+        long count;
 
-        if ( startIndexStr == null || batchSizeStr == null ) {
+        if ( startIndexStr == null || batchSizeStr == null || countStr == null) {
             LOG.error( "Null value found for startIndex or batch size." );
             return "Null value found for startIndex or batch size.";
         }
@@ -3110,6 +3091,7 @@ public class OrganizationManagementController
             try {
                 startIndex = Integer.parseInt( startIndexStr );
                 batchSize = Integer.parseInt( batchSizeStr );
+                count = Long.parseLong( countStr );
             } catch ( NumberFormatException e ) {
                 LOG.error(
                     "NumberFormatException caught while trying to convert startIndex or batchSize or companyId  Nested exception is ",
@@ -3118,7 +3100,7 @@ public class OrganizationManagementController
             }
 
             surveyPreInitiationList = socialManagementService.getProcessedPreInitiatedSurveys( user.getCompany().getCompanyId(),
-                startIndex, batchSize );
+                startIndex, batchSize , count );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
             return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_PROCESSED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
@@ -3136,7 +3118,8 @@ public class OrganizationManagementController
         LOG.info( "Method to getCorruptPreInitiatedSurveys started" );
         String startIndexStr = request.getParameter( "startIndex" );
         String batchSizeStr = request.getParameter( "batchSize" );
-        if ( startIndexStr == null || batchSizeStr == null ) {
+        String countStr = request.getParameter( "count" );
+        if ( startIndexStr == null || batchSizeStr == null || countStr == null ) {
             LOG.error( "Null value found for startIndex or batch size." );
             return "Null value found for startIndex or batch size.";
         }
@@ -3144,6 +3127,7 @@ public class OrganizationManagementController
         SurveyPreInitiationList surveyPreInitiationList = new SurveyPreInitiationList();
         int startIndex;
         int batchSize;
+        long count;
         try {
             User user = sessionHelper.getCurrentUser();
             if ( user == null || user.getCompany() == null ) {
@@ -3152,6 +3136,7 @@ public class OrganizationManagementController
             try {
                 startIndex = Integer.parseInt( startIndexStr );
                 batchSize = Integer.parseInt( batchSizeStr );
+                count = Long.parseLong( countStr );
             } catch ( NumberFormatException e ) {
                 LOG.error(
                     "NumberFormatException caught while trying to convert startIndex or batchSize or companyId  Nested exception is ",
@@ -3159,7 +3144,7 @@ public class OrganizationManagementController
                 throw e;
             }
             surveyPreInitiationList = socialManagementService.getCorruptPreInitiatedSurveys( user.getCompany().getCompanyId(),
-                startIndex, batchSize );
+                startIndex, batchSize , count );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
             return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_CORRUPT_PREINITIATED_SURVEYS_UNSUCCESSFUL,
@@ -3236,8 +3221,9 @@ public class OrganizationManagementController
         LOG.info( "Method to get getUserWithAliasedEmails started" );
         String startIndexStr = request.getParameter( "startIndex" );
         String batchSizeStr = request.getParameter( "batchSize" );
+        String countStr = request.getParameter( "count" );
 
-        if ( startIndexStr == null || batchSizeStr == null ) {
+        if ( startIndexStr == null || batchSizeStr == null || countStr == null) {
             LOG.error( "Null value found for startIndex or batch size." );
             return "Null value found for startIndex or batch size.";
         }
@@ -3245,6 +3231,7 @@ public class OrganizationManagementController
         UserList userList = new UserList();
         int startIndex;
         int batchSize;
+        long count;
         try {
 
             User user = sessionHelper.getCurrentUser();
@@ -3255,6 +3242,7 @@ public class OrganizationManagementController
             try {
                 startIndex = Integer.parseInt( startIndexStr );
                 batchSize = Integer.parseInt( batchSizeStr );
+                count = Long.parseLong( countStr );
             } catch ( NumberFormatException e ) {
                 LOG.error( "NumberFormatException caught while trying to convert startIndex or batchSize  Nested exception is ",
                     e );
@@ -3263,7 +3251,7 @@ public class OrganizationManagementController
 
 
             userList = userManagementService.getUsersAndEmailMappingForCompany( user.getCompany().getCompanyId(), startIndex,
-                batchSize );
+                batchSize , count );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching UserWithAliasedEmails. Reason :" + nonFatalException.getMessage(),
                 nonFatalException );

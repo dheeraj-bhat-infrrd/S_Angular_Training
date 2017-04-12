@@ -127,10 +127,11 @@
 		bindEventsForProcessUserPage();
 		bindEventForMappedUserPage();
 		bindEventForCorruptRecordPage();
+		//comment unecessary calls made while loading apps 
 		initializeUnmatchedUserPage();
-		initializeProcesedUserPage();
-		initializeMapped();
-		initializeCorruptRecordsPage();
+		//initializeProcesedUserPage();
+		//initializeMapped();
+		//initializeCorruptRecordsPage();
 	}); 
 	
 	var selectedTabIdOnSurveyRecordsSection=1;

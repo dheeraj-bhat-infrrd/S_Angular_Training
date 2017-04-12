@@ -9,7 +9,7 @@ import com.realtech.socialsurvey.core.entities.DisabledAccount;
  */
 public interface DisabledAccountDao extends GenericDao<DisabledAccount, Long> {
 
-	public List<DisabledAccount> disableAccounts(Date maxDisableDate);
+	public List<DisabledAccount> getAccountsToDisable(Date maxDisableDate);
 
 	public List<DisabledAccount> getAccountsForPurge(int graceSpan);
 	

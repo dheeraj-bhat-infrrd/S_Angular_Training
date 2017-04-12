@@ -67,5 +67,8 @@ public interface UserDao extends GenericDao<User, Long>
 
 
     public User getActiveOrIncompleteUser( String userName ) throws NoRecordsFetchedException;
+    
+    public List<String> getRegisteredEmailsInOtherCompanies( Company company ) throws InvalidInputException;
+
 
 }
