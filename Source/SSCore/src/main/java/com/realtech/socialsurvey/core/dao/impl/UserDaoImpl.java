@@ -494,5 +494,33 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         return users.get( CommonConstants.INITIAL_INDEX );
     }
 
+    
+    @Override
+    public List<String> getRegisteredEmailsInOtherCompanies( Company company ) throws InvalidInputException{
+        if ( company == null ) {
+            throw new InvalidInputException( "Invalid company id passed in getAgentIdsUnderCompany method" );
+        }
+        LOG.info( "Method to get all user emails address other than under  company id : " + company.getCompanyId() + " started." );
+        Criteria criteria = null;
+        try {
+            criteria = getSession().createCriteria( User.class );
+            criteria.setProjection( Projections.property( CommonConstants.EMAIL_ID ) );
+            criteria.add( Restrictions.ne( CommonConstants.COMPANY_COLUMN , company));
+
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE ) );
+
+            criteria.add( criterion );
+            
+            LOG.info( "Method to get all user emails address other than under  company id : " + company.getCompanyId() + " ended." );
+            return criteria.list();
+    } catch ( HibernateException hibernateException ) {
+        throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
+    }
+    }   
+    
 }
 // JIRA SS-42 By RM-05 EOC

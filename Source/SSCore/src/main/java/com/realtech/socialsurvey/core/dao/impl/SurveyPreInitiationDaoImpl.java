@@ -186,7 +186,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
 
         criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN, Arrays.asList(
-            CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_PRE_INITIATED,
+            CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED,
             CommonConstants.STATUS_SURVEYPREINITIATION_DELETED ) ) );
 
         criteria.add( Restrictions.in( CommonConstants.AGENT_ID, agentReportData.keySet() ) );
@@ -201,6 +201,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             else if ( startDate == null && endDate != null )
                 criteria.add( Restrictions.le( CommonConstants.CREATED_ON, new Timestamp( endDate.getTime() ) ) );
 
+            LOG.info( "criteria to get incomplete survey count for user ranking report is : "  +criteria.toString() );
             surveys = criteria.list();
         } catch ( HibernateException e ) {
             LOG.error( "Exception caught in getIncomplgetIncompleteSurveysCounteteSurveyForReminder() ", e );
@@ -431,6 +432,10 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         } else if ( agentIds != null && agentIds.size() > 0 ) {
             query.setParameterList( "agentIds", agentIds );
         }
+        
+        LOG.info( "query for get incompleted survey for garph is :" + query.toString() + " , " + query );
+
+        
         @SuppressWarnings ( "unchecked") List<Object[]> results = query.list();
         if ( results != null && results.size() > 0 ) {
             aggregateResult = new HashMap<Integer, Integer>();
