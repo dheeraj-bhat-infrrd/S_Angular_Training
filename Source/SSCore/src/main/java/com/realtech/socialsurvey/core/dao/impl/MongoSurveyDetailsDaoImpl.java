@@ -2638,11 +2638,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 query.addCriteria( Criteria.where( CommonConstants.REGION_ID_COLUMN ).is( 0 ) );
                 query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( 0 ) );
                 query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( 0 ) );
+                query.addCriteria( Criteria.where( columnName ).is( queries.get( columnName ) ) );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
                 query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( 0 ) );
                 query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( 0 ) );
+                query.addCriteria( Criteria.where( columnName ).is( queries.get( columnName ) ) );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( 0 ) );
+                query.addCriteria( Criteria.where( columnName ).is( queries.get( columnName ) ) );
             } else
                 query.addCriteria( Criteria.where( columnName ).is( queries.get( columnName ) ) );
         }
