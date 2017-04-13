@@ -4427,6 +4427,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         //save to api call details
                         Gson gson = new Gson();
                         String requestBody = gson.toJson( fetchZillowReviewBodyByNMLS );
+                        
+                        LOG.info("NMLS id : " + zillowLenderRef.getNmlsId() + " Zillow Data: " + responseString);
+                        
                         saveExternalAPICallDetailForZillowLender( requestBody ,  responseString);
                         
                         if ( responseString != null ) {
