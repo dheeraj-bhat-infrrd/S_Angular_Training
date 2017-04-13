@@ -10721,7 +10721,7 @@ function validateprofileUrlEditForm() {
 		showToast();
 		return false;
 	}
-
+	
 	$.ajax({
 		url : "./updateprofileurl.do?searchKey=" + profileUrl,
 		type : "GET",
@@ -10797,6 +10797,9 @@ function saveZillowEmailAddress() {
 			loadSocialMediaUrlInPopup();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
+		} else if(data && data == "zillow-error"){
+			$('#overlay-toast').text("Invalid Zillow profile");
+			showToast();
 		} else {
 			$('#overlay-toast').text("Some problem occurred while saving zillow");
 			showToast();
@@ -10811,7 +10814,26 @@ function validateZillowForm() {
 		showToast();
 		return false;
 	} else {
-		return true;
+		var nmlsId = $('input[name="nmlsId"]').val();
+		if (nmlsId != undefined || nmlsId != "") {
+			if (nmlsId != "" && !$.isNumeric(nmlsId)) {				
+				$('#overlay-toast').text("NMLS should be number only.");
+				showToast();
+				return false;				
+			} if (nmlsId != "" && $.isNumeric(nmlsId)) { 
+				if(nmlsId > 99999999) {
+					$('#overlay-toast').text("NMLS should be 8 digits number only");
+					showToast();
+					return false;
+				} else {
+					return true;
+				}
+			} else {
+				return true;
+			}
+		}  else {
+			return true;
+		}
 	}
 }
 

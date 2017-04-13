@@ -57,6 +57,7 @@ import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
 import com.realtech.socialsurvey.core.entities.FacebookPage;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
+import com.realtech.socialsurvey.core.entities.LenderRef;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
@@ -1369,7 +1370,7 @@ public class SocialManagementController
     }
 
 
-    private SocialMediaTokens updateZillow( SocialMediaTokens mediaTokens, String profileLink, String zillowScreenName )
+    private SocialMediaTokens updateZillow( SocialMediaTokens mediaTokens, String profileLink, String zillowScreenName, Integer nmlsId )
     {
         LOG.debug( "Method updateGoogleToken() called from SocialManagementController" );
         if ( mediaTokens == null ) {
@@ -1387,6 +1388,14 @@ public class SocialManagementController
         }
         if ( zillowScreenName != null ) {
             mediaTokens.getZillowToken().setZillowScreenName( zillowScreenName );
+        }
+        if ( nmlsId != null ) {
+        	LenderRef lenderRef = mediaTokens.getZillowToken().getLenderRef();
+        	if(lenderRef == null)
+        		lenderRef = new LenderRef();
+        	
+        	lenderRef.setNmlsId(nmlsId);
+            mediaTokens.getZillowToken().setLenderRef(lenderRef);
         }
 
         LOG.debug( "Method updateZillow() finished from SocialManagementController" );
@@ -1728,12 +1737,24 @@ public class SocialManagementController
         ZillowIntegrationAgentApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZillowIntegrationAgentApi();
         User user = sessionHelper.getCurrentUser();
         String zillowScreenName = request.getParameter( "zillowProfileName" );
+        String nmlsTemp = request.getParameter( "nmlsId" );
+        Integer nmlsId = null;
+        if(nmlsTemp != null && nmlsTemp.trim().length() > 0)
+        	nmlsId = new Integer(nmlsTemp);
         SocialMediaTokens mediaTokens = null;
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
             .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
         if ( profileSettings == null ) {
             profileSettings = (OrganizationUnitSettings) session.getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
         }
+        
+        //if NMLS id is passed
+        //fetch profile name by calling Zillow (if review present, then only will be available)
+        //if review not present, only create data with empty zillowProfileLink, zillowScreenName & zillowLenderId but with nmls id
+        if ( nmlsId != null ) {//now not required, if profile name is passed and mandatory as parameter
+        	
+        }
+        
         if ( zillowScreenName == null || zillowScreenName == "" ) {
             model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
 
@@ -1755,6 +1776,7 @@ public class SocialManagementController
                 
                 //decode the zillow url
                 zillowScreenName = java.net.URLDecoder.decode(zillowScreenName, "UTF-8");
+                //zillowProfileMapType = java.net.URLDecoder.decode(zillowProfileMapType, "UTF-8");
 
                 
                 // if user has changed his Zillow account, then delete existing Zillow reviews
@@ -1818,6 +1840,7 @@ public class SocialManagementController
                     map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
                 }
 
+               String error = null;
                if(map != null){
                    //get Profile url
                    Map<String, Object> responseMap = new HashMap<String, Object>();
@@ -1839,9 +1862,16 @@ public class SocialManagementController
                    List<SurveyDetails> surveyDetailsList =  profileManagementService.buildSurveyDetailFromZillowAgentReviewMap( map );
                    organizationManagementService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings,
                             user.getCompany().getCompanyId() );
+                   
+                   Map<String, Object> messageRes = (HashMap<String, Object>) map.get( "message" );                   
+                   error = (String) messageRes.get( "code" );
+                   
                }
                 
-                
+               	if(error != null && !error.equals("0")) {//Zillow is returning 0 for successfull profile
+               		return CommonConstants.ZILLOW_PROFILE_ERROR;
+               	}
+               	
                 int accountMasterId = accountType.getValue();
                 if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                     OrganizationUnitSettings companySettings = organizationManagementService
@@ -1850,7 +1880,7 @@ public class SocialManagementController
                         throw new InvalidInputException( "No company settings found in current session" );
                     }
                     mediaTokens = companySettings.getSocialMediaTokens();
-                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName, nmlsId );
                     mediaTokens = socialManagementService.checkOrAddZillowLastUpdated( mediaTokens );
                     mediaTokens = socialManagementService.updateSocialMediaTokens(
                         MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
@@ -1889,7 +1919,7 @@ public class SocialManagementController
                         throw new InvalidInputException( "No Region settings found in current session" );
                     }
                     mediaTokens = regionSettings.getSocialMediaTokens();
-                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName, nmlsId );
                     mediaTokens = socialManagementService.checkOrAddZillowLastUpdated( mediaTokens );
                     mediaTokens = socialManagementService.updateSocialMediaTokens(
                         MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
@@ -1928,7 +1958,7 @@ public class SocialManagementController
                         throw new InvalidInputException( "No Branch settings found in current session" );
                     }
                     mediaTokens = branchSettings.getSocialMediaTokens();
-                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName, nmlsId );
                     mediaTokens = socialManagementService.checkOrAddZillowLastUpdated( mediaTokens );
                     mediaTokens = socialManagementService.updateSocialMediaTokens(
                         MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
@@ -1967,7 +1997,7 @@ public class SocialManagementController
                         throw new InvalidInputException( "No Agent settings found in current session" );
                     }
                     mediaTokens = agentSettings.getSocialMediaTokens();
-                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName, nmlsId );
                     mediaTokens = socialManagementService.checkOrAddZillowLastUpdated( mediaTokens );
                     mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                     agentSettings.setSocialMediaTokens( mediaTokens );

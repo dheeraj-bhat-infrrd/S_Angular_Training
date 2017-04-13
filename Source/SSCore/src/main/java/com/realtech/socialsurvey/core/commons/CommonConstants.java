@@ -374,10 +374,13 @@ public interface CommonConstants
     public static final String USER_PROFILE_LIST = "profileList";
     public static final String USER_PROFILE_MAP = "profileMap";
     public static final String USER_PROFILE_SETTINGS = "profileSettings";
+    public static final String USER_ZILLOW_PROFILE_TYPE_NMLS = "nmls";
+    public static final String USER_ZILLOW_PROFILE_TYPE_PROFILENAME = "profileName";
     public static final String USER_ACCOUNT_SETTINGS = "accountSettings";
     public static final String USER_APP_SETTINGS = "appSettings";
     public static final String COMPLAIN_REG_SETTINGS = "complaintRegSettings";
     public static final String ERROR = "error";
+    public static final String ZILLOW_PROFILE_ERROR = "zillow-error";
     public static final String MESSAGE = "message";
     public static final String EMAIL_TYPE = "emailtype";
     public static final String EMAIL_TYPE_WORK = "work";

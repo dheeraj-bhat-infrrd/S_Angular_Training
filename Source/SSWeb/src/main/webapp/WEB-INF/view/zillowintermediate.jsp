@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+
 <c:if test="${not empty accountSettings}">
 	<c:set var = "profile" value = "${ accountSettings }"></c:set>
 </c:if>
@@ -20,27 +21,58 @@
 			<div class="text-center font-24">
 					<div style="padding: 0px 20px;" class="clearfix">
 						<div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
+						<form id="zillowForm">
 						<div>
-							<form id="zillowForm">
-	 							<div class="zillow-input-container clearfix popupUrl">
+							
+	 							<!--  <div class="zillow-input-container clearfix popupUrl">
 									<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
 									<div class="zillow-input-cont">
 										<span><spring:message code="label.zillowconnect.link.key"/></span>
 										<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
 										<span>/</span>
 									</div>
+								</div> -->
+								<div class="zillow-input-container clearfix popupUrl">
+									<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
 								</div>
-							</form>
+							
 							<div class="zillow-example-cont popupUrl">
-								<div class="zillow-exm-url">
+								
+								<!-- <div class="zillow-exm-url">
 									<span class="zillow-url"><spring:message code="label.zillow.exampleurl.key" /></span>
 								</div>
 								<div class="zillow-exm-profile">
 									<span><spring:message code="label.zillow.exampleprofilename.text.key" /></span> 
 									<span class="zillow-exm-profilename"><spring:message code="label.zillow.exampleprofilename.key" /></span>
 								</div>
+								 -->
+								 
+								 <div class="zillow-exm-profile">
+									 <div class="zillow-input-container clearfix popupUrl">
+										<div class="zillow-input-cont">
+											<span><spring:message code="label.zillowconnect.link.key"/></span>
+											<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
+											<span>/</span>
+										</div>
+										<div class="zillow-exm-url">
+											<span class="zillow-url"><spring:message code="label.zillow.exampleurl.key" /></span>
+										</div>
+									</div>
+									<div>
+										<!--  <select id="select-zillow-profile-or-nmsid"  name="zillowProfileType" class="float-left dash-sel-item-sm">
+											
+											<option value="nmls" data-entity="nmls"><spring:message code="label.zillowconnect.nmls.key"/></option>
+										</select>-->
+										<div style="margin-bottom: 10px; font-size: 14px; text-align: center; padding: 0px 10px;">
+											<span><spring:message code="label.zillowconnect.nmls.header.key"/></span>
+											<input id="zillow-profile-input" class="zillow-input" name="nmlsId" type="text" maxlength="8" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }" />								
+										</div>
+										</div>
+								</div>
+								
 							</div>
 						</div>
+						</form>
 						</div>
 					</div>
 					<div style="font-size: 11px; text-align: center;"></div>
@@ -50,3 +82,12 @@
 		</div>
 	</div>
 </div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#select-zillow-profile-or-nmsid").on('change', function() {
+			var txt = $(this).find('option:selected').text();
+			$("#zillow-profile-input").attr("placeholder", txt);
+		});
+	});
+</script>
