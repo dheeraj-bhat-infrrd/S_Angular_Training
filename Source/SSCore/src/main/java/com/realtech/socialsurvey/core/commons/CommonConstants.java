@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.commons;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -381,6 +382,7 @@ public interface CommonConstants
     public static final String COMPLAIN_REG_SETTINGS = "complaintRegSettings";
     public static final String ERROR = "error";
     public static final String ZILLOW_PROFILE_ERROR = "zillow-error";
+    public static final String ZILLOW_NMLS_REQUIRED_ERROR ="zillow-nmls-required-error";
     public static final String MESSAGE = "message";
     public static final String EMAIL_TYPE = "emailtype";
     public static final String EMAIL_TYPE_WORK = "work";
@@ -1156,6 +1158,8 @@ public interface CommonConstants
 
 
     public static final String ZILLOW_PROFILE_URL = "http://zillow.com/profile/";
+    
+    public static final List<String> ZILLOW_LENDING_VERTICALS = new ArrayList<String>(Arrays.asList("Mortgage"));
 
     // Zillow Temp Post Table column names
     public static final String ZILLOW_REVIEW_URL_COLUMN = "zillowReviewUrl";

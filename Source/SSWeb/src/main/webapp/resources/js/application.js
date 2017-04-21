@@ -10800,6 +10800,9 @@ function saveZillowEmailAddress() {
 		} else if(data && data == "zillow-error"){
 			$('#overlay-toast').text("Invalid Zillow profile");
 			showToast();
+		} else if(data && data == "zillow-nmls-required-error"){
+			$('#overlay-toast').text("NMLS is required");
+			showToast();
 		} else {
 			$('#overlay-toast').text("Some problem occurred while saving zillow");
 			showToast();

@@ -1748,12 +1748,23 @@ public class SocialManagementController
             profileSettings = (OrganizationUnitSettings) session.getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
         }
         
-        //if NMLS id is passed
-        //fetch profile name by calling Zillow (if review present, then only will be available)
-        //if review not present, only create data with empty zillowProfileLink, zillowScreenName & zillowLenderId but with nmls id
-        if ( nmlsId != null ) {//now not required, if profile name is passed and mandatory as parameter
-        	
+        //If Company Vertical is Lending means vertical=Real Estate, NMLS is required
+        if(CommonConstants.ZILLOW_LENDING_VERTICALS.contains(profileSettings.getVertical())) {
+        	//if NMLS id is passed            
+            if ( nmlsId != null ) {
+            	//fetch profile name by calling Zillow (if review present, then only will be available)
+            	//if review present fetch reviews to get the screen name,
+            	//if no review present, ask for screen name from user (by poping up)
+            } else {
+            	//model.addAttribute( "Error", "NMLS is required" );
+            	//return CommonConstants.ERROR;
+            	return CommonConstants.ZILLOW_NMLS_REQUIRED_ERROR;
+            }
+        } else {
+        	//for other NMLS is not required
         }
+        
+        
         
         if ( zillowScreenName == null || zillowScreenName == "" ) {
             model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
