@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -406,7 +407,7 @@ public class SocialManagementController
                     requestUtils.getRequestServerName( request ) + facebookRedirectUri );
                 facebook4j.User fbUser = facebook.getUser( facebook.getId() );
                 if ( user != null ) {
-                    profileLink = fbUser.getLink().toString();
+                    profileLink = facebookUri +  facebook.getId() ; //fbUser.getLink().toString();
                     FacebookPage personalUserAccount = new FacebookPage();
                     personalUserAccount.setAccessToken( accessToken.getToken() );
                     personalUserAccount.setName( fbUser.getName() );
