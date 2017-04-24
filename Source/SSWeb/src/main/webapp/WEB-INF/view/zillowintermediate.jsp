@@ -47,7 +47,7 @@
 													  
 													  
 													  	<span><spring:message code="label.zillowconnect.link.key"/></span>
-														<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
+														<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
 														<span>/</span>
 													  </c:otherwise>
 												</c:choose>
@@ -56,7 +56,20 @@
 									</div>
 									<div id="screen-name-container">
 										<div class="zillow-input-container clearfix popupUrl">
-											here
+											<div>
+												<span><spring:message code="label.zillowconnect.screen.name.key"/></span>
+												<span class="zillowProfileNameSpan">${ profile.socialMediaTokens.zillowToken.zillowScreenName }</span>
+											</div>						
+											
+											<div class="zillow-exm-profile">
+												<span><spring:message code="label.zillow.exampleprofilename.sample.key" /></span> <br/>
+												<span class="zillow-exm-profilename">
+													<spring:message code="label.zillowconnect.link.key" /><span class="zillowProfileNameSpan">${ profile.socialMediaTokens.zillowToken.zillowScreenName }</span>
+												</span>
+											</div>
+											<div>* You can find your screen name while logged into Zillow by hovering over "My Zillow" and clicking the "Profile" button. 
+												Once you're on your profile, click on "Edit your profile" then you will be directed to the page where you can view and edit your "Screen name."
+											</div>
 										</div>
 									</div>
 								</form>

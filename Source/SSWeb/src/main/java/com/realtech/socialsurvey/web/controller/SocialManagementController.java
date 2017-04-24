@@ -78,7 +78,9 @@ import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBodyByNMLS;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationLenderApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -231,6 +233,12 @@ public class SocialManagementController
 
     @Autowired
     private URLGenerator urlGenerator;
+    
+    @Value ( "${ZILLOW_PARTNER_ID}")
+    private String zillowPartnerId;
+    
+    @Autowired
+    private ZillowIntergrationApiBuilder zillowIntegrationApiBuilder;
 
 
     /**
@@ -1735,7 +1743,7 @@ public class SocialManagementController
         ZillowIntegrationAgentApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZillowIntegrationAgentApi();
         User user = sessionHelper.getCurrentUser();
         String zillowScreenName = request.getParameter( "zillowProfileName" );
-        String nmlsTemp = request.getParameter( "nmlsId" );
+        String nmlsTemp = request.getParameter("nmls");
         Integer nmlsId = null;
         if(nmlsTemp != null && nmlsTemp.trim().length() > 0)
         	nmlsId = new Integer(nmlsTemp);
@@ -1746,16 +1754,56 @@ public class SocialManagementController
             profileSettings = (OrganizationUnitSettings) session.getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
         }
         
+        //find screen name by nmls id
+        mediaTokens = profileSettings.getDeletedSocialTokens();
+        ZillowToken zillowToken = null;
+        if(mediaTokens != null)  {
+        	if( mediaTokens.getZillowToken() != null ) {
+        		zillowToken = profileSettings.getSocialMediaTokens().getZillowToken();
+        	} else {
+        		zillowToken = new ZillowToken();
+        	}
+        } else {
+        	mediaTokens = new SocialMediaTokens();
+        	zillowToken = new ZillowToken();
+        	LenderRef lenderRef = new LenderRef();
+        	zillowToken.setLenderRef(lenderRef);
+        	mediaTokens.setZillowToken(zillowToken);
+        }
+        
+        LenderRef zillowLenderRef = zillowToken.getLenderRef();
+        retrofit.client.Response response = null;
+        if(nmlsId != null) {
+        	LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : " + zillowLenderRef.getNmlsId() + " and screen name : " + zillowScreenName );
+        	FetchZillowReviewBodyByNMLS fetchZillowReviewBodyByNMLS = new FetchZillowReviewBodyByNMLS();                       
+            LenderRef lenderRef = new LenderRef();
+            lenderRef.setNmlsId(nmlsId);
+            fetchZillowReviewBodyByNMLS.setLenderRef(lenderRef);
+            fetchZillowReviewBodyByNMLS.setPartnerId( zillowPartnerId );
+            ZillowIntegrationLenderApi zillowIntegrationLenderApi = zillowIntegrationApiBuilder.getZillowIntegrationLenderApi();
+            try {
+	            response = zillowIntegrationLenderApi.fetchZillowReviewsByNMLS( fetchZillowReviewBodyByNMLS );
+	            
+	            if ( response != null ) {
+	                String responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+	            }
+            } catch (Exception e) {
+            	
+            }
+        } else {
+        	//throw error
+        }
+        
         session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
         model.addAttribute( "socialNetwork", "zillow" );
+        
+        profileSettings.getSocialMediaTokens().getZillowToken().setZillowScreenName("sc1-test");
+        
         session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
-        session.setAttribute( CommonConstants.USER_ZILLOW_NMLS_ID, nmlsId );
-        
-    	//return JspResolver.SOCIAL_ZILLOW_INTERMEDIATE_FOR_SCREEN_NAME;
-    	//return JspResolver.SOCIAL_ZILLOW_INTERMEDIATE;
-        return  new Gson().toJson( profileSettings );
+        return "invalid-nmls";
+       // return  new Gson().toJson( profileSettings );
     }
 
 
