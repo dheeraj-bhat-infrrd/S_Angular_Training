@@ -220,6 +220,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     private String facebookRedirectUriForMail;
     @Value ( "${FB_GRAPH_URI}")
     private String fbGraphUrl;
+    
+    @Value ( "${FB_REST_BASE_URL}")
+    private String facebookRestBaseURL;
+    
+    @Value ( "${FB_PERMISSION_SCOPE_LIST}")
+    private String fbPermissionScopeList;
 
 
     // Twitter
@@ -332,6 +338,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         confBuilder.setOAuthAppSecret( facebookAppSecret );
         confBuilder.setOAuthCallbackURL( serverBaseUrl + facebookRedirectUri );
         confBuilder.setOAuthPermissions( facebookScope );
+        confBuilder.setRestBaseURL( facebookRestBaseURL );
+        confBuilder.setOAuthPermissions( fbPermissionScopeList );
         facebook4j.conf.Configuration configuration = confBuilder.build();
 
         return new FacebookFactory( configuration ).getInstance();
@@ -346,6 +354,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         confBuilder.setOAuthAppSecret( facebookAppSecret );
         confBuilder.setOAuthCallbackURL( callBackUrl );
         confBuilder.setOAuthPermissions( facebookScope );
+        confBuilder.setRestBaseURL( facebookRestBaseURL );
+        confBuilder.setOAuthPermissions( fbPermissionScopeList );
+
         facebook4j.conf.Configuration configuration = confBuilder.build();
 
         return new FacebookFactory( configuration ).getInstance();
