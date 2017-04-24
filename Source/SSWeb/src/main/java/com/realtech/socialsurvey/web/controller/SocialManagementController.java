@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -42,7 +44,9 @@ import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -1773,6 +1777,7 @@ public class SocialManagementController
         
         LenderRef zillowLenderRef = zillowToken.getLenderRef();
         retrofit.client.Response response = null;
+        String screenName = null;
         if(nmlsId != null) {
         	LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : " + zillowLenderRef.getNmlsId() + " and screen name : " + zillowScreenName );
         	FetchZillowReviewBodyByNMLS fetchZillowReviewBodyByNMLS = new FetchZillowReviewBodyByNMLS();                       
@@ -1782,13 +1787,43 @@ public class SocialManagementController
             fetchZillowReviewBodyByNMLS.setPartnerId( zillowPartnerId );
             ZillowIntegrationLenderApi zillowIntegrationLenderApi = zillowIntegrationApiBuilder.getZillowIntegrationLenderApi();
             try {
+            	//Call zillow to fetch reviews for the profile name
 	            response = zillowIntegrationLenderApi.fetchZillowReviewsByNMLS( fetchZillowReviewBodyByNMLS );
 	            
-	            if ( response != null ) {
+	            if ( response != null ) {	        
 	                String responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+	                
+	                if ( responseString != null ) {
+                        Map<String, Object> map = null;
+                        try {
+                            map = convertJsonStringToMap( responseString );
+                            
+                            if ( map != null ) {
+                            	List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
+                                surveyDetailsList = profileManagementService.buildSurveyDetailFromZillowLenderReviewMap( map );
+                                LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
+                                if(surveyDetailsList != null && surveyDetailsList.size() > 0) {
+                                	List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
+                                	reviews = (List<HashMap<String, Object>>) map.get( "reviews" );
+                                    if ( reviews != null ) {
+                                        for ( Map<String, Object> review : reviews ) {
+                                        	HashMap<String, Object> individualReviewee = (HashMap<String, Object>) review.get( "individualReviewee" );
+                                        	//get screen name 
+                                        	screenName = (String) individualReviewee.get("screenName");
+                                        	break;
+                                        }
+                                    }
+                                    //if screenName == null, no review present, ask to enter screen name
+                                }
+                            }
+                        } catch ( IOException e ) {
+                            LOG.error( "Exception caught while parsing zillow reviews" + e.getMessage() );
+                            throw new UnavailableException( "Zillow reviews could not be fetched for  nmls: " + nmlsId );
+                        }
+	                }
 	            }
             } catch (Exception e) {
-            	
+            	return "invalid-nmls";
             }
         } else {
         	//throw error
@@ -1798,12 +1833,18 @@ public class SocialManagementController
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
         model.addAttribute( "socialNetwork", "zillow" );
         
-        profileSettings.getSocialMediaTokens().getZillowToken().setZillowScreenName("sc1-test");
+        profileSettings.getSocialMediaTokens().getZillowToken().setZillowScreenName(screenName);
         
         session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
-        return "invalid-nmls";
-       // return  new Gson().toJson( profileSettings );
+        //return "invalid-nmls";
+        return  new Gson().toJson( profileSettings );
+    }
+    
+    Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException, IOException
+    {
+        Map<String, Object> map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
+        return map;
     }
 
 
