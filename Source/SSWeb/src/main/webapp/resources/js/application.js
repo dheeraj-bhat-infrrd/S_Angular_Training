@@ -10852,6 +10852,8 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				
 				//$('#overlay-next').bind('click');
 				//$('#overlay-cancel').bind('click');
+			} else if(data == 'no-screen-name')  {
+				//show section to insert screen name
 			} else {
 				
 				data = $.parseJSON(data);				

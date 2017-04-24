@@ -1814,6 +1814,9 @@ public class SocialManagementController
                                         }
                                     }
                                     //if screenName == null, no review present, ask to enter screen name
+                                    if(screenName == null ) {
+                                    	return "no-screen-name";
+                                    }
                                 }
                             }
                         } catch ( IOException e ) {
