@@ -12,44 +12,56 @@
 	</c:if>
 </c:if>
 
-${ profile }
-
 <div class=" padding-001 ">
 	<div class="container login-container">
 		<div class="row login-row">
 			
-			<div class=" padding-001 margin-top-25 margin-bottom-25 bg-fff margin-0-auto col-xs-12 col-md-10 col-sm-12 col-lg-8">
+			<div class=" padding-001 margin-top-25 margin-bottom-25 bg-fff margin-0-auto col-xs-12 col-md-12 col-sm-12 col-lg-12">
 			<div class="text-center font-24">
 					<div style="padding: 0px 20px;" class="clearfix">
 						<div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
-						<div>
-							<form id="zillowForm">
-	 							<div class="zillow-input-container clearfix popupUrl">
-									<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
-									<div class="zillow-input-cont">
-										<c:choose>
-											  <c:when test="${profile.vertical == 'Mortgage'}">
-											    
-											  </c:when>
-											  <c:otherwise>
-											  	<span><spring:message code="label.zillowconnect.link.key"/></span>
-												<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
-												<span>/</span>
-											  </c:otherwise>
-										</c:choose>
+							<div>
+								<form id="zillowForm">
+									<input type="hidden" id="profileType" value="${profile.vertical}" ></input>
+									<div id="main-container">
+			 							<div class="zillow-input-container clearfix popupUrl">
+											<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
+											<div class="zillow-input-cont">
+												<c:choose>
+													  <c:when test="${profile.vertical == 'Mortgage'}">
+													    <span>
+														    <spring:message code="label.zillowconnect.nmls.header.key" />
+															<input class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">
+														</span>
+													  </c:when>
+													  <c:otherwise>
+													  	<div class="zillow-example-cont popupUrl">
+															<div class="zillow-exm-url">
+																<span class="zillow-url"><spring:message code="label.zillow.exampleurl.key" /></span>
+															</div>
+															<div class="zillow-exm-profile">
+																<span><spring:message code="label.zillow.exampleprofilename.text.key" /></span> 
+																<span class="zillow-exm-profilename"><spring:message code="label.zillow.exampleprofilename.key" /></span>
+															</div>
+														</div>
+													  
+													  
+													  	<span><spring:message code="label.zillowconnect.link.key"/></span>
+														<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
+														<span>/</span>
+													  </c:otherwise>
+												</c:choose>
+											</div>
+										</div>
 									</div>
-								</div>
-							</form>
-							<div class="zillow-example-cont popupUrl">
-								<div class="zillow-exm-url">
-									<span class="zillow-url"><spring:message code="label.zillow.exampleurl.key" /></span>
-								</div>
-								<div class="zillow-exm-profile">
-									<span><spring:message code="label.zillow.exampleprofilename.text.key" /></span> 
-									<span class="zillow-exm-profilename"><spring:message code="label.zillow.exampleprofilename.key" /></span>
-								</div>
+									<div id="screen-name-container">
+										<div class="zillow-input-container clearfix popupUrl">
+											here
+										</div>
+									</div>
+								</form>
+								
 							</div>
-						</div>
 						</div>
 					</div>
 					<div style="font-size: 11px; text-align: center;"></div>

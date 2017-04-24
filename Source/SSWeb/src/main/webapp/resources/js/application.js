@@ -8917,14 +8917,34 @@ function createEditProfileUrlPopup2(body) {
 }
 function createZillowProfileUrlPopup(body) {
 	$('#overlay-text').html(body);
-	$('#overlay-continue').html("Submit");
+	$('#main-container').show();
+	$('#screen-name-container').hide();	
+	var profileType = $('#profileType').val();
+	//put condition for profileType
+	if(profileType == 'Mortgage') {
+		$('#overlay-continue').html("By Screen Name");
+	}
+	//$('#overlay-continue').html("Submit");
 	$('#overlay-cancel').html("Cancel");
+	$('#overlay-next').html("Next");
+	$('#overlay-next').show();
 	$('#overlay-continue').off();
 	$('#overlay-continue').click(function() {
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
-		saveZillowEmailAddress();
-		overlayRevert();
+		//saveZillowEmailAddress(profileType);
+		//show Screen non editable-name found by NMLS, Ok, Back, Cancle buttons 
+		openNextScreenForZillowScreenName(profileType, "by-screen-name");
+		//overlayRevert();
+	});
+	
+	$('#overlay-next').click(function() {
+		$('#overlay-next').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		//show Screen non editable-name found by NMLS, Ok, Back, Cancle buttons 
+		//saveZillowEmailAddress(profileType);
+		openNextScreenForZillowScreenName(profileType, "next");
+		//overlayRevert();
 	});
 
 	$('#overlay-main').show();
@@ -8936,10 +8956,11 @@ function createZillowProfileUrlPopup(body) {
 function createZillowProfileUrlPopupPath(body) {
 	$('#overlay-text').html(body);
 	$('#overlay-continue').html("ok");
+	var profileType = $('#profileType').val();
 	$('#overlay-continue').click(function() {
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
-		saveZillowEmailAddress();
+		saveZillowEmailAddress(profileType);
 		overlayRevert();
 	});
 }
@@ -10786,8 +10807,8 @@ function attachEventsOnSocialMonitor() {
 }
 
 // Zillow connect functions
-function saveZillowEmailAddress() {
-	if (!validateZillowForm()) {
+function saveZillowEmailAddress(profileType) {
+	if (!validateZillowForm(profileType)) {
 		return false;
 	}
 	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
@@ -10810,12 +10831,42 @@ function saveZillowEmailAddress() {
 	}, "zillowForm");
 }
 
-function validateZillowForm() {
-	var zillowProfileName = $('input[name="zillowProfileName"]').val();
-	if (zillowProfileName == undefined || zillowProfileName == "") {
-		$('#overlay-toast').text("Please enter a valid profile name");
-		showToast();
+//Open show Screen name for Zillow
+function openNextScreenForZillowScreenName(profileType, button) {
+	$('#overlay-main').show();
+	disableBodyScroll();
+	
+	if (button != 'by-screen-name' && !validateZillowForm(profileType)) {
 		return false;
+	}
+	
+	if (button != 'by-screen-name') {
+		callAjaxPOST("/zillowValidateNMLS.do", function(data) {
+			alert(data);
+			if (data) {
+				
+				$('#main-container').hide();
+				$('#screen-name-container').show();
+				
+				$('#overlay-next').hide();
+				$('#overlay-cancel').html("Cancel");
+				$('#overlay-continue').html("Save");
+			}
+		}, "zillowForm");
+	}
+	
+	
+	
+}
+
+function validateZillowForm(profileType) {
+	if(profileType != 'Mortgage') {
+		var zillowProfileName = $('input[name="zillowProfileName"]').val();
+		if (zillowProfileName == undefined || zillowProfileName == "") {
+			$('#overlay-toast').text("Please enter a valid profile name");
+			showToast();
+			return false;
+		}
 	} else {
 		var nmlsId = $('input[name="nmlsId"]').val();
 		if (nmlsId != undefined || nmlsId != "") {

@@ -91,6 +91,11 @@
 							<!-- Populated by javascript -->
 						</div>
 					</div>
+					<div class="float-left ol-btn-wrapper">
+						<div id="overlay-next" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

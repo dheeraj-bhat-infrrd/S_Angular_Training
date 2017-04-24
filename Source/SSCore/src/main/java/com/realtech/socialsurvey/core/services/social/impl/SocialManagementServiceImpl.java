@@ -2805,7 +2805,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 									false);
 							} catch (Exception e) {
 								LOG.error("Fetch Zillow reviews exception " + agentSetting.getProfileName());
-								reportBug("Zillow", agentSetting.getProfileName(), e);
+								//reportBug("Zillow", agentSetting.getProfileName() + " iden: " + agentSetting.getIden(), e);
 							}
 							LOG.debug("Fetched and saved zillow reviews for agent id : " + agentSetting.getIden());
 						}
@@ -2821,7 +2821,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 										false);
 							} catch (Exception e) {
 								LOG.error("Fetch Zillow reviews exception " + branchSetting.getProfileName());
-								reportBug("Zillow", branchSetting.getProfileName(), e);
+								//reportBug("Zillow", branchSetting.getProfileName() + " iden: " + branchSetting.getIden(), e);
 							}
 							LOG.debug("Fetched and saved zillow reviews for branch id : " + branchSetting.getIden());
 						}
@@ -2837,7 +2837,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 									false);
 							} catch (Exception e) {
 								LOG.error("Fetch Zillow reviews exception " + regionSetting.getProfileName());
-								reportBug("Zillow", regionSetting.getProfileName(), e);
+								//reportBug("Zillow", regionSetting.getProfileName() + " iden: " + regionSetting.getIden(), e);
 							}
 							LOG.debug("Fetched and saved zillow reviews for region id : " + regionSetting.getIden());
 						}
@@ -2853,7 +2853,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 								false);
 						} catch (Exception e) {
 							LOG.error("Fetch Zillow reviews exception " + companySettings.getProfileName());
-							reportBug("Zillow", companySettings.getProfileName(), e);
+							//reportBug("Zillow", companySettings.getProfileName() + " iden: " + companySettings.getIden(), e);
 						}
 						LOG.debug("Fetched and saved zillow reviews for company id : " + companyId);
 					}

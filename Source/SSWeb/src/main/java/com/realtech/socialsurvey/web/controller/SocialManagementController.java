@@ -1725,6 +1725,38 @@ public class SocialManagementController
         model.addAttribute( "columnValue", request.getParameter( "columnValue" ) );
         return JspResolver.HEADER_SURVEY_INVITE_ADMIN;
     }
+    
+    @RequestMapping ( value = "/zillowValidateNMLS", method = RequestMethod.POST)
+    @ResponseBody
+    public String zillowValidateNMLS( Model model, HttpServletRequest request )
+    {
+    	LOG.info( "Method zillowValidateNMLS() called from SocialManagementController" );
+        HttpSession session = request.getSession( false );
+        ZillowIntegrationAgentApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZillowIntegrationAgentApi();
+        User user = sessionHelper.getCurrentUser();
+        String zillowScreenName = request.getParameter( "zillowProfileName" );
+        String nmlsTemp = request.getParameter( "nmlsId" );
+        Integer nmlsId = null;
+        if(nmlsTemp != null && nmlsTemp.trim().length() > 0)
+        	nmlsId = new Integer(nmlsTemp);
+        SocialMediaTokens mediaTokens = null;
+        OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+            .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
+        if ( profileSettings == null ) {
+            profileSettings = (OrganizationUnitSettings) session.getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+        }
+        
+        session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+        model.addAttribute( "socialNetwork", "zillow" );
+        session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
+        session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+        session.setAttribute( CommonConstants.USER_ZILLOW_NMLS_ID, nmlsId );
+        
+    	//return JspResolver.SOCIAL_ZILLOW_INTERMEDIATE_FOR_SCREEN_NAME;
+    	//return JspResolver.SOCIAL_ZILLOW_INTERMEDIATE;
+        return  new Gson().toJson( profileSettings );
+    }
 
 
     @SuppressWarnings ( { "unchecked", "unused" })

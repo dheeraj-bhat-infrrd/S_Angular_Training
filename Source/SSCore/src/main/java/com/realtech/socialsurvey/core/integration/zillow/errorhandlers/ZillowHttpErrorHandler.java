@@ -21,7 +21,7 @@ public class ZillowHttpErrorHandler implements ErrorHandler {
 		LOG.error("Found error "+cause.getMessage());
 		Response response = cause.getResponse();
 		if(response != null && response.getStatus() != HttpStatus.SC_OK){
-			return new FatalException("Error connecting to the zillow", cause);
+			return new FatalException("Error connecting to the zillow : msg " + cause.getMessage() + " localize msg: " + cause.getLocalizedMessage(), cause);
 		}
 		return cause;
 	}
