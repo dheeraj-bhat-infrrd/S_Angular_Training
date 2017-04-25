@@ -116,6 +116,7 @@ import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
 import facebook4j.PostUpdate;
+import facebook4j.Reading;
 import facebook4j.ResponseList;
 import facebook4j.auth.AccessToken;
 import twitter4j.StatusUpdate;
@@ -3397,11 +3398,22 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         facebook.setOAuthAppId( facebookClientId, facebookAppSecret );
         facebook.setOAuthAccessToken( new facebook4j.auth.AccessToken( accessToken.getToken() ) );
 
-        //update facebook pages
-        ResponseList<Account> accounts;
+        //update Facebook pages
+        List<Account> accounts = new ArrayList<Account>();
         List<FacebookPage> facebookPages = new ArrayList<FacebookPage>();
         try {
-            accounts = facebook.getAccounts();
+            //get all account list using pagination
+            ResponseList<Account> resultList;
+            Reading arg0 = new Reading().limit( 25 );
+            resultList = facebook.getAccounts( arg0 );
+            facebook.fetchNext( resultList.getPaging() );
+            accounts.addAll( resultList );
+
+            while ( resultList.getPaging() != null && resultList.getPaging().getNext() != null ) {
+                resultList = facebook.fetchNext( resultList.getPaging() );
+                accounts.addAll( resultList );
+            }
+            //convert Facebook account to SS entity
             FacebookPage facebookPage = null;
             for ( Account account : accounts ) {
                 facebookPage = new FacebookPage();
