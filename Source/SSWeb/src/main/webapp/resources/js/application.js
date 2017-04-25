@@ -10826,12 +10826,12 @@ function saveZillowEmailAddress(profileType) {
 			loadSocialMediaUrlInPopup();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
-		} else if(data && data == "zillow-error"){
+		/*} else if(data && data == "zillow-error"){
 			$('#overlay-toast').text("Invalid Zillow profile");
 			showToast();
 		} else if(data && data == "zillow-nmls-required-error"){
 			$('#overlay-toast').text("NMLS is required");
-			showToast();
+			showToast(); */
 		} else {
 			$('#overlay-toast').text("Some problem occurred while saving zillow");
 			showToast();
@@ -10878,6 +10878,12 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				$('#overlay-disconnect').show();
 				$('#overlay-save').html("Yes, that's me");
 				$('#overlay-save').show();
+				
+				$('#overlay-save').click(function() {
+					$('#overlay-save').unbind('click');
+					$('#overlay-cancel').unbind('click');
+					saveZillowEmailAddress(profileType);
+				});
 			}
 		}, "zillowForm");
 	}

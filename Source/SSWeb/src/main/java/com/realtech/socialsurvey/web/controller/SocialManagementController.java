@@ -1759,13 +1759,15 @@ public class SocialManagementController
         }
         
         //find screen name by nmls id
-        mediaTokens = profileSettings.getDeletedSocialTokens();
+        mediaTokens = profileSettings.getSocialMediaTokens();
         ZillowToken zillowToken = null;
         if(mediaTokens != null)  {
         	if( mediaTokens.getZillowToken() != null ) {
         		zillowToken = profileSettings.getSocialMediaTokens().getZillowToken();
         	} else {
         		zillowToken = new ZillowToken();
+        		mediaTokens.setZillowToken(zillowToken);
+        		profileSettings.getSocialMediaTokens().setZillowToken(zillowToken);
         	}
         } else {
         	mediaTokens = new SocialMediaTokens();
@@ -1773,13 +1775,14 @@ public class SocialManagementController
         	LenderRef lenderRef = new LenderRef();
         	zillowToken.setLenderRef(lenderRef);
         	mediaTokens.setZillowToken(zillowToken);
+        	profileSettings.getSocialMediaTokens().setZillowToken(zillowToken);
         }
         
         LenderRef zillowLenderRef = zillowToken.getLenderRef();
         retrofit.client.Response response = null;
         String screenName = null;
         if(nmlsId != null) {
-        	LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : " + zillowLenderRef.getNmlsId() + " and screen name : " + zillowScreenName );
+        	LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : " + nmlsId + " and screen name : " + zillowScreenName );
         	FetchZillowReviewBodyByNMLS fetchZillowReviewBodyByNMLS = new FetchZillowReviewBodyByNMLS();                       
             LenderRef lenderRef = new LenderRef();
             lenderRef.setNmlsId(nmlsId);
@@ -1835,6 +1838,14 @@ public class SocialManagementController
         session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
         model.addAttribute( "socialNetwork", "zillow" );
+        
+       /* if(profileSettings.getSocialMediaTokens() == null) {
+        	SocialMediaTokens socialMediaToken = new SocialMediaTokens();
+        	ZillowToken zillowTokenNew = new ZillowToken();
+        	socialMediaToken.setZillowToken(zillowTokenNew);
+        	List<>
+        	profileSettingssetSocialMediaTokens(socialMediaTokens);
+        }*/
         
         profileSettings.getSocialMediaTokens().getZillowToken().setZillowScreenName(screenName);
         
