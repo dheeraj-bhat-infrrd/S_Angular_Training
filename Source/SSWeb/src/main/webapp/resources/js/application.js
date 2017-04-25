@@ -8918,7 +8918,10 @@ function createEditProfileUrlPopup2(body) {
 function createZillowProfileUrlPopup(body) {
 	$('#overlay-text').html(body);
 	$('#main-container').show();
-	$('#screen-name-container').hide();	
+	$('#screen-name-found-container').hide();
+	$('#no-screen-name-container').hide();
+	$('#by-screen-name-container').hide();
+	$('#overlay-change').hide();
 	var profileType = $('#profileType').val();
 	//put condition for profileType
 	if(profileType == 'Mortgage') {
@@ -10849,13 +10852,13 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 			if(data == 'invalid-nmls') {
 				$('#overlay-toast').text("Invalid NMLS");
 				showToast();
-				
-				//$('#overlay-next').bind('click');
-				//$('#overlay-cancel').bind('click');
 			} else if(data == 'no-screen-name')  {
 				//show section to insert screen name
-			} else {
-				
+				$('#main-container').hide();
+				$('#screen-name-found-container').hide();
+				$('#by-screen-name-container').hide();
+				$('#no-screen-name-container').show();
+			} else {//if screen name is found by nmls
 				data = $.parseJSON(data);				
 				var socialMediaTokens = data.socialMediaTokens;
 				var zillowScreenName = data.socialMediaTokens.zillowToken.zillowScreenName;
@@ -10863,17 +10866,32 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				$('.zillowProfileNameSpan').text(zillowScreenName);				
 				
 				$('#main-container').hide();
-				$('#screen-name-container').show();
+				$('#screen-name-found-container').show();
 				
 				$('#overlay-next').hide();
-				$('#overlay-cancel').html("Cancel");
-				$('#overlay-continue').html("Save");
-
+				$('#overlay-cancel').hide();
+				$('#overlay-change').html("Change NMLS#");
+				$('#overlay-disconnect').html("Disconnect Zillow");
+				$('#overlay-continue').html("Yes, that's me");
 			}
 		}, "zillowForm");
 	}
 	
-	
+	if (button == 'by-screen-name') {
+		$('#main-container').hide();
+		$('#screen-name-found-container').hide();
+		$('#no-screen-name-container').hide();
+		$('#by-screen-name-container').show();
+		
+		$('#overlay-next').hide();		
+		$('#overlay-change').hide();		
+		$('#overlay-continue').hide();
+		
+		$('#overlay-disconnect').html("Disconnect Zillow");
+		$('#overlay-disconnect').show();
+		$('#overlay-cancel').html("Cancel");
+		$('#overlay-continue').html("Save");
+	}
 	
 }
 
