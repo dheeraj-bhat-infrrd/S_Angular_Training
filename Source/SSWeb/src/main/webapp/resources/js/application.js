@@ -8922,13 +8922,18 @@ function createZillowProfileUrlPopup(body) {
 	$('#no-screen-name-container').hide();
 	$('#by-screen-name-container').hide();
 	$('#overlay-change').hide();
+	$('#overlay-disconnect').hide();
+	$('#overlay-change').hide();
+	$('#overlay-save').hide();
 	var profileType = $('#profileType').val();
 	//put condition for profileType
 	if(profileType == 'Mortgage') {
 		$('#overlay-continue').html("By Screen Name");
+		$('#overlay-continue').show();
 	}
 	//$('#overlay-continue').html("Submit");
 	$('#overlay-cancel').html("Cancel");
+	$('#overlay-cancel').show();
 	$('#overlay-next').html("Next");
 	$('#overlay-next').show();
 	//$('#overlay-continue').off();
@@ -8943,13 +8948,9 @@ function createZillowProfileUrlPopup(body) {
 	
 	$('#overlay-next').click(function() {
 		//show Screen non editable-name found by NMLS, Ok, Back, Cancle buttons 
-		//saveZillowEmailAddress(profileType);
-		var nmlsId = $('input[name="nmlsId"]').val();
-		
+		var nmlsId = $('input[name="nmlsId"]').val();		
 		var formData = new FormData();
-		formData.append("nmlsId", nmlsId);
-		
-		
+		formData.append("nmlsId", nmlsId);		
 		openNextScreenForZillowScreenName(profileType, "next", nmlsId);
 		//overlayRevert();
 	});
@@ -10870,9 +10871,13 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				
 				$('#overlay-next').hide();
 				$('#overlay-cancel').hide();
+				$('#overlay-continue').hide();
 				$('#overlay-change').html("Change NMLS#");
+				$('#overlay-change').show();
 				$('#overlay-disconnect').html("Disconnect Zillow");
-				$('#overlay-continue').html("Yes, that's me");
+				$('#overlay-disconnect').show();
+				$('#overlay-save').html("Yes, that's me");
+				$('#overlay-save').show();
 			}
 		}, "zillowForm");
 	}
@@ -10890,7 +10895,9 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 		$('#overlay-disconnect').html("Disconnect Zillow");
 		$('#overlay-disconnect').show();
 		$('#overlay-cancel').html("Cancel");
-		$('#overlay-continue').html("Save");
+		$('#overlay-cancel').show();
+		$('#overlay-save').html("Save");
+		$('#overlay-save').show();
 	}
 	
 }
