@@ -73,7 +73,7 @@
 											
 											<div>
 												<span><spring:message code="label.zillowconnect.screen.name.key"/></span>											
-												<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
+												<input class="zillow-input zillowProfileName" name="zillowProfileNameNoScreenForNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
 											</div>							
 											
 											<div class="zillow-exm-profile">
@@ -95,7 +95,7 @@
 											
 											<div>
 												<span><spring:message code="label.zillowconnect.screen.name.key"/></span>											
-												<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
+												<input class="zillow-input zillowProfileName" name="zillowProfileNameForNmls" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
 											</div>				
 											
 											<div class="zillow-exm-profile">

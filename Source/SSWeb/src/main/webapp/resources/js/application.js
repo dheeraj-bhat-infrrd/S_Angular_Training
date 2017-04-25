@@ -10814,6 +10814,27 @@ function attachEventsOnSocialMonitor() {
 	});
 }
 
+//callAjaxPOST("/zillowValidateNMLS.do?nmls="+nmls, function(data)
+		
+// Zillow connect functions
+function saveZillowProfile(profileType, zillowProfileName, nmls) {
+	if (!validateZillowForm(profileType)) {
+		return false;
+	}
+	callAjaxFormSubmit("/zillowSaveInfo.do?zillowProfileName="+zillowProfileName+"&nmls="+nmls, function(data) {
+		if (data && data == "success") {
+			showProfileLinkInEditProfilePage("zillow", $('input[name="zillowProfileName"]').val());
+			loadSocialMediaUrlInSettingsPage();
+			loadSocialMediaUrlInPopup();
+			$('#overlay-toast').text("Zillow update successful");
+			showToast();
+		} else {
+			$('#overlay-toast').text("Some problem occurred while saving zillow");
+			showToast();
+		}
+	}, "zillowForm");
+}
+
 // Zillow connect functions
 function saveZillowEmailAddress(profileType) {
 	if (!validateZillowForm(profileType)) {
@@ -10859,6 +10880,28 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				$('#screen-name-found-container').hide();
 				$('#by-screen-name-container').hide();
 				$('#no-screen-name-container').show();
+				
+				$('#overlay-next').hide();
+				$('#overlay-continue').hide();
+				$('#overlay-save').html("Save");
+				$('#overlay-save').show();
+				$('#overlay-disconnect').html("Disconnect Zillow");
+				$('#overlay-disconnect').show();
+				
+				$('#overlay-save').click(function() {
+					$('#overlay-save').unbind('click');
+					$('#overlay-cancel').unbind('click');
+					$('#overlay-disconnect').unbind('click');
+					var nmls = $('input[name="nmlsId"]').val();					
+					var zillowProfileName = $('input[name="zillowProfileNameNoScreenForNMLS"]').val();
+					if (zillowProfileName == undefined || zillowProfileName == "") {
+						$('#overlay-toast').text("Please enter a valid profile name");
+						showToast();
+						return false;
+					}
+					saveZillowProfile(profileType, zillowProfileName, nmls);
+					overlayRevert();
+				});
 			} else {//if screen name is found by nmls
 				data = $.parseJSON(data);				
 				var socialMediaTokens = data.socialMediaTokens;
@@ -10883,6 +10926,7 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 					$('#overlay-save').unbind('click');
 					$('#overlay-cancel').unbind('click');
 					saveZillowEmailAddress(profileType);
+					overlayRevert();
 				});
 			}
 		}, "zillowForm");
@@ -10904,6 +10948,16 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 		$('#overlay-cancel').show();
 		$('#overlay-save').html("Save");
 		$('#overlay-save').show();
+		
+		$('#overlay-save').click(function() {
+			$('#overlay-save').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			$('#overlay-disconnect').unbind('click');
+			$('input[name="nmlsId"]').val("");
+			var zillowProfileName = $('input[name="zillowProfileNameForNmls"]').val();
+			saveZillowProfile(profileType, zillowProfileName, "");
+			overlayRevert();
+		});
 	}
 	
 }

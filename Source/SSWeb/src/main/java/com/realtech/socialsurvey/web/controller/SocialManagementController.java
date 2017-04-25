@@ -1816,10 +1816,10 @@ public class SocialManagementController
                                         	break;
                                         }
                                     }
-                                    //if screenName == null, no review present, ask to enter screen name
-                                    if(screenName == null ) {
-                                    	return "no-screen-name";
-                                    }
+                                }
+                                //if screenName == null, no review present, ask to enter screen name
+                                if(screenName == null ) {
+                                	return "no-screen-name";
                                 }
                             }
                         } catch ( IOException e ) {
@@ -1884,7 +1884,7 @@ public class SocialManagementController
         }
         
         //If Company Vertical is Lending means vertical=Real Estate, NMLS is required
-        if(CommonConstants.ZILLOW_LENDING_VERTICALS.contains(profileSettings.getVertical())) {
+        /*if(CommonConstants.ZILLOW_LENDING_VERTICALS.contains(profileSettings.getVertical())) {
         	//if NMLS id is passed            
             if ( nmlsId != null ) {
             	//fetch profile name by calling Zillow (if review present, then only will be available)
@@ -1897,13 +1897,12 @@ public class SocialManagementController
             }
         } else {
         	//for other NMLS is not required
-        }
+        }*/
         
         
         
         if ( zillowScreenName == null || zillowScreenName == "" ) {
-            model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
-
+            model.addAttribute( "Error", "Please provide either the zillow screen name." );
         } else {
             try {
                 String profileLink = null;
