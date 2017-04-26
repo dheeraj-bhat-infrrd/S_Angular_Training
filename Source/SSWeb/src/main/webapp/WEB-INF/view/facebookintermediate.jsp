@@ -77,7 +77,7 @@ $(document).ready(function() {
 	else {
 	}
 	
-	var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;'>")
+	var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;max-height: 220px;overflow: auto;'>")
 	<c:forEach var="page" items="${pageNames}" varStatus="loop">
 		radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${fn:escapeXml(page.name)}"+" <br/>");
 	</c:forEach>
