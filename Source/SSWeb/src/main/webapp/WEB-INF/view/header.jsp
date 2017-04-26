@@ -81,32 +81,32 @@
 					<!-- Populated by javascript -->
 				</div>
 				<div class="clearfix">
-					<div class="float-left ol-btn-wrapper">
+					<div class="float-left ol-btn-wrapper overlay-cancel">
 						<div id="overlay-cancel" class="ol-btn cursor-pointer">
 							<!-- Populated by javascript -->
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper">
+					<div class="float-left ol-btn-wrapper overlay-continue">
 						<div id="overlay-continue" class="ol-btn cursor-pointer">
 							<!-- Populated by javascript -->
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper">
+					<div class="float-left ol-btn-wrapper overlay-next">
 						<div id="overlay-next" class="ol-btn cursor-pointer">
 							<!-- Populated by javascript -->
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper">
+					<div class="float-left ol-btn-wrapper overlay-change">
 						<div id="overlay-change" class="ol-btn cursor-pointer">
 							<!-- Populated by javascript -->
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper">
+					<div class="float-left ol-btn-wrapper overlay">
 						<div id="overlay-disconnect" class="ol-btn cursor-pointer">
 							<!-- Populated by javascript -->
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper">
+					<div class="float-left ol-btn-wrapper overlay-save">
 						<div id="overlay-save" class="ol-btn cursor-pointer">
 							<!-- Populated by javascript -->
 						</div>

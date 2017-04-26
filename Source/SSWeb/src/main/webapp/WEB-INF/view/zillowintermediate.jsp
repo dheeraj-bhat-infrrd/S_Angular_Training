@@ -28,7 +28,7 @@
 											<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
 											<div class="zillow-input-cont">
 												<c:choose>
-													  <c:when test="${profile.vertical == 'Mortgage'}">
+													  <c:when test="${profile.vertical != 'Mortgage'}">
 													    <span>
 														    <spring:message code="label.zillowconnect.nmls.header.key" />
 															<input class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">

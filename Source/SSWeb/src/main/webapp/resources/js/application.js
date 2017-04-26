@@ -8927,10 +8927,20 @@ function createZillowProfileUrlPopup(body) {
 	$('#overlay-save').hide();
 	var profileType = $('#profileType').val();
 	//put condition for profileType
-	if(profileType == 'Mortgage') {
+	if(profileType != 'Mortgage') {
 		$('#overlay-continue').html("By Screen Name");
 		$('#overlay-continue').show();
+	} else {
+		$('.overlay-next').hide();
+		$('.overlay-continue').hide();
+		$('.overlay-disconnect').hide();
+		$('.overlay-next').hide();
+		
+		$('.overlay-save').show();
+		$('#overlay-save').html("Save");
+		$('#overlay-save').show();
 	}
+	
 	//$('#overlay-continue').html("Submit");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-cancel').show();
