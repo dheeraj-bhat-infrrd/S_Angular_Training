@@ -108,5 +108,13 @@ namespace EncompassSocialSurvey
             }
         }
 
+        public static string fetchEncompassVersion
+        {
+            get
+            {
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.ENCOMPASS_VERSION];
+            }
+        }
+
     }
 }
