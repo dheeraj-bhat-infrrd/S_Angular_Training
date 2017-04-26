@@ -146,20 +146,19 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
     {
         long expiryHours = expirySeconds / 3600;
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis( tokenCreatedOn );
-        Date createdOn = cal.getTime();
 
         // adding 7 days to created on time
+        cal = Calendar.getInstance();
         cal.add( Calendar.HOUR, 168 );
-        Date createdOnPlusSeven = cal.getTime();
+        Date currentDatePlusSeven = cal.getTime();
 
         Calendar cal2 = Calendar.getInstance();
-        cal2.setTimeInMillis( createdOn.getTime() );
+        cal2.setTimeInMillis( tokenCreatedOn );
 
         cal2.add( Calendar.HOUR, (int) expiryHours );
         Date expiresOn = cal2.getTime();
 
-        if ( createdOnPlusSeven.after( expiresOn ) )
+        if ( currentDatePlusSeven.after( expiresOn ) )
             return true;
 
         return false;

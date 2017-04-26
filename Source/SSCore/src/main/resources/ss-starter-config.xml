@@ -365,6 +365,7 @@
 				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
 				<entry key="socialManagementService" value-ref="socialManagementService" />
+				<entry key="socialMediaExceptionHandler" value-ref="socialMediaExceptionHandler" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -769,6 +770,8 @@
 		class="com.realtech.socialsurvey.core.services.crmbatchtrackerhistory.impl.CRMBatchTrackerHistoryServiceImpl" />
 	<bean id="urlService"
 		class="com.realtech.socialsurvey.core.services.generator.impl.UrlServiceImpl" />
+	<bean id="socialMediaExceptionHandler"
+		class="com.realtech.socialsurvey.core.services.social.impl.SocialMediaExceptionHandlerImpl" />	
 	<bean id="loneWolfRestUtils" class="com.realtech.socialsurvey.core.utils.LoneWolfRestUtils" />
 
 	<bean id="loneWolfIntegrationService"

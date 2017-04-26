@@ -44,6 +44,8 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
     @Autowired
     private URLGenerator urlGenerator;
 
+    private final int fbTokenInsufficientPermissionErrorCode = 200;
+    
     private final int fbTokenExpireErrorCode = 190;
 
     private final int[] fbTokenExpireErrorSubCode = { 458, 459, 460, 463, 464, 467 };
@@ -53,9 +55,8 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
     public void handleFacebookException( FacebookException e, OrganizationUnitSettings settings, String collectionName )
     {
         LOG.debug( " Method handleFacebookException started" );
-        if ( e.getErrorCode() == fbTokenExpireErrorCode ) {
-            if ( ArrayUtils.contains( fbTokenExpireErrorSubCode, e.getErrorSubcode() ) ) {
-                if ( settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getFacebookToken() != null ) {
+        if ( (e.getErrorCode() == fbTokenExpireErrorCode &&  ArrayUtils.contains( fbTokenExpireErrorSubCode, e.getErrorSubcode() )) || e.getErrorCode() == fbTokenInsufficientPermissionErrorCode) {
+          if ( settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getFacebookToken() != null ) {
                     FacebookToken facebookToken = settings.getSocialMediaTokens().getFacebookToken();
                     //check if already a mail has been sent
                     if ( !facebookToken.isTokenExpiryAlertSent() ) {
@@ -72,7 +73,7 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
                         }
                     }
                 }
-            }
+            
         }
 
         LOG.debug( " Method handleFacebookException ended" );
