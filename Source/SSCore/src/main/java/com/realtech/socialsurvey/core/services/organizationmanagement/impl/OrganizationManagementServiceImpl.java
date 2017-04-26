@@ -5863,12 +5863,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state )
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state, String encompassVersion )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.debug( "Getting list of encompass crm info for state : " + state );
+        LOG.debug( "Getting list of encompass crm info for state : " + state + " and version : " + encompassVersion );
         List<OrganizationUnitSettings> organizationUnitSettingsList = null;
-        organizationUnitSettingsList = organizationUnitSettingsDao.getCompanyListForEncompass( state );
+        organizationUnitSettingsList = organizationUnitSettingsDao.getCompanyListForEncompass( state, encompassVersion );
         LOG.debug( "Returning company settings list with provided crm list" );
         return organizationUnitSettingsList;
     }
