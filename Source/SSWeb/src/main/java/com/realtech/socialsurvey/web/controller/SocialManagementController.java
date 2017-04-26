@@ -1901,7 +1901,7 @@ public class SocialManagementController
         
         
         
-        if ( zillowScreenName == null || zillowScreenName == "" ) {
+        if ( zillowScreenName == null || zillowScreenName.equals("") ) {
             model.addAttribute( "Error", "Please provide either the zillow screen name." );
         } else {
             try {
@@ -2002,20 +2002,22 @@ public class SocialManagementController
                            }
                        }
                    }    
+                   
+                   Map<String, Object> messageRes = (HashMap<String, Object>) map.get( "message" );                   
+                   error = (String) messageRes.get( "code" );
+                   
+	               if(error != null && !error.equals("0")) {//Zillow is returning 0 for successfull profile
+	            	   return CommonConstants.ZILLOW_PROFILE_ERROR;
+	               }
+               	
                    //update zillow count
                    profileManagementService.modifyZillowCallCount( map );
                    List<SurveyDetails> surveyDetailsList =  profileManagementService.buildSurveyDetailFromZillowAgentReviewMap( map );
                    organizationManagementService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings,
                             user.getCompany().getCompanyId() );
-                   
-                   Map<String, Object> messageRes = (HashMap<String, Object>) map.get( "message" );                   
-                   error = (String) messageRes.get( "code" );
-                   
                }
                 
-               	if(error != null && !error.equals("0")) {//Zillow is returning 0 for successfull profile
-               		return CommonConstants.ZILLOW_PROFILE_ERROR;
-               	}
+               
                	
                 int accountMasterId = accountType.getValue();
                 if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {

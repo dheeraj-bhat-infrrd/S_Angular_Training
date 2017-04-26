@@ -28,7 +28,7 @@
 											<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
 											<div class="zillow-input-cont">
 												<c:choose>
-													  <c:when test="${profile.vertical != 'Mortgage'}">
+													  <c:when test="${profile.vertical == 'Mortgage'}">
 													    <span>
 														    <spring:message code="label.zillowconnect.nmls.header.key" />
 															<input class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">
@@ -95,7 +95,7 @@
 											
 											<div>
 												<span><spring:message code="label.zillowconnect.screen.name.key"/></span>											
-												<input class="zillow-input zillowProfileName" name="zillowProfileNameForNmls" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
+												<input class="zillow-input zillowProfileName" name="zillowProfileNameForNoNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
 											</div>				
 											
 											<div class="zillow-exm-profile">

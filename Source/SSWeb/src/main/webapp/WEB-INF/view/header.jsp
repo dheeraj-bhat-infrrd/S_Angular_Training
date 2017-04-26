@@ -101,7 +101,7 @@
 							<!-- Populated by javascript -->
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper overlay">
+					<div class="float-left ol-btn-wrapper overlay-disconnect">
 						<div id="overlay-disconnect" class="ol-btn cursor-pointer">
 							<!-- Populated by javascript -->
 						</div>

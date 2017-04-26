@@ -6835,7 +6835,7 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 			}
 		});
 		if (!webAddressValid) {
-			alert("Invalid web address");
+			//alert("Invalid web address");
 			return false;
 		}
 		webAddresses = JSON.stringify(webAddresses);
@@ -8915,6 +8915,7 @@ function createEditProfileUrlPopup2(body) {
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
+
 function createZillowProfileUrlPopup(body) {
 	$('#overlay-text').html(body);
 	$('#main-container').show();
@@ -8927,44 +8928,53 @@ function createZillowProfileUrlPopup(body) {
 	$('#overlay-save').hide();
 	var profileType = $('#profileType').val();
 	//put condition for profileType
-	if(profileType != 'Mortgage') {
+	if(profileType == 'Mortgage') {
 		$('#overlay-continue').html("By Screen Name");
 		$('#overlay-continue').show();
+		
+		$('#overlay-next').html("Next");
+		$('#overlay-next').show();
+		
+		//$('#overlay-continue').off();
+		$('#overlay-continue').click(function() {
+			//saveZillowEmailAddress(profileType);
+			//by screen name
+			openNextScreenForZillowScreenName(profileType, "by-screen-name", null);
+		});
+		
+		$('#overlay-next').click(function() {
+			//show Screen non editable-name found by NMLS, Ok, Back, Cancle buttons 
+			var nmlsId = $('input[name="nmlsId"]').val();		
+			var formData = new FormData();
+			formData.append("nmlsId", nmlsId);		
+			openNextScreenForZillowScreenName(profileType, "next", nmlsId);
+		});
 	} else {
 		$('.overlay-next').hide();
 		$('.overlay-continue').hide();
 		$('.overlay-disconnect').hide();
-		$('.overlay-next').hide();
+		$('.overlay-change').hide();
 		
 		$('.overlay-save').show();
 		$('#overlay-save').html("Save");
 		$('#overlay-save').show();
+		
+		$('.overlay-cancel').show();
+		$('#overlay-cancel').html("Cancel");
+		$('#overlay-cancel').show();
+		
+		$('#overlay-save').click(function() {
+			$('#overlay-save').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			var zillowProfileName = $('input[name="zillowProfileName"]').val();
+			saveZillowProfile(profileType, zillowProfileName, "");
+			overlayRevert();
+		});
 	}
 	
-	//$('#overlay-continue').html("Submit");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-cancel').show();
-	$('#overlay-next').html("Next");
-	$('#overlay-next').show();
-	//$('#overlay-continue').off();
-	$('#overlay-continue').click(function() {
-		//$('#overlay-continue').unbind('click');
-		//$('#overlay-cancel').unbind('click');
-		//saveZillowEmailAddress(profileType);
-		//by screen name
-		openNextScreenForZillowScreenName(profileType, "by-screen-name", null);
-		//overlayRevert();
-	});
 	
-	$('#overlay-next').click(function() {
-		//show Screen non editable-name found by NMLS, Ok, Back, Cancle buttons 
-		var nmlsId = $('input[name="nmlsId"]').val();		
-		var formData = new FormData();
-		formData.append("nmlsId", nmlsId);		
-		openNextScreenForZillowScreenName(profileType, "next", nmlsId);
-		//overlayRevert();
-	});
-
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
@@ -10838,6 +10848,9 @@ function saveZillowProfile(profileType, zillowProfileName, nmls) {
 			loadSocialMediaUrlInPopup();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
+		} else if(data && data == "zillow-error"){
+			$('#overlay-toast').text("Invalid Zillow profile");
+			showToast();
 		} else {
 			$('#overlay-toast').text("Some problem occurred while saving zillow");
 			showToast();
@@ -10850,6 +10863,7 @@ function saveZillowEmailAddress(profileType) {
 	if (!validateZillowForm(profileType)) {
 		return false;
 	}
+
 	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
 		if (data && data == "success") {
 			showProfileLinkInEditProfilePage("zillow", $('input[name="zillowProfileName"]').val());
@@ -10857,12 +10871,12 @@ function saveZillowEmailAddress(profileType) {
 			loadSocialMediaUrlInPopup();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
-		/*} else if(data && data == "zillow-error"){
+		} else if(data && data == "zillow-error"){
 			$('#overlay-toast').text("Invalid Zillow profile");
 			showToast();
 		} else if(data && data == "zillow-nmls-required-error"){
 			$('#overlay-toast').text("NMLS is required");
-			showToast(); */
+			showToast();
 		} else {
 			$('#overlay-toast').text("Some problem occurred while saving zillow");
 			showToast();
@@ -10935,7 +10949,9 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				$('#overlay-save').click(function() {
 					$('#overlay-save').unbind('click');
 					$('#overlay-cancel').unbind('click');
-					saveZillowEmailAddress(profileType);
+					//saveZillowEmailAddress(profileType);
+					var nmls = $('input[name="nmlsId"]').val();	
+					saveZillowProfile(profileType, zillowScreenName, nmls);
 					overlayRevert();
 				});
 			}
@@ -10964,8 +10980,9 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 			$('#overlay-cancel').unbind('click');
 			$('#overlay-disconnect').unbind('click');
 			$('input[name="nmlsId"]').val("");
-			var zillowProfileName = $('input[name="zillowProfileNameForNmls"]').val();
-			saveZillowProfile(profileType, zillowProfileName, "");
+			var zillowProfileName = $('input[name="zillowProfileNameForNoNMLS"]').val();
+			//saveZillowEmailAddress(profileType);
+			saveZillowProfile(profileType, zillowProfileName, "") ;
 			overlayRevert();
 		});
 	}
@@ -10980,6 +10997,7 @@ function validateZillowForm(profileType) {
 			showToast();
 			return false;
 		}
+		return true;
 	} else {
 		var nmlsId = $('input[name="nmlsId"]').val();
 		if (nmlsId != undefined || nmlsId != "") {
