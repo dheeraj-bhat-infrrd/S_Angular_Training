@@ -1411,8 +1411,13 @@ span.footer-ul a:hover {
 	margin-left: -4%;
 }
 .popupUrl{
-	width:438px;
+		width:438px;
 }
+
+.popupUrl-zillow{
+	width:65% !important;
+}
+
 .urlPopupButton{
 	width: 335px;
 	margin-left: 60px;

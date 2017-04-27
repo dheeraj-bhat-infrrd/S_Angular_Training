@@ -81,36 +81,36 @@
 					<!-- Populated by javascript -->
 				</div>
 				<div class="clearfix">
-					<div class="float-left ol-btn-wrapper overlay-cancel">
+					<div class="float-left ol-btn-wrapper">
 						<div id="overlay-cancel" class="ol-btn cursor-pointer">
 							<!-- Populated by javascript -->
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper overlay-continue">
+					<div class="float-left ol-btn-wrapper">
 						<div id="overlay-continue" class="ol-btn cursor-pointer">
 							<!-- Populated by javascript -->
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper overlay-next">
+					<!-- <div class="float-left ol-btn-wrapper">
 						<div id="overlay-next" class="ol-btn cursor-pointer">
-							<!-- Populated by javascript -->
+							
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper overlay-change">
+					<div class="float-left ol-btn-wrapper">
 						<div id="overlay-change" class="ol-btn cursor-pointer">
-							<!-- Populated by javascript -->
+							
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper overlay-disconnect">
+					<div class="float-left ol-btn-wrapper">
 						<div id="overlay-disconnect" class="ol-btn cursor-pointer">
-							<!-- Populated by javascript -->
+							
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper overlay-save">
+					<div class="float-left ol-btn-wrapper">
 						<div id="overlay-save" class="ol-btn cursor-pointer">
-							<!-- Populated by javascript -->
+							
 						</div>
-					</div>
+					</div> -->
 				</div>
 			</div>
 		</div>

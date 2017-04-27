@@ -6974,6 +6974,8 @@ function overlayRevert() {
 
 	enableBodyScroll();
 	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
+
+	$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
 }
 
 // Update Basic detail
@@ -8917,71 +8919,81 @@ function createEditProfileUrlPopup2(body) {
 }
 
 function createZillowProfileUrlPopup(body) {
+	//.popupUrl-zillow
+	//.overlay-disable-wrapper-zillow 
+	$("#overlay-pop-up").addClass("overlay-disable-wrapper-zillow");
 	$('#overlay-text').html(body);
 	$('#main-container').show();
+	$('#overlay-header').hide();
 	$('#screen-name-found-container').hide();
 	$('#no-screen-name-container').hide();
 	$('#by-screen-name-container').hide();
 	
-	$('.overlay-change').hide();
-	$('.overlay-disconnect').hide();
-	$('.overlay-change').hide();
-	$('.overlay-save').hide();
+	/*$('.overlay-change').hide();
+	$('.overlay-disconnect').hide();*/
+	$('#overlay-cancel').html('');
+	$('#overlay-continue').html('');
 	var profileType = $('#profileType').val();
 	//put condition for profileType
 	if(profileType == 'Mortgage') {
-		$('#overlay-continue').html("By Screen Name");
-		$('#overlay-continue').show();
-		$('.overlay-continue').show();
 		
-		$('#overlay-next').html("Next");
-		$('#overlay-next').show();
-		$('.overlay-next').show();
+		$('#overlay-continue-zillow').html("By Screen Name");
+		$('#overlay-continue-zillow').show();
+		$('.overlay-continue-zillow').show();
 		
-		$('.overlay-change').hide();
-		$('.overlay-disconnect').hide();
-		$('.overlay-save').hide();
+		$('#overlay-next-zillow').html("Next");
+		$('#overlay-next-zillow').show();
+		$('.overlay-next-zillow').show();
+		
+		$('#overlay-cancel-zillow').html("Cancel");
+		$('#overlay-cancel-zillow').show();
+		$('.overlay-cancel-zillow').show();
 		
 		//$('#overlay-continue').off();
-		$('#overlay-continue').click(function() {
-			//saveZillowEmailAddress(profileType);
+		$('#overlay-continue-zillow').click(function() {
 			//by screen name
 			openNextScreenForZillowScreenName(profileType, "by-screen-name", null);
 		});
 		
-		$('#overlay-next').click(function() {
+		$('#overlay-next-zillow').click(function() {
 			//show Screen non editable-name found by NMLS, Ok, Back, Cancle buttons 
 			var nmlsId = $('input[name="nmlsId"]').val();		
 			var formData = new FormData();
 			formData.append("nmlsId", nmlsId);		
 			openNextScreenForZillowScreenName(profileType, "next", nmlsId);
 		});
-	} else {
-		$('.overlay-next').hide();
+	} else { // non-mortgage
+		/*$('.overlay-next').hide();
 		$('.overlay-continue').hide();
 		$('.overlay-disconnect').hide();
-		$('.overlay-change').hide();
+		$('.overlay-change').hide();*/
 		
-		$('.overlay-save').show();
-		$('#overlay-save').html("Save");
-		$('#overlay-save').show();
+		$('.overlay-save-zillow').show();
+		$('#overlay-save-zillow').html("Save");
+		$('#overlay-save-zillow').show();
 		
-		$('.overlay-cancel').show();
-		$('#overlay-cancel').html("Cancel");
-		$('#overlay-cancel').show();
+		$('.overlay-cancel-zillow').show();
+		$('#overlay-cancel-zillow').html("Cancel");
+		$('#overlay-cancel-zillow').show();
 		
-		$('#overlay-save').click(function() {
-			$('#overlay-save').unbind('click');
-			$('#overlay-cancel').unbind('click');
+		$('#overlay-save-zillow').click(function() {
+			$('#overlay-save-zillow').unbind('click');
+			$('#overlay-cancel-zillow').unbind('click');
 			var zillowProfileName = $('input[name="zillowProfileName"]').val();
 			saveZillowProfile(profileType, zillowProfileName, "");
+			$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");//?????
 			overlayRevert();
 		});
 	}
 	
-	$('#overlay-cancel').html("Cancel");
+	/*$('#overlay-cancel').html("Cancel");
 	$('#overlay-cancel').show();
-	$('.overlay-cancel').show();
+	$('.overlay-cancel').show();*/
+	
+	$('#overlay-cancel-zillow').click(function(){
+		overlayRevert();
+		$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
+	});
 	
 	$('#overlay-main').show();
 	disableBodyScroll();
@@ -10913,22 +10925,24 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				$('#by-screen-name-container').hide();
 				$('#no-screen-name-container').show();
 				
-				$('.overlay-next').hide();
+				//$('input[name="zillowProfileNameNoScreenForNMLS"]').val("");//clearing
+				
+				/*$('.overlay-next').hide();
 				$('.overlay-continue').hide();
 				$('.overlay-change').hide();
-				$('.overlay-cancel').hide();
+				$('.overlay-cancel').hide();*/
 				
-				$('#overlay-save').html("Save");
+				/*$('#overlay-save-noscreen').html("Save");
 				$('#overlay-save').show();
 				$('.overlay-save').show();
 				$('#overlay-disconnect').html("Disconnect Zillow");
 				$('#overlay-disconnect').show();
-				$('.overlay-disconnect').show();
+				$('.overlay-disconnect').show();*/
 				
-				$('#overlay-save').click(function() {
-					$('#overlay-save').unbind('click');
-					$('#overlay-cancel').unbind('click');
-					$('#overlay-disconnect').unbind('click');
+				$('#overlay-save-noscreen').click(function() {
+					$('#overlay-save-noscreen').unbind('click');
+					$('#overlay-cancel-noscreen').unbind('click');
+					$('#overlay-disconnect-noscreen').unbind('click');
 					var nmls = $('input[name="nmlsId"]').val();					
 					var zillowProfileName = $('input[name="zillowProfileNameNoScreenForNMLS"]').val();
 					if (zillowProfileName == undefined || zillowProfileName == "") {
@@ -10937,6 +10951,10 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 						return false;
 					}
 					saveZillowProfile(profileType, zillowProfileName, nmls);
+					overlayRevert();
+				});
+				
+				$('#overlay-cancel-noscreen').click(function() {
 					overlayRevert();
 				});
 			} else {//if screen name is found by nmls
@@ -10949,45 +10967,50 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				$('#main-container').hide();
 				$('#screen-name-found-container').show();
 				
-				$('.overlay-next').hide();
+				/*$('.overlay-next').hide();
 				$('.overlay-cancel').hide();
-				$('.overlay-continue').hide();
-				$('#overlay-change').html("Change NMLS#");
-				$('#overlay-change').show();
-				$('.overlay-change').show();
-				$('#overlay-disconnect').html("Disconnect Zillow");
-				$('#overlay-disconnect').show();
-				$('.overlay-disconnect').show();
-				$('#overlay-save').html("Yes, that's me");
-				$('#overlay-save').show();
-				$('.overlay-save').show();
+				$('.overlay-continue').hide();*/
+				$('#overlay-change-zillow').html("Change NMLS#");
+				$('#overlay-change-zillow').show();
+				$('.overlay-change-zillow').show();
+				$('#overlay-disconnect-zillow').html("Disconnect Zillow");
+				$('#overlay-disconnect-zillow').show();
+				$('.overlay-disconnect-zillow').show();
+				$('#overlay-save-zillow-byscreen').html("Yes, that's me");
+				$('#overlay-save-zillow-byscreen').show();
+				$('.overlay-save-zillow-byscreen').show();
 				
-				$('#overlay-save').click(function() {
-					$('#overlay-save').unbind('click');
-					$('#overlay-cancel').unbind('click');
-					//saveZillowEmailAddress(profileType);
+				$('#overlay-save-zillow-byscreen').click(function() {
+					$('#overlay-save-zillow-byscreen').unbind('click');
+					//$('#overlay-cancel').unbind('click');
 					var nmls = $('input[name="nmlsId"]').val();	
 					saveZillowProfile(profileType, zillowScreenName, nmls);
 					overlayRevert();
 				});
 				
-				$('#overlay-change').click(function() {
-					$('#overlay-cancel').show();
-					$('.overlay-cancel').show();
-					$('#overlay-continue').html("By Screen Name");
-					$('#overlay-continue').show();
-					$('.overlay-continue').show();
+				$('#overlay-change-zillow').click(function() {
+					$('#overlay-cancel-zillow').html("Cancel");
+					$('#overlay-cancel-zillow').show();
+					$('.overlay-cancel-zillow').show();
 					
-					$('#overlay-next').html("Next");
-					$('#overlay-next').show();
-					$('.overlay-next').show();
+					$('#overlay-continue-zillow').html("By Screen Name");
+					$('#overlay-continue-zillow').show();
+					$('.overlay-continue-zillow').show();
 					
-					$('.overlay-change').hide();
-					$('.overlay-disconnect').hide();
-					$('.overlay-save').hide();
+					$('#overlay-next-zillow').html("Next");
+					$('#overlay-next-zillow').show();
+					$('.overlay-next-zillow').show();
+					
+					$('.overlay-change-zillow').hide();
+					$('.overlay-disconnect-zillow').hide();
+					$('.overlay-save-zillow').hide();
 					
 					$('#main-container').show();
 					$('#screen-name-found-container').hide();
+					
+					$('#overlay-cancel-zillow').click(function() {
+						overlayRevert();
+					});
 				});				
 			}
 		}, "zillowForm");
@@ -10999,28 +11022,32 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 		$('#no-screen-name-container').hide();
 		$('#by-screen-name-container').show();
 		
-		$('.overlay-next').hide();		
+		/*$('.overlay-next').hide();		
 		$('.overlay-change').hide();		
-		$('.overlay-continue').hide();
+		$('.overlay-continue').hide();*/
 		
-		$('#overlay-disconnect').html("Disconnect Zillow");
-		$('#overlay-disconnect').show();
-		$('.overlay-disconnect').show();
-		$('#overlay-cancel').html("Cancel");
-		$('#overlay-cancel').show();
-		$('.overlay-cancel').show();
-		$('#overlay-save').html("Save");
-		$('#overlay-save').show();
-		$('.overlay-save').show();
+		/*$('#overlay-disconnect-zillow-byscreen-name').html("Disconnect Zillow");
+		$('#overlay-disconnect-zillow-byscreen-name').show();
+		$('.overlay-disconnect-zillow-byscreen-name').show();
+		$('#overlay-cancel-zillow').html("Cancel");
+		$('#overlay-cancel-zillow').show();
+		$('.overlay-cancel-zillow').show();
+		$('#overlay-save-zillow-byscreen').html("Save");
+		$('#overlay-save-zillow-byscreen').show();
+		$('.overlay-save-zillow-byscreen').show();*/
 		
-		$('#overlay-save').click(function() {
-			$('#overlay-save').unbind('click');
-			$('#overlay-cancel').unbind('click');
-			$('#overlay-disconnect').unbind('click');
+		$('#overlay-save-zillow-byscreen-name').click(function() {
+			$('#overlay-save-zillow-byscreen-name').unbind('click');
+			$('#overlay-cancel-zillow-byscreen-name').unbind('click');
+			$('#overlay-disconnect-zillow-byscreen-name').unbind('click');
 			$('input[name="nmlsId"]').val("");
 			var zillowProfileName = $('input[name="zillowProfileNameForNoNMLS"]').val();
 			//saveZillowEmailAddress(profileType);
 			saveZillowProfile(profileType, zillowProfileName, "") ;
+			overlayRevert();
+		});
+		
+		$('#overlay-cancel-zillow-byscreen-name').click(function() {
 			overlayRevert();
 		});
 	}
