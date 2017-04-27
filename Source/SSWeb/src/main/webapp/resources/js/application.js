@@ -8922,18 +8922,25 @@ function createZillowProfileUrlPopup(body) {
 	$('#screen-name-found-container').hide();
 	$('#no-screen-name-container').hide();
 	$('#by-screen-name-container').hide();
-	$('#overlay-change').hide();
-	$('#overlay-disconnect').hide();
-	$('#overlay-change').hide();
-	$('#overlay-save').hide();
+	
+	$('.overlay-change').hide();
+	$('.overlay-disconnect').hide();
+	$('.overlay-change').hide();
+	$('.overlay-save').hide();
 	var profileType = $('#profileType').val();
 	//put condition for profileType
 	if(profileType == 'Mortgage') {
 		$('#overlay-continue').html("By Screen Name");
 		$('#overlay-continue').show();
+		$('.overlay-continue').show();
 		
 		$('#overlay-next').html("Next");
 		$('#overlay-next').show();
+		$('.overlay-next').show();
+		
+		$('.overlay-change').hide();
+		$('.overlay-disconnect').hide();
+		$('.overlay-save').hide();
 		
 		//$('#overlay-continue').off();
 		$('#overlay-continue').click(function() {
@@ -8974,6 +8981,7 @@ function createZillowProfileUrlPopup(body) {
 	
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-cancel').show();
+	$('.overlay-cancel').show();
 	
 	$('#overlay-main').show();
 	disableBodyScroll();
@@ -10905,12 +10913,17 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				$('#by-screen-name-container').hide();
 				$('#no-screen-name-container').show();
 				
-				$('#overlay-next').hide();
-				$('#overlay-continue').hide();
+				$('.overlay-next').hide();
+				$('.overlay-continue').hide();
+				$('.overlay-change').hide();
+				$('.overlay-cancel').hide();
+				
 				$('#overlay-save').html("Save");
 				$('#overlay-save').show();
+				$('.overlay-save').show();
 				$('#overlay-disconnect').html("Disconnect Zillow");
 				$('#overlay-disconnect').show();
+				$('.overlay-disconnect').show();
 				
 				$('#overlay-save').click(function() {
 					$('#overlay-save').unbind('click');
@@ -10936,15 +10949,18 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				$('#main-container').hide();
 				$('#screen-name-found-container').show();
 				
-				$('#overlay-next').hide();
-				$('#overlay-cancel').hide();
-				$('#overlay-continue').hide();
+				$('.overlay-next').hide();
+				$('.overlay-cancel').hide();
+				$('.overlay-continue').hide();
 				$('#overlay-change').html("Change NMLS#");
 				$('#overlay-change').show();
+				$('.overlay-change').show();
 				$('#overlay-disconnect').html("Disconnect Zillow");
 				$('#overlay-disconnect').show();
+				$('.overlay-disconnect').show();
 				$('#overlay-save').html("Yes, that's me");
 				$('#overlay-save').show();
+				$('.overlay-save').show();
 				
 				$('#overlay-save').click(function() {
 					$('#overlay-save').unbind('click');
@@ -10954,6 +10970,25 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 					saveZillowProfile(profileType, zillowScreenName, nmls);
 					overlayRevert();
 				});
+				
+				$('#overlay-change').click(function() {
+					$('#overlay-cancel').show();
+					$('.overlay-cancel').show();
+					$('#overlay-continue').html("By Screen Name");
+					$('#overlay-continue').show();
+					$('.overlay-continue').show();
+					
+					$('#overlay-next').html("Next");
+					$('#overlay-next').show();
+					$('.overlay-next').show();
+					
+					$('.overlay-change').hide();
+					$('.overlay-disconnect').hide();
+					$('.overlay-save').hide();
+					
+					$('#main-container').show();
+					$('#screen-name-found-container').hide();
+				});				
 			}
 		}, "zillowForm");
 	}
@@ -10964,16 +10999,19 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 		$('#no-screen-name-container').hide();
 		$('#by-screen-name-container').show();
 		
-		$('#overlay-next').hide();		
-		$('#overlay-change').hide();		
-		$('#overlay-continue').hide();
+		$('.overlay-next').hide();		
+		$('.overlay-change').hide();		
+		$('.overlay-continue').hide();
 		
 		$('#overlay-disconnect').html("Disconnect Zillow");
 		$('#overlay-disconnect').show();
+		$('.overlay-disconnect').show();
 		$('#overlay-cancel').html("Cancel");
 		$('#overlay-cancel').show();
+		$('.overlay-cancel').show();
 		$('#overlay-save').html("Save");
 		$('#overlay-save').show();
+		$('.overlay-save').show();
 		
 		$('#overlay-save').click(function() {
 			$('#overlay-save').unbind('click');
