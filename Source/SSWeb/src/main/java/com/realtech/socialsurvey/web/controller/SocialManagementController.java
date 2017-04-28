@@ -2255,6 +2255,122 @@ public class SocialManagementController
         LOG.info( "Method getProfileUrl() finished from SocialManagementController" );
         return profileUrl;
     }
+    
+    /**
+     * Disconnect Zillow either with or without deleting Zillow reviews
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/disconnectZillow", method = RequestMethod.POST)
+    public String disconnectZillow( HttpServletRequest request )
+    {
+        String socialMedia =  CommonConstants.ZILLOW_SOCIAL_SITE;
+        //String removeFeedStr = request.getParameter( "removeFeed" );
+        String keepOrDeleteReview = request.getParameter( "keepOrDeleteReview" );
+        boolean removeFeed = true;
+        
+        HttpSession session = request.getSession();
+        OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+            .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
+        SocialMediaTokens mediaTokens = null;
+        try {
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            if ( userSettings == null || entityType == null ) {
+                throw new InvalidInputException( "No user settings found in session" );
+            }
+            if ( socialMedia == null || socialMedia.isEmpty() ) {
+                throw new InvalidInputException( "Social media can not be null or empty" );
+            }
+            
+            SettingsForApplication settings = SettingsForApplication.ZILLOW;
+            boolean isZillow = false;
+            boolean unset = CommonConstants.UNSET_SETTINGS;
+            
+            // Check for the collection to update
+            OrganizationUnitSettings unitSettings = null;
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
+                mediaTokens = unitSettings.getSocialMediaTokens();
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                userSettings.setCompanySettings( unitSettings );
+                //update SETTINGS_SET_STATUS to unset in COMPANY table
+                Company company = userManagementService.getCompanyById( entityId );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, settings, unset );
+                    // Commented as Zillow reviews are saved in Social Survey database, SS-307
+                    // Set IS_ZILLOW_CONNECTED to false
+                    // if ( isZillow ) {
+                    //    company.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                    //    company.setZillowAverageScore( 0.0 );
+                    //    company.setZillowReviewCount( 0 );
+                    // }
+                    userManagementService.updateCompany( company );
+                }
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+                mediaTokens = unitSettings.getSocialMediaTokens();
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
+                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                userSettings.getRegionSettings().put( entityId, unitSettings );
+                //update SETTINGS_SET_STATUS to unset in REGION table
+                Region region = userManagementService.getRegionById( entityId );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, settings, unset );
+                    // Set IS_ZILLOW_CONNECTED to false
+                    // if ( isZillow ) {
+                    //    region.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                    //    region.setZillowAverageScore( 0.0 );
+                    //    region.setZillowReviewCount( 0 );
+                    // }
+                    userManagementService.updateRegion( region );
+                }
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                mediaTokens = unitSettings.getSocialMediaTokens();
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
+                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                userSettings.getBranchSettings().put( entityId, unitSettings );
+                //update SETTINGS_SET_STATUS to unset in BRANCH table
+                Branch branch = userManagementService.getBranchById( entityId );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, settings, unset );
+                    // Set IS_ZILLOW_CONNECTED to false
+                    // if ( isZillow ) {
+                    //    branch.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                    //    branch.setZillowAverageScore( 0.0 );
+                    //    branch.setZillowReviewCount( 0 );
+                    // }
+                    userManagementService.updateBranch( branch );
+                }
+            }
+            if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                unitSettings = userManagementService.getUserSettings( entityId );
+                mediaTokens = unitSettings.getSocialMediaTokens();
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                userSettings.setAgentSettings( (AgentSettings) unitSettings );
+            }
+            profileSettings.setSocialMediaTokens( unitSettings.getSocialMediaTokens() );
+
+            // Remove zillow reviews on disconnect.
+            if ( socialMedia.equals( CommonConstants.ZILLOW_SOCIAL_SITE ) && keepOrDeleteReview != null && keepOrDeleteReview.equals( "delete-review" )) {//and is to delete reviews
+                LOG.debug( "Deleting zillow feed for agent ID : " + entityId );
+                surveyHandler.deleteExistingZillowSurveysByEntity( entityType, entityId );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "Exception occured in disconnectSocialNetwork() while disconnecting with the social Media. Reason : ",
+                e );
+            return "failue";
+        }
+
+        session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
+        return "success";
+    }
 
 
     @ResponseBody

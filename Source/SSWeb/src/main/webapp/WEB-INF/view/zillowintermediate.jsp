@@ -68,6 +68,7 @@
 														  	<span><spring:message code="label.zillowconnect.link.key"/></span>
 															<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
 															<span>/</span>
+															<a href="#" class="help-link" title="Help">?</a>
 														</div>
 														<div>
 															<div class="float-left ol-btn-wrapper overlay-cancel-zillow">
@@ -125,7 +126,8 @@
 												
 												<div>
 													<span><spring:message code="label.zillowconnect.screen.name.key"/></span>											
-													<input class="zillow-input zillowProfileName" name="zillowProfileNameNoScreenForNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
+													<input class="zillow-input zillowProfileName" name="zillowProfileNameNoScreenForNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">	
+													<a href="#" class="help-link" title="Help">?</a>											
 												</div>							
 												
 												<div class="zillow-exm-profile">
@@ -167,6 +169,7 @@
 												<div>
 													<span><spring:message code="label.zillowconnect.screen.name.key"/></span>											
 													<input class="zillow-input zillowProfileName" name="zillowProfileNameForNoNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
+													<a href="#" class="help-link" title="Help">?</a>
 												</div>				
 												
 												<div class="zillow-exm-profile">
@@ -198,6 +201,36 @@
 											</div>
 										</div>
 									</div>
+									<div id="disconnect-zillow-container">
+										<div class="zillow-input-container clearfix popupUrl-zillow">
+											<div>
+												<div>- Disconnect Zillow Profile -</div>
+												<div>Disconnecting will prevent us from fetching any new reviews from Zillow and will remove the Zillow Profile link from your SocialSurvey public page.</div>
+											</div>
+											<div>
+												<div class="float-left ol-btn-wrapper overlay-cancel-disconnect-zillow" style="width: 30% !important;">
+													<div id="overlay-cancel-disconnect-zillow" class="ol-btn cursor-pointer">
+														Cancel
+													</div>
+												</div>
+												<div class="float-left ol-btn-wrapper overlay-keepreview-disconnect-zillow" style="width: 30% !important;">
+													<div id="overlay-keepreview-disconnect-zillow" class="ol-btn cursor-pointer">
+														Keep Zillow Reviews
+													</div>
+												</div>
+												
+												<div class="float-left ol-btn-wrapper overlay-deletereview-disconnect-zillow" style="width: 30% !important;">
+													<div id="overlay-deletereview-disconnect-zillow" class="ol-btn cursor-pointer">
+														Delete Zillow Reviews
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div id="zillow-help-container">
+										<div class="zillow-input-container clearfix popupUrl-zillow">
+										</div>
+									</div>
 								</form>
 								
 							</div>
@@ -213,7 +246,7 @@
 
 <script>
 $( document ).ready(function() {     
-    $('.icn-realtor, .icn-lendingtree, .icn-yelp, .icn-gplus, .icn-google-business, .icn-lin, .icn-twit, .icn-fb').on('click', function(event) {
+    $('.icn-realtor, .icn-lendingtree, .icn-yelp, .icn-gplus, .icn-google-business, .icn-lin, .icn-twit, .icn-fb, .icn-wide-gplus, .icn-wide-linkedin, .icn-wide-twitter, .icn-wide-fb').on('click', function(event) {
     	$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
     });
     
