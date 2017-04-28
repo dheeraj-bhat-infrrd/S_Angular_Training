@@ -139,8 +139,10 @@
 													<a href="#" class="help-link" title="Help">?</a>											
 												</div>							
 												
-												<div class="zillow-exm-profile popup-padding-bottom">
-													<span><spring:message code="label.zillow.exampleprofilename.sample.key" /></span>
+												<div class="popup-padding-bottom">
+													<div class="popup-padding-bottom">
+														<span><spring:message code="label.zillow.exampleprofilename.sample.key" /></span>
+													</div>
 													<div>
 														<span class="zillow-exm-profilename">
 															<spring:message code="label.zillowconnect.link.key" /><span class="zillowProfileNameSpan">${ profile.socialMediaTokens.zillowToken.zillowScreenName }</span>
@@ -185,10 +187,12 @@
 												</div>				
 												
 												<div class="zillow-exm-profile popup-padding-bottom">
-													<span><spring:message code="label.zillow.exampleprofilename.sample.key" /></span> <br/>
-													<span class="zillow-exm-profilename">
+													<div class="popup-padding-bottom">
+														<span><spring:message code="label.zillow.exampleprofilename.sample.key" /></span>
+													</div>
+													<div>
 														<spring:message code="label.zillowconnect.link.key" /><span class="zillowProfileNameSpan">${ profile.socialMediaTokens.zillowToken.zillowScreenName }</span>
-													</span>
+													</div>
 												</div>
 												<div class="popup-padding-bottom">* You can find your screen name while logged into Zillow by hovering over "My Zillow" and clicking the "Profile" button. 
 													Once you're on your profile, click on "Edit your profile" then you will be directed to the page where you can view and edit your "Screen name."

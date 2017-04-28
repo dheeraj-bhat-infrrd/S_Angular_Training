@@ -2355,7 +2355,9 @@ public class SocialManagementController
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 userSettings.setAgentSettings( (AgentSettings) unitSettings );
             }
-            profileSettings.setSocialMediaTokens( unitSettings.getSocialMediaTokens() );
+            if(profileSettings != null) {
+                profileSettings.setSocialMediaTokens( unitSettings.getSocialMediaTokens() );
+            }
 
             // Remove zillow reviews on disconnect.
             if ( socialMedia.equals( CommonConstants.ZILLOW_SOCIAL_SITE ) && keepOrDeleteReview != null && keepOrDeleteReview.equals( "delete-review" )) {//and is to delete reviews
