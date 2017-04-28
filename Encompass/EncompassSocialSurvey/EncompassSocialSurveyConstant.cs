@@ -73,6 +73,10 @@ namespace EncompassSocialSurvey
 
         public const string fetchCompaniesUrlParameterStateDryRun = "dryrun";
 
+        public const string fetchCompaniesUrlParameterVersion = "version";
+
+        public const string ENCOMPASS_VERSION = "encompass_version";
+ 
 
         public static string GetAppSettingsValue(string key)
         {

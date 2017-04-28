@@ -54,8 +54,10 @@ public class UrlGeneratorImpl implements URLGenerator {
 			plainText.append(key);
 			plainText.append("=");
 			try {
-				//URL encoading is required to support &,= and other chars
-				plainText.append(URLEncoder.encode(params.get(key), "UTF-8"));
+				if(params.get(key) != null) {
+					//URL encoading is required to support &,= and other chars
+					plainText.append(URLEncoder.encode(params.get(key), "UTF-8"));
+				}
 			} catch (UnsupportedEncodingException e) {
 				throw new InvalidInputException();
 			}
@@ -175,8 +177,10 @@ public class UrlGeneratorImpl implements URLGenerator {
 			
 			if(keyValuePair.length == 2){
 				try {
-					//URL decode required before adding to param which may save data in Mongo
-					params.put(keyValuePair[0], URLDecoder.decode(keyValuePair[1], "UTF-8"));
+					if(keyValuePair[1] != null) {
+						//URL decode required before adding to param which may save data in Mongo
+						params.put(keyValuePair[0], URLDecoder.decode(keyValuePair[1], "UTF-8"));
+					}
 				} catch (UnsupportedEncodingException e) {
 					throw new InvalidInputException();
 				}
