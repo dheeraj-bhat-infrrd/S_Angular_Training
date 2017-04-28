@@ -10953,9 +10953,6 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				//$('input[name="zillowProfileNameNoScreenForNMLS"]').val("");//clearing
 				
 				$('#overlay-save-noscreen').click(function() {
-					$('#overlay-save-noscreen').unbind('click');
-					$('#overlay-cancel-noscreen').unbind('click');
-					$('#overlay-disconnect-noscreen').unbind('click');
 					var nmls = $('input[name="nmlsId"]').val();					
 					var zillowProfileName = $('input[name="zillowProfileNameNoScreenForNMLS"]').val();
 					if (zillowProfileName == undefined || zillowProfileName == "") {
@@ -11031,7 +11028,7 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				});
 				
 				$('#overlay-save-zillow-byscreen').click(function() {
-					$('#overlay-save-zillow-byscreen').unbind('click');
+					//$('#overlay-save-zillow-byscreen').unbind('click');
 					//$('#overlay-cancel').unbind('click');
 					var nmls = $('input[name="nmlsId"]').val();	
 					saveZillowProfile(profileType, zillowScreenName, nmls);
@@ -11075,9 +11072,9 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 		$('#by-screen-name-container').show();
 		
 		$('#overlay-save-zillow-byscreen-name').click(function() {
-			$('#overlay-save-zillow-byscreen-name').unbind('click');
-			$('#overlay-cancel-zillow-byscreen-name').unbind('click');
-			$('#overlay-disconnect-zillow-byscreen-name').unbind('click');
+			//$('#overlay-save-zillow-byscreen-name').unbind('click');
+			//$('#overlay-cancel-zillow-byscreen-name').unbind('click');
+			//$('#overlay-disconnect-zillow-byscreen-name').unbind('click');
 			$('input[name="nmlsId"]').val("");
 			var zillowProfileName = $('input[name="zillowProfileNameForNoNMLS"]').val();
 			saveZillowProfile(profileType, zillowProfileName, "") ;

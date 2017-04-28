@@ -177,7 +177,7 @@
 											<div>
 												<div class="popup-header">- Zillow Lending Profile Connection -</div>
 												<div class="popup-padding-bottom">
-													<span><spring:message code="label.zillowconnect.by.screen.name.key"/></span>
+													<span><spring:message code="label.zillowconnect.by.screen.name.only.key"/></span>
 												</div>
 												
 												<div class="popup-padding-bottom">
