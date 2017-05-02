@@ -12,34 +12,31 @@
 	</c:if>
 </c:if>
 
-<div class=" padding-001 ">
-	<div class="container login-container">
-		<div class="row login-row">
-			
-			<div class=" padding-001 margin-top-25 margin-bottom-25 bg-fff margin-0-auto col-xs-12 col-md-12 col-sm-12 col-lg-12">
-			<div class="text-center font-24">
-					<div style="padding: 0px 20px;" class="clearfix">
-						<div style="margin-bottom: 10px; font-size: 13px; text-align: center; padding: 0px 10px;">
-							<div>
+
+							
 								<form id="zillowForm">
 									<input type="hidden" id="profileType" value="${profile.vertical}" ></input>
 									<div id="main-container" class="non-zillow-help-container">
-			 							<div class="zillow-input-container clearfix popupUrl-zillow">
+			 							<div class="zillow-input-container clearfix">
 											<div class="zillow-input-cont">
 												<c:choose>
 													  <c:when test="${profile.vertical == 'Mortgage'}">
-													  	<div class="popup-header">- Zillow Lending Profile Connection -</div>
-													  	<div class="popup-padding-bottom">
-													  		<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>	
-													  	</div>
-													    <div class="popup-padding-bottom">
-														    <span>
-															    <spring:message code="label.zillowconnect.nmls.header.key"/>
-																<input class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">
-																<a href="#" class="help-link" title="Help"></a>
-															</span>
+													  	<div class="welcome-popup-hdr-wrapper clearfix">
+																<div class="float-left wc-hdr-txt">Zillow Lending Profile Lookup</div>
+																<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
 														</div>
-														
+														<div class="welcome-popup-body-wrapper popup-body clearfix">
+														  	<div class="popup-padding-bottom">
+														  		<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>	
+														  	</div>
+														    <div class="popup-padding-bottom">
+															    <span>
+																    <spring:message code="label.zillowconnect.nmls.header.key"/>
+																	<input class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">
+																	<a href="#" class="help-link" title="Help"></a>
+																</span>
+															</div>
+														</div>
 														<div>
 															<div class="float-left ol-btn-wrapper overlay-cancel-zillow" style="width: 30% !important;">
 																<div id="overlay-cancel-zillow" class="ol-btn cursor-pointer">
@@ -265,25 +262,23 @@
 									</div>
 								</form>
 								
-							</div>
-						</div>
-					</div>
-					<div style="font-size: 11px; text-align: center;"></div>
-				</div>
-				
-			</div>
-		</div>
-	</div>
-</div>
+						
+						
 
 <script>
 $( document ).ready(function() {     
-    $('.icn-realtor, .icn-lendingtree, .icn-yelp, .icn-gplus, .icn-google-business, .icn-lin, .icn-twit, .icn-fb, .icn-wide-gplus, .icn-wide-linkedin, .icn-wide-twitter, .icn-wide-fb').on('click', function(event) {
+    /*$('.icn-realtor, .icn-lendingtree, .icn-yelp, .icn-gplus, .icn-google-business, .icn-lin, .icn-twit, .icn-fb, .icn-wide-gplus, .icn-wide-linkedin, .icn-wide-twitter, .icn-wide-fb').on('click', function(event) {
     	$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
     });
     
     $('.icn-zillow').on('click', function(event) {
         $("#overlay-pop-up").addClass("overlay-disable-wrapper-zillow");
+    });*/
+    
+   
+    $('.zillow-popup-close-icn').on('click', function(event) {
+        $("#zillow-popup").hide();
+        overlayRevert();
     });
     
 });

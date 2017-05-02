@@ -266,6 +266,10 @@ $(document).on('click', function(e) {
 		$('#email-map-pop-up').hide();
 		enableBodyScroll();
 	}
+	if ($('#zillow-popup').is(':visible')) {
+		$('#zillow-popup').hide();
+		enableBodyScroll();
+	} 
 
 });
 
@@ -295,7 +299,10 @@ $(document).on('keyup', function(e) {
 			$('#email-map-pop-up').hide();
 			enableBodyScroll();
 		}
-
+		if ($('#zillow-popup').is(':visible')) {
+			$('#zillow-popup').hide();
+			enableBodyScroll();
+		}
 	}
 });
 
@@ -312,6 +319,9 @@ $(document).on('click', '#welcome-popup-invite', function(e) {
 	e.stopPropagation();
 });
 $(document).on('click', '#overlay-pop-up', function(e) {
+	e.stopPropagation();
+});
+$(document).on('click', '#zillow-popup-body', function(e) {
 	e.stopPropagation();
 });
 $(document).on('click', '.datepicker-months', function(e) {
@@ -465,7 +475,7 @@ function confirmUserReportAbuse(payload) {
 }
 
 $('body').click(function() {
-	$('#hr-dd-wrapper').slideUp(200);
+	$('#hr-dd-wrapper').slideUp(200);	
 });
 
 function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoOfAccount) {
@@ -8920,9 +8930,10 @@ function createEditProfileUrlPopup2(body) {
 
 function createZillowProfileUrlPopup(body) {
 	//.popupUrl-zillow
-	//.overlay-disable-wrapper-zillow 
-	$("#overlay-pop-up").addClass("overlay-disable-wrapper-zillow");
-	$('#overlay-text').html(body);
+	//.overlay-disable-wrapper-zillow 	
+	//$('#overlay-popup').html(body);
+	$('#zillow-popup-body').html(body);
+	//$("#zillow-popup").addClass("overlay-disable-wrapper-zillow");
 	$('#main-container').show();
 	$('#overlay-header').hide();
 	$('#screen-name-found-container').hide();
@@ -8976,7 +8987,7 @@ function createZillowProfileUrlPopup(body) {
 			$('#overlay-cancel-zillow').unbind('click');
 			var zillowProfileName = $('input[name="zillowProfileName"]').val();
 			saveZillowProfile(profileType, zillowProfileName, "");
-			$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");//?????
+			//$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");//?????
 			overlayRevert();
 		});
 	}
@@ -8987,7 +8998,8 @@ function createZillowProfileUrlPopup(body) {
 	
 	$('#overlay-cancel-zillow').click(function(){
 		overlayRevert();
-		$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
+		$('#zillow-popup').hide();
+		//$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
 	});
 	
 	$('.help-link').click(function(){
@@ -8996,18 +9008,18 @@ function createZillowProfileUrlPopup(body) {
 		
 		$('#overlay-contact-support').click(function(){
 			overlayRevert();
-			$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
+			//$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
 			//call help page
 			showMainContent('./showhelppage.do');	
 		});
 		
 		$('#overlay-contact-support-close').click(function(){
 			overlayRevert();
-			$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
+			//$("#zillow-popup").removeClass("overlay-disable-wrapper-zillow");
 		});
 	});
 	
-	$('#overlay-main').show();
+	$('#zillow-popup').show();
 	disableBodyScroll();
 }
 /*

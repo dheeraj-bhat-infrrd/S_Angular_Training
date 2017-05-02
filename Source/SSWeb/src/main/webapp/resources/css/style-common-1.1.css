@@ -751,6 +751,10 @@ input#find-pro-submit{
     padding: 10px 30px 15px 30px;
 }
 
+.zillow-popup-wrapper {
+	padding: 10px 30px 0 30px !important;
+}
+
 .welcome-popup-hdr-wrapper {
     height: 45px;
     line-height: 45px;
@@ -1431,6 +1435,12 @@ span.footer-ul a:hover {
 .urlPopupButton{
 	width: 335px;
 	margin-left: 60px;
+}
+
+.popup-body {
+	padding: 25px 25px 25px 25px !important;
+	padding-left: 15px !important;		
+	background: #F9F9FB !important;
 }
 
 /*changes for help page*/
