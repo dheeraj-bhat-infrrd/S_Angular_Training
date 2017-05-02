@@ -34,9 +34,9 @@
 													  	</div>
 													    <div class="popup-padding-bottom">
 														    <span>
-															    <spring:message code="label.zillowconnect.nmls.header.key" />
+															    <spring:message code="label.zillowconnect.nmls.header.key"/>
 																<input class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">
-																<a href="#" class="help-link" title="Help">?</a>
+																<a href="#" class="help-link" title="Help"></a>
 															</span>
 														</div>
 														
@@ -74,7 +74,7 @@
 															  	<span><spring:message code="label.zillowconnect.link.key"/></span>
 																<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
 																<span>/</span>
-																<a href="#" class="help-link" title="Help">?</a>
+																<a href="#" class="help-link" title="Help"></a>
 															</div>
 														</div>
 														<div>
@@ -136,7 +136,7 @@
 												<div class="popup-padding-bottom">
 													<span><spring:message code="label.zillowconnect.screen.name.key"/></span>											
 													<input class="zillow-input zillowProfileName" name="zillowProfileNameNoScreenForNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">	
-													<a href="#" class="help-link" title="Help">?</a>											
+													<a href="#" class="help-link" title="Help"></a>											
 												</div>							
 												
 												<div class="popup-padding-bottom">
@@ -183,7 +183,7 @@
 												<div class="popup-padding-bottom">
 													<span><spring:message code="label.zillowconnect.screen.name.key"/></span>											
 													<input class="zillow-input zillowProfileName" name="zillowProfileNameForNoNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
-													<a href="#" class="help-link" title="Help">?</a>
+													<a href="#" class="help-link" title="Help"></a>
 												</div>				
 												
 												<div class="zillow-exm-profile popup-padding-bottom">

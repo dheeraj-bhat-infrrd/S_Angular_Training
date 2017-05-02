@@ -9233,3 +9233,12 @@ ul.accordion li>a:before {
     border-radius: 3px;
     padding: 4px 10px 4px 10px;
 }
+
+.help-link {
+	background-image: url('../images/help-icon.png') no-repeat center !important;
+	background: url('../images/help-icon.png') no-repeat center !important;
+	cursor: pointer !important;
+	display: inline-block;
+	width: 22px !important; /* Width of new image */
+  	height: 22px !important; /* Height of new image */
+}
