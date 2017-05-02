@@ -16,6 +16,8 @@
 							
 								<form id="zillowForm">
 									<input type="hidden" id="profileType" value="${profile.vertical}" ></input>
+									<input type="hidden" id="nmlsIdHidden" value="${profile.socialMediaTokens.zillowToken.lenderRef.nmlsId}" ></input>
+									<input type="hidden" id="screenNameHidden" value="${profile.socialMediaTokens.zillowToken.zillowScreenName}" ></input>
 									<div id="main-container" class="non-zillow-help-container">
 			 							<div class="zillow-input-container clearfix">
 											<div class="zillow-input-cont">
@@ -55,37 +57,43 @@
 															</div>
 														</div>
 													  </c:when>
+													  
 													  <c:otherwise>
-													  	<div>
-														  	<div class="zillow-example-cont popupUrl">
-														  		<div class="popup-header">- Zillow Real Estate Profile Connection -</div>
-																<div class="zillow-exm-url popup-padding-bottom">
-																	<span class="zillow-url"><spring:message code="label.zillow.exampleurl.key" /></span>
+													  		<div id="no-screen-name-saved">
+															  	<div>
+																  	<div class="zillow-example-cont popupUrl">
+																  		<div class="popup-header">- Zillow Real Estate Profile Connection -</div>
+																		<div class="zillow-exm-url popup-padding-bottom">
+																			<span class="zillow-url"><spring:message code="label.zillow.exampleurl.key" /></span>
+																		</div>
+																		<div class="zillow-exm-profile popup-padding-bottom">
+																			<span><spring:message code="label.zillow.exampleprofilename.text.key" /></span> 
+																			<span class="zillow-exm-profilename"><spring:message code="label.zillow.exampleprofilename.key" /></span>
+																		</div>
+																	</div>
+																	<div class="popup-padding-bottom">
+																	  	<span><spring:message code="label.zillowconnect.link.key"/></span>
+																		<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
+																		<span>/</span>
+																		<a href="#" class="help-link" title="Help"></a>
+																	</div>
 																</div>
-																<div class="zillow-exm-profile popup-padding-bottom">
-																	<span><spring:message code="label.zillow.exampleprofilename.text.key" /></span> 
-																	<span class="zillow-exm-profilename"><spring:message code="label.zillow.exampleprofilename.key" /></span>
+																<div>
+																	<div class="float-left ol-btn-wrapper overlay-cancel-zillow">
+																		<div id="overlay-cancel-zillow" class="ol-btn cursor-pointer">
+																			Cancel
+																		</div>
+																	</div>
+																	<div class="float-left ol-btn-wrapper overlay-save-zillow">
+																		<div id="overlay-save-zillow" class="ol-btn cursor-pointer">
+																			Save
+																		</div>
+																	</div>
 																</div>
 															</div>
-															<div class="popup-padding-bottom">
-															  	<span><spring:message code="label.zillowconnect.link.key"/></span>
-																<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
-																<span>/</span>
-																<a href="#" class="help-link" title="Help"></a>
+															<div id="screen-name-saved">
+																Screen name saved
 															</div>
-														</div>
-														<div>
-															<div class="float-left ol-btn-wrapper overlay-cancel-zillow">
-																<div id="overlay-cancel-zillow" class="ol-btn cursor-pointer">
-																	<!-- Populated by javascript -->
-																</div>
-															</div>
-															<div class="float-left ol-btn-wrapper overlay-save-zillow">
-																<div id="overlay-save-zillow" class="ol-btn cursor-pointer">
-																	<!-- Populated by javascript -->
-																</div>
-															</div>
-														</div>
 													  </c:otherwise>
 												</c:choose>
 											</div>
