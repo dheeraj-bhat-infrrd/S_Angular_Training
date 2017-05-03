@@ -1457,6 +1457,10 @@ span.footer-ul a:hover {
 	padding-bottom: 15px !important; 
 }
 
+.popup-padding-top {
+	padding-top: 35px !important; 
+}
+
 .urlPopupButton{
 	width: 335px;
 	margin-left: 60px;

@@ -9234,6 +9234,10 @@ ul.accordion li>a:before {
     padding: 4px 10px 4px 10px;
 }
 
+.help-link-container {
+	margin: 6px 0 0 8px !important;
+}
+
 .help-link {
 	background-image: url('../images/help-icon.png') no-repeat center !important;
 	background: url('../images/help-icon.png') no-repeat center !important;

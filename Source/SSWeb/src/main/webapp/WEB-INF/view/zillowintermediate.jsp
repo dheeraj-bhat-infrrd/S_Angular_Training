@@ -69,12 +69,16 @@
 																	</div>
 																  	<div class="welcome-popup-body-wrapper popup-body clearfix">
 																  		<div class="popup-padding-bottom">
-																		  	<span>Zillow Screen Name</span>
-																			<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">																	
-																			<a href="#" class="help-link" title="Help"></a>
+																	  		<div class="float-left">
+																			  	<span>Zillow Screen Name</span>
+																				<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">																	
+																			</div>
+																			<div class="float-left help-link-container">
+																				<a href="#" class="help-link" title="Help"></a>
+																			</div>
 																		</div>
 																		
-																		<div class="zillow-exm-url popup-padding-bottom">
+																		<div class="zillow-exm-url popup-padding-bottom popup-padding-top clearfix">
 																			<div>
 																				Your screen name is part of your Zillow profile URL. For example:
 																			</div>
@@ -86,7 +90,6 @@
 																			Once you're on your profile, click on "Edit your profile" then you will be directed to the page where you can view and edit your "Screen name."
 																		</div>
 																	</div>
-																	
 																</div>
 																<div>
 																	<div class="float-left ol-btn-wrapper overlay-cancel-zillow">
@@ -280,23 +283,26 @@
 											</div>
 										</div>
 									</div>
-									<div id="zillow-help-container">
-										<div class="zillow-input-container clearfix popupUrl-zillow">
-											<div>
-												<div class="popup-header">- About Zillow Profile Connection -</div>
+									<div id="zillow-help-container" class="clearfix">
+										<div>
+											<div class="welcome-popup-hdr-wrapper clearfix">
+												<div class="float-left wc-hdr-txt">About Zillow Profile Connection</div>
+												<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
+											</div>
+											<div class="welcome-popup-body-wrapper popup-body clearfix">
 												<div class="popup-padding-bottom">SocialSurvey can connect to your Zillow profile to automatically fetch up to the last 50 approved reviews in addition to provioding a link to your Zillow profile on your SocailSurvey public page. Your Zillow profile page may also be used to ask customers who give you a GREAT review to share that review manually on you Zillow profile.</div>
 												<div class="popup-padding-bottom">Zillow does not allow third parties, such as SocialSurvey, to post reviews automatically to Zillow profiles. Zillow reviews are not made avaiable to be shared on SocialSurvey until they have been manually audited by Zillow staff which typically takes 10 business days.</div>
 											</div>
-											<div>
-												<div class="float-left ol-btn-wrapper overlay-contact-support" style="width: 50% !important;">
-													<div id="overlay-contact-support" class="ol-btn cursor-pointer">
-														Contact Support
-													</div>
+										</div>
+										<div>
+											<div class="float-left ol-btn-wrapper overlay-contact-support" style="width: 50% !important;">
+												<div id="overlay-contact-support" class="ol-btn cursor-pointer">
+													Contact Support
 												</div>
-												<div class="float-left ol-btn-wrapper overlay-contact-support-close" style="width: 50% !important;">
-													<div id="overlay-contact-support-close" class="ol-btn cursor-pointer">
-														Close
-													</div>
+											</div>
+											<div class="float-left ol-btn-wrapper overlay-contact-support-close" style="width: 50% !important;">
+												<div id="overlay-contact-support-close" class="ol-btn cursor-pointer">
+													Close
 												</div>
 											</div>
 										</div>
