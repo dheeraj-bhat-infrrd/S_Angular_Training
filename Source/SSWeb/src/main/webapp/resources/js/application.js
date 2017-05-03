@@ -8955,6 +8955,26 @@ function noScreenNameSavedBind() {
 		
 		screenNameSavedBind();
 	});
+	
+	$('#overlay-disconnect-zillow-byscreen-name').click(function() {
+		$('#no-screen-name-saved').hide();
+		$('#no-screen-name-container').hide();
+		$('#disconnect-zillow-container').show();
+		var nmls = $('input[name="nmlsId"]').val();					
+		var zillowProfileName = $('input[name="zillowProfileName"]').val();
+		
+		$('#overlay-cancel-disconnect-zillow').click(function() {
+			overlayRevert();
+		});
+		
+		$('#overlay-keepreview-disconnect-zillow').click(function() {
+			disconnectZillow(profileType, zillowProfileName, nmls, "keep-review");
+		});
+		
+		$('#overlay-deletereview-disconnect-zillow').click(function() {
+			disconnectZillow(profileType, zillowProfileName, nmls, "delete-review");
+		});
+	});
 }
 
 function screenNameSavedBind() {

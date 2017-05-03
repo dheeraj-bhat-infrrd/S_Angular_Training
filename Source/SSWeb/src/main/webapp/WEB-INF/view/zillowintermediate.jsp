@@ -92,15 +92,17 @@
 																	</div>
 																</div>
 																<div>
-																	<div class="float-left ol-btn-wrapper overlay-cancel-zillow">
-																		<div id="overlay-no-screen-name-saved-cancel-zillow" class="ol-btn cursor-pointer">
-																			Cancel
-																		</div>
+																	<div class="float-left ol-btn-wrapper overlay-save-cancel" style="width: 20% !important;">
+																		<a href="#" id="overlay-disconnect-zillow-byscreen-name" class="zillow-link" >Disconnect Zillow</a>
 																	</div>
-																	<div class="float-left ol-btn-wrapper overlay-save-zillow">
+																	
+																	<div class="float-right ol-btn-wrapper overlay-save-zillow" style="width: 18% !important;">
 																		<div id="overlay-screen-name-to-saved-zillow" class="ol-btn cursor-pointer">
 																			Save
 																		</div>
+																	</div>
+																	<div class="float-right ol-btn-wrapper overlay-save-cancel" style="width: 8% !important;">
+																		<a href="#" id="overlay-save-cancel" class="zillow-link" >Cancel</a>
 																	</div>
 																</div>
 															</div>
@@ -258,27 +260,29 @@
 											</div>
 										</div>
 									</div>
-									<div id="disconnect-zillow-container" class="non-zillow-help-container">
-										<div class="zillow-input-container clearfix popupUrl-zillow">
-											<div>
-												<div class="popup-header">- Disconnect Zillow Profile -</div>
-												<div class="popup-padding-bottom">Disconnecting will prevent us from fetching any new reviews from Zillow and will remove the Zillow Profile link from your SocialSurvey public page.</div>
+									<div id="disconnect-zillow-container" class="clearfix">
+										<div>
+											<div class="welcome-popup-hdr-wrapper clearfix">
+												<div class="float-left wc-hdr-txt">Disconnect Zillow Profile</div>
+												<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
 											</div>
-											<div>
-												<div class="float-left ol-btn-wrapper overlay-cancel-disconnect-zillow" style="width: 30% !important;">
-													<div id="overlay-cancel-disconnect-zillow" class="ol-btn cursor-pointer">
-														Cancel
-													</div>
+											<div class="welcome-popup-body-wrapper popup-body clearfix">
+												<div class="popup-padding-bottom">Disconnecting will prevent us from fetching any new reviews from Zillow and will remove the Zillow Profile link from your SocialSurvey public page.</div>
+												
+											</div>
+										</div>
+										<div>
+											<div class="float-left ol-btn-wrapper overlay-cancel-disconnect-zillow" style="width: 20% !important;">										
+												<a href="#" id="overlay-cancel-disconnect-zillow" class="zillow-link" >Cancel</a>
+											</div>
+											<div class="float-right ol-btn-wrapper overlay-deletereview-disconnect-zillow" style="width: 20% !important;">
+												<div id="overlay-deletereview-disconnect-zillow" class="ol-btn cursor-pointer">
+													Delete Zillow Reviews
 												</div>
-												<div class="float-left ol-btn-wrapper overlay-keepreview-disconnect-zillow" style="width: 30% !important;">
-													<div id="overlay-keepreview-disconnect-zillow" class="ol-btn cursor-pointer">
-														Keep Zillow Reviews
-													</div>
-												</div>
-												<div class="float-left ol-btn-wrapper overlay-deletereview-disconnect-zillow" style="width: 30% !important;">
-													<div id="overlay-deletereview-disconnect-zillow" class="ol-btn cursor-pointer">
-														Delete Zillow Reviews
-													</div>
+											</div>
+											<div class="float-right ol-btn-wrapper overlay-keepreview-disconnect-zillow" style="width: 20% !important;">
+												<div id="overlay-keepreview-disconnect-zillow" class="ol-btn cursor-pointer">
+													Keep Zillow Reviews
 												</div>
 											</div>
 										</div>
@@ -295,15 +299,17 @@
 											</div>
 										</div>
 										<div>
-											<div class="float-left ol-btn-wrapper overlay-contact-support" style="width: 50% !important;">
-												<div id="overlay-contact-support" class="ol-btn cursor-pointer">
-													Contact Support
-												</div>
+											<div class="float-left ol-btn-wrapper overlay-contact-support" style="width: 20% !important;">
+												<a href="#" id="overlay-contact-support" class="zillow-link" >Contact Support</a>
 											</div>
-											<div class="float-left ol-btn-wrapper overlay-contact-support-close" style="width: 50% !important;">
+											
+											<div class="float-right ol-btn-wrapper overlay-contact-support-close" style="width: 18% !important;">
 												<div id="overlay-contact-support-close" class="ol-btn cursor-pointer">
 													Close
 												</div>
+											</div>
+											<div class="float-right ol-btn-wrapper overlay-contact-support-cancel" style="width: 8% !important;">
+													<a href="#" id="overlay-contact-support-cancel" class="zillow-link" >Cancel</a>
 											</div>
 										</div>
 									</div>
