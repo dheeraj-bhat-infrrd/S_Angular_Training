@@ -1158,6 +1158,7 @@ public interface CommonConstants
 
 
     public static final String ZILLOW_PROFILE_URL = "http://zillow.com/profile/";
+    public static final String ZILLOW_LENDER_PROFILE_URL = "http://zillow.com/lender-profile/";
     
     public static final List<String> ZILLOW_LENDING_VERTICALS = new ArrayList<String>(Arrays.asList("Mortgage"));
 

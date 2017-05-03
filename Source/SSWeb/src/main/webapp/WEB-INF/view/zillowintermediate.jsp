@@ -18,6 +18,8 @@
 									<input type="hidden" id="profileType" value="${profile.vertical}" ></input>
 									<input type="hidden" id="nmlsIdHidden" value="${profile.socialMediaTokens.zillowToken.lenderRef.nmlsId}" ></input>
 									<input type="hidden" id="screenNameHidden" value="${profile.socialMediaTokens.zillowToken.zillowScreenName}" ></input>
+									<input type="hidden" id="zillowNonLenderURI" value="${zillowNonLenderURI}" ></input>
+									<input type="hidden" id="zillowLenderPath" value="${zillowLenderURI}" ></input>
 									<div id="main-container" class="non-zillow-help-container">
 			 							<div class="zillow-input-container clearfix">
 											<div class="zillow-input-cont">
@@ -61,38 +63,69 @@
 													  <c:otherwise>
 													  		<div id="no-screen-name-saved">
 															  	<div>
-																  	<div class="zillow-example-cont popupUrl">
-																  		<div class="popup-header">- Zillow Real Estate Profile Connection -</div>
+															  		<div class="welcome-popup-hdr-wrapper clearfix">
+																		<div class="float-left wc-hdr-txt">Zillow Real Estate Profile Connection</div>
+																		<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
+																	</div>
+																  	<div class="welcome-popup-body-wrapper popup-body clearfix">
+																  		<div class="popup-padding-bottom">
+																		  	<span>Zillow Screen Name</span>
+																			<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">																	
+																			<a href="#" class="help-link" title="Help"></a>
+																		</div>
+																		
 																		<div class="zillow-exm-url popup-padding-bottom">
-																			<span class="zillow-url"><spring:message code="label.zillow.exampleurl.key" /></span>
+																			<div>
+																				Your screen name is part of your Zillow profile URL. For example:
+																			</div>
+																			<div>
+																				<span><spring:message code="label.zillow.exampleurl.key" /><span class="zillow-url">Screen Name</span>/</span>
+																			</div>
 																		</div>
-																		<div class="zillow-exm-profile popup-padding-bottom">
-																			<span><spring:message code="label.zillow.exampleprofilename.text.key" /></span> 
-																			<span class="zillow-exm-profilename"><spring:message code="label.zillow.exampleprofilename.key" /></span>
+																		<div class="popup-padding-bottom">* You can find your screen name while logged into Zillow by hovering over "My Zillow" and clicking the "Profile" button. 
+																			Once you're on your profile, click on "Edit your profile" then you will be directed to the page where you can view and edit your "Screen name."
 																		</div>
 																	</div>
-																	<div class="popup-padding-bottom">
-																	  	<span><spring:message code="label.zillowconnect.link.key"/></span>
-																		<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
-																		<span>/</span>
-																		<a href="#" class="help-link" title="Help"></a>
-																	</div>
+																	
 																</div>
 																<div>
 																	<div class="float-left ol-btn-wrapper overlay-cancel-zillow">
-																		<div id="overlay-cancel-zillow" class="ol-btn cursor-pointer">
+																		<div id="overlay-no-screen-name-saved-cancel-zillow" class="ol-btn cursor-pointer">
 																			Cancel
 																		</div>
 																	</div>
 																	<div class="float-left ol-btn-wrapper overlay-save-zillow">
-																		<div id="overlay-save-zillow" class="ol-btn cursor-pointer">
+																		<div id="overlay-screen-name-to-saved-zillow" class="ol-btn cursor-pointer">
 																			Save
 																		</div>
 																	</div>
 																</div>
 															</div>
 															<div id="screen-name-saved">
-																Screen name saved
+																<div class="welcome-popup-hdr-wrapper clearfix">
+																		<div class="float-left wc-hdr-txt">Zillow Real Estate Profile Connection</div>
+																		<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
+																</div>
+																<div class="welcome-popup-body-wrapper popup-body clearfix">
+																  	<div class="popup-padding-bottom">
+																  		<label class="zillow-input-label">Please click the link to verify this is your Zillow profile page:</label>	
+																  	</div>
+																    <div class="popup-padding-bottom">
+																	    <a target="_blank" id="zillow-profile-link" class="zillow-profile-link" href='<spring:message code="label.zillowconnect.link.key" />${ profile.socialMediaTokens.zillowToken.zillowScreenName }'>
+																	    		<spring:message code="label.zillowconnect.link.key" />${ profile.socialMediaTokens.zillowToken.zillowScreenName }
+																	    </a>
+																	</div>
+																</div>
+																<div>
+																	<div class="float-right ol-btn-wrapper overlay-continue-zillow" style="width: 20% !important;">
+																		<div id="overlay-save-zillow-screen-name" class="ol-btn cursor-pointer">
+																			Yes, that's me
+																		</div>
+																	</div>
+																	<div class="float-right ol-btn-wrapper overlay-cancel-zillow" style="width: 8% !important;">
+																		<a href="#" id="overlay-change-zillow-screen-name" class="zillow-link" >Change</a>
+																	</div>
+																</div>
 															</div>
 													  </c:otherwise>
 												</c:choose>

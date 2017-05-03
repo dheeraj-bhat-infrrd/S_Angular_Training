@@ -361,8 +361,11 @@ public class SocialManagementController
         model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
         if ( socialNetwork.equalsIgnoreCase( "facebook" ) )
             return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
-        else if ( socialNetwork.equalsIgnoreCase( "zillow" ) )
+        else if ( socialNetwork.equalsIgnoreCase( "zillow" ) ) {
+            session.setAttribute( "zillowNonLenderURI", CommonConstants.ZILLOW_PROFILE_URL);
+            session.setAttribute( "zillowLenderURI", CommonConstants.ZILLOW_LENDER_PROFILE_URL);
             return JspResolver.SOCIAL_ZILLOW_INTERMEDIATE;
+        }
         else
             return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
@@ -1860,6 +1863,52 @@ public class SocialManagementController
     {
         Map<String, Object> map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
         return map;
+    }
+    
+    @SuppressWarnings ( { "unchecked", "unused" })
+    @RequestMapping ( value = "/zillowUpdateFrofileInfo")
+    @ResponseBody
+    public String zillowUpdateFrofileInfo( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method zillowUpdateFrofileInfo() called from SocialManagementController" );
+        HttpSession session = request.getSession( false );
+        ZillowIntegrationAgentApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZillowIntegrationAgentApi();
+        User user = sessionHelper.getCurrentUser();
+        String zillowScreenName = request.getParameter( "zillowProfileName" );
+        String nmlsTemp = request.getParameter( "nmlsId" );
+        Integer nmlsId = null;
+        if(nmlsTemp != null && nmlsTemp.trim().length() > 0)
+            nmlsId = new Integer(nmlsTemp);
+        SocialMediaTokens mediaTokens = null;
+        OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+            .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
+        if ( profileSettings == null ) {
+            profileSettings = (OrganizationUnitSettings) session.getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+        }
+        
+        if ( zillowScreenName != null && !zillowScreenName.equals("") ) {
+            if(profileSettings.getSocialMediaTokens() == null) {
+                ZillowToken zillowToken = new ZillowToken();
+                zillowToken.setZillowScreenName( zillowScreenName );
+                
+                SocialMediaTokens socialMediaTokens = new SocialMediaTokens();
+                socialMediaTokens.setZillowToken( zillowToken );
+                profileSettings.setSocialMediaTokens(socialMediaTokens);
+            } else if( profileSettings.getSocialMediaTokens().getZillowToken() == null) {
+                ZillowToken zillowToken = new ZillowToken();
+                zillowToken.setZillowScreenName( zillowScreenName );
+                
+                profileSettings.getSocialMediaTokens().setZillowToken( zillowToken );
+            }
+            else {
+                profileSettings.getSocialMediaTokens().getZillowToken().setZillowScreenName(zillowScreenName);
+            }
+            
+            session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
+            session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+        }
+        
+        return "success";
     }
 
 
