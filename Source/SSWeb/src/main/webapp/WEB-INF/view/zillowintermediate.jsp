@@ -310,7 +310,7 @@
 											</div>
 											
 											<div class="float-right ol-btn-wrapper overlay-contact-support-close ol-btn-wrapper-right-zillow" style="width: 18% !important;">
-												<div id="overlay-contact-support-close" class="ol-btn cursor-pointer">
+												<div id="overlay-contact-support-close" class="ol-btn cursor-pointer all-cancel">
 													Close
 												</div>
 											</div>
