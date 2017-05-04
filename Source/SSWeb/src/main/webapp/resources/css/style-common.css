@@ -1506,6 +1506,14 @@ button.paypal.is-active {
 	padding: 15px;
 }
 
+.ol-btn-wrapper-left-zillow {
+	padding-left: 0px !important;
+}
+
+.ol-btn-wrapper-right-zillow {
+	padding-right: 0px !important;
+}
+
 .ol-btn {
 	cursor: pointer;
 	max-width: 150px;

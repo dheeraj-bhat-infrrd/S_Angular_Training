@@ -26,7 +26,7 @@
 												<c:choose>
 													  <c:when test="${profile.vertical == 'Mortgage'}">
 													  	<div class="welcome-popup-hdr-wrapper clearfix">
-																<div class="float-left wc-hdr-txt">Zillow Lending Profile Lookup</div>
+																<div class="float-left wc-hdr-txt"><spring:message code="label.zillowconnect.lender.header.key"/></div>
 																<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
 														</div>
 														<div class="welcome-popup-body-wrapper popup-body clearfix">
@@ -44,10 +44,10 @@
 															</div>
 														</div>
 														<div>
-															<div class="float-left ol-btn-wrapper overlay-continue-zillow" style="width: 20% !important;">
+															<div class="float-left ol-btn-wrapper overlay-continue-zillow ol-btn-wrapper-left-zillow" style="width: 20% !important;">
 																<a href="#" id="overlay-continue-zillow" class="zillow-link" >By Screen Name</a>
 															</div>
-															<div class="float-right ol-btn-wrapper overlay-next-zillow" style="width: 18% !important;">
+															<div class="float-right ol-btn-wrapper overlay-next-zillow ol-btn-wrapper-right-zillow" style="width: 18% !important;">
 																<div id="overlay-next-zillow" class="ol-btn cursor-pointer">
 																	Next
 																</div>
@@ -62,7 +62,7 @@
 													  		<div id="no-screen-name-saved">
 															  	<div>
 															  		<div class="welcome-popup-hdr-wrapper clearfix">
-																		<div class="float-left wc-hdr-txt">Zillow Real Estate Profile Connection</div>
+																		<div class="float-left wc-hdr-txt"><spring:message code="label.zillowconnect.estate.header.key" /></div>
 																		<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
 																	</div>
 																  	<div class="welcome-popup-body-wrapper popup-body clearfix">
@@ -84,17 +84,17 @@
 																				<span><spring:message code="label.zillow.exampleurl.key" /><span class="zillow-url"><spring:message code="label.zillowconnect.profileName.key"/></span>/</span>
 																			</div>
 																		</div>
-																		<div class="popup-padding-bottom">* You can find your screen name while logged into Zillow by hovering over "My Zillow" and clicking the "Profile" button. 
-																			Once you're on your profile, click on "Edit your profile" then you will be directed to the page where you can view and edit your "Screen name."
+																		<div class="popup-padding-bottom">
+																			<spring:message code="label.zillowconnect.by.screen.name.note.key"/>
 																		</div>
 																	</div>
 																</div>
 																<div>
-																	<div class="float-left ol-btn-wrapper overlay-disconnect-zillow-byscreen-name" style="width: 20% !important;">
+																	<div class="float-left ol-btn-wrapper overlay-disconnect-zillow-byscreen-name ol-btn-wrapper-left-zillow" style="width: 20% !important;">
 																		<a href="#" id="overlay-disconnect-zillow-byscreen-name" class="zillow-link" >Disconnect Zillow</a>
 																	</div>
 																	
-																	<div class="float-right ol-btn-wrapper overlay-save-zillow" style="width: 18% !important;">
+																	<div class="float-right ol-btn-wrapper overlay-save-zillow ol-btn-wrapper-right-zillow" style="width: 18% !important;">
 																		<div id="overlay-screen-name-to-saved-zillow" class="ol-btn cursor-pointer">
 																			Save
 																		</div>
@@ -106,7 +106,7 @@
 															</div>
 															<div id="screen-name-saved">
 																<div class="welcome-popup-hdr-wrapper clearfix">
-																		<div class="float-left wc-hdr-txt">Zillow Real Estate Profile Connection</div>
+																		<div class="float-left wc-hdr-txt"><spring:message code="label.zillowconnect.estate.header.key" /></div>
 																		<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
 																</div>
 																<div class="welcome-popup-body-wrapper popup-body clearfix">
@@ -120,7 +120,7 @@
 																	</div>
 																</div>
 																<div>
-																	<div class="float-right ol-btn-wrapper overlay-continue-zillow" style="width: 20% !important;">
+																	<div class="float-right ol-btn-wrapper overlay-continue-zillow ol-btn-wrapper-right-zillow" style="width: 20% !important;">
 																		<div id="overlay-save-zillow-screen-name" class="ol-btn cursor-pointer">
 																			Yes, that's me
 																		</div>
@@ -137,7 +137,7 @@
 									</div>
 									<div id="screen-name-found-container" class="clearfix">
 										<div class="welcome-popup-hdr-wrapper clearfix">
-											<div class="float-left wc-hdr-txt">Zillow Lending Profile Connection</div>
+											<div class="float-left wc-hdr-txt"><spring:message code="label.zillowconnect.lender.header.key"/></div>
 											<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
 										</div>
 										<div class="welcome-popup-body-wrapper popup-body clearfix">
@@ -151,11 +151,11 @@
 											</div>
 										</div>
 										<div>
-											<div class="float-left ol-btn-wrapper overlay-change-zillow" style="width: 20% !important;">
+											<div class="float-left ol-btn-wrapper overlay-change-zillow ol-btn-wrapper-left-zillow" style="width: 20% !important;">
 												<a href="#" id="overlay-change-zillow" class="zillow-link" >Change NMLS#</a>
 											</div>
 											
-											<div class="float-right ol-btn-wrapper overlay-save-zillow-byscreen" style="width: 18% !important;">
+											<div class="float-right ol-btn-wrapper overlay-save-zillow-byscreen ol-btn-wrapper-right-zillow" style="width: 18% !important;">
 												<div id="overlay-save-zillow-byscreen" class="ol-btn cursor-pointer">
 													Yes, that's me
 												</div>
@@ -168,7 +168,7 @@
 									<div id="no-screen-name-container" class="non-zillow-help-container clearfix">
 										<div>
 											<div class="welcome-popup-hdr-wrapper clearfix">
-												<div class="float-left wc-hdr-txt">Zillow Lending Profile Connection</div>
+												<div class="float-left wc-hdr-txt"><spring:message code="label.zillowconnect.lender.header.key"/></div>
 												<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
 											</div>
 											<div class="welcome-popup-body-wrapper popup-body clearfix">
@@ -197,17 +197,17 @@
 														</span>
 													</div>
 												</div>
-												<div class="popup-padding-bottom">* You can find your screen name while logged into Zillow by hovering over "My Zillow" and clicking the "Profile" button. 
-													Once you're on your profile, click on "Edit your profile" then you will be directed to the page where you can view and edit your "Screen name."
+												<div class="popup-padding-bottom">
+													<spring:message code="label.zillowconnect.by.screen.name.note.key"/>
 												</div>
 											</div>
 										</div>
 										<div>
-											<div class="float-left ol-btn-wrapper overlay-disconnect-noscreen" style="width: 20% !important;">												
+											<div class="float-left ol-btn-wrapper overlay-disconnect-noscreen ol-btn-wrapper-left-zillow" style="width: 20% !important;">												
 												<a href="#" id="overlay-disconnect-noscreen" class="zillow-link" >Disconnect Zillow</a>
 											</div>
 											
-											<div class="float-right ol-btn-wrapper overlay-save-noscreen" style="width: 18% !important;">
+											<div class="float-right ol-btn-wrapper overlay-save-noscreen ol-btn-wrapper-right-zillow" style="width: 18% !important;">
 												<div id="overlay-save-noscreen" class="ol-btn cursor-pointer">
 													Save
 												</div>
@@ -220,7 +220,7 @@
 									<div id="by-screen-name-container" class="non-zillow-help-container clearfix">
 										<div>
 											<div class="welcome-popup-hdr-wrapper clearfix">
-												<div class="float-left wc-hdr-txt">Zillow Lending Profile Connection</div>
+												<div class="float-left wc-hdr-txt"><spring:message code="label.zillowconnect.lender.header.key"/></div>
 												<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
 											</div>
 											<div class="welcome-popup-body-wrapper popup-body clearfix">
@@ -248,16 +248,16 @@
 														</span>
 													</div>
 												</div>
-												<div class="popup-padding-bottom">* You can find your screen name while logged into Zillow by hovering over "My Zillow" and clicking the "Profile" button. 
-													Once you're on your profile, click on "Edit your profile" then you will be directed to the page where you can view and edit your "Screen name."
+												<div class="popup-padding-bottom">
+													<spring:message code="label.zillowconnect.by.screen.name.note.key"/>
 												</div>
 											</div>
 										</div>
 										<div>
-											<div class="float-left ol-btn-wrapper overlay-disconnect-zillow-byscreen-name" style="width: 20% !important;">
+											<div class="float-left ol-btn-wrapper overlay-disconnect-zillow-byscreen-name ol-btn-wrapper-left-zillow" style="width: 20% !important;">
 												<a href="#" id="overlay-disconnect-zillow-byscreen-name" class="zillow-link" >Disconnect Zillow</a>
 											</div>
-											<div class="float-right ol-btn-wrapper overlay-save-zillow-byscreen-name" style="width: 18% !important;">
+											<div class="float-right ol-btn-wrapper overlay-save-zillow-byscreen-name ol-btn-wrapper-right-zillow" style="width: 18% !important;">
 												<div id="overlay-save-zillow-byscreen-name" class="ol-btn cursor-pointer">
 													Save
 												</div>
@@ -278,10 +278,10 @@
 											</div>
 										</div>
 										<div>
-											<div class="float-left ol-btn-wrapper overlay-cancel-disconnect-zillow" style="width: 20% !important;">										
+											<div class="float-left ol-btn-wrapper overlay-cancel-disconnect-zillow ol-btn-wrapper-left-zillow" style="width: 20% !important;">										
 												<a href="#" id="overlay-cancel-disconnect-zillow" class="zillow-link all-cancel" >Cancel</a>
 											</div>
-											<div class="float-right ol-btn-wrapper overlay-deletereview-disconnect-zillow" style="width: 20% !important;">
+											<div class="float-right ol-btn-wrapper overlay-deletereview-disconnect-zillow ol-btn-wrapper-right-zillow" style="width: 20% !important;">
 												<div id="overlay-deletereview-disconnect-zillow" class="ol-btn cursor-pointer">
 													Delete Zillow Reviews
 												</div>
@@ -305,11 +305,11 @@
 											</div>
 										</div>
 										<div>
-											<div class="float-left ol-btn-wrapper overlay-contact-support" style="width: 20% !important;">
+											<div class="float-left ol-btn-wrapper overlay-contact-support ol-btn-wrapper-left-zillow" style="width: 20% !important;">
 												<a href="#" id="overlay-contact-support" class="zillow-link" >Contact Support</a>
 											</div>
 											
-											<div class="float-right ol-btn-wrapper overlay-contact-support-close" style="width: 18% !important;">
+											<div class="float-right ol-btn-wrapper overlay-contact-support-close ol-btn-wrapper-right-zillow" style="width: 18% !important;">
 												<div id="overlay-contact-support-close" class="ol-btn cursor-pointer">
 													Close
 												</div>
