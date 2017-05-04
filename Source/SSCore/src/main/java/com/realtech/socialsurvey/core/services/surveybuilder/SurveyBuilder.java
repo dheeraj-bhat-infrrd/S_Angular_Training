@@ -171,7 +171,7 @@ public interface SurveyBuilder {
 	 * @param user
 	 * @throws InvalidInputException
 	 */
-	public void addDefaultSurveyToCompany(User user) throws InvalidInputException;
+	public void createNewSurveyForCompany(User user) throws InvalidInputException;
 	
 	/**
 	 * Checks if the survey is default and clones it. If not leaves it as it is.
