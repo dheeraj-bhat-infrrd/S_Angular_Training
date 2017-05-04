@@ -297,7 +297,7 @@ public class AccountServiceImpl implements AccountService
 
         //add default survey questions
         if ( surveyBuilder.checkForExistingSurvey( companyAdmin ) == null ) {
-            surveyBuilder.addDefaultSurveyToCompany( companyAdmin );
+            surveyBuilder.createNewSurveyForCompany( companyAdmin );
         }
 
         //Update profile completion stage for company admin
