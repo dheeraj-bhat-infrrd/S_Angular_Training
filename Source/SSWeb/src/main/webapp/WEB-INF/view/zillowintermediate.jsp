@@ -34,28 +34,26 @@
 														  		<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>	
 														  	</div>
 														    <div class="popup-padding-bottom">
-															    <span>
-																    <spring:message code="label.zillowconnect.nmls.header.key"/>
-																	<input class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">
+															    <div class="float-left">
+																	    <span><spring:message code="label.zillowconnect.nmls.header.key"/></span>
+																		<input class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">
+																</div>
+																<div class="float-left help-link-container">
 																	<a href="#" class="help-link" title="Help"></a>
-																</span>
+																</div>
 															</div>
 														</div>
 														<div>
-															<div class="float-left ol-btn-wrapper overlay-cancel-zillow" style="width: 30% !important;">
-																<div id="overlay-cancel-zillow" class="ol-btn cursor-pointer">
-																	<!-- Populated by javascript -->
-																</div>
+															<div class="float-left ol-btn-wrapper overlay-continue-zillow" style="width: 20% !important;">
+																<a href="#" id="overlay-continue-zillow" class="zillow-link" >By Screen Name</a>
 															</div>
-															<div class="float-left ol-btn-wrapper overlay-continue-zillow" style="width: 30% !important;">
-																<div id="overlay-continue-zillow" class="ol-btn cursor-pointer">
-																	<!-- Populated by javascript -->
-																</div>
-															</div>
-															<div class="float-left ol-btn-wrapper overlay-next-zillow" style="width: 30% !important;">
+															<div class="float-right ol-btn-wrapper overlay-next-zillow" style="width: 18% !important;">
 																<div id="overlay-next-zillow" class="ol-btn cursor-pointer">
-																	<!-- Populated by javascript -->
+																	Next
 																</div>
+															</div>
+															<div class="float-right ol-btn-wrapper overlay-cancel-zillow" style="width: 8% !important;">
+																<a href="#" id="overlay-cancel-zillow" class="zillow-link all-cancel" >Cancel</a>
 															</div>
 														</div>
 													  </c:when>
@@ -70,7 +68,7 @@
 																  	<div class="welcome-popup-body-wrapper popup-body clearfix">
 																  		<div class="popup-padding-bottom">
 																	  		<div class="float-left">
-																			  	<span>Zillow Screen Name</span>
+																			  	<span><spring:message code="label.zillowconnect.screen.name.key"/></span>
 																				<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">																	
 																			</div>
 																			<div class="float-left help-link-container">
@@ -83,7 +81,7 @@
 																				Your screen name is part of your Zillow profile URL. For example:
 																			</div>
 																			<div>
-																				<span><spring:message code="label.zillow.exampleurl.key" /><span class="zillow-url">Screen Name</span>/</span>
+																				<span><spring:message code="label.zillow.exampleurl.key" /><span class="zillow-url"><spring:message code="label.zillowconnect.profileName.key"/></span>/</span>
 																			</div>
 																		</div>
 																		<div class="popup-padding-bottom">* You can find your screen name while logged into Zillow by hovering over "My Zillow" and clicking the "Profile" button. 
@@ -92,7 +90,7 @@
 																	</div>
 																</div>
 																<div>
-																	<div class="float-left ol-btn-wrapper overlay-save-cancel" style="width: 20% !important;">
+																	<div class="float-left ol-btn-wrapper overlay-disconnect-zillow-byscreen-name" style="width: 20% !important;">
 																		<a href="#" id="overlay-disconnect-zillow-byscreen-name" class="zillow-link" >Disconnect Zillow</a>
 																	</div>
 																	
@@ -102,7 +100,7 @@
 																		</div>
 																	</div>
 																	<div class="float-right ol-btn-wrapper overlay-save-cancel" style="width: 8% !important;">
-																		<a href="#" id="overlay-save-cancel" class="zillow-link" >Cancel</a>
+																		<a href="#" id="overlay-save-cancel" class="zillow-link all-cancel" >Cancel</a>
 																	</div>
 																</div>
 															</div>
@@ -117,7 +115,7 @@
 																  	</div>
 																    <div class="popup-padding-bottom">
 																	    <a target="_blank" id="zillow-profile-link" class="zillow-profile-link" href='<spring:message code="label.zillowconnect.link.key" />${ profile.socialMediaTokens.zillowToken.zillowScreenName }'>
-																	    		<spring:message code="label.zillowconnect.link.key" />${ profile.socialMediaTokens.zillowToken.zillowScreenName }
+																	    	<spring:message code="label.zillowconnect.link.key" />${ profile.socialMediaTokens.zillowToken.zillowScreenName }
 																	    </a>
 																	</div>
 																</div>
@@ -137,58 +135,65 @@
 											</div>
 										</div>
 									</div>
-									<div id="screen-name-found-container" class="non-zillow-help-container">
-											<div class="zillow-input-container clearfix popupUrl-zillow">
-												<div>
-													<div class="popup-header">- Zillow Lending Profile Connection -</div>
-													<div class="popup-padding-bottom">
-														<span><spring:message code="label.zillowconnect.screen.name.found.key"/></span>
-													</div>
-													<div class="zillow-exm-profile popup-padding-bottom">
-														<spring:message code="label.zillowconnect.link.key" /><span class="zillowProfileNameSpan">${ profile.socialMediaTokens.zillowToken.zillowScreenName }</span>
-													</div>
-												</div>
-												<div>
-													<div class="float-left ol-btn-wrapper overlay-change-zillow" style="width: 30% !important;">
-														<div id="overlay-change-zillow" class="ol-btn cursor-pointer">
-															<!-- Populated by javascript -->
-														</div>
-													</div>
-													<div class="float-left ol-btn-wrapper overlay-disconnect-zillow" style="width: 30% !important;">
-														<div id="overlay-disconnect-zillow" class="ol-btn cursor-pointer">
-															<!-- Populated by javascript -->
-														</div>
-													</div>
-													<div class="float-left ol-btn-wrapper overlay-save-zillow-byscreen" style="width: 30% !important;">
-														<div id="overlay-save-zillow-byscreen" class="ol-btn cursor-pointer">
-															<!-- Populated by javascript -->
-														</div>
-													</div>
+									<div id="screen-name-found-container" class="clearfix">
+										<div class="welcome-popup-hdr-wrapper clearfix">
+											<div class="float-left wc-hdr-txt">Zillow Lending Profile Connection</div>
+											<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
+										</div>
+										<div class="welcome-popup-body-wrapper popup-body clearfix">
+											<div class="popup-padding-bottom">
+												<span><spring:message code="label.zillowconnect.screen.name.found.key"/></span>
+											</div>
+											<div class="zillow-exm-profile popup-padding-bottom">
+												<a target="_blank" id="zillow-profile-lender-link" class="zillow-profile-link" href='<spring:message code="label.zillowconnect.lender.link.key" />${ profile.socialMediaTokens.zillowToken.zillowScreenName }'>
+											    	<spring:message code="label.zillowconnect.lender.link.key" />${ profile.socialMediaTokens.zillowToken.zillowScreenName }
+											    </a>
+											</div>
+										</div>
+										<div>
+											<div class="float-left ol-btn-wrapper overlay-change-zillow" style="width: 20% !important;">
+												<a href="#" id="overlay-change-zillow" class="zillow-link" >Change NMLS#</a>
+											</div>
+											
+											<div class="float-right ol-btn-wrapper overlay-save-zillow-byscreen" style="width: 18% !important;">
+												<div id="overlay-save-zillow-byscreen" class="ol-btn cursor-pointer">
+													Yes, that's me
 												</div>
 											</div>
+											<div class="float-right ol-btn-wrapper overlay-disconnect-zillow" style="width: 20% !important;">
+												<a href="#" id="overlay-disconnect-zillow" class="zillow-link" >Disconnect Zillow</a>
+											</div>
+										</div>
 									</div>
-									<div id="no-screen-name-container" class="non-zillow-help-container">
-										<div class="zillow-input-container clearfix popupUrl-zillow">
-											<div>
-												<div class="popup-header">- Zillow Lending Profile Connection -</div>
+									<div id="no-screen-name-container" class="non-zillow-help-container clearfix">
+										<div>
+											<div class="welcome-popup-hdr-wrapper clearfix">
+												<div class="float-left wc-hdr-txt">Zillow Lending Profile Connection</div>
+												<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
+											</div>
+											<div class="welcome-popup-body-wrapper popup-body clearfix">
 												<div class="popup-padding-bottom">
 													<span><spring:message code="label.zillowconnect.no.screen.name.key"/></span>
 													<!-- <span class="zillowProfileNameSpan">${ profile.socialMediaTokens.zillowToken.zillowScreenName }</span> -->
 												</div>
 												
 												<div class="popup-padding-bottom">
-													<span><spring:message code="label.zillowconnect.screen.name.key"/></span>											
-													<input class="zillow-input zillowProfileName" name="zillowProfileNameNoScreenForNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">	
-													<a href="#" class="help-link" title="Help"></a>											
+													<div class="float-left">
+														<span><spring:message code="label.zillowconnect.screen.name.key"/></span>
+														<input class="zillow-input zillowProfileName" name="zillowProfileNameNoScreenForNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">																																				
+													</div>
+													<div class="float-left help-link-container">
+														<a href="#" class="help-link" title="Help"></a>
+													</div>										
 												</div>							
 												
-												<div class="popup-padding-bottom">
-													<div class="popup-padding-bottom">
+												<div class="popup-padding-bottom popup-padding-top clearfix">
+													<div>
 														<span><spring:message code="label.zillow.exampleprofilename.sample.key" /></span>
 													</div>
 													<div>
-														<span class="zillow-exm-profilename">
-															<spring:message code="label.zillowconnect.link.key" /><span class="zillowProfileNameSpan">${ profile.socialMediaTokens.zillowToken.zillowScreenName }</span>
+														<span class="">
+															<spring:message code="label.zillowconnect.lender.link.key" /><span class="zillow-url"><spring:message code="label.zillowconnect.profileName.key"/></span>/
 														</span>
 													</div>
 												</div>
@@ -196,67 +201,69 @@
 													Once you're on your profile, click on "Edit your profile" then you will be directed to the page where you can view and edit your "Screen name."
 												</div>
 											</div>
-											<div>
-												<div class="float-left ol-btn-wrapper overlay-disconnect-noscreen" style="width: 30% !important;">
-													<div id="overlay-disconnect-noscreen" class="ol-btn cursor-pointer">
-														Disconnect Zillow
-													</div>
+										</div>
+										<div>
+											<div class="float-left ol-btn-wrapper overlay-disconnect-noscreen" style="width: 20% !important;">												
+												<a href="#" id="overlay-disconnect-noscreen" class="zillow-link" >Disconnect Zillow</a>
+											</div>
+											
+											<div class="float-right ol-btn-wrapper overlay-save-noscreen" style="width: 18% !important;">
+												<div id="overlay-save-noscreen" class="ol-btn cursor-pointer">
+													Save
 												</div>
-												<div class="float-left ol-btn-wrapper overlay-cancel-noscreen" style="width: 30% !important;">
-													<div id="overlay-cancel-noscreen" class="ol-btn cursor-pointer">
-														Cancel
-													</div>
-												</div>
-												<div class="float-left ol-btn-wrapper overlay-save-noscreen" style="width: 30% !important;">
-													<div id="overlay-save-noscreen" class="ol-btn cursor-pointer">
-														Save
-													</div>
-												</div>
+											</div>
+											<div class="float-right ol-btn-wrapper overlay-cancel-noscreen" style="width: 8% !important;">
+												<a href="#" id="overlay-cancel-noscreen" class="zillow-link all-cancel" >Cancel</a>
 											</div>
 										</div>
 									</div>
-									<div id="by-screen-name-container" class="non-zillow-help-container">
-										<div class="zillow-input-container clearfix popupUrl-zillow">
-											<div>
-												<div class="popup-header">- Zillow Lending Profile Connection -</div>
+									<div id="by-screen-name-container" class="non-zillow-help-container clearfix">
+										<div>
+											<div class="welcome-popup-hdr-wrapper clearfix">
+												<div class="float-left wc-hdr-txt">Zillow Lending Profile Connection</div>
+												<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
+											</div>
+											<div class="welcome-popup-body-wrapper popup-body clearfix">
 												<div class="popup-padding-bottom">
 													<span><spring:message code="label.zillowconnect.by.screen.name.only.key"/></span>
 												</div>
 												
-												<div class="popup-padding-bottom">
-													<span><spring:message code="label.zillowconnect.screen.name.key"/></span>											
-													<input class="zillow-input zillowProfileName" name="zillowProfileNameForNoNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
-													<a href="#" class="help-link" title="Help"></a>
+												<div class="popup-padding-bottom clearfix">
+													<div class="float-left">
+														<span><spring:message code="label.zillowconnect.screen.name.key"/></span>											
+														<input class="zillow-input zillowProfileName" name="zillowProfileNameForNoNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
+													</div>
+													<div class="float-left help-link-container">
+														<a href="#" class="help-link" title="Help"></a>
+													</div>
 												</div>				
 												
-												<div class="zillow-exm-profile popup-padding-bottom">
-													<div class="popup-padding-bottom">
+												<div class="popup-padding-bottom clearfix">
+													<div>
 														<span><spring:message code="label.zillow.exampleprofilename.sample.key" /></span>
 													</div>
 													<div>
-														<spring:message code="label.zillowconnect.link.key" /><span class="zillowProfileNameSpan">${ profile.socialMediaTokens.zillowToken.zillowScreenName }</span>
+														<span>
+															<spring:message code="label.zillowconnect.lender.link.key" /><span class="zillow-url"><spring:message code="label.zillowconnect.profileName.key"/></span>/
+														</span>
 													</div>
 												</div>
 												<div class="popup-padding-bottom">* You can find your screen name while logged into Zillow by hovering over "My Zillow" and clicking the "Profile" button. 
 													Once you're on your profile, click on "Edit your profile" then you will be directed to the page where you can view and edit your "Screen name."
 												</div>
 											</div>
-											<div>
-												<div class="float-left ol-btn-wrapper overlay-disconnect-zillow-byscreen-name" style="width: 30% !important;">
-													<div id="overlay-disconnect-zillow-byscreen-name" class="ol-btn cursor-pointer">
-														Disconnect Zillow
-													</div>
+										</div>
+										<div>
+											<div class="float-left ol-btn-wrapper overlay-disconnect-zillow-byscreen-name" style="width: 20% !important;">
+												<a href="#" id="overlay-disconnect-zillow-byscreen-name" class="zillow-link" >Disconnect Zillow</a>
+											</div>
+											<div class="float-right ol-btn-wrapper overlay-save-zillow-byscreen-name" style="width: 18% !important;">
+												<div id="overlay-save-zillow-byscreen-name" class="ol-btn cursor-pointer">
+													Save
 												</div>
-												<div class="float-left ol-btn-wrapper overlay-cancel-zillow-byscreen-name" style="width: 30% !important;">
-													<div id="overlay-cancel-zillow-byscreen-name" class="ol-btn cursor-pointer">
-														Cancel
-													</div>
-												</div>
-												<div class="float-left ol-btn-wrapper overlay-save-zillow-byscreen-name" style="width: 30% !important;">
-													<div id="overlay-save-zillow-byscreen-name" class="ol-btn cursor-pointer">
-														Save
-													</div>
-												</div>
+											</div>
+											<div class="float-right ol-btn-wrapper overlay-cancel-zillow-byscreen-name" style="width: 8% !important;">
+												<a href="#" id="overlay-cancel-zillow-byscreen-name" class="zillow-link all-cancel" >Cancel</a>
 											</div>
 										</div>
 									</div>
@@ -267,13 +274,12 @@
 												<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
 											</div>
 											<div class="welcome-popup-body-wrapper popup-body clearfix">
-												<div class="popup-padding-bottom">Disconnecting will prevent us from fetching any new reviews from Zillow and will remove the Zillow Profile link from your SocialSurvey public page.</div>
-												
+												<div class="popup-padding-bottom">Disconnecting will prevent us from fetching any new reviews from Zillow and will remove the Zillow Profile link from your SocialSurvey public page.</div>					
 											</div>
 										</div>
 										<div>
 											<div class="float-left ol-btn-wrapper overlay-cancel-disconnect-zillow" style="width: 20% !important;">										
-												<a href="#" id="overlay-cancel-disconnect-zillow" class="zillow-link" >Cancel</a>
+												<a href="#" id="overlay-cancel-disconnect-zillow" class="zillow-link all-cancel" >Cancel</a>
 											</div>
 											<div class="float-right ol-btn-wrapper overlay-deletereview-disconnect-zillow" style="width: 20% !important;">
 												<div id="overlay-deletereview-disconnect-zillow" class="ol-btn cursor-pointer">
@@ -309,7 +315,7 @@
 												</div>
 											</div>
 											<div class="float-right ol-btn-wrapper overlay-contact-support-cancel" style="width: 8% !important;">
-													<a href="#" id="overlay-contact-support-cancel" class="zillow-link" >Cancel</a>
+												<a href="#" id="overlay-contact-support-cancel" class="zillow-link all-cancel" >Cancel</a>
 											</div>
 										</div>
 									</div>
