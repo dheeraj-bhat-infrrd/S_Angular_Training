@@ -36,10 +36,10 @@
 														    <div class="popup-padding-bottom">
 															    <div class="float-left">
 																	    <span><spring:message code="label.zillowconnect.nmls.header.key"/></span>
-																		<input class="zillow-input" name="nmlsId" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">
+																		<input class="zillow-input" name="nmlsId" type="text" maxlength="8" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">
 																</div>
 																<div class="float-left help-link-container">
-																	<a href="#" class="help-link" title="Help"></a>
+																	<a href="#" class="help-link main-container" title="Help"></a>
 																</div>
 															</div>
 														</div>
@@ -72,7 +72,7 @@
 																				<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">																	
 																			</div>
 																			<div class="float-left help-link-container">
-																				<a href="#" class="help-link" title="Help"></a>
+																				<a href="#" class="help-link main-container" title="Help"></a>
 																			</div>
 																		</div>
 																		
@@ -183,7 +183,7 @@
 														<input class="zillow-input zillowProfileName" name="zillowProfileNameNoScreenForNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">																																				
 													</div>
 													<div class="float-left help-link-container">
-														<a href="#" class="help-link" title="Help"></a>
+														<a href="#" class="help-link no-screen-name-container" title="Help"></a>
 													</div>										
 												</div>							
 												
@@ -234,7 +234,7 @@
 														<input class="zillow-input zillowProfileName" name="zillowProfileNameForNoNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
 													</div>
 													<div class="float-left help-link-container">
-														<a href="#" class="help-link" title="Help"></a>
+														<a href="#" class="help-link by-screen-name-container" title="Help"></a>
 													</div>
 												</div>				
 												
@@ -315,7 +315,7 @@
 												</div>
 											</div>
 											<div class="float-right ol-btn-wrapper overlay-contact-support-cancel" style="width: 8% !important;">
-												<a href="#" id="overlay-contact-support-cancel" class="zillow-link all-cancel" >Cancel</a>
+												<a href="#" id="overlay-contact-support-cancel" class="zillow-link" >Cancel</a>
 											</div>
 										</div>
 									</div>
@@ -338,6 +338,25 @@ $( document ).ready(function() {
     $('.zillow-popup-close-icn').on('click', function(event) {
         $("#zillow-popup").hide();
         overlayRevert();
+    });
+    
+    $('input[name="nmlsId"]').keydown(function (e) {
+    	// Allow: backspace, delete, tab, escape, enter, ctrl+A and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+             // Allow: Ctrl+A
+            (e.keyCode == 65 && e.ctrlKey === true) || 
+             // Allow: home, end, left, right
+            (e.keyCode >= 35 && e.keyCode <= 39)) {
+                 // let it happen, don't do anything
+                 return;
+        }
+
+        var charValue = String.fromCharCode(e.keyCode)
+            , valid = /^[0-9]+$/.test(charValue);
+
+        if (!valid) {
+            e.preventDefault();
+        }
     });
     
 });

@@ -1753,8 +1753,13 @@ public class SocialManagementController
         String zillowScreenName = request.getParameter( "zillowProfileName" );
         String nmlsTemp = request.getParameter("nmls");
         Integer nmlsId = null;
-        if(nmlsTemp != null && nmlsTemp.trim().length() > 0)
+        if(nmlsTemp != null && nmlsTemp.trim().length() > 0) {
+            try {
         	nmlsId = new Integer(nmlsTemp);
+            } catch (Exception ex) {
+                return "invalid-nmls"; 
+            }
+        }
         SocialMediaTokens mediaTokens = null;
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
             .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );

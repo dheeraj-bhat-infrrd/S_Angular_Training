@@ -9081,14 +9081,14 @@ function createZillowProfileUrlPopup(body) {
 		
 		$('#overlay-contact-support').click(function(){
 			overlayRevert();
-			//$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
 			//call help page
 			showMainContent('./showhelppage.do');	
 		});
 		
-		$('#overlay-contact-support-close').click(function(){
-			overlayRevert();
-			//$("#zillow-popup").removeClass("overlay-disable-wrapper-zillow");
+		$('#overlay-contact-support-cancel').click(function(){
+			$('#zillow-help-container').hide();
+			var showContent = $('.help-link').attr('class').split(' ')[1];
+			$('#'+ showContent).show();
 		});
 	});	
 	
@@ -11121,10 +11121,6 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				disconnectZillow(profileType, zillowProfileName, nmls, "delete-review");
 			});
 		});
-		
-		/*$('#overlay-cancel-zillow-byscreen-name').click(function() {
-			overlayRevert();
-		});*/
 	}
 	
 }
@@ -11177,22 +11173,6 @@ function showZillowPageWithProfileLink(zillowScreenName) {
 	});
 	
 	$('#overlay-change-zillow').click(function() {
-		$('#overlay-cancel-zillow').html("Cancel");
-		$('#overlay-cancel-zillow').show();
-		$('.overlay-cancel-zillow').show();
-		
-		$('#overlay-continue-zillow').html("By Screen Name");
-		$('#overlay-continue-zillow').show();
-		$('.overlay-continue-zillow').show();
-		
-		$('#overlay-next-zillow').html("Next");
-		$('#overlay-next-zillow').show();
-		$('.overlay-next-zillow').show();
-		
-		$('.overlay-change-zillow').hide();
-		$('.overlay-disconnect-zillow').hide();
-		$('.overlay-save-zillow').hide();
-		
 		$('#main-container').show();
 		$('#screen-name-found-container').hide();
 		
@@ -11212,26 +11192,7 @@ function validateZillowForm(profileType) {
 		}
 		return true;
 	} else {
-		var nmlsId = $('input[name="nmlsId"]').val();
-		if (nmlsId != undefined || nmlsId != "") {
-			if (nmlsId != "" && !$.isNumeric(nmlsId)) {				
-				$('#overlay-toast').text("NMLS should be number only.");
-				showToast();
-				return false;				
-			} if (nmlsId != "" && $.isNumeric(nmlsId)) { 
-				if(nmlsId > 99999999) {
-					$('#overlay-toast').text("NMLS should be 8 digits number only");
-					showToast();
-					return false;
-				} else {
-					return true;
-				}
-			} else {
-				return true;
-			}
-		}  else {
-			return true;
-		}
+		return true;
 	}
 }
 
