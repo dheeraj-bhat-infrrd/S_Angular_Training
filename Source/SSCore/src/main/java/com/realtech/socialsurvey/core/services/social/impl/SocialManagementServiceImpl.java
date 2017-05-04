@@ -115,6 +115,7 @@ import facebook4j.Account;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
+import facebook4j.Post;
 import facebook4j.PostUpdate;
 import facebook4j.Reading;
 import facebook4j.ResponseList;
@@ -3376,6 +3377,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             mediaTokens = new SocialMediaTokens();
         }
 
+       
         //check for facebook token
         FacebookToken facebookToken = mediaTokens.getFacebookToken();
         if ( facebookToken == null ) {
@@ -3625,4 +3627,89 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         return profileLink;
     }
 
+    
+    
+    /**
+     * 
+     * @param tokenCreatedOn
+     * @param expirySeconds
+     * @return
+     */
+    @Override
+    public boolean checkFacebookTokenExpiry(FacebookToken facebookToken )
+    {
+        
+        long tokenCreatedOn = facebookToken.getFacebookAccessTokenCreatedOn();
+        long expirySeconds = facebookToken.getFacebookAccessTokenExpiresOn();
+        
+        long expiryHours = expirySeconds / 3600;
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis( tokenCreatedOn );
+        Date createdOn = cal.getTime();
+
+
+        Calendar curDateCal = Calendar.getInstance();
+        // adding 7 days to current time
+        curDateCal.add( Calendar.HOUR, 168 );
+        Date curDatePlusSeven = curDateCal.getTime();
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTimeInMillis( createdOn.getTime() );
+
+        cal2.add( Calendar.HOUR, (int) expiryHours );
+        Date expiresOn = cal2.getTime();
+
+        if ( curDatePlusSeven.after( expiresOn ) ){
+            Facebook facebook = new FacebookFactory().getInstance();
+            facebook.setOAuthAppId( facebookClientId, facebookAppSecret );
+            facebook.setOAuthAccessToken( new AccessToken( facebookToken.getFacebookAccessTokenToPost() ) );
+            try{
+                facebook.getPosts( new Reading().limit( 1 ) );                        
+            }catch ( FacebookException e ){
+                return true;                       
+            }
+        }
+
+        return false;
+
+    }
+    
+    
+    /**
+     * 
+     * @param tokenCreatedOn
+     * @param expirySeconds
+     * @return
+     */
+    @Override
+    public boolean checkLinkedInTokenExpiry(LinkedInToken linkedInToken )
+    {
+        
+        long tokenCreatedOn = linkedInToken.getLinkedInAccessTokenCreatedOn();
+        long expirySeconds = linkedInToken.getLinkedInAccessTokenExpiresIn();
+        
+        long expiryHours = expirySeconds / 3600;
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis( tokenCreatedOn );
+        Date createdOn = cal.getTime();
+
+
+        Calendar curDateCal = Calendar.getInstance();
+        // adding 7 days to current time
+        curDateCal.add( Calendar.HOUR, 168 );
+        Date curDatePlusSeven = curDateCal.getTime();
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTimeInMillis( createdOn.getTime() );
+
+        cal2.add( Calendar.HOUR, (int) expiryHours );
+        Date expiresOn = cal2.getTime();
+
+        if ( curDatePlusSeven.after( expiresOn ) ){
+                return true;                           
+        }
+
+        return false;
+
+    }
 }
