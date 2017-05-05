@@ -113,7 +113,8 @@ public class AdminController
 
         if ( company != null && company.getCompanyId() > 0 ) {
             List<LicenseDetail> licenseDetails = company.getLicenseDetails();
-            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE || company.getStatus() == CommonConstants.STATUS_INCOMPLETE ) {
+            //delete a company if status is inactive or incomplete or registration is incomplete or payment is due
+            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE || company.getStatus() == CommonConstants.STATUS_INCOMPLETE || (company.getStatus() == 1 && licenseDetails.size() == 0) ) {
                 try {
                     if ( licenseDetails.size() > 0 ) {
                         // Unsubscribing company from braintree
