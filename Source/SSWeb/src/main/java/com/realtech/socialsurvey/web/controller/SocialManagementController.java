@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -43,7 +45,9 @@ import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -79,7 +83,9 @@ import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBodyByNMLS;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationLenderApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -232,6 +238,12 @@ public class SocialManagementController
 
     @Autowired
     private URLGenerator urlGenerator;
+    
+    @Value ( "${ZILLOW_PARTNER_ID}")
+    private String zillowPartnerId;
+    
+    @Autowired
+    private ZillowIntergrationApiBuilder zillowIntegrationApiBuilder;
 
 
     /**
@@ -349,8 +361,11 @@ public class SocialManagementController
         model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
         if ( socialNetwork.equalsIgnoreCase( "facebook" ) )
             return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
-        else if ( socialNetwork.equalsIgnoreCase( "zillow" ) )
+        else if ( socialNetwork.equalsIgnoreCase( "zillow" ) ) {
+            session.setAttribute( "zillowNonLenderURI", CommonConstants.ZILLOW_PROFILE_URL);
+            session.setAttribute( "zillowLenderURI", CommonConstants.ZILLOW_LENDER_PROFILE_URL);
             return JspResolver.SOCIAL_ZILLOW_INTERMEDIATE;
+        }
         else
             return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
@@ -1726,7 +1741,134 @@ public class SocialManagementController
         model.addAttribute( "columnValue", request.getParameter( "columnValue" ) );
         return JspResolver.HEADER_SURVEY_INVITE_ADMIN;
     }
-
+    
+    @RequestMapping ( value = "/zillowValidateNMLS", method = RequestMethod.POST)
+    @ResponseBody
+    public String zillowValidateNMLS( Model model, HttpServletRequest request )
+    {
+    	LOG.info( "Method zillowValidateNMLS() called from SocialManagementController" );
+        HttpSession session = request.getSession( false );
+        ZillowIntegrationAgentApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZillowIntegrationAgentApi();
+        User user = sessionHelper.getCurrentUser();
+        String zillowScreenName = request.getParameter( "zillowProfileName" );
+        String nmlsTemp = request.getParameter("nmls");
+        Integer nmlsId = null;
+        if(nmlsTemp != null && nmlsTemp.trim().length() > 0) {
+            try {
+        	nmlsId = new Integer(nmlsTemp);
+            } catch (Exception ex) {
+                return "invalid-nmls"; 
+            }
+        }
+        SocialMediaTokens mediaTokens = null;
+        OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+            .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
+        if ( profileSettings == null ) {
+            profileSettings = (OrganizationUnitSettings) session.getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+        }
+        
+        //find screen name by nmls id
+        mediaTokens = profileSettings.getSocialMediaTokens();
+        ZillowToken zillowToken = null;
+        if(mediaTokens != null)  {
+        	if( mediaTokens.getZillowToken() != null ) {
+        		zillowToken = profileSettings.getSocialMediaTokens().getZillowToken();
+        	} else {
+        		zillowToken = new ZillowToken();
+        		mediaTokens.setZillowToken(zillowToken);
+        		profileSettings.getSocialMediaTokens().setZillowToken(zillowToken);
+        	}
+        } else {
+        	mediaTokens = new SocialMediaTokens();
+        	zillowToken = new ZillowToken();
+        	LenderRef lenderRef = new LenderRef();
+        	zillowToken.setLenderRef(lenderRef);
+        	mediaTokens.setZillowToken(zillowToken);
+        	profileSettings.getSocialMediaTokens().setZillowToken(zillowToken);
+        }
+        
+        LenderRef zillowLenderRef = zillowToken.getLenderRef();
+        retrofit.client.Response response = null;
+        String screenName = null;
+        if(nmlsId != null) {
+        	LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : " + nmlsId + " and screen name : " + zillowScreenName );
+        	FetchZillowReviewBodyByNMLS fetchZillowReviewBodyByNMLS = new FetchZillowReviewBodyByNMLS();                       
+            LenderRef lenderRef = new LenderRef();
+            lenderRef.setNmlsId(nmlsId);
+            fetchZillowReviewBodyByNMLS.setLenderRef(lenderRef);
+            fetchZillowReviewBodyByNMLS.setPartnerId( zillowPartnerId );
+            ZillowIntegrationLenderApi zillowIntegrationLenderApi = zillowIntegrationApiBuilder.getZillowIntegrationLenderApi();
+            try {
+            	//Call zillow to fetch reviews for the profile name
+	            response = zillowIntegrationLenderApi.fetchZillowReviewsByNMLS( fetchZillowReviewBodyByNMLS );
+	            
+	            if ( response != null ) {	        
+	                String responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+	                
+	                if ( responseString != null ) {
+                        Map<String, Object> map = null;
+                        try {
+                            map = convertJsonStringToMap( responseString );
+                            
+                            if ( map != null ) {
+                            	List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
+                                surveyDetailsList = profileManagementService.buildSurveyDetailFromZillowLenderReviewMap( map );
+                                LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
+                                if(surveyDetailsList != null && surveyDetailsList.size() > 0) {
+                                	List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
+                                	reviews = (List<HashMap<String, Object>>) map.get( "reviews" );
+                                    if ( reviews != null ) {
+                                        for ( Map<String, Object> review : reviews ) {
+                                        	HashMap<String, Object> individualReviewee = (HashMap<String, Object>) review.get( "individualReviewee" );
+                                        	//get screen name 
+                                        	screenName = (String) individualReviewee.get("screenName");
+                                        	break;
+                                        }
+                                    }
+                                }
+                                //if screenName == null, no review present, ask to enter screen name
+                                if(screenName == null ) {
+                                	return "no-screen-name";
+                                }
+                            }
+                        } catch ( IOException e ) {
+                            LOG.error( "Exception caught while parsing zillow reviews" + e.getMessage() );
+                            throw new UnavailableException( "Zillow reviews could not be fetched for  nmls: " + nmlsId );
+                        }
+	                }
+	            }
+            } catch (Exception e) {
+            	return "invalid-nmls";
+            }
+        } else {
+        	//throw error
+        }
+        
+        session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+        model.addAttribute( "socialNetwork", "zillow" );
+        
+       /* if(profileSettings.getSocialMediaTokens() == null) {
+        	SocialMediaTokens socialMediaToken = new SocialMediaTokens();
+        	ZillowToken zillowTokenNew = new ZillowToken();
+        	socialMediaToken.setZillowToken(zillowTokenNew);
+        	List<>
+        	profileSettingssetSocialMediaTokens(socialMediaTokens);
+        }*/
+        
+        profileSettings.getSocialMediaTokens().getZillowToken().setZillowScreenName(screenName);
+        
+        session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
+        session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+        //return "invalid-nmls";
+        return  new Gson().toJson( profileSettings );
+    }
+    
+    Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException, IOException
+    {
+        Map<String, Object> map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
+        return map;
+    }
 
     @SuppressWarnings ( { "unchecked", "unused" })
     @RequestMapping ( value = "/zillowSaveInfo")
@@ -1749,16 +1891,26 @@ public class SocialManagementController
             profileSettings = (OrganizationUnitSettings) session.getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
         }
         
-        //if NMLS id is passed
-        //fetch profile name by calling Zillow (if review present, then only will be available)
-        //if review not present, only create data with empty zillowProfileLink, zillowScreenName & zillowLenderId but with nmls id
-        if ( nmlsId != null ) {//now not required, if profile name is passed and mandatory as parameter
-        	
-        }
+        //If Company Vertical is Lending means vertical=Real Estate, NMLS is required
+        /*if(CommonConstants.ZILLOW_LENDING_VERTICALS.contains(profileSettings.getVertical())) {
+        	//if NMLS id is passed            
+            if ( nmlsId != null ) {
+            	//fetch profile name by calling Zillow (if review present, then only will be available)
+            	//if review present fetch reviews to get the screen name,
+            	//if no review present, ask for screen name from user (by poping up)
+            } else {
+            	//model.addAttribute( "Error", "NMLS is required" );
+            	//return CommonConstants.ERROR;
+            	return CommonConstants.ZILLOW_NMLS_REQUIRED_ERROR;
+            }
+        } else {
+        	//for other NMLS is not required
+        }*/
         
-        if ( zillowScreenName == null || zillowScreenName == "" ) {
-            model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
-
+        
+        
+        if ( zillowScreenName == null || zillowScreenName.equals("") ) {
+            model.addAttribute( "Error", "Please provide either the zillow screen name." );
         } else {
             try {
                 String profileLink = null;
@@ -1858,20 +2010,22 @@ public class SocialManagementController
                            }
                        }
                    }    
+                   
+                   Map<String, Object> messageRes = (HashMap<String, Object>) map.get( "message" );                   
+                   error = (String) messageRes.get( "code" );
+                   
+	               if(error != null && !error.equals("0")) {//Zillow is returning 0 for successfull profile
+	            	   return CommonConstants.ZILLOW_PROFILE_ERROR;
+	               }
+               	
                    //update zillow count
                    profileManagementService.modifyZillowCallCount( map );
                    List<SurveyDetails> surveyDetailsList =  profileManagementService.buildSurveyDetailFromZillowAgentReviewMap( map );
                    organizationManagementService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings,
                             user.getCompany().getCompanyId() );
-                   
-                   Map<String, Object> messageRes = (HashMap<String, Object>) map.get( "message" );                   
-                   error = (String) messageRes.get( "code" );
-                   
                }
                 
-               	if(error != null && !error.equals("0")) {//Zillow is returning 0 for successfull profile
-               		return CommonConstants.ZILLOW_PROFILE_ERROR;
-               	}
+               
                	
                 int accountMasterId = accountType.getValue();
                 if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -2107,6 +2261,124 @@ public class SocialManagementController
 
         LOG.info( "Method getProfileUrl() finished from SocialManagementController" );
         return profileUrl;
+    }
+    
+    /**
+     * Disconnect Zillow either with or without deleting Zillow reviews
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/disconnectZillow", method = RequestMethod.POST)
+    public String disconnectZillow( HttpServletRequest request )
+    {
+        String socialMedia =  CommonConstants.ZILLOW_SOCIAL_SITE;
+        //String removeFeedStr = request.getParameter( "removeFeed" );
+        String keepOrDeleteReview = request.getParameter( "keepOrDeleteReview" );
+        boolean removeFeed = true;
+        
+        HttpSession session = request.getSession();
+        OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+            .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
+        SocialMediaTokens mediaTokens = null;
+        try {
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            if ( userSettings == null || entityType == null ) {
+                throw new InvalidInputException( "No user settings found in session" );
+            }
+            if ( socialMedia == null || socialMedia.isEmpty() ) {
+                throw new InvalidInputException( "Social media can not be null or empty" );
+            }
+            
+            SettingsForApplication settings = SettingsForApplication.ZILLOW;
+            boolean isZillow = false;
+            boolean unset = CommonConstants.UNSET_SETTINGS;
+            
+            // Check for the collection to update
+            OrganizationUnitSettings unitSettings = null;
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
+                mediaTokens = unitSettings.getSocialMediaTokens();
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                userSettings.setCompanySettings( unitSettings );
+                //update SETTINGS_SET_STATUS to unset in COMPANY table
+                Company company = userManagementService.getCompanyById( entityId );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, settings, unset );
+                    // Commented as Zillow reviews are saved in Social Survey database, SS-307
+                    // Set IS_ZILLOW_CONNECTED to false
+                    // if ( isZillow ) {
+                    //    company.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                    //    company.setZillowAverageScore( 0.0 );
+                    //    company.setZillowReviewCount( 0 );
+                    // }
+                    userManagementService.updateCompany( company );
+                }
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+                mediaTokens = unitSettings.getSocialMediaTokens();
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
+                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                userSettings.getRegionSettings().put( entityId, unitSettings );
+                //update SETTINGS_SET_STATUS to unset in REGION table
+                Region region = userManagementService.getRegionById( entityId );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, settings, unset );
+                    // Set IS_ZILLOW_CONNECTED to false
+                    // if ( isZillow ) {
+                    //    region.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                    //    region.setZillowAverageScore( 0.0 );
+                    //    region.setZillowReviewCount( 0 );
+                    // }
+                    userManagementService.updateRegion( region );
+                }
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                mediaTokens = unitSettings.getSocialMediaTokens();
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
+                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                userSettings.getBranchSettings().put( entityId, unitSettings );
+                //update SETTINGS_SET_STATUS to unset in BRANCH table
+                Branch branch = userManagementService.getBranchById( entityId );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, settings, unset );
+                    // Set IS_ZILLOW_CONNECTED to false
+                    // if ( isZillow ) {
+                    //    branch.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                    //    branch.setZillowAverageScore( 0.0 );
+                    //    branch.setZillowReviewCount( 0 );
+                    // }
+                    userManagementService.updateBranch( branch );
+                }
+            }
+            if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                unitSettings = userManagementService.getUserSettings( entityId );
+                mediaTokens = unitSettings.getSocialMediaTokens();
+                unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                userSettings.setAgentSettings( (AgentSettings) unitSettings );
+            }
+            if(profileSettings != null) {
+                profileSettings.setSocialMediaTokens( unitSettings.getSocialMediaTokens() );
+            }
+
+            // Remove zillow reviews on disconnect.
+            if ( socialMedia.equals( CommonConstants.ZILLOW_SOCIAL_SITE ) && keepOrDeleteReview != null && keepOrDeleteReview.equals( "delete-review" )) {//and is to delete reviews
+                LOG.debug( "Deleting zillow feed for agent ID : " + entityId );
+                surveyHandler.deleteExistingZillowSurveysByEntity( entityType, entityId );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "Exception occured in disconnectSocialNetwork() while disconnecting with the social Media. Reason : ",
+                e );
+            return "failue";
+        }
+
+        session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
+        return "success";
     }
 
 

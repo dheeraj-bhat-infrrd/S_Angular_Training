@@ -845,6 +845,9 @@ $(document).keyup(function(e) {
 
 		else if ($('#bd-srv-pu').is(":visible"))
 			$('.bd-q-btn-done').trigger('click');
+		
+		else if ($('#zillow-popup').is(":visible"))
+			overlayRevert();
 	}
 });
 

@@ -4662,7 +4662,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             String createdDate = (String) review.get( "reviewDate" );
                             String reviewerProfileUrl = (String) review.get( "reviewerLink" );
                             String customerFirstName = (String) review.get( "reviewer" );
-                            Double score = Double.valueOf( (String) review.get( "rating" ) );
+                            Double score = Double.valueOf( review.get( "rating" ).toString().length() > 0 ? (String) review.get( "rating" ) : "0" );
                             boolean isAbusive = false;
                             
                             SurveyDetails surveyDetails = new SurveyDetails();
