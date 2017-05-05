@@ -11037,7 +11037,6 @@ function saveZillowEmailAddress(profileType) {
 
 //Open show Screen name for Zillow
 function openNextScreenForZillowScreenName(profileType, button, nmls) {
-	$('#overlay-main').show();
 	disableBodyScroll();
 	
 	if (button != 'by-screen-name' && !validateZillowForm(profileType)) {
