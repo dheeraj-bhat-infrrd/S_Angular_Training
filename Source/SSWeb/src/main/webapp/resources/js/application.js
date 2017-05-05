@@ -9075,7 +9075,7 @@ function createZillowProfileUrlPopup(body) {
 		//$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
 	});
 	
-	$('.help-link').click(function(){
+	/*$('.help-link').click(function(){
 		$('.non-zillow-help-container').hide();
 		$('#zillow-help-container').show();
 		
@@ -9090,7 +9090,7 @@ function createZillowProfileUrlPopup(body) {
 			var showContent = $('.help-link').attr('class').split(' ')[1];
 			$('#'+ showContent).show();
 		});
-	});	
+	});*/
 	
 	$('.all-cancel').click(function(){
 		overlayRevert();
@@ -9099,6 +9099,25 @@ function createZillowProfileUrlPopup(body) {
 	$('#zillow-popup').show();
 	disableBodyScroll();
 }
+
+//toDisplayOnClose will be hidden on click of Help icon and will be displayed if Calcel is clicked on Help popup
+function openHelpPopup(toDisplayOnClose) {
+	$('#'+ toDisplayOnClose).hide();
+	$('#zillow-help-container').show();
+	
+	$('#overlay-contact-support').click(function(){
+		overlayRevert();
+		//call help page
+		showMainContent('./showhelppage.do');	
+	});
+	
+	$('#overlay-contact-support-cancel').click(function(){
+		$('#zillow-help-container').hide();
+		$('.non-zillow-help-container').hide();
+		$('#'+ toDisplayOnClose).show();
+	});
+}
+
 /*
  * function saveZillowEmailAddress1(){ console.info("before zillosaveinfo is called"); callAjaxGET("/zillowSaveInfo.do", function(data) { createZillowProfileUrlPopupPath( data); }, true); }
  */

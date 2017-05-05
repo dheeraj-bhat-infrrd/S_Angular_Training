@@ -39,7 +39,7 @@
 																		<input class="zillow-input" name="nmlsId" type="text" maxlength="8" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">
 																</div>
 																<div class="float-left help-link-container">
-																	<a href="#" class="help-link main-container" title="Help"></a>
+																	<a href="#" class="help-link main-container" title="Help" onclick="openHelpPopup('main-container')"></a>
 																</div>
 															</div>
 														</div>
@@ -72,7 +72,7 @@
 																				<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">																	
 																			</div>
 																			<div class="float-left help-link-container">
-																				<a href="#" class="help-link main-container" title="Help"></a>
+																				<a href="#" class="help-link main-container" title="Help" onclick="openHelpPopup('main-container')"></a>
 																			</div>
 																		</div>
 																		
@@ -183,7 +183,7 @@
 														<input class="zillow-input zillowProfileName" name="zillowProfileNameNoScreenForNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">																																				
 													</div>
 													<div class="float-left help-link-container">
-														<a href="#" class="help-link no-screen-name-container" title="Help"></a>
+														<a href="#" class="help-link" title="Help" onclick="openHelpPopup('no-screen-name-container')"></a>
 													</div>										
 												</div>							
 												
@@ -234,7 +234,7 @@
 														<input class="zillow-input zillowProfileName" name="zillowProfileNameForNoNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
 													</div>
 													<div class="float-left help-link-container">
-														<a href="#" class="help-link by-screen-name-container" title="Help"></a>
+														<a href="#" class="help-link" title="Help" onclick="openHelpPopup('by-screen-name-container')"></a>
 													</div>
 												</div>				
 												
