@@ -433,6 +433,21 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	
+	<bean id="surveyquestionupdater"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.SurveyQuestionUpdater" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="surveyBuilder" value-ref="surveyBuilder" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="userManagementService" value-ref="userManagementService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
@@ -655,6 +670,13 @@
 		<property name="startDelay" value="2000" />
 	</bean>
 	
+	<bean id="surveyquestionupdatercron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="surveyquestionupdater" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="2000" />
+	</bean>
+	
 	<bean id="deleteUsedVendastaTicketscron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="deleteUsedVendastaTickets" />
@@ -680,7 +702,7 @@
 				<ref bean="billingreportjobdetail" />
 				<ref bean="dotloopjobdetail" />
 				<ref bean="lonewolfjobdetail" />
-				<ref bean="socialMediaTokenExpiryJobDetail" />
+				<!-- <ref bean="socialMediaTokenExpiryJobDetail" /> -->
 				<ref bean="surveyfileuploadjobdetail" />
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
@@ -693,7 +715,8 @@
 				<!-- <ref bean="remaxEntitiesTransfer" /> -->
 				<!-- <ref bean="updateExistingCompanyPrice" /> -->
 				<!-- <ref bean="hideUsersFromSearch" />	-->
-				<!-- <ref bean="surveysourceidupdater" /> -->			
+				<!-- <ref bean="surveysourceidupdater" /> -->
+				<!-- <ref bean="surveyquestionupdater" /> -->		
 			</list>
 		</property>
 
@@ -715,7 +738,7 @@
 				<ref bean="billingreportcron" />
 				<ref bean="dotloopcron" />
 				<ref bean="lonewolfcron" />
-				<ref bean="socialmediatokenexpirycron" />
+				<!-- <ref bean="socialmediatokenexpirycron" /> -->
 				<ref bean="surveyfileuploadcron" />
 				<ref bean="solrreviewcounterupdatercron" />
 				<!-- <ref bean="setcompanyidsinsocialpostscron" /> -->
@@ -729,6 +752,7 @@
 				<!-- <ref bean="hideUsersFromSearchcron" /> -->
 				<!--  <ref bean="deleteUsedVendastaTicketscron" />-->	
 				<!-- <ref bean="surveysourceidupdatercron" /> -->
+				<!-- <ref bean="surveyquestionupdatercron" /> -->
 			</list>
 		</property>
 		<property name="quartzProperties">

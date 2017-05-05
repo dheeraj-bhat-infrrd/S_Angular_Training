@@ -40,6 +40,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
@@ -86,6 +87,10 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
     @Autowired
     private EmailServices emailServices;
+    
+    
+    @Autowired
+    private SocialManagementService socialManagementService;
     
     @Autowired
     private SocialMediaExceptionHandler socialMediaExceptionHandler;
@@ -232,6 +237,18 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
             	LOG.debug("Post for id "+iden+" and posted by: "+posts.get(CommonConstants.INITIAL_INDEX).getFrom().getName());
             }
             status.setRetries( RETRIES_INITIAL );
+            
+            //check if Facebook token is mark as expired
+            if(token.isTokenExpiryAlertSent()){
+                //mark social media as unexpired
+                token.setTokenExpiryAlertSent( false );
+                token.setTokenExpiryAlertEmail( null );
+                token.setTokenExpiryAlertTime( null );
+                //update in database
+                socialManagementService.updateFacebookToken( collection, iden, token );
+                
+            }
+            
         } catch ( FacebookException e ) {
             
             LOG.error( "Exception in Facebook feed extration. Reason: " + e.getMessage() );

@@ -113,7 +113,7 @@ public class AdminController
 
         if ( company != null && company.getCompanyId() > 0 ) {
             List<LicenseDetail> licenseDetails = company.getLicenseDetails();
-            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE ) {
+            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE || company.getStatus() == CommonConstants.STATUS_INCOMPLETE ) {
                 try {
                     if ( licenseDetails.size() > 0 ) {
                         // Unsubscribing company from braintree

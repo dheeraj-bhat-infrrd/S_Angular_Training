@@ -297,5 +297,11 @@ public interface SocialManagementService
 
     public String getClientCompanyProfileUrlForAgentToPostInSocialMedia( Long agentId, OrganizationUnitSettings unitSettings,
         String collectionType ) throws InvalidInputException;
+
+
+    boolean checkFacebookTokenExpiry( FacebookToken facebookToken );
+
+
+    boolean checkLinkedInTokenExpiry( LinkedInToken linkedInToken );
 }
 // JIRA SS-34 BY RM02 BOC
