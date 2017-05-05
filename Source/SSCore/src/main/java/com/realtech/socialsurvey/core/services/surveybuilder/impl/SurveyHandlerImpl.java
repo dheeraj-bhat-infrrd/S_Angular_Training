@@ -2362,8 +2362,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
                 user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
             if ( companySettings != null && companySettings.getSurvey_settings() != null
-                && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 )
+                && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 ){
                 duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
+            }else{
+                duplicateSurveyInterval = defaultSurveyRetakeInterval;
+            }
         }
 
 
@@ -3137,8 +3140,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
                 currentAgent.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
             if ( companySettings != null && companySettings.getSurvey_settings() != null
-                && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 )
+                && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 ){
                 duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
+            }else{
+                duplicateSurveyInterval = defaultSurveyRetakeInterval;
+            }
         }
 
         // check if incomplete survey exist
