@@ -2600,6 +2600,8 @@ public class SocialManagementController
                 }
                 if ( tokens.getZillowToken() != null && tokens.getZillowToken().getZillowProfileLink() != null ) {
                     model.addAttribute( "zillowLink", tokens.getZillowToken().getZillowProfileLink() );
+                    model.addAttribute( "profileSettings", tokens.getZillowToken() );
+                    session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
                 }
                 if ( tokens.getYelpToken() != null && tokens.getYelpToken().getYelpPageLink() != null ) {
                     model.addAttribute( "yelpLink", tokens.getYelpToken().getYelpPageLink() );
