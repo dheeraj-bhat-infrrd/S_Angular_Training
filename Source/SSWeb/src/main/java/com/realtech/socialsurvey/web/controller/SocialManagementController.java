@@ -1784,7 +1784,11 @@ public class SocialManagementController
         	LenderRef lenderRef = new LenderRef();
         	zillowToken.setLenderRef(lenderRef);
         	mediaTokens.setZillowToken(zillowToken);
-        	profileSettings.getSocialMediaTokens().setZillowToken(zillowToken);
+        	if(profileSettings.getSocialMediaTokens() != null)
+        	    profileSettings.getSocialMediaTokens().setZillowToken(zillowToken);
+        	else {
+        	    profileSettings.setSocialMediaTokens(mediaTokens);
+        	}
         }
         
         LenderRef zillowLenderRef = zillowToken.getLenderRef();
