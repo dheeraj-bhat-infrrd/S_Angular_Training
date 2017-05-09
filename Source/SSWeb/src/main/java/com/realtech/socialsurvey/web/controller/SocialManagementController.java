@@ -2284,6 +2284,7 @@ public class SocialManagementController
         try {
             UserSettings userSettings = (UserSettings) session
                 .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || entityType == null ) {
@@ -2301,6 +2302,8 @@ public class SocialManagementController
             OrganizationUnitSettings unitSettings = null;
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getCompanySettings( entityId );
+                if(!checkForExistiongProfile(unitSettings))
+                    return "no-zillow";
                 mediaTokens = unitSettings.getSocialMediaTokens();
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -2320,6 +2323,8 @@ public class SocialManagementController
                 }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
+                if(!checkForExistiongProfile(unitSettings))
+                    return "no-zillow";
                 mediaTokens = unitSettings.getSocialMediaTokens();
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
@@ -2338,6 +2343,8 @@ public class SocialManagementController
                 }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                if(!checkForExistiongProfile(unitSettings))
+                    return "no-zillow";
                 mediaTokens = unitSettings.getSocialMediaTokens();
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
@@ -2357,11 +2364,16 @@ public class SocialManagementController
             }
             if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 unitSettings = userManagementService.getUserSettings( entityId );
+                
+                if(!checkForExistiongProfile(unitSettings))
+                    return "no-zillow";
+                
                 mediaTokens = unitSettings.getSocialMediaTokens();
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 userSettings.setAgentSettings( (AgentSettings) unitSettings );
             }
+            
             if(profileSettings != null) {
                 profileSettings.setSocialMediaTokens( unitSettings.getSocialMediaTokens() );
             }
@@ -2379,6 +2391,16 @@ public class SocialManagementController
 
         session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
         return "success";
+    }
+    
+    private Boolean checkForExistiongProfile(OrganizationUnitSettings unitSettings) {
+        if(unitSettings != null 
+            && ( unitSettings.getSocialMediaTokens() == null 
+            || unitSettings.getSocialMediaTokens().getZillowToken() == null )) {
+            return false;//"no-zillow";
+        } else {
+            return true;
+        }
     }
 
 
