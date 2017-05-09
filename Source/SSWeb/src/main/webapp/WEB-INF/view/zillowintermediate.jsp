@@ -241,7 +241,7 @@
 											
 											<div class="float-right ol-btn-wrapper overlay-save-noscreen ol-btn-wrapper-right-zillow" style="width: 18% !important;">
 												<div id="overlay-save-noscreen" class="ol-btn cursor-pointer">
-													Save
+													Yes, that's me
 												</div>
 											</div>
 											<div class="float-right ol-btn-wrapper overlay-cancel-noscreen" style="width: 8% !important;">
