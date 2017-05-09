@@ -299,9 +299,6 @@
 											</div>
 										</div>
 									</div>
-									<div id="no-screen-name-confirm-container1" class="non-zillow-help-container clearfix" style="display:none;">
-									ppppppp
-									</div>
 									<div id="disconnect-zillow-container" class="clearfix">
 										<div>
 											<div class="welcome-popup-hdr-wrapper clearfix">
