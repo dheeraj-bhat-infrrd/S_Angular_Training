@@ -11069,6 +11069,8 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				
 				$('#overlay-next-noscreen').click(function() {
 					var zillowScreenName = $('input[name="zillowProfileNameNoScreenForNMLS"]').val();
+					if(zillowScreenName == undefined || zillowScreenName == "")
+						zillowScreenName = $('input[name="zillowProfileNameForNoNMLS"]').val();
 					var zillowProfileNameURI = ""; 
 					if(profileType == 'Mortgage')
 						zillowProfileNameURI = $('#zillowLenderPath').val();
@@ -11090,6 +11092,8 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				$('#overlay-save-noscreen').click(function() {
 					var nmls = $('input[name="nmlsId"]').val();					
 					var zillowProfileName = $('input[name="zillowProfileNameNoScreenForNMLS"]').val();
+					if(zillowProfileName == undefined || zillowProfileName == "")
+						zillowProfileName = $('input[name="zillowProfileNameForNoNMLS"]').val();
 					if (zillowProfileName == undefined || zillowProfileName == "") {
 						$('#overlay-toast').text("Please enter a valid profile name");
 						showToast();
@@ -11139,13 +11143,63 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 		$('#by-screen-name-container').show();
 		
 		$('#overlay-save-zillow-byscreen-name').click(function() {
-			//$('#overlay-save-zillow-byscreen-name').unbind('click');
-			//$('#overlay-cancel-zillow-byscreen-name').unbind('click');
-			//$('#overlay-disconnect-zillow-byscreen-name').unbind('click');
-			$('input[name="nmlsId"]').val("");
-			var zillowProfileName = $('input[name="zillowProfileNameForNoNMLS"]').val();
-			saveZillowProfile(profileType, zillowProfileName, "") ;
+			
+			//$('input[name="nmlsId"]').val("");
+			//var zillowProfileName = $('input[name="zillowProfileNameForNoNMLS"]').val();
+			//saveZillowProfile(profileType, zillowProfileName, "") ;
+			
+			var zillowScreenName = $('input[name="zillowProfileNameNoScreenForNMLS"]').val();
+			if(zillowScreenName == undefined || zillowScreenName == "")
+				zillowScreenName = $('input[name="zillowProfileNameForNoNMLS"]').val();
+			var zillowProfileNameURI = ""; 
+			if(profileType == 'Mortgage')
+				zillowProfileNameURI = $('#zillowLenderPath').val();
+			else
+				zillowProfileNameURI = $('#zillowNonLenderURI').val();
+			$('#zillow-profile-lender-new-link').attr("href", zillowProfileNameURI + zillowScreenName);
+			$('#zillow-profile-lender-new-link').html(zillowProfileNameURI + zillowScreenName);
+			
+			$('#by-screen-name-container').hide();
+			$('#no-screen-name-confirm-container').show();
+			
+			$('#overlay-save-noscreen').click(function() {
+				var nmls = $('input[name="nmlsId"]').val();					
+				var zillowProfileName = $('input[name="zillowProfileNameNoScreenForNMLS"]').val();
+				if(zillowProfileName == undefined || zillowProfileName == "")
+					zillowProfileName = $('input[name="zillowProfileNameForNoNMLS"]').val();
+				if (zillowProfileName == undefined || zillowProfileName == "") {
+					$('#overlay-toast').text("Please enter a valid profile name");
+					showToast();
+					return false;
+				}
+				saveZillowProfile(profileType, zillowProfileName, nmls);
+			});
+			
+			$('#overlay-disconnect-noscreen').click(function() {
+				$('#no-screen-name-container').hide();
+				$('#disconnect-zillow-container').show();
+				var nmls = $('input[name="nmlsId"]').val();					
+				var zillowProfileName = $('input[name="zillowProfileNameForNoNMLS"]').val();
+				
+				$('#overlay-cancel-disconnect-zillow').click(function() {
+					overlayRevert();
+				});
+				
+				$('#overlay-keepreview-disconnect-zillow').click(function() {
+					disconnectZillow(profileType, zillowProfileName, nmls, "keep-review");
+				});
+				
+				$('#overlay-deletereview-disconnect-zillow').click(function() {
+					disconnectZillow(profileType, zillowProfileName, nmls, "delete-review");
+				});
+			});
+			
+			$('#overlay-cancel-noscreen').click(function() {
+				overlayRevert();
+			});
 		});
+		
+		
 		
 		$('#overlay-disconnect-zillow-byscreen-name').click(function() {
 			$('#by-screen-name-container').hide();
