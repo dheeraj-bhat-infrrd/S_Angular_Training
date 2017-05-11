@@ -341,14 +341,14 @@
 												<a href="#" id="overlay-contact-support" class="zillow-link" >Contact Support</a>
 											</div>
 											
-											<div class="float-right ol-btn-wrapper overlay-contact-support-close ol-btn-wrapper-right-zillow" style="width: 18% !important;">
-												<div id="overlay-contact-support-close" class="ol-btn cursor-pointer all-cancel">
+											<div class="float-right ol-btn-wrapper overlay-contact-support-cancel ol-btn-wrapper-right-zillow" style="width: 20% !important;">
+												<div id="overlay-contact-support-cancel" class="ol-btn cursor-pointer">
 													Close
 												</div>
 											</div>
-											<div class="float-right ol-btn-wrapper overlay-contact-support-cancel" style="width: 8% !important;">
+											<!-- <div class="float-right ol-btn-wrapper overlay-contact-support-cancel" style="width: 8% !important;">
 												<a href="#" id="overlay-contact-support-cancel" class="zillow-link" >Cancel</a>
-											</div>
+											</div> -->
 										</div>
 									</div>
 								</form>
