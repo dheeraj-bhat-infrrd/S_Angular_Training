@@ -11050,7 +11050,7 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 	if (button != 'by-screen-name') {
 		callAjaxPOST("/zillowValidateNMLS.do?nmls="+nmls, function(data) {
 			if(data == 'invalid-nmls') {
-				$('#overlay-toast').text("Invalid NMLS");
+				$('#overlay-toast').text("Couldn't find the Zillow profile with this NMLS ID");
 				showToast();
 			} else if(data == 'no-screen-name')  {
 				//show section to insert screen name
