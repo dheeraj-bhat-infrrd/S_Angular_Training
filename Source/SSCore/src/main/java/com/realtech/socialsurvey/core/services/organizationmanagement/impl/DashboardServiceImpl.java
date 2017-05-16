@@ -552,9 +552,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         } else if ( columnName.equals( "branchId" ) ) {
             agentIds = userProfileDao.findUserIdsByBranch( columnValue );
         }
-        Map<Integer, Integer> incompleteSurveys = surveyPreInitiationDao.getIncompletSurveyAggregationCount( companyId, agentId,
-            CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds, criteria );
-        LOG.debug( "Aggregating completed and incomplete surveys" );
+        
+        
+        Map<Integer, Integer> incompleteSurveys =  new HashMap<Integer, Integer>();
+        if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
+            incompleteSurveys = surveyPreInitiationDao.getIncompletSurveyAggregationCount( companyId, agentId,
+                CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds, criteria );
+            LOG.debug( "Aggregating completed and incomplete surveys" );
+        }
+       
         Map<Integer, Integer> allSurveysSent = aggregateAllSurveysSent( incompleteSurveys, completedSurveyToBeProcessed );
 
         LOG.debug( "Getting clicked surveys" );
@@ -585,7 +591,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             && ( incompleteSurveys != null && incompleteSurveys.size() > 0 ) ) {
             return incompleteSurveys;
         } else if ( ( completedSurveys == null || completedSurveys.size() == 0 )
-            && ( incompleteSurveys == null || incompleteSurveys.size() > 0 ) ) {
+            && ( incompleteSurveys == null || incompleteSurveys.size() == 0 ) ) {
             return null;
         } else {
             // both the maps are present
