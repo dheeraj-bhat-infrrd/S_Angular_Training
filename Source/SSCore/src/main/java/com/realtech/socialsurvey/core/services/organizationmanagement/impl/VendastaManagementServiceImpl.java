@@ -442,6 +442,10 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
                 throw new NoRecordsFetchedException( "Invalid EntityId: " + vendastaRmAccount.getEntityId()
                     + " for EntityType: " + vendastaRmAccount.getEntityType() );
             }
+            
+            // fill the default entries for creating the account
+            populateRmAccountDetails( vendastaRmAccount );
+            
             if ( !isForced ) {
                 if ( unitSettings != null && unitSettings.getVendasta_rm_settings() != null
                     && !StringUtils.isEmpty( unitSettings.getVendasta_rm_settings().getAccountId() ) ) {
@@ -483,6 +487,12 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
         dataMap.put( "customerIdentifier", customerIdentifier );
         dataMap.put( "isAlreadyExistingAccount", isAlreadyExistingAccount );
         return dataMap;
+    }
+
+
+    private void populateRmAccountDetails( VendastaRmAccount vendastaRmAccount )
+    {
+        
     }
 
 
