@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -31,20 +30,23 @@ public class DisabledAccountDaoImpl extends GenericDaoImpl<DisabledAccount, Long
      */
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<DisabledAccount> disableAccounts( Date maxDisableDate )
+    public List<DisabledAccount> getAccountsToDisable( Date maxDisableDate )
     {
         try {
             Date currentDate = new Date();
-            Query query = getSession()
-                .createQuery( "update DisabledAccount set status=?, modifiedOn=? where disableDate<? and status=?" );
-            query.setParameter( 0, CommonConstants.STATUS_ACCOUNT_DISABLED );
+            /*Query query = getSession()
+                .createQuery( "update DisabledAccount set status=?, modifiedOn=? where disableDate<? and status=? and isForceDelete=false" );
+            query.setParameter( 0, CommonConstants.DISABLED_ACCOUNT_PROCESSED );
             query.setParameter( 1, currentDate );
             query.setParameter( 2, maxDisableDate );
             query.setParameter( 3, CommonConstants.STATUS_ACTIVE );
-            query.executeUpdate();
+            query.executeUpdate();*/
             Criteria criteria = getSession().createCriteria( DisabledAccount.class );
-            criteria.add( Restrictions.eq( CommonConstants.MODIFIED_ON_COLUMN, currentDate ) );
-            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACCOUNT_DISABLED ) );
+            criteria.add(Restrictions.eq( CommonConstants.IS_FORCE_DELETE_COLUMN, false ));
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+            criteria.add( Restrictions.le( CommonConstants.ACCOUNT_DISABLE_DATE_COLUMN, currentDate ) );
+
+            
             return criteria.list();
         } catch ( HibernateException e ) {
             throw new DatabaseException( "HibernateException caught in disableAccounts(). Nested exception is ", e );
@@ -60,18 +62,14 @@ public class DisabledAccountDaoImpl extends GenericDaoImpl<DisabledAccount, Long
     public List<DisabledAccount> getAccountsForPurge( int graceSpan )
     {
         try {
-            
-            List<Integer> elgibleStatus = new ArrayList<Integer>();
-            elgibleStatus.add( CommonConstants.STATUS_COMPANY_DISABLED );
-            elgibleStatus.add( CommonConstants.STATUS_INACTIVE);
-            
+                        
             Criteria criteria = getSession().createCriteria( DisabledAccount.class );
             Date maxDateForPurge = getNdaysBackDate( graceSpan );
-            Criterion rest1 = Restrictions.eq( "isForceDelete", true );
-            Criterion rest2 = Restrictions.and( Restrictions.lt( CommonConstants.MODIFIED_ON_COLUMN, maxDateForPurge ),
-                Restrictions.in( CommonConstants.STATUS_COLUMN, elgibleStatus ),
-                Restrictions.lt( "disableDate", maxDateForPurge ) );
-            criteria.add( Restrictions.or( rest1, rest2 ) );
+            Criterion criterion = Restrictions.and( 
+                Restrictions.lt( CommonConstants.ACCOUNT_DISABLE_DATE_COLUMN, maxDateForPurge ),
+                Restrictions.eq( CommonConstants.IS_FORCE_DELETE_COLUMN, true ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ));
+            criteria.add(criterion);
             return criteria.list();
         } catch ( HibernateException e ) {
             throw new DatabaseException( "HibernateException caught in getAccountsForPurge(). Nested exception is ", e );

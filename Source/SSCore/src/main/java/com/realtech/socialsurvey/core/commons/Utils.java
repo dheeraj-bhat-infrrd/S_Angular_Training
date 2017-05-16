@@ -50,7 +50,7 @@ public class Utils
 	@Value("${EMAIL_MASKING_SUFFIX}")
 	private String maskingSuffix;
 
-    @Value ( "${SENDER_EMAIL_DOMAIN}")
+    @Value ( "${SOCIALSURVEYME_SENDER_EMAIL_DOMAIN}")
     private String defaultEmailDomain;
 
     @Autowired
@@ -332,6 +332,7 @@ public class Utils
 
     /**
      * Method to encrypt user id in email id
+     * this method is not used by any function but test cases reside on it 
      * */
     public String encryptUserEmailId( String emailId )
     {

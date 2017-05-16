@@ -65,6 +65,10 @@ namespace EncompassSocialSurvey.Service
                 url += EncompassSocialSurveyConstant.fetchCompaniesUrlParameterStateDryRun;
             }
 
+            //get the version of encompass being used
+            string encompassVersion = EncompassSocialSurveyConfiguration.fetchEncompassVersion;
+            url += "&" + EncompassSocialSurveyConstant.fetchCompaniesUrlParameterVersion + "=" + encompassVersion;
+
             Logger.Debug("url for http request is :" + url);
             var response = client.GetAsync(url).Result;
 

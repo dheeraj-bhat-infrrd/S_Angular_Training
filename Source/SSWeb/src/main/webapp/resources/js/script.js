@@ -845,6 +845,9 @@ $(document).keyup(function(e) {
 
 		else if ($('#bd-srv-pu').is(":visible"))
 			$('.bd-q-btn-done').trigger('click');
+		
+		else if ($('#zillow-popup').is(":visible"))
+			overlayRevert();
 	}
 });
 
@@ -1430,6 +1433,7 @@ function initializeFindAProPage() {
 }
 var MappedUserSize = 10;
 var MappedUserStartIndex = 0;
+var MappedUserCount = -1;
 function initializeMapped() {
 	$('#mapped').html('');
 	$('#mapped-paginate-btn').attr("data-start", 0);
@@ -1440,6 +1444,7 @@ function initializeMapped() {
 
 var UnmatchedUserSize = 10;
 var UnmatchedUserStartIndex = 0;
+var UnmatchedUserCount = -1;
 function initializeUnmatchedUserPage() {
 	$('#new').html('');
 	$('#un-new-paginate-btn').attr("data-start", 0);
@@ -1449,6 +1454,7 @@ function initializeUnmatchedUserPage() {
 
 var CorruptRecordsSize = 10;
 var CorruptRecordsStartIndex = 0;
+var CorruptRecordsCount = -1;
 function initializeCorruptRecordsPage() {
 	$('#corrupt').html('');
 	$('#corrupt-paginate-btn').attr("data-start", 0);
@@ -1631,6 +1637,7 @@ function bindEventForUnmatchedUserPage() {
 
 var ProcessedUserSize = 10;
 var ProcessedUserStartIndex = 0;
+var ProcessedUserCount = -1;
 function initializeProcesedUserPage() {
 	$('#processed').html('');
 	$('#un-processed-paginate-btn').attr("data-start", 0);
@@ -1725,6 +1732,7 @@ function fetchMappedUsers(newIndex) {
 	showOverlay();
 	var payload = {
 		"batchSize" : MappedUserSize,
+		"count" : MappedUserCount,
 		"startIndex" : newIndex
 
 	};
@@ -1736,6 +1744,7 @@ function fetchUnmatchedUsers(newIndex) {
 	showOverlay();
 	var payload = {
 		"batchSize" : UnmatchedUserSize,
+		"count" : UnmatchedUserCount,
 		"startIndex" : newIndex
 
 	};
@@ -1748,6 +1757,7 @@ function fetchCorruptRecords(newIndex) {
 	showOverlay();
 	var payload = {
 		"batchSize" : CorruptRecordsSize,
+		"count" : CorruptRecordsCount,
 		"startIndex" : newIndex
 
 	};
@@ -1759,6 +1769,7 @@ function fetchProcessedUsers(newIndex) {
 	showOverlay();
 	var payload = {
 		"batchSize" : ProcessedUserSize,
+		"count" : ProcessedUserCount,
 		"startIndex" : newIndex
 
 	};
@@ -2013,6 +2024,7 @@ function paginateMappedUser(response) {
 	} else {
 		if (start == 0) {
 			var usersSize = reponseJson.totalRecord;
+			MappedUserCount = usersSize ;
 			if (usersSize > 0) {
 				$('#mapped-paginate-btn').show().attr("data-total", usersSize);
 				var totalPage = 0;
@@ -2048,6 +2060,7 @@ function paginateUnmatchedUser(response) {
 	} else {
 		if (start == 0) {
 			var usersSize = reponseJson.totalRecord;
+			UnmatchedUserCount = usersSize;
 			if (usersSize > 0) {
 				$('#un-new-paginate-btn').show().attr("data-total", usersSize);
 				var totalPage = 0;
@@ -2082,6 +2095,7 @@ function paginateCorruptRecords(response) {
 	} else {
 		if (start == 0) {
 			var usersSize = reponseJson.totalRecord;
+			CorruptRecordsCount = usersSize ;
 			if (usersSize > 0) {
 				$('#corrupt-paginate-btn').show().attr("data-total", usersSize);
 				var totalPage = 0;
@@ -2116,6 +2130,7 @@ function paginateProcessedUser(response) {
 	} else {
 		if (start == 0) {
 			var usersSize = reponseJson.totalRecord;
+			ProcessedUserCount = usersSize ;
 			if (usersSize > 0) {
 				$('#un-processed-paginate-btn').show().attr("data-total", usersSize);
 				var totalPage = 0;

@@ -97,9 +97,7 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
 
             if ( smTokens != null && smTokens.getLinkedInToken() != null
                 && smTokens.getLinkedInToken().getLinkedInAccessTokenExpiresIn() != 0L ) {
-                long tokenCreatedOn = smTokens.getLinkedInToken().getLinkedInAccessTokenCreatedOn();
-                long expirySeconds = smTokens.getLinkedInToken().getLinkedInAccessTokenExpiresIn();
-                if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ) {
+                if (socialManagementService.checkLinkedInTokenExpiry( smTokens.getLinkedInToken() )  ) {
                    LinkedInToken linkedInToken = smTokens.getLinkedInToken();
                     if ( !linkedInToken.isTokenExpiryAlertSent() ) {
                         //send alert mail to entity 
@@ -118,9 +116,7 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
             }
             if ( smTokens != null && smTokens.getFacebookToken() != null
                 && smTokens.getFacebookToken().getFacebookAccessTokenExpiresOn() != 0L ) {
-                long tokenCreatedOn = smTokens.getFacebookToken().getFacebookAccessTokenCreatedOn();
-                long expirySeconds = smTokens.getFacebookToken().getFacebookAccessTokenExpiresOn();
-                if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ) {
+                if ( socialManagementService.checkFacebookTokenExpiry( smTokens.getFacebookToken() )  ){
                     FacebookToken facebookToken = smTokens.getFacebookToken();
                     if ( ! facebookToken.isTokenExpiryAlertSent() ) {
                         LOG.debug( "Alert Mail hasn't send to sending alert mail for entity" );
@@ -146,20 +142,19 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
     {
         long expiryHours = expirySeconds / 3600;
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis( tokenCreatedOn );
-        Date createdOn = cal.getTime();
 
         // adding 7 days to created on time
+        cal = Calendar.getInstance();
         cal.add( Calendar.HOUR, 168 );
-        Date createdOnPlusSeven = cal.getTime();
+        Date currentDatePlusSeven = cal.getTime();
 
         Calendar cal2 = Calendar.getInstance();
-        cal2.setTimeInMillis( createdOn.getTime() );
+        cal2.setTimeInMillis( tokenCreatedOn );
 
         cal2.add( Calendar.HOUR, (int) expiryHours );
         Date expiresOn = cal2.getTime();
 
-        if ( createdOnPlusSeven.after( expiresOn ) )
+        if ( currentDatePlusSeven.after( expiresOn ) )
             return true;
 
         return false;

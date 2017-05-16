@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
@@ -47,6 +48,9 @@ public class HierarchyUploadServiceImplTest
 
     @Mock
     private HierarchyDownloadService hierarchyDownloadService;
+
+    @Mock
+    private UserDao userDao;
 
 
     @BeforeClass
@@ -107,6 +111,8 @@ public class HierarchyUploadServiceImplTest
     {
         Company company = new Company();
         company.setCompany( "Raremile" );
+        company.setCompanyId( 0 );
+        Mockito.when( userDao.getRegisteredEmailsInOtherCompanies( company ) ).thenReturn( new ArrayList<String>() );
         Mockito.when( hierarchyDownloadService.fetchUpdatedHierarchyStructure( company ) ).thenReturn( getHierarchyUpload() );
         File file = new File( "." );
         UploadValidation validationObj = hierarchyUploadServiceImpl.validateUserUploadFile( company,

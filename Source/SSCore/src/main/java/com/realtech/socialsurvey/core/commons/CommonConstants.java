@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.commons;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,13 +21,17 @@ public interface CommonConstants
     public static final String CONFIG_PROPERTIES_FILE = "config.properties";
     public static final String MESSAGE_PROPERTIES_FILE = "displaymessage.properties";
     //default email settings 
-    public static final String SENDGRID_SENDER_USERNAME = "SENDGRID_SENDER_USERNAME";
-    public static final String SENDGRID_SENDER_NAME = "SENDGRID_SENDER_NAME";
-    public static final String SENDGRID_SENDER_PASSWORD = "SENDGRID_SENDER_PASSWORD";
+    public static final String SENDGRID_SENDER_SOCIALSURVEYME_USERNAME = "SENDGRID_SENDER_SOCIALSURVEYME_USERNAME";
+    public static final String SENDGRID_SENDER_SOCIALSURVEYME_PASSWORD = "SENDGRID_SENDER_SOCIALSURVEYME_PASSWORD";
+    public static final String SENDGRID_SENDER_SOCIALSURVEYME_NAME = "SENDGRID_SENDER_SOCIALSURVEYME_NAME";
+    public static final String SEND_EMAIL_THROUGH_SOCIALSURVEY_ME = "socialsurvey.me";
+    
     //email settings for socialsurvey.us
     public static final String SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME = "SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME";
     public static final String SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD = "SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD";
     public static final String SENDGRID_SENDER_SOCIALSURVEYUS_NAME = "SENDGRID_SENDER_SOCIALSURVEYUS_NAME";
+    public static final String SEND_EMAIL_THROUGH_SOCIALSURVEY_US = "socialsurvey.us";
+
     /**
      * Default constants
      */
@@ -123,6 +128,7 @@ public interface CommonConstants
     public static final double MAX_RATING_SCORE = 5;
     public static final String YES_STRING = "Y";
     public static final String NO_STRING = "N";
+    public static final int DISABLED_ACCOUNT_PROCESSED = 2;
 
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
@@ -304,6 +310,8 @@ public interface CommonConstants
     public static final String SURVEY_COMPLETED_DATE_COLUMN = "surveyCompletedDate";
     public static final String SURVEY_UPDATED_DATE_COLUMN = "surveyUpdatedDate";
     public static final String SURVEY_TRANSACTION_DATE_COLUMN = "surveyTransactionDate";
+    public static final String ACCOUNT_DISABLE_DATE_COLUMN = "disableDate";
+    public static final String IS_FORCE_DELETE_COLUMN = "isForceDelete";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -354,9 +362,7 @@ public interface CommonConstants
     public static final String CITY = "city";
     public static final String CRM_SOURCE = "crm_source";
     public static final String VERTICAL = "vertical";
-    public static final String SEND_EMAIL_THROUGH_SOCIALSURVEY_ME = "socialsurvey.me";
-    public static final String SEND_EMAIL_THROUGH_SOCIALSURVEY_US = "socialsurvey.us";
-    
+   
     // JIRA - SS-536: Added for manual registration via invite
     public static final String BILLING_MODE_COLUMN = "billingMode";
     public static final String VERTICAL_COLUMN = "verticalsMaster";
@@ -369,10 +375,15 @@ public interface CommonConstants
     public static final String USER_PROFILE_LIST = "profileList";
     public static final String USER_PROFILE_MAP = "profileMap";
     public static final String USER_PROFILE_SETTINGS = "profileSettings";
+    public static final String USER_ZILLOW_PROFILE_TYPE_NMLS = "nmls";
+    public static final String USER_ZILLOW_NMLS_ID = "nmls-id";
+    public static final String USER_ZILLOW_PROFILE_TYPE_PROFILENAME = "profileName";
     public static final String USER_ACCOUNT_SETTINGS = "accountSettings";
     public static final String USER_APP_SETTINGS = "appSettings";
     public static final String COMPLAIN_REG_SETTINGS = "complaintRegSettings";
     public static final String ERROR = "error";
+    public static final String ZILLOW_PROFILE_ERROR = "zillow-error";
+    public static final String ZILLOW_NMLS_REQUIRED_ERROR ="zillow-nmls-required-error";
     public static final String MESSAGE = "message";
     public static final String EMAIL_TYPE = "emailtype";
     public static final String EMAIL_TYPE_WORK = "work";
@@ -528,7 +539,6 @@ public interface CommonConstants
     public static final String ENCOMPASS_GENERATE_REPORT_COLUMN = "generateReport";
     public static final String ENCOMPASS_DEFAULT_FEILD_ID = "1997";
     public static final String ENCOMPASS_VERSION_COULMN = "version";
-    public static final List<String> ENCOMPASS_VERSIONS = Arrays.asList( "16.2.0","16.3.2","17.1.0" );
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
@@ -609,7 +619,7 @@ public interface CommonConstants
     public static final String PAYMENT_CHANGE_FLAG = "paymentChange";
     public static final int STATUS_PAYMENT_FAILED = 2;
     public static final String DISABLED_ACCOUNT_FLAG = "disabled";
-    public static final int PAYMENT_RETRIES = 2;
+    public static final int PAYMENT_RETRIES = 1;
 
     // Survey Constants
     public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
@@ -862,8 +872,6 @@ public interface CommonConstants
 
     public static final String SURVEY_SOURCE_ZILLOW = "Zillow";
     
-    public static final String IS_REALTECH_ADMIN = "isRealTechAdmin";
-
     //Excel constants
     public final String EXCEL_FORMAT = "application/vnd.ms-excel";
     public final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
@@ -1150,6 +1158,9 @@ public interface CommonConstants
 
 
     public static final String ZILLOW_PROFILE_URL = "http://zillow.com/profile/";
+    public static final String ZILLOW_LENDER_PROFILE_URL = "http://zillow.com/lender-profile/";
+    
+    public static final List<String> ZILLOW_LENDING_VERTICALS = new ArrayList<String>(Arrays.asList("Mortgage"));
 
     // Zillow Temp Post Table column names
     public static final String ZILLOW_REVIEW_URL_COLUMN = "zillowReviewUrl";

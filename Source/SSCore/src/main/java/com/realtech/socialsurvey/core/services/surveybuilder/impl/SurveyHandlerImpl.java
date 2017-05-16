@@ -180,6 +180,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Value ( "${MAX_SURVEY_REMINDER_INTERVAL}")
     private int maxSurveyReminderInterval;
+    
+    @Value ( "${DEFAULT_SURVEY_RETAKE_INTERVAL}")
+    private int defaultSurveyRetakeInterval;
+    
 
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_SUBJECT}")
     String paramOrderTakeSurveySubject;
@@ -1767,8 +1771,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
                         user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                     if ( companySettings != null && companySettings.getSurvey_settings() != null
-                        && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 )
-                        duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
+                        && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 ){
+                        duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();                        
+                    }else{
+                        duplicateSurveyInterval = defaultSurveyRetakeInterval;
+                    }
 
                     // check the pre-initiation and then the survey table
                     List<SurveyPreInitiation> incompleteSurveyCustomers = null;
@@ -2355,8 +2362,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
                 user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
             if ( companySettings != null && companySettings.getSurvey_settings() != null
-                && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 )
+                && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 ){
                 duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
+            }else{
+                duplicateSurveyInterval = defaultSurveyRetakeInterval;
+            }
         }
 
 
@@ -3130,8 +3140,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
                 currentAgent.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
             if ( companySettings != null && companySettings.getSurvey_settings() != null
-                && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 )
+                && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 ){
                 duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
+            }else{
+                duplicateSurveyInterval = defaultSurveyRetakeInterval;
+            }
         }
 
         // check if incomplete survey exist

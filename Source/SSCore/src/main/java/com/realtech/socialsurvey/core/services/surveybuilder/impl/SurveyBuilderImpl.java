@@ -792,12 +792,12 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	 */
 	@Override
 	@Transactional
-	public void addDefaultSurveyToCompany(User user) throws InvalidInputException {
+	public void createNewSurveyForCompany(User user) throws InvalidInputException {
 		if (user == null) {
-			LOG.error("addDefaultSurveyToCompany : Invalid company parameter passed.");
-			throw new InvalidInputException("addDefaultSurveyToCompany : Invalid company parameter passed.");
+			LOG.error("createNewSurveyForCompany : Invalid user parameter passed.");
+			throw new InvalidInputException("createNewSurveyForCompany : Invalid user parameter passed.");
 		}
-		LOG.info("Adding default survey to company for user id : " + user.getUserId());
+		LOG.info("Adding new survey to company for user id : " + user.getUserId());
 
 		// Next we get the default survey for a particular vertical
 		LOG.debug("Fetching the default survey");
@@ -817,15 +817,21 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		// If default survey exists we map it to the company. Otherwise we dont.
 		if (defaultSurvey != null) {
 			// Now we add the survey to the company
-			LOG.debug("Adding aurvey to company");
-			addSurveyToCompany(user, defaultSurvey, user.getCompany());
-			LOG.info("Default survey added to the company");
+			LOG.debug("Cloning survey to company");
+			try {
+                cloneSurveyFromTemplate( user, defaultSurvey.getSurveyId() );
+            } catch ( NoRecordsFetchedException e ) {
+                LOG.warn("Error while creating new survey for user. Mapping default survey for the user" + user.getUserId());
+                addSurveyToCompany(user, defaultSurvey, user.getCompany());
+                LOG.info("Default survey added to the company");
+            }
+			
 		}
 		else {
 			LOG.info("Default survey not found, so no default survey has been mapped to the company");
 		}
 
-		LOG.info("addDefaultSurveyToCompany completed!");
+		LOG.info("createNewSurveyForCompany completed! for company : " + user.getCompany().getCompanyId());
 	}
 	
 	/**

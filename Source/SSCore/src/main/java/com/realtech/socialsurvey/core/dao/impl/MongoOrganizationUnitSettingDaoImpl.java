@@ -697,7 +697,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
      * @throws NoRecordsFetchedException
      */
     @Override
-    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state )
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state, String encompassVersion )
         throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "Getting Company list for encompass where state : " + state );
@@ -706,6 +706,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             throw new InvalidInputException( "state is not present to fetch encompass info list." );
         }
         
+
+        if ( encompassVersion == null || encompassVersion.isEmpty() ) {
+            LOG.debug( " encompass version is not present to fetch encompass info list." );
+            throw new InvalidInputException( "encompass version is not present to fetch encompass info list." );
+        } 
         
         List<OrganizationUnitSettings> organizationUnitsSettingsList = null;
         Query query = new Query();
@@ -721,8 +726,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         }
 
         //filter out other versions of encompass info needed
-       /* query.addCriteria(
-            Criteria.where( KEY_CRM_INFO + "." + CommonConstants.ENCOMPASS_VERSION_COULMN ).is( encompassVersion ) );*/
+        query.addCriteria(
+            Criteria.where( KEY_CRM_INFO + "." + CommonConstants.ENCOMPASS_VERSION_COULMN ).is( encompassVersion ) );
 
         //Add criteria to make sure that it doesn't pick up companies that are deleted
         query.addCriteria( Criteria.where( KEY_STATUS ).ne( CommonConstants.STATUS_DELETED_MONGO ) );

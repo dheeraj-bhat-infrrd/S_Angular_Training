@@ -26,8 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
@@ -93,12 +95,17 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
     @Autowired
     private HierarchyStructureUploadService hierarchyStructureUploadService;
+    
+    @Autowired
+    private UserDao userDao;
+
 
     @Value ( "${MASK_EMAIL_ADDRESS}")
     private String maskEmail;
 
 
     @Override
+    @Transactional
     public UploadValidation validateUserUploadFile( Company company, String fileName, boolean isAppend )
         throws InvalidInputException
     {
@@ -133,7 +140,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             Map<String, String> userErrors = new HashMap<String, String>();
             parseRegions( workBook, validationObject, regionErrors, isAppend );
             parseBranches( workBook, validationObject, branchErrors, isAppend );
-            parseUsers( workBook, validationObject, userErrors, isAppend );
+            parseUsers( workBook, validationObject, userErrors, isAppend ,  company);
             if ( validationObject.isBranchHeadersInvalid() || validationObject.isRegionHeadersInvalid()
                 || validationObject.isUserHeadersInvalid() ) {
                 throw new InvalidInputException();
@@ -758,7 +765,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     }
 
     void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> userErrors,
-        boolean isAppend ) throws InvalidInputException
+        boolean isAppend , Company company ) throws InvalidInputException
     {
         // Parse each row for users and then check for valid users. On successful validation, check if the user is a new, modified or deleted user.
         // Possible reasons for errors
@@ -783,6 +790,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         Set<String> emailSet = new HashSet<String>();
         Map<String, String> sourceUserIdErrors = new HashMap<String, String>();
         Map<String, String> emailErrors = new HashMap<String, String>();
+        
+        List<String> existingEmailsInApplication = userDao.getRegisteredEmailsInOtherCompanies( company );
 
         //Create header map
         Map<Integer, String> headerMap = new HashMap<Integer, String>();
@@ -933,7 +942,13 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     updateUploadValidationWithModifiedUser( uploadedUser, validationObject, userMap );
                 }
                 uploadedUsers.add( uploadedUser );
-
+                
+                //check if email is already present in other companies
+                if(existingEmailsInApplication.contains( uploadedUser.getEmailId() )){
+                    emailErrors.put( uploadedUser.getSourceUserId(), "The email address " + uploadedUser.getEmailId()
+                        + " is already registered with other company at row : " + uploadedUser.getRowNum() );
+                }
+                
                 //Check for email address duplication
                 if ( emailSet.contains( uploadedUser.getEmailId() ) ) {
                     emailErrors.put( uploadedUser.getSourceUserId(), "The email address " + uploadedUser.getEmailId()

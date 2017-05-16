@@ -308,9 +308,9 @@ public class SurveyBuilderImplTest
 
     //Tests for addDefaultSurveyToCompany
     @Test ( expected = InvalidInputException.class)
-    public void addDefaultSurveyToCompanyTestUserNull() throws InvalidInputException
+    public void createNewSurveyForCompanyTestUserNull() throws InvalidInputException
     {
-        surveyBuilderImpl.addDefaultSurveyToCompany( null );
+        surveyBuilderImpl.createNewSurveyForCompany( null );
     }
 
 

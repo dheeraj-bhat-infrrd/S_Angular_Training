@@ -162,5 +162,8 @@ public final class EmailTemplateConstants {
     
     public static final String PAYMENT_RETRIES_FAILED_MAIL_SUBJECT = "PaymentRetriesFailedAlertMailSubject.txt";
     public static final String PAYMENT_RETRIES_FAILED_MAIL_BODY = "PaymentRetriesFailedAlertMailBody.html";
+    
+    public static final String CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_SUBJECT = "CancelSubscriptionRequestAlertMailSubject.txt";
+    public static final String CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_BODY = "CancelSubscriptionRequestAlertMailBody.html";
 
 }

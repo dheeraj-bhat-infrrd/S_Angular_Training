@@ -113,7 +113,8 @@ public class AdminController
 
         if ( company != null && company.getCompanyId() > 0 ) {
             List<LicenseDetail> licenseDetails = company.getLicenseDetails();
-            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE ) {
+            //delete a company if status is inactive or incomplete or registration is incomplete or payment is due
+            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE || company.getStatus() == CommonConstants.STATUS_INCOMPLETE || (company.getStatus() == 1 && licenseDetails.size() == 0) ) {
                 try {
                     if ( licenseDetails.size() > 0 ) {
                         // Unsubscribing company from braintree
@@ -140,8 +141,6 @@ public class AdminController
                     LOG.error( "An error occurred while purging company : " + companyId + ". Reason : ", e );
                 }
 
-                // marking comapny to be deleted forcefully during purge batch
-                //organizationManagementService.forceDeleteDisabledAccount( company.getCompanyId(), loggedInUser.getUserId() );
             }
         }
         return message;
@@ -533,12 +532,6 @@ public class AdminController
             //Set the autologin attribute as true
             newSession.setAttribute( CommonConstants.IS_AUTO_LOGIN, "true" );
             newSession.setAttribute( CommonConstants.REALTECH_USER_ID, adminUser.getUserId() );
-            if(adminUser.isSuperAdmin()){
-                newSession.setAttribute( CommonConstants.IS_REALTECH_ADMIN, true );
-            }else{
-                newSession.setAttribute( CommonConstants.IS_REALTECH_ADMIN, false );
-            }
-
             sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
 
         } catch ( NonFatalException e ) {

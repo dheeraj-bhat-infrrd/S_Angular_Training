@@ -81,9 +81,12 @@ public class EmailServicesImpl implements EmailServices
 
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-
-    @Value ( "${SENDER_EMAIL_DOMAIN}")
-    private String defaultEmailDomain;
+    
+    @Value ( "${SOCIALSURVEYME_SENDER_EMAIL_DOMAIN}")
+    private String defaultSendGridMeEmailDomain;
+    
+    @Value ("${SOCIALSURVEYUS_SENDER_EMAIL_DOMAIN}")
+    private String defaultSendGridUsEmailDomain;
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String appBaseUrl;
@@ -1845,7 +1848,15 @@ public class EmailServicesImpl implements EmailServices
         
         //JIRA SS-975 end
         
+        //checking for the right defaultEmailDomain
+        String defaultEmailDomain = null ;
+        if( sendEmailThrough == null || sendEmailThrough.isEmpty() || sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME ) ){
+            defaultEmailDomain = defaultSendGridMeEmailDomain ;
+        }else if( sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US  )){
+            defaultEmailDomain = defaultSendGridUsEmailDomain ;
+        }
         emailEntity.setSenderEmailId( "u-" + agentSettings.getUserEncryptedId() + "@" + defaultEmailDomain );
+        
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );
 
         LOG.debug( "Prepared email entity for sending mail" );
@@ -2107,7 +2118,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void forwardCustomerReplyMail( String recipientMailId, String subject, String mailBody, String senderName,
-        String senderEmailAddress, String messageId ) throws InvalidInputException, UndeliveredEmailException
+        String senderEmailAddress, String messageId, String sendUsingDomain ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Executing the sendSurveyReminderMail() method" );
         boolean saveForwardMailDetails = true;
@@ -2164,6 +2175,11 @@ public class EmailServicesImpl implements EmailServices
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         emailEntity.setSenderName( senderName );
         emailEntity.setSenderEmailId( senderEmailAddress );
+        
+        if(sendUsingDomain != null && sendUsingDomain.equals(defaultSendGridUsEmailDomain)){
+            emailEntity.setSendEmailThrough(CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US);
+        }
+        
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmail( emailEntity, subject, mailBody, true, false );
         LOG.info( "Successfully forwarded customer reply mail from " + senderEmailAddress + " to : " + recipientMailId );
@@ -2325,6 +2341,38 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements
             .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.PAYMENT_RETRIES_FAILED_MAIL_BODY );
+        messageBodyReplacements
+            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, companyName ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+        LOG.info( "Successfully sent payment faield alert mail" );
+    }
+    
+    
+    
+    @Async
+    @Override
+    public void sendCancelSubscriptionRequestAlertMail( String recipientMailId, String displayName, String companyName )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending retries exhausted mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending payment faield alert mail " );
+        }
+        if ( displayName == null || displayName.isEmpty() ) {
+            LOG.error( "displayName parameter is empty or null for sending retry exhausted mail " );
+            throw new InvalidInputException( "displayName parameter is empty or null for sending payment faield alert mail " );
+        }
+
+        LOG.info( "Sending payment faield alert email to : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_BODY );
         messageBodyReplacements
             .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, companyName ) );
 

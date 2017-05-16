@@ -554,7 +554,7 @@ public interface UserManagementService
     public void removeUserProfile( User user, User adminUser, Long profileId ) throws UserAssignmentException;
 
 
-    UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize )
+    UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize, long count )
         throws InvalidInputException, NoRecordsFetchedException;
 
 

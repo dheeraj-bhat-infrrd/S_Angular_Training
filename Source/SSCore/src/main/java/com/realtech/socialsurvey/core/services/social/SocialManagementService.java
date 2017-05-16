@@ -213,15 +213,15 @@ public interface SocialManagementService
     public void removeProcessedZillowTempPosts( List<Long> processedZillowTempPostIds );
 
 
-    SurveyPreInitiationList getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+    SurveyPreInitiationList getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize , long count )
         throws InvalidInputException;
 
 
-    SurveyPreInitiationList getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+    SurveyPreInitiationList getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize , long count )
         throws InvalidInputException;
 
 
-    SurveyPreInitiationList getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+    SurveyPreInitiationList getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize , long count )
         throws InvalidInputException;
 
 
@@ -297,5 +297,11 @@ public interface SocialManagementService
 
     public String getClientCompanyProfileUrlForAgentToPostInSocialMedia( Long agentId, OrganizationUnitSettings unitSettings,
         String collectionType ) throws InvalidInputException;
+
+
+    boolean checkFacebookTokenExpiry( FacebookToken facebookToken );
+
+
+    boolean checkLinkedInTokenExpiry( LinkedInToken linkedInToken );
 }
 // JIRA SS-34 BY RM02 BOC
