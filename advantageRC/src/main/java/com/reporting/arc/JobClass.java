@@ -1,16 +1,17 @@
 /**
  * 
  */
-package com.ss.aez.cronjob;
+package com.reporting.arc;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import com.ss.aez.main.MongoExportTask;
-import com.ss.aez.main.MySqlImportTask;
-import com.ss.aez.report.ReportGenerater;
-import com.ss.aez.util.EmailSendingUtil;
+import com.reporting.arc.db.MongoExportTask;
+import com.reporting.arc.db.MySqlImportTask;
+import com.reporting.arc.reports.ReportGenerater;
+import com.reporting.arc.utils.EmailSendingUtil;
+
 
 /**
  * @author Subhrajit

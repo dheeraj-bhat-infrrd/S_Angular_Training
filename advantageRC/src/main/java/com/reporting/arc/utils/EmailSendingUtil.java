@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.ss.aez.util;
+package com.reporting.arc.utils;
 
 import com.sendgrid.SendGrid;
 import com.sendgrid.SendGrid.Email;
