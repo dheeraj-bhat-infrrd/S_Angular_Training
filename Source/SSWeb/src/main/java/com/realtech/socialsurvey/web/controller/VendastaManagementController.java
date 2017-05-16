@@ -31,7 +31,11 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.VendastaMa
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
+import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
 import com.realtech.socialsurvey.web.common.JspResolver;
+
+import retrofit.client.Response;
 
 
 /**
@@ -56,6 +60,9 @@ public class VendastaManagementController
 
     @Autowired
     UrlValidationHelper urlValidationHelper;
+
+    @Autowired
+    SSApiIntergrationBuilder ssApiIntergrationBuilder;
 
 
     // updates the boolean value vendastaAccessible in mongo for every hierarchy
@@ -286,4 +293,28 @@ public class VendastaManagementController
         return JspResolver.VENDASTA_SSO_ERROR;
     }
 
+
+    @RequestMapping ( value = "/vendasta/rm/account/create", method = RequestMethod.GET)
+    @ResponseBody
+    public String createVendastaRmAccount( HttpServletRequest request )
+    {
+        DisplayMessage message = null;
+        try {
+            HttpSession currentSession = request.getSession( false );
+            String entityType = (String) currentSession.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            long entityId = (long) currentSession.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            VendastaRmCreateRequest createRequest = new VendastaRmCreateRequest();
+            createRequest.setEntityId( entityId );
+            createRequest.setEntityType( entityType );
+
+            Response apiResponse = ssApiIntergrationBuilder.getIntegrationApi().createVendastaRmAccount( createRequest, false );
+            message = new DisplayMessage( apiResponse.getBody().toString(), DisplayMessageType.SUCCESS_MESSAGE );
+
+        } catch ( Exception unhandledException ) {
+            LOG.error( "unable to create account in vendasta, Reason: " + unhandledException.getMessage(), unhandledException );
+            message = messageUtils.getDisplayMessage( unhandledException.getMessage(), DisplayMessageType.ERROR_MESSAGE );
+        }
+
+        return new Gson().toJson( message );
+    }
 }

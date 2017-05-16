@@ -486,6 +486,7 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
     }
 
 
+    @SuppressWarnings ( "unchecked")
     private String createRmAccount( VendastaRmAccount vendastaRmAccount, Map<String, Object> hierarchyDetails )
         throws IOException, InvalidInputException
     {
