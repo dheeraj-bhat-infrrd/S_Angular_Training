@@ -2258,11 +2258,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( endDate != null )
             endTime = new Timestamp( endDate.getTime() );
         
+        List<SurveyPreInitiation> surveys = null;
         if ( iden > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
-            
+             surveys = surveyPreInitiationDao.getIncompleteSurvey( startTime, endTime, startIndex,
+                numOfRows, agentIds, isCompanyAdmin, iden, realtechAdmin );
         }
-        List<SurveyPreInitiation> surveys = surveyPreInitiationDao.getIncompleteSurvey( startTime, endTime, startIndex,
-            numOfRows, agentIds, isCompanyAdmin, iden, realtechAdmin );
+       
         return surveys;
     }
     
