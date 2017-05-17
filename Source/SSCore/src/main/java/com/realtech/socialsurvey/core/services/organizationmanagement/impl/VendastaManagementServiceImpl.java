@@ -500,6 +500,9 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
         
         if( unitSettings.getContact_details().getCountry() != null && vendastaRmAccount.getCountry() == null ){
             vendastaRmAccount.setCountry( unitSettings.getContact_details().getCountry() );
+            
+        }if( unitSettings.getContact_details().getName() != null && vendastaRmAccount.getCompanyName() == null ){
+            vendastaRmAccount.setCompanyName( unitSettings.getContact_details().getName() );
         }
         
         if( unitSettings.getContact_details().getState() != null && vendastaRmAccount.getState() == null ){
