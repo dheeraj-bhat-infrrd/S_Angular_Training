@@ -5216,16 +5216,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyHandler.updateZillowSurveyUpdatedDateInExistingSurveyDetails( existingSurveyDetails );
             }
             
-
-            LOG.info("Saving review in temp table");
+            //if survey is new, surveyDetails.get_id() will not be null, coz, a new data entry happened to SURVEY_DETAILS Mongo Collection
             if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
-                && fromBatch ) {
-                postToTempTable( collectionName, profile, surveyDetails );
-                
-            }
-
-           
-            
+                && fromBatch && surveyDetails != null && surveyDetails.get_id() != null ) {
+                LOG.info("Saving review in temp table");
+                postToTempTable( collectionName, profile, surveyDetails );                
+            }                    
         }
         if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
             long reviewCount = getReviewsCount( profile.getIden(), -1, -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false,
