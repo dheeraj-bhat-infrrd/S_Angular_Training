@@ -415,7 +415,7 @@ public class SocialMediaTokenController
             accessToken = facebook.getOAuthAccessToken( oauthCode, facebookOauthRedirectUrlForRequestServer );
             facebook4j.User fbUser = facebook.getUser( facebook.getId() );
             if ( fbUser != null ) {
-                profileLink = fbUser.getLink().toString();
+                profileLink = facebookUri +  facebook.getId() ; //fbUser.getLink().toString();
                 FacebookPage personalUserAccount = new FacebookPage();
                 personalUserAccount.setAccessToken( accessToken.getToken() );
                 personalUserAccount.setName( fbUser.getName() );

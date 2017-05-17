@@ -143,6 +143,14 @@ import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
+import facebook4j.Facebook;
+import facebook4j.FacebookException;
+import facebook4j.FacebookFactory;
+import facebook4j.Post;
+import facebook4j.Reading;
+import facebook4j.ResponseList;
+import facebook4j.auth.AccessToken;
+
 
 @DependsOn ( "generic")
 @Component
@@ -7841,24 +7849,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( settings != null && settings.getSocialMediaTokens() != null
             && settings.getSocialMediaTokens().getFacebookToken() != null ) {
             FacebookToken facebookToken = settings.getSocialMediaTokens().getFacebookToken();
-            long tokenCreatedOn = facebookToken.getFacebookAccessTokenCreatedOn();
-            long expirySeconds = facebookToken.getFacebookAccessTokenExpiresOn();
             if ( facebookToken.getFacebookAccessTokenExpiresOn() != 0L ) {
-                if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ) {
-                    socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                if ( socialManagementService.checkFacebookTokenExpiry( facebookToken )  ) {
+                    //check if token is still expired
+                    socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE ); 
                 }
             }
-            if ( facebookToken.isTokenExpiryAlertSent() )
-                socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
         }
 
         //linkedin token
         if ( settings != null && settings.getSocialMediaTokens() != null
             && settings.getSocialMediaTokens().getLinkedInToken() != null ) {
             LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInToken();
-            long tokenCreatedOn = linkedInToken.getLinkedInAccessTokenCreatedOn();
-            long expirySeconds = linkedInToken.getLinkedInAccessTokenExpiresIn();
-            if ( checkTokenExpiry( tokenCreatedOn, expirySeconds ) ) {
+            if ( socialManagementService.checkLinkedInTokenExpiry( linkedInToken ) ) {
                 socialMedias.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
             }
         }
@@ -7866,40 +7869,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "method getExpiredSocailMedia ended" );
         return new ArrayList<String>( socialMedias );
     }
-
-
-    /**
-     * 
-     * @param tokenCreatedOn
-     * @param expirySeconds
-     * @return
-     */
-    private boolean checkTokenExpiry( long tokenCreatedOn, long expirySeconds )
-    {
-        long expiryHours = expirySeconds / 3600;
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis( tokenCreatedOn );
-        Date createdOn = cal.getTime();
-
-
-        Calendar curDateCal = Calendar.getInstance();
-        // adding 7 days to current time
-        curDateCal.add( Calendar.HOUR, 168 );
-        Date curDatePlusSeven = curDateCal.getTime();
-
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTimeInMillis( createdOn.getTime() );
-
-        cal2.add( Calendar.HOUR, (int) expiryHours );
-        Date expiresOn = cal2.getTime();
-
-        if ( curDatePlusSeven.after( expiresOn ) )
-            return true;
-
-        return false;
-
-    }
-
 
     public List<Long> fetchEntityIdsWithHiddenAttribute( String CollectionName )
     {

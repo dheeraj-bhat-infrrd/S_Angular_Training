@@ -487,7 +487,7 @@ public class OrganizationManagementController
             // We check if there is mapped survey for the company and add a default survey if
             // not.
             if ( surveyBuilder.checkForExistingSurvey( user ) == null ) {
-                surveyBuilder.addDefaultSurveyToCompany( user );
+                surveyBuilder.createNewSurveyForCompany( user );
             }
 
             // check the company and see if manual registaration. Skip payment in that case
