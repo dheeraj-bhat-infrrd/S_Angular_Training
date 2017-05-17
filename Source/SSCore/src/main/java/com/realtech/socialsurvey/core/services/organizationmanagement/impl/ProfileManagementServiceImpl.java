@@ -73,6 +73,7 @@ import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleBusinessToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
+import com.realtech.socialsurvey.core.entities.LenderRef;
 import com.realtech.socialsurvey.core.entities.LendingTreeToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInProfileData;
@@ -110,6 +111,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBody;
+import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBodyByNMLS;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationLenderApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
@@ -2255,8 +2257,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             startTime = new Timestamp( startDate.getTime() );
         if ( endDate != null )
             endTime = new Timestamp( endDate.getTime() );
-        List<SurveyPreInitiation> surveys = surveyPreInitiationDao.getIncompleteSurvey( startTime, endTime, startIndex,
-            numOfRows, agentIds, isCompanyAdmin, iden, realtechAdmin );
+        
+        List<SurveyPreInitiation> surveys = null;
+        if ( iden > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
+             surveys = surveyPreInitiationDao.getIncompleteSurvey( startTime, endTime, startIndex,
+                numOfRows, agentIds, isCompanyAdmin, iden, realtechAdmin );
+        }
+       
         return surveys;
     }
     
@@ -2284,7 +2291,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             startTime = new Timestamp( startDate.getTime() );
         if ( endDate != null )
             endTime = new Timestamp( endDate.getTime() );
-    	count = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, new int[]{CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED}, startTime, endTime, agentIds);
+        
+        if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
+            count = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, new int[]{CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED}, startTime, endTime, agentIds);            
+        }
     	return count;
     }
 
@@ -4404,13 +4414,56 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     ZillowToken zillowToken = token.getZillowToken();
                     String zillowScreenName = zillowToken.getZillowScreenName();
                     String zillowLenderId = zillowToken.getZillowLenderId();
+                    LenderRef zillowLenderRef = zillowToken.getLenderRef();
                     Response response = null;
                     
-                    
-                    if( ! StringUtils.isEmpty( zillowLenderId ) ){
+                   // if nmls found, use it
+                    if(zillowLenderRef != null && zillowLenderRef.getNmlsId() != null) {
+                    	LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : " + zillowLenderRef.getNmlsId() + " and screen name : " + zillowScreenName );
+                    	FetchZillowReviewBodyByNMLS fetchZillowReviewBodyByNMLS = new FetchZillowReviewBodyByNMLS();                       
+                        LenderRef lenderRef = new LenderRef();
+                        lenderRef.setNmlsId(zillowLenderRef.getNmlsId());
+                        fetchZillowReviewBodyByNMLS.setLenderRef(lenderRef);
+                        fetchZillowReviewBodyByNMLS.setPartnerId( zillowPartnerId );
+                        ZillowIntegrationLenderApi zillowIntegrationLenderApi = zillowIntegrationApiBuilder.getZillowIntegrationLenderApi();
+                        response = zillowIntegrationLenderApi.fetchZillowReviewsByNMLS( fetchZillowReviewBodyByNMLS );
+                        
+                        if ( response != null ) {
+                            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+                        }
+                        
+                        //save to api call details
+                        Gson gson = new Gson();
+                        String requestBody = gson.toJson( fetchZillowReviewBodyByNMLS );
+                        
+                        LOG.info("NMLS id : " + zillowLenderRef.getNmlsId() + " Zillow Data: " + responseString);
+                        
+                        saveExternalAPICallDetailForZillowLender( requestBody ,  responseString);
+                        
+                        if ( responseString != null ) {
+                            Map<String, Object> map = null;
+                            try {
+                                map = convertJsonStringToMap( responseString );
+                            } catch ( IOException e ) {
+                                LOG.error( "Exception caught while parsing zillow reviews" + e.getMessage() );
+                                reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
+                                throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
+                                    + " zillow account " + zillowScreenName );
+                            }
+                            
+                            if ( map != null ) {
+                                surveyDetailsList = buildSurveyDetailFromZillowLenderReviewMap( map );
+                                LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
+                                surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName,
+                                       profile, companyId, fromBatch, fromPublicPage );
+                                
+                            }
+                        }
+                    }
+                    else if( ! StringUtils.isEmpty( zillowLenderId ) ){
                         LOG.info( "LendeId found for enity. So getting records from lender API using lender id : " + zillowLenderId + " and screen name : " + zillowScreenName );
                         FetchZillowReviewBody fetchZillowReviewBody = new FetchZillowReviewBody();
-                        fetchZillowReviewBody.setLenderId( zillowLenderId );
+                        fetchZillowReviewBody.setLenderId( zillowLenderId );                       
                         fetchZillowReviewBody.setPartnerId( zillowPartnerId );
                         ZillowIntegrationLenderApi zillowIntegrationLenderApi = zillowIntegrationApiBuilder.getZillowIntegrationLenderApi();
                         response = zillowIntegrationLenderApi.fetchZillowReviewsByLenderId( fetchZillowReviewBody );
@@ -4617,7 +4670,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             String createdDate = (String) review.get( "reviewDate" );
                             String reviewerProfileUrl = (String) review.get( "reviewerLink" );
                             String customerFirstName = (String) review.get( "reviewer" );
-                            Double score = Double.valueOf( (String) review.get( "rating" ) );
+                            Double score = Double.valueOf( review.get( "rating" ).toString().length() > 0 ? (String) review.get( "rating" ) : "0" );
                             boolean isAbusive = false;
                             
                             SurveyDetails surveyDetails = new SurveyDetails();

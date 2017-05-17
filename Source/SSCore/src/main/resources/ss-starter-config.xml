@@ -495,7 +495,7 @@
 	<bean id="socialpostimportcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialpostsimportjobdetail" />
-		<property name="cronExpression" value="0 0/15 * * * ?" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
 	</bean>
 
 	<!-- setting cron for isprofileimgset batch -->
