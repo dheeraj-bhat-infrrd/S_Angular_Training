@@ -5216,6 +5216,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyHandler.updateZillowSurveyUpdatedDateInExistingSurveyDetails( existingSurveyDetails );
             }
             
+            //SS-1214: handling Column 'ZILLOW_SURVEY_ID' cannot be null for the Table: ZILLOW_TEMP_POST
             //if survey is new, surveyDetails.get_id() will not be null, coz, a new data entry happened to SURVEY_DETAILS Mongo Collection
             if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
                 && fromBatch && surveyDetails != null && surveyDetails.get_id() != null ) {
