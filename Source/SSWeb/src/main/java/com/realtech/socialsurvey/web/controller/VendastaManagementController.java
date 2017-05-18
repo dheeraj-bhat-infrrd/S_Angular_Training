@@ -36,6 +36,7 @@ import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 
 /**
@@ -303,16 +304,31 @@ public class VendastaManagementController
             HttpSession currentSession = request.getSession( false );
             String entityType = (String) currentSession.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             long entityId = (long) currentSession.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-            VendastaRmCreateRequest createRequest = new VendastaRmCreateRequest();
-            createRequest.setEntityId( entityId );
-            createRequest.setEntityType( entityType );
 
-            Response apiResponse = ssApiIntergrationBuilder.getIntegrationApi().createVendastaRmAccount( createRequest, false );
-            message = new DisplayMessage( apiResponse.getBody().toString(), DisplayMessageType.SUCCESS_MESSAGE );
+            if ( CommonConstants.AGENT_ID.equals( entityType ) ) {
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.VENDASTA_NOT_FOR_AGENT,
+                    DisplayMessageType.ERROR_MESSAGE );
+            } else {
+
+                VendastaRmCreateRequest createRequest = new VendastaRmCreateRequest();
+                createRequest.setEntityId( entityId );
+                createRequest.setEntityType( entityType );
+                createRequest.setCompanyName( (String) request.getParameter( "companyName" ) );
+                createRequest.setCountry( (String) request.getParameter( "country" ) );
+                createRequest.setState( (String) request.getParameter( "state" ) );
+                createRequest.setCity( (String) request.getParameter( "city" ) );
+                createRequest.setAddress( (String) request.getParameter( "address" ) );
+                createRequest.setZip( (String) request.getParameter( "zip" ) );
+
+                Response apiResponse = ssApiIntergrationBuilder.getIntegrationApi().createVendastaRmAccount( createRequest,
+                    false );
+                message = new DisplayMessage( new String( ( (TypedByteArray) apiResponse.getBody() ).getBytes() ),
+                    DisplayMessageType.SUCCESS_MESSAGE );
+            }
 
         } catch ( Exception unhandledException ) {
             LOG.error( "unable to create account in vendasta, Reason: " + unhandledException.getMessage(), unhandledException );
-            message = messageUtils.getDisplayMessage( unhandledException.getMessage(), DisplayMessageType.ERROR_MESSAGE );
+            message = new DisplayMessage( unhandledException.getMessage(), DisplayMessageType.ERROR_MESSAGE );
         }
 
         return new Gson().toJson( message );
