@@ -236,19 +236,19 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
         OrganizationUnitSettings unitSettings = null;
         Map<String, Object> details = new HashMap<String, Object>();
         if ( entityId > 0 ) {
-            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+            if ( CommonConstants.COMPANY_ID.equalsIgnoreCase( entityType ) ) {
                 collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getCompanySettings( entityId );
 
-            } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+            } else if ( CommonConstants.REGION_ID.equalsIgnoreCase( entityType ) ) {
                 collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
 
-            } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+            } else if ( CommonConstants.BRANCH_ID.equalsIgnoreCase( entityType ) ) {
                 collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
 
-            } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+            } else if ( CommonConstants.AGENT_ID.equalsIgnoreCase( entityType ) ) {
                 collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getAgentSettings( entityId );
             } else {

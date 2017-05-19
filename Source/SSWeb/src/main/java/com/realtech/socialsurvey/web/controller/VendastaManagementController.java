@@ -115,42 +115,31 @@ public class VendastaManagementController
     @RequestMapping ( value = "/showlistingsmanagersettings")
     public String showVendastaSettings( Model model, HttpServletRequest request )
     {
-
         LOG.info( "Method showVendastaSettings of OrganizationManagementController called" );
-        HttpSession session = request.getSession( false );
-        String vendastaAccess = null;
+        try {
+            HttpSession session = request.getSession( false );
+            
+            if ( session == null || session.getAttribute( CommonConstants.VENDASTA_ACCESS ) == null
+                || !CommonConstants.AGREE_SHARE_COLUMN_TRUE
+                    .equals( String.valueOf( session.getAttribute( CommonConstants.VENDASTA_ACCESS ) ) ) ) {
+                throw new NonFatalException( "Listings manager settings is not accessible for the current session." );
+            }
 
-        if ( session != null && session.getAttribute( CommonConstants.VENDASTA_ACCESS ) != null ) {
-            vendastaAccess = String.valueOf( session.getAttribute( CommonConstants.VENDASTA_ACCESS ) );
-        }
-
-        if ( vendastaAccess != null && vendastaAccess == "true" ) {
             String columnName = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             Long columnValue = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            Map<String, Object> hierarchyDetails = vendastaManagementService.getUnitSettingsForAHierarchy( columnName,
+                columnValue );
+            OrganizationUnitSettings unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
+            
+            model.addAttribute( "settings", unitSettings );
 
-            try {
-                OrganizationUnitSettings unitSettings = null;
-                if ( columnName != null && columnValue != null ) {
-                    Map<String, Object> hierarchyDetails = vendastaManagementService.getUnitSettingsForAHierarchy( columnName,
-                        columnValue );
-                    unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
-                    if ( unitSettings.getVendasta_rm_settings() != null
-                        && unitSettings.getVendasta_rm_settings().getAccountId() != null ) {
-                        model.addAttribute( "accountId", unitSettings.getVendasta_rm_settings().getAccountId() );
-                    }
-                }
-            } catch ( NonFatalException error ) {
-                LOG.error( "NonfatalException while showing vendasta settings. Reason: " + error.getMessage(), error );
-                model.addAttribute( "message",
-                    messageUtils.getDisplayMessage( error.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-                return JspResolver.MESSAGE_HEADER;
-            }
-        } else {
+            LOG.info( "Method showVendastaSettings of OrganizationManagementController finished" );
+            return JspResolver.VENDASTA_SETTINGS;
 
+        } catch ( Exception error ) {
+            LOG.error( "Exception while showing listings manager settings. Reason: " + error.getMessage(), error );
+            return JspResolver.LISTINGS_MANAGER_SETTINGS_ERROR;
         }
-
-        LOG.info( "Method showVendastaSettings of OrganizationManagementController finished" );
-        return JspResolver.VENDASTA_SETTINGS;
     }
 
 

@@ -12011,11 +12011,11 @@ function initiateVendastaAccountCreation(){
 					
 					$('#account-iden').val(apiResult.customerIdentifier);
 					$('#vendasta-create-accnt-form').hide();
+					$('#vendasta-rm-create-account').hide();
 					$('#vendasta-settings-form').show();
 					showInfoMobileAndWeb(apiResult.message.replace(/^"(.+)"$/,'$1'));
 				} else {
 					showErrorInvalidMobileAndWeb(result.message.replace(/^"(.+)"$/,'$1'));
-					resetInputFields("vendasta-create-accnt-form");
 				}
 			}, formData, true, '#vendasta-rm-create-account');
 		}
