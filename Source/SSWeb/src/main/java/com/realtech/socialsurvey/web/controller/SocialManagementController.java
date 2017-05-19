@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -1864,7 +1866,6 @@ public class SocialManagementController
         
         session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
-        //return "invalid-nmls";
         return  new Gson().toJson( profileSettings );
     }
     
@@ -1883,7 +1884,8 @@ public class SocialManagementController
         HttpSession session = request.getSession( false );
         ZillowIntegrationAgentApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZillowIntegrationAgentApi();
         User user = sessionHelper.getCurrentUser();
-        String zillowScreenName = request.getParameter( "zillowProfileName" );
+        //SS-1224 - zillowScreenName update
+        String zillowScreenName = request.getParameter( "zillowScreenName" );
         String nmlsTemp = request.getParameter( "nmlsId" );
         Integer nmlsId = null;
         if(nmlsTemp != null && nmlsTemp.trim().length() > 0)
