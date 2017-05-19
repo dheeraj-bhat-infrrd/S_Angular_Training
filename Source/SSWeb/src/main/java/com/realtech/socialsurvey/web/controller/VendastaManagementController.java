@@ -31,7 +31,12 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.VendastaMa
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
+import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
 import com.realtech.socialsurvey.web.common.JspResolver;
+
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 
 /**
@@ -56,6 +61,9 @@ public class VendastaManagementController
 
     @Autowired
     UrlValidationHelper urlValidationHelper;
+
+    @Autowired
+    SSApiIntergrationBuilder ssApiIntergrationBuilder;
 
 
     // updates the boolean value vendastaAccessible in mongo for every hierarchy
@@ -286,4 +294,43 @@ public class VendastaManagementController
         return JspResolver.VENDASTA_SSO_ERROR;
     }
 
+
+    @RequestMapping ( value = "/vendasta/rm/account/create", method = RequestMethod.POST)
+    @ResponseBody
+    public String createVendastaRmAccount( HttpServletRequest request )
+    {
+        DisplayMessage message = null;
+        try {
+            HttpSession currentSession = request.getSession( false );
+            String entityType = (String) currentSession.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            long entityId = (long) currentSession.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+            if ( CommonConstants.AGENT_ID.equals( entityType ) ) {
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.VENDASTA_NOT_FOR_AGENT,
+                    DisplayMessageType.ERROR_MESSAGE );
+            } else {
+
+                VendastaRmCreateRequest createRequest = new VendastaRmCreateRequest();
+                createRequest.setEntityId( entityId );
+                createRequest.setEntityType( entityType );
+                createRequest.setCompanyName( (String) request.getParameter( "companyName" ) );
+                createRequest.setCountry( (String) request.getParameter( "country" ) );
+                createRequest.setState( (String) request.getParameter( "state" ) );
+                createRequest.setCity( (String) request.getParameter( "city" ) );
+                createRequest.setAddress( (String) request.getParameter( "address" ) );
+                createRequest.setZip( (String) request.getParameter( "zip" ) );
+
+                Response apiResponse = ssApiIntergrationBuilder.getIntegrationApi().createVendastaRmAccount( createRequest,
+                    false );
+                message = new DisplayMessage( new String( ( (TypedByteArray) apiResponse.getBody() ).getBytes() ),
+                    DisplayMessageType.SUCCESS_MESSAGE );
+            }
+
+        } catch ( Exception unhandledException ) {
+            LOG.error( "unable to create account in vendasta, Reason: " + unhandledException.getMessage(), unhandledException );
+            message = new DisplayMessage( unhandledException.getMessage(), DisplayMessageType.ERROR_MESSAGE );
+        }
+
+        return new Gson().toJson( message );
+    }
 }
