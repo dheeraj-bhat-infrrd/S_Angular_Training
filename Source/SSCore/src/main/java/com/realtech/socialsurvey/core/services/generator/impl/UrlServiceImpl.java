@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.generator.impl;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -163,7 +164,7 @@ public class UrlServiceImpl implements UrlService
             if ( urlParts.length > 1 ) {
                 String queryParamParts[] = urlParts[1].split( "&q=" );
                 for ( int i = 0; i < queryParamParts.length; i++ ) {
-                    queryParams.putAll( urlGenerator.decryptParameters( queryParamParts[i] ) );
+                    queryParams.putAll( urlGenerator.decryptParameters( URLDecoder.decode(queryParamParts[i], "UTF-8") ) );
                 }
             }
             return queryParams;

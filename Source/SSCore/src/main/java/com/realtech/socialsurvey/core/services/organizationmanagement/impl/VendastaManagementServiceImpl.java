@@ -442,6 +442,10 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
                 throw new NoRecordsFetchedException( "Invalid EntityId: " + vendastaRmAccount.getEntityId()
                     + " for EntityType: " + vendastaRmAccount.getEntityType() );
             }
+
+            // fill the default entries for creating the account
+            populateRmAccountDetails( vendastaRmAccount );
+
             if ( !isForced ) {
                 if ( unitSettings != null && unitSettings.getVendasta_rm_settings() != null
                     && !StringUtils.isEmpty( unitSettings.getVendasta_rm_settings().getAccountId() ) ) {
@@ -486,6 +490,40 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
     }
 
 
+    private void populateRmAccountDetails( VendastaRmAccount vendastaRmAccount )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        Map<String, Object> hierarchyDetails = getUnitSettingsForAHierarchy( vendastaRmAccount.getEntityType(),
+            vendastaRmAccount.getEntityId() );
+        
+        OrganizationUnitSettings unitSettings = (OrganizationUnitSettings)hierarchyDetails.get( "unitSettings" );
+        
+        if( unitSettings.getContact_details().getCountry() != null && vendastaRmAccount.getCountry() == null ){
+            vendastaRmAccount.setCountry( unitSettings.getContact_details().getCountry() );
+            
+        }if( unitSettings.getContact_details().getName() != null && vendastaRmAccount.getCompanyName() == null ){
+            vendastaRmAccount.setCompanyName( unitSettings.getContact_details().getName() );
+        }
+        
+        if( unitSettings.getContact_details().getState() != null && vendastaRmAccount.getState() == null ){
+            vendastaRmAccount.setState( unitSettings.getContact_details().getState() );
+        }
+        
+        if( unitSettings.getContact_details().getCity() != null && vendastaRmAccount.getCity() == null ){
+            vendastaRmAccount.setCity( unitSettings.getContact_details().getCity() );
+        }
+        
+        if( unitSettings.getContact_details().getAddress() != null && vendastaRmAccount.getAddress() == null ){
+            vendastaRmAccount.setAddress( unitSettings.getContact_details().getAddress() );
+        }
+        
+        if( unitSettings.getContact_details().getZipcode() != null && vendastaRmAccount.getZip() == null ){
+            vendastaRmAccount.setZip( unitSettings.getContact_details().getZipcode() );
+        }
+    }
+
+
+    @SuppressWarnings ( "unchecked")
     private String createRmAccount( VendastaRmAccount vendastaRmAccount, Map<String, Object> hierarchyDetails )
         throws IOException, InvalidInputException
     {

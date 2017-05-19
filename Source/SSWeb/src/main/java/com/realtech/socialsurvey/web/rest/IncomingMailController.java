@@ -29,8 +29,11 @@ public class IncomingMailController
 {
     private static final Logger LOG = LoggerFactory.getLogger( IncomingMailController.class );
 
-    @Value ( "${SENDER_EMAIL_DOMAIN}")
-    private String defaultEmailDomain;
+    @Value ( "${SOCIALSURVEYME_SENDER_EMAIL_DOMAIN}")
+    private String defaultSendGridMeEmailDomain;
+    
+    @Value ("${SOCIALSURVEYUS_SENDER_EMAIL_DOMAIN}")
+    private String defaultSendGridUsEmailDomain;
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
@@ -50,6 +53,8 @@ public class IncomingMailController
 	private static String NULL_USER_EMAIL_ADDRESS = "u-null@alert.socialsurvey.me";
 	private static String NULL_USER_EMAIL_ADDRESS_DEMO = "u-null@socialsurvey.me";
 
+	private String EMAIL_REGEX = ".*@([A-Za-z0-9\\.-]+)";
+    private Pattern EMAIL_REGEX_PATTERN = Pattern.compile( EMAIL_REGEX );
 
     /**
      *  Method to handle forwarding of customer reply to corresponding recipient based on below strategy :
@@ -100,7 +105,10 @@ public class IncomingMailController
         }
 
         LOG.info( "Proceeding to resolve mailTo : " + mailTo );
-        String resolvedMailto = resolveMailTo( mailTo );
+        LOG.info( "subject:" +subject + "\n mailFrom:" + mailFrom + "\n mailTo:" +mailTo+ "\n header:" +headers);
+        String sendUsingDomain = getDefaultDomainFromEmail(mailTo);
+        LOG.info( "finished getDefaultDomainFromTo and the sendUsingDomain :" +sendUsingDomain );
+        String resolvedMailto = resolveMailTo( mailTo ,sendUsingDomain );
         if ( resolvedMailto == null || resolvedMailto.isEmpty() ) {
             LOG.error( "Resolved Mail id found null or empty" );
             return CommonConstants.SENDGRID_OK_STATUS;
@@ -119,15 +127,43 @@ public class IncomingMailController
             return CommonConstants.SENDGRID_OK_STATUS;
         }
         LOG.info( "Message Id : " + messageId );
+        LOG.info( "calling forwardCustomerReplyMail" );
         emailServices.forwardCustomerReplyMail( resolvedMailto, subject, mailBody, senderInfo.get( 0 ), senderInfo.get( 1 ),
-            messageId );
+            messageId , sendUsingDomain);
+        LOG.info( "finished forwardCustomerReplyMail" );
         LOG.info( "Method inboundMail() call ended to forward reply of customer" );
 
         return CommonConstants.SENDGRID_OK_STATUS;
     }
+    
+
+    private String getDefaultDomainFromEmail( String emailId )
+    {
+        //Get the domain from the email ID
+        if ( emailId == null || emailId.isEmpty() ) {
+            LOG.error( "Mail To passed cannot be null or empty" );
+            return null;
+        }
+        //check if the value after @ is either of the default values
+        String emailDomain = null ;
+        Matcher matcher = EMAIL_REGEX_PATTERN.matcher(emailId);
+        if(matcher.find()){
+         emailDomain = matcher.group(1);
+        }
+        
+        if ( emailDomain == null || emailDomain.isEmpty() ) {
+            return null;
+        } else if ( emailDomain.equals( defaultSendGridMeEmailDomain ) ) {
+            return defaultSendGridMeEmailDomain;
+        } else if ( emailDomain.equals( defaultSendGridUsEmailDomain ) ) {
+            return defaultSendGridUsEmailDomain;
+        } else {
+            return defaultSendGridMeEmailDomain;
+        }
+    }
 
 
-    private String resolveMailTo( String mailTo ) throws NumberFormatException, InvalidInputException
+    private String resolveMailTo( String mailTo , String defaultEmailDomain ) throws NumberFormatException, InvalidInputException
     {
         if ( mailTo == null || mailTo.isEmpty() ) {
             LOG.error( "Mail To passed cannot be null or empty" );

@@ -224,11 +224,12 @@ public interface OrganizationManagementService
      * Adds a Disabled Account record in the database
      * 
      * @param companyId
+     * @return 
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      * @throws PaymentException
      */
-    public void addDisabledAccount( long companyId, boolean forceDisable, long modifiedBy )
+    public DisabledAccount addDisabledAccount( long companyId, boolean forceDisable, long modifiedBy )
         throws InvalidInputException, NoRecordsFetchedException, PaymentException;
 
 
@@ -240,7 +241,7 @@ public interface OrganizationManagementService
      * @throws NoRecordsFetchedException
      * @throws PaymentException
      */
-    public void deleteDisabledAccount( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
+    public void inactiveDisabledAccount( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     /**
@@ -1286,7 +1287,7 @@ public interface OrganizationManagementService
         int batch_size ) throws InvalidInputException;
 
 
-    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state )
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state, String encompassVersion )
         throws InvalidInputException, NoRecordsFetchedException;
 
 
@@ -1372,8 +1373,6 @@ public interface OrganizationManagementService
         int branchId );
 
 
-    public void forceDeleteDisabledAccount( long companyId, long userId );
-
 
     /**
      * Returns agent social media tokens
@@ -1456,5 +1455,15 @@ public interface OrganizationManagementService
    
     void updateSendEmailThroughForCompany( OrganizationUnitSettings companySettings, String sendEmailThrough )
         throws InvalidInputException;
+
+
+    void markDisabledAccountAsProcessed( Company company ) throws InvalidInputException;
+
+
+    void processCancelSubscriptionRequest( OrganizationUnitSettings companySettings, boolean isAccountDisabled, long userId )
+        throws NonFatalException;
+
+
+    void processDeactivateCompany( Company company, long userId ) throws InvalidInputException, SolrException, NonFatalException;
 
 }

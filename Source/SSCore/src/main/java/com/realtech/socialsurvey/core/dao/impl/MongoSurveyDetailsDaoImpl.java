@@ -1416,6 +1416,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         BasicDBObject aggregationObject = new BasicDBObject( "aggregate", SURVEY_DETAILS_COLLECTION ).append( "pipeline",
             pipeline );
 
+        LOG.info( "aggregation for get completed survey for garph is :" + aggregationObject.toString() + " , " + aggregationObject );
         CommandResult aggregateResult = mongoTemplate.executeCommand( aggregationObject );
 
         List<BasicDBObject> aggregatedData = null;
@@ -2051,6 +2052,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             }
         }
 
+        LOG.info( "aggregation to get complete survey count for user ranking report is : "  + aggregation );
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
             SurveyDetails.class );
 
@@ -2636,11 +2638,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 query.addCriteria( Criteria.where( CommonConstants.REGION_ID_COLUMN ).is( 0 ) );
                 query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( 0 ) );
                 query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( 0 ) );
+                query.addCriteria( Criteria.where( columnName ).is( queries.get( columnName ) ) );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
                 query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( 0 ) );
                 query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( 0 ) );
+                query.addCriteria( Criteria.where( columnName ).is( queries.get( columnName ) ) );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( 0 ) );
+                query.addCriteria( Criteria.where( columnName ).is( queries.get( columnName ) ) );
             } else
                 query.addCriteria( Criteria.where( columnName ).is( queries.get( columnName ) ) );
         }

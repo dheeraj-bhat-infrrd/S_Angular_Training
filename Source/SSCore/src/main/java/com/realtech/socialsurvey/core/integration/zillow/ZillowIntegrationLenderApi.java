@@ -9,5 +9,8 @@ public interface ZillowIntegrationLenderApi
     
     @POST( "/getPublishedLenderReviews")
     public Response fetchZillowReviewsByLenderId( @Body FetchZillowReviewBody fetchZillowReviewBody );
+    
+    @POST( "/getPublishedLenderReviews")
+    public Response fetchZillowReviewsByNMLS( @Body FetchZillowReviewBodyByNMLS fetchZillowReviewBodyByNMLS );
 
 }

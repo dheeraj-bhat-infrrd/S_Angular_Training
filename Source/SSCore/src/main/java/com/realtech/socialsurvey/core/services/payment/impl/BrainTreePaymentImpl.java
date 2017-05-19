@@ -1779,6 +1779,10 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
             LOG.debug( "Sending subscription past due date mail" );
             emailServices.sendSubscriptionChargeUnsuccessfulEmail( user.getEmailId(),
                 user.getFirstName() + " " + user.getLastName(), String.valueOf( retryDays ) );
+            //update payment failed
+            licenseDetail.setPaymentRetries( licenseDetail.getPaymentRetries() + 1 );
+            licenseDetailDao.update( licenseDetail );
+            
         } else if ( notificationType == CommonConstants.SUBSCRIPTION_CHARGED_SUCCESSFULLY ) {
             LOG.debug( "Sending charge successful mail" );
             // TODO: implement
@@ -1786,18 +1790,22 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
             LOG.debug( "Sending charge unsuccessful mail" );
             
         } else if ( notificationType == CommonConstants.SUBSCRIPTION_CANCELED ){
-            // subscription cancelled deactivate the company
-            organizationManagementService.addDisabledAccount( licenseDetail.getCompany().getCompanyId(), true, CommonConstants.REALTECH_ADMIN_ID );
-            User realtechAdmin = userManagementService.getUserObjByUserId( CommonConstants.REALTECH_ADMIN_ID );
-            //soft delete the company. set status deleted 
-            organizationManagementService.deleteCompany( licenseDetail.getCompany(), realtechAdmin , CommonConstants.STATUS_COMPANY_DISABLED );
-            //temporary inactive the admin so he can login and get notification about deactivation
-            userManagementService.temporaryInactiveCompanyAdmin( licenseDetail.getCompany().getCompanyId() );
-            //send mail to user about subscription canceled and deactivation
-            emailServices.sendRetryExhaustedEmail( user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
-                user.getLoginName() );
-            //send mail to application support email
-            emailServices.sendPaymentFailedAlertEmail( applicationSupportEmail, applicationAdminName, licenseDetail.getCompany().getCompany() );
+            
+            //if payment is past due and already got failed than deactivate the company
+            if(licenseDetail.getPaymentRetries() >= CommonConstants.PAYMENT_RETRIES){
+                // subscription cancelled deactivate the company
+                organizationManagementService.addDisabledAccount( licenseDetail.getCompany().getCompanyId(), false, CommonConstants.REALTECH_ADMIN_ID );
+                User realtechAdmin = userManagementService.getUserObjByUserId( CommonConstants.REALTECH_ADMIN_ID );
+                //soft delete the company. set status deleted 
+                organizationManagementService.deleteCompany( licenseDetail.getCompany(), realtechAdmin , CommonConstants.STATUS_COMPANY_DISABLED );
+                //temporary inactive the admin so he can login and get notification about deactivation
+                userManagementService.temporaryInactiveCompanyAdmin( licenseDetail.getCompany().getCompanyId() );
+                //send mail to user about subscription canceled and deactivation
+                emailServices.sendRetryExhaustedEmail( user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
+                    user.getLoginName() );
+                //send mail to application support email
+                emailServices.sendPaymentFailedAlertEmail( applicationSupportEmail, applicationAdminName, licenseDetail.getCompany().getCompany() );
+            }           
            
         }
     }
@@ -1808,18 +1816,27 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
     public Map<String, Object> updateSubscriptionPriceBasedOnUsersCount( Company company )
         throws InvalidInputException, NoRecordsFetchedException, PaymentException, SubscriptionUpgradeUnsuccessfulException
     {
-        if ( company == null ) {
+        if ( company == null || company.getLicenseDetails() == null || company.getLicenseDetails().isEmpty() ) {
             LOG.warn( "Company is null while updating the subscription price" );
             throw new InvalidInputException( "Subscription id cannot be null" );
         }
         Map<String, Object> resultMap = new HashMap<>();
         boolean priceChanged = false;
         LOG.debug( "Updating the braintree subscription for comapny: " + company.toString() );
-        // get the number of users for the company
-        long numOfUsers = findNumberOfUsersForCompany( company );
+        LicenseDetail licenseDetail = company.getLicenseDetails().get( CommonConstants.INITIAL_INDEX );
         // get the current accounts master account linked with the company
-        double amount = company.getLicenseDetails().get( CommonConstants.INITIAL_INDEX ).getAccountsMaster().getAmount()
-            * numOfUsers;
+        double amount = 0l;
+        long numOfUsers;
+        //charge only
+        if(licenseDetail.getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
+             amount = licenseDetail.getAccountsMaster().getAmount();
+             numOfUsers = 1l;
+        }else{
+            // get the number of users for the company
+             numOfUsers = findNumberOfUsersForCompany( company );
+             amount = licenseDetail.getAccountsMaster().getAmount() * numOfUsers;
+        }
+        
         String sAmount = AMOUNT_FORMAT.format( amount );
         // get the current price
         double previousAmount = getSubscriptionPriceFromBraintree( company );
@@ -1827,8 +1844,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
             "Previous amount: " + previousAmount + "\t Revised amount: " + sAmount + " for company " + company.getCompanyId() );
         if ( previousAmount != Double.parseDouble( sAmount ) ) {
             priceChanged = true;
-            LOG.debug( "Upgrading the account for " + company.getCompany() + " with by " + numOfUsers
-                + " users for an amount of " + amount );
+            LOG.debug( "Upgrading the account for " + company.getCompany() + "for an amount of " + amount );
             // Calling braintree for updating the amount
             LOG.debug( "Calling braintree for updating the amount" );
             // proration is not required

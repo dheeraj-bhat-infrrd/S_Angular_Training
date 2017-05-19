@@ -1109,4 +1109,10 @@ public class UserManagementServiceImplTest
         Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( null );
         userManagementServiceImpl.saveIgnoredEmailCompanyMapping( "test", 1l );
     }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testgetUsersAndEmailMappingForCompanyForInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getUsersAndEmailMappingForCompany( 0, 1, 10, -1 );
+    }
 }

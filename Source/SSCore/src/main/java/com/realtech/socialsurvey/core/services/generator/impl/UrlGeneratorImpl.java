@@ -2,6 +2,9 @@ package com.realtech.socialsurvey.core.services.generator.impl;
 //JIRA: SS-6: By RM03
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -50,7 +53,14 @@ public class UrlGeneratorImpl implements URLGenerator {
 		for(String key : params.keySet()){
 			plainText.append(key);
 			plainText.append("=");
-			plainText.append(params.get(key));
+			try {
+				if(params.get(key) != null) {
+					//URL encoading is required to support &,= and other chars
+					plainText.append(URLEncoder.encode(params.get(key), "UTF-8"));
+				}
+			} catch (UnsupportedEncodingException e) {
+				throw new InvalidInputException();
+			}
 			plainText.append("&");
 		}
 
@@ -166,7 +176,14 @@ public class UrlGeneratorImpl implements URLGenerator {
 			String[] keyValuePair = keyValuePairs[counter].split("=");
 			
 			if(keyValuePair.length == 2){
-				params.put(keyValuePair[0], keyValuePair[1]);
+				try {
+					if(keyValuePair[1] != null) {
+						//URL decode required before adding to param which may save data in Mongo
+						params.put(keyValuePair[0], URLDecoder.decode(keyValuePair[1], "UTF-8"));
+					}
+				} catch (UnsupportedEncodingException e) {
+					throw new InvalidInputException();
+				}
 			}
 			else if (keyValuePair.length == 1) {
 				params.put(keyValuePair[0], "");

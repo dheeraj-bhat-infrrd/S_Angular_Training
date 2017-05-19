@@ -1480,6 +1480,11 @@ button.paypal.is-active {
 	box-shadow: 0px 0px 8px 0px #7C7C7C;
 }
 
+.overlay-disable-wrapper-zillow {
+	max-width: 820px !important;
+}	
+
+
 .ol-header {
 	line-height: 50px;
 	font-size: 16px;
@@ -1499,6 +1504,14 @@ button.paypal.is-active {
 .ol-btn-wrapper {
 	width: 50%;
 	padding: 15px;
+}
+
+.ol-btn-wrapper-left-zillow {
+	padding-left: 0px !important;
+}
+
+.ol-btn-wrapper-right-zillow {
+	padding-right: 0px !important;
 }
 
 .ol-btn {
@@ -2181,6 +2194,11 @@ button.paypal.is-active {
 	margin-top: 10px;
 	color: #e00000;
 	margin-left: 30px;
+}
+
+.vendasta-account-create-form-error {
+	margin-top: 10px;
+	color: #e00000;
 }
 
 .initial-dd-wrapper {
@@ -4878,6 +4896,10 @@ img.prof-image {
 
 .rfr_lbl_width-98 {
 	width: 98px !important;
+}
+
+.rfr_lbl_width-106 {
+	width: 106px !important;
 }
 
 .rfr_txt_fld {
@@ -8485,7 +8507,7 @@ label.zillow-input-label {
 }
 
 input.zillow-input {
-	width: 135px;
+	width: 220px;
 	height: 35px;
 	line-height: normal;
 	padding: 5px 0 5px 10px;
@@ -9227,4 +9249,17 @@ ul.accordion li>a:before {
     border: 1px solid #dcdcdc;
     border-radius: 3px;
     padding: 4px 10px 4px 10px;
+}
+
+.help-link-container {
+	margin: 6px 0 0 8px !important;
+}
+
+.help-link {
+	background-image: url('../images/help-icon.png') no-repeat center !important;
+	background: url('../images/help-icon.png') no-repeat center !important;
+	cursor: pointer !important;
+	display: inline-block;
+	width: 22px !important; /* Width of new image */
+  	height: 22px !important; /* Height of new image */
 }

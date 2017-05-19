@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -769,7 +770,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //Update profileName and profileUrl if possible
         String profileNameForUpdate = null;
         String profileName = agentSettings.getProfileName();
-        String newProfileName = user.getFirstName().toLowerCase() + "-" + user.getLastName().toLowerCase();
+        String newProfileName = null;
+        String fullName = null;
+        
+        
+        
+        if( ! StringUtils.isEmpty( user.getFirstName()) ){
+            fullName = user.getFirstName().toLowerCase();
+            if( ! StringUtils.isEmpty( user.getLastName() )){
+                fullName  +=  " " + user.getLastName().toLowerCase();
+            }
+        }
+             
+        newProfileName = generateIndividualProfileName( user.getUserId(), fullName, user.getEmailId() );
+        
         user.setProfileName( profileName );
         user.setProfileUrl( "/" + profileName );
         if ( !profileName.equals( newProfileName ) ) {
@@ -3959,7 +3973,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Transactional
     @Override
-    public UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize )
+    public UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize , long count)
         throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "Method to getUsersAndEmailMappingForCompant for  companyId : " + companyId + " started." );
@@ -3994,7 +4008,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             users.add( userVO );
         }
         userList.setUsers( users );
-        userList.setTotalRecord( userDao.getCountOfUsersAndEmailMappingForCompany( company ) );
+        if(count == -1){
+            userList.setTotalRecord( userDao.getCountOfUsersAndEmailMappingForCompany( company ) ); 
+        }else{
+            userList.setTotalRecord( count );
+        }
 
         return userList;
     }
@@ -4638,8 +4656,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( String emailId, long userId )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        User user = this.saveEmailUserMapping( emailId, userId );
+        User user = userDao.findById(User.class, userId);
         socialManagementService.updateAgentIdOfSurveyPreinitiationRecordsForEmail( user, emailId );
+        this.saveEmailUserMapping( emailId, userId );
     }
 
 
