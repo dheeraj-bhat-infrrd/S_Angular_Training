@@ -11249,7 +11249,6 @@ function showZillowPageWithProfileLink(zillowScreenName) {
 	$('#overlay-save-zillow-byscreen').click(function() {
 		var nmls = $('input[name="nmlsId"]').val();	
 		var zillowScreenName = $("#screenNameTempHidden").val();	
-		alert(zillowScreenName);
 		if(validInput(nmls)) {
 			saveZillowProfile(profileType, zillowScreenName, nmls);
 		}
