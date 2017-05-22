@@ -11989,7 +11989,7 @@ function initiateVendastaAccountCreation(){
 				"address" : $('#vendasta-address').val(),
 				"zip" : $('#vendasta-zip').val()
 			};
-			callAjaxPostWithPayloadData("/vendasta/rm/account/create.do", function(data) {
+			callAjaxPostWithPayloadData("/setuplistingsmanager.do", function(data) {
 				hideOverlay();
 				var result = JSON.parse(data);
 				if (result.type != "ERROR_MESSAGE") {

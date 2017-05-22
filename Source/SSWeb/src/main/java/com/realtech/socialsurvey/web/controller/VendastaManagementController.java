@@ -286,7 +286,7 @@ public class VendastaManagementController
     }
 
 
-    @RequestMapping ( value = "/vendasta/rm/account/create", method = RequestMethod.POST)
+    @RequestMapping ( value = "/setuplistingsmanager", method = RequestMethod.POST)
     @ResponseBody
     public String createVendastaRmAccount( HttpServletRequest request )
     {
