@@ -11952,14 +11952,14 @@ function validateVendastaAccountCreationForm(){
 	var isVendastaAccountCreationValid = true;
 	var isFocussed = false;
 
-	if (!validateVendastaCompanyName('vendasta-company-name')) {
+	if (!validateVendastaCompanyName('vendasta-hierarchy-name')) {
 		isVendastaAccountCreationValid = false;
 		if (!isFocussed) {
-			$('#vendasta-company-name').focus();
+			$('#vendasta-hierarchy-name').focus();
 			isFocussed = true;
 		}
 	}
-	if (!validateVendastaCountry('vendasta-country-name')) {
+	if (!validateVendastaCountry('vendasta-country-name', 'vendasta-country-code')) {
 		isVendastaAccountCreationValid = false;
 		if (!isFocussed) {
 			$('#vendasta-country-name').focus();
@@ -12004,8 +12004,8 @@ function initiateVendastaAccountCreation(){
 		if (validateVendastaAccountCreationForm()) {
 			showOverlay();
 			var formData = {
-				"companyName" : $('#vendasta-company-name').val(),
-				"country" : $('#vendasta-country-name').val(),
+				"companyName" : $('#vendasta-hierarchy-name').val(),
+				"country" : $('#vendasta-country-code').val(),
 				"state" : $('#vendasta-state-name').val(),
 				"city" : $('#vendasta-city-name').val(),
 				"address" : $('#vendasta-address').val(),
@@ -12020,14 +12020,39 @@ function initiateVendastaAccountCreation(){
 					
 					$('#account-iden').val(apiResult.customerIdentifier);
 					$('#vendasta-create-accnt-form').hide();
+					$('#vendasta-rm-create-account').hide();
 					$('#vendasta-settings-form').show();
 					showInfoMobileAndWeb(apiResult.message.replace(/^"(.+)"$/,'$1'));
 				} else {
 					showErrorInvalidMobileAndWeb(result.message.replace(/^"(.+)"$/,'$1'));
-					resetInputFields("vendasta-create-accnt-form");
 				}
 			}, formData, true, '#vendasta-rm-create-account');
 		}
 	});
+}
+
+function vendastaCountryAutoComplete(){
+	// Integrating autocomplete with country input text field
+	$("#vendasta-country-name").autocomplete({
+		minLength : 1,
+		source : countryData,
+		delay : 0,
+		autoFocus : true,
+		open : function(event, ui) {
+			$("#vendasta-country-code").val("");
+		},
+		select : function(event, ui) {
+			$("#vendasta-country-name").val(ui.item.label);
+			$("#vendasta-country-code").val(ui.item.code);
+			return false;
+		},
+		close : function(event, ui) {
+		},
+		create : function(event, ui) {
+			$('.ui-helper-hidden-accessible').remove();
+		}
+	}).autocomplete("instance")._renderItem = function(ul, item) {
+		return $("<li>").append(item.label).appendTo(ul);
+	};
 }
 
