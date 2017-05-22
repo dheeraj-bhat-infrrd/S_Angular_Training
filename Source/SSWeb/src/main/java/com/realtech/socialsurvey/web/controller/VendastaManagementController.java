@@ -132,6 +132,8 @@ public class VendastaManagementController
             OrganizationUnitSettings unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
             
             model.addAttribute( "settings", unitSettings );
+            model.addAttribute( "columnName", columnName );
+            model.addAttribute( "columnValue", columnValue );
 
             LOG.info( "Method showVendastaSettings of OrganizationManagementController finished" );
             return JspResolver.VENDASTA_SETTINGS;
@@ -310,7 +312,7 @@ public class VendastaManagementController
                 createRequest.setZip( (String) request.getParameter( "zip" ) );
 
                 Response apiResponse = ssApiIntergrationBuilder.getIntegrationApi().createVendastaRmAccount( createRequest,
-                    false );
+                    true );
                 message = new DisplayMessage( new String( ( (TypedByteArray) apiResponse.getBody() ).getBytes() ),
                     DisplayMessageType.SUCCESS_MESSAGE );
             }

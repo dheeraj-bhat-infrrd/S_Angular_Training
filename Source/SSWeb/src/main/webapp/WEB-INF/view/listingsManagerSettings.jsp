@@ -22,6 +22,7 @@
 </c:choose>
 
 
+
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row clearfix">
@@ -34,7 +35,10 @@
 	</div>
 </div>
 
+
+
 <c:set value="${settings.vendasta_rm_settings.accountId}" var="accountId"/>
+<c:set value="${settings.contact_details}" var="contactDetails"/>
 
 <c:choose>
 	<c:when test="${ settings != null and accountMasterId == 4 and profilemasterid != 4 }">
@@ -46,7 +50,7 @@
 							<div class="clearfix um-top-form-wrapper">
 								<form id="vendasta-settings-form" class="hide" method="post">						
 									<div
-										class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding">
+										class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 										<div class="hm-item-row item-row-OR clearfix float-left">
 											<div class="um-item-row-left text-right">
 												<spring:message code="label.account.iden.key" />
@@ -66,17 +70,45 @@
 										</div>
 									</div>
 								</div>
-								<div id="vndsta-form-submit"
-									class="bd-vms-btn-save cursor-pointer vms-resp-submit">Save</div>
+								<div class="row" style="clear: both;width: 252px;margin: 0 auto;">
+  									<div class="col-md-6">
+    									<div id="vndsta-form-submit-save" class="col-md-12 cursor-pointer bd-vms-btn-save" style="">Save
+   										</div>
+  									</div>
+  									<div class="col-md-6">
+   										<div id="vndsta-form-submit-create" class="col-md-12 cursor-pointer bd-vms-btn-save">Start Fresh
+    									</div>
+  									</div>
+								</div>
 							</form>
 							<form id="vendasta-create-accnt-form" class="hide" method="post">
 								<div style="border-right: 1px solid #dcdcdc;float: left;width: 50%;">							
 									<div class="reg_form_row clearfix">
-										<div class="float-left rfr_lbl rfr_lbl_width-106"><spring:message code="label.vendasta.account.create.company.name"/></div>
+										<c:choose>
+											<c:when test="${profilemasterid == 1 }">
+												<div class="float-left rfr_lbl rfr_lbl_width-106"><spring:message code="label.vendasta.account.create.company.name"/></div>
+											</c:when>
+											<c:when test="${profilemasterid == 2 }">
+												<div class="float-left rfr_lbl rfr_lbl_width-106"><spring:message code="label.regionname.key"/></div>
+											</c:when>
+											<c:when test="${profilemasterid == 3 }">
+												<div class="float-left rfr_lbl rfr_lbl_width-106"><spring:message code="label.branchname.key"/></div>
+											</c:when>
+										</c:choose>
 										<div class="float-left rfr_txt">
 											<div class="rfr_icn icn-fname"></div>
 											<div class="rfr_txt_fld">
-											<input type="text" class="rfr_input_fld" id="vendasta-company-name" name="vendasta-company-name" placeholder='<spring:message code="label.vendasta.account.create.company.name"/>'>
+											<c:choose>
+												<c:when test="${profilemasterid == 1 }">
+													<input type="text" class="rfr_input_fld" id="vendasta-hierarchy-name" name="vendasta-hierarchy-name" placeholder='<spring:message code="label.vendasta.account.create.company.name"/>' value="${contactDetails.name }">													
+												</c:when>
+												<c:when test="${profilemasterid == 2 }">
+													<input type="text" class="rfr_input_fld" id="vendasta-hierarchy-name" name="vendasta-hierarchy-name" placeholder='<spring:message code="label.regionname.key"/>' value="${contactDetails.name }">
+												</c:when>
+												<c:when test="${profilemasterid == 3 }">
+													<input type="text" class="rfr_input_fld" id="vendasta-hierarchy-name" name="vendasta-hierarchy-name" placeholder='<spring:message code="label.branchname.key"/>' value="${contactDetails.name }">
+												</c:when>
+											</c:choose>
 											</div>
 											<div class="vendasta-account-create-form-error"></div>
 										</div>
@@ -86,7 +118,8 @@
 										<div class="float-left rfr_txt">
 											<div class="rfr_icn icn-fname"></div>
 											<div class="rfr_txt_fld">
-											<input type="text" class="rfr_input_fld" id="vendasta-country-name" name="vendasta-country-name" placeholder='<spring:message code="label.vendasta.account.create.country.name"/>'>
+											<input type="text" class="rfr_input_fld" id="vendasta-country-name" name="vendasta-country-name" placeholder='<spring:message code="label.vendasta.account.create.country.name"/>' value="${contactDetails.country }">
+											<input type="hidden" name="vendasta-country-code" id="vendasta-country-code" value="${contactDetails.countryCode }">
 											</div>
 											<div class="vendasta-account-create-form-error"></div>
 										</div>
@@ -96,7 +129,7 @@
 										<div class="float-left rfr_txt">
 											<div class="rfr_icn icn-fname"></div>
 											<div class="rfr_txt_fld">
-											<input type="text" class="rfr_input_fld" id="vendasta-state-name" name="vendasta-state-name" placeholder='<spring:message code="label.vendasta.account.create.state.name"/>'>
+											<input type="text" class="rfr_input_fld" id="vendasta-state-name" name="vendasta-state-name" placeholder='<spring:message code="label.vendasta.account.create.state.name"/>' value="${contactDetails.state }">
 											</div>
 											<div class="vendasta-account-create-form-error"></div>
 										</div>
@@ -106,7 +139,7 @@
 										<div class="float-left rfr_txt">
 											<div class="rfr_icn icn-fname"></div>
 											<div class="rfr_txt_fld">
-											<input type="text" class="rfr_input_fld" id="vendasta-city-name" name="vendasta-city-name" placeholder='<spring:message code="label.vendasta.account.create.city.name"/>'>
+											<input type="text" class="rfr_input_fld" id="vendasta-city-name" name="vendasta-city-name" placeholder='<spring:message code="label.vendasta.account.create.city.name"/>' value="${contactDetails.city }">
 											</div>
 											<div class="vendasta-account-create-form-error"></div>
 										</div>
@@ -116,7 +149,7 @@
 										<div class="float-left rfr_txt">
 											<div class="rfr_icn icn-fname"></div>
 											<div class="rfr_txt_fld">
-											<input type="text" class="rfr_input_fld" id="vendasta-address" name="vendasta-address" placeholder='<spring:message code="label.vendasta.account.create.address"/>'>
+											<input type="text" class="rfr_input_fld" id="vendasta-address" name="vendasta-address" placeholder='<spring:message code="label.vendasta.account.create.address"/>' value="${contactDetails.address1 }">
 											</div>
 											<div class="vendasta-account-create-form-error"></div>
 										</div>
@@ -126,7 +159,7 @@
 										<div class="float-left rfr_txt">
 											<div class="rfr_icn icn-fname"></div>
 											<div class="rfr_txt_fld">
-											<input type="text" class="rfr_input_fld" id="vendasta-zip" name="vendasta-zip" placeholder='<spring:message code="label.vendasta.account.create.zip"/>'>
+											<input type="text" class="rfr_input_fld" id="vendasta-zip" name="vendasta-zip" placeholder='<spring:message code="label.vendasta.account.create.zip"/>' value="${contactDetails.zipcode }">
 											</div>
 											<div class="vendasta-account-create-form-error"></div>
 										</div>
@@ -140,7 +173,7 @@
 											<div class="st-score-text">
 												Alternatively, Account Identifier can also be entered to setup listings manager.
 											</div>
-											<div class="reg_btn" id="enter-account-id-instead" style="margin-top: 30px;">Enter account identifier</div>
+											<div class="reg_btn" id="enter-account-id-instead" style="margin-top: 30px;">Enter Account Identifier</div>
 										</div>
 									</div>
 								</form>
@@ -171,7 +204,7 @@
 			$('#vendasta-rm-create-account').show();
 		}
 		updateViewAsScroll();
-		$(document).on('click', '#vndsta-form-submit', function(e) {
+		$(document).on('click', '#vndsta-form-submit-save', function(e) {
 			e.stopPropagation();
 			if (validateVendastaFields()) {
 				showOverlay();
@@ -190,6 +223,12 @@
 			}
 		});
 		
+		$(document).on('click', '#vndsta-form-submit-create', function(e) {
+			$('#vendasta-settings-form').hide();
+			$('#vendasta-create-accnt-form').show();
+			$('#vendasta-rm-create-account').show();
+		});
+		
 		
 		$(document).on('click', '#enter-account-id-instead', function(e){
 			$('#vendasta-settings-form').show();
@@ -198,5 +237,7 @@
 		});
 	
 		initiateVendastaAccountCreation();
+		
+		vendastaCountryAutoComplete();
 	});
 </script>
