@@ -1514,3 +1514,10 @@ span.footer-ul a:hover {
     font-family: 'opensanssemibold';
     text-align: center;
 }
+
+.vendasta-setting-access-cont {
+	margin: 20% 0px 20% 0px;
+    font-size: 24px;
+    font-family: 'opensanssemibold';
+    text-align: center;
+}

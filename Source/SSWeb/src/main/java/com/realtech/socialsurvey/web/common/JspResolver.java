@@ -112,6 +112,7 @@ public interface JspResolver
     public static final String ABUSIVE_REVIEWS_REPORTS = "abusivereviewsreports";
     public static final String SHOW_WIDGET = "show_widget";
     public static final String VENDASTA_SETTINGS = "listingsManagerSettings";
+    public static final String LISTINGS_MANAGER_SETTINGS_ERROR = "listingsManagerSettingsError";
 
     //Help Settings
     public static final String HELP_EDIT = "help";
@@ -180,5 +181,4 @@ public interface JspResolver
 
     //vendasta 
     public static final String VENDASTA_SSO_ERROR = "vendastaError";
-
 }
