@@ -2196,6 +2196,11 @@ button.paypal.is-active {
 	margin-left: 30px;
 }
 
+.vendasta-account-create-form-error {
+	margin-top: 10px;
+	color: #e00000;
+}
+
 .initial-dd-wrapper {
 	border: 1px solid #dcdcdc;
 	position: absolute;
@@ -4891,6 +4896,10 @@ img.prof-image {
 
 .rfr_lbl_width-98 {
 	width: 98px !important;
+}
+
+.rfr_lbl_width-106 {
+	width: 106px !important;
 }
 
 .rfr_txt_fld {

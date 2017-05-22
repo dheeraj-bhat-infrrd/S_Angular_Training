@@ -11926,3 +11926,86 @@ function validateVendastaFields(){
 	return isVendastaValid;
 }
 
+function validateVendastaAccountCreationForm(){
+	var isVendastaAccountCreationValid = true;
+	var isFocussed = false;
+
+	if (!validateVendastaCompanyName('vendasta-company-name')) {
+		isVendastaAccountCreationValid = false;
+		if (!isFocussed) {
+			$('#vendasta-company-name').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateVendastaCountry('vendasta-country-name')) {
+		isVendastaAccountCreationValid = false;
+		if (!isFocussed) {
+			$('#vendasta-country-name').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateVendastaState('vendasta-state-name')) {
+		isVendastaAccountCreationValid = false;
+		if (!isFocussed) {
+			$('#vendasta-state-name').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateVendastaCity('vendasta-city-name')) {
+		isVendastaAccountCreationValid = false;
+		if (!isFocussed) {
+			$('#vendasta-city-name').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateVendastaAddress('vendasta-address')) {
+		isVendastaAccountCreationValid = false;
+		if (!isFocussed) {
+			$('#vendasta-address').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateVendastaZip('vendasta-zip')) {
+		isVendastaAccountCreationValid = false;
+		if (!isFocussed) {
+			$('#vendasta-zip').focus();
+			isFocussed = true;
+		}
+	}
+
+	return isVendastaAccountCreationValid;
+}
+
+function initiateVendastaAccountCreation(){ 
+	$(document).on('click', '#vendasta-rm-create-account', function(e) {
+		e.stopPropagation();
+		if (validateVendastaAccountCreationForm()) {
+			showOverlay();
+			var formData = {
+				"companyName" : $('#vendasta-company-name').val(),
+				"country" : $('#vendasta-country-name').val(),
+				"state" : $('#vendasta-state-name').val(),
+				"city" : $('#vendasta-city-name').val(),
+				"address" : $('#vendasta-address').val(),
+				"zip" : $('#vendasta-zip').val()
+			};
+			callAjaxPostWithPayloadData("/vendasta/rm/account/create.do", function(data) {
+				hideOverlay();
+				var result = JSON.parse(data);
+				if (result.type != "ERROR_MESSAGE") {
+					
+					var apiResult = JSON.parse(result.message);
+					
+					$('#account-iden').val(apiResult.customerIdentifier);
+					$('#vendasta-create-accnt-form').hide();
+					$('#vendasta-settings-form').show();
+					showInfoMobileAndWeb(apiResult.message.replace(/^"(.+)"$/,'$1'));
+				} else {
+					showErrorInvalidMobileAndWeb(result.message.replace(/^"(.+)"$/,'$1'));
+					resetInputFields("vendasta-create-accnt-form");
+				}
+			}, formData, true, '#vendasta-rm-create-account');
+		}
+	});
+}
+
