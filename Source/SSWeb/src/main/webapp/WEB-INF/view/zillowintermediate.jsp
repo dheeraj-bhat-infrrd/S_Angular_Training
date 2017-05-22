@@ -18,6 +18,7 @@
 									<input type="hidden" id="profileType" value="${profile.vertical}" ></input>
 									<input type="hidden" id="nmlsIdHidden" value="${profile.socialMediaTokens.zillowToken.lenderRef.nmlsId}" ></input>
 									<input type="hidden" id="screenNameHidden" value="${profile.socialMediaTokens.zillowToken.zillowScreenName}" ></input>
+									<input type="hidden" id="screenNameTempHidden"></input>
 									<input type="hidden" id="zillowNonLenderURI" value="${zillowNonLenderURI}" ></input>
 									<input type="hidden" id="zillowLenderPath" value="${zillowLenderURI}" ></input>
 									<div id="main-container" class="non-zillow-help-container">
@@ -36,7 +37,7 @@
 														    <div class="popup-padding-bottom">
 															    <div class="float-left">
 																	    <span><spring:message code="label.zillowconnect.nmls.header.key"/></span>
-																		<input class="zillow-input" name="nmlsId" type="text" maxlength="8" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' value = "${ profile.socialMediaTokens.zillowToken.lenderRef.nmlsId }">
+																		<input class="zillow-input" name="nmlsId" type="text" maxlength="8" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.nmls.key"/>' >
 																</div>
 																<div class="float-left help-link-container">
 																	<a href="#" class="help-link main-container" title="Help" onclick="openHelpPopup('main-container')"></a>
@@ -69,7 +70,7 @@
 																  		<div class="popup-padding-bottom">
 																	  		<div class="float-left">
 																			  	<span><spring:message code="label.zillowconnect.screen.name.key"/></span>
-																				<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">																	
+																				<input class="zillow-input zillowProfileName" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' >																	
 																			</div>
 																			<div class="float-left help-link-container">
 																				<a href="#" class="help-link main-container" title="Help" onclick="openHelpPopup('main-container')"></a>
@@ -180,7 +181,7 @@
 												<div class="popup-padding-bottom">
 													<div class="float-left">
 														<span><spring:message code="label.zillowconnect.screen.name.key"/></span>
-														<input class="zillow-input zillowProfileName" name="zillowProfileNameNoScreenForNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">																																				
+														<input class="zillow-input zillowProfileName" name="zillowProfileNameNoScreenForNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' >																																				
 													</div>
 													<div class="float-left help-link-container">
 														<a href="#" class="help-link" title="Help" onclick="openHelpPopup('no-screen-name-container')"></a>
@@ -263,7 +264,7 @@
 												<div class="popup-padding-bottom clearfix">
 													<div class="float-left">
 														<span><spring:message code="label.zillowconnect.screen.name.key"/></span>											
-														<input class="zillow-input zillowProfileName" name="zillowProfileNameForNoNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">												
+														<input class="zillow-input zillowProfileName" name="zillowProfileNameForNoNMLS" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' >												
 													</div>
 													<div class="float-left help-link-container">
 														<a href="#" class="help-link" title="Help" onclick="openHelpPopup('by-screen-name-container')"></a>
@@ -366,6 +367,28 @@ $( document ).ready(function() {
         $("#overlay-pop-up").addClass("overlay-disable-wrapper-zillow");
     });*/
     
+    //SS-1224 - zillowScreenName update + SS-1125 - UI validation for empty input
+    $('input[name="nmlsId"]').val($('#nmlsIdHidden').val());
+    
+    $('input[name="zillowProfileNameNoScreenForNMLS"]').val($('#screenNameHidden').val());
+    $('input[name="zillowProfileNameForNoNMLS"]').val($('#screenNameHidden').val());
+    $('input[name="zillowProfileName"]').val($('#screenNameHidden').val());   
+    
+    $('input[name="zillowProfileNameNoScreenForNMLS"]').on('input', function (e) {
+		$('input[name="zillowProfileNameForNoNMLS"]').val($('input[name="zillowProfileNameNoScreenForNMLS"]').val());
+		$('input[name="zillowProfileName"]').val($('input[name="zillowProfileNameNoScreenForNMLS"]').val());
+    });
+    
+    $('input[name="zillowProfileNameForNoNMLS"]').on('input',function (e) {
+		$('input[name="zillowProfileNameNoScreenForNMLS"]').val($('input[name="zillowProfileNameForNoNMLS"]').val());
+		$('input[name="zillowProfileName"]').val($('input[name="zillowProfileNameForNoNMLS"]').val());
+    });
+    
+    $('input[name="zillowProfileName"]').on('input',function (e) {
+		$('input[name="zillowProfileNameNoScreenForNMLS"]').val($('input[name="zillowProfileName"]').val());
+		$('input[name="zillowProfileNameForNoNMLS"]').val($('input[name="zillowProfileName"]').val());
+    });
+    
    
     $('.zillow-popup-close-icn').on('click', function(event) {
         $("#zillow-popup").hide();
@@ -390,7 +413,7 @@ $( document ).ready(function() {
             e.preventDefault();
         }
         
-        if($('input[name="nmlsId"]').val().length > 0) {
+        if($('input[name="nmlsId"]').val().trim().length > 0) {
         	showHideDisconnectZillowLink(true);
         } else {
         	showHideDisconnectZillowLink(false);
@@ -398,7 +421,7 @@ $( document ).ready(function() {
     });
     
     $('input[name="zillowProfileNameForNoNMLS"]').on('input propertychange paste', function() {
-    	if($('input[name="zillowProfileNameForNoNMLS"]').val().length > 0) {
+    	if($('input[name="zillowProfileNameForNoNMLS"]').val().trim().length > 0) {
         	showHideDisconnectZillowLink(true);
         } else {
         	showHideDisconnectZillowLink(false);
@@ -406,7 +429,7 @@ $( document ).ready(function() {
     });
     
     $('input[name="zillowProfileNameNoScreenForNMLS"]').on('input propertychange paste', function() {
-    	if($('input[name="zillowProfileNameNoScreenForNMLS"]').val().length > 0) {
+    	if($('input[name="zillowProfileNameNoScreenForNMLS"]').val().trim().length > 0) {
         	showHideDisconnectZillowLink(true);
         } else {
         	showHideDisconnectZillowLink(false);
@@ -414,7 +437,7 @@ $( document ).ready(function() {
     });
     
     $('input[name="zillowProfileName"]').on('input propertychange paste', function() {
-    	if($('input[name="zillowProfileName"]').val().length > 0) {
+    	if($('input[name="zillowProfileName"]').val().trim().length > 0) {
         	showHideDisconnectZillowLink(true);
         } else {
         	showHideDisconnectZillowLink(false);
@@ -422,13 +445,13 @@ $( document ).ready(function() {
     });
     
     
-    if($('input[name="zillowProfileNameForNoNMLS"]').val().length > 0) {
+    if($('input[name="zillowProfileNameForNoNMLS"]').val().trim().length > 0) {
     	showHideDisconnectZillowLink(true);
     } else {
     	showHideDisconnectZillowLink(false);
     }
     
-    if($('input[name="zillowProfileNameNoScreenForNMLS"]').val().length > 0) {
+    if($('input[name="zillowProfileNameNoScreenForNMLS"]').val().trim().length > 0) {
     	showHideDisconnectZillowLink(true);
     } else {
     	showHideDisconnectZillowLink(false);
