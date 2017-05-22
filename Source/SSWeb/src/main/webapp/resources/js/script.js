@@ -310,6 +310,15 @@ function showToast() {
 	}, 3000);
 }
 
+//SS-1225
+//show Toast
+function showToastLong() {
+	$('#toast-container').fadeIn();
+	setTimeout(function() {
+		$('#toast-container').fadeOut();
+	}, 8000);
+}
+
 // detectBrowser();
 
 function detectBrowser() {
