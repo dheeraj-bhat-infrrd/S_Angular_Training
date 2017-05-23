@@ -4583,6 +4583,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 String zillowProfileUrl = CommonConstants.ZILLOW_PROFILE_URL;
                 if(individualReviewee != null){
                     profileName = (String) individualReviewee.get("screenName");
+
+                    //SS-1226 : Zillow reviews' social posts are displaying broken link 
+                    if(profileName != null && profileName.contains( " " )) {
+                        profileName = profileName.replace( " ", "%20" );
+                    }
+                    
                     zillowProfileUrl  += profileName;
                 }
                 
