@@ -4585,6 +4585,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     profileName = (String) individualReviewee.get("screenName");
 
                     //SS-1226 : Zillow reviews' social posts are displaying broken link 
+                    //empty space replaced by %20 for FaceBook posts
                     if(profileName != null && profileName.contains( " " )) {
                         profileName = profileName.replace( " ", "%20" );
                     }
