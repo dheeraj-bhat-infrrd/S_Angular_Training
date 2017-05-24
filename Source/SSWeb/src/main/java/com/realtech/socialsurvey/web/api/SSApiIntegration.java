@@ -105,7 +105,7 @@ public interface SSApiIntegration
 
     //vendasta: BEGIN
     
-    @POST ( "/vendasta/rm/account/create" )
+    @POST ( "/v1/vendasta/rm/account/create" )
     Response createVendastaRmAccount( @Body VendastaRmCreateRequest accountDetails, @Query ( "isForced" ) boolean isForced );
     
     //vendasta: END

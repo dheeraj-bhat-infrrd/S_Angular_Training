@@ -29,7 +29,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 
 
 @RestController
-@RequestMapping ( "/vendasta")
+@RequestMapping ( "/v1")
 public class VendastaController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( VendastaController.class );
@@ -55,7 +55,7 @@ public class VendastaController
     }
 
 
-    @RequestMapping ( value = "/rm/account/create", method = RequestMethod.POST)
+    @RequestMapping ( value = "/vendasta/rm/account/create", method = RequestMethod.POST)
     @ApiOperation ( value = "Create vendasta rm account")
     public ResponseEntity<?> createVendastaRmAccount( @Valid @RequestBody VendastaRmAccountVO vendastaRmAccountVO,
         @RequestParam ( value = "isForced", defaultValue = "false") boolean isForced ) throws SSApiException
