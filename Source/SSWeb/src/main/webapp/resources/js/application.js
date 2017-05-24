@@ -11979,6 +11979,7 @@ function validateVendastaAccountCreationForm(){
 function initiateVendastaAccountCreation(){ 
 	$(document).on('click', '#vendasta-rm-create-account', function(e) {
 		e.stopPropagation();
+		hideTapedMessages();
 		if (validateVendastaAccountCreationForm()) {
 			showOverlay();
 			var formData = {
@@ -12034,3 +12035,11 @@ function vendastaCountryAutoComplete(){
 	};
 }
 
+function hideTapedMessages(){
+	hideInfo();
+	hideError();
+	hideErrorSuccess();
+	hideInfoSuccess();
+	hideErrorInvalid();
+	hideInfoInvalid();
+}
