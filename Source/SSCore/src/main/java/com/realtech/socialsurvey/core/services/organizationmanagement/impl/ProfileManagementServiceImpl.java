@@ -2257,8 +2257,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             startTime = new Timestamp( startDate.getTime() );
         if ( endDate != null )
             endTime = new Timestamp( endDate.getTime() );
-        List<SurveyPreInitiation> surveys = surveyPreInitiationDao.getIncompleteSurvey( startTime, endTime, startIndex,
-            numOfRows, agentIds, isCompanyAdmin, iden, realtechAdmin );
+        
+        List<SurveyPreInitiation> surveys = null;
+        if ( iden > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
+             surveys = surveyPreInitiationDao.getIncompleteSurvey( startTime, endTime, startIndex,
+                numOfRows, agentIds, isCompanyAdmin, iden, realtechAdmin );
+        }
+       
         return surveys;
     }
     
@@ -2286,7 +2291,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             startTime = new Timestamp( startDate.getTime() );
         if ( endDate != null )
             endTime = new Timestamp( endDate.getTime() );
-    	count = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, new int[]{CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED}, startTime, endTime, agentIds);
+        
+        if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
+            count = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, new int[]{CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED}, startTime, endTime, agentIds);            
+        }
     	return count;
     }
 
@@ -4583,6 +4591,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 String zillowProfileUrl = CommonConstants.ZILLOW_PROFILE_URL;
                 if(individualReviewee != null){
                     profileName = (String) individualReviewee.get("screenName");
+
+                    //SS-1226 : Zillow reviews' social posts are displaying broken link 
+                    //empty space replaced by %20 for FaceBook posts
+                    if(profileName != null && profileName.contains( " " )) {
+                        profileName = profileName.replace( " ", "%20" );
+                    }
+                    
                     zillowProfileUrl  += profileName;
                 }
                 
