@@ -20,7 +20,7 @@ public class VendastaHttpErrorHandler implements ErrorHandler
     {
         LOG.error( "Found error " + cause.getMessage() );
         Response response = cause.getResponse();
-        if ( response != null && response.getStatus() != HttpStatus.SC_OK ) {
+        if ( response != null && response.getStatus() != HttpStatus.SC_OK  && response.getStatus() != HttpStatus.SC_CREATED) {
             return new VendastaAccessException( "Error connecting to Vendasta.", cause );
         }
         return cause;

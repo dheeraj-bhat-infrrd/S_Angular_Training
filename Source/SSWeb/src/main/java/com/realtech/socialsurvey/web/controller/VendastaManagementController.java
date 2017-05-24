@@ -31,7 +31,12 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.VendastaMa
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
+import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
 import com.realtech.socialsurvey.web.common.JspResolver;
+
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 
 /**
@@ -56,6 +61,9 @@ public class VendastaManagementController
 
     @Autowired
     UrlValidationHelper urlValidationHelper;
+
+    @Autowired
+    SSApiIntergrationBuilder ssApiIntergrationBuilder;
 
 
     // updates the boolean value vendastaAccessible in mongo for every hierarchy
@@ -107,42 +115,33 @@ public class VendastaManagementController
     @RequestMapping ( value = "/showlistingsmanagersettings")
     public String showVendastaSettings( Model model, HttpServletRequest request )
     {
-
         LOG.info( "Method showVendastaSettings of OrganizationManagementController called" );
-        HttpSession session = request.getSession( false );
-        String vendastaAccess = null;
+        try {
+            HttpSession session = request.getSession( false );
+            
+            if ( session == null || session.getAttribute( CommonConstants.VENDASTA_ACCESS ) == null
+                || !CommonConstants.AGREE_SHARE_COLUMN_TRUE
+                    .equals( String.valueOf( session.getAttribute( CommonConstants.VENDASTA_ACCESS ) ) ) ) {
+                throw new NonFatalException( "Listings manager settings is not accessible for the current session." );
+            }
 
-        if ( session != null && session.getAttribute( CommonConstants.VENDASTA_ACCESS ) != null ) {
-            vendastaAccess = String.valueOf( session.getAttribute( CommonConstants.VENDASTA_ACCESS ) );
-        }
-
-        if ( vendastaAccess != null && vendastaAccess == "true" ) {
             String columnName = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             Long columnValue = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            Map<String, Object> hierarchyDetails = vendastaManagementService.getUnitSettingsForAHierarchy( columnName,
+                columnValue );
+            OrganizationUnitSettings unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
+            
+            model.addAttribute( "settings", unitSettings );
+            model.addAttribute( "columnName", columnName );
+            model.addAttribute( "columnValue", columnValue );
 
-            try {
-                OrganizationUnitSettings unitSettings = null;
-                if ( columnName != null && columnValue != null ) {
-                    Map<String, Object> hierarchyDetails = vendastaManagementService.getUnitSettingsForAHierarchy( columnName,
-                        columnValue );
-                    unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
-                    if ( unitSettings.getVendasta_rm_settings() != null
-                        && unitSettings.getVendasta_rm_settings().getAccountId() != null ) {
-                        model.addAttribute( "accountId", unitSettings.getVendasta_rm_settings().getAccountId() );
-                    }
-                }
-            } catch ( NonFatalException error ) {
-                LOG.error( "NonfatalException while showing vendasta settings. Reason: " + error.getMessage(), error );
-                model.addAttribute( "message",
-                    messageUtils.getDisplayMessage( error.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-                return JspResolver.MESSAGE_HEADER;
-            }
-        } else {
+            LOG.info( "Method showVendastaSettings of OrganizationManagementController finished" );
+            return JspResolver.VENDASTA_SETTINGS;
 
+        } catch ( Exception error ) {
+            LOG.error( "Exception while showing listings manager settings. Reason: " + error.getMessage(), error );
+            return JspResolver.LISTINGS_MANAGER_SETTINGS_ERROR;
         }
-
-        LOG.info( "Method showVendastaSettings of OrganizationManagementController finished" );
-        return JspResolver.VENDASTA_SETTINGS;
     }
 
 
@@ -286,4 +285,43 @@ public class VendastaManagementController
         return JspResolver.VENDASTA_SSO_ERROR;
     }
 
+
+    @RequestMapping ( value = "/vendasta/rm/account/create", method = RequestMethod.POST)
+    @ResponseBody
+    public String createVendastaRmAccount( HttpServletRequest request )
+    {
+        DisplayMessage message = null;
+        try {
+            HttpSession currentSession = request.getSession( false );
+            String entityType = (String) currentSession.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            long entityId = (long) currentSession.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+            if ( CommonConstants.AGENT_ID.equals( entityType ) ) {
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.VENDASTA_NOT_FOR_AGENT,
+                    DisplayMessageType.ERROR_MESSAGE );
+            } else {
+
+                VendastaRmCreateRequest createRequest = new VendastaRmCreateRequest();
+                createRequest.setEntityId( entityId );
+                createRequest.setEntityType( entityType );
+                createRequest.setCompanyName( (String) request.getParameter( "companyName" ) );
+                createRequest.setCountry( (String) request.getParameter( "country" ) );
+                createRequest.setState( (String) request.getParameter( "state" ) );
+                createRequest.setCity( (String) request.getParameter( "city" ) );
+                createRequest.setAddress( (String) request.getParameter( "address" ) );
+                createRequest.setZip( (String) request.getParameter( "zip" ) );
+
+                Response apiResponse = ssApiIntergrationBuilder.getIntegrationApi().createVendastaRmAccount( createRequest,
+                    true );
+                message = new DisplayMessage( new String( ( (TypedByteArray) apiResponse.getBody() ).getBytes() ),
+                    DisplayMessageType.SUCCESS_MESSAGE );
+            }
+
+        } catch ( Exception unhandledException ) {
+            LOG.error( "unable to create account in vendasta, Reason: " + unhandledException.getMessage(), unhandledException );
+            message = new DisplayMessage( unhandledException.getMessage(), DisplayMessageType.ERROR_MESSAGE );
+        }
+
+        return new Gson().toJson( message );
+    }
 }

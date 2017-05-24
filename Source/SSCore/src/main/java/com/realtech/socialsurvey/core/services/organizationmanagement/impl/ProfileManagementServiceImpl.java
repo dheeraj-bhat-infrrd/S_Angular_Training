@@ -4583,6 +4583,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 String zillowProfileUrl = CommonConstants.ZILLOW_PROFILE_URL;
                 if(individualReviewee != null){
                     profileName = (String) individualReviewee.get("screenName");
+
+                    //SS-1226 : Zillow reviews' social posts are displaying broken link 
+                    //empty space replaced by %20 for FaceBook posts
+                    if(profileName != null && profileName.contains( " " )) {
+                        profileName = profileName.replace( " ", "%20" );
+                    }
+                    
                     zillowProfileUrl  += profileName;
                 }
                 
@@ -5216,16 +5223,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyHandler.updateZillowSurveyUpdatedDateInExistingSurveyDetails( existingSurveyDetails );
             }
             
-
-            LOG.info("Saving review in temp table");
+            //SS-1214: handling Column 'ZILLOW_SURVEY_ID' cannot be null for the Table: ZILLOW_TEMP_POST
+            //if survey is new, surveyDetails.get_id() will not be null, coz, a new data entry happened to SURVEY_DETAILS Mongo Collection
             if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
-                && fromBatch ) {
-                postToTempTable( collectionName, profile, surveyDetails );
-                
-            }
-
-           
-            
+                && fromBatch && surveyDetails != null && surveyDetails.get_id() != null ) {
+                LOG.info("Saving review in temp table");
+                postToTempTable( collectionName, profile, surveyDetails );                
+            }                    
         }
         if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
             long reviewCount = getReviewsCount( profile.getIden(), -1, -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false,
