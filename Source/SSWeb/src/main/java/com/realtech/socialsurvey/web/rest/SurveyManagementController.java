@@ -297,15 +297,20 @@ public class SurveyManagementController
 						}
 					}
 				}
-				// Generate the text as in mail
-				String surveyDetail = generateSurveyTextForMail(customerName, mood, survey, isAbusive, allowCheckBox);
-				String surveyScore = String.valueOf(surveyHandler.getFormattedSurveyScore(survey.getScore()));
-				String agentName = (agent.getLastName() != null && !agent.getLastName().isEmpty())
-						? (agent.getFirstName() + " " + agent.getLastName()) : agent.getFirstName();
-				for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
-					emailServices.sendSurveyCompletionMailToAdminsAndAgent(agentName, admin.getValue(), admin.getKey(), surveyDetail, customerName,
-							surveyScore, logoUrl, agentSettings.getCompleteProfileUrl());
-				}
+                // Generate the text as in mail
+                String surveyDetail = generateSurveyTextForMail( customerName, mood, survey, isAbusive, allowCheckBox );
+
+                // Generate the text for customer details in mail 
+                String customerDetail = generateCustomerTextForMail(customerName, customerEmail, survey.getSourceId() );
+
+                String surveyScore = String.valueOf( surveyHandler.getFormattedSurveyScore( survey.getScore() ) );
+                String agentName = ( agent.getLastName() != null && !agent.getLastName().isEmpty() )
+                    ? ( agent.getFirstName() + " " + agent.getLastName() ) : agent.getFirstName();
+                for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
+                    emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
+                        surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
+                        customerDetail );
+                }
 
 				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(survey.getCompanyId());
 
@@ -327,8 +332,8 @@ public class SurveyManagementController
 						String displayName = survey.getCustomerFirstName();
 						if (survey.getCustomerLastName() != null)
 							displayName = displayName + " " + survey.getCustomerLastName();
-						emailServices.sendComplaintHandleMail(complaintRegistrationSettings.getMailId(), displayName, customerEmail, mood,
-								surveyScore, surveyDetail);
+						emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), displayName,
+                            customerEmail, mood, surveyScore, survey.getSourceId(), surveyDetail );
 					}
 
 				}
@@ -349,7 +354,29 @@ public class SurveyManagementController
 		return "Survey stored successfully";
 	}
 
-	private String generateSurveyTextForMail(String customerName, String mood, SurveyDetails survey, boolean isAbusive, boolean allowCheckBox) {
+	private String generateCustomerTextForMail( String customerFullName, String customerEmailId, String surveySourceId )
+    {
+	    
+        StringBuilder customerDetail = new StringBuilder( "<div style=\"margin: 15px 0px 15px 0px;\">" );
+   
+        customerDetail.append( "Here are the customer details:" );
+            
+        customerDetail.append( "<div style=\"margin: 10px 0px 10px 10px;\">" );
+        customerDetail.append( "Customer Name: " );
+        customerDetail.append( customerFullName == null ? "" : customerFullName );
+        customerDetail.append( "<br/> Customer Email: " );
+        customerDetail.append( customerEmailId == null ? "" : customerEmailId );
+        customerDetail.append( "<br/> Transaction Id: ");
+        customerDetail.append( surveySourceId == null ? "" : surveySourceId );
+        
+        customerDetail.append( "</div>" );
+        customerDetail.append( "</div>" );
+        
+        return customerDetail.toString();
+        
+    }
+
+    private String generateSurveyTextForMail(String customerName, String mood, SurveyDetails survey, boolean isAbusive, boolean allowCheckBox) {
 		final String tableOneFirstColumnWidth = "150px";
 		final String tableTwoFirstColumnWidth = "50%";
 
