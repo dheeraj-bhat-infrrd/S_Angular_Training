@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VendastaProductSettings;
+import com.realtech.socialsurvey.core.entities.VendastaRmAccount;
 import com.realtech.socialsurvey.core.entities.VendastaSingleSignOnTicket;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -41,6 +42,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.VendastaMa
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 
+import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 
@@ -234,28 +236,29 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
         OrganizationUnitSettings unitSettings = null;
         Map<String, Object> details = new HashMap<String, Object>();
         if ( entityId > 0 ) {
-            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+            if ( CommonConstants.COMPANY_ID.equalsIgnoreCase( entityType ) ) {
                 collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getCompanySettings( entityId );
 
-            } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+            } else if ( CommonConstants.REGION_ID.equalsIgnoreCase( entityType ) ) {
                 collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
 
-            } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+            } else if ( CommonConstants.BRANCH_ID.equalsIgnoreCase( entityType ) ) {
                 collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
 
-            } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+            } else if ( CommonConstants.AGENT_ID.equalsIgnoreCase( entityType ) ) {
                 collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getAgentSettings( entityId );
             } else {
-                throw new InvalidInputException( "Invalid Collection Type" );
+                throw new InvalidInputException( "Invalid EntityType: " + entityType
+                    + ". EntityType should be one of the following: [companyId, regionId, branchId, agentId]." );
             }
             details.put( "collectionName", collectionName );
             details.put( "unitSettings", unitSettings );
         } else {
-            throw new InvalidInputException( "Invalid Collection Id" );
+            throw new InvalidInputException( "Invalid EntityId: " + entityId + ". EntityId should be greater than 0." );
 
         }
         LOG.info( "VendastaManagementService.getUnitSettingsForAHierarchy finished" );
@@ -412,7 +415,7 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
 
                 Map<String, Object> ResponseMap = new ObjectMapper().readValue( responseString,
                     new TypeReference<HashMap<String, Object>>() {} );
-                HashMap<String, Object> data = (HashMap<String, Object>)ResponseMap.get( "data" );
+                HashMap<String, Object> data = (HashMap<String, Object>) ResponseMap.get( "data" );
                 if ( data != null && data.size() != 0 ) {
                     status = true;
                 }
@@ -421,5 +424,182 @@ public class VendastaManagementServiceImpl implements VendastaManagementService
             LOG.error( "Error connecting to vendasta. " + ex.getMessage() );
         }
         return status;
+    }
+
+
+    @Override
+    public Map<String, Object> validateAndCreateRmAccount( VendastaRmAccount vendastaRmAccount, boolean isForced )
+        throws InvalidInputException
+    {
+        String customerIdentifier = null;
+        boolean isAlreadyExistingAccount = false;
+        Map<String, Object> dataMap = new HashMap<>();
+        try {
+            Map<String, Object> hierarchyDetails = this.getUnitSettingsForAHierarchy( vendastaRmAccount.getEntityType(),
+                vendastaRmAccount.getEntityId() );
+            OrganizationUnitSettings unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
+            if ( unitSettings == null ) {
+                throw new NoRecordsFetchedException( "Invalid EntityId: " + vendastaRmAccount.getEntityId()
+                    + " for EntityType: " + vendastaRmAccount.getEntityType() );
+            }
+
+            // fill the default entries for creating the account
+            populateRmAccountDetails( vendastaRmAccount );
+
+            if ( !isForced ) {
+                if ( unitSettings != null && unitSettings.getVendasta_rm_settings() != null
+                    && !StringUtils.isEmpty( unitSettings.getVendasta_rm_settings().getAccountId() ) ) {
+                    if ( this.isAccountExistInVendasta( unitSettings.getVendasta_rm_settings().getAccountId() ) ) {
+                        customerIdentifier = unitSettings.getVendasta_rm_settings().getAccountId();
+                        isAlreadyExistingAccount = true;
+                    }
+                }
+                if ( !isAlreadyExistingAccount ) {
+                    customerIdentifier = createRmAccount( vendastaRmAccount, hierarchyDetails );
+                }
+            } else {
+                customerIdentifier = createRmAccount( vendastaRmAccount, hierarchyDetails );
+            }
+        } catch ( VendastaAccessException e ) {
+            LOG.error( "Error connecting to vendasta." );
+            try {
+                if ( e.getCause() instanceof RetrofitError ) {
+                    RetrofitError error = (RetrofitError) e.getCause();
+                    String responseString = new String( ( (TypedByteArray) error.getResponse().getBody() ).getBytes() );
+                    Map<String, Object> responseMap = new ObjectMapper().readValue( responseString,
+                        new TypeReference<HashMap<String, Object>>() {} );
+                    String message = (String) responseMap.get( "message" );
+                    throw new InvalidInputException( message );
+                }
+            } catch ( IOException ex ) {
+                LOG.error( "Error connecting to vendasta. " + ex );
+                throw new InvalidInputException( "Invalid json response received from Vendasta." + e.getMessage() );
+            }
+        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( "Error connecting to vendasta. " + e );
+            throw new InvalidInputException( e.getMessage() );
+        } catch ( IOException e ) {
+            LOG.error( "Error connecting to vendasta. " + e );
+            throw new InvalidInputException( "Invalid json response received from Vendasta." + e.getMessage() );
+        } catch ( Exception e ) {
+            throw new InvalidInputException( "Error in creating Vendasta RM account. " + e );
+        }
+        dataMap.put( "customerIdentifier", customerIdentifier );
+        dataMap.put( "isAlreadyExistingAccount", isAlreadyExistingAccount );
+        return dataMap;
+    }
+
+
+    private void populateRmAccountDetails( VendastaRmAccount vendastaRmAccount )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        Map<String, Object> hierarchyDetails = getUnitSettingsForAHierarchy( vendastaRmAccount.getEntityType(),
+            vendastaRmAccount.getEntityId() );
+        
+        OrganizationUnitSettings unitSettings = (OrganizationUnitSettings)hierarchyDetails.get( "unitSettings" );
+        
+        if( unitSettings.getContact_details().getCountry() != null && vendastaRmAccount.getCountry() == null ){
+            vendastaRmAccount.setCountry( unitSettings.getContact_details().getCountry() );
+            
+        }if( unitSettings.getContact_details().getName() != null && vendastaRmAccount.getCompanyName() == null ){
+            vendastaRmAccount.setCompanyName( unitSettings.getContact_details().getName() );
+        }
+        
+        if( unitSettings.getContact_details().getState() != null && vendastaRmAccount.getState() == null ){
+            vendastaRmAccount.setState( unitSettings.getContact_details().getState() );
+        }
+        
+        if( unitSettings.getContact_details().getCity() != null && vendastaRmAccount.getCity() == null ){
+            vendastaRmAccount.setCity( unitSettings.getContact_details().getCity() );
+        }
+        
+        if( unitSettings.getContact_details().getAddress() != null && vendastaRmAccount.getAddress() == null ){
+            vendastaRmAccount.setAddress( unitSettings.getContact_details().getAddress() );
+        }
+        
+        if( unitSettings.getContact_details().getZipcode() != null && vendastaRmAccount.getZip() == null ){
+            vendastaRmAccount.setZip( unitSettings.getContact_details().getZipcode() );
+        }
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    private String createRmAccount( VendastaRmAccount vendastaRmAccount, Map<String, Object> hierarchyDetails )
+        throws IOException, InvalidInputException
+    {
+        String customerIdentifier = null;
+        Map<String, String> data = getVendastaRmAccountDataMap( vendastaRmAccount );
+        Response response = vendastaApiIntegrationBuilder.getIntegrationApi().createRmAccount( data,
+            new HashMap<Object, Object>() );
+        if ( response != null && response.getStatus() == HttpStatus.SC_CREATED ) {
+            String responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+            Map<String, Object> responseMap = new ObjectMapper().readValue( responseString,
+                new TypeReference<HashMap<String, Object>>() {} );
+            Map<String, Object> responseData = (HashMap<String, Object>) responseMap.get( "data" );
+            if ( responseData != null && responseData.size() > 0 ) {
+                if ( storeCustomerIdentifierInMongoForEntity( hierarchyDetails,
+                    (String) responseData.get( "customerIdentifier" ) ) ) {
+                    customerIdentifier = (String) responseData.get( "customerIdentifier" );
+                }
+            }
+        }
+        return customerIdentifier;
+    }
+
+
+    private boolean storeCustomerIdentifierInMongoForEntity( Map<String, Object> hierarchyDetails, String customerIdentifier )
+        throws InvalidInputException
+    {
+        OrganizationUnitSettings unitSettings = (OrganizationUnitSettings) hierarchyDetails.get( "unitSettings" );
+        String collectionName = (String) hierarchyDetails.get( "collectionName" );
+        VendastaProductSettings settings = new VendastaProductSettings();
+        settings.setAccountId( customerIdentifier );
+        boolean isStoredInMongo = this.updateVendastaRMSettings( collectionName, unitSettings, settings );
+        return isStoredInMongo;
+    }
+
+
+    private Map<String, String> getVendastaRmAccountDataMap( VendastaRmAccount account )
+    {
+        Map<String, String> data = new HashMap<String, String>();
+        data.put( "apiKey", apiKey );
+        data.put( "apiUser", apiUser );
+        data.put( "address", account.getAddress() );
+        data.put( "city", account.getCity() );
+        data.put( "companyName", account.getCompanyName() );
+        data.put( "country", account.getCountry() );
+        data.put( "zip", account.getZip() );
+        data.put( "state", account.getState() );
+        data.put( "accountGroupId", account.getAccountGroupId() );
+        data.put( "adminNotes", account.getAdminNotes() );
+        data.put( "alternateEmail", account.getAlternateEmail() );
+        data.put( "billingCode", account.getBillingCode() );
+        data.put( "businessCategory", account.getBusinessCategory() );
+        data.put( "callTrackingNumber", account.getCallTrackingNumber() );
+        data.put( "cellNumber", account.getCellNumber() );
+        data.put( "commonCompanyName", account.getCommonCompanyName() );
+        data.put( "competitor", account.getCompetitor() );
+        data.put( "customerIdentifier", account.getCustomerIdentifier() );
+        data.put( "email", account.getEmail() );
+        data.put( "employee", account.getEmployee() );
+        data.put( "faxNumber", account.getFaxNumber() );
+        data.put( "firstName", account.getFirstName() );
+        data.put( "lastName", account.getLastName() );
+        data.put( "marketId", account.getMarketId() );
+        data.put( "salesPersonEmail", account.getSalesPersonEmail() );
+        data.put( "service", account.getService() );
+        data.put( "ssoToken", account.getSsoToken() );
+        data.put( "taxId", account.getTaxId() );
+        data.put( "twitterSearches", account.getTwitterSearches() );
+        data.put( "website", account.getWebsite() );
+        data.put( "welcomeMessage", account.getWelcomeMessage() );
+        data.put( "workNumber", account.getWorkNumber() );
+        data.put( "demoAccountFlag", account.getDemoAccountFlag() );
+        data.put( "sendAlertsFlag", account.getSendAlertsFlag() );
+        data.put( "sendReportsFlag", account.getSendReportsFlag() );
+        data.put( "sendTutorialsFlag", account.getSendTutorialsFlag() );
+        data.put( "latitude", account.getLatitude() );
+        data.put( "longitude", account.getLongitude() );
+        return data;
     }
 }

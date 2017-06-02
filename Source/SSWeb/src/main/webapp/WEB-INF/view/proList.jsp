@@ -108,10 +108,12 @@
 							<div id="pro-next" class="float-right sur-paginate-btn">Next &gt;</div>
 						</div>
 					</div>
+					<!--
+					SS-1212: hiding this ad from appearing on the 'Find a pro' search results 
 					<div class="ctnt-right-item col-lg-3 col-md-3 col-sm-3 col-xs-12 ads-container">
 						<a href="http://mbshighway.com/sosur" target="_blank">
 						<img class="mbs-highwayad" src="/resources/images/Sidebar_MBSHighway.png"></a>
-					</div>
+					</div> -->
 				</div>
 			</div>
 		</div>
