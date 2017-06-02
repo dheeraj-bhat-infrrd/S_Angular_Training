@@ -13,6 +13,8 @@
 				<div class="float-left hm-header-row-left text-center">
 					<spring:message code="label.listingsmanager.key" />
 				</div>
+				<!-- SS-1182 Add user assignment dropdown -->
+				<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
 			</div>
 		</div>
 	</div>
@@ -33,6 +35,9 @@
 			});
 			loadVendastaIframe();
 		});
+		
+		//SS-1182 Enable user assignment dropdown
+		updateViewAsScroll();
 
 		//load Reviews monitor Iframe with Vendasta product URL
 		function loadVendastaIframe() {

@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.api;
 
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
+import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.Payment;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
@@ -101,4 +102,11 @@ public interface SSApiIntegration
 
     @POST ( "/v1/webaddress")
     Response validateWebAddress( @Body String webAddress );
+
+    //vendasta: BEGIN
+    
+    @POST ( "/v1/vendasta/rm/account/create" )
+    Response createVendastaRmAccount( @Body VendastaRmCreateRequest accountDetails, @Query ( "isForced" ) boolean isForced );
+    
+    //vendasta: END
 }
