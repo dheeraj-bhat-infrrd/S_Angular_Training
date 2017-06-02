@@ -310,6 +310,15 @@ function showToast() {
 	}, 3000);
 }
 
+//SS-1225
+//show Toast
+function showToastLong() {
+	$('#toast-container').fadeIn();
+	setTimeout(function() {
+		$('#toast-container').fadeOut();
+	}, 8000);
+}
+
 // detectBrowser();
 
 function detectBrowser() {
@@ -3789,6 +3798,81 @@ function validateVendastaAccountId(elementId) {
 	} else {
 		$('#' + elementId).next('.hm-item-err-2').html('Please enter Account ID.');
 		$('#' + elementId).next('.hm-item-err-2').show();
+		return false;
+	}
+}
+
+function validateVendastaCompanyName(elementId) {
+	if ($('#' + elementId).val() != "") {
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').hide();
+		return true;
+	} else {
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').html('Please enter a valid company Name.');
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').show();
+		return false;
+	}
+}
+
+function validateVendastaCountry(countryId, codeId) {
+	if ($('#' + countryId).val() != "") {
+		var countryName = $('#' + countryId).val();
+		var code = $('#' + codeId).val();
+		for( var country in countryData ){
+			if( countryData[country].label == countryName && countryData[country].code == code){
+				$('#' + countryId).parent().next('.vendasta-account-create-form-error').hide();
+				return true;
+			}
+		}
+		$('#' + countryId).parent().next('.vendasta-account-create-form-error').html('Please select a valid Country name.');
+		$('#' + countryId).parent().next('.vendasta-account-create-form-error').show();
+		return false;
+	} else {
+		$('#' + countryId).parent().next('.vendasta-account-create-form-error').html('Please select a valid Country name.');
+		$('#' + countryId).parent().next('.vendasta-account-create-form-error').show();
+		return false;
+	}
+}
+
+function validateVendastaState(elementId) {
+	if ($('#' + elementId).val() != "") {
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').hide();
+		return true;
+	} else {
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').html('Please enter a valid State name.');
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').show();
+		return false;
+	}
+}
+
+function validateVendastaCity(elementId) {
+	if ($('#' + elementId).val() != "") {
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').hide();
+		return true;
+	} else {
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').html('Please enter a valid city name.');
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').show();
+		return false;
+	}
+}
+
+function validateVendastaAddress(elementId) {
+	if ($('#' + elementId).val() != "") {
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').hide();
+		return true;
+	} else {
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').html('Please enter a valid address.');
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').show();
+		return false;
+	}
+}
+
+function validateVendastaZip(elementId) {
+	if ($('#' + elementId).val() != "") {
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').hide();
+		return true;
+	} else {
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').html('Please enter a valid zip code.');
+		$('#' + elementId).parent().next('.vendasta-account-create-form-error').show();
 		return false;
 	}
 }
