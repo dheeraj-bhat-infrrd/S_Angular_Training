@@ -78,7 +78,7 @@
 									+ profileLevel
 									+ "/"
 									+ iden
-									+ "\" frameborder=\"0\" width=\"100%\" height=\"500px\" style=\"overflow-y: scroll;\" /&gt;";
+									+ "\" frameborder=\"0\" width=\"100%\" height=\"500px\" style=\"overflow-y: scroll;\" &gt&lt;/iframe&gt;";
 							body += "&lt;script type=\"text/javascript\"&gt;$(document).ready(function(){ var myEventMethod = window.addEventListener ? \"addEventListener\" : \"attachEvent\"; var myEventListener = window[myEventMethod]; var myEventMessage = myEventMethod == \"attachEvent\" ? \"onmessage\" : \"message\"; myEventListener(myEventMessage, function (e) { if (e.data === parseInt(e.data)) document.getElementById('ss-widget-iframe').height = e.data + \"px\";    }, false);});&lt;/script&gt;";
 						}
 

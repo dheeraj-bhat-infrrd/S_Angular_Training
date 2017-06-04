@@ -645,7 +645,7 @@
 	<bean id="zillowreviewprocessandautopostcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="zillowreviewprocessandautopostjobdetail" />
-		<property name="cronExpression" value="0 0 9 * * ?" />
+		<property name="cronExpression" value="0 0 8 * * ?" />
 	</bean>
 
 	<bean id="userencryptedidupdatercron"

@@ -4656,8 +4656,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( String emailId, long userId )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        User user = this.saveEmailUserMapping( emailId, userId );
+        User user = userDao.findById(User.class, userId);
         socialManagementService.updateAgentIdOfSurveyPreinitiationRecordsForEmail( user, emailId );
+        this.saveEmailUserMapping( emailId, userId );
     }
 
 
