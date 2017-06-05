@@ -158,7 +158,6 @@
   </connection>
   <order>
   <hop> <from>branch_detail_log</from><to>branch_input</to><enabled>Y</enabled> </hop>
-  <hop> <from>parse_branch_region</from><to>branch_null_check</to><enabled>Y</enabled> </hop>
   <hop> <from>branch_null_check</from><to>branch_detail_log</to><enabled>Y</enabled> </hop>
   <hop> <from>branch_input</from><to>Select_branch_values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select_branch_values</from><to>random_branch_post_id</to><enabled>Y</enabled> </hop>
@@ -172,13 +171,15 @@
   <hop> <from>random_region_post_id </from><to>region_shared_on</to><enabled>Y</enabled> </hop>
   <hop> <from>region_shared_on</from><to>region_final_log</to><enabled>Y</enabled> </hop>
   <hop> <from>region_final_log</from><to>set_type_boolean 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>parse_branch_region</from><to>region_null_check</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB Input</from><to>parse_id</to><enabled>Y</enabled> </hop>
-  <hop> <from>parse_id</from><to>parse_branch_region</to><enabled>Y</enabled> </hop>
   <hop> <from>set_type_boolean</from><to>branch_insert</to><enabled>Y</enabled> </hop>
   <hop> <from>branch_insert</from><to>branch_update</to><enabled>Y</enabled> </hop>
   <hop> <from>set_type_boolean 2</from><to>Table output</to><enabled>Y</enabled> </hop>
   <hop> <from>Table output</from><to>Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>parse_id</from><to>parse_branch</to><enabled>Y</enabled> </hop>
+  <hop> <from>parse_id</from><to>parse_region</to><enabled>Y</enabled> </hop>
+  <hop> <from>parse_branch</from><to>branch_null_check</to><enabled>Y</enabled> </hop>
+  <hop> <from>parse_region</from><to>region_null_check</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>MongoDB Input</name>
@@ -881,7 +882,7 @@
     </step>
 
   <step>
-    <name>parse_branch_region</name>
+    <name>parse_region</name>
     <type>JsonInput</type>
     <description/>
     <distribute>N</distribute>
@@ -908,19 +909,6 @@
       <include_subfolders>N</include_subfolders>
     </file>
     <fields>
-      <field>
-        <name>branchDetails</name>
-        <path>&#x24;..socialMediaPostDetails.branchMediaPostDetailsList&#x5b;&#x2a;&#x5d;</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
       <field>
         <name>regionDetails</name>
         <path>&#x24;.socialMediaPostDetails.regionMediaPostDetailsList&#x5b;&#x2a;&#x5d;</path>
@@ -949,8 +937,8 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>143</xloc>
-      <yloc>125</yloc>
+      <xloc>128</xloc>
+      <yloc>174</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -959,7 +947,7 @@
     <name>parse_id</name>
     <type>JsonInput</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -1011,8 +999,8 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>146</xloc>
-      <yloc>25</yloc>
+      <xloc>34</xloc>
+      <yloc>126</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1868,6 +1856,68 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1180</xloc>
       <yloc>171</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>parse_branch</name>
+    <type>JsonInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <addresultfile>N</addresultfile>
+    <readurl>N</readurl>
+    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
+    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
+    <ignoreMissingPath>Y</ignoreMissingPath>
+    <rownum_field/>
+    <file>
+      <name/>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <fields>
+      <field>
+        <name>branchDetails</name>
+        <path>&#x24;.socialMediaPostDetails.branchMediaPostDetailsList&#x5b;&#x2a;&#x5d;</path>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <IsInFields>Y</IsInFields>
+    <IsAFile>N</IsAFile>
+    <valueField>json</valueField>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>145</xloc>
+      <yloc>32</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
