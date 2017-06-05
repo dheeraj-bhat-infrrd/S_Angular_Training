@@ -938,7 +938,7 @@
            <schema_name/>
            </partitioning>
 <send_true_to>FB Token OP</send_true_to>
-<send_false_to/>
+<send_false_to>Delete FB Token</send_false_to>
     <compare>
 <condition>
  <negated>N</negated>
