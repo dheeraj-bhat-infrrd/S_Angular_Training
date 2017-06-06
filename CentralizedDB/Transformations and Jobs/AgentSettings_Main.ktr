@@ -342,6 +342,348 @@
     </step>
 
   <step>
+    <name>AgentSettings_SocialMediaToken_JavaScript</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var final_agent_id &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;AgentId &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_8&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var typeVar &#x3d; 4&#x3b;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>final_agent_id</name>
+        <rename>final_agent_id</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>typeVar</name>
+        <rename>typeVar</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1560</xloc>
+      <yloc>708</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>AgentSettings_TableOP</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <schema/>
+    <table>agent_settings</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>AGENT_SETTINGS_ID</column_name>
+          <stream_name>AGENT_SETTINGS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>PROFILE_COMPLETION</column_name>
+          <stream_name>profile_completion</stream_name>
+        </field>
+        <field>
+          <column_name>STATUS</column_name>
+          <stream_name>status</stream_name>
+        </field>
+        <field>
+          <column_name>VERTICAL</column_name>
+          <stream_name>vertical</stream_name>
+        </field>
+        <field>
+          <column_name>SOCIAL_MEDIA_TOKENS_ID</column_name>
+          <stream_name>SOCIAL_MEDIA_TOKENS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</column_name>
+          <stream_name>allowOverrideForSocialMedia</stream_name>
+        </field>
+        <field>
+          <column_name>ALLOW_ZILLOW_AUTO_POST</column_name>
+          <stream_name>allowZillowAutoPost</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_BY</column_name>
+          <stream_name>createdBy</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_ON_MONGO</column_name>
+          <stream_name>createdOn</stream_name>
+        </field>
+        <field>
+          <column_name>IS_ACCOUNT_DISABLED</column_name>
+          <stream_name>isAccountDisabled</stream_name>
+        </field>
+        <field>
+          <column_name>IS_DEFAULT_BY_SYSTEM</column_name>
+          <stream_name>isDefaultBySystem</stream_name>
+        </field>
+        <field>
+          <column_name>IS_LOCATION_ENABLED</column_name>
+          <stream_name>isLocationEnabled</stream_name>
+        </field>
+        <field>
+          <column_name>IS_LOGO_IMAGE_PROCESSED</column_name>
+          <stream_name>isLogoImageProcessed</stream_name>
+        </field>
+        <field>
+          <column_name>IS_PROFILE_IMAGE_PROCESSED</column_name>
+          <stream_name>isProfileImageProcessed</stream_name>
+        </field>
+        <field>
+          <column_name>IS_SEO_CONTENT_MODIFIED</column_name>
+          <stream_name>isSeoContentModified</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_BY</column_name>
+          <stream_name>modifiedBy</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_ON_MONGO</column_name>
+          <stream_name>modifiedOn</stream_name>
+        </field>
+        <field>
+          <column_name>PROFILE_IMAGE_URL</column_name>
+          <stream_name>profileImageUrl</stream_name>
+        </field>
+        <field>
+          <column_name>PROFILE_IMAGE_URL_THUMBNAIL</column_name>
+          <stream_name>profileImageUrlThumbnail</stream_name>
+        </field>
+        <field>
+          <column_name>PROFILE_NAME</column_name>
+          <stream_name>profileName</stream_name>
+        </field>
+        <field>
+          <column_name>PROFILE_URL</column_name>
+          <stream_name>profileUrl</stream_name>
+        </field>
+        <field>
+          <column_name>REVIEW_COUNT</column_name>
+          <stream_name>reviewCount</stream_name>
+        </field>
+        <field>
+          <column_name>SEND_EMAIL_FROM_COMPANY</column_name>
+          <stream_name>sendEmailFromCompany</stream_name>
+        </field>
+        <field>
+          <column_name>USER_ENCRYPTED_ID</column_name>
+          <stream_name>userEncryptedId</stream_name>
+        </field>
+        <field>
+          <column_name>VENDASTA_ACCESSIBLE</column_name>
+          <stream_name>vendastaAccessible</stream_name>
+        </field>
+        <field>
+          <column_name>USER_ID</column_name>
+          <stream_name>iden</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_ON</column_name>
+          <stream_name>createdOnStr</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_ON</column_name>
+          <stream_name>modifiedOnStr</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>926</xloc>
+      <yloc>1224</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>AgnetSettings</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>      <field>        <name>AGENT_SETTINGS_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>allowOverrideForSocialMedia</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>allowZillowAutoPost</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>createdBy</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>createdOn</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isAccountDisabled</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isDefaultBySystem</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isLocationEnabled</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isLogoImageProcessed</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isProfileImageProcessed</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isSeoContentModified</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>modifiedBy</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>modifiedOn</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profileImageUrl</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profileImageUrlThumbnail</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profileName</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profileUrl</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profile_completion</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>reviewCount</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>sendEmailFromCompany</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>status</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>userEncryptedId</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>vendastaAccessible</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>vertical</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>iden</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>486</xloc>
+      <yloc>1114</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>DateConverter </name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;function convertToDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;var date &#x3d; new Date&#x28;milliValue&#x29;&#x3b;&#xd;&#xa;var year &#x3d; date.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;var month &#x3d; date.getMonth&#x28;&#x29;&#x2b;1&#x3b;&#xd;&#xa;var day &#x3d; date.getDate&#x28;&#x29;&#x3b;&#xd;&#xa;var hour &#x3d; date.getHours&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var min &#x3d; date.getMinutes&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var sec &#x3d; date.getSeconds&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;hour.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;hour &#x3d; &#x22;0&#x22;&#x2b;hour&#x3b;&#xd;&#xa;&#x7d; &#xd;&#xa;if&#x28;min.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;min &#x3d; &#x22;0&#x22;&#x2b;min&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sec.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;sec &#x3d; &#x22;0&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;hour&#x2b;&#x22;&#x3a;&#x22;&#x2b;min&#x2b;&#x22;&#x3a;&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;var createdOnStr &#x3d; convertToDate&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnStr &#x3d; convertToDate&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>createdOnStr</name>
+        <rename>createdOnStr</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>modifiedOnStr</name>
+        <rename>modifiedOnStr</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>628</xloc>
+      <yloc>1114</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>DateConverter FB Token</name>
     <type>ScriptValueMod</type>
     <description/>
@@ -356,15 +698,9 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;function convertToDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;var date &#x3d; new Date&#x28;milliValue&#x29;&#x3b;&#xd;&#xa;var year &#x3d; date.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;var month &#x3d; date.getMonth&#x28;&#x29;&#x2b;1&#x3b;&#xd;&#xa;var day &#x3d; date.getDate&#x28;&#x29;&#x3b;&#xd;&#xa;var hour &#x3d; date.getHours&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var min &#x3d; date.getMinutes&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var sec &#x3d; date.getSeconds&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;hour.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;hour &#x3d; &#x22;0&#x22;&#x2b;hour&#x3b;&#xd;&#xa;&#x7d; &#xd;&#xa;if&#x28;min.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;min &#x3d; &#x22;0&#x22;&#x2b;min&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sec.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;sec &#x3d; &#x22;0&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;hour&#x2b;&#x22;&#x3a;&#x22;&#x2b;min&#x2b;&#x22;&#x3a;&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;var createdOnStr &#x3d; convertToDate&#x28;facebookAccessTokenCreatedOn&#x29;&#x3b;&#xd;&#xa;var expiresOnStr &#x3d; convertToDate&#x28;facebookAccessTokenExpiresOn&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;function convertToDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;var date &#x3d; new Date&#x28;milliValue&#x29;&#x3b;&#xd;&#xa;var year &#x3d; date.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;var month &#x3d; date.getMonth&#x28;&#x29;&#x2b;1&#x3b;&#xd;&#xa;var day &#x3d; date.getDate&#x28;&#x29;&#x3b;&#xd;&#xa;var hour &#x3d; date.getHours&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var min &#x3d; date.getMinutes&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var sec &#x3d; date.getSeconds&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;hour.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;hour &#x3d; &#x22;0&#x22;&#x2b;hour&#x3b;&#xd;&#xa;&#x7d; &#xd;&#xa;if&#x28;min.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;min &#x3d; &#x22;0&#x22;&#x2b;min&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sec.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;sec &#x3d; &#x22;0&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;hour&#x2b;&#x22;&#x3a;&#x22;&#x2b;min&#x2b;&#x22;&#x3a;&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;var createdOnStr &#x3d; convertToDate&#x28;facebookAccessTokenCreatedOn&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>createdOnStr</name>
         <rename>createdOnStr</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>expiresOnStr</name>
-        <rename>expiresOnStr</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -532,7 +868,7 @@
         </field>
         <field>
           <column_name>FACEBOOK_ACCESS_TOKEN_EXPIRES_ON</column_name>
-          <stream_name>expiresOnStr</stream_name>
+          <stream_name>facebookAccessTokenExpiresOn</stream_name>
         </field>
         <field>
           <column_name>id</column_name>
@@ -599,6 +935,131 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>482</xloc>
       <yloc>29</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter Agent Settings Social Media Token</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Social Media Token OP</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>FACEBOOK_TOKEN_ID</leftvalue>
+   <function>IS NOT NULL</function>
+   <rightvalue/>
+   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <conditions>
+    <condition>
+     <negated>N</negated>
+     <leftvalue>GOOGLE_BUSINESS_TOKEN_ID</leftvalue>
+     <function>IS NOT NULL</function>
+     <rightvalue/>
+     </condition>
+    <condition>
+     <negated>N</negated>
+     <operator>OR</operator>
+     <conditions>
+      <condition>
+       <negated>N</negated>
+       <leftvalue>GOOGLE_TOKEN_ID</leftvalue>
+       <function>IS NOT NULL</function>
+       <rightvalue/>
+       </condition>
+      <condition>
+       <negated>N</negated>
+       <operator>OR</operator>
+       <conditions>
+        <condition>
+         <negated>N</negated>
+         <leftvalue>LENDING_TREE_TOKEN_ID</leftvalue>
+         <function>IS NOT NULL</function>
+         <rightvalue/>
+         </condition>
+        <condition>
+         <negated>N</negated>
+         <operator>OR</operator>
+         <conditions>
+          <condition>
+           <negated>N</negated>
+           <leftvalue>LINKED_IN_TOKEN_ID</leftvalue>
+           <function>IS NOT NULL</function>
+           <rightvalue/>
+           </condition>
+          <condition>
+           <negated>N</negated>
+           <operator>OR</operator>
+           <conditions>
+            <condition>
+             <negated>N</negated>
+             <leftvalue>REALTOR_TOKEN_ID</leftvalue>
+             <function>IS NOT NULL</function>
+             <rightvalue/>
+             </condition>
+            <condition>
+             <negated>N</negated>
+             <operator>OR</operator>
+             <conditions>
+              <condition>
+               <negated>N</negated>
+               <leftvalue>TWITTER_TOKEN_ID</leftvalue>
+               <function>IS NOT NULL</function>
+               <rightvalue/>
+               </condition>
+              <condition>
+               <negated>N</negated>
+               <operator>OR</operator>
+               <conditions>
+                <condition>
+                 <negated>N</negated>
+                 <leftvalue>YELP_TOKEN_ID</leftvalue>
+                 <function>IS NOT NULL</function>
+                 <rightvalue/>
+                 </condition>
+                <condition>
+                 <negated>N</negated>
+                 <operator>OR</operator>
+                 <leftvalue>ZILLOW_TOKEN_ID</leftvalue>
+                 <function>IS NOT NULL</function>
+                 <rightvalue/>
+                 </condition>
+                </conditions>
+               </condition>
+              </conditions>
+             </condition>
+            </conditions>
+           </condition>
+          </conditions>
+         </condition>
+        </conditions>
+       </condition>
+      </conditions>
+     </condition>
+    </conditions>
+   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1560</xloc>
+      <yloc>858</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1284,6 +1745,34 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>482</xloc>
       <yloc>503</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Merge Join</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>INNER</join_type>
+<step1>Sort Agent Settings</step1>
+<step2>Sort rows Social Media token</step2>
+    <keys_1>
+      <key>iden</key>
+    </keys_1>
+    <keys_2>
+      <key>final_agent_id</key>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>928</xloc>
+      <yloc>1114</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2279,6 +2768,47 @@
     </step>
 
   <step>
+    <name>Multiway Merge Join</name>
+    <type>MultiwayMergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>FULL OUTER</join_type>
+<step0>Sort FB Token</step0>
+<step1>Sort GB Token</step1>
+<step2>Sort Google Token</step2>
+<step3>Sort LendingTree Token</step3>
+<step4>Sort LinkdIn Token</step4>
+<step5>Sort Realtor Token</step5>
+<step6>Sort Yelp Token</step6>
+<step7>Sort Twitter Token</step7>
+<step8>Sort Zillow Token</step8>
+    <number_input>9</number_input>
+    <keys>
+      <key>AgentId</key>
+      <key>AgentId</key>
+      <key>AgentId</key>
+      <key>AgentId</key>
+      <key>AgentId</key>
+      <key>AgentId</key>
+      <key>AgentId</key>
+      <key>AgentId</key>
+      <key>AgentId</key>
+    </keys>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1386</xloc>
+      <yloc>504</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Realtor Token OP</name>
     <type>TableOutput</type>
     <description/>
@@ -2364,6 +2894,562 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>482</xloc>
       <yloc>630</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Social Media Token OP</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <schema/>
+    <table>social_media_tokens</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>N</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>FACEBOOK_TOKEN_ID</column_name>
+          <stream_name>FACEBOOK_TOKEN_ID</stream_name>
+        </field>
+        <field>
+          <column_name>GOOGLE_BUSINESS_TOKEN_ID</column_name>
+          <stream_name>GOOGLE_BUSINESS_TOKEN_ID</stream_name>
+        </field>
+        <field>
+          <column_name>GOOGLE_TOKEN_ID</column_name>
+          <stream_name>GOOGLE_TOKEN_ID</stream_name>
+        </field>
+        <field>
+          <column_name>LENDING_TREE_TOKEN_ID</column_name>
+          <stream_name>LENDING_TREE_TOKEN_ID</stream_name>
+        </field>
+        <field>
+          <column_name>LINKED_IN_TOKEN_ID</column_name>
+          <stream_name>LINKED_IN_TOKEN_ID</stream_name>
+        </field>
+        <field>
+          <column_name>REALTOR_TOKEN_ID</column_name>
+          <stream_name>REALTOR_TOKEN_ID</stream_name>
+        </field>
+        <field>
+          <column_name>TWITTER_TOKEN_ID</column_name>
+          <stream_name>TWITTER_TOKEN_ID</stream_name>
+        </field>
+        <field>
+          <column_name>YELP_TOKEN_ID</column_name>
+          <stream_name>YELP_TOKEN_ID</stream_name>
+        </field>
+        <field>
+          <column_name>SOCIAL_MEDIA_TOKENS_ID</column_name>
+          <stream_name>SOCIAL_MEDIA_TOKENS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>type</column_name>
+          <stream_name>typeVar</stream_name>
+        </field>
+        <field>
+          <column_name>id</column_name>
+          <stream_name>final_agent_id</stream_name>
+        </field>
+        <field>
+          <column_name>ZILLOW_TOKEN_ID</column_name>
+          <stream_name>ZILLOW_TOKEN_ID</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1560</xloc>
+      <yloc>1004</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>SocialMediaTokens</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>      <field>        <name>AgentId</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>AgentId_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>AgentId_2</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>AgentId_3</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>AgentId_4</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>AgentId_5</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>AgentId_6</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>AgentId_7</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>AgentId_8</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>FACEBOOK_TOKEN_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>GOOGLE_BUSINESS_TOKEN_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>GOOGLE_TOKEN_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>LENDING_TREE_TOKEN_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>LINKED_IN_TOKEN_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>REALTOR_TOKEN_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SOCIAL_MEDIA_TOKENS_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>TWITTER_TOKEN_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>YELP_TOKEN_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>ZILLOW_TOKEN_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1560</xloc>
+      <yloc>590</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort Agent Settings</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>iden</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>760</xloc>
+      <yloc>1114</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort FB Token</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AgentId</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1124</xloc>
+      <yloc>29</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort GB Token</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AgentId</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1124</xloc>
+      <yloc>132</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort Google Token</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AgentId</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1124</xloc>
+      <yloc>247</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort LendingTree Token</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AgentId</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1124</xloc>
+      <yloc>371</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort LinkdIn Token</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AgentId</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1124</xloc>
+      <yloc>503</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort Realtor Token</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AgentId</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1124</xloc>
+      <yloc>630</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort Twitter Token</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AgentId</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1124</xloc>
+      <yloc>835</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort Yelp Token</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AgentId</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1124</xloc>
+      <yloc>739</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort Zillow Token</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AgentId</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1124</xloc>
+      <yloc>952</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows Social Media token</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>final_agent_id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1191</xloc>
+      <yloc>1114</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2478,6 +3564,31 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>482</xloc>
       <yloc>835</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>UUID_AgentSettings</name>
+    <type>RandomValue</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>AGENT_SETTINGS_ID</name>
+        <type>random uuid</type>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>335</xloc>
+      <yloc>1114</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2633,6 +3744,31 @@
     </step>
 
   <step>
+    <name>UUID_SocialMediaToken</name>
+    <type>RandomValue</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>SOCIAL_MEDIA_TOKENS_ID</name>
+        <type>random uuid</type>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1560</xloc>
+      <yloc>504</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>UUID_TwitterToken</name>
     <type>RandomValue</type>
     <description/>
@@ -2749,7 +3885,7 @@
         </value>
       <value>
         <name>FACEBOOK_ACCESS_TOKEN_EXPIRES_ON</name>
-        <rename>expiresOnStr</rename>
+        <rename>facebookAccessTokenExpiresOn</rename>
         </value>
       <value>
         <name>FACEBOOK_ACCESS_TOKEN_TO_POST</name>
@@ -2879,6 +4015,51 @@
     </step>
 
   <step>
+    <name>Update LendingTree token</name>
+    <type>Update</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <skip_lookup>N</skip_lookup>
+    <commit>100</commit>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>lending_tree_token</table>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>AgentId</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>LENDING_TREE_PROFILE_LINK</name>
+        <rename>lendingTreeProfileLink</rename>
+        </value>
+      </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>990</xloc>
+      <yloc>444</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Update LinkdIn Token</name>
     <type>Update</type>
     <description/>
@@ -2948,51 +4129,6 @@
     </step>
 
   <step>
-    <name>Update LendingTree token</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>lending_tree_token</table>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>AgentId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>LENDING_TREE_PROFILE_LINK</name>
-        <rename>lendingTreeProfileLink</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>990</xloc>
-      <yloc>444</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Update Realtor Token</name>
     <type>Update</type>
     <description/>
@@ -3033,6 +4169,91 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>995</xloc>
       <yloc>700</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Update Social media Token</name>
+    <type>Update</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <skip_lookup>N</skip_lookup>
+    <commit>100</commit>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>social_media_tokens</table>
+      <key>
+        <name>typeVar</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>final_agent_id</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>FACEBOOK_TOKEN_ID</name>
+        <rename>FACEBOOK_TOKEN_ID</rename>
+        </value>
+      <value>
+        <name>GOOGLE_BUSINESS_TOKEN_ID</name>
+        <rename>GOOGLE_BUSINESS_TOKEN_ID</rename>
+        </value>
+      <value>
+        <name>GOOGLE_TOKEN_ID</name>
+        <rename>GOOGLE_TOKEN_ID</rename>
+        </value>
+      <value>
+        <name>LENDING_TREE_TOKEN_ID</name>
+        <rename>LENDING_TREE_TOKEN_ID</rename>
+        </value>
+      <value>
+        <name>LINKED_IN_TOKEN_ID</name>
+        <rename>LINKED_IN_TOKEN_ID</rename>
+        </value>
+      <value>
+        <name>REALTOR_TOKEN_ID</name>
+        <rename>REALTOR_TOKEN_ID</rename>
+        </value>
+      <value>
+        <name>TWITTER_TOKEN_ID</name>
+        <rename>TWITTER_TOKEN_ID</rename>
+        </value>
+      <value>
+        <name>YELP_TOKEN_ID</name>
+        <rename>YELP_TOKEN_ID</rename>
+        </value>
+      <value>
+        <name>type</name>
+        <rename>typeVar</rename>
+        </value>
+      <value>
+        <name>id</name>
+        <rename>final_agent_id</rename>
+        </value>
+      <value>
+        <name>ZILLOW_TOKEN_ID</name>
+        <rename>ZILLOW_TOKEN_ID</rename>
+        </value>
+      </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1387</xloc>
+      <yloc>1114</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3404,1233 +4625,6 @@
       </GUI>
     </step>
 
-  <step>
-    <name>Sort FB Token</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AgentId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1124</xloc>
-      <yloc>29</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort GB Token</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AgentId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1124</xloc>
-      <yloc>132</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort Google Token</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AgentId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1124</xloc>
-      <yloc>247</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort LendingTree Token</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AgentId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1124</xloc>
-      <yloc>371</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort LinkdIn Token</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AgentId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1124</xloc>
-      <yloc>503</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort Realtor Token</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AgentId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1124</xloc>
-      <yloc>630</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort Yelp Token</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AgentId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1124</xloc>
-      <yloc>739</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort Twitter Token</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AgentId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1124</xloc>
-      <yloc>835</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort Zillow Token</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AgentId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1124</xloc>
-      <yloc>952</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<join_type>FULL OUTER</join_type>
-<step0>Sort FB Token</step0>
-<step1>Sort GB Token</step1>
-<step2>Sort Google Token</step2>
-<step3>Sort LendingTree Token</step3>
-<step4>Sort LinkdIn Token</step4>
-<step5>Sort Realtor Token</step5>
-<step6>Sort Yelp Token</step6>
-<step7>Sort Twitter Token</step7>
-<step8>Sort Zillow Token</step8>
-    <number_input>9</number_input>
-    <keys>
-      <key>AgentId</key>
-      <key>AgentId</key>
-      <key>AgentId</key>
-      <key>AgentId</key>
-      <key>AgentId</key>
-      <key>AgentId</key>
-      <key>AgentId</key>
-      <key>AgentId</key>
-      <key>AgentId</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1386</xloc>
-      <yloc>504</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>UUID_SocialMediaToken</name>
-    <type>RandomValue</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>SOCIAL_MEDIA_TOKENS_ID</name>
-        <type>random uuid</type>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1560</xloc>
-      <yloc>504</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>SocialMediaTokens</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>      <field>        <name>AgentId</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AgentId_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AgentId_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AgentId_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AgentId_4</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AgentId_5</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AgentId_6</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AgentId_7</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AgentId_8</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>FACEBOOK_TOKEN_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>GOOGLE_BUSINESS_TOKEN_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>GOOGLE_TOKEN_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>LENDING_TREE_TOKEN_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>LINKED_IN_TOKEN_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>REALTOR_TOKEN_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>SOCIAL_MEDIA_TOKENS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>TWITTER_TOKEN_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>YELP_TOKEN_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>ZILLOW_TOKEN_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1560</xloc>
-      <yloc>590</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>AgentSettings_SocialMediaToken_JavaScript</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var final_agent_id &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;AgentId &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AgentId_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AgentId_8&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var typeVar &#x3d; 4&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>final_agent_id</name>
-        <rename>final_agent_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>typeVar</name>
-        <rename>typeVar</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1560</xloc>
-      <yloc>708</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter Agent Settings Social Media Token</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Social Media Token OP</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>FACEBOOK_TOKEN_ID</leftvalue>
-   <function>IS NOT NULL</function>
-   <rightvalue/>
-   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>OR</operator>
-   <conditions>
-    <condition>
-     <negated>N</negated>
-     <leftvalue>GOOGLE_BUSINESS_TOKEN_ID</leftvalue>
-     <function>IS NOT NULL</function>
-     <rightvalue/>
-     </condition>
-    <condition>
-     <negated>N</negated>
-     <operator>OR</operator>
-     <conditions>
-      <condition>
-       <negated>N</negated>
-       <leftvalue>GOOGLE_TOKEN_ID</leftvalue>
-       <function>IS NOT NULL</function>
-       <rightvalue/>
-       </condition>
-      <condition>
-       <negated>N</negated>
-       <operator>OR</operator>
-       <conditions>
-        <condition>
-         <negated>N</negated>
-         <leftvalue>LENDING_TREE_TOKEN_ID</leftvalue>
-         <function>IS NOT NULL</function>
-         <rightvalue/>
-         </condition>
-        <condition>
-         <negated>N</negated>
-         <operator>OR</operator>
-         <conditions>
-          <condition>
-           <negated>N</negated>
-           <leftvalue>LINKED_IN_TOKEN_ID</leftvalue>
-           <function>IS NOT NULL</function>
-           <rightvalue/>
-           </condition>
-          <condition>
-           <negated>N</negated>
-           <operator>OR</operator>
-           <conditions>
-            <condition>
-             <negated>N</negated>
-             <leftvalue>REALTOR_TOKEN_ID</leftvalue>
-             <function>IS NOT NULL</function>
-             <rightvalue/>
-             </condition>
-            <condition>
-             <negated>N</negated>
-             <operator>OR</operator>
-             <conditions>
-              <condition>
-               <negated>N</negated>
-               <leftvalue>TWITTER_TOKEN_ID</leftvalue>
-               <function>IS NOT NULL</function>
-               <rightvalue/>
-               </condition>
-              <condition>
-               <negated>N</negated>
-               <operator>OR</operator>
-               <conditions>
-                <condition>
-                 <negated>N</negated>
-                 <leftvalue>YELP_TOKEN_ID</leftvalue>
-                 <function>IS NOT NULL</function>
-                 <rightvalue/>
-                 </condition>
-                <condition>
-                 <negated>N</negated>
-                 <operator>OR</operator>
-                 <leftvalue>ZILLOW_TOKEN_ID</leftvalue>
-                 <function>IS NOT NULL</function>
-                 <rightvalue/>
-                 </condition>
-                </conditions>
-               </condition>
-              </conditions>
-             </condition>
-            </conditions>
-           </condition>
-          </conditions>
-         </condition>
-        </conditions>
-       </condition>
-      </conditions>
-     </condition>
-    </conditions>
-   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1560</xloc>
-      <yloc>858</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Social Media Token OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>social_media_tokens</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>FACEBOOK_TOKEN_ID</column_name>
-          <stream_name>FACEBOOK_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>GOOGLE_BUSINESS_TOKEN_ID</column_name>
-          <stream_name>GOOGLE_BUSINESS_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>GOOGLE_TOKEN_ID</column_name>
-          <stream_name>GOOGLE_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>LENDING_TREE_TOKEN_ID</column_name>
-          <stream_name>LENDING_TREE_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>LINKED_IN_TOKEN_ID</column_name>
-          <stream_name>LINKED_IN_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>REALTOR_TOKEN_ID</column_name>
-          <stream_name>REALTOR_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>TWITTER_TOKEN_ID</column_name>
-          <stream_name>TWITTER_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>YELP_TOKEN_ID</column_name>
-          <stream_name>YELP_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>SOCIAL_MEDIA_TOKENS_ID</column_name>
-          <stream_name>SOCIAL_MEDIA_TOKENS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>typeVar</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>final_agent_id</stream_name>
-        </field>
-        <field>
-          <column_name>ZILLOW_TOKEN_ID</column_name>
-          <stream_name>ZILLOW_TOKEN_ID</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1560</xloc>
-      <yloc>1004</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update Social media Token</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>social_media_tokens</table>
-      <key>
-        <name>typeVar</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>final_agent_id</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>FACEBOOK_TOKEN_ID</name>
-        <rename>FACEBOOK_TOKEN_ID</rename>
-        </value>
-      <value>
-        <name>GOOGLE_BUSINESS_TOKEN_ID</name>
-        <rename>GOOGLE_BUSINESS_TOKEN_ID</rename>
-        </value>
-      <value>
-        <name>GOOGLE_TOKEN_ID</name>
-        <rename>GOOGLE_TOKEN_ID</rename>
-        </value>
-      <value>
-        <name>LENDING_TREE_TOKEN_ID</name>
-        <rename>LENDING_TREE_TOKEN_ID</rename>
-        </value>
-      <value>
-        <name>LINKED_IN_TOKEN_ID</name>
-        <rename>LINKED_IN_TOKEN_ID</rename>
-        </value>
-      <value>
-        <name>REALTOR_TOKEN_ID</name>
-        <rename>REALTOR_TOKEN_ID</rename>
-        </value>
-      <value>
-        <name>TWITTER_TOKEN_ID</name>
-        <rename>TWITTER_TOKEN_ID</rename>
-        </value>
-      <value>
-        <name>YELP_TOKEN_ID</name>
-        <rename>YELP_TOKEN_ID</rename>
-        </value>
-      <value>
-        <name>type</name>
-        <rename>typeVar</rename>
-        </value>
-      <value>
-        <name>id</name>
-        <rename>final_agent_id</rename>
-        </value>
-      <value>
-        <name>ZILLOW_TOKEN_ID</name>
-        <rename>ZILLOW_TOKEN_ID</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1387</xloc>
-      <yloc>1114</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort rows Social Media token</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>final_agent_id</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1191</xloc>
-      <yloc>1114</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>UUID_AgentSettings</name>
-    <type>RandomValue</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>AGENT_SETTINGS_ID</name>
-        <type>random uuid</type>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>335</xloc>
-      <yloc>1114</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>AgnetSettings</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>      <field>        <name>AGENT_SETTINGS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>allowOverrideForSocialMedia</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>allowZillowAutoPost</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>createdBy</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>createdOn</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isAccountDisabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isDefaultBySystem</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isLocationEnabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isLogoImageProcessed</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isProfileImageProcessed</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isSeoContentModified</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>modifiedBy</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>modifiedOn</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profileImageUrl</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profileImageUrlThumbnail</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profileName</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profileUrl</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profile_completion</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>reviewCount</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>sendEmailFromCompany</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>status</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>userEncryptedId</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>vendastaAccessible</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>vertical</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>iden</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>486</xloc>
-      <yloc>1114</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>DateConverter </name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;function convertToDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;var date &#x3d; new Date&#x28;milliValue&#x29;&#x3b;&#xd;&#xa;var year &#x3d; date.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;var month &#x3d; date.getMonth&#x28;&#x29;&#x2b;1&#x3b;&#xd;&#xa;var day &#x3d; date.getDate&#x28;&#x29;&#x3b;&#xd;&#xa;var hour &#x3d; date.getHours&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var min &#x3d; date.getMinutes&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var sec &#x3d; date.getSeconds&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;hour.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;hour &#x3d; &#x22;0&#x22;&#x2b;hour&#x3b;&#xd;&#xa;&#x7d; &#xd;&#xa;if&#x28;min.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;min &#x3d; &#x22;0&#x22;&#x2b;min&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sec.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;sec &#x3d; &#x22;0&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;hour&#x2b;&#x22;&#x3a;&#x22;&#x2b;min&#x2b;&#x22;&#x3a;&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;var createdOnStr &#x3d; convertToDate&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnStr &#x3d; convertToDate&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>createdOnStr</name>
-        <rename>createdOnStr</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>modifiedOnStr</name>
-        <rename>modifiedOnStr</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>628</xloc>
-      <yloc>1114</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort Agent Settings</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>iden</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>760</xloc>
-      <yloc>1114</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Merge Join</name>
-    <type>MergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<join_type>INNER</join_type>
-<step1>Sort Agent Settings</step1>
-<step2>Sort rows Social Media token</step2>
-    <keys_1>
-      <key>iden</key>
-    </keys_1>
-    <keys_2>
-      <key>final_agent_id</key>
-    </keys_2>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>928</xloc>
-      <yloc>1114</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>AgentSettings_TableOP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>agent_settings</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>AGENT_SETTINGS_ID</column_name>
-          <stream_name>AGENT_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_COMPLETION</column_name>
-          <stream_name>profile_completion</stream_name>
-        </field>
-        <field>
-          <column_name>STATUS</column_name>
-          <stream_name>status</stream_name>
-        </field>
-        <field>
-          <column_name>VERTICAL</column_name>
-          <stream_name>vertical</stream_name>
-        </field>
-        <field>
-          <column_name>SOCIAL_MEDIA_TOKENS_ID</column_name>
-          <stream_name>SOCIAL_MEDIA_TOKENS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</column_name>
-          <stream_name>allowOverrideForSocialMedia</stream_name>
-        </field>
-        <field>
-          <column_name>ALLOW_ZILLOW_AUTO_POST</column_name>
-          <stream_name>allowZillowAutoPost</stream_name>
-        </field>
-        <field>
-          <column_name>CREATED_BY</column_name>
-          <stream_name>createdBy</stream_name>
-        </field>
-        <field>
-          <column_name>CREATED_ON_MONGO</column_name>
-          <stream_name>createdOn</stream_name>
-        </field>
-        <field>
-          <column_name>IS_ACCOUNT_DISABLED</column_name>
-          <stream_name>isAccountDisabled</stream_name>
-        </field>
-        <field>
-          <column_name>IS_DEFAULT_BY_SYSTEM</column_name>
-          <stream_name>isDefaultBySystem</stream_name>
-        </field>
-        <field>
-          <column_name>IS_LOCATION_ENABLED</column_name>
-          <stream_name>isLocationEnabled</stream_name>
-        </field>
-        <field>
-          <column_name>IS_LOGO_IMAGE_PROCESSED</column_name>
-          <stream_name>isLogoImageProcessed</stream_name>
-        </field>
-        <field>
-          <column_name>IS_PROFILE_IMAGE_PROCESSED</column_name>
-          <stream_name>isProfileImageProcessed</stream_name>
-        </field>
-        <field>
-          <column_name>IS_SEO_CONTENT_MODIFIED</column_name>
-          <stream_name>isSeoContentModified</stream_name>
-        </field>
-        <field>
-          <column_name>MODIFIED_BY</column_name>
-          <stream_name>modifiedBy</stream_name>
-        </field>
-        <field>
-          <column_name>MODIFIED_ON_MONGO</column_name>
-          <stream_name>modifiedOn</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_IMAGE_URL</column_name>
-          <stream_name>profileImageUrl</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_IMAGE_URL_THUMBNAIL</column_name>
-          <stream_name>profileImageUrlThumbnail</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_NAME</column_name>
-          <stream_name>profileName</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_URL</column_name>
-          <stream_name>profileUrl</stream_name>
-        </field>
-        <field>
-          <column_name>REVIEW_COUNT</column_name>
-          <stream_name>reviewCount</stream_name>
-        </field>
-        <field>
-          <column_name>SEND_EMAIL_FROM_COMPANY</column_name>
-          <stream_name>sendEmailFromCompany</stream_name>
-        </field>
-        <field>
-          <column_name>USER_ENCRYPTED_ID</column_name>
-          <stream_name>userEncryptedId</stream_name>
-        </field>
-        <field>
-          <column_name>VENDASTA_ACCESSIBLE</column_name>
-          <stream_name>vendastaAccessible</stream_name>
-        </field>
-        <field>
-          <column_name>USER_ID</column_name>
-          <stream_name>iden</stream_name>
-        </field>
-        <field>
-          <column_name>CREATED_ON</column_name>
-          <stream_name>createdOnStr</stream_name>
-        </field>
-        <field>
-          <column_name>MODIFIED_ON</column_name>
-          <stream_name>modifiedOnStr</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>926</xloc>
-      <yloc>1224</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step_error_handling>
       <error>
         <source_step>FB Token OP</source_step>
@@ -4705,8 +4699,32 @@
         <min_pct_rows/>
       </error>
       <error>
+        <source_step>Social Media Token OP</source_step>
+        <target_step>Update Social media Token</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
         <source_step>Twitter Token OP</source_step>
         <target_step>Update Twitter Token</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update Social media Token</source_step>
+        <target_step>Social Media Token OP</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -4731,30 +4749,6 @@
       <error>
         <source_step>Zillow Table OP</source_step>
         <target_step>Update Zillow Token</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Social Media Token OP</source_step>
-        <target_step>Update Social media Token</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update Social media Token</source_step>
-        <target_step>Social Media Token OP</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
