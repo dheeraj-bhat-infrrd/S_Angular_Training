@@ -560,7 +560,7 @@
     <ignore_flag_field/>
     <lookup>
       <schema/>
-      <table>social_media_post_details</table>
+      <table>lookup table</table>
       <key>
         <name>survey_details_id</name>
         <field>SURVEY_DETAILS_ID</field>
@@ -579,6 +579,10 @@
         <condition>&#x3d;</condition>
         <name2/>
         </key>
+      <value>
+        <name>SOCIAL_MEDIA_POST_DETAILS_ID</name>
+        <rename>SOCIAL_MEDIA_POST_DETAILS_ID</rename>
+        </value>
       <value>
         <name>SHARED_ON_FACEBOOK</name>
         <rename>SharedOnFacebook</rename>
@@ -791,7 +795,7 @@
     <ignore_flag_field/>
     <lookup>
       <schema/>
-      <table>social_media_post_details</table>
+      <table>lookup table</table>
       <key>
         <name>survey_details_id</name>
         <field>SURVEY_DETAILS_ID</field>
@@ -810,6 +814,10 @@
         <condition>&#x3d;</condition>
         <name2/>
         </key>
+      <value>
+        <name>SOCIAL_MEDIA_POST_DETAILS_ID</name>
+        <rename>SOCIAL_MEDIA_POST_DETAILS_ID</rename>
+        </value>
       <value>
         <name>SHARED_ON_FACEBOOK</name>
         <rename>SharedOnFacebook</rename>
