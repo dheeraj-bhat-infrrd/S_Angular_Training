@@ -367,7 +367,7 @@ public class SurveyManagementController
         customerDetail.append( "<br/> Customer Email: " );
         customerDetail.append( customerEmailId == null ? "" : customerEmailId );
         customerDetail.append( "<br/> Transaction Id: ");
-        customerDetail.append( surveySourceId == null ? "" : surveySourceId );
+        customerDetail.append( surveySourceId == null ? "N/A" : surveySourceId );
         
         customerDetail.append( "</div>" );
         customerDetail.append( "</div>" );
