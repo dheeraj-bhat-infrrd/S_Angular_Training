@@ -1611,15 +1611,16 @@ DROP TABLE IF EXISTS `phone`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `phone` (
-  `PHONE_ID` varchar(36) NOT NULL,
-  `CONTACT_NUMBERS_ID` varchar(36) DEFAULT NULL,
+  `PHONE_ID` varchar(36) DEFAULT NULL,
+  `CONTACT_NUMBERS_ID` varchar(36) NOT NULL,
   `COUNTRY_ABBR` varchar(45) DEFAULT NULL,
   `COUNTRY_CODE` varchar(45) DEFAULT NULL,
   `EXTENSION` varchar(45) DEFAULT NULL,
   `FORMATTED_PHONE_NUMBER` varchar(45) DEFAULT NULL,
   `NUMBER` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`PHONE_ID`),
-  UNIQUE KEY `CONTACT_NUMBERS_ID_UNIQUE` (`CONTACT_NUMBERS_ID`)
+  `PHONE_TYPE` int(11) NOT NULL,
+  PRIMARY KEY (`CONTACT_NUMBERS_ID`,`PHONE_TYPE`),
+  UNIQUE KEY `PHONE_ID_UNIQUE` (`PHONE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
