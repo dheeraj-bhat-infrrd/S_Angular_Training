@@ -4405,21 +4405,71 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER,
                 CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER );
 
+            LOG.info( "Batch incompleteSurveyReminderSender started" );
+            
             for ( Company company : organizationManagementService.getAllCompanies() ) {
+                
+                LOG.info( "getting reminder information for company with id " + company.getCompanyId()  );
+                
                 Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
                 int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
                 int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
-                LOG.debug( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
+                LOG.info( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
+                
+                //getting epoch date
                 SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
-                Date epochReminderDate = null;
+                Date epochReminderDate = sdf.parse( CommonConstants.EPOCH_REMINDER_TIME );
+               
+                
+                //get survey list to send invitation mail
+                LOG.info( "getting survey list to send invitation mail for company with id " + company.getCompanyId()  );
+                List<SurveyPreInitiation> surveysForInvitationMail = surveyHandler
+                    .getSurveyListToSendInvitationMail( company , epochReminderDate );
+                LOG.info( "Found " + ( surveysForInvitationMail != null ? surveysForInvitationMail.size() : 0 )
+                    + " surveysForInvitationMail for company id " + company.getCompanyId() );
+                
+                //iterating throgh the surveys
+                for ( SurveyPreInitiation survey : surveysForInvitationMail ) {
+                    
+                    User user = null;
+                    try {
+                        user = getUserByUserId( survey.getAgentId() );
+                    } catch ( InvalidInputException ie ) {
+                        LOG.warn( "Invalid user mapped to the agent id" );
+                        continue;
+                    }
+                    //If agent is deleted, mark survey as corrupt and fetch next survey
+                    if ( user != null && checkIfSurveyAgentIsDeleted( user, survey ) ) {
+                        LOG.debug( "The agent id : " + survey.getAgentId() + " is deleted. Skipping record." );
+                        continue;
+                    }
+                    
+                    LOG.debug( "Sending survey initiation mail" );
+                    surveyHandler.prepareAndSendInvitationMail( survey );
+                    surveyHandler.markSurveyAsSent( survey );
+                    surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), false );
+                }
+                
+                
+                
+                //getting minLastReminderTime and maxLastReminderTime
+                long currentTime = System.currentTimeMillis();
+                Map<String , Date> lastReminderTimeCriterias = surveyHandler.getMinMaxLastSurveyReminderTime( currentTime, reminderInterval );
+                Date minLastReminderTime = lastReminderTimeCriterias.get( "minLastReminderTime" );
+                Date maxLastReminderTime = lastReminderTimeCriterias.get( "maxLastReminderTime" );
+                LOG.info( "minLastReminderTime is " +  minLastReminderTime + " and maxLastReminderTime is " + maxLastReminderTime + " for company with id " + company.getCompanyId() );
+ 
+                
+                //get survey list to send survey reminder mail
+                LOG.info( "getting survey list to send survey reminder mail for company with id " + company.getCompanyId()  );
                 List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler
-                    .getIncompleteSurveyCustomersEmail( company );
-                LOG.debug( "Found " + ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 )
-                    + " surveys sent for company id " + company.getCompanyId() );
+                    .getIncompleteSurveyForReminderEmail( company ,minLastReminderTime , maxLastReminderTime ,reminderCount);
+                LOG.info( "Found " + ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 )
+                    + " incompleteSurveyCustomers for company id " + company.getCompanyId() );
+                
+                
                 for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
                     LOG.debug( "Processing survey pre initiation id: " + survey.getSurveyPreIntitiationId() );
-
-                    LOG.debug( "Survey pre initiation id: " + survey.getSurveyPreIntitiationId() + " within reminder counts" );
 
                     User user = null;
                     try {
@@ -4434,58 +4484,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         continue;
                     }
 
-                    boolean reminder = false;
-                    try {
-                        epochReminderDate = sdf.parse( CommonConstants.EPOCH_REMINDER_TIME );
-                    } catch ( Exception e ) {
-                        LOG.error( "Exception caught " + e.getMessage() );
-                        continue;
-                    }
-                    LOG.debug( "Last reminder time: " + String.valueOf( survey.getLastReminderTime() ) );
-                    if ( survey.getLastReminderTime().after( epochReminderDate ) ) {
-                        LOG.debug( "Reminder mail for incomplete survey id: " + survey.getSurveyPreIntitiationId() );
-                        reminder = true;
-                    } else {
-                        LOG.debug(
-                            "Initial survey request mail for incomplete survey id: " + survey.getSurveyPreIntitiationId() );
-                        reminder = false;
-                    }
-
                     // send a survey invitation mail if reminder is false or a reminder mail if reminder is true
-                    try {
-                        if ( reminder ) {
-                            LOG.debug( "Check if survey is eligible for a reminder mail" );
-                            long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
-                            long currentTime = System.currentTimeMillis();
-                            if ( surveyHandler.checkSurveyReminderEligibility( surveyLastRemindedTime, currentTime,
-                                reminderInterval ) ) {
-                                if ( survey.getReminderCounts() < reminderCount ) {
-                                    surveyHandler.sendSurveyReminderEmail( survey );
-                                    surveyHandler.markSurveyAsSent( survey );
-                                    surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
-                                } else {
-                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId()
-                                        + " has exceeded the reminder count " );
-                                }
-                            }
-                        } else {
-                            LOG.debug( "Sending survey initiation mail" );
-                            // check if the mail is an older mail
-                            surveyHandler.prepareAndSendInvitationMail( survey );
-                            surveyHandler.markSurveyAsSent( survey );
-                            surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
-
-                        }
-                    } catch ( InvalidInputException e ) {
-                        LOG.error(
-                            "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
-                            e );
-                    } catch ( ProfileNotFoundException e ) {
-                        LOG.error( "Error while sending incomplete survey mail ", e );
-                    }
+                    surveyHandler.sendSurveyReminderEmail( survey );
+                    surveyHandler.markSurveyAsSent( survey );
+                    surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
+                                
+                    
                 }
             }
-            LOG.debug( "Completed IncompleteSurveyReminderSender" );
+            LOG.info( "Completed IncompleteSurveyReminderSender" );
             //Update last build time in batch tracker table
             batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER );
         } catch ( Exception e ) {

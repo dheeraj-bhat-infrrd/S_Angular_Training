@@ -71,6 +71,9 @@ public class SurveyPreInitiation implements Serializable
 
     @Column ( name = "ENGAGEMENT_CLOSED_TIME")
     private Timestamp engagementClosedTime;
+    
+    @Column ( name = "IS_SURVEY_REQUEST_SENT")
+    private int isSurveyRequestSent;
 
     @Column ( name = "REMINDER_COUNTS")
     private int reminderCounts;
@@ -311,6 +314,18 @@ public class SurveyPreInitiation implements Serializable
     public void setEngagementClosedTime( Timestamp engagementClosedTime )
     {
         this.engagementClosedTime = engagementClosedTime;
+    }
+
+
+    public int getIsSurveyRequestSent()
+    {
+        return isSurveyRequestSent;
+    }
+
+
+    public void setIsSurveyRequestSent( int isSurveyRequestSent )
+    {
+        this.isSurveyRequestSent = isSurveyRequestSent;
     }
 
 
