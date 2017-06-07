@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>Branch_Settings_ProfileStages</name>
+    <name>Branch_Settings_FacebookPages</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -102,9 +102,9 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;06&#x2f;04 10&#x3a;27&#x3a;50.780</created_date>
+  <created_date>2017&#x2f;06&#x2f;07 15&#x3a;19&#x3a;41.751</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;06&#x2f;04 10&#x3a;27&#x3a;50.780</modified_date>
+  <modified_date>2017&#x2f;06&#x2f;07 15&#x3a;19&#x3a;41.751</modified_date>
   </info>
   <notepads>
   </notepads>
@@ -190,19 +190,17 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>MongoDB I - Branch Settings_2</from><to>Json Input BranchId</to><enabled>Y</enabled> </hop>
-  <hop> <from>Json Input BranchId</from><to>ProfileStages_JSON Input</to><enabled>Y</enabled> </hop>
-  <hop> <from>ProfileStages_JSON Input</from><to>ProfleStages Parsing</to><enabled>Y</enabled> </hop>
-  <hop> <from>BranchSettings Input</from><to>Sort BranchSettings Table</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort BranchSettings Table</from><to>Merge Join BranchSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>ProfleStages Parsing</from><to>Sort rows ProfileStages</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows ProfileStages</from><to>Merge Join BranchSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join BranchSettings</from><to>UUID_ProfileStages</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_ProfileStages</from><to>Profile Stages OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Profile Stages OP</from><to>Update ProfileStages</to><enabled>Y</enabled> </hop>
+  <hop> <from>FB Token IP</from><to>Sort FB Token</to><enabled>Y</enabled> </hop>
+  <hop> <from>MongoDB Input</from><to>Json Input BranchId</to><enabled>Y</enabled> </hop>
+  <hop> <from>Json Input BranchId</from><to>FacebookPages Input</to><enabled>Y</enabled> </hop>
+  <hop> <from>FacebookPages Input</from><to>FacebookPages Parsing</to><enabled>Y</enabled> </hop>
+  <hop> <from>FacebookPages Parsing</from><to>Sort rows FB Pages</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort FB Token</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows FB Pages</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>FacebookPages Table OP</to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>BranchSettings Input</name>
+    <name>FB Token IP</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -213,7 +211,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  BRANCH_SETTINGS_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;FROM branch_settings&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  FACEBOOK_TOKEN_ID&#xd;&#xa;, type&#xd;&#xa;, id&#xd;&#xa;FROM facebook_token where type &#x3d; 3&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -221,8 +219,184 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>67</xloc>
-      <yloc>142</yloc>
+      <xloc>61</xloc>
+      <yloc>191</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>FacebookPages Input</name>
+    <type>JsonInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <addresultfile>N</addresultfile>
+    <readurl>N</readurl>
+    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
+    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
+    <ignoreMissingPath>N</ignoreMissingPath>
+    <rownum_field/>
+    <file>
+      <name/>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <fields>
+      <field>
+        <name>facebookPages</name>
+        <path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;&#x2a;&#x5d;</path>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <IsInFields>Y</IsInFields>
+    <IsAFile>N</IsAFile>
+    <valueField>json</valueField>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>382</xloc>
+      <yloc>41</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>FacebookPages Parsing</name>
+    <type>JsonInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <addresultfile>N</addresultfile>
+    <readurl>N</readurl>
+    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
+    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
+    <ignoreMissingPath>N</ignoreMissingPath>
+    <rownum_field/>
+    <file>
+      <name/>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <fields>
+      <field>
+        <name>_id</name>
+        <path>&#x24;._id</path>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>name</name>
+        <path>&#x24;.name</path>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>accessToken</name>
+        <path>&#x24;.accessToken</path>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>category</name>
+        <path>&#x24;.category</path>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>profileUrl</name>
+        <path>&#x24;.profileUrl</path>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <IsInFields>Y</IsInFields>
+    <IsAFile>N</IsAFile>
+    <valueField>facebookPages</valueField>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>596</xloc>
+      <yloc>41</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -258,7 +432,7 @@
       <field>
         <name>branchId</name>
         <path>&#x24;.iden</path>
-        <type>Integer</type>
+        <type>None</type>
         <format/>
         <currency/>
         <decimal/>
@@ -283,42 +457,14 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>211</xloc>
-      <yloc>30</yloc>
+      <xloc>197</xloc>
+      <yloc>41</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Merge Join BranchSettings</name>
-    <type>MergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<join_type>INNER</join_type>
-<step1>Sort rows ProfileStages</step1>
-<step2>Sort BranchSettings Table</step2>
-    <keys_1>
-      <key>branchId</key>
-    </keys_1>
-    <keys_2>
-      <key>BRANCH_ID</key>
-    </keys_2>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>432</xloc>
-      <yloc>142</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>MongoDB I - Branch Settings_2</name>
+    <name>MongoDB Input</name>
     <type>MongoDbInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -358,39 +504,7 @@
       <mongo_field>
         <field_name>_id</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>_id_1</field_name>
-
         <field_path>&#x24;._id</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>accessToken</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.accessToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>address</field_name>
-
-        <field_path>&#x24;.contact_details.address</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>address1</field_name>
-
-        <field_path>&#x24;.contact_details.address1</field_path>
 
         <field_type>String</field_type>
 
@@ -412,33 +526,25 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>autoPostEnabled</field_name>
+        <field_name>about_me</field_name>
 
-        <field_path>&#x24;.survey_settings.autoPostEnabled</field_path>
+        <field_path>&#x24;.contact_details.about_me</field_path>
 
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>autoPostLinkToUserSiteEnabled</field_name>
-
-        <field_path>&#x24;.survey_settings.autoPostLinkToUserSiteEnabled</field_path>
-
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>auto_post_score</field_name>
+        <field_name>address</field_name>
 
-        <field_path>&#x24;.survey_settings.auto_post_score</field_path>
+        <field_path>&#x24;.contact_details.address</field_path>
 
-        <field_type>Number</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>category</field_name>
+        <field_name>address1</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.category</field_path>
+        <field_path>&#x24;.contact_details.address1</field_path>
 
         <field_type>String</field_type>
 
@@ -447,6 +553,46 @@
         <field_name>city</field_name>
 
         <field_path>&#x24;.contact_details.city</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryAbbr</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryAbbr</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryCode_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>formattedPhoneNumber</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.formattedPhoneNumber</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>number</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.number</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.work</field_path>
 
         <field_type>String</field_type>
 
@@ -463,6 +609,46 @@
         <field_name>countryCode</field_name>
 
         <field_path>&#x24;.contact_details.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name</field_name>
+
+        <field_path>&#x24;.contact_details.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>state</field_name>
+
+        <field_path>&#x24;.contact_details.state</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>title</field_name>
+
+        <field_path>&#x24;.contact_details.title</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work</field_name>
+
+        <field_path>&#x24;.contact_details.web_addresses.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zipcode</field_name>
+
+        <field_path>&#x24;.contact_details.zipcode</field_path>
 
         <field_type>String</field_type>
 
@@ -492,11 +678,251 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>duplicateSurveyInterval</field_name>
+        <field_name>hiddenSection</field_name>
 
-        <field_path>&#x24;.survey_settings.duplicateSurveyInterval</field_path>
+        <field_path>&#x24;.hiddenSection</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>iden</field_name>
+
+        <field_path>&#x24;.iden</field_path>
 
         <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isAccountDisabled</field_name>
+
+        <field_path>&#x24;.isAccountDisabled</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isDefaultBySystem</field_name>
+
+        <field_path>&#x24;.isDefaultBySystem</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isLocationEnabled</field_name>
+
+        <field_path>&#x24;.isLocationEnabled</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isLogoImageProcessed</field_name>
+
+        <field_path>&#x24;.isLogoImageProcessed</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isProfileImageProcessed</field_name>
+
+        <field_path>&#x24;.isProfileImageProcessed</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isSeoContentModified</field_name>
+
+        <field_path>&#x24;.isSeoContentModified</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isAboutMeLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isAboutMeLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isAddressLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isAddressLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isBlogAddressLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isBlogAddressLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isFaxPhoneLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isFaxPhoneLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isLogoLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isLogoLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isMinScoreLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isMinScoreLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isPersonalPhoneLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isPersonalPhoneLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWebAddressLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isWebAddressLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkEmailLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isWorkEmailLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkPhoneLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isWorkPhoneLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>logo</field_name>
+
+        <field_path>&#x24;.logo</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>logoThumbnail</field_name>
+
+        <field_path>&#x24;.logoThumbnail</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>modifiedBy</field_name>
+
+        <field_path>&#x24;.modifiedBy</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>modifiedOn</field_name>
+
+        <field_path>&#x24;.modifiedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileImageUrl</field_name>
+
+        <field_path>&#x24;.profileImageUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileImageUrlThumbnail</field_name>
+
+        <field_path>&#x24;.profileImageUrlThumbnail</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileName</field_name>
+
+        <field_path>&#x24;.profileName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>order</field_name>
+
+        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.order</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileStageKey</field_name>
+
+        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.profileStageKey</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>status</field_name>
+
+        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.status</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileUrl</field_name>
+
+        <field_path>&#x24;.profileUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profile_completion</field_name>
+
+        <field_path>&#x24;.profile_completion</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>sendEmailFromCompany</field_name>
+
+        <field_path>&#x24;.sendEmailFromCompany</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -540,6 +966,62 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>_id_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>accessToken</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.accessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>category</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.category</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileUrl_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>tokenExpiryAlertSent_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>googleBusinessLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.googleBusinessToken.googleBusinessLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>googleAccessToken</field_name>
 
         <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessToken</field_path>
@@ -564,14 +1046,6 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>googleBusinessLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleBusinessToken.googleBusinessLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
         <field_name>googleRefreshToken</field_name>
 
         <field_path>&#x24;.socialMediaTokens.googleToken.googleRefreshToken</field_path>
@@ -580,163 +1054,11 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>hiddenSection</field_name>
+        <field_name>profileLink</field_name>
 
-        <field_path>&#x24;.hiddenSection</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>iden</field_name>
-
-        <field_path>&#x24;.iden</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isAboutMeLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isAboutMeLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isAccountDisabled</field_name>
-
-        <field_path>&#x24;.isAccountDisabled</field_path>
+        <field_path>&#x24;.socialMediaTokens.googleToken.profileLink</field_path>
 
         <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isAddressLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isAddressLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isBlogAddressLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isBlogAddressLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isDefaultBySystem</field_name>
-
-        <field_path>&#x24;.isDefaultBySystem</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isFaxPhoneLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isFaxPhoneLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isLocationEnabled</field_name>
-
-        <field_path>&#x24;.isLocationEnabled</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isLogoImageProcessed</field_name>
-
-        <field_path>&#x24;.isLogoImageProcessed</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isLogoLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isLogoLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isMinScoreLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isMinScoreLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isPersonalPhoneLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isPersonalPhoneLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isProfileImageProcessed</field_name>
-
-        <field_path>&#x24;.isProfileImageProcessed</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isReminderDisabled</field_name>
-
-        <field_path>&#x24;.survey_settings.isReminderDisabled</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isSeoContentModified</field_name>
-
-        <field_path>&#x24;.isSeoContentModified</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isSocialPostReminderDisabled</field_name>
-
-        <field_path>&#x24;.survey_settings.isSocialPostReminderDisabled</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isWebAddressLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isWebAddressLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isWorkEmailLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isWorkEmailLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isWorkPhoneLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isWorkPhoneLocked</field_path>
-
-        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -780,217 +1102,17 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>logo</field_name>
+        <field_name>tokenExpiryAlertSent</field_name>
 
-        <field_path>&#x24;.logo</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>logoThumbnail</field_name>
-
-        <field_path>&#x24;.logoThumbnail</field_path>
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
 
         <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>max_number_of_social_pos_reminders</field_name>
-
-        <field_path>&#x24;.survey_settings.max_number_of_social_pos_reminders</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>max_number_of_survey_reminders</field_name>
-
-        <field_path>&#x24;.survey_settings.max_number_of_survey_reminders</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>modifiedBy</field_name>
-
-        <field_path>&#x24;.modifiedBy</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>modifiedOn</field_name>
-
-        <field_path>&#x24;.modifiedOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>name</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>name_1</field_name>
-
-        <field_path>&#x24;.contact_details.name</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>nmlsId</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.zillowToken.lenderRef.nmlsId</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>order</field_name>
-
-        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.order</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileImageUrl</field_name>
-
-        <field_path>&#x24;.profileImageUrl</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileImageUrlThumbnail</field_name>
-
-        <field_path>&#x24;.profileImageUrlThumbnail</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleToken.profileLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileName</field_name>
-
-        <field_path>&#x24;.profileName</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileStageKey</field_name>
-
-        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.profileStageKey</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileUrl</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileUrl_1</field_name>
-
-        <field_path>&#x24;.profileUrl</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profile_completion</field_name>
-
-        <field_path>&#x24;.profile_completion</field_path>
-
-        <field_type>Number</field_type>
 
       </mongo_field>
       <mongo_field>
         <field_name>realtorProfileLink</field_name>
 
         <field_path>&#x24;.socialMediaTokens.realtorToken.realtorProfileLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>sendEmailFromCompany</field_name>
-
-        <field_path>&#x24;.sendEmailFromCompany</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>show_survey_above_score</field_name>
-
-        <field_path>&#x24;.survey_settings.show_survey_above_score</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>social_post_reminder_interval_in_days</field_name>
-
-        <field_path>&#x24;.survey_settings.social_post_reminder_interval_in_days</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>state</field_name>
-
-        <field_path>&#x24;.contact_details.state</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>status</field_name>
-
-        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.status</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>survey_reminder_interval_in_days</field_name>
-
-        <field_path>&#x24;.survey_settings.survey_reminder_interval_in_days</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>tokenExpiryAlertSent</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>tokenExpiryAlertSent_1</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
 
         <field_type>String</field_type>
 
@@ -1028,35 +1150,19 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>vendastaAccessible</field_name>
-
-        <field_path>&#x24;.vendastaAccessible</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>vertical</field_name>
-
-        <field_path>&#x24;.vertical</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>work</field_name>
-
-        <field_path>&#x24;.contact_details.web_addresses.work</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
         <field_name>yelpPageLink</field_name>
 
         <field_path>&#x24;.socialMediaTokens.yelpToken.yelpPageLink</field_path>
 
         <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>nmlsId</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.zillowToken.lenderRef.nmlsId</field_path>
+
+        <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1084,231 +1190,135 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>zipcode</field_name>
+        <field_name>autoPostEnabled</field_name>
 
-        <field_path>&#x24;.contact_details.zipcode</field_path>
+        <field_path>&#x24;.survey_settings.autoPostEnabled</field_path>
 
         <field_type>String</field_type>
 
       </mongo_field>
+      <mongo_field>
+        <field_name>autoPostLinkToUserSiteEnabled</field_name>
+
+        <field_path>&#x24;.survey_settings.autoPostLinkToUserSiteEnabled</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>auto_post_score</field_name>
+
+        <field_path>&#x24;.survey_settings.auto_post_score</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>duplicateSurveyInterval</field_name>
+
+        <field_path>&#x24;.survey_settings.duplicateSurveyInterval</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isReminderDisabled</field_name>
+
+        <field_path>&#x24;.survey_settings.isReminderDisabled</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isSocialPostReminderDisabled</field_name>
+
+        <field_path>&#x24;.survey_settings.isSocialPostReminderDisabled</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>max_number_of_social_pos_reminders</field_name>
+
+        <field_path>&#x24;.survey_settings.max_number_of_social_pos_reminders</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>max_number_of_survey_reminders</field_name>
+
+        <field_path>&#x24;.survey_settings.max_number_of_survey_reminders</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>show_survey_above_score</field_name>
+
+        <field_path>&#x24;.survey_settings.show_survey_above_score</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>social_post_reminder_interval_in_days</field_name>
+
+        <field_path>&#x24;.survey_settings.social_post_reminder_interval_in_days</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>survey_reminder_interval_in_days</field_name>
+
+        <field_path>&#x24;.survey_settings.survey_reminder_interval_in_days</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>vendastaAccessible</field_name>
+
+        <field_path>&#x24;.vendastaAccessible</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>vertical</field_name>
+
+        <field_path>&#x24;.vertical</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowReviewAverage</field_name>
+
+        <field_path>&#x24;.zillowReviewAverage</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowReviewCount</field_name>
+
+        <field_path>&#x24;.zillowReviewCount</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
     </mongo_fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>71</xloc>
-      <yloc>30</yloc>
+      <xloc>61</xloc>
+      <yloc>41</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Profile Stages OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>profile_stages</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>ORDER</column_name>
-          <stream_name>order</stream_name>
-        </field>
-        <field>
-          <column_name>STATUS</column_name>
-          <stream_name>status</stream_name>
-        </field>
-        <field>
-          <column_name>BRANCH_SETTINGS_ID</column_name>
-          <stream_name>BRANCH_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_STAGE_KEY</column_name>
-          <stream_name>profileStageKey</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_STAGES_ID</column_name>
-          <stream_name>PROFILE_STAGES_ID</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>432</xloc>
-      <yloc>364</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>ProfileStages_JSON Input</name>
-    <type>JsonInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <include>N</include>
-    <include_field/>
-    <rownum>N</rownum>
-    <addresultfile>N</addresultfile>
-    <readurl>N</readurl>
-    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
-    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>N</ignoreMissingPath>
-    <rownum_field/>
-    <file>
-      <name/>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
-    <fields>
-      <field>
-        <name>profileStages</name>
-        <path>&#x24;.profileStages&#x5b;&#x2a;&#x5d;</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-    </fields>
-    <limit>0</limit>
-    <IsInFields>Y</IsInFields>
-    <IsAFile>N</IsAFile>
-    <valueField>json</valueField>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>354</xloc>
-      <yloc>30</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>ProfleStages Parsing</name>
-    <type>JsonInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <include>N</include>
-    <include_field/>
-    <rownum>N</rownum>
-    <addresultfile>N</addresultfile>
-    <readurl>N</readurl>
-    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
-    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>N</ignoreMissingPath>
-    <rownum_field/>
-    <file>
-      <name/>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
-    <fields>
-      <field>
-        <name>profileStageKey</name>
-        <path>&#x24;.profileStageKey</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>order</name>
-        <path>&#x24;.order</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>status</name>
-        <path>&#x24;.status</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-    </fields>
-    <limit>0</limit>
-    <IsInFields>Y</IsInFields>
-    <IsAFile>N</IsAFile>
-    <valueField>profileStages</valueField>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>594</xloc>
-      <yloc>30</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort BranchSettings Table</name>
+    <name>Sort FB Token</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1327,7 +1337,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>BRANCH_ID</name>
+        <name>id</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1335,14 +1345,14 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>212</xloc>
-      <yloc>142</yloc>
+      <xloc>201</xloc>
+      <yloc>191</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Sort rows ProfileStages</name>
+    <name>Sort rows FB Pages</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1369,15 +1379,15 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>594</xloc>
-      <yloc>142</yloc>
+      <xloc>596</xloc>
+      <yloc>191</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>UUID_ProfileStages</name>
-    <type>RandomValue</type>
+    <name>Merge Join</name>
+    <type>MergeJoin</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1386,23 +1396,26 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>
-      <field>
-        <name>PROFILE_STAGES_ID</name>
-        <type>random uuid</type>
-      </field>
-    </fields>
+<join_type>INNER</join_type>
+<step1>Sort FB Token</step1>
+<step2>Sort rows FB Pages</step2>
+    <keys_1>
+      <key>id</key>
+    </keys_1>
+    <keys_2>
+      <key>branchId</key>
+    </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>432</xloc>
-      <yloc>255</yloc>
+      <xloc>405</xloc>
+      <yloc>191</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update ProfileStages</name>
-    <type>Update</type>
+    <name>FacebookPages Table OP</name>
+    <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1412,60 +1425,57 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>profile_stages</table>
-      <key>
-        <name>BRANCH_SETTINGS_ID</name>
-        <field>BRANCH_SETTINGS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>profileStageKey</name>
-        <field>PROFILE_STAGE_KEY</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>PROFILE_STAGE_KEY</name>
-        <rename>profileStageKey</rename>
-        </value>
-      <value>
-        <name>ORDER</name>
-        <rename>order</rename>
-        </value>
-      <value>
-        <name>STATUS</name>
-        <rename>status</rename>
-        </value>
-      </lookup>
+    <schema/>
+    <table>facebook_pages</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>FACEBOOK_TOKEN_ID</column_name>
+          <stream_name>FACEBOOK_TOKEN_ID</stream_name>
+        </field>
+        <field>
+          <column_name>NAME</column_name>
+          <stream_name>name</stream_name>
+        </field>
+        <field>
+          <column_name>CATEGORY</column_name>
+          <stream_name>category</stream_name>
+        </field>
+        <field>
+          <column_name>ACCESS_TOKEN</column_name>
+          <stream_name>accessToken</stream_name>
+        </field>
+        <field>
+          <column_name>PROFILE_URL</column_name>
+          <stream_name>profileUrl</stream_name>
+        </field>
+        <field>
+          <column_name>FACEBOOK_PAGES_ID</column_name>
+          <stream_name>_id</stream_name>
+        </field>
+    </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>269</xloc>
-      <yloc>364</yloc>
+      <xloc>405</xloc>
+      <yloc>301</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
-      <error>
-        <source_step>Profile Stages OP</source_step>
-        <target_step>Update ProfileStages</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
   </step_error_handling>
    <slave-step-copy-partition-distribution>
 </slave-step-copy-partition-distribution>
