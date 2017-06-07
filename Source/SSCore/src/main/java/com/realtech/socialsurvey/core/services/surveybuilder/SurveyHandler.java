@@ -92,7 +92,7 @@ public interface SurveyHandler
     public Map<String, String> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException;
 
 
-    public List<SurveyPreInitiation> getIncompleteSurveyCustomersEmail( Company company );
+    public List<SurveyPreInitiation> getIncompleteSurveyForReminderEmail( Company company, Date minLastReminderDate , Date maxLastReminderDate, int maxReminderCount );
 
 
     public void updateReminderCount( List<Long> agents, List<String> customers );
@@ -363,4 +363,10 @@ public interface SurveyHandler
 
 
     void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails );
+
+
+    public List<SurveyPreInitiation> getSurveyListToSendInvitationMail( Company company, Date epochDate );
+
+
+    Map<String, Date> getMinMaxLastSurveyReminderTime( long systemTime, int reminderInterval );
 }
