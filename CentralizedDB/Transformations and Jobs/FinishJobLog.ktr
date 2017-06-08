@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>file_upload</name>
+    <name>FinishJobLog</name>
     <description/>
     <extended_description/>
     <trans_version/>
-    <trans_type>SerialSingleThreaded</trans_type>
+    <trans_type>Normal</trans_type>
     <trans_status>0</trans_status>
     <directory>&#x2f;</directory>
     <parameters>
+        <parameter>
+            <name>endTime</name>
+            <default_value>null</default_value>
+            <description/>
+        </parameter>
         <parameter>
             <name>mongo_host</name>
             <default_value>localhost</default_value>
@@ -74,6 +79,11 @@
             <default_value>root</default_value>
             <description/>
         </parameter>
+        <parameter>
+            <name>status</name>
+            <default_value/>
+            <description/>
+        </parameter>
     </parameters>
     <log>
 <trans-log-table><connection/>
@@ -132,9 +142,9 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;05&#x2f;25 17&#x3a;07&#x3a;15.120</created_date>
+  <created_date>2017&#x2f;06&#x2f;08 16&#x3a;15&#x3a;24.593</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;05&#x2f;25 17&#x3a;07&#x3a;15.120</modified_date>
+  <modified_date>2017&#x2f;06&#x2f;08 16&#x3a;15&#x3a;24.593</modified_date>
   </info>
   <notepads>
   </notepads>
@@ -167,13 +177,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;mysql_info_host&#x7d;</server>
+    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;mysql_info_schema_name&#x7d;</database>
-    <port>&#x24;&#x7b;mysql_info_port_no&#x7d;</port>
-    <username>&#x24;&#x7b;mysql_info_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_info_password&#x7d;</password>
+    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -183,7 +193,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_info_port_no&#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -193,12 +203,13 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Table input</from><to>Modified Java Script Value FileName</to><enabled>Y</enabled> </hop>
-  <hop> <from>Modified Java Script Value FileName</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Get Variables</from><to>Add constants</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add constants</from><to>Update JobLogDetails</to><enabled>Y</enabled> </hop>
+  <hop> <from>Get EndTime</from><to>Get Variables</to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>Table input</name>
-    <type>TableInput</type>
+    <name>Add constants</name>
+    <type>Constant</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -207,54 +218,88 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>SS_INFO_CONNECTION</connection>
-    <sql>SELECT&#xd;&#xa;  FILE_UPLOAD_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, ADMIN_USER_ID&#xd;&#xa;, FILE_NAME&#xd;&#xa;, UPLOAD_TYPE&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, START_DATE&#xd;&#xa;, END_DATE&#xd;&#xa;, PROFILE_LEVEL&#xd;&#xa;, PROFILE_VALUE&#xd;&#xa;FROM FILE_UPLOAD&#xd;&#xa;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>133</xloc>
-      <yloc>220</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Modified Java Script Value FileName</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var fileName &#x3d; FILE_NAME&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;fileName &#x3d;&#x3d; null &#x7c;&#x7c; fileName &#x3d;&#x3d; &#x22;&#x22;&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;fileName &#x3d; &#x22; &#x22;&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>fileName</name>
-        <rename>fileName</rename>
+    <fields>
+      <field>
+        <name>jobName</name>
         <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>ParentMainJob</nullif>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>292</xloc>
-      <yloc>221</yloc>
+      <xloc>384</xloc>
+      <yloc>115</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Insert &#x2f; Update</name>
-    <type>InsertUpdate</type>
+    <name>Get Variables</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>currentStep</name>
+        <variable>&#x24;&#x7b;Internal.Job.Name&#x7d;</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+      </field>
+      <field>
+        <name>status</name>
+        <variable>&#x24;&#x7b;status&#x7d;</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+      </field>
+      <field>
+        <name>jobLogId</name>
+        <variable>&#x24;&#x7b;jobLogId&#x7d;</variable>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>277</xloc>
+      <yloc>113</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Update JobLogDetails</name>
+    <type>Update</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -264,82 +309,62 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
+    <skip_lookup>N</skip_lookup>
     <commit>100</commit>
-    <update_bypassed>N</update_bypassed>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
     <lookup>
       <schema/>
-      <table>file_upload</table>
+      <table>job_log_details</table>
       <key>
-        <name>FILE_UPLOAD_ID</name>
-        <field>FILE_UPLOAD_ID</field>
+        <name>jobLogId</name>
+        <field>JOB_LOG_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
-      </key>
+        </key>
       <value>
-        <name>FILE_UPLOAD_ID</name>
-        <rename>FILE_UPLOAD_ID</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>COMPANY_ID</name>
-        <rename>COMPANY_ID</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>ADMIN_USER_ID</name>
-        <rename>ADMIN_USER_ID</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>FILE_NAME</name>
-        <rename>fileName</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>UPLOAD_TYPE</name>
-        <rename>UPLOAD_TYPE</rename>
-        <update>Y</update>
-      </value>
+        <name>CURRENT_JOB_NAME</name>
+        <rename>currentStep</rename>
+        </value>
       <value>
         <name>STATUS</name>
-        <rename>STATUS</rename>
-        <update>Y</update>
-      </value>
+        <rename>status</rename>
+        </value>
       <value>
-        <name>CREATED_ON</name>
-        <rename>CREATED_ON</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MODIFIED_ON</name>
-        <rename>MODIFIED_ON</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>START_DATE</name>
-        <rename>START_DATE</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>END_DATE</name>
-        <rename>END_DATE</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>PROFILE_LEVEL</name>
-        <rename>PROFILE_LEVEL</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>PROFILE_VALUE</name>
-        <rename>PROFILE_VALUE</rename>
-        <update>Y</update>
-      </value>
-    </lookup>
+        <name>JOB_END_TIME</name>
+        <rename>time</rename>
+        </value>
+      </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>506</xloc>
-      <yloc>221</yloc>
+      <xloc>510</xloc>
+      <yloc>113</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Get EndTime</name>
+    <type>SystemInfo</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>time</name>
+        <type>system date &#x28;variable&#x29;</type>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>140</xloc>
+      <yloc>113</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
