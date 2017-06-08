@@ -4444,10 +4444,17 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         continue;
                     }
                     
-                    LOG.debug( "Sending survey initiation mail" );
-                    surveyHandler.prepareAndSendInvitationMail( survey );
-                    surveyHandler.markSurveyAsSent( survey );
-                    surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), false );
+                    try {
+                        LOG.debug( "Sending survey initiation mail" );
+                        surveyHandler.prepareAndSendInvitationMail( survey );
+                        surveyHandler.markSurveyAsSent( survey );
+                        surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), false );
+                    
+                    } catch ( ProfileNotFoundException | InvalidInputException   e ) {
+                    LOG.error(
+                        "ProfileNotFoundException / InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
+                        e );
+                    }
                 }
                 
                 
@@ -4484,11 +4491,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         continue;
                     }
 
+                    try{
+                    
                     // send a survey invitation mail if reminder is false or a reminder mail if reminder is true
                     surveyHandler.sendSurveyReminderEmail( survey );
                     surveyHandler.markSurveyAsSent( survey );
                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
                                 
+                    } catch ( ProfileNotFoundException | InvalidInputException   e ) {
+                        LOG.error(
+                            "ProfileNotFoundException / InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
+                            e );
+                    }
                     
                 }
             }
