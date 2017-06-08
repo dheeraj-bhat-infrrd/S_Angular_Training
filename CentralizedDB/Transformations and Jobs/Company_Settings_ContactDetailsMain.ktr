@@ -165,8 +165,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>988</xloc>
-      <yloc>316</yloc>
+      <xloc>991</xloc>
+      <yloc>94</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -225,8 +225,8 @@
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>583</xloc>
-      <yloc>546</yloc>
+      <xloc>586</xloc>
+      <yloc>324</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -303,8 +303,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>424</xloc>
-      <yloc>534</yloc>
+      <xloc>427</xloc>
+      <yloc>312</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -331,8 +331,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>567</xloc>
-      <yloc>322</yloc>
+      <xloc>570</xloc>
+      <yloc>100</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -809,8 +809,8 @@
       </mongo_field>
     </mongo_fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>110</xloc>
-      <yloc>325</yloc>
+      <xloc>113</xloc>
+      <yloc>103</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -843,8 +843,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>339</xloc>
-      <yloc>319</yloc>
+      <xloc>342</xloc>
+      <yloc>97</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -877,8 +877,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>799</xloc>
-      <yloc>320</yloc>
+      <xloc>802</xloc>
+      <yloc>98</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -902,8 +902,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>532</xloc>
-      <yloc>431</yloc>
+      <xloc>535</xloc>
+      <yloc>209</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -969,8 +969,8 @@
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>224</xloc>
-      <yloc>534</yloc>
+      <xloc>227</xloc>
+      <yloc>312</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
