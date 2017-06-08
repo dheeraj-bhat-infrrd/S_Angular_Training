@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>Branch_Settings_ProfileStages</name>
+    <name>Branch_Settings_ContactDetails_Main</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -102,9 +102,9 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;06&#x2f;04 10&#x3a;27&#x3a;50.780</created_date>
+  <created_date>2017&#x2f;06&#x2f;06 18&#x3a;45&#x3a;51.783</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;06&#x2f;04 10&#x3a;27&#x3a;50.780</modified_date>
+  <modified_date>2017&#x2f;06&#x2f;06 18&#x3a;45&#x3a;51.783</modified_date>
   </info>
   <notepads>
   </notepads>
@@ -190,16 +190,14 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>MongoDB I - Branch Settings_2</from><to>Json Input BranchId</to><enabled>Y</enabled> </hop>
-  <hop> <from>Json Input BranchId</from><to>ProfileStages_JSON Input</to><enabled>Y</enabled> </hop>
-  <hop> <from>ProfileStages_JSON Input</from><to>ProfleStages Parsing</to><enabled>Y</enabled> </hop>
   <hop> <from>BranchSettings Input</from><to>Sort BranchSettings Table</to><enabled>Y</enabled> </hop>
+  <hop> <from>MongoDB I - Branch Settings_2</from><to>Sort BranchSettings Mongo</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join BranchSettings</from><to>UUID_ContactDetails</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_ContactDetails</from><to>ContactDetails</to><enabled>Y</enabled> </hop>
+  <hop> <from>ContactDetails</from><to>ContactDetails OP</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort BranchSettings Mongo</from><to>Merge Join BranchSettings</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort BranchSettings Table</from><to>Merge Join BranchSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>ProfleStages Parsing</from><to>Sort rows ProfileStages</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows ProfileStages</from><to>Merge Join BranchSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join BranchSettings</from><to>UUID_ProfileStages</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_ProfileStages</from><to>Profile Stages OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Profile Stages OP</from><to>Update ProfileStages</to><enabled>Y</enabled> </hop>
+  <hop> <from>ContactDetails OP</from><to>Update ContactDetails</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>BranchSettings Input</name>
@@ -221,15 +219,15 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>67</xloc>
-      <yloc>142</yloc>
+      <xloc>848</xloc>
+      <yloc>46</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Json Input BranchId</name>
-    <type>JsonInput</type>
+    <name>ContactDetails</name>
+    <type>SelectValues</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -238,53 +236,129 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <include>N</include>
-    <include_field/>
-    <rownum>N</rownum>
-    <addresultfile>N</addresultfile>
-    <readurl>N</readurl>
-    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
-    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>N</ignoreMissingPath>
-    <rownum_field/>
-    <file>
-      <name/>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
+    <fields>      <field>        <name>BRANCH_SETTINGS_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>address</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>address1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>city</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>country</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>countryCode</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>name_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>state</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>zipcode</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CONTACT_DETAILS_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>439</xloc>
+      <yloc>261</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>ContactDetails OP</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <schema/>
+    <table>contact_details</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
     <fields>
-      <field>
-        <name>branchId</name>
-        <path>&#x24;.iden</path>
-        <type>Integer</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
+        <field>
+          <column_name>BRANCH_SETTINGS_ID</column_name>
+          <stream_name>BRANCH_SETTINGS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>ADDRESS</column_name>
+          <stream_name>address</stream_name>
+        </field>
+        <field>
+          <column_name>ADDRESS1</column_name>
+          <stream_name>address1</stream_name>
+        </field>
+        <field>
+          <column_name>CITY</column_name>
+          <stream_name>city</stream_name>
+        </field>
+        <field>
+          <column_name>COUNTRY</column_name>
+          <stream_name>country</stream_name>
+        </field>
+        <field>
+          <column_name>STATE</column_name>
+          <stream_name>state</stream_name>
+        </field>
+        <field>
+          <column_name>ZIPCODE</column_name>
+          <stream_name>zipcode</stream_name>
+        </field>
+        <field>
+          <column_name>CONTACT_DETAILS_ID</column_name>
+          <stream_name>CONTACT_DETAILS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>COUNTRY_CODE</column_name>
+          <stream_name>countryCode</stream_name>
+        </field>
+        <field>
+          <column_name>NAME</column_name>
+          <stream_name>name_1</stream_name>
+        </field>
     </fields>
-    <limit>0</limit>
-    <IsInFields>Y</IsInFields>
-    <IsAFile>N</IsAFile>
-    <valueField>json</valueField>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>211</xloc>
-      <yloc>30</yloc>
+      <xloc>341</xloc>
+      <yloc>261</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -301,18 +375,18 @@
            <schema_name/>
            </partitioning>
 <join_type>INNER</join_type>
-<step1>Sort rows ProfileStages</step1>
+<step1>Sort BranchSettings Mongo</step1>
 <step2>Sort BranchSettings Table</step2>
     <keys_1>
-      <key>branchId</key>
+      <key>iden</key>
     </keys_1>
     <keys_2>
       <key>BRANCH_ID</key>
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>432</xloc>
-      <yloc>142</yloc>
+      <xloc>434</xloc>
+      <yloc>46</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -342,7 +416,7 @@
     <connect_timeout/>
     <socket_timeout/>
     <read_preference>primary</read_preference>
-    <output_json>Y</output_json>
+    <output_json>N</output_json>
     <query_is_pipeline>N</query_is_pipeline>
     <execute_for_each_row>N</execute_for_each_row>
 
@@ -1093,15 +1167,15 @@
       </mongo_field>
     </mongo_fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>71</xloc>
-      <yloc>30</yloc>
+      <xloc>97</xloc>
+      <yloc>46</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Profile Stages OP</name>
-    <type>TableOutput</type>
+    <name>Sort BranchSettings Mongo</name>
+    <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1110,199 +1184,25 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>profile_stages</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
     <fields>
-        <field>
-          <column_name>ORDER</column_name>
-          <stream_name>order</stream_name>
-        </field>
-        <field>
-          <column_name>STATUS</column_name>
-          <stream_name>status</stream_name>
-        </field>
-        <field>
-          <column_name>BRANCH_SETTINGS_ID</column_name>
-          <stream_name>BRANCH_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_STAGE_KEY</column_name>
-          <stream_name>profileStageKey</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_STAGES_ID</column_name>
-          <stream_name>PROFILE_STAGES_ID</stream_name>
-        </field>
+      <field>
+        <name>iden</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>432</xloc>
-      <yloc>364</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>ProfileStages_JSON Input</name>
-    <type>JsonInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <include>N</include>
-    <include_field/>
-    <rownum>N</rownum>
-    <addresultfile>N</addresultfile>
-    <readurl>N</readurl>
-    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
-    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>N</ignoreMissingPath>
-    <rownum_field/>
-    <file>
-      <name/>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
-    <fields>
-      <field>
-        <name>profileStages</name>
-        <path>&#x24;.profileStages&#x5b;&#x2a;&#x5d;</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-    </fields>
-    <limit>0</limit>
-    <IsInFields>Y</IsInFields>
-    <IsAFile>N</IsAFile>
-    <valueField>json</valueField>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>354</xloc>
-      <yloc>30</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>ProfleStages Parsing</name>
-    <type>JsonInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <include>N</include>
-    <include_field/>
-    <rownum>N</rownum>
-    <addresultfile>N</addresultfile>
-    <readurl>N</readurl>
-    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
-    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>N</ignoreMissingPath>
-    <rownum_field/>
-    <file>
-      <name/>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
-    <fields>
-      <field>
-        <name>profileStageKey</name>
-        <path>&#x24;.profileStageKey</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>order</name>
-        <path>&#x24;.order</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>status</name>
-        <path>&#x24;.status</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-    </fields>
-    <limit>0</limit>
-    <IsInFields>Y</IsInFields>
-    <IsAFile>N</IsAFile>
-    <valueField>profileStages</valueField>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>594</xloc>
-      <yloc>30</yloc>
+      <xloc>256</xloc>
+      <yloc>46</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1335,48 +1235,14 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>212</xloc>
-      <yloc>142</yloc>
+      <xloc>716</xloc>
+      <yloc>47</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Sort rows ProfileStages</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>branchId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>594</xloc>
-      <yloc>142</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>UUID_ProfileStages</name>
+    <name>UUID_ContactDetails</name>
     <type>RandomValue</type>
     <description/>
     <distribute>Y</distribute>
@@ -1388,20 +1254,20 @@
            </partitioning>
     <fields>
       <field>
-        <name>PROFILE_STAGES_ID</name>
+        <name>CONTACT_DETAILS_ID</name>
         <type>random uuid</type>
       </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>432</xloc>
-      <yloc>255</yloc>
+      <xloc>437</xloc>
+      <yloc>161</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update ProfileStages</name>
+    <name>Update ContactDetails</name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -1419,44 +1285,58 @@
     <ignore_flag_field/>
     <lookup>
       <schema/>
-      <table>profile_stages</table>
+      <table>contact_details</table>
       <key>
         <name>BRANCH_SETTINGS_ID</name>
         <field>BRANCH_SETTINGS_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
         </key>
-      <key>
-        <name>profileStageKey</name>
-        <field>PROFILE_STAGE_KEY</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
       <value>
-        <name>PROFILE_STAGE_KEY</name>
-        <rename>profileStageKey</rename>
+        <name>ADDRESS</name>
+        <rename>address</rename>
         </value>
       <value>
-        <name>ORDER</name>
-        <rename>order</rename>
+        <name>ADDRESS1</name>
+        <rename>address1</rename>
         </value>
       <value>
-        <name>STATUS</name>
-        <rename>status</rename>
+        <name>CITY</name>
+        <rename>city</rename>
+        </value>
+      <value>
+        <name>COUNTRY</name>
+        <rename>country</rename>
+        </value>
+      <value>
+        <name>COUNTRY_CODE</name>
+        <rename>countryCode</rename>
+        </value>
+      <value>
+        <name>NAME</name>
+        <rename>name_1</rename>
+        </value>
+      <value>
+        <name>STATE</name>
+        <rename>state</rename>
+        </value>
+      <value>
+        <name>ZIPCODE</name>
+        <rename>zipcode</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>269</xloc>
-      <yloc>364</yloc>
+      <xloc>201</xloc>
+      <yloc>261</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
       <error>
-        <source_step>Profile Stages OP</source_step>
-        <target_step>Update ProfileStages</target_step>
+        <source_step>ContactDetails OP</source_step>
+        <target_step>Update ContactDetails</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>

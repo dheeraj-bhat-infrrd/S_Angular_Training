@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>Branch_Settings_ContactDetails</name>
+    <name>Agent_Settings_ContactDetails</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -102,9 +102,9 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;06&#x2f;04 00&#x3a;15&#x3a;19.738</created_date>
+  <created_date>2017&#x2f;06&#x2f;07 16&#x3a;23&#x3a;41.371</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;06&#x2f;04 00&#x3a;15&#x3a;19.738</modified_date>
+  <modified_date>2017&#x2f;06&#x2f;07 16&#x3a;23&#x3a;41.371</modified_date>
   </info>
   <notepads>
   </notepads>
@@ -190,37 +190,33 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>BranchSettings Input</from><to>Sort BranchSettings Table</to><enabled>Y</enabled> </hop>
-  <hop> <from>MongoDB I - Branch Settings_2</from><to>Sort BranchSettings Mongo</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort BranchSettings Table</from><to>Merge Join BranchSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort BranchSettings Mongo</from><to>Merge Join BranchSettings</to><enabled>Y</enabled> </hop>
+  <hop> <from>AgentSettings Input</from><to>Sort AgentSettings Table</to><enabled>Y</enabled> </hop>
   <hop> <from>ContactDetails</from><to>Sort rows ContactDetails</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows ContactDetails</from><to>Join Contact Details</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join BranchSettings</from><to>Sort rows BranchSettingsId</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows BranchSettingsId</from><to>Join Contact Details</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join Contact Details</from><to>UUID_ContactNumbers</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_ContactNumbers</from><to>ContactNumbers</to><enabled>Y</enabled> </hop>
   <hop> <from>ContactNumbers</from><to>ContactNumbers OP</to><enabled>Y</enabled> </hop>
   <hop> <from>ContactNumbers OP</from><to>Update ContactNumbers</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join Contact Details</from><to>UUID_WebAddress</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join Contact Details</from><to>UUID_ContactNumbers</to><enabled>Y</enabled> </hop>
   <hop> <from>Join Contact Details</from><to>UUID_Mail</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_Mail</from><to>Mail</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_WebAddress</from><to>WebAddress</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join Contact Details</from><to>UUID_WebAddress</to><enabled>Y</enabled> </hop>
   <hop> <from>Mail</from><to>Mail TableOP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Mail TableOP</from><to>Update Mail</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join AgentSettings</from><to>Sort rows AgentSettingsId</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join AgentSettings</from><to>UUID_SurveySettings</to><enabled>Y</enabled> </hop>
+  <hop> <from>MongoDB I - Agent Settings_2</from><to>Sort AgentSettings Mongo</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort AgentSettings Mongo</from><to>Merge Join AgentSettings</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort AgentSettings Table</from><to>Merge Join AgentSettings</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows AgentSettingsId</from><to>Join Contact Details</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows ContactDetails</from><to>Join Contact Details</to><enabled>Y</enabled> </hop>
+  <hop> <from>SurveySettings</from><to>SurveySettings_TableOP</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_ContactNumbers</from><to>ContactNumbers</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_Mail</from><to>Mail</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_SurveySettings</from><to>SurveySettings</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_WebAddress</from><to>WebAddress</to><enabled>Y</enabled> </hop>
   <hop> <from>WebAddress</from><to>WebAddresss OP</to><enabled>Y</enabled> </hop>
   <hop> <from>WebAddresss OP</from><to>Update Web Address</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_LockSettings</from><to>LockSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join BranchSettings</from><to>UUID_LockSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>LockSettings</from><to>LockSettings_TableOP</to><enabled>Y</enabled> </hop>
-  <hop> <from>LockSettings_TableOP</from><to>Update LockSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join BranchSettings</from><to>UUID_SurveySettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_SurveySettings</from><to>SurveySettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>SurveySettings</from><to>SurveySettings_TableOP</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveySettings_TableOP</from><to>Update SurveySettings</to><enabled>Y</enabled> </hop>
+  <hop> <from>Mail TableOP</from><to>Update Mail</to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>BranchSettings Input</name>
+    <name>AgentSettings Input</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -231,7 +227,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  BRANCH_SETTINGS_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;FROM branch_settings&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  AGENT_SETTINGS_ID&#xd;&#xa;, USER_ID&#xd;&#xa;FROM agent_settings&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -239,8 +235,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>823</xloc>
-      <yloc>31</yloc>
+      <xloc>813</xloc>
+      <yloc>25</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -257,7 +253,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  CONTACT_DETAILS_ID, BRANCH_SETTINGS_ID&#xd;&#xa;FROM contact_details&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  CONTACT_DETAILS_ID&#xd;&#xa;, AGENT_SETTINGS_ID&#xd;&#xa;FROM contact_details&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -265,8 +261,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>840</xloc>
-      <yloc>498</yloc>
+      <xloc>1034</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -290,11 +286,19 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>work_2</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>personal</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>175</xloc>
-      <yloc>498</yloc>
+      <xloc>316</xloc>
+      <yloc>287</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -336,11 +340,19 @@
           <column_name>CONTACT_NUMBERS_ID</column_name>
           <stream_name>CONTACT_NUMBERS_ID</stream_name>
         </field>
+        <field>
+          <column_name>WORK</column_name>
+          <stream_name>work_2</stream_name>
+        </field>
+        <field>
+          <column_name>PERSONAL</column_name>
+          <stream_name>personal</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>59</xloc>
-      <yloc>498</yloc>
+      <xloc>201</xloc>
+      <yloc>287</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -357,172 +369,18 @@
            <schema_name/>
            </partitioning>
 <join_type>INNER</join_type>
-<step1>Sort rows BranchSettingsId</step1>
+<step1>Sort rows AgentSettingsId</step1>
 <step2>Sort rows ContactDetails</step2>
     <keys_1>
-      <key>BRANCH_SETTINGS_ID</key>
+      <key>AGENT_SETTINGS_ID</key>
     </keys_1>
     <keys_2>
-      <key>BRANCH_SETTINGS_ID</key>
+      <key>AGENT_SETTINGS_ID</key>
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>409</xloc>
-      <yloc>498</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>LockSettings</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>      <field>        <name>BRANCH_SETTINGS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>LOCK_SETTINGS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isAboutMeLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isAddressLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isBlogAddressLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isFaxPhoneLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isLogoLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isMinScoreLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isPersonalPhoneLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWebAddressLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWorkEmailLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWorkPhoneLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>109</xloc>
-      <yloc>125</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>LockSettings_TableOP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>lock_settings</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>BRANCH_SETTINGS_ID</column_name>
-          <stream_name>BRANCH_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>LOCK_SETTINGS_ID</column_name>
-          <stream_name>LOCK_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>IS_ABOUT_ME_LOCKED</column_name>
-          <stream_name>isAboutMeLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_ADDRESS_LOCKED</column_name>
-          <stream_name>isAddressLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_BLOG_ADDRESS_LOCKED</column_name>
-          <stream_name>isBlogAddressLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_FAX_PHONE_LOCKED</column_name>
-          <stream_name>isFaxPhoneLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_LOGO_LOCKED</column_name>
-          <stream_name>isLogoLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_MIN_SCORE_LOCKED</column_name>
-          <stream_name>isMinScoreLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_PERSONAL_PHONE_LOCKED</column_name>
-          <stream_name>isPersonalPhoneLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_WEB_ADDRESS_LOCKED</column_name>
-          <stream_name>isWebAddressLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_WORK_EMAIL_LOCKED</column_name>
-          <stream_name>isWorkEmailLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_WORK_PHONE_LOCKED</column_name>
-          <stream_name>isWorkPhoneLocked</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>109</xloc>
-      <yloc>224</yloc>
+      <xloc>599</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -546,11 +404,31 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>isPersonalEmailVerified</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isWorkEmailVerified</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isWorkMailVerifiedByAdmin</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>work</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>workEmailToVerify</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>287</xloc>
-      <yloc>665</yloc>
+      <xloc>481</xloc>
+      <yloc>455</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -589,20 +467,40 @@
           <stream_name>MAIL_IDS</stream_name>
         </field>
         <field>
-          <column_name>CONTACT_DETAILS_ID</column_name>
+          <column_name>CONTACT_DETAILS _ID</column_name>
           <stream_name>CONTACT_DETAILS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>IS_PERSONAL_EMAIL_VERIFIED</column_name>
+          <stream_name>isPersonalEmailVerified</stream_name>
+        </field>
+        <field>
+          <column_name>IS_WORK_EMAIL_VERIFIED</column_name>
+          <stream_name>isWorkEmailVerified</stream_name>
+        </field>
+        <field>
+          <column_name>IS_WORK_MAIL_VERIFIED_BY_ADMIN</column_name>
+          <stream_name>isWorkMailVerifiedByAdmin</stream_name>
+        </field>
+        <field>
+          <column_name>WORK</column_name>
+          <stream_name>work</stream_name>
+        </field>
+        <field>
+          <column_name>WORK_EMAIL_TO_VERIFY</column_name>
+          <stream_name>workEmailToVerify</stream_name>
         </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>288</xloc>
-      <yloc>742</yloc>
+      <xloc>482</xloc>
+      <yloc>532</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Merge Join BranchSettings</name>
+    <name>Merge Join AgentSettings</name>
     <type>MergeJoin</type>
     <description/>
     <distribute>N</distribute>
@@ -613,24 +511,24 @@
            <schema_name/>
            </partitioning>
 <join_type>INNER</join_type>
-<step1>Sort BranchSettings Table</step1>
-<step2>Sort BranchSettings Mongo</step2>
+<step1>Sort AgentSettings Mongo</step1>
+<step2>Sort AgentSettings Table</step2>
     <keys_1>
-      <key>BRANCH_ID</key>
+      <key>iden</key>
     </keys_1>
     <keys_2>
-      <key>iden</key>
+      <key>USER_ID</key>
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>409</xloc>
-      <yloc>31</yloc>
+      <xloc>399</xloc>
+      <yloc>25</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>MongoDB I - Branch Settings_2</name>
+    <name>MongoDB I - Agent Settings_2</name>
     <type>MongoDbInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -645,7 +543,7 @@
     <use_all_replica_members>N</use_all_replica_members>
     <db_name>ss_db</db_name>
     <fields_name/>
-    <collection>BRANCH_SETTINGS</collection>
+    <collection>AGENT_SETTINGS</collection>
     <json_field_name>json</json_field_name>
     <json_query/>
     <auth_user/>
@@ -662,6 +560,14 @@
       <mongo_field>
         <field_name>_class</field_name>
 
+        <field_path>&#x24;.positions&#x5b;0&#x5d;._class</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_class_1</field_name>
+
         <field_path>&#x24;._class</field_path>
 
         <field_type>String</field_type>
@@ -670,7 +576,7 @@
       <mongo_field>
         <field_name>_id</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
+        <field_path>&#x24;._id</field_path>
 
         <field_type>String</field_type>
 
@@ -678,7 +584,55 @@
       <mongo_field>
         <field_name>_id_1</field_name>
 
-        <field_path>&#x24;._id</field_path>
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.company._id</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_id_2</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_id_3</field_name>
+
+        <field_path>&#x24;.linkedInProfileData._id</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_id_4</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;._id</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_total</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.pictureUrls._total</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_total_1</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.positions._total</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>about_me</field_name>
+
+        <field_path>&#x24;.contact_details.about_me</field_path>
 
         <field_type>String</field_type>
 
@@ -687,6 +641,14 @@
         <field_name>accessToken</field_name>
 
         <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.accessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>achievement</field_name>
+
+        <field_path>&#x24;.achievements&#x5b;0&#x5d;.achievement</field_path>
 
         <field_type>String</field_type>
 
@@ -708,6 +670,14 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>address2</field_name>
+
+        <field_path>&#x24;.contact_details.address2</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>allowOverrideForSocialMedia</field_name>
 
         <field_path>&#x24;.allowOverrideForSocialMedia</field_path>
@@ -719,6 +689,22 @@
         <field_name>allowZillowAutoPost</field_name>
 
         <field_path>&#x24;.allowZillowAutoPost</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>authorized_in&#x5b;0&#x5d;</field_name>
+
+        <field_path>&#x24;.licenses.authorized_in&#x5b;0&#x5d;</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>authorized_in&#x5b;1&#x5d;</field_name>
+
+        <field_path>&#x24;.licenses.authorized_in&#x5b;1&#x5d;</field_path>
 
         <field_type>String</field_type>
 
@@ -764,6 +750,14 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>code</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.location.country.code</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>country</field_name>
 
         <field_path>&#x24;.contact_details.country</field_path>
@@ -772,9 +766,41 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>countryAbbr</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryAbbr</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryAbbr_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.countryAbbr</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>countryCode</field_name>
 
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryCode_1</field_name>
+
         <field_path>&#x24;.contact_details.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryCode_2</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryCode</field_path>
 
         <field_type>String</field_type>
 
@@ -809,6 +835,46 @@
         <field_path>&#x24;.survey_settings.duplicateSurveyInterval</field_path>
 
         <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>endMonth</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.endMonth</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>endYear</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.endYear</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>expertise&#x5b;0&#x5d;</field_name>
+
+        <field_path>&#x24;.expertise&#x5b;0&#x5d;</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>expertise&#x5b;1&#x5d;</field_name>
+
+        <field_path>&#x24;.expertise&#x5b;1&#x5d;</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>expertise&#x5b;2&#x5d;</field_name>
+
+        <field_path>&#x24;.expertise&#x5b;2&#x5d;</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -847,6 +913,38 @@
         <field_name>facebookPageLink</field_name>
 
         <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>firstName</field_name>
+
+        <field_path>&#x24;.contact_details.firstName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>firstName_1</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.firstName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>formattedPhoneNumber</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.formattedPhoneNumber</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>formattedPhoneNumber_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.formattedPhoneNumber</field_path>
 
         <field_type>String</field_type>
 
@@ -892,9 +990,33 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>headline</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.headline</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>hiddenSection</field_name>
 
         <field_path>&#x24;.hiddenSection</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>hobbies&#x5b;0&#x5d;</field_name>
+
+        <field_path>&#x24;.hobbies&#x5b;0&#x5d;</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>hobbies&#x5b;1&#x5d;</field_name>
+
+        <field_path>&#x24;.hobbies&#x5b;1&#x5d;</field_path>
 
         <field_type>String</field_type>
 
@@ -908,11 +1030,19 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>isAboutMeLocked</field_name>
+        <field_name>industry</field_name>
 
-        <field_path>&#x24;.lockSettings.isAboutMeLocked</field_path>
+        <field_path>&#x24;.contact_details.industry</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>industry_1</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.industry</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -924,19 +1054,19 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>isAddressLocked</field_name>
+        <field_name>isCurrent</field_name>
 
-        <field_path>&#x24;.lockSettings.isAddressLocked</field_path>
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.isCurrent</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>isBlogAddressLocked</field_name>
+        <field_name>isCurrent_1</field_name>
 
-        <field_path>&#x24;.lockSettings.isBlogAddressLocked</field_path>
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.isCurrent</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -945,14 +1075,6 @@
         <field_path>&#x24;.isDefaultBySystem</field_path>
 
         <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isFaxPhoneLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isFaxPhoneLocked</field_path>
-
-        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -972,25 +1094,9 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>isLogoLocked</field_name>
+        <field_name>isPersonalEmailVerified</field_name>
 
-        <field_path>&#x24;.lockSettings.isLogoLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isMinScoreLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isMinScoreLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isPersonalPhoneLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isPersonalPhoneLocked</field_path>
+        <field_path>&#x24;.contact_details.mail_ids.isPersonalEmailVerified</field_path>
 
         <field_type>Boolean</field_type>
 
@@ -1028,27 +1134,35 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>isWebAddressLocked</field_name>
+        <field_name>isWorkEmailVerified</field_name>
 
-        <field_path>&#x24;.lockSettings.isWebAddressLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isWorkEmailLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isWorkEmailLocked</field_path>
+        <field_path>&#x24;.contact_details.mail_ids.isWorkEmailVerified</field_path>
 
         <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>isWorkPhoneLocked</field_name>
+        <field_name>isWorkMailVerifiedByAdmin</field_name>
 
-        <field_path>&#x24;.lockSettings.isWorkPhoneLocked</field_path>
+        <field_path>&#x24;.contact_details.mail_ids.isWorkMailVerifiedByAdmin</field_path>
 
         <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>lastName</field_name>
+
+        <field_path>&#x24;.contact_details.lastName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>lastName_1</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.lastName</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1092,17 +1206,9 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>logo</field_name>
+        <field_name>location</field_name>
 
-        <field_path>&#x24;.logo</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>logoThumbnail</field_name>
-
-        <field_path>&#x24;.logoThumbnail</field_path>
+        <field_path>&#x24;.contact_details.location</field_path>
 
         <field_type>String</field_type>
 
@@ -1140,15 +1246,15 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>name</field_name>
+        <field_name>month</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.startDate.month</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>name_1</field_name>
+        <field_name>name</field_name>
 
         <field_path>&#x24;.contact_details.name</field_path>
 
@@ -1156,11 +1262,59 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>nmlsId</field_name>
+        <field_name>name_1</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.zillowToken.lenderRef.nmlsId</field_path>
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.company.name</field_path>
 
-        <field_type>Integer</field_type>
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name_2</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name_3</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name_4</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.location.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name_5</field_name>
+
+        <field_path>&#x24;.associations&#x5b;0&#x5d;.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>number</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.number</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>number_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.number</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1169,6 +1323,22 @@
         <field_path>&#x24;.profileStages&#x5b;0&#x5d;.order</field_path>
 
         <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>personal</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.personal</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>pictureUrl</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.pictureUrl</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1214,7 +1384,7 @@
       <mongo_field>
         <field_name>profileUrl</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
+        <field_path>&#x24;.profileUrl</field_path>
 
         <field_type>String</field_type>
 
@@ -1222,7 +1392,7 @@
       <mongo_field>
         <field_name>profileUrl_1</field_name>
 
-        <field_path>&#x24;.profileUrl</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
 
         <field_type>String</field_type>
 
@@ -1236,11 +1406,27 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>publicProfileUrl</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.publicProfileUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>realtorProfileLink</field_name>
 
         <field_path>&#x24;.socialMediaTokens.realtorToken.realtorProfileLink</field_path>
 
         <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>reviewCount</field_name>
+
+        <field_path>&#x24;.reviewCount</field_path>
+
+        <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1268,6 +1454,30 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>startMonth</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.startMonth</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>startTime</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.startTime</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>startYear</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.startYear</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>state</field_name>
 
         <field_path>&#x24;.contact_details.state</field_path>
@@ -1284,6 +1494,22 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>status_1</field_name>
+
+        <field_path>&#x24;.status</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>summary</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;2&#x5d;.summary</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>survey_reminder_interval_in_days</field_name>
 
         <field_path>&#x24;.survey_settings.survey_reminder_interval_in_days</field_path>
@@ -1292,9 +1518,33 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>title</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.title</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>title_1</field_name>
+
+        <field_path>&#x24;.contact_details.title</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>title_2</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.title</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>tokenExpiryAlertSent</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
 
         <field_type>String</field_type>
 
@@ -1302,7 +1552,7 @@
       <mongo_field>
         <field_name>tokenExpiryAlertSent_1</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
 
         <field_type>String</field_type>
 
@@ -1340,6 +1590,22 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>userEncryptedId</field_name>
+
+        <field_path>&#x24;.userEncryptedId</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>values&#x5b;0&#x5d;</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.pictureUrls.values&#x5b;0&#x5d;</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>vendastaAccessible</field_name>
 
         <field_path>&#x24;.vendastaAccessible</field_path>
@@ -1358,9 +1624,41 @@
       <mongo_field>
         <field_name>work</field_name>
 
+        <field_path>&#x24;.contact_details.mail_ids.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>workEmailToVerify</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.workEmailToVerify</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_1</field_name>
+
         <field_path>&#x24;.contact_details.web_addresses.work</field_path>
 
         <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_2</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>year</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.startDate.year</field_path>
+
+        <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1405,14 +1703,14 @@
       </mongo_field>
     </mongo_fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>72</xloc>
-      <yloc>31</yloc>
+      <xloc>62</xloc>
+      <yloc>25</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Sort BranchSettings Mongo</name>
+    <name>Sort AgentSettings Mongo</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1439,14 +1737,14 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>251</xloc>
-      <yloc>31</yloc>
+      <xloc>241</xloc>
+      <yloc>25</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Sort BranchSettings Table</name>
+    <name>Sort AgentSettings Table</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1465,7 +1763,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>BRANCH_ID</name>
+        <name>USER_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1473,14 +1771,14 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>602</xloc>
-      <yloc>31</yloc>
+      <xloc>592</xloc>
+      <yloc>25</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Sort rows BranchSettingsId</name>
+    <name>Sort rows AgentSettingsId</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1499,7 +1797,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>BRANCH_SETTINGS_ID</name>
+        <name>AGENT_SETTINGS_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1507,8 +1805,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>409</xloc>
-      <yloc>413</yloc>
+      <xloc>599</xloc>
+      <yloc>120</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1533,7 +1831,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>BRANCH_SETTINGS_ID</name>
+        <name>AGENT_SETTINGS_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1541,8 +1839,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>622</xloc>
-      <yloc>498</yloc>
+      <xloc>816</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1558,11 +1856,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>      <field>        <name>BRANCH_SETTINGS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>SURVEY_SETTINGS_ID</name>
+    <fields>      <field>        <name>AGENT_SETTINGS_ID</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1610,11 +1904,15 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_SETTINGS_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>711</xloc>
-      <yloc>120</yloc>
+      <xloc>329</xloc>
+      <yloc>107</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1649,12 +1947,8 @@
     <return_field/>
     <fields>
         <field>
-          <column_name>BRANCH_SETTINGS_ID</column_name>
-          <stream_name>BRANCH_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_SETTINGS_ID</column_name>
-          <stream_name>SURVEY_SETTINGS_ID</stream_name>
+          <column_name>AGENT_SETTINGS_ID</column_name>
+          <stream_name>AGENT_SETTINGS_ID</stream_name>
         </field>
         <field>
           <column_name>AUTO_POST_SCORE</column_name>
@@ -1700,11 +1994,15 @@
           <column_name>IS_SOCIAL_POST_REMINDER_DISABLED</column_name>
           <stream_name>isSocialPostReminderDisabled</stream_name>
         </field>
+        <field>
+          <column_name>SURVEY_SETTINGS_ID</column_name>
+          <stream_name>SURVEY_SETTINGS_ID</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>711</xloc>
-      <yloc>215</yloc>
+      <xloc>208</xloc>
+      <yloc>107</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1728,33 +2026,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>291</xloc>
-      <yloc>498</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>UUID_LockSettings</name>
-    <type>RandomValue</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>LOCK_SETTINGS_ID</name>
-        <type>random uuid</type>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>242</xloc>
-      <yloc>125</yloc>
+      <xloc>449</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1778,8 +2051,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>291</xloc>
-      <yloc>588</yloc>
+      <xloc>485</xloc>
+      <yloc>378</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1803,8 +2076,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>548</xloc>
-      <yloc>120</yloc>
+      <xloc>438</xloc>
+      <yloc>107</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1828,8 +2101,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>559</xloc>
-      <yloc>591</yloc>
+      <xloc>753</xloc>
+      <yloc>381</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1860,86 +2133,19 @@
         <condition>&#x3d;</condition>
         <name2/>
         </key>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>58</xloc>
-      <yloc>601</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update LockSettings</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>lock_settings</table>
-      <key>
-        <name>BRANCH_SETTINGS_ID</name>
-        <field>BRANCH_SETTINGS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
       <value>
-        <name>IS_ABOUT_ME_LOCKED</name>
-        <rename>isAboutMeLocked</rename>
+        <name>PERSONAL</name>
+        <rename>personal</rename>
         </value>
       <value>
-        <name>IS_ADDRESS_LOCKED</name>
-        <rename>isAddressLocked</rename>
-        </value>
-      <value>
-        <name>IS_BLOG_ADDRESS_LOCKED</name>
-        <rename>isBlogAddressLocked</rename>
-        </value>
-      <value>
-        <name>IS_FAX_PHONE_LOCKED</name>
-        <rename>isFaxPhoneLocked</rename>
-        </value>
-      <value>
-        <name>IS_LOGO_LOCKED</name>
-        <rename>isLogoLocked</rename>
-        </value>
-      <value>
-        <name>IS_MIN_SCORE_LOCKED</name>
-        <rename>isMinScoreLocked</rename>
-        </value>
-      <value>
-        <name>IS_PERSONAL_PHONE_LOCKED</name>
-        <rename>isPersonalPhoneLocked</rename>
-        </value>
-      <value>
-        <name>IS_WEB_ADDRESS_LOCKED</name>
-        <rename>isWebAddressLocked</rename>
-        </value>
-      <value>
-        <name>IS_WORK_EMAIL_LOCKED</name>
-        <rename>isWorkEmailLocked</rename>
-        </value>
-      <value>
-        <name>IS_WORK_PHONE_LOCKED</name>
-        <rename>isWorkPhoneLocked</rename>
+        <name>WORK</name>
+        <rename>work_2</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>109</xloc>
-      <yloc>346</yloc>
+      <xloc>204</xloc>
+      <yloc>391</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1970,11 +2176,31 @@
         <condition>&#x3d;</condition>
         <name2/>
         </key>
+      <value>
+        <name>IS_PERSONAL_EMAIL_VERIFIED</name>
+        <rename>isPersonalEmailVerified</rename>
+        </value>
+      <value>
+        <name>IS_WORK_EMAIL_VERIFIED</name>
+        <rename>isWorkEmailVerified</rename>
+        </value>
+      <value>
+        <name>IS_WORK_MAIL_VERIFIED_BY_ADMIN</name>
+        <rename>isWorkMailVerifiedByAdmin</rename>
+        </value>
+      <value>
+        <name>WORK</name>
+        <rename>work</rename>
+        </value>
+      <value>
+        <name>WORK_EMAIL_TO_VERIFY</name>
+        <rename>workEmailToVerify</rename>
+        </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>190</xloc>
-      <yloc>741</yloc>
+      <xloc>384</xloc>
+      <yloc>531</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2000,8 +2226,8 @@
       <schema/>
       <table>survey_settings</table>
       <key>
-        <name>BRANCH_SETTINGS_ID</name>
-        <field>BRANCH_SETTINGS_ID</field>
+        <name>AGENT_SETTINGS_ID</name>
+        <field>AGENT_SETTINGS_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
         </key>
@@ -2052,8 +2278,8 @@
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>711</xloc>
-      <yloc>335</yloc>
+      <xloc>69</xloc>
+      <yloc>107</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2085,14 +2311,14 @@
         <name2/>
         </key>
       <value>
-        <name>work</name>
-        <rename>work</rename>
+        <name>WORK</name>
+        <rename>work_1</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>713</xloc>
-      <yloc>735</yloc>
+      <xloc>907</xloc>
+      <yloc>525</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2116,15 +2342,15 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>work</name>
+      </field>      <field>        <name>work_1</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>558</xloc>
-      <yloc>663</yloc>
+      <xloc>752</xloc>
+      <yloc>453</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2167,14 +2393,14 @@
           <stream_name>CONTACT_DETAILS_ID</stream_name>
         </field>
         <field>
-          <column_name>work</column_name>
-          <stream_name>work</stream_name>
+          <column_name>WORK</column_name>
+          <stream_name>work_1</stream_name>
         </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>557</xloc>
-      <yloc>735</yloc>
+      <xloc>751</xloc>
+      <yloc>525</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2183,18 +2409,6 @@
       <error>
         <source_step>ContactNumbers OP</source_step>
         <target_step>Update ContactNumbers</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>LockSettings_TableOP</source_step>
-        <target_step>Update LockSettings</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
