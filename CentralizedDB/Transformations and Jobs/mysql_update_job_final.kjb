@@ -170,8 +170,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>405</xloc>
-      <yloc>103</yloc>
+      <xloc>83</xloc>
+      <yloc>239</yloc>
       </entry>
     <entry>
       <name>job_no_1</name>
@@ -202,7 +202,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>157</xloc>
+      <xloc>256</xloc>
       <yloc>240</yloc>
       </entry>
     <entry>
@@ -234,8 +234,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>318</xloc>
-      <yloc>287</yloc>
+      <xloc>449</xloc>
+      <yloc>240</yloc>
       </entry>
     <entry>
       <name>Job_no_3</name>
@@ -266,8 +266,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>494</xloc>
-      <yloc>293</yloc>
+      <xloc>631</xloc>
+      <yloc>239</yloc>
       </entry>
     <entry>
       <name>Job_no_4</name>
@@ -298,8 +298,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>682</xloc>
-      <yloc>227</yloc>
+      <xloc>862</xloc>
+      <yloc>239</yloc>
       </entry>
   </entries>
   <hops>
@@ -313,31 +313,31 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>START</from>
+      <from>job_no_1</from>
       <to>Job_no_2</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
+      <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>START</from>
+      <from>Job_no_2</from>
       <to>Job_no_3</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
+      <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>START</from>
+      <from>Job_no_3</from>
       <to>Job_no_4</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
+      <unconditional>N</unconditional>
     </hop>
   </hops>
   <notepads>
