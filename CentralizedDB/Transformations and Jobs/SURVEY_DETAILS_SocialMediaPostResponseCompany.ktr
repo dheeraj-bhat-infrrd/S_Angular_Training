@@ -136,55 +136,37 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Parse_id_companyId</from><to>parse_companyMediaPostResponseDetails</to><enabled>Y</enabled> </hop>
+  <hop> <from>FBTable output</from><to>FBUpdate</to><enabled>Y</enabled> </hop>
+  <hop> <from>LINKoutput</from><to>LinkUpdate</to><enabled>Y</enabled> </hop>
   <hop> <from>Mongo_Survey_details</from><to>Parse_id_companyId</to><enabled>Y</enabled> </hop>
+  <hop> <from>Parse_id_companyId</from><to>parse_companyMediaPostResponseDetails</to><enabled>Y</enabled> </hop>
+  <hop> <from>Twitter output</from><to>TwitterUpdate</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_FACEBOOK_POST_RESPONSE_LIST</from><to>fb_log</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_LINKEDIN_POST_RESPONSE_LIST</from><to>link_log</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_TWITTER_POST_RESPONSE_LIST</from><to>twit_log 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>facebook_log</from><to>Sort_facebook_rows</to><enabled>Y</enabled> </hop>
-  <hop> <from>linkedin_log</from><to>Sort_linkedin_rows</to><enabled>Y</enabled> </hop>
-  <hop> <from>twitter_log</from><to>sort_twitter_rows</to><enabled>Y</enabled> </hop>
-  <hop> <from>parse_companyMediaPostResponseDetails</from><to>type_constants</to><enabled>Y</enabled> </hop>
-  <hop> <from>fb_Update</from><to>facebook_log</to><enabled>Y</enabled> </hop>
-  <hop> <from>fb_insert</from><to>facebook_log</to><enabled>Y</enabled> </hop>
-  <hop> <from>fb_insert</from><to>fb_Update</to><enabled>Y</enabled> </hop>
   <hop> <from>fb_log</from><to>modify_facebook_date</to><enabled>Y</enabled> </hop>
+  <hop> <from>fb_stream</from><to>FBTable output</to><enabled>Y</enabled> </hop>
   <hop> <from>filter_facebook_null</from><to>parse_facebook</to><enabled>Y</enabled> </hop>
   <hop> <from>filter_linkedin_null</from><to>parse_linkedin</to><enabled>Y</enabled> </hop>
   <hop> <from>filter_twitter_null</from><to>parse_twitter</to><enabled>Y</enabled> </hop>
-  <hop> <from>link_Update</from><to>linkedin_log</to><enabled>Y</enabled> </hop>
-  <hop> <from>link_insert</from><to>linkedin_log</to><enabled>Y</enabled> </hop>
-  <hop> <from>link_insert</from><to>link_Update</to><enabled>Y</enabled> </hop>
   <hop> <from>link_log</from><to>modify_linkedin_date</to><enabled>Y</enabled> </hop>
-  <hop> <from>modify_facebook_date</from><to>fb_insert</to><enabled>Y</enabled> </hop>
-  <hop> <from>modify_linkedin_date</from><to>link_insert</to><enabled>Y</enabled> </hop>
-  <hop> <from>modify_twitter_date</from><to>twitter_insert</to><enabled>Y</enabled> </hop>
+  <hop> <from>link_stream</from><to>LINKoutput</to><enabled>Y</enabled> </hop>
+  <hop> <from>modify_facebook_date</from><to>fb_stream</to><enabled>Y</enabled> </hop>
+  <hop> <from>modify_linkedin_date</from><to>link_stream</to><enabled>Y</enabled> </hop>
+  <hop> <from>modify_twitter_date</from><to>twitter_stream </to><enabled>Y</enabled> </hop>
+  <hop> <from>parse_companyMediaPostResponseDetails</from><to>type_constants</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_facebook</from><to>UUID_FACEBOOK_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_linkedin</from><to>UUID_LINKEDIN_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_twitter</from><to>UUID_TWITTER_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
   <hop> <from>twit_log 2</from><to>modify_twitter_date</to><enabled>Y</enabled> </hop>
-  <hop> <from>twitter_insert</from><to>twitter_log</to><enabled>Y</enabled> </hop>
-  <hop> <from>twitter_insert</from><to>twitter_update</to><enabled>Y</enabled> </hop>
-  <hop> <from>twitter_update</from><to>twitter_log</to><enabled>Y</enabled> </hop>
+  <hop> <from>twitter_stream </from><to>Twitter output</to><enabled>Y</enabled> </hop>
   <hop> <from>type_constants</from><to>filter_facebook_null</to><enabled>Y</enabled> </hop>
   <hop> <from>type_constants</from><to>filter_linkedin_null</to><enabled>Y</enabled> </hop>
   <hop> <from>type_constants</from><to>filter_twitter_null</to><enabled>Y</enabled> </hop>
-  <hop> <from>Block this step until steps finish</from><to>social_insert</to><enabled>Y</enabled> </hop>
-  <hop> <from>Modified Java Script Value</from><to>Write to log 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select_social_media</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_SOCIAL_MEDIA_POST_RESPONSE_DETAILS</from><to>Select_social_media</to><enabled>Y</enabled> </hop>
-  <hop> <from>Write to log 3</from><to>Block this step until steps finish</to><enabled>Y</enabled> </hop>
-  <hop> <from>social_insert</from><to>social_update</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort_facebook_rows</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort_linkedin_rows</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>sort_twitter_rows</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Multiway Merge Join</from><to>UUID_SOCIAL_MEDIA_POST_RESPONSE_DETAILS</to><enabled>Y</enabled> </hop>
-  <hop> <from>Write to log 3</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Modified Java Script Value 2</from><to>Write to log</to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>Block this step until steps finish</name>
-    <type>BlockUntilStepsFinish</type>
+    <name>FBTable output</name>
+    <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -193,43 +175,64 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <steps>
-      <step>
-        <name>fb_insert</name>
-        <CopyNr>0</CopyNr>
-        </step>
-      <step>
-        <name>fb_Update</name>
-        <CopyNr>0</CopyNr>
-        </step>
-      <step>
-        <name>link_insert</name>
-        <CopyNr>0</CopyNr>
-        </step>
-      <step>
-        <name>link_Update</name>
-        <CopyNr>0</CopyNr>
-        </step>
-      <step>
-        <name>twitter_insert</name>
-        <CopyNr>0</CopyNr>
-        </step>
-      <step>
-        <name>twitter_update</name>
-        <CopyNr>0</CopyNr>
-        </step>
-      </steps>
+    <connection>Local instance MySQL57</connection>
+    <schema/>
+    <table>facebook_post_response_list</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>type</column_name>
+          <stream_name>type</stream_name>
+        </field>
+        <field>
+          <column_name>ACCESS_TOKEN</column_name>
+          <stream_name>ACCESS_TOKEN</stream_name>
+        </field>
+        <field>
+          <column_name>POST_DATE</column_name>
+          <stream_name>POST_DATE</stream_name>
+        </field>
+        <field>
+          <column_name>RESPONSE_MESSAGE</column_name>
+          <stream_name>RESPONSE_MESSAGE</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_DETAILS_ID</column_name>
+          <stream_name>SURVEY_DETAILS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>FACEBOOK_POST_RESPONSE_LIST_ID</column_name>
+          <stream_name>FACEBOOK_POST_RESPONSE_LIST_ID</stream_name>
+        </field>
+        <field>
+          <column_name>id</column_name>
+          <stream_name>id</stream_name>
+        </field>
+    </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1886</xloc>
-      <yloc>569</yloc>
+      <xloc>1265</xloc>
+      <yloc>73</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Modified Java Script Value</name>
-    <type>ScriptValueMod</type>
+    <name>FBUpdate</name>
+    <type>Update</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -238,40 +241,57 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var final_company_id &#x3d; 0&#x3b;&#xd;&#xa;var final_survey_details_id &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;companyId&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; companyId&#x3b;&#xd;&#xa;&#x7d; else if&#x28;companyId_1&#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;	final_company_id&#x3d;companyId_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;companyId_2&#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;	final_company_id&#x3d; companyId_2&#x3b;&#xd;&#xa;&#x7d; &#xd;&#xa;var typeVar &#x3d; 1&#x3b;&#xd;&#xa;if&#x28;survey_details_id&#x21;&#x3d;null&#x29;&#x7b;&#xd;&#xa;	final_survey_details_id &#x3d; survey_details_id&#x3b;&#xd;&#xa;&#x7d; else if&#x28;survey_details_id_1&#x21;&#x3d;null&#x29;&#x7b;&#xd;&#xa;	final_survey_details_id &#x3d; survey_details_id_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;survey_details_id_2&#x21;&#x3d;null&#x29;&#x7b;&#xd;&#xa;	final_survey_details_id &#x3d; survey_details_id_2&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>final_company_id</name>
-        <rename>final_company_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>final_survey_details_id</name>
-        <rename>final_survey_details_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>typeVar</name>
-        <rename>typeVar</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
+    <connection>Local instance MySQL57</connection>
+    <skip_lookup>N</skip_lookup>
+    <commit>100</commit>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>facebook_post_response_list</table>
+      <key>
+        <name>id</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>SURVEY_DETAILS_ID</name>
+        <field>SURVEY_DETAILS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>ACCESS_TOKEN</name>
+        <rename>ACCESS_TOKEN</rename>
+        </value>
+      <value>
+        <name>POST_DATE</name>
+        <rename>POST_DATE</rename>
+        </value>
+      <value>
+        <name>RESPONSE_MESSAGE</name>
+        <rename>RESPONSE_MESSAGE</rename>
+        </value>
+      </lookup>
+     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1882</xloc>
-      <yloc>401</yloc>
+      <xloc>1428</xloc>
+      <yloc>133</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Modified Java Script Value 2</name>
-    <type>ScriptValueMod</type>
+    <name>LINKoutput</name>
+    <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -280,15 +300,124 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;FACEBOOK_POST_RESPONSE_LIST_ID &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa; trans_Status &#x3d; CONTINUE_TRANSFORMATION&#xd;&#xa;&#x7d;else&#x7b;&#xd;&#xa; trans_Status &#x3d; SKIP_TRANSFORMATION&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>    </fields>     <cluster_schema/>
+    <connection>Local instance MySQL57</connection>
+    <schema/>
+    <table>linkedin_post_response_list</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>LINKEDIN_POST_RESPONSE_LIST_ID</column_name>
+          <stream_name>LINKEDIN_POST_RESPONSE_LIST_ID</stream_name>
+        </field>
+        <field>
+          <column_name>id</column_name>
+          <stream_name>id</stream_name>
+        </field>
+        <field>
+          <column_name>type</column_name>
+          <stream_name>type</stream_name>
+        </field>
+        <field>
+          <column_name>ACCESS_TOKEN</column_name>
+          <stream_name>ACCESS_TOKEN</stream_name>
+        </field>
+        <field>
+          <column_name>POST_DATE</column_name>
+          <stream_name>POST_DATE</stream_name>
+        </field>
+        <field>
+          <column_name>REFERENCE_URL</column_name>
+          <stream_name>REFERENCE_URL</stream_name>
+        </field>
+        <field>
+          <column_name>RESPONSE_MESSAGE</column_name>
+          <stream_name>RESPONSE_MESSAGE</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_DETAILS_ID</column_name>
+          <stream_name>SURVEY_DETAILS_ID</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2042</xloc>
-      <yloc>493</yloc>
+      <xloc>1285</xloc>
+      <yloc>187</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>LinkUpdate</name>
+    <type>Update</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>Local instance MySQL57</connection>
+    <skip_lookup>N</skip_lookup>
+    <commit>100</commit>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>linkedin_post_response_list</table>
+      <key>
+        <name>id</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>SURVEY_DETAILS_ID</name>
+        <field>SURVEY_DETAILS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>ACCESS_TOKEN</name>
+        <rename>ACCESS_TOKEN</rename>
+        </value>
+      <value>
+        <name>POST_DATE</name>
+        <rename>POST_DATE</rename>
+        </value>
+      <value>
+        <name>REFERENCE_URL</name>
+        <rename>REFERENCE_URL</rename>
+        </value>
+      <value>
+        <name>RESPONSE_MESSAGE</name>
+        <rename>RESPONSE_MESSAGE</rename>
+        </value>
+      </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1425</xloc>
+      <yloc>246</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -323,37 +452,8 @@
     <execute_for_each_row>N</execute_for_each_row>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>116</xloc>
-      <yloc>63</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<join_type>FULL OUTER</join_type>
-<step0>Sort_facebook_rows</step0>
-<step1>sort_twitter_rows</step1>
-<step2>Sort_linkedin_rows</step2>
-    <number_input>3</number_input>
-    <keys>
-      <key>companyId,survey_details_id</key>
-      <key>companyId,survey_details_id</key>
-      <key>companyId,survey_details_id</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1635</xloc>
-      <yloc>243</yloc>
+      <xloc>93</xloc>
+      <yloc>30</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -427,15 +527,15 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>112</xloc>
-      <yloc>164</yloc>
+      <xloc>89</xloc>
+      <yloc>131</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Select_social_media</name>
-    <type>SelectValues</type>
+    <name>Twitter output</name>
+    <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -444,634 +544,64 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>companyId</name>
-        <rename>companyId</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>survey_details_id</name>
-        <rename>survey_details_id</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>company_facebook</name>
-        <rename>company_facebook</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>company_linkedin</name>
-        <rename>company_linkedin</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>company_twitter</name>
-        <rename>company_twitter</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>type</name>
-        <rename>type</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>0</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>facebook_accessToken</name>
-        <rename>facebook_accessToken</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>facebook_postDate</name>
-        <rename>facebook_postDate</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>facebook_responseMessage</name>
-        <rename>facebook_responseMessage</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>FACEBOOK_POST_RESPONSE_LIST_ID</name>
-        <rename>FACEBOOK_POST_RESPONSE_LIST_ID</rename>
-        <type>None</type>
-        <length>36</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>postDateStr</name>
-        <rename>postDateStr</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>json_1</name>
-        <rename>json_1</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>companyId_1</name>
-        <rename>companyId_1</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>survey_details_id_1</name>
-        <rename>survey_details_id_1</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>company_facebook_1</name>
-        <rename>company_facebook_1</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>company_linkedin_1</name>
-        <rename>company_linkedin_1</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>company_twitter_1</name>
-        <rename>company_twitter_1</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>type_1</name>
-        <rename>type_1</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>0</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>twitter_accessToken</name>
-        <rename>twitter_accessToken</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>twitter_postDate</name>
-        <rename>twitter_postDate</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>twitter_responseMessage</name>
-        <rename>twitter_responseMessage</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>TWITTER_POST_RESPONSE_LIST_ID</name>
-        <rename>TWITTER_POST_RESPONSE_LIST_ID</rename>
-        <type>None</type>
-        <length>36</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>postDateStr_1</name>
-        <rename>postDateStr_1</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>json_2</name>
-        <rename>json_2</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>companyId_2</name>
-        <rename>companyId_2</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>survey_details_id_2</name>
-        <rename>survey_details_id_2</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>company_facebook_2</name>
-        <rename>company_facebook_2</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>company_linkedin_2</name>
-        <rename>company_linkedin_2</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>company_twitter_2</name>
-        <rename>company_twitter_2</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>type_2</name>
-        <rename>type_2</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>0</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>linkedin_accessToken</name>
-        <rename>linkedin_accessToken</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>linkedin_postDate</name>
-        <rename>linkedin_postDate</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>linkedin_referenceUrl</name>
-        <rename>linkedin_referenceUrl</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>linkedin_responseMessage</name>
-        <rename>linkedin_responseMessage</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>LINKEDIN_POST_RESPONSE_LIST_ID</name>
-        <rename>LINKEDIN_POST_RESPONSE_LIST_ID</rename>
-        <type>None</type>
-        <length>36</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>entityType</name>
-        <rename>entityType</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>postDateStr_2</name>
-        <rename>postDateStr_2</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>SOCIAL_MEDIA_POST_RESPONSE_DETAILS_ID</name>
-        <rename>SOCIAL_MEDIA_POST_RESPONSE_DETAILS_ID</rename>
-        <type>None</type>
-        <length>36</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1881</xloc>
-      <yloc>323</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort_facebook_rows</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
+    <connection>Local instance MySQL57</connection>
+    <schema/>
+    <table>twitter_post_response_list</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
     <fields>
-      <field>
-        <name>companyId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>type</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>survey_details_id</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
+        <field>
+          <column_name>TWITTER_POST_RESPONSE_LIST_ID</column_name>
+          <stream_name>TWITTER_POST_RESPONSE_LIST_ID</stream_name>
+        </field>
+        <field>
+          <column_name>id</column_name>
+          <stream_name>id</stream_name>
+        </field>
+        <field>
+          <column_name>type</column_name>
+          <stream_name>type</stream_name>
+        </field>
+        <field>
+          <column_name>ACCESS_TOKEN</column_name>
+          <stream_name>ACCESS_TOKEN</stream_name>
+        </field>
+        <field>
+          <column_name>POST_DATE</column_name>
+          <stream_name>POST_DATE</stream_name>
+        </field>
+        <field>
+          <column_name>RESPONSE_MESSAGE</column_name>
+          <stream_name>RESPONSE_MESSAGE</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_DETAILS_ID</column_name>
+          <stream_name>SURVEY_DETAILS_ID</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1425</xloc>
-      <yloc>120</yloc>
+      <xloc>1306</xloc>
+      <yloc>388</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Sort_linkedin_rows</name>
-    <type>SortRows</type>
+    <name>TwitterUpdate</name>
+    <type>Update</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1080,37 +610,50 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>companyId</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
+    <connection>Local instance MySQL57</connection>
+    <skip_lookup>N</skip_lookup>
+    <commit>100</commit>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>twitter_post_response_list</table>
+      <key>
+        <name>id</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
         <name>type</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>survey_details_id</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>SURVEY_DETAILS_ID</name>
+        <field>SURVEY_DETAILS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>ACCESS_TOKEN</name>
+        <rename>ACCESS_TOKEN</rename>
+        </value>
+      <value>
+        <name>POST_DATE</name>
+        <rename>POST_DATE</rename>
+        </value>
+      <value>
+        <name>RESPONSE_MESSAGE</name>
+        <rename>RESPONSE_MESSAGE</rename>
+        </value>
+      </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1432</xloc>
-      <yloc>246</yloc>
+      <xloc>1435</xloc>
+      <yloc>447</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1134,8 +677,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>721</xloc>
-      <yloc>124</yloc>
+      <xloc>698</xloc>
+      <yloc>91</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1159,33 +702,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>731</xloc>
-      <yloc>250</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>UUID_SOCIAL_MEDIA_POST_RESPONSE_DETAILS</name>
-    <type>RandomValue</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>SOCIAL_MEDIA_POST_RESPONSE_DETAILS_ID</name>
-        <type>random uuid</type>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1882</xloc>
-      <yloc>242</yloc>
+      <xloc>713</xloc>
+      <yloc>282</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1210,230 +728,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>703</xloc>
-      <yloc>387</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Write to log</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>survey_details_id</name>
-        </field>
-      <field>
-        <name>FACEBOOK_POST_RESPONSE_LIST_ID</name>
-        </field>
-      <field>
-        <name>LINKEDIN_POST_RESPONSE_LIST_ID</name>
-        </field>
-      <field>
-        <name>TWITTER_POST_RESPONSE_LIST_ID</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2216</xloc>
-      <yloc>493</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Write to log 3</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>final_survey_details_id</name>
-        </field>
-      <field>
-        <name>FACEBOOK_POST_RESPONSE_LIST_ID</name>
-        </field>
-      <field>
-        <name>LINKEDIN_POST_RESPONSE_LIST_ID</name>
-        </field>
-      <field>
-        <name>TWITTER_POST_RESPONSE_LIST_ID</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1883</xloc>
-      <yloc>496</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>facebook_log</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>companyId</name>
-        </field>
-      <field>
-        <name>FACEBOOK_POST_RESPONSE_LIST_ID</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1295</xloc>
-      <yloc>123</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>fb_Update</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>Local instance MySQL57</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>facebook_post_response_list</table>
-      <key>
-        <name>companyId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>ACCESS_TOKEN</name>
-        <rename>facebook_accessToken</rename>
-        </value>
-      <value>
-        <name>POST_DATE</name>
-        <rename>postDateStr</rename>
-        </value>
-      <value>
-        <name>RESPONSE_MESSAGE</name>
-        <rename>facebook_responseMessage</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1203</xloc>
-      <yloc>154</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>fb_insert</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>Local instance MySQL57</connection>
-    <schema/>
-    <table>facebook_post_response_list</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>FACEBOOK_POST_RESPONSE_LIST_ID</column_name>
-          <stream_name>FACEBOOK_POST_RESPONSE_LIST_ID</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>companyId</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>ACCESS_TOKEN</column_name>
-          <stream_name>facebook_accessToken</stream_name>
-        </field>
-        <field>
-          <column_name>POST_DATE</column_name>
-          <stream_name>postDateStr</stream_name>
-        </field>
-        <field>
-          <column_name>RESPONSE_MESSAGE</column_name>
-          <stream_name>facebook_responseMessage</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1108</xloc>
-      <yloc>126</yloc>
+      <yloc>473</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1464,8 +759,86 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>884</xloc>
-      <yloc>123</yloc>
+      <xloc>861</xloc>
+      <yloc>90</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>fb_stream</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>      <field>        <name>companyId</name>
+        <rename>id</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>type</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>facebook_accessToken</name>
+        <rename>ACCESS_TOKEN</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>postDateStr</name>
+        <rename>POST_DATE</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>facebook_responseMessage</name>
+        <rename>RESPONSE_MESSAGE</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>FACEBOOK_POST_RESPONSE_LIST_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>survey_details_id</name>
+        <rename>SURVEY_DETAILS_ID</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>POST_DATE</name>
+        <rename>POST_DATE</rename>
+        <type>Timestamp</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>id</name>
+        <rename>id</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1123</xloc>
+      <yloc>108</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1488,8 +861,8 @@
         <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;company_facebook &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	trans_Status &#x3d; SKIP_TRANSFORMATION&#xd;&#xa;&#x7d;else&#xd;&#xa;	trans_Status &#x3d; CONTINUE_TRANSFORMATION</jsScript_script>
       </jsScript>    </jsScripts>    <fields>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>398</xloc>
-      <yloc>124</yloc>
+      <xloc>375</xloc>
+      <yloc>91</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1512,8 +885,8 @@
         <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;company_linkedin &#x3d;&#x3d; null &#x29;&#x7b;&#xd;&#xa;	trans_Status &#x3d; SKIP_TRANSFORMATION&#xd;&#xa;&#x7d;else&#xd;&#xa;	trans_Status &#x3d; CONTINUE_TRANSFORMATION</jsScript_script>
       </jsScript>    </jsScripts>    <fields>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>426</xloc>
-      <yloc>253</yloc>
+      <xloc>408</xloc>
+      <yloc>285</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1537,130 +910,7 @@
       </jsScript>    </jsScripts>    <fields>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>402</xloc>
-      <yloc>391</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>link_Update</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>Local instance MySQL57</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>linkedin_post_response_list</table>
-      <key>
-        <name>companyId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>ACCESS_TOKEN</name>
-        <rename>linkedin_accessToken</rename>
-        </value>
-      <value>
-        <name>POST_DATE</name>
-        <rename>postDateStr</rename>
-        </value>
-      <value>
-        <name>REFERENCE_URL</name>
-        <rename>linkedin_referenceUrl</rename>
-        </value>
-      <value>
-        <name>RESPONSE_MESSAGE</name>
-        <rename>linkedin_responseMessage</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1203</xloc>
-      <yloc>273</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>link_insert</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>Local instance MySQL57</connection>
-    <schema/>
-    <table>linkedin_post_response_list</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>LINKEDIN_POST_RESPONSE_LIST_ID</column_name>
-          <stream_name>LINKEDIN_POST_RESPONSE_LIST_ID</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>companyId</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>ACCESS_TOKEN</column_name>
-          <stream_name>linkedin_accessToken</stream_name>
-        </field>
-        <field>
-          <column_name>POST_DATE</column_name>
-          <stream_name>postDateStr</stream_name>
-        </field>
-        <field>
-          <column_name>REFERENCE_URL</column_name>
-          <stream_name>linkedin_referenceUrl</stream_name>
-        </field>
-        <field>
-          <column_name>RESPONSE_MESSAGE</column_name>
-          <stream_name>linkedin_responseMessage</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1124</xloc>
-      <yloc>249</yloc>
+      <yloc>477</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1691,15 +941,15 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>898</xloc>
-      <yloc>249</yloc>
+      <xloc>880</xloc>
+      <yloc>281</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>linkedin_log</name>
-    <type>WriteToLog</type>
+    <name>link_stream</name>
+    <type>SelectValues</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1708,23 +958,73 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>companyId</name>
-        </field>
-      <field>
-        <name>LINKEDIN_POST_RESPONSE_LIST_ID</name>
-        </field>
-      </fields>
-     <cluster_schema/>
+    <fields>      <field>        <name>LINKEDIN_POST_RESPONSE_LIST_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>companyId</name>
+        <rename>id</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>type</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>linkedin_accessToken</name>
+        <rename>ACCESS_TOKEN</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>postDateStr</name>
+        <rename>POST_DATE</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>linkedin_referenceUrl</name>
+        <rename>REFERENCE_URL</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>linkedin_responseMessage</name>
+        <rename>RESPONSE_MESSAGE</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>survey_details_id</name>
+        <rename>SURVEY_DETAILS_ID</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>POST_DATE</name>
+        <rename>POST_DATE</rename>
+        <type>Timestamp</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>id</name>
+        <rename>id</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1309</xloc>
-      <yloc>245</yloc>
+      <xloc>1117</xloc>
+      <yloc>229</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1753,8 +1053,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>996</xloc>
-      <yloc>127</yloc>
+      <xloc>973</xloc>
+      <yloc>94</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1789,8 +1089,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1013</xloc>
-      <yloc>249</yloc>
+      <xloc>995</xloc>
+      <yloc>281</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1820,7 +1120,7 @@
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>992</xloc>
-      <yloc>386</yloc>
+      <yloc>472</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1907,8 +1207,8 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>112</xloc>
-      <yloc>254</yloc>
+      <xloc>89</xloc>
+      <yloc>221</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1995,8 +1295,8 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>519</xloc>
-      <yloc>122</yloc>
+      <xloc>496</xloc>
+      <yloc>89</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2096,8 +1396,8 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>539</xloc>
-      <yloc>252</yloc>
+      <xloc>521</xloc>
+      <yloc>284</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2185,178 +1485,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>522</xloc>
-      <yloc>389</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>social_insert</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>Local instance MySQL57</connection>
-    <schema/>
-    <table>social_media_post_response_details</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>SOCIAL_MEDIA_POST_RESPONSE_DETAILS_ID</column_name>
-          <stream_name>SOCIAL_MEDIA_POST_RESPONSE_DETAILS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_DETAILS_ID</column_name>
-          <stream_name>final_survey_details_id</stream_name>
-        </field>
-        <field>
-          <column_name>ENTITY_ID</column_name>
-          <stream_name>final_company_id</stream_name>
-        </field>
-        <field>
-          <column_name>ENTITY_TYPE</column_name>
-          <stream_name>typeVar</stream_name>
-        </field>
-        <field>
-          <column_name>FACEBOOK_POST_RESPONSE_LIST_ID</column_name>
-          <stream_name>FACEBOOK_POST_RESPONSE_LIST_ID</stream_name>
-        </field>
-        <field>
-          <column_name>TWITTER_POST_RESPONSE_LIST_ID</column_name>
-          <stream_name>TWITTER_POST_RESPONSE_LIST_ID</stream_name>
-        </field>
-        <field>
-          <column_name>LINKEDIN_POST_RESPONSE_LIST_ID</column_name>
-          <stream_name>LINKEDIN_POST_RESPONSE_LIST_ID</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1885</xloc>
-      <yloc>657</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>social_update</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>Local instance MySQL57</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>Y</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>social_media_post_response_details</table>
-      <key>
-        <name>final_survey_details_id</name>
-        <field>SURVEY_DETAILS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>typeVar</name>
-        <field>ENTITY_TYPE</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>final_company_id</name>
-        <field>ENTITY_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>FACEBOOK_POST_RESPONSE_LIST_ID</name>
-        <rename>FACEBOOK_POST_RESPONSE_LIST_ID</rename>
-        </value>
-      <value>
-        <name>LINKEDIN_POST_RESPONSE_LIST_ID</name>
-        <rename>LINKEDIN_POST_RESPONSE_LIST_ID</rename>
-        </value>
-      <value>
-        <name>TWITTER_POST_RESPONSE_LIST_ID</name>
-        <rename>TWITTER_POST_RESPONSE_LIST_ID</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1733</xloc>
-      <yloc>655</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>sort_twitter_rows</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>TWITTER_POST_RESPONSE_LIST_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>type</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>survey_details_id</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1433</xloc>
-      <yloc>378</yloc>
+      <yloc>475</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2388,14 +1517,14 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>875</xloc>
-      <yloc>387</yloc>
+      <yloc>473</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>twitter_insert</name>
-    <type>TableOutput</type>
+    <name>twitter_stream </name>
+    <type>SelectValues</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -2404,138 +1533,69 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
-    <schema/>
-    <table>twitter_post_response_list</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>TWITTER_POST_RESPONSE_LIST_ID</column_name>
-          <stream_name>TWITTER_POST_RESPONSE_LIST_ID</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>companyId</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>ACCESS_TOKEN</column_name>
-          <stream_name>twitter_accessToken</stream_name>
-        </field>
-        <field>
-          <column_name>POST_DATE</column_name>
-          <stream_name>postDateStr</stream_name>
-        </field>
-        <field>
-          <column_name>RESPONSE_MESSAGE</column_name>
-          <stream_name>twitter_responseMessage</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
+    <fields>      <field>        <name>TWITTER_POST_RESPONSE_LIST_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>companyId</name>
+        <rename>id</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>type</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>twitter_accessToken</name>
+        <rename>ACCESS_TOKEN</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>postDateStr</name>
+        <rename>POST_DATE</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>twitter_responseMessage</name>
+        <rename>RESPONSE_MESSAGE</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>survey_details_id</name>
+        <rename>SURVEY_DETAILS_ID</rename>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>POST_DATE</name>
+        <rename>POST_DATE</rename>
+        <type>Timestamp</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>id</name>
+        <rename>id</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1126</xloc>
-      <yloc>386</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>twitter_log</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>companyId</name>
-        </field>
-      <field>
-        <name>TWITTER_POST_RESPONSE_LIST_ID</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1313</xloc>
-      <yloc>379</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>twitter_update</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>Local instance MySQL57</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>twitter_post_response_list</table>
-      <key>
-        <name>companyId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>POST_DATE</name>
-        <rename>postDateStr</rename>
-        </value>
-      <value>
-        <name>ACCESS_TOKEN</name>
-        <rename>twitter_accessToken</rename>
-        </value>
-      <value>
-        <name>RESPONSE_MESSAGE</name>
-        <rename>twitter_responseMessage</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1223</xloc>
-      <yloc>410</yloc>
+      <xloc>1132</xloc>
+      <yloc>440</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2567,16 +1627,16 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>310</xloc>
-      <yloc>253</yloc>
+      <xloc>287</xloc>
+      <yloc>220</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
       <error>
-        <source_step>fb_insert</source_step>
-        <target_step>fb_Update</target_step>
+        <source_step>FBTable output</source_step>
+        <target_step>FBUpdate</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -2587,8 +1647,8 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>link_insert</source_step>
-        <target_step>link_Update</target_step>
+        <source_step>LINKoutput</source_step>
+        <target_step>LinkUpdate</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -2599,20 +1659,8 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>social_insert</source_step>
-        <target_step>social_update</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>twitter_insert</source_step>
-        <target_step>twitter_update</target_step>
+        <source_step>Twitter output</source_step>
+        <target_step>TwitterUpdate</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>

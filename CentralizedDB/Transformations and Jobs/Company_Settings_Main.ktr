@@ -2294,7 +2294,7 @@
            <schema_name/>
            </partitioning>
     <connection>Local instance MySQL57</connection>
-    <sql>SELECT&#xd;&#xa;  SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, type&#xd;&#xa;, id&#xd;&#xa;FROM social_media_tokens where type &#x3d; 3&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, type&#xd;&#xa;, id&#xd;&#xa;FROM social_media_tokens where type &#x3d; 1&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2336,8 +2336,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>842</xloc>
-      <yloc>110</yloc>
+      <xloc>817</xloc>
+      <yloc>111</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
