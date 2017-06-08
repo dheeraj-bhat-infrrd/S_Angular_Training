@@ -207,17 +207,17 @@
   <hop> <from>UUID_Mail</from><to>Mail</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_WebAddress</from><to>WebAddress</to><enabled>Y</enabled> </hop>
   <hop> <from>Mail</from><to>Mail TableOP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Mail TableOP</from><to>Update Mail</to><enabled>Y</enabled> </hop>
   <hop> <from>WebAddress</from><to>WebAddresss OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>WebAddresss OP</from><to>Update Web Address</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_LockSettings</from><to>LockSettings</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join BranchSettings</from><to>UUID_LockSettings</to><enabled>Y</enabled> </hop>
   <hop> <from>LockSettings</from><to>LockSettings_TableOP</to><enabled>Y</enabled> </hop>
-  <hop> <from>LockSettings_TableOP</from><to>Update LockSettings</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join BranchSettings</from><to>UUID_SurveySettings</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_SurveySettings</from><to>SurveySettings</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveySettings</from><to>SurveySettings_TableOP</to><enabled>Y</enabled> </hop>
+  <hop> <from>WebAddresss OP</from><to>Update Web Address</to><enabled>Y</enabled> </hop>
+  <hop> <from>Mail TableOP</from><to>Update Mail</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveySettings_TableOP</from><to>Update SurveySettings</to><enabled>Y</enabled> </hop>
+  <hop> <from>LockSettings_TableOP</from><to>Update LockSettings</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>BranchSettings Input</name>
@@ -290,6 +290,14 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>personal</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>work_2</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -335,6 +343,14 @@
         <field>
           <column_name>CONTACT_NUMBERS_ID</column_name>
           <stream_name>CONTACT_NUMBERS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>PERSONAL</column_name>
+          <stream_name>personal</stream_name>
+        </field>
+        <field>
+          <column_name>WORK</column_name>
+          <stream_name>work_2</stream_name>
         </field>
     </fields>
      <cluster_schema/>
@@ -546,6 +562,26 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>isPersonalEmailVerified</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isWorkEmailVerified</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isWorkMailVerifiedByAdmin</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>work</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>workEmailToVerify</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -589,8 +625,28 @@
           <stream_name>MAIL_IDS</stream_name>
         </field>
         <field>
-          <column_name>CONTACT_DETAILS_ID</column_name>
+          <column_name>WORK</column_name>
+          <stream_name>work</stream_name>
+        </field>
+        <field>
+          <column_name>CONTACT_DETAILS _ID</column_name>
           <stream_name>CONTACT_DETAILS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>IS_PERSONAL_EMAIL_VERIFIED</column_name>
+          <stream_name>isPersonalEmailVerified</stream_name>
+        </field>
+        <field>
+          <column_name>IS_WORK_EMAIL_VERIFIED</column_name>
+          <stream_name>isWorkEmailVerified</stream_name>
+        </field>
+        <field>
+          <column_name>IS_WORK_MAIL_VERIFIED_BY_ADMIN</column_name>
+          <stream_name>isWorkMailVerifiedByAdmin</stream_name>
+        </field>
+        <field>
+          <column_name>WORK_EMAIL_TO_VERIFY</column_name>
+          <stream_name>workEmailToVerify</stream_name>
         </field>
     </fields>
      <cluster_schema/>
@@ -670,7 +726,7 @@
       <mongo_field>
         <field_name>_id</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
+        <field_path>&#x24;._id</field_path>
 
         <field_type>String</field_type>
 
@@ -678,7 +734,15 @@
       <mongo_field>
         <field_name>_id_1</field_name>
 
-        <field_path>&#x24;._id</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>about_me</field_name>
+
+        <field_path>&#x24;.contact_details.about_me</field_path>
 
         <field_type>String</field_type>
 
@@ -703,6 +767,14 @@
         <field_name>address1</field_name>
 
         <field_path>&#x24;.contact_details.address1</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>address2</field_name>
+
+        <field_path>&#x24;.contact_details.address2</field_path>
 
         <field_type>String</field_type>
 
@@ -772,9 +844,41 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>countryAbbr</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryAbbr</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryAbbr_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.countryAbbr</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>countryCode</field_name>
 
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryCode_1</field_name>
+
         <field_path>&#x24;.contact_details.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryCode_2</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryCode</field_path>
 
         <field_type>String</field_type>
 
@@ -852,6 +956,30 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>firstName</field_name>
+
+        <field_path>&#x24;.contact_details.firstName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>formattedPhoneNumber</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.formattedPhoneNumber</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>formattedPhoneNumber_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.formattedPhoneNumber</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>googleAccessToken</field_name>
 
         <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessToken</field_path>
@@ -905,6 +1033,14 @@
         <field_path>&#x24;.iden</field_path>
 
         <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>industry</field_name>
+
+        <field_path>&#x24;.contact_details.industry</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -988,6 +1124,14 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>isPersonalEmailVerified</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isPersonalEmailVerified</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>isPersonalPhoneLocked</field_name>
 
         <field_path>&#x24;.lockSettings.isPersonalPhoneLocked</field_path>
@@ -1044,11 +1188,35 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>isWorkEmailVerified</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isWorkEmailVerified</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkMailVerifiedByAdmin</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isWorkMailVerifiedByAdmin</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>isWorkPhoneLocked</field_name>
 
         <field_path>&#x24;.lockSettings.isWorkPhoneLocked</field_path>
 
         <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>lastName</field_name>
+
+        <field_path>&#x24;.contact_details.lastName</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1087,6 +1255,14 @@
         <field_name>linkedInPageLink</field_name>
 
         <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>location</field_name>
+
+        <field_path>&#x24;.contact_details.location</field_path>
 
         <field_type>String</field_type>
 
@@ -1142,7 +1318,7 @@
       <mongo_field>
         <field_name>name</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
+        <field_path>&#x24;.contact_details.name</field_path>
 
         <field_type>String</field_type>
 
@@ -1150,7 +1326,7 @@
       <mongo_field>
         <field_name>name_1</field_name>
 
-        <field_path>&#x24;.contact_details.name</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
 
         <field_type>String</field_type>
 
@@ -1164,11 +1340,35 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>number</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.number</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>number_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.number</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>order</field_name>
 
         <field_path>&#x24;.profileStages&#x5b;0&#x5d;.order</field_path>
 
         <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>personal</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.personal</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1214,7 +1414,7 @@
       <mongo_field>
         <field_name>profileUrl</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
+        <field_path>&#x24;.profileUrl</field_path>
 
         <field_type>String</field_type>
 
@@ -1222,7 +1422,7 @@
       <mongo_field>
         <field_name>profileUrl_1</field_name>
 
-        <field_path>&#x24;.profileUrl</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
 
         <field_type>String</field_type>
 
@@ -1292,9 +1492,17 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>title</field_name>
+
+        <field_path>&#x24;.contact_details.title</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>tokenExpiryAlertSent</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
 
         <field_type>String</field_type>
 
@@ -1302,7 +1510,7 @@
       <mongo_field>
         <field_name>tokenExpiryAlertSent_1</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
 
         <field_type>String</field_type>
 
@@ -1358,7 +1566,31 @@
       <mongo_field>
         <field_name>work</field_name>
 
+        <field_path>&#x24;.contact_details.mail_ids.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>workEmailToVerify</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.workEmailToVerify</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_1</field_name>
+
         <field_path>&#x24;.contact_details.web_addresses.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_2</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.work</field_path>
 
         <field_type>String</field_type>
 
@@ -1385,6 +1617,22 @@
         <field_path>&#x24;.socialMediaTokens.zillowToken.zillowProfileLink</field_path>
 
         <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowReviewAverage</field_name>
+
+        <field_path>&#x24;.zillowReviewAverage</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowReviewCount</field_name>
+
+        <field_path>&#x24;.zillowReviewCount</field_path>
+
+        <field_type>Number</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1508,7 +1756,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>409</xloc>
-      <yloc>413</yloc>
+      <yloc>343</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1860,6 +2108,14 @@
         <condition>&#x3d;</condition>
         <name2/>
         </key>
+      <value>
+        <name>PERSONAL</name>
+        <rename>personal</rename>
+        </value>
+      <value>
+        <name>WORK</name>
+        <rename>work_2</rename>
+        </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1970,6 +2226,26 @@
         <condition>&#x3d;</condition>
         <name2/>
         </key>
+      <value>
+        <name>WORK</name>
+        <rename>work</rename>
+        </value>
+      <value>
+        <name>IS_PERSONAL_EMAIL_VERIFIED</name>
+        <rename>isPersonalEmailVerified</rename>
+        </value>
+      <value>
+        <name>IS_WORK_EMAIL_VERIFIED</name>
+        <rename>isWorkEmailVerified</rename>
+        </value>
+      <value>
+        <name>IS_WORK_MAIL_VERIFIED_BY_ADMIN</name>
+        <rename>isWorkMailVerifiedByAdmin</rename>
+        </value>
+      <value>
+        <name>WORK_EMAIL_TO_VERIFY</name>
+        <rename>workEmailToVerify</rename>
+        </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -2085,8 +2361,8 @@
         <name2/>
         </key>
       <value>
-        <name>work</name>
-        <rename>work</rename>
+        <name>WORK</name>
+        <rename>work_1</rename>
         </value>
       </lookup>
      <cluster_schema/>
@@ -2116,7 +2392,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>work</name>
+      </field>      <field>        <name>work_1</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -2167,8 +2443,8 @@
           <stream_name>CONTACT_DETAILS_ID</stream_name>
         </field>
         <field>
-          <column_name>work</column_name>
-          <stream_name>work</stream_name>
+          <column_name>WORK</column_name>
+          <stream_name>work_1</stream_name>
         </field>
     </fields>
      <cluster_schema/>

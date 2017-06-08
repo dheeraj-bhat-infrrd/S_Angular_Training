@@ -164,7 +164,7 @@
       </parameters>      <parallel>Y</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>134</xloc>
+      <xloc>131</xloc>
       <yloc>220</yloc>
       </entry>
     <entry>
@@ -230,7 +230,7 @@
       </parameters>      <parallel>Y</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>408</xloc>
+      <xloc>413</xloc>
       <yloc>220</yloc>
       </entry>
     <entry>
@@ -362,7 +362,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>408</xloc>
+      <xloc>413</xloc>
       <yloc>70</yloc>
       </entry>
     <entry>
@@ -397,6 +397,39 @@
       <nr>0</nr>
       <xloc>131</xloc>
       <yloc>70</yloc>
+      </entry>
+    <entry>
+      <name>CRM_INFO</name>
+      <description/>
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;Agent_Settings_crm_info.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>413</xloc>
+      <yloc>386</yloc>
       </entry>
   </entries>
   <hops>
@@ -466,6 +499,15 @@
     <hop>
       <from>ContactDetails</from>
       <to>ContactDetailsPhone</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>AgentSettings_Main_1</from>
+      <to>CRM_INFO</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

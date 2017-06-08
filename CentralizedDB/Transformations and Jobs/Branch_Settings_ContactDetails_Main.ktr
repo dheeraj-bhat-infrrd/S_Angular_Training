@@ -240,11 +240,23 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>CONTACT_DETAILS_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>about_me</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>      <field>        <name>address</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>address1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>address2</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -260,11 +272,27 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>name_1</name>
+      </field>      <field>        <name>firstName</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>state</name>
+      </field>      <field>        <name>industry</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>lastName</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>location</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>name</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>title</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -272,7 +300,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>CONTACT_DETAILS_ID</name>
+      </field>      <field>        <name>state</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -319,12 +347,24 @@
           <stream_name>BRANCH_SETTINGS_ID</stream_name>
         </field>
         <field>
+          <column_name>CONTACT_DETAILS_ID</column_name>
+          <stream_name>CONTACT_DETAILS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>ABOUT_ME</column_name>
+          <stream_name>about_me</stream_name>
+        </field>
+        <field>
           <column_name>ADDRESS</column_name>
           <stream_name>address</stream_name>
         </field>
         <field>
           <column_name>ADDRESS1</column_name>
           <stream_name>address1</stream_name>
+        </field>
+        <field>
+          <column_name>ADDRESS2</column_name>
+          <stream_name>address2</stream_name>
         </field>
         <field>
           <column_name>CITY</column_name>
@@ -335,24 +375,40 @@
           <stream_name>country</stream_name>
         </field>
         <field>
-          <column_name>STATE</column_name>
-          <stream_name>state</stream_name>
+          <column_name>INDUSTRY</column_name>
+          <stream_name>industry</stream_name>
+        </field>
+        <field>
+          <column_name>LOCATION</column_name>
+          <stream_name>location</stream_name>
+        </field>
+        <field>
+          <column_name>NAME</column_name>
+          <stream_name>name</stream_name>
+        </field>
+        <field>
+          <column_name>TITLE</column_name>
+          <stream_name>title</stream_name>
         </field>
         <field>
           <column_name>ZIPCODE</column_name>
           <stream_name>zipcode</stream_name>
         </field>
         <field>
-          <column_name>CONTACT_DETAILS_ID</column_name>
-          <stream_name>CONTACT_DETAILS_ID</stream_name>
+          <column_name>STATE</column_name>
+          <stream_name>state</stream_name>
         </field>
         <field>
           <column_name>COUNTRY_CODE</column_name>
           <stream_name>countryCode</stream_name>
         </field>
         <field>
-          <column_name>NAME</column_name>
-          <stream_name>name_1</stream_name>
+          <column_name>FIRST_NAME</column_name>
+          <stream_name>firstName</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_NAME</column_name>
+          <stream_name>lastName</stream_name>
         </field>
     </fields>
      <cluster_schema/>
@@ -432,7 +488,7 @@
       <mongo_field>
         <field_name>_id</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
+        <field_path>&#x24;._id</field_path>
 
         <field_type>String</field_type>
 
@@ -440,7 +496,15 @@
       <mongo_field>
         <field_name>_id_1</field_name>
 
-        <field_path>&#x24;._id</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>about_me</field_name>
+
+        <field_path>&#x24;.contact_details.about_me</field_path>
 
         <field_type>String</field_type>
 
@@ -470,6 +534,14 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>address2</field_name>
+
+        <field_path>&#x24;.contact_details.address2</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>allowOverrideForSocialMedia</field_name>
 
         <field_path>&#x24;.allowOverrideForSocialMedia</field_path>
@@ -490,7 +562,7 @@
 
         <field_path>&#x24;.survey_settings.autoPostEnabled</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -498,7 +570,7 @@
 
         <field_path>&#x24;.survey_settings.autoPostLinkToUserSiteEnabled</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -534,9 +606,41 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>countryAbbr</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryAbbr</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryAbbr_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.countryAbbr</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>countryCode</field_name>
 
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryCode_1</field_name>
+
         <field_path>&#x24;.contact_details.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryCode_2</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryCode</field_path>
 
         <field_type>String</field_type>
 
@@ -614,6 +718,30 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>firstName</field_name>
+
+        <field_path>&#x24;.contact_details.firstName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>formattedPhoneNumber</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.formattedPhoneNumber</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>formattedPhoneNumber_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.formattedPhoneNumber</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>googleAccessToken</field_name>
 
         <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessToken</field_path>
@@ -670,11 +798,19 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>industry</field_name>
+
+        <field_path>&#x24;.contact_details.industry</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>isAboutMeLocked</field_name>
 
         <field_path>&#x24;.lockSettings.isAboutMeLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -690,7 +826,7 @@
 
         <field_path>&#x24;.lockSettings.isAddressLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -698,7 +834,7 @@
 
         <field_path>&#x24;.lockSettings.isBlogAddressLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -714,7 +850,7 @@
 
         <field_path>&#x24;.lockSettings.isFaxPhoneLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -738,7 +874,7 @@
 
         <field_path>&#x24;.lockSettings.isLogoLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -746,7 +882,15 @@
 
         <field_path>&#x24;.lockSettings.isMinScoreLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isPersonalEmailVerified</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isPersonalEmailVerified</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -754,7 +898,7 @@
 
         <field_path>&#x24;.lockSettings.isPersonalPhoneLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -770,7 +914,7 @@
 
         <field_path>&#x24;.survey_settings.isReminderDisabled</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -786,7 +930,7 @@
 
         <field_path>&#x24;.survey_settings.isSocialPostReminderDisabled</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -794,7 +938,7 @@
 
         <field_path>&#x24;.lockSettings.isWebAddressLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -802,7 +946,23 @@
 
         <field_path>&#x24;.lockSettings.isWorkEmailLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkEmailVerified</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isWorkEmailVerified</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkMailVerifiedByAdmin</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isWorkMailVerifiedByAdmin</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -810,7 +970,15 @@
 
         <field_path>&#x24;.lockSettings.isWorkPhoneLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>lastName</field_name>
+
+        <field_path>&#x24;.contact_details.lastName</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -849,6 +1017,14 @@
         <field_name>linkedInPageLink</field_name>
 
         <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>location</field_name>
+
+        <field_path>&#x24;.contact_details.location</field_path>
 
         <field_type>String</field_type>
 
@@ -904,7 +1080,7 @@
       <mongo_field>
         <field_name>name</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
+        <field_path>&#x24;.contact_details.name</field_path>
 
         <field_type>String</field_type>
 
@@ -912,7 +1088,7 @@
       <mongo_field>
         <field_name>name_1</field_name>
 
-        <field_path>&#x24;.contact_details.name</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
 
         <field_type>String</field_type>
 
@@ -926,11 +1102,35 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>number</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone2.number</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>number_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.number</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>order</field_name>
 
         <field_path>&#x24;.profileStages&#x5b;0&#x5d;.order</field_path>
 
         <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>personal</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.personal</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -976,7 +1176,7 @@
       <mongo_field>
         <field_name>profileUrl</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
+        <field_path>&#x24;.profileUrl</field_path>
 
         <field_type>String</field_type>
 
@@ -984,7 +1184,7 @@
       <mongo_field>
         <field_name>profileUrl_1</field_name>
 
-        <field_path>&#x24;.profileUrl</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
 
         <field_type>String</field_type>
 
@@ -1054,9 +1254,17 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>title</field_name>
+
+        <field_path>&#x24;.contact_details.title</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>tokenExpiryAlertSent</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
 
         <field_type>String</field_type>
 
@@ -1064,7 +1272,7 @@
       <mongo_field>
         <field_name>tokenExpiryAlertSent_1</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
 
         <field_type>String</field_type>
 
@@ -1120,7 +1328,31 @@
       <mongo_field>
         <field_name>work</field_name>
 
+        <field_path>&#x24;.contact_details.mail_ids.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>workEmailToVerify</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.workEmailToVerify</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_1</field_name>
+
         <field_path>&#x24;.contact_details.web_addresses.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_2</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.work</field_path>
 
         <field_type>String</field_type>
 
@@ -1147,6 +1379,22 @@
         <field_path>&#x24;.socialMediaTokens.zillowToken.zillowProfileLink</field_path>
 
         <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowReviewAverage</field_name>
+
+        <field_path>&#x24;.zillowReviewAverage</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowReviewCount</field_name>
+
+        <field_path>&#x24;.zillowReviewCount</field_path>
+
+        <field_type>Number</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1293,12 +1541,20 @@
         <name2/>
         </key>
       <value>
+        <name>ABOUT_ME</name>
+        <rename>about_me</rename>
+        </value>
+      <value>
         <name>ADDRESS</name>
         <rename>address</rename>
         </value>
       <value>
         <name>ADDRESS1</name>
         <rename>address1</rename>
+        </value>
+      <value>
+        <name>ADDRESS2</name>
+        <rename>address2</rename>
         </value>
       <value>
         <name>CITY</name>
@@ -1309,20 +1565,40 @@
         <rename>country</rename>
         </value>
       <value>
-        <name>COUNTRY_CODE</name>
-        <rename>countryCode</rename>
+        <name>INDUSTRY</name>
+        <rename>industry</rename>
+        </value>
+      <value>
+        <name>LOCATION</name>
+        <rename>location</rename>
         </value>
       <value>
         <name>NAME</name>
-        <rename>name_1</rename>
+        <rename>name</rename>
+        </value>
+      <value>
+        <name>TITLE</name>
+        <rename>title</rename>
+        </value>
+      <value>
+        <name>ZIPCODE</name>
+        <rename>zipcode</rename>
         </value>
       <value>
         <name>STATE</name>
         <rename>state</rename>
         </value>
       <value>
-        <name>ZIPCODE</name>
-        <rename>zipcode</rename>
+        <name>COUNTRY_CODE</name>
+        <rename>countryCode</rename>
+        </value>
+      <value>
+        <name>FIRST_NAME</name>
+        <rename>firstName</rename>
+        </value>
+      <value>
+        <name>LAST_NAME</name>
+        <rename>lastName</rename>
         </value>
       </lookup>
      <cluster_schema/>
