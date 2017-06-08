@@ -137,13 +137,13 @@
   </connection>
   <order>
   <hop> <from>CompanySettings Input</from><to>SortCompanySettings Table</to><enabled>Y</enabled> </hop>
-  <hop> <from>ContactDetails 3</from><to>ContactDetails OP 3</to><enabled>Y</enabled> </hop>
   <hop> <from>SortCompanySettings Mongo</from><to>Merge JoinCompanySettings</to><enabled>Y</enabled> </hop>
   <hop> <from>SortCompanySettings Table</from><to>Merge JoinCompanySettings</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB I - Company Settings</from><to>SortCompanySettings Mongo</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge JoinCompanySettings</from><to>UUID_ContactDetails</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_ContactDetails</from><to>ContactDetails 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>ContactDetails OP 3</from><to>Update ContactDetails 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>ContactDetails 3</from><to>ContactDetails OP 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>ContactDetails OP 3</from><to>ContactUpdate</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>CompanySettings Input</name>
@@ -225,8 +225,8 @@
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>586</xloc>
-      <yloc>324</yloc>
+      <xloc>587</xloc>
+      <yloc>325</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -289,16 +289,16 @@
           <stream_name>zipcode</stream_name>
         </field>
         <field>
-          <column_name>CONTACT_DETAILS _ID</column_name>
-          <stream_name>CONTACT_DETAILS_ID</stream_name>
-        </field>
-        <field>
           <column_name>COUNTRY_CODE</column_name>
           <stream_name>countryCode</stream_name>
         </field>
         <field>
           <column_name>NAME</column_name>
           <stream_name>name_1</stream_name>
+        </field>
+        <field>
+          <column_name>CONTACT_DETAILS_ID</column_name>
+          <stream_name>CONTACT_DETAILS_ID</stream_name>
         </field>
     </fields>
      <cluster_schema/>
@@ -909,7 +909,7 @@
     </step>
 
   <step>
-    <name>Update ContactDetails 2</name>
+    <name>ContactUpdate</name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -969,8 +969,8 @@
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>227</xloc>
-      <yloc>312</yloc>
+      <xloc>233</xloc>
+      <yloc>310</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -978,7 +978,7 @@
   <step_error_handling>
       <error>
         <source_step>ContactDetails OP 3</source_step>
-        <target_step>Update ContactDetails 2</target_step>
+        <target_step>ContactUpdate</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
