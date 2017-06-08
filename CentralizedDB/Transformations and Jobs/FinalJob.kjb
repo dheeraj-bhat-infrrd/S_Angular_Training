@@ -113,7 +113,7 @@
       <type>JOB</type>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>E&#x3a;&#x5c;SocialSurveyRep&#x5c;CentralizedDB&#x5c;Transformations and Jobs&#x5c;mysql_master_table_updates&#x5c;mysql_update_no_4.kjb</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;mysql_update_job_final.kjb</filename>
       <jobname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
