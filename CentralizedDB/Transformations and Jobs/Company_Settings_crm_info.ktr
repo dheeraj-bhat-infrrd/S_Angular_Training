@@ -145,9 +145,9 @@
   <hop> <from>segregateClassificationCode</from><to>breakClassificationCode</to><enabled>Y</enabled> </hop>
   <hop> <from>breakClassificationCode</from><to>Generate random value</to><enabled>Y</enabled> </hop>
   <hop> <from>Generate random value</from><to>Select values</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select values</from><to>classificationCodesTO</to><enabled>Y</enabled> </hop>
   <hop> <from>crm-infoTO</from><to>Update</to><enabled>Y</enabled> </hop>
   <hop> <from>Update</from><to>segregateClassificationCode</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values</from><to>classificationCodesTO</to><enabled>Y</enabled> </hop>
   <hop> <from>classificationCodesTO</from><to>ClassificationCodesUpdate</to><enabled>Y</enabled> </hop>
   </order>
   <step>
@@ -176,10 +176,6 @@
         <condition>&#x3d;</condition>
         <name2/>
         </key>
-      <value>
-        <name>CLASSIFICATION_CODES_ID</name>
-        <rename>CLASSIFICATION_CODES_ID</rename>
-        </value>
       <value>
         <name>CODE</name>
         <rename>Code</rename>
