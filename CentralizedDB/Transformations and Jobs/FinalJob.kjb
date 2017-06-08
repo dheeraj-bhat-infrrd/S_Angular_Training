@@ -1,81 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>mysql_update_job_final</name>
+  <name>FinalJob</name>
     <description/>
     <extended_description/>
     <job_version/>
-    <job_status>0</job_status>
   <directory>&#x2f;</directory>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;06&#x2f;01 16&#x3a;11&#x3a;12.661</created_date>
+  <created_date>2017&#x2f;06&#x2f;07 23&#x3a;56&#x3a;52.930</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;06&#x2f;01 16&#x3a;11&#x3a;12.661</modified_date>
+  <modified_date>2017&#x2f;06&#x2f;07 23&#x3a;56&#x3a;52.930</modified_date>
     <parameters>
-        <parameter>
-            <name>mongo_host</name>
-            <default_value>localhost</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mongo_port</name>
-            <default_value>27017</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_host</name>
-            <default_value>localhost</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_host</name>
-            <default_value>ss-rdbms-demo.c3n1qsdsmjxc.us-west-2.rds.amazonaws.com</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_password</name>
-            <default_value>shipra744772</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_port_no</name>
-            <default_value>3306</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_schema_name</name>
-            <default_value>ss_user</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_user_name</name>
-            <default_value>shipra</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_master_schema_name</name>
-            <default_value>ss_user</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_password</name>
-            <default_value>root</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_port_no</name>
-            <default_value>3306</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_schema_name</name>
-            <default_value>ss_centralized_mongodb</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_user_name</name>
-            <default_value>root</default_value>
-            <description/>
-        </parameter>
     </parameters>
   <connection>
     <name>SS_Centralized_Mysql_Conn</name>
@@ -170,16 +104,16 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>405</xloc>
-      <yloc>103</yloc>
+      <xloc>37</xloc>
+      <yloc>268</yloc>
       </entry>
     <entry>
-      <name>job_no_1</name>
+      <name>Mysql MasterTable Updates</name>
       <description/>
       <type>JOB</type>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>E&#x3a;&#x5c;SSR&#x5c;mysql_info_to_centralized_updates&#x5c;mysql_update_no_1.kjb</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;mysql_update_job_final.kjb</filename>
       <jobname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -202,16 +136,48 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>155</xloc>
-      <yloc>240</yloc>
+      <xloc>296</xloc>
+      <yloc>269</yloc>
       </entry>
     <entry>
-      <name>Job_no_2</name>
+      <name>Standalone_Small Collections</name>
       <description/>
       <type>JOB</type>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>E&#x3a;&#x5c;SSR&#x5c;mysql_info_to_centralized_updates&#x5c;mysql_update_no_2.kjb</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;Standalone_Small Collections_Job.kjb</filename>
+      <jobname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Nothing</loglevel>
+      <slave_server_name/>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <expand_remote_job>N</expand_remote_job>
+      <create_parent_folder>N</create_parent_folder>
+      <pass_export>N</pass_export>
+      <force_separate_logging>N</force_separate_logging>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <set_append_logfile>N</set_append_logfile>
+      <parallel>Y</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>482</xloc>
+      <yloc>264</yloc>
+      </entry>
+    <entry>
+      <name>RegionSettings</name>
+      <description/>
+      <type>JOB</type>
+      <specification_method>filename</specification_method>
+      <job_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;RegionSettingsJob.kjb</filename>
       <jobname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -234,16 +200,16 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>318</xloc>
-      <yloc>287</yloc>
+      <xloc>605</xloc>
+      <yloc>66</yloc>
       </entry>
     <entry>
-      <name>Job_no_3</name>
+      <name>BranchSettings</name>
       <description/>
       <type>JOB</type>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>E&#x3a;&#x5c;SSR&#x5c;mysql_info_to_centralized_updates&#x5c;mysql_update_no_3.kjb</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;BranchSettingsJob.kjb</filename>
       <jobname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -266,16 +232,16 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>494</xloc>
-      <yloc>293</yloc>
+      <xloc>630</xloc>
+      <yloc>144</yloc>
       </entry>
     <entry>
-      <name>Job_no_4</name>
+      <name>CompanySettings</name>
       <description/>
       <type>JOB</type>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;mysql_update_no_4.kjb</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;COMPANY_SETTINGS_JOB.kjb</filename>
       <jobname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -298,41 +264,132 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>682</xloc>
-      <yloc>227</yloc>
+      <xloc>630</xloc>
+      <yloc>371</yloc>
+      </entry>
+    <entry>
+      <name>SurveyDetails</name>
+      <description/>
+      <type>JOB</type>
+      <specification_method>filename</specification_method>
+      <job_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;SURVEY_DETAILS_JOB.kjb</filename>
+      <jobname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Nothing</loglevel>
+      <slave_server_name/>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <expand_remote_job>N</expand_remote_job>
+      <create_parent_folder>N</create_parent_folder>
+      <pass_export>N</pass_export>
+      <force_separate_logging>N</force_separate_logging>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <set_append_logfile>N</set_append_logfile>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>636</xloc>
+      <yloc>262</yloc>
+      </entry>
+    <entry>
+      <name>AgentSettings</name>
+      <description/>
+      <type>JOB</type>
+      <specification_method>filename</specification_method>
+      <job_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;AgentSettingsJob.kjb</filename>
+      <jobname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Nothing</loglevel>
+      <slave_server_name/>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <expand_remote_job>N</expand_remote_job>
+      <create_parent_folder>N</create_parent_folder>
+      <pass_export>N</pass_export>
+      <force_separate_logging>N</force_separate_logging>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <set_append_logfile>N</set_append_logfile>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>617</xloc>
+      <yloc>473</yloc>
       </entry>
   </entries>
   <hops>
     <hop>
-      <from>START</from>
-      <to>job_no_1</to>
+      <from>Mysql MasterTable Updates</from>
+      <to>Standalone_Small Collections</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
+      <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>START</from>
-      <to>Job_no_2</to>
+      <from>Standalone_Small Collections</from>
+      <to>RegionSettings</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
+      <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>START</from>
-      <to>Job_no_3</to>
+      <from>Standalone_Small Collections</from>
+      <to>BranchSettings</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Standalone_Small Collections</from>
+      <to>SurveyDetails</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Standalone_Small Collections</from>
+      <to>CompanySettings</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Standalone_Small Collections</from>
+      <to>AgentSettings</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
     </hop>
     <hop>
       <from>START</from>
-      <to>Job_no_4</to>
+      <to>Mysql MasterTable Updates</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
