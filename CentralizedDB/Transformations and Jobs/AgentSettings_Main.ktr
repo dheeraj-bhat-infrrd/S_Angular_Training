@@ -134,6 +134,33 @@
   <notepads>
   </notepads>
   <connection>
+    <name>Local instance MySQL57</name>
+    <server>&#x24;&#x7b;mysql_host &#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;mysql_schema_name &#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no &#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password &#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no &#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
     <name>MySql_Con</name>
     <server>localhost</server>
     <type>MYSQL</type>
@@ -189,13 +216,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>localhost</server>
+    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>ss_user</database>
-    <port>3306</port>
-    <username>root</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
+    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -205,7 +232,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -1619,219 +1646,43 @@
 
     <mongo_fields>
       <mongo_field>
-        <field_name>createdOn</field_name>
-
-        <field_path>&#x24;.createdOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>lastName</field_name>
-
-        <field_path>&#x24;.contact_details.lastName</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isSeoContentModified</field_name>
-
-        <field_path>&#x24;.isSeoContentModified</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>order</field_name>
-
-        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.order</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>startYear</field_name>
-
-        <field_path>&#x24;.positions&#x5b;0&#x5d;.startYear</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>zillowProfileLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowProfileLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>location</field_name>
-
-        <field_path>&#x24;.contact_details.location</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>title</field_name>
-
-        <field_path>&#x24;.positions&#x5b;0&#x5d;.title</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isCurrent</field_name>
-
-        <field_path>&#x24;.positions&#x5b;0&#x5d;.isCurrent</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>modifiedOn</field_name>
-
-        <field_path>&#x24;.modifiedOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>survey_reminder_interval_in_days</field_name>
-
-        <field_path>&#x24;.survey_settings.survey_reminder_interval_in_days</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profile_completion</field_name>
-
-        <field_path>&#x24;.profile_completion</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>facebookAccessToken</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isDefaultBySystem</field_name>
-
-        <field_path>&#x24;.isDefaultBySystem</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>googleAccessTokenCreatedOn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessTokenCreatedOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>yelpPageLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.yelpToken.yelpPageLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>facebookAccessTokenCreatedOn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenCreatedOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>countryAbbr</field_name>
-
-        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryAbbr</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>googleAccessToken</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>vertical</field_name>
-
-        <field_path>&#x24;.vertical</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>year</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.startDate.year</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>googleAccessTokenExpiresIn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessTokenExpiresIn</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>zillowLenderId</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowLenderId</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>max_number_of_survey_reminders</field_name>
-
-        <field_path>&#x24;.survey_settings.max_number_of_survey_reminders</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
         <field_name>allowOverrideForSocialMedia</field_name>
 
         <field_path>&#x24;.allowOverrideForSocialMedia</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>auto_post_score</field_name>
+        <field_name>allowZillowAutoPost</field_name>
 
-        <field_path>&#x24;.survey_settings.auto_post_score</field_path>
+        <field_path>&#x24;.allowZillowAutoPost</field_path>
 
-        <field_type>Number</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>vendastaAccessible</field_name>
+        <field_name>autoPostEnabled</field_name>
 
-        <field_path>&#x24;.vendastaAccessible</field_path>
+        <field_path>&#x24;.survey_settings.autoPostEnabled</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>autoPostLinkToUserSiteEnabled</field_name>
+
+        <field_path>&#x24;.survey_settings.autoPostLinkToUserSiteEnabled</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>hiddenSection</field_name>
+
+        <field_path>&#x24;.hiddenSection</field_path>
+
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1839,39 +1690,103 @@
 
         <field_path>&#x24;.isAccountDisabled</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>profileStageKey</field_name>
+        <field_name>isCurrent</field_name>
 
-        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.profileStageKey</field_path>
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.isCurrent</field_path>
 
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>linkedInAccessTokenCreatedOn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessTokenCreatedOn</field_path>
-
-        <field_type>Number</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>month</field_name>
+        <field_name>isCurrent_1</field_name>
 
-        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.startDate.month</field_path>
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.isCurrent</field_path>
 
-        <field_type>Integer</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>_id</field_name>
+        <field_name>isDefaultBySystem</field_name>
 
-        <field_path>&#x24;._id</field_path>
+        <field_path>&#x24;.isDefaultBySystem</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isLocationEnabled</field_name>
+
+        <field_path>&#x24;.isLocationEnabled</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isLogoImageProcessed</field_name>
+
+        <field_path>&#x24;.isLogoImageProcessed</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isPersonalEmailVerified</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isPersonalEmailVerified</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isProfileImageProcessed</field_name>
+
+        <field_path>&#x24;.isProfileImageProcessed</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isReminderDisabled</field_name>
+
+        <field_path>&#x24;.survey_settings.isReminderDisabled</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isSeoContentModified</field_name>
+
+        <field_path>&#x24;.isSeoContentModified</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isSocialPostReminderDisabled</field_name>
+
+        <field_path>&#x24;.survey_settings.isSocialPostReminderDisabled</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkEmailVerified</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isWorkEmailVerified</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkMailVerifiedByAdmin</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isWorkMailVerifiedByAdmin</field_path>
+
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1879,21 +1794,37 @@
 
         <field_path>&#x24;.sendEmailFromCompany</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>twitterPageLink</field_name>
+        <field_name>tokenExpiryAlertSent</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterPageLink</field_path>
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>facebookAccessTokenExpiresOn</field_name>
+        <field_name>vendastaAccessible</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenExpiresOn</field_path>
+        <field_path>&#x24;.vendastaAccessible</field_path>
+
+        <field_type>Boolean</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_id_1</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.company._id</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_id_4</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;._id</field_path>
 
         <field_type>Integer</field_type>
 
@@ -1907,353 +1838,17 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>work</field_name>
+        <field_name>_total_1</field_name>
 
-        <field_path>&#x24;.contact_details.mail_ids.work</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>name</field_name>
-
-        <field_path>&#x24;.contact_details.name</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isLocationEnabled</field_name>
-
-        <field_path>&#x24;.isLocationEnabled</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>linkedInAccessTokenExpiresIn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessTokenExpiresIn</field_path>
+        <field_path>&#x24;.linkedInProfileData.positions._total</field_path>
 
         <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>facebookPageLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPageLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>values&#x5b;0&#x5d;</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.pictureUrls.values&#x5b;0&#x5d;</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>userEncryptedId</field_name>
-
-        <field_path>&#x24;.userEncryptedId</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>firstName</field_name>
-
-        <field_path>&#x24;.contact_details.firstName</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isCurrent_1</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.isCurrent</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>twitterAccessToken</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>accessToken</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.accessToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isWorkMailVerifiedByAdmin</field_name>
-
-        <field_path>&#x24;.contact_details.mail_ids.isWorkMailVerifiedByAdmin</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>industry</field_name>
-
-        <field_path>&#x24;.contact_details.industry</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>status</field_name>
-
-        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.status</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isSocialPostReminderDisabled</field_name>
-
-        <field_path>&#x24;.survey_settings.isSocialPostReminderDisabled</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileImageUrl</field_name>
-
-        <field_path>&#x24;.profileImageUrl</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>_id_1</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.company._id</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isReminderDisabled</field_name>
-
-        <field_path>&#x24;.survey_settings.isReminderDisabled</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>pictureUrl</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.pictureUrl</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>linkedInAccessToken</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>tokenExpiryAlertSent</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
-
-        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
         <field_name>duplicateSurveyInterval</field_name>
 
         <field_path>&#x24;.survey_settings.duplicateSurveyInterval</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>firstName_1</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.firstName</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>summary</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;2&#x5d;.summary</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isWorkEmailVerified</field_name>
-
-        <field_path>&#x24;.contact_details.mail_ids.isWorkEmailVerified</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileUrl</field_name>
-
-        <field_path>&#x24;.profileUrl</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>lendingTreeProfileLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>code</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.location.country.code</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>category</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.category</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>twitterAccessTokenSecret</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessTokenSecret</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>show_survey_above_score</field_name>
-
-        <field_path>&#x24;.survey_settings.show_survey_above_score</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileName</field_name>
-
-        <field_path>&#x24;.profileName</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>name_1</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.company.name</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isLogoImageProcessed</field_name>
-
-        <field_path>&#x24;.isLogoImageProcessed</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>createdBy</field_name>
-
-        <field_path>&#x24;.createdBy</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>name_2</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>realtorProfileLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.realtorToken.realtorProfileLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>name_3</field_name>
-
-        <field_path>&#x24;.positions&#x5b;0&#x5d;.name</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>title_1</field_name>
-
-        <field_path>&#x24;.contact_details.title</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>reviewCount</field_name>
-
-        <field_path>&#x24;.reviewCount</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>about_me</field_name>
-
-        <field_path>&#x24;.contact_details.about_me</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>allowZillowAutoPost</field_name>
-
-        <field_path>&#x24;.allowZillowAutoPost</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>endYear</field_name>
-
-        <field_path>&#x24;.positions&#x5b;0&#x5d;.endYear</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>max_number_of_social_pos_reminders</field_name>
-
-        <field_path>&#x24;.survey_settings.max_number_of_social_pos_reminders</field_path>
 
         <field_type>Integer</field_type>
 
@@ -2267,35 +1862,27 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>industry_1</field_name>
+        <field_name>endYear</field_name>
 
-        <field_path>&#x24;.linkedInProfileData.industry</field_path>
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.endYear</field_path>
 
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>startTime</field_name>
-
-        <field_path>&#x24;.positions&#x5b;0&#x5d;.startTime</field_path>
-
-        <field_type>String</field_type>
+        <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>_class</field_name>
+        <field_name>facebookAccessTokenExpiresOn</field_name>
 
-        <field_path>&#x24;.positions&#x5b;0&#x5d;._class</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenExpiresOn</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>linkedInPageLink</field_name>
+        <field_name>googleAccessTokenExpiresIn</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInPageLink</field_path>
+        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessTokenExpiresIn</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -2307,201 +1894,49 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>startMonth</field_name>
+        <field_name>linkedInAccessTokenExpiresIn</field_name>
 
-        <field_path>&#x24;.positions&#x5b;0&#x5d;.startMonth</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>name_4</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.location.name</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>autoPostLinkToUserSiteEnabled</field_name>
-
-        <field_path>&#x24;.survey_settings.autoPostLinkToUserSiteEnabled</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>modifiedBy</field_name>
-
-        <field_path>&#x24;.modifiedBy</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>_id_2</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>work_1</field_name>
-
-        <field_path>&#x24;.contact_details.web_addresses.work</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>googleBusinessLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleBusinessToken.googleBusinessLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>zillowScreenName</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowScreenName</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileUrl_1</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>title_2</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.title</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>formattedPhoneNumber</field_name>
-
-        <field_path>&#x24;.contact_details.contact_numbers.phone1.formattedPhoneNumber</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>_id_3</field_name>
-
-        <field_path>&#x24;.linkedInProfileData._id</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileImageUrlThumbnail</field_name>
-
-        <field_path>&#x24;.profileImageUrlThumbnail</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>countryCode</field_name>
-
-        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryCode</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>number</field_name>
-
-        <field_path>&#x24;.contact_details.contact_numbers.phone1.number</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>hiddenSection</field_name>
-
-        <field_path>&#x24;.hiddenSection</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>twitterAccessTokenCreatedOn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessTokenCreatedOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>_total_1</field_name>
-
-        <field_path>&#x24;.linkedInProfileData.positions._total</field_path>
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessTokenExpiresIn</field_path>
 
         <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>facebookAccessTokenToPost</field_name>
+        <field_name>max_number_of_social_pos_reminders</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenToPost</field_path>
+        <field_path>&#x24;.survey_settings.max_number_of_social_pos_reminders</field_path>
 
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isProfileImageProcessed</field_name>
-
-        <field_path>&#x24;.isProfileImageProcessed</field_path>
-
-        <field_type>String</field_type>
+        <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>publicProfileUrl</field_name>
+        <field_name>max_number_of_survey_reminders</field_name>
 
-        <field_path>&#x24;.linkedInProfileData.publicProfileUrl</field_path>
+        <field_path>&#x24;.survey_settings.max_number_of_survey_reminders</field_path>
 
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleToken.profileLink</field_path>
-
-        <field_type>String</field_type>
+        <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>headline</field_name>
+        <field_name>month</field_name>
 
-        <field_path>&#x24;.linkedInProfileData.headline</field_path>
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.startDate.month</field_path>
 
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>_class_1</field_name>
-
-        <field_path>&#x24;._class</field_path>
-
-        <field_type>String</field_type>
+        <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>_id_4</field_name>
+        <field_name>order</field_name>
 
-        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;._id</field_path>
+        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.order</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>reviewCount</field_name>
+
+        <field_path>&#x24;.reviewCount</field_path>
 
         <field_type>Integer</field_type>
 
@@ -2515,17 +1950,273 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>work_2</field_name>
+        <field_name>startMonth</field_name>
 
-        <field_path>&#x24;.contact_details.contact_numbers.work</field_path>
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.startMonth</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>startYear</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.startYear</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>status</field_name>
+
+        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.status</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>survey_reminder_interval_in_days</field_name>
+
+        <field_path>&#x24;.survey_settings.survey_reminder_interval_in_days</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>year</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.startDate.year</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>auto_post_score</field_name>
+
+        <field_path>&#x24;.survey_settings.auto_post_score</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>createdOn</field_name>
+
+        <field_path>&#x24;.createdOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>facebookAccessTokenCreatedOn</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenCreatedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>googleAccessTokenCreatedOn</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessTokenCreatedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>linkedInAccessTokenCreatedOn</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessTokenCreatedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>modifiedOn</field_name>
+
+        <field_path>&#x24;.modifiedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profile_completion</field_name>
+
+        <field_path>&#x24;.profile_completion</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>show_survey_above_score</field_name>
+
+        <field_path>&#x24;.survey_settings.show_survey_above_score</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterAccessTokenCreatedOn</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessTokenCreatedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_class</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;._class</field_path>
 
         <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>tokenExpiryAlertSent_1</field_name>
+        <field_name>_class_1</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
+        <field_path>&#x24;._class</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_id</field_name>
+
+        <field_path>&#x24;._id</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_id_2</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_id_3</field_name>
+
+        <field_path>&#x24;.linkedInProfileData._id</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>about_me</field_name>
+
+        <field_path>&#x24;.contact_details.about_me</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>accessToken</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.accessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>category</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.category</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>code</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.location.country.code</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryAbbr</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryAbbr</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryCode</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>createdBy</field_name>
+
+        <field_path>&#x24;.createdBy</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>facebookAccessToken</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>facebookAccessTokenToPost</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenToPost</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>facebookPageLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>firstName</field_name>
+
+        <field_path>&#x24;.contact_details.firstName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>firstName_1</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.firstName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>formattedPhoneNumber</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.formattedPhoneNumber</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>googleAccessToken</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>googleBusinessLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.googleBusinessToken.googleBusinessLink</field_path>
 
         <field_type>String</field_type>
 
@@ -2539,9 +2230,33 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>isPersonalEmailVerified</field_name>
+        <field_name>headline</field_name>
 
-        <field_path>&#x24;.contact_details.mail_ids.isPersonalEmailVerified</field_path>
+        <field_path>&#x24;.linkedInProfileData.headline</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>industry</field_name>
+
+        <field_path>&#x24;.contact_details.industry</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>industry_1</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.industry</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>lastName</field_name>
+
+        <field_path>&#x24;.contact_details.lastName</field_path>
 
         <field_type>String</field_type>
 
@@ -2555,9 +2270,177 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>autoPostEnabled</field_name>
+        <field_name>lendingTreeProfileLink</field_name>
 
-        <field_path>&#x24;.survey_settings.autoPostEnabled</field_path>
+        <field_path>&#x24;.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>linkedInAccessToken</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>linkedInPageLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>location</field_name>
+
+        <field_path>&#x24;.contact_details.location</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>modifiedBy</field_name>
+
+        <field_path>&#x24;.modifiedBy</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name</field_name>
+
+        <field_path>&#x24;.contact_details.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name_1</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.company.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name_2</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name_3</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name_4</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.location.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>number</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.number</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>pictureUrl</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.pictureUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileImageUrl</field_name>
+
+        <field_path>&#x24;.profileImageUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileImageUrlThumbnail</field_name>
+
+        <field_path>&#x24;.profileImageUrlThumbnail</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.googleToken.profileLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileName</field_name>
+
+        <field_path>&#x24;.profileName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileStageKey</field_name>
+
+        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.profileStageKey</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileUrl</field_name>
+
+        <field_path>&#x24;.profileUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileUrl_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>publicProfileUrl</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.publicProfileUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>realtorProfileLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.realtorToken.realtorProfileLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>startTime</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.startTime</field_path>
 
         <field_type>String</field_type>
 
@@ -2566,6 +2449,150 @@
         <field_name>status_1</field_name>
 
         <field_path>&#x24;.status</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>summary</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;2&#x5d;.summary</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>title</field_name>
+
+        <field_path>&#x24;.positions&#x5b;0&#x5d;.title</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>title_1</field_name>
+
+        <field_path>&#x24;.contact_details.title</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>title_2</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.positions.values&#x5b;0&#x5d;.title</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>tokenExpiryAlertSent_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterAccessToken</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterAccessTokenSecret</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessTokenSecret</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterPageLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>userEncryptedId</field_name>
+
+        <field_path>&#x24;.userEncryptedId</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>values&#x5b;0&#x5d;</field_name>
+
+        <field_path>&#x24;.linkedInProfileData.pictureUrls.values&#x5b;0&#x5d;</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>vertical</field_name>
+
+        <field_path>&#x24;.vertical</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_1</field_name>
+
+        <field_path>&#x24;.contact_details.web_addresses.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_2</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>yelpPageLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.yelpToken.yelpPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowLenderId</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowLenderId</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowProfileLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowProfileLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowScreenName</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowScreenName</field_path>
 
         <field_type>String</field_type>
 

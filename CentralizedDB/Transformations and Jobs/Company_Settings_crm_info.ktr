@@ -135,6 +135,60 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>SS_Centralized_Mysql_Conn</name>
+    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;mysql_schema_name&#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
   <hop> <from>CompanySettings Input</from><to>parse crm_info</to><enabled>Y</enabled> </hop>
   <hop> <from>parse crm_info</from><to>break crm_info</to><enabled>Y</enabled> </hop>
@@ -142,13 +196,14 @@
   <hop> <from>break crm_info</from><to>Select Crm Info</to><enabled>Y</enabled> </hop>
   <hop> <from>Select Crm Info</from><to>UUID-crm-info</to><enabled>Y</enabled> </hop>
   <hop> <from>crm-infoTO</from><to>segregateClassificationCode</to><enabled>Y</enabled> </hop>
-  <hop> <from>segregateClassificationCode</from><to>breakClassificationCode</to><enabled>Y</enabled> </hop>
   <hop> <from>breakClassificationCode</from><to>Generate random value</to><enabled>Y</enabled> </hop>
   <hop> <from>Generate random value</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>crm-infoTO</from><to>Update</to><enabled>Y</enabled> </hop>
   <hop> <from>Update</from><to>segregateClassificationCode</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>classificationCodesTO</to><enabled>Y</enabled> </hop>
   <hop> <from>classificationCodesTO</from><to>ClassificationCodesUpdate</to><enabled>Y</enabled> </hop>
+  <hop> <from>segregateClassificationCode</from><to>Filter rows ClassificationCodes</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows ClassificationCodes</from><to>breakClassificationCode</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>ClassificationCodesUpdate</name>
@@ -199,8 +254,8 @@
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>637</xloc>
-      <yloc>560</yloc>
+      <xloc>642</xloc>
+      <yloc>624</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -261,7 +316,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>813</xloc>
-      <yloc>377</yloc>
+      <yloc>447</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -458,7 +513,7 @@
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>813</xloc>
-      <yloc>465</yloc>
+      <yloc>535</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -913,7 +968,7 @@
     <readurl>N</readurl>
     <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
     <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>N</ignoreMissingPath>
+    <ignoreMissingPath>Y</ignoreMissingPath>
     <rownum_field/>
     <file>
       <name/>
@@ -1003,8 +1058,8 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>810</xloc>
-      <yloc>288</yloc>
+      <xloc>813</xloc>
+      <yloc>358</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1069,8 +1124,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>809</xloc>
-      <yloc>554</yloc>
+      <xloc>813</xloc>
+      <yloc>624</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1330,6 +1385,35 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>813</xloc>
       <yloc>193</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter rows ClassificationCodes</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to/>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>classificationCodes</leftvalue>
+ <function>IS NOT NULL</function>
+ <rightvalue/>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>810</xloc>
+      <yloc>280</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
