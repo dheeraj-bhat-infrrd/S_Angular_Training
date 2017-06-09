@@ -3241,6 +3241,25 @@ CREATE TABLE `classification_codes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+--Table Structure for table 'job_log_details`
+--
+
+DROP TABLE IF EXISTS `job_log_details`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `job_log_details` (
+  `JOB_LOG_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `JOB_NAME` varchar(45) DEFAULT NULL,
+  `STATUS` varchar(45) DEFAULT NULL,
+  `JOB_START_TIME` timestamp NULL DEFAULT NULL,
+  `JOB_END_TIME` timestamp NULL DEFAULT NULL,
+  `CURRENT_JOB_NAME` varchar(45) DEFAULT NULL,
+  `JOB_UUID` varchar(45) NOT NULL,
+  PRIMARY KEY (`JOB_LOG_ID`),
+  UNIQUE KEY `JOB_UUID_UNIQUE` (`JOB_UUID`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+--
 -- Dumping events for database 'ss_centralized_mongodb'
 --
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
