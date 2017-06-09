@@ -164,13 +164,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>localhost</server>
+    <server>&#x24;&#x7b;mysql_info_host&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>ss_user</database>
-    <port>3306</port>
-    <username>root</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
+    <database>&#x24;&#x7b;mysql_info_schema_name&#x7d;</database>
+    <port>&#x24;&#x7b;mysql_info_port_no&#x7d;</port>
+    <username>&#x24;&#x7b;mysql_info_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_info_password&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -180,7 +180,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_info_port_no&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -194,11 +194,12 @@
   <hop> <from>MongoDB Input</from><to>Json Input BranchId</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Input BranchId</from><to>FacebookPages Input</to><enabled>Y</enabled> </hop>
   <hop> <from>FacebookPages Input</from><to>FacebookPages Parsing</to><enabled>Y</enabled> </hop>
-  <hop> <from>FacebookPages Parsing</from><to>Sort rows FB Pages</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort FB Token</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows FB Pages</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>FacebookPages Table OP</to><enabled>Y</enabled> </hop>
   <hop> <from>FacebookPages Table OP</from><to>Update FB Pages</to><enabled>Y</enabled> </hop>
+  <hop> <from>FacebookPages Parsing</from><to>Filter rows facebook pages</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows facebook pages</from><to>Sort rows FB Pages</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>FB Token IP</name>
@@ -1523,6 +1524,35 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>236</xloc>
       <yloc>301</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter rows facebook pages</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows FB Pages</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>_id</leftvalue>
+ <function>IS NOT NULL</function>
+ <rightvalue/>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>592</xloc>
+      <yloc>125</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
