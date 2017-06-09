@@ -198,7 +198,7 @@
   <hop> <from>Sort rows FB Pages</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Input</from><to>Filter rows Facebook Pages</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows Facebook Pages</from><to>Sort rows FB Pages</to><enabled>Y</enabled> </hop>
-  <hop> <from>FacebookPages Table OP</from><to>Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>FacebookPages Table OP</from><to>Update FacebookPages</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>FB Token IP</name>
@@ -1444,7 +1444,7 @@
     </step>
 
   <step>
-    <name>Update</name>
+    <name>Update FacebookPages</name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -1497,7 +1497,7 @@
   <step_error_handling>
       <error>
         <source_step>FacebookPages Table OP</source_step>
-        <target_step>Update</target_step>
+        <target_step>Update FacebookPages</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
