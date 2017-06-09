@@ -4444,6 +4444,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         continue;
                     }
                     
+                    //check if we have send invitation mail already
+                    if(survey.getLastReminderTime().compareTo( epochReminderDate )  > 0){
+                        LOG.warn( "We have already send invitation mail for customer " + survey.getCustomerEmailId() );
+                        continue;
+                    }
+                    
+                    
                     try {
                         LOG.debug( "Sending survey initiation mail" );
                         surveyHandler.prepareAndSendInvitationMail( survey );
@@ -4491,6 +4498,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         continue;
                     }
 
+                  //check if we have send reminder mail already
+                    if(survey.getReminderCounts() >= reminderCount){
+                        LOG.warn( "We have already send max reminder mail for customer " + survey.getCustomerEmailId() );
+                        continue;
+                    }
+                    
                     try{
                     
                     // send a survey invitation mail if reminder is false or a reminder mail if reminder is true
