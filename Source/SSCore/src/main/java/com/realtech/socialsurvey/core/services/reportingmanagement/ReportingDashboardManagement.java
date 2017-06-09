@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -59,5 +60,17 @@ public interface ReportingDashboardManagement
     List<List<Object>> getUserRankingPastMonth(String entityType, Long entityId,int month,int year,int startIndex,int batchSize);
     
     List<List<Object>> getUserRankingPastYear(String entityType, Long entityId,int year,int startIndex,int batchSize);
+
+    Map<String, Object> fetchRankingCountThisYear( long userId, long entityId, String entityType, int year, int BatchSize )
+        throws NonFatalException;
+
+    Map<String, Object> fetchRankingCountThisMonth( long userId, long entityId, String entityType, int year, int month,
+        int BatchSize ) throws NonFatalException;
+
+    Map<String, Object> fetchRankingCountPastYear( long userId, long entityId, String entityType, int year, int BatchSize )
+        throws NonFatalException;
+
+    Map<String, Object> fetchRankingCountPastMonth( long userId, long entityId, String entityType, int year, int month,
+        int BatchSize ) throws NonFatalException;
     
 }

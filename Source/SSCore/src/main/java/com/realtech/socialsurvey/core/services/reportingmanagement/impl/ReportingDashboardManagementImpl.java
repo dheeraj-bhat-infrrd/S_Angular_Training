@@ -1286,4 +1286,68 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     	}
     	return userRanking;
 	}   
+	
+	@Override
+    @Transactional(value = "transactionManagerForReporting")
+    public Map<String, Object> fetchRankingCountThisYear(long userId ,long entityId ,String entityType , int year ,int BatchSize)throws NonFatalException{
+	    Map<String, Object> RankingCountStartIndex = new HashMap<String,Object>();
+	    if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
+	        RankingCountStartIndex.put( "Count",userRankingThisYearMainDao.fetchUserRankingCountForThisYearMain( entityId, year, userId ) );
+	        int Rank = userRankingThisYearMainDao.fetchUserRankingRankForThisYearMain( userId, entityId, year );
+	        //get the mod to determine startIndex
+	        int mod = (Rank % BatchSize);
+	        int startIndex = Rank - mod;
+            RankingCountStartIndex.put( "startIndex",startIndex);
+
+	    }
+	    return RankingCountStartIndex;
+	 }
+	
+	@Override
+    @Transactional(value = "transactionManagerForReporting")
+    public Map<String, Object> fetchRankingCountThisMonth(long userId ,long entityId ,String entityType , int year , int month ,int BatchSize)throws NonFatalException{
+        Map<String, Object> RankingCountStartIndex = new HashMap<String,Object>();
+        if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
+            RankingCountStartIndex.put( "Count",userRankingThisMonthMainDao.fetchUserRankingCountForThisMonthMain( entityId, year, month, userId ) );
+            int Rank = userRankingThisMonthMainDao.fetchUserRankingRankForThisMonthMain( userId, entityId, year );
+            //get the mod to determine startIndex
+            int mod = (Rank % BatchSize);
+            int startIndex = Rank - mod;
+            RankingCountStartIndex.put( "startIndex",startIndex);
+
+        }
+        return RankingCountStartIndex;
+     }
+	
+	@Override
+    @Transactional(value = "transactionManagerForReporting")
+    public Map<String, Object> fetchRankingCountPastYear(long userId ,long entityId ,String entityType , int year ,int BatchSize)throws NonFatalException{
+        Map<String, Object> RankingCountStartIndex = new HashMap<String,Object>();
+        if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
+            RankingCountStartIndex.put( "Count",userRankingPastYearMainDao.fetchUserRankingCountForPastYearMain( entityId, year, userId ) );
+            int Rank = userRankingPastYearMainDao.fetchUserRankingRankForPastYearMain( userId, entityId, year );
+            //get the mod to determine startIndex
+            int mod = (Rank % BatchSize);
+            int startIndex = Rank - mod;
+            RankingCountStartIndex.put( "startIndex",startIndex);
+
+        }
+        return RankingCountStartIndex;
+     }
+	
+	@Override
+    @Transactional(value = "transactionManagerForReporting")
+    public Map<String, Object> fetchRankingCountPastMonth(long userId ,long entityId ,String entityType , int year , int month ,int BatchSize)throws NonFatalException{
+        Map<String, Object> RankingCountStartIndex = new HashMap<String,Object>();
+        if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
+            RankingCountStartIndex.put( "Count",userRankingPastMonthMainDao.fetchUserRankingCountForPastMonthMain( entityId, year, month, userId ) );
+            int Rank = userRankingPastMonthMainDao.fetchUserRankingRankForPastMonthMain( userId, entityId, year );
+            //get the mod to determine startIndex
+            int mod = (Rank % BatchSize);
+            int startIndex = Rank - mod;
+            RankingCountStartIndex.put( "startIndex",startIndex);
+
+        }
+        return RankingCountStartIndex;
+     }
 }

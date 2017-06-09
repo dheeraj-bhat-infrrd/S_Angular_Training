@@ -145,5 +145,17 @@ public interface SSApiIntegration
     
     @GET("/v1/getuserrankingforpastmonth")
     Response getUserRankingForPastMonth(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("month") int month, @Query ("year") int year, @Query ("startIndex") int startIndex, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingcountthisyear")
+    Response getUserRankingCountForThisYear(@Query ("userId") Long userId, @Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("year") int year, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingcountthismonth")
+    Response getUserRankingCountForThisMonth(@Query ("userId") Long userId, @Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("month") int month, @Query ("year") int year, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingcountpastyear")
+    Response getUserRankingCountForPastYear(@Query ("userId") Long userId, @Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("year") int year, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingcountpastmonth")
+    Response getUserRankingCountForPastMonth(@Query ("userId") Long userId, @Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("month") int month, @Query ("year") int year, @Query ("batchSize") int batchSize);
     //reporting:END
 }

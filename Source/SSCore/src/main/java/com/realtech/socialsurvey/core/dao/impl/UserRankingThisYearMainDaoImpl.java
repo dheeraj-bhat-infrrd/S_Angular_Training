@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,4 +46,32 @@ public class UserRankingThisYearMainDaoImpl extends GenericReportingDaoImpl<User
         return (List<UserRankingThisYearMain>) criteria.list();
 	}
 	
+	
+	@Override
+    public int fetchUserRankingRankForThisYearMain(Long userId , Long companyId, int year) {
+        LOG.info( "method to fetch user ranking Main Rank for this year, fetchUserRankingRankForThisYearMain() started" );
+        Query query = getSession().createSQLQuery( "SELECT rank FROM user_ranking_this_year_main WHERE user_id = :userId " );
+        query.setParameter( "userId", userId  );
+        int UserRank = (int) query.uniqueResult();
+        LOG.info( "method to fetch user ranking Main Rank for this year, fetchUserRankingRankForThisYearMain() finished." );
+        return UserRank;
+    }
+	
+	@Override
+    public long fetchUserRankingCountForThisYearMain(Long companyId, int year , Long userId ) {
+        LOG.info( "method to fetch user ranking Main count for this year, fetchUserRankingCountForThisYearMain() started" );
+        Criteria criteria = getSession().createCriteria( UserRankingThisYearMain.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );    
+            criteria.setProjection( Projections.rowCount() );
+            Long count = (Long) criteria.uniqueResult();
+            LOG.info( "method to fetch user ranking main count for this year, fetchUserRankingCountForThisYearMain() finished." );
+            return count.longValue();
+            }
+        catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchUserRankingCountForThisYearMain() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingCountForThisYearMain() ", hibernateException );
+        }  
+    }
 }
