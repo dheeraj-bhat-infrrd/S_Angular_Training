@@ -229,8 +229,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>323</xloc>
-      <yloc>258</yloc>
+      <xloc>422</xloc>
+      <yloc>257</yloc>
       </entry>
     <entry>
       <name>CreateJobLog</name>
@@ -299,8 +299,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>248</xloc>
-      <yloc>177</yloc>
+      <xloc>297</xloc>
+      <yloc>258</yloc>
       </entry>
     <entry>
       <name>RegionSettings</name>
@@ -331,8 +331,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>465</xloc>
-      <yloc>258</yloc>
+      <xloc>564</xloc>
+      <yloc>257</yloc>
       </entry>
     <entry>
       <name>BranchSettings</name>
@@ -363,8 +363,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>572</xloc>
-      <yloc>258</yloc>
+      <xloc>671</xloc>
+      <yloc>257</yloc>
       </entry>
     <entry>
       <name>CompanySettings</name>
@@ -395,8 +395,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>878</xloc>
-      <yloc>258</yloc>
+      <xloc>977</xloc>
+      <yloc>257</yloc>
       </entry>
     <entry>
       <name>SurveyDetails</name>
@@ -427,8 +427,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>682</xloc>
-      <yloc>259</yloc>
+      <xloc>781</xloc>
+      <yloc>258</yloc>
       </entry>
     <entry>
       <name>AgentSettings</name>
@@ -459,8 +459,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>783</xloc>
-      <yloc>258</yloc>
+      <xloc>882</xloc>
+      <yloc>257</yloc>
       </entry>
     <entry>
       <name>FinishJobLog</name>
@@ -495,32 +495,47 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>878</xloc>
-      <yloc>375</yloc>
+      <xloc>977</xloc>
+      <yloc>374</yloc>
+      </entry>
+    <entry>
+      <name>GetLastModifiedTime</name>
+      <description/>
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;Get_Last_Modified_Time.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>101</xloc>
+      <yloc>151</yloc>
       </entry>
   </entries>
   <hops>
     <hop>
-      <from>START</from>
-      <to>CreateJobLog</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
-    </hop>
-    <hop>
       <from>CreateJobLog</from>
       <to>GetJobLogID</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>GetJobLogID</from>
-      <to>Mysql MasterTable Updates</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -575,6 +590,33 @@
     <hop>
       <from>Mysql MasterTable Updates</from>
       <to>RegionSettings</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>GetJobLogID</from>
+      <to>Mysql MasterTable Updates</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>START</from>
+      <to>GetLastModifiedTime</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>GetLastModifiedTime</from>
+      <to>CreateJobLog</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
