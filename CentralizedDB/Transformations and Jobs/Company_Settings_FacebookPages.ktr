@@ -191,13 +191,14 @@
   </connection>
   <order>
   <hop> <from>FB Token IP</from><to>Sort FB Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>Json Input BranchId</from><to>Json Input</to><enabled>Y</enabled> </hop>
+  <hop> <from>Json Input CompanyId</from><to>Json Input</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>FacebookPages Table OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>MongoDB Input</from><to>Json Input BranchId</to><enabled>Y</enabled> </hop>
+  <hop> <from>MongoDB Input</from><to>Json Input CompanyId</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort FB Token</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows FB Pages</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Input</from><to>Filter rows Facebook Pages</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows Facebook Pages</from><to>Sort rows FB Pages</to><enabled>Y</enabled> </hop>
+  <hop> <from>FacebookPages Table OP</from><to>Update</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>FB Token IP</name>
@@ -283,6 +284,35 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>524</xloc>
       <yloc>345</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter rows Facebook Pages</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows FB Pages</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>_id</leftvalue>
+ <function>IS NOT NULL</function>
+ <rightvalue/>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>708</xloc>
+      <yloc>172</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -402,7 +432,7 @@
     </step>
 
   <step>
-    <name>Json Input BranchId</name>
+    <name>Json Input CompanyId</name>
     <type>JsonInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -430,7 +460,7 @@
     </file>
     <fields>
       <field>
-        <name>branchId</name>
+        <name>companyId</name>
         <path>&#x24;.iden</path>
         <type>None</type>
         <format/>
@@ -481,7 +511,7 @@
       <key>id</key>
     </keys_1>
     <keys_2>
-      <key>branchId</key>
+      <key>companyId</key>
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -507,7 +537,7 @@
     <use_all_replica_members>N</use_all_replica_members>
     <db_name>ss_db</db_name>
     <fields_name/>
-    <collection>BRANCH_SETTINGS</collection>
+    <collection>COMPANY_SETTINGS</collection>
     <json_field_name>json</json_field_name>
     <json_query/>
     <auth_user/>
@@ -1399,7 +1429,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>branchId</name>
+        <name>companyId</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1414,8 +1444,8 @@
     </step>
 
   <step>
-    <name>Filter rows Facebook Pages</name>
-    <type>FilterRows</type>
+    <name>Update</name>
+    <type>Update</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1424,25 +1454,59 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>Sort rows FB Pages</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>_id</leftvalue>
- <function>IS NOT NULL</function>
- <rightvalue/>
- </condition>
-    </compare>
+    <connection>Local instance MySQL57</connection>
+    <skip_lookup>N</skip_lookup>
+    <commit>100</commit>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>facebook_pages</table>
+      <key>
+        <name>_id</name>
+        <field>FACEBOOK_PAGES_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>CATEGORY</name>
+        <rename>category</rename>
+        </value>
+      <value>
+        <name>ACCESS_TOKEN</name>
+        <rename>accessToken</rename>
+        </value>
+      <value>
+        <name>PROFILE_URL</name>
+        <rename>profileUrl</rename>
+        </value>
+      <value>
+        <name>NAME</name>
+        <rename>name</rename>
+        </value>
+      </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>708</xloc>
-      <yloc>172</yloc>
+      <xloc>689</xloc>
+      <yloc>340</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
+      <error>
+        <source_step>FacebookPages Table OP</source_step>
+        <target_step>Update</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
   </step_error_handling>
    <slave-step-copy-partition-distribution>
 </slave-step-copy-partition-distribution>
