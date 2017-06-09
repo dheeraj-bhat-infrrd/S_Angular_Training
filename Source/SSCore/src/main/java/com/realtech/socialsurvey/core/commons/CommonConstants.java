@@ -856,7 +856,7 @@ public interface CommonConstants
 
     public static final String REGION_OBJECT = "region";
 
-    public static final String SURVEY_REMINDER_COUNT = "reminderCount";
+    public static final String SURVEY_REMINDER_COUNT = "reminderCounts";
     public static final String SURVEY_REMINDER_INTERVAL = "reminderInterval";
 
     //Session variable
