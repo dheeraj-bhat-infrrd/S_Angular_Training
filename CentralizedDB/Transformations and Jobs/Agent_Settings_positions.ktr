@@ -195,6 +195,7 @@
   <hop> <from>UUID_Positions</from><to>Positions OP</to><enabled>Y</enabled> </hop>
   <hop> <from>Positions Parsing</from><to>Filter Positions</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Positions</from><to>UUID_Positions</to><enabled>Y</enabled> </hop>
+  <hop> <from>Positions OP</from><to>Update Positions</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AgentSettingsId</name>
@@ -226,7 +227,7 @@
     <fields>
       <field>
         <name>AgentSettingsId</name>
-        <path>&#x24;.iden</path>
+        <path>&#x24;._id.&#x24;oid</path>
         <type>None</type>
         <format/>
         <currency/>
@@ -1869,6 +1870,12 @@
         <condition>&#x3d;</condition>
         <name2/>
         </key>
+      <key>
+        <name>startTime</name>
+        <field>START_TIME</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
       <value>
         <name>NAME</name>
         <rename>name</rename>
@@ -1878,20 +1885,12 @@
         <rename>title</rename>
         </value>
       <value>
-        <name>AGENT_SETTINGS_ID</name>
-        <rename>AgentSettingsId</rename>
-        </value>
-      <value>
         <name>START_MONTH</name>
         <rename>startMonth</rename>
         </value>
       <value>
         <name>START_YEAR</name>
         <rename>startYear</rename>
-        </value>
-      <value>
-        <name>START_TIME</name>
-        <rename>startTime</rename>
         </value>
       <value>
         <name>END_MONTH</name>
@@ -1909,10 +1908,6 @@
         <name>END_TIME</name>
         <rename>endTime</rename>
         </value>
-      <value>
-        <name>POSITIONS_ID</name>
-        <rename>POSITIONS_ID</rename>
-        </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1926,7 +1921,7 @@
       <error>
         <source_step>Positions OP</source_step>
         <target_step>Update Positions</target_step>
-        <is_enabled>N</is_enabled>
+        <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
         <fields_valuename/>
