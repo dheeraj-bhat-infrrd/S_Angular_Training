@@ -506,6 +506,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( surveyPreInitiation != null ) {
             surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiation.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
+            surveyPreInitiation.setIsSurveyRequestSent( 1 );
             surveyPreInitiationDao.merge( surveyPreInitiation );
         }
         LOG.debug( "Method to increase reminder count by 1, updateReminderCount() finished." );
@@ -642,20 +643,49 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     @Transactional
-    public List<SurveyPreInitiation> getIncompleteSurveyCustomersEmail( Company company )
+    public List<SurveyPreInitiation> getIncompleteSurveyForReminderEmail( Company company, Date minLastReminderDate , Date maxLastReminderDate, int maxReminderCount )
     {
-        LOG.debug( "started." );
+        LOG.debug( "method getIncompleteSurveyForReminderEmail started." );
 
         List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
 
-        LOG.debug( "Now fetching survey which are already processed " );
         Criterion companyCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
         Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN,
             Arrays.asList( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED, CommonConstants.SURVEY_STATUS_INITIATED ) );
 
+        Criterion minLastReminderCriteria = Restrictions.gt( CommonConstants.SURVEY_LAST_REMINDER_TIME, minLastReminderDate );
+        Criterion maxLastReminderCriteria = Restrictions.lt( CommonConstants.SURVEY_LAST_REMINDER_TIME, maxLastReminderDate );
+
+        Criterion reminderCountCriteria = Restrictions.lt( CommonConstants.SURVEY_REMINDER_COUNT, maxReminderCount );
+
+        LOG.info( "Criteria to getIncompleteSurveyForReminderEmail is  "  + companyCriteria.toString() + " " + statusCriteria.toString() + " " + minLastReminderCriteria.toString() + " " + maxLastReminderCriteria );
+        
         incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
-            statusCriteria );
-        LOG.debug( "finished." );
+            statusCriteria, minLastReminderCriteria , maxLastReminderCriteria , reminderCountCriteria  );
+        LOG.debug( "method getIncompleteSurveyForReminderEmail finished." );
+        return incompleteSurveyCustomers;
+    }
+    
+    
+    @Override
+    @Transactional
+    public List<SurveyPreInitiation> getSurveyListToSendInvitationMail( Company company , Date epochDate)
+    {
+        LOG.debug( "method getSurveyListToSendInvitationMail started." );
+
+        List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
+
+        Criterion companyCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
+        Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN,
+            Arrays.asList( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED, CommonConstants.SURVEY_STATUS_INITIATED ) );
+        
+        Criterion lastReminderCriteria = Restrictions.le( CommonConstants.SURVEY_LAST_REMINDER_TIME, epochDate );
+
+        LOG.info( "Criteria to getSurveyListToSendInvitationMail is  "  + companyCriteria.toString() + " " + statusCriteria.toString() + " " + lastReminderCriteria.toString() );
+
+        incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
+            statusCriteria, lastReminderCriteria );
+        LOG.debug( "method getSurveyListToSendInvitationMail finished." );
         return incompleteSurveyCustomers;
     }
 
@@ -3989,4 +4019,24 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         }
     }
+    
+    
+    @Override
+    public Map<String , Date> getMinMaxLastSurveyReminderTime( long systemTime, int reminderInterval )
+    {
+        
+        LOG.debug( "method getMinMaxLastSurveyReminderTime started" );
+        Date minLastReminderTime = new Date(systemTime - maxSurveyReminderInterval * ( 1000 * 60 * 60 * 24 ));
+        Date maxLastReminderTime = new Date(systemTime - reminderInterval * ( 1000 * 60 * 60 * 24 ));
+
+        
+        Map<String , Date> minMaxLastReminderTime = new HashMap<String , Date>();
+        minMaxLastReminderTime.put( "minLastReminderTime", minLastReminderTime );
+        minMaxLastReminderTime.put( "maxLastReminderTime", maxLastReminderTime );
+
+        LOG.debug( "method getMinMaxLastSurveyReminderTime ended" );
+
+        return minMaxLastReminderTime;
+    }
+
 }
