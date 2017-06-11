@@ -248,7 +248,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>SS_INFO_CONNECTION</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <sql>SELECT&#xd;&#xa;  STATUS_ID&#xd;&#xa;, STATUS_NAME&#xd;&#xa;FROM SURVEY_PRE_INITIATION_STATUS_LOOKUP&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>

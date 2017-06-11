@@ -194,6 +194,7 @@
   </connection>
   <order>
   <hop> <from>Table input</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update</from><to>Write to log</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Insert &#x2f; Update</name>
@@ -359,7 +360,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_INFO_CONNECTION</connection>
-    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, LOGIN_NAME&#xd;&#xa;, LOGIN_PASSWORD&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_USER_ID&#xd;&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xd;&#xa;, IS_OWNER&#xd;&#xa;, STATUS&#xd;&#xa;, LAST_LOGIN&#xd;&#xa;, NUM_OF_LOGINS&#xd;&#xa;, SUPER_ADMIN&#xd;&#xa;, IS_ZILLOW_CONNECTED&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ZILLOW_AVERAGE_SCORE&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, REGISTRATION_STAGE&#xd;&#xa;, FORCE_PASSWORD&#xd;&#xa;FROM USERS&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, LOGIN_NAME&#xd;&#xa;, LOGIN_PASSWORD&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_USER_ID&#xd;&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xd;&#xa;, IS_OWNER&#xd;&#xa;, STATUS&#xd;&#xa;, LAST_LOGIN&#xd;&#xa;, NUM_OF_LOGINS&#xd;&#xa;, SUPER_ADMIN&#xd;&#xa;, IS_ZILLOW_CONNECTED&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ZILLOW_AVERAGE_SCORE&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, REGISTRATION_STAGE&#xd;&#xa;, FORCE_PASSWORD&#xd;&#xa;FROM USERS&#xd;&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -369,6 +370,104 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>312</xloc>
       <yloc>154</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <loglevel>log_level_basic</loglevel>
+      <displayHeader>Y</displayHeader>
+      <limitRows>N</limitRows>
+      <limitRowsNumber>0</limitRowsNumber>
+      <logmessage/>
+    <fields>
+      <field>
+        <name>USER_ID</name>
+        </field>
+      <field>
+        <name>COMPANY_ID</name>
+        </field>
+      <field>
+        <name>LOGIN_NAME</name>
+        </field>
+      <field>
+        <name>LOGIN_PASSWORD</name>
+        </field>
+      <field>
+        <name>EMAIL_ID</name>
+        </field>
+      <field>
+        <name>FIRST_NAME</name>
+        </field>
+      <field>
+        <name>LAST_NAME</name>
+        </field>
+      <field>
+        <name>SOURCE</name>
+        </field>
+      <field>
+        <name>SOURCE_USER_ID</name>
+        </field>
+      <field>
+        <name>IS_ATLEAST_ONE_USERPROFILE_COMPLETE</name>
+        </field>
+      <field>
+        <name>IS_OWNER</name>
+        </field>
+      <field>
+        <name>STATUS</name>
+        </field>
+      <field>
+        <name>LAST_LOGIN</name>
+        </field>
+      <field>
+        <name>NUM_OF_LOGINS</name>
+        </field>
+      <field>
+        <name>SUPER_ADMIN</name>
+        </field>
+      <field>
+        <name>IS_ZILLOW_CONNECTED</name>
+        </field>
+      <field>
+        <name>ZILLOW_REVIEW_COUNT</name>
+        </field>
+      <field>
+        <name>ZILLOW_AVERAGE_SCORE</name>
+        </field>
+      <field>
+        <name>CREATED_ON</name>
+        </field>
+      <field>
+        <name>CREATED_BY</name>
+        </field>
+      <field>
+        <name>MODIFIED_ON</name>
+        </field>
+      <field>
+        <name>MODIFIED_BY</name>
+        </field>
+      <field>
+        <name>REGISTRATION_STAGE</name>
+        </field>
+      <field>
+        <name>FORCE_PASSWORD</name>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>703</xloc>
+      <yloc>156</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

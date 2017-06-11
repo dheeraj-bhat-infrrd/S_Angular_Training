@@ -194,6 +194,7 @@
   </connection>
   <order>
   <hop> <from>Table input</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update</from><to>Write to log</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Insert &#x2f; Update</name>
@@ -264,7 +265,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_INFO_CONNECTION</connection>
-    <sql>SELECT&#xd;&#xa;  USERCOUNT_MODIFICATION_NOTIFICATION_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;FROM USERCOUNT_MODIFICATION_NOTIFICATION&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  USERCOUNT_MODIFICATION_NOTIFICATION_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;FROM USERCOUNT_MODIFICATION_NOTIFICATION&#xd;&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -274,6 +275,47 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>229</xloc>
       <yloc>172</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <loglevel>log_level_basic</loglevel>
+      <displayHeader>Y</displayHeader>
+      <limitRows>N</limitRows>
+      <limitRowsNumber>0</limitRowsNumber>
+      <logmessage/>
+    <fields>
+      <field>
+        <name>USERCOUNT_MODIFICATION_NOTIFICATION_ID</name>
+        </field>
+      <field>
+        <name>COMPANY_ID</name>
+        </field>
+      <field>
+        <name>STATUS</name>
+        </field>
+      <field>
+        <name>CREATED_ON</name>
+        </field>
+      <field>
+        <name>MODIFIED_ON</name>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>629</xloc>
+      <yloc>145</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
