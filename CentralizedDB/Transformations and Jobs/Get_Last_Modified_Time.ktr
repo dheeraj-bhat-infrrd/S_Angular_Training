@@ -305,7 +305,7 @@
         <field_name>lastModifiedTime</field_name>
         <variable_name>lastModifiedTime</variable_name>
         <variable_type>PARENT_JOB</variable_type>
-        <default_value/>
+        <default_value>&#x27;1970-01-01 00&#x3a;00&#x3a;01&#x27;</default_value>
         </field>
       </fields>
     <use_formatting>N</use_formatting>
