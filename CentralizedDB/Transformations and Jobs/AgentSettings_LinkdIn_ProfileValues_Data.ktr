@@ -205,6 +205,7 @@
   <hop> <from>Sort rows 2</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>Write to log</to><enabled>Y</enabled> </hop>
   <hop> <from>Write to log</from><to>LinkdIn Company</to><enabled>Y</enabled> </hop>
+  <hop> <from>LinkdIn Company OP</from><to>Update LinkdIn Company</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Filter rows 2</name>
@@ -423,12 +424,12 @@
     <return_field/>
     <fields>
         <field>
-          <column_name>LINKED_IN_PROFILE_DATA_VALUES_PK</column_name>
-          <stream_name>LINKED_IN_PROFILE_DATA_VALUES_PK</stream_name>
-        </field>
-        <field>
           <column_name>LINKED_IN_PROFILE_DATA_COMPANY_ID</column_name>
           <stream_name>companyId</stream_name>
+        </field>
+        <field>
+          <column_name>LINKED_IN_PROFILE_DATA_VALUES_PK</column_name>
+          <stream_name>LINKED_IN_PROFILE_DATA_VALUES_PK</stream_name>
         </field>
         <field>
           <column_name>LINKED_IN_PROFILE_DATA_NAME</column_name>
@@ -2243,6 +2244,12 @@
         <condition>&#x3d;</condition>
         <name2/>
         </key>
+      <key>
+        <name>companyId</name>
+        <field>LINKED_IN_PROFILE_DATA_COMPANY_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
       <value>
         <name>LINKED_IN_PROFILE_DATA_NAME</name>
         <rename>companyName</rename>
@@ -2338,7 +2345,7 @@
       <error>
         <source_step>LinkdIn Company OP</source_step>
         <target_step>Update LinkdIn Company</target_step>
-        <is_enabled>N</is_enabled>
+        <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
         <fields_valuename/>

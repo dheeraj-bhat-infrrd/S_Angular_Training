@@ -653,15 +653,6 @@
     </hop>
     <hop>
       <from>Update JobLog</from>
-      <to>file_upload Transformation</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Update JobLog</from>
       <to>license_details Transformation</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>

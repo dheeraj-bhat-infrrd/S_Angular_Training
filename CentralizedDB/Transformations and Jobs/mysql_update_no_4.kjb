@@ -551,15 +551,6 @@
     </hop>
     <hop>
       <from>Update JobLogs</from>
-      <to>user_referral_mapping Transformation</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Update JobLogs</from>
       <to>branch Transformation</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
