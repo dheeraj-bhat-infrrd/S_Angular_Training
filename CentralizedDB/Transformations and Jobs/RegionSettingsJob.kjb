@@ -39,6 +39,33 @@
     </attributes>
   </connection>
   <connection>
+    <name>MySql_Con</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>sakila</database>
+    <port>3306</port>
+    <username>&#x24;&#x7b;db_user_name&#x7d;</username>
+    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
     <name>SS_Centralized_Mysql_Conn</name>
     <server>&#x24;&#x7b;mysql_host&#x7d;</server>
     <type>MYSQL</type>
@@ -67,13 +94,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
+    <server>localhost</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
-    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
+    <database>ss_user</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -83,7 +110,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -198,7 +225,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>328</xloc>
-      <yloc>257</yloc>
+      <yloc>252</yloc>
       </entry>
     <entry>
       <name>FacebookPages</name>
@@ -264,7 +291,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>460</xloc>
-      <yloc>256</yloc>
+      <yloc>252</yloc>
       </entry>
     <entry>
       <name>ContactDetails_Main</name>
@@ -297,7 +324,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>598</xloc>
-      <yloc>258</yloc>
+      <yloc>252</yloc>
       </entry>
     <entry>
       <name>ContactDetails</name>
@@ -330,7 +357,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>721</xloc>
-      <yloc>258</yloc>
+      <yloc>252</yloc>
       </entry>
     <entry>
       <name>ContactDetails Phone</name>
@@ -363,7 +390,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>839</xloc>
-      <yloc>258</yloc>
+      <yloc>252</yloc>
       </entry>
     <entry>
       <name>ProfileStages</name>
@@ -551,8 +578,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>118</xloc>
-      <yloc>253</yloc>
+      <xloc>115</xloc>
+      <yloc>252</yloc>
       </entry>
   </entries>
   <hops>
@@ -752,7 +779,7 @@
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
+      <unconditional>Y</unconditional>
     </hop>
   </hops>
   <notepads>
