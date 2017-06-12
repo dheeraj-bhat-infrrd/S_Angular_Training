@@ -139,6 +139,33 @@
   <notepads>
   </notepads>
   <connection>
+    <name>Local instance MySQL57</name>
+    <server>&#x24;&#x7b;mysql_host &#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;mysql_schema_name &#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no &#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password &#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no &#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
     <name>SS_Centralized_Mysql_Conn</name>
     <server>&#x24;&#x7b;mysql_host&#x7d;</server>
     <type>MYSQL</type>
@@ -193,8 +220,8 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Table input</from><to>Modified Java Script Value for customer name n mail id</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value for customer name n mail id</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Table input</from><to>Modified Java Script Value for customer name n mail id</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Insert &#x2f; Update</name>
@@ -227,122 +254,122 @@
       <value>
         <name>SURVEY_SOURCE</name>
         <rename>SURVEY_SOURCE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SURVEY_SOURCE_ID</name>
         <rename>SURVEY_SOURCE_ID</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>COMPANY_ID</name>
         <rename>COMPANY_ID</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>AGENT_ID</name>
         <rename>AGENT_ID</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>AGENT_NAME</name>
         <rename>AGENT_NAME</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>AGENT_EMAILID</name>
         <rename>AGENT_EMAILID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>CUSTOMER_LAST_NAME</name>
-        <rename>CUSTOMER_LAST_NAME</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>CUSTOMER_INTERACTION_DETAILS</name>
-        <rename>CUSTOMER_INTERACTION_DETAILS</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>ENGAGEMENT_CLOSED_TIME</name>
-        <rename>ENGAGEMENT_CLOSED_TIME</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>REMINDER_COUNTS</name>
-        <rename>REMINDER_COUNTS</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>LAST_REMINDER_TIME</name>
-        <rename>LAST_REMINDER_TIME</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>STATUS</name>
-        <rename>STATUS</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>CREATED_ON</name>
-        <rename>CREATED_ON</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>MODIFIED_ON</name>
-        <rename>MODIFIED_ON</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>REGION_COLLECTION_ID</name>
-        <rename>REGION_COLLECTION_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>BRANCH_COLLECTION_ID</name>
-        <rename>BRANCH_COLLECTION_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>COLLECTION_NAME</name>
-        <rename>COLLECTION_NAME</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>ERROR_CODE</name>
-        <rename>ERROR_CODE</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>STATE</name>
-        <rename>STATE</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>CITY</name>
-        <rename>CITY</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>TRANSACTION_TYPE</name>
-        <rename>TRANSACTION_TYPE</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>CUSTOMER_EMAIL_ID</name>
-        <rename>cust_email_id</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>CUSTOMER_FIRST_NAME</name>
         <rename>cust_first_name</rename>
-        <update>N</update>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>CUSTOMER_LAST_NAME</name>
+        <rename>CUSTOMER_LAST_NAME</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>CUSTOMER_EMAIL_ID</name>
+        <rename>cust_email_id</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>CUSTOMER_INTERACTION_DETAILS</name>
+        <rename>CUSTOMER_INTERACTION_DETAILS</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>ENGAGEMENT_CLOSED_TIME</name>
+        <rename>ENGAGEMENT_CLOSED_TIME</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>REMINDER_COUNTS</name>
+        <rename>REMINDER_COUNTS</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>LAST_REMINDER_TIME</name>
+        <rename>LAST_REMINDER_TIME</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>STATUS</name>
+        <rename>STATUS</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>CREATED_ON</name>
+        <rename>CREATED_ON</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MODIFIED_ON</name>
+        <rename>MODIFIED_ON</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>REGION_COLLECTION_ID</name>
+        <rename>REGION_COLLECTION_ID</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>BRANCH_COLLECTION_ID</name>
+        <rename>BRANCH_COLLECTION_ID</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>COLLECTION_NAME</name>
+        <rename>COLLECTION_NAME</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>ERROR_CODE</name>
+        <rename>ERROR_CODE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>STATE</name>
+        <rename>STATE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>CITY</name>
+        <rename>CITY</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>TRANSACTION_TYPE</name>
+        <rename>TRANSACTION_TYPE</rename>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>552</xloc>
+      <xloc>551</xloc>
       <yloc>135</yloc>
       <draw>Y</draw>
       </GUI>
@@ -396,11 +423,11 @@
            <schema_name/>
            </partitioning>
     <connection>SS_INFO_CONNECTION</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, SURVEY_SOURCE&#xd;&#xa;, SURVEY_SOURCE_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, AGENT_EMAILID&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, CUSTOMER_EMAIL_ID&#xd;&#xa;, CUSTOMER_INTERACTION_DETAILS&#xd;&#xa;, ENGAGEMENT_CLOSED_TIME&#xd;&#xa;, REMINDER_COUNTS&#xd;&#xa;, LAST_REMINDER_TIME&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, REGION_COLLECTION_ID&#xd;&#xa;, BRANCH_COLLECTION_ID&#xd;&#xa;, COLLECTION_NAME&#xd;&#xa;, ERROR_CODE&#xd;&#xa;, STATE&#xd;&#xa;, CITY&#xd;&#xa;, TRANSACTION_TYPE&#xd;&#xa;FROM SURVEY_PRE_INITIATION&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, SURVEY_SOURCE&#xd;&#xa;, SURVEY_SOURCE_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, AGENT_EMAILID&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, CUSTOMER_EMAIL_ID&#xd;&#xa;, CUSTOMER_INTERACTION_DETAILS&#xd;&#xa;, ENGAGEMENT_CLOSED_TIME&#xd;&#xa;, REMINDER_COUNTS&#xd;&#xa;, LAST_REMINDER_TIME&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, REGION_COLLECTION_ID&#xd;&#xa;, BRANCH_COLLECTION_ID&#xd;&#xa;, COLLECTION_NAME&#xd;&#xa;, ERROR_CODE&#xd;&#xa;, STATE&#xd;&#xa;, CITY&#xd;&#xa;, TRANSACTION_TYPE&#xd;&#xa;FROM SURVEY_PRE_INITIATION&#xd;&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
+    <variables_active>Y</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
