@@ -10,32 +10,62 @@
     <directory>&#x2f;</directory>
     <parameters>
         <parameter>
-            <name>mongo_host </name>
+            <name>mongo_host</name>
             <default_value>localhost</default_value>
             <description/>
         </parameter>
         <parameter>
-            <name>mongo_port </name>
-            <default_value>27017 </default_value>
+            <name>mongo_port</name>
+            <default_value>27017</default_value>
             <description/>
         </parameter>
         <parameter>
-            <name>mysql_host </name>
+            <name>mysql_host</name>
             <default_value>localhost</default_value>
             <description/>
         </parameter>
         <parameter>
-            <name>mysql_password </name>
-            <default_value>root</default_value>
+            <name>mysql_info_host</name>
+            <default_value>ss-rdbms-demo.c3n1qsdsmjxc.us-west-2.rds.amazonaws.com</default_value>
             <description/>
         </parameter>
         <parameter>
-            <name>mysql_port_no </name>
+            <name>mysql_info_password</name>
+            <default_value>shipra744772</default_value>
+            <description/>
+        </parameter>
+        <parameter>
+            <name>mysql_info_port_no</name>
             <default_value>3306</default_value>
             <description/>
         </parameter>
         <parameter>
-            <name>mysql_schema_name </name>
+            <name>mysql_info_schema_name</name>
+            <default_value>ss_user</default_value>
+            <description/>
+        </parameter>
+        <parameter>
+            <name>mysql_info_user_name</name>
+            <default_value>shipra</default_value>
+            <description/>
+        </parameter>
+        <parameter>
+            <name>mysql_master_schema_name</name>
+            <default_value>ss_user</default_value>
+            <description/>
+        </parameter>
+        <parameter>
+            <name>mysql_password</name>
+            <default_value>root</default_value>
+            <description/>
+        </parameter>
+        <parameter>
+            <name>mysql_port_no</name>
+            <default_value>3306</default_value>
+            <description/>
+        </parameter>
+        <parameter>
+            <name>mysql_schema_name</name>
             <default_value>ss_centralized_mongodb</default_value>
             <description/>
         </parameter>
@@ -109,14 +139,14 @@
   <notepads>
   </notepads>
   <connection>
-    <name>Local instance MySQL57</name>
-    <server>&#x24;&#x7b;mysql_host &#x7d;</server>
+    <name>SS_Centralized_Mysql_Conn</name>
+    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;mysql_schema_name &#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no &#x7d;</port>
+    <database>&#x24;&#x7b;mysql_schema_name&#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
     <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password &#x7d;</password>
+    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -126,7 +156,34 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no &#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -161,7 +218,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <sql>SELECT&#xd;&#xa;  FACEBOOK_POST_RESPONSE_LIST_ID&#xd;&#xa;, id&#xd;&#xa;, type&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;FROM facebook_post_response_list&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
@@ -657,7 +714,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <sql>SELECT&#xd;&#xa;  LINKEDIN_POST_RESPONSE_LIST_ID&#xd;&#xa;, id&#xd;&#xa;, type&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;FROM linkedin_post_response_list&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
@@ -683,7 +740,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>social_media_post_response_details</table>
     <commit>1000</commit>
@@ -749,7 +806,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -854,7 +911,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <sql>SELECT&#xd;&#xa;  TWITTER_POST_RESPONSE_LIST_ID&#xd;&#xa;, id&#xd;&#xa;, type&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;FROM twitter_post_response_list&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
