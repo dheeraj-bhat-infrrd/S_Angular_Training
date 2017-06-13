@@ -2032,7 +2032,7 @@ public class EmailServicesImpl implements EmailServices
 
         //SS-1435: Send survey details too.
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, customerName, customerMailId, mood,
-            rating, surveySourceId == null ? "N/A" : surveySourceId, surveyDetail ) );
+            rating, surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId, surveyDetail ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity,
