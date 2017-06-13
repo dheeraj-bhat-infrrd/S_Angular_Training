@@ -11002,6 +11002,30 @@ function saveZillowProfile(profileType, zillowProfileName, nmls) {
 	}, "zillowForm");
 }
 
+//SS-1225
+//Zillow connect  by screen name for Mortgage functions
+function saveZillowProfileForMortgage(profileType, zillowProfileName, nmls) {
+	if (!validateZillowForm(profileType)) {
+		return false;
+	}
+	callAjaxFormSubmit("/zillowSaveInfoByScreenNameForMortgage.do?zillowScreenName="+zillowProfileName, function(data) {
+		if (data && data == "success") {
+			overlayRevert();
+			showProfileLinkInEditProfilePage("zillow", $('input[name="zillowProfileName"]').val());
+			loadSocialMediaUrlInSettingsPage();
+			loadSocialMediaUrlInPopup();
+			$('#overlay-toast').text("Zillow update successful");
+			showToast();
+		} else if(data && data == "zillow-error"){
+			$('#overlay-toast').text("Invalid Zillow profile");
+			showToast();
+		} else {
+			$('#overlay-toast').text("Some problem occurred while saving zillow");
+			showToast();
+		}
+	}, "zillowForm");
+}
+
 // Zillow connect functions
 function saveZillowEmailAddress(profileType) {
 	if (!validateZillowForm(profileType)) {
@@ -11039,8 +11063,8 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 	if (button != 'by-screen-name') {
 		callAjaxPOST("/zillowValidateNMLS.do?nmls="+nmls, function(data) {
 			if(data == 'invalid-nmls') {
-				$('#overlay-toast').text("Couldn't find the Zillow profile with this NMLS ID");
-				showToast();
+				$('#overlay-toast').text("No corresponding Zillow profile found, please connect using screen name");
+				showToastLong();
 			} else if(data == 'no-screen-name')  {
 				//show section to insert screen name
 				$('#main-container').hide();
@@ -11049,8 +11073,6 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 				$('#disconnect-zillow-container').hide();
 				$('#zillow-help-container').hide();
 				$('#no-screen-name-container').show();
-				
-				
 				
 				if($('input[name="zillowProfileNameNoScreenForNMLS"]').val().length > 0) {
 			    	showHideDisconnectZillowLink(true);
@@ -11156,7 +11178,7 @@ function openNextScreenForZillowScreenName(profileType, button, nmls) {
 					if(zillowProfileName == undefined || zillowProfileName == "" || zillowProfileName.trim().length == 0)
 						zillowProfileName = $('input[name="zillowProfileNameForNoNMLS"]').val();
 					if(validInput(zillowProfileName)) {
-						saveZillowProfile(profileType, zillowProfileName, nmls);
+						saveZillowProfileForMortgage(profileType, zillowProfileName, nmls);
 					}
 				});
 				
