@@ -17,6 +17,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.BatchTracker;
+import com.realtech.socialsurvey.core.entities.BatchTrackerHistory;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
@@ -33,6 +34,9 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
 
     @Autowired
     private GenericDao<BatchTracker, Long> batchTrackerDao;
+    
+    @Autowired
+    private GenericDao<BatchTrackerHistory, Long> batchTrackerHistoryDao;
 
     @Autowired
     private SurveyDetailsDao surveyDetailsDao;
@@ -138,6 +142,16 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
         batchTracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         batchTracker.setError( "Error : " + error );
         batchTrackerDao.update( batchTracker );
+        
+        //insert entry in  batch tracker history
+        BatchTrackerHistory batchTrackerHistory = new BatchTrackerHistory();
+        batchTrackerHistory.setBatchTracker( batchTracker );
+        batchTrackerHistory.setSartTime( batchTracker.getLastStartTime() );
+        batchTrackerHistory.setEndTime(  new Timestamp( System.currentTimeMillis() )  );
+        batchTrackerHistory.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        batchTrackerHistory.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        batchTrackerHistory.setError(  "Error : " + error  );
+        batchTrackerHistoryDao.save( batchTrackerHistory );
 
         LOG.debug( "method updateModifiedOnColumnByBatchType() ended for batch type : " + batchType );
 
@@ -166,6 +180,16 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
         batchTracker.setError( null );
         batchTrackerDao.update( batchTracker );
 
+        //insert entry in  batch tracker history
+        BatchTrackerHistory batchTrackerHistory = new BatchTrackerHistory();
+        batchTrackerHistory.setBatchTracker( batchTracker );
+        batchTrackerHistory.setSartTime( batchTracker.getLastStartTime() );
+        batchTrackerHistory.setEndTime(  new Timestamp( System.currentTimeMillis() )  );
+        batchTrackerHistory.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        batchTrackerHistory.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        batchTrackerHistory.setError( null );
+        batchTrackerHistoryDao.save( batchTrackerHistory );
+        
         LOG.debug( "method updateModifiedOnColumnByBatchType() ended for batch type : " + batchType );
     }
 
