@@ -109,4 +109,11 @@ public interface SSApiIntegration
     Response createVendastaRmAccount( @Body VendastaRmCreateRequest accountDetails, @Query ( "isForced" ) boolean isForced );
     
     //vendasta: END
+    
+    //reporting: BEGIN
+    
+    @GET ( "/v1/createdummyapi" )
+    Response createDummyReporting();
+    
+    //reporting:END
 }
