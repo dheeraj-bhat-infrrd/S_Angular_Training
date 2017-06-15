@@ -181,15 +181,17 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
         batchTrackerDao.update( batchTracker );
 
         //insert entry in  batch tracker history
-        BatchTrackerHistory batchTrackerHistory = new BatchTrackerHistory();
-        batchTrackerHistory.setBatchTracker( batchTracker );
-        batchTrackerHistory.setSartTime( batchTracker.getLastStartTime() );
-        batchTrackerHistory.setEndTime(  new Timestamp( System.currentTimeMillis() )  );
-        batchTrackerHistory.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        batchTrackerHistory.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        batchTrackerHistory.setError( null );
-        batchTrackerHistoryDao.save( batchTrackerHistory );
-        
+        if( ! batchType.equals( CommonConstants.BATCH_TYPE_EMAIL_READER )){
+            //skip the entry in history table for email processor batch
+            BatchTrackerHistory batchTrackerHistory = new BatchTrackerHistory();
+            batchTrackerHistory.setBatchTracker( batchTracker );
+            batchTrackerHistory.setSartTime( batchTracker.getLastStartTime() );
+            batchTrackerHistory.setEndTime(  new Timestamp( System.currentTimeMillis() )  );
+            batchTrackerHistory.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+            batchTrackerHistory.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            batchTrackerHistory.setError( null );
+            batchTrackerHistoryDao.save( batchTrackerHistory );
+        }
         LOG.debug( "method updateModifiedOnColumnByBatchType() ended for batch type : " + batchType );
     }
 
