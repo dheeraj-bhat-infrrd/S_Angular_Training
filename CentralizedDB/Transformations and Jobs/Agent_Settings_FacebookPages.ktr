@@ -191,18 +191,50 @@
   </connection>
   <order>
   <hop> <from>FB Token IP</from><to>Sort FB Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>FacebookPages Input</from><to>FacebookPages Parsing</to><enabled>Y</enabled> </hop>
   <hop> <from>FacebookPages Parsing</from><to>Filter rows facebook pages</to><enabled>Y</enabled> </hop>
   <hop> <from>FacebookPages Table OP</from><to>Update FB Pages</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows facebook pages</from><to>Sort rows FB Pages</to><enabled>Y</enabled> </hop>
-  <hop> <from>Json Input BranchId</from><to>FacebookPages Input</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>FacebookPages Table OP</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB Input</from><to>Json Input BranchId</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort FB Token</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows FB Pages</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Constant FB Pages</from><to>Text file output</to><enabled>Y</enabled> </hop>
   <hop> <from>Update FB Pages</from><to>Constant FB Pages</to><enabled>Y</enabled> </hop>
+  <hop> <from>Json Input BranchId</from><to>FacebookPages Parsing</to><enabled>Y</enabled> </hop>
   </order>
+  <step>
+    <name>Constant FB Pages</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>stepName</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Agent_Settings_Update_FB_Pages</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>94</xloc>
+      <yloc>350</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step>
     <name>FB Token IP</name>
     <type>TableInput</type>
@@ -225,68 +257,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>94</xloc>
       <yloc>239</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>FacebookPages Input</name>
-    <type>JsonInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <include>N</include>
-    <include_field/>
-    <rownum>N</rownum>
-    <addresultfile>N</addresultfile>
-    <readurl>N</readurl>
-    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
-    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>Y</ignoreMissingPath>
-    <rownum_field/>
-    <file>
-      <name/>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
-    <fields>
-      <field>
-        <name>facebookPages</name>
-        <path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;&#x2a;&#x5d;</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-    </fields>
-    <limit>0</limit>
-    <IsInFields>Y</IsInFields>
-    <IsAFile>N</IsAFile>
-    <valueField>json</valueField>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>415</xloc>
-      <yloc>89</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -399,8 +369,8 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>625</xloc>
-      <yloc>89</yloc>
+      <xloc>432</xloc>
+      <yloc>90</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -461,7 +431,7 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>438</xloc>
+      <xloc>432</xloc>
       <yloc>349</yloc>
       <draw>Y</draw>
       </GUI>
@@ -491,7 +461,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>625</xloc>
-      <yloc>173</yloc>
+      <yloc>90</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -553,7 +523,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>230</xloc>
-      <yloc>89</yloc>
+      <yloc>90</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -580,7 +550,7 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>438</xloc>
+      <xloc>432</xloc>
       <yloc>239</yloc>
       <draw>Y</draw>
       </GUI>
@@ -604,7 +574,7 @@
     <fields_name/>
     <collection>BRANCH_SETTINGS</collection>
     <json_field_name>json</json_field_name>
-    <json_query/>
+    <json_query>&#x7b;&#x24;query&#x3a;&#x7b;&#x22;modifiedOn&#x22; &#x3a;&#x7b;&#x24;gte&#x3a;&#x24;&#x7b;modifiedOnSettings&#x7d;&#x7d;&#x7d;&#x7d;</json_query>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -1435,7 +1405,7 @@
     </mongo_fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>94</xloc>
-      <yloc>89</yloc>
+      <yloc>90</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1504,90 +1474,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>625</xloc>
       <yloc>239</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update FB Pages</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>facebook_pages</table>
-      <key>
-        <name>FACEBOOK_TOKEN_ID</name>
-        <field>FACEBOOK_TOKEN_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>NAME</name>
-        <rename>name</rename>
-        </value>
-      <value>
-        <name>CATEGORY</name>
-        <rename>category</rename>
-        </value>
-      <value>
-        <name>ACCESS_TOKEN</name>
-        <rename>accessToken</rename>
-        </value>
-      <value>
-        <name>PROFILE_URL</name>
-        <rename>profileUrl</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>234</xloc>
-      <yloc>349</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant FB Pages</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Agent_Settings_Update_FB_Pages</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>94</xloc>
-      <yloc>350</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1700,6 +1586,57 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>94</xloc>
       <yloc>471</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Update FB Pages</name>
+    <type>Update</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <skip_lookup>N</skip_lookup>
+    <commit>100</commit>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>facebook_pages</table>
+      <key>
+        <name>FACEBOOK_TOKEN_ID</name>
+        <field>FACEBOOK_TOKEN_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>NAME</name>
+        <rename>name</rename>
+        </value>
+      <value>
+        <name>CATEGORY</name>
+        <rename>category</rename>
+        </value>
+      <value>
+        <name>ACCESS_TOKEN</name>
+        <rename>accessToken</rename>
+        </value>
+      <value>
+        <name>PROFILE_URL</name>
+        <rename>profileUrl</rename>
+        </value>
+      </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>234</xloc>
+      <yloc>349</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
