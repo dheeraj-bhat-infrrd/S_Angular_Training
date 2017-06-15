@@ -10,62 +10,32 @@
     <directory>&#x2f;</directory>
     <parameters>
         <parameter>
-            <name>mongo_host</name>
+            <name>mongo_host </name>
             <default_value>localhost</default_value>
             <description/>
         </parameter>
         <parameter>
-            <name>mongo_port</name>
-            <default_value>27017</default_value>
+            <name>mongo_port </name>
+            <default_value>27017 </default_value>
             <description/>
         </parameter>
         <parameter>
-            <name>mysql_host</name>
+            <name>mysql_host </name>
             <default_value>localhost</default_value>
             <description/>
         </parameter>
         <parameter>
-            <name>mysql_info_host</name>
-            <default_value>ss-rdbms-demo.c3n1qsdsmjxc.us-west-2.rds.amazonaws.com</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_password</name>
-            <default_value>shipra744772</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_port_no</name>
-            <default_value>3306</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_schema_name</name>
-            <default_value>ss_user</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_user_name</name>
-            <default_value>shipra</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_master_schema_name</name>
-            <default_value>ss_user</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_password</name>
+            <name>mysql_password </name>
             <default_value>root</default_value>
             <description/>
         </parameter>
         <parameter>
-            <name>mysql_port_no</name>
+            <name>mysql_port_no </name>
             <default_value>3306</default_value>
             <description/>
         </parameter>
         <parameter>
-            <name>mysql_schema_name</name>
+            <name>mysql_schema_name </name>
             <default_value>ss_centralized_mongodb</default_value>
             <description/>
         </parameter>
@@ -139,6 +109,33 @@
   <notepads>
   </notepads>
   <connection>
+    <name>Local instance MySQL57</name>
+    <server>&#x24;&#x7b;mysql_host &#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;mysql_schema_name &#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no &#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password &#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no &#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
     <name>MySql_Con</name>
     <server>localhost</server>
     <type>MYSQL</type>
@@ -194,13 +191,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
+    <server>localhost</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no &#x7d;</port>
-    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password &#x7d;</password>
+    <database>ss_user</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -210,7 +207,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no &#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -227,8 +224,42 @@
   <hop> <from>Loging</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_details_insert</from><to>survey_details_Update</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 2</from><to>survey_details_insert</to><enabled>Y</enabled> </hop>
-  <hop> <from>MongoDB Input</from><to>Write to log 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey_details_Update</from><to>Add constants 2</to><enabled>Y</enabled> </hop>
   </order>
+  <step>
+    <name>Add constants 2</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>stepName</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>SurveyDetails_UpdateJobLogDetails</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>546</xloc>
+      <yloc>323</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step>
     <name>DateConverter</name>
     <type>ScriptValueMod</type>
@@ -278,7 +309,7 @@
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>372</xloc>
-      <yloc>127</yloc>
+      <yloc>126</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -307,7 +338,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>487</xloc>
-      <yloc>128</yloc>
+      <yloc>126</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -316,15 +347,15 @@
     <name>MongoDB Input</name>
     <type>MongoDbInput</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <hostname>&#x24;&#x7b;mongo_host&#x7d;</hostname>
-    <port>&#x24;&#x7b;mongo_port&#x7d;</port>
+    <hostname>&#x24;&#x7b;mongo_host &#x7d;</hostname>
+    <port>&#x24;&#x7b;mongo_port &#x7d;</port>
     <use_all_replica_members>N</use_all_replica_members>
     <db_name>ss_db</db_name>
     <fields_name/>
@@ -1009,7 +1040,7 @@
     </mongo_fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>76</xloc>
-      <yloc>127</yloc>
+      <yloc>126</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3614,7 +3645,119 @@
       </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>589</xloc>
-      <yloc>127</yloc>
+      <yloc>126</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Text file output</name>
+    <type>TextFileOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <separator>&#x3b;</separator>
+    <enclosure>&#x22;</enclosure>
+    <enclosure_forced>N</enclosure_forced>
+    <enclosure_fix_disabled>N</enclosure_fix_disabled>
+    <header>Y</header>
+    <footer>N</footer>
+    <format>DOS</format>
+    <compression>None</compression>
+    <encoding/>
+    <endedLine/>
+    <fileNameInField>N</fileNameInField>
+    <fileNameField/>
+    <create_parent_folder>Y</create_parent_folder>
+    <file>
+      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
+      <is_command>N</is_command>
+      <servlet_output>N</servlet_output>
+      <do_not_open_new_file_init>N</do_not_open_new_file_init>
+      <extention>txt</extention>
+      <append>Y</append>
+      <split>N</split>
+      <haspartno>N</haspartno>
+      <add_date>Y</add_date>
+      <add_time>Y</add_time>
+      <SpecifyFormat>N</SpecifyFormat>
+      <date_time_format/>
+      <add_to_result_filenames>Y</add_to_result_filenames>
+      <pad>N</pad>
+      <fast_dump>N</fast_dump>
+      <splitevery>0</splitevery>
+    </file>
+    <fields>
+      <field>
+        <name>NumOfError</name>
+        <type>Integer</type>
+        <format>&#x23;&#x3b;-&#x23;</format>
+        <currency/>
+        <decimal>.</decimal>
+        <group>,</group>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>3</length>
+        <precision>0</precision>
+      </field>
+      <field>
+        <name>ErrorDesc</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>ErrorFields</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>ErrorCode</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>stepName</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>372</xloc>
+      <yloc>323</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3646,36 +3789,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>266</xloc>
-      <yloc>128</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Write to log 2</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>modifiedOn</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>171</xloc>
-      <yloc>247</yloc>
+      <yloc>126</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3691,7 +3805,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
+    <connection>Local instance MySQL57</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>Y</use_batch>
@@ -3857,8 +3971,8 @@
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>880</xloc>
-      <yloc>209</yloc>
+      <xloc>722</xloc>
+      <yloc>323</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3874,7 +3988,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
+    <connection>Local instance MySQL57</connection>
     <schema/>
     <table>survey_details</table>
     <commit>1000</commit>
@@ -4054,6 +4168,18 @@
     </step>
 
   <step_error_handling>
+      <error>
+        <source_step>survey_details_Update</source_step>
+        <target_step>Add constants 2</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
+        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
+        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
+        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
       <error>
         <source_step>survey_details_insert</source_step>
         <target_step>survey_details_Update</target_step>

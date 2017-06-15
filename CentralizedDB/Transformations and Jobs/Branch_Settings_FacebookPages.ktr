@@ -164,13 +164,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
+    <server>localhost</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
-    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
+    <database>ss_user</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -180,7 +180,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -192,15 +192,50 @@
   <order>
   <hop> <from>FB Token IP</from><to>Sort FB Token</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB Input</from><to>Json Input BranchId</to><enabled>Y</enabled> </hop>
-  <hop> <from>Json Input BranchId</from><to>FacebookPages Input</to><enabled>Y</enabled> </hop>
-  <hop> <from>FacebookPages Input</from><to>FacebookPages Parsing</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort FB Token</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows FB Pages</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>FacebookPages Table OP</to><enabled>Y</enabled> </hop>
   <hop> <from>FacebookPages Parsing</from><to>Filter rows facebook pages</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows facebook pages</from><to>Sort rows FB Pages</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows FB Pages</from><to>Microsoft Excel Output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Microsoft Excel Output</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Json Input BranchId</from><to>FacebookPages Parsing</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>FacebookPages Table OP</to><enabled>Y</enabled> </hop>
   <hop> <from>FacebookPages Table OP</from><to>Update FB Pages</to><enabled>Y</enabled> </hop>
+  <hop> <from>Constant FB Pages</from><to>Text file output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update FB Pages</from><to>Constant FB Pages</to><enabled>Y</enabled> </hop>
   </order>
+  <step>
+    <name>Constant FB Pages</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>stepName</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Branch_Settings_Update_FB_Pages</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>217</xloc>
+      <yloc>421</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step>
     <name>FB Token IP</name>
     <type>TableInput</type>
@@ -223,68 +258,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>61</xloc>
       <yloc>191</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>FacebookPages Input</name>
-    <type>JsonInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <include>N</include>
-    <include_field/>
-    <rownum>N</rownum>
-    <addresultfile>N</addresultfile>
-    <readurl>N</readurl>
-    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
-    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>Y</ignoreMissingPath>
-    <rownum_field/>
-    <file>
-      <name/>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
-    <fields>
-      <field>
-        <name>facebookPages</name>
-        <path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;&#x2a;&#x5d;</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-    </fields>
-    <limit>0</limit>
-    <IsInFields>Y</IsInFields>
-    <IsAFile>N</IsAFile>
-    <valueField>json</valueField>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>382</xloc>
-      <yloc>41</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -420,7 +393,7 @@
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
+    <use_batch>N</use_batch>
     <specify_fields>Y</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
     <partitioning_field/>
@@ -459,8 +432,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>405</xloc>
-      <yloc>301</yloc>
+      <xloc>354</xloc>
+      <yloc>300</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -488,7 +461,7 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>592</xloc>
+      <xloc>596</xloc>
       <yloc>125</yloc>
       <draw>Y</draw>
       </GUI>
@@ -569,7 +542,7 @@
            </partitioning>
 <join_type>INNER</join_type>
 <step1>Sort FB Token</step1>
-<step2>Sort rows FB Pages</step2>
+<step2>Microsoft Excel Output</step2>
     <keys_1>
       <key>id</key>
     </keys_1>
@@ -578,8 +551,105 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>405</xloc>
-      <yloc>191</yloc>
+      <xloc>354</xloc>
+      <yloc>192</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Microsoft Excel Output</name>
+    <type>ExcelOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <header>Y</header>
+    <footer>N</footer>
+    <encoding/>
+    <append>N</append>
+    <add_to_result_filenames>Y</add_to_result_filenames>
+    <file>
+      <name>D&#x3a;&#x5c;Subhrajit&#x5c;FacebookPages.xls.xls</name>
+      <extention>xls</extention>
+      <do_not_open_newfile_init>N</do_not_open_newfile_init>
+      <create_parent_folder>N</create_parent_folder>
+      <split>N</split>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <SpecifyFormat>N</SpecifyFormat>
+      <date_time_format/>
+      <sheetname>Sheet1</sheetname>
+      <autosizecolums>N</autosizecolums>
+      <nullisblank>N</nullisblank>
+      <protect_sheet>N</protect_sheet>
+      <password>Encrypted </password>
+      <splitevery>0</splitevery>
+      <usetempfiles>N</usetempfiles>
+      <tempdirectory/>
+      </file>
+    <template>
+      <enabled>N</enabled>
+      <append>N</append>
+      <filename>template.xls</filename>
+    </template>
+    <fields>
+      <field>
+        <name>_id</name>
+        <type>None</type>
+        <format/>
+      </field>
+      <field>
+        <name>accessToken</name>
+        <type>None</type>
+        <format/>
+      </field>
+      <field>
+        <name>branchId</name>
+        <type>None</type>
+        <format/>
+      </field>
+      <field>
+        <name>category</name>
+        <type>None</type>
+        <format/>
+      </field>
+      <field>
+        <name>name</name>
+        <type>None</type>
+        <format/>
+      </field>
+      <field>
+        <name>profileUrl</name>
+        <type>None</type>
+        <format/>
+      </field>
+    </fields>
+    <custom>
+    <header_font_name>arial</header_font_name>
+    <header_font_size>10</header_font_size>
+    <header_font_bold>N</header_font_bold>
+    <header_font_italic>N</header_font_italic>
+    <header_font_underline>no</header_font_underline>
+    <header_font_orientation>horizontal</header_font_orientation>
+    <header_font_color>black</header_font_color>
+    <header_background_color>none</header_background_color>
+    <header_row_height>255</header_row_height>
+    <header_alignment>left</header_alignment>
+    <header_image/>
+    <row_font_name>arial</row_font_name>
+    <row_font_size>10</row_font_size>
+    <row_font_color>black</row_font_color>
+    <row_background_color>none</row_background_color>
+      </custom>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>495</xloc>
+      <yloc>192</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1507,6 +1577,118 @@
     </step>
 
   <step>
+    <name>Text file output</name>
+    <type>TextFileOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <separator>&#x3b;</separator>
+    <enclosure>&#x22;</enclosure>
+    <enclosure_forced>N</enclosure_forced>
+    <enclosure_fix_disabled>N</enclosure_fix_disabled>
+    <header>Y</header>
+    <footer>N</footer>
+    <format>DOS</format>
+    <compression>None</compression>
+    <encoding/>
+    <endedLine/>
+    <fileNameInField>N</fileNameInField>
+    <fileNameField/>
+    <create_parent_folder>Y</create_parent_folder>
+    <file>
+      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
+      <is_command>N</is_command>
+      <servlet_output>N</servlet_output>
+      <do_not_open_new_file_init>N</do_not_open_new_file_init>
+      <extention>txt</extention>
+      <append>Y</append>
+      <split>N</split>
+      <haspartno>N</haspartno>
+      <add_date>Y</add_date>
+      <add_time>Y</add_time>
+      <SpecifyFormat>N</SpecifyFormat>
+      <date_time_format/>
+      <add_to_result_filenames>Y</add_to_result_filenames>
+      <pad>N</pad>
+      <fast_dump>N</fast_dump>
+      <splitevery>0</splitevery>
+    </file>
+    <fields>
+      <field>
+        <name>NumOfError</name>
+        <type>Integer</type>
+        <format>&#x23;&#x3b;-&#x23;</format>
+        <currency/>
+        <decimal>.</decimal>
+        <group>,</group>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>3</length>
+        <precision>0</precision>
+      </field>
+      <field>
+        <name>ErrorDesc</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>ErrorFields</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>ErrorCode</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>stepName</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>370</xloc>
+      <yloc>421</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Update FB Pages</name>
     <type>Update</type>
     <description/>
@@ -1532,6 +1714,12 @@
         <condition>&#x3d;</condition>
         <name2/>
         </key>
+      <key>
+        <name>_id</name>
+        <field>FACEBOOK_PAGES_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
       <value>
         <name>NAME</name>
         <rename>name</rename>
@@ -1551,8 +1739,8 @@
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>265</xloc>
-      <yloc>302</yloc>
+      <xloc>216</xloc>
+      <yloc>300</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1566,6 +1754,18 @@
         <descriptions_valuename/>
         <fields_valuename/>
         <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update FB Pages</source_step>
+        <target_step>Constant FB Pages</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
+        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
+        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
+        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
         <max_errors/>
         <max_pct_errors/>
         <min_pct_rows/>
