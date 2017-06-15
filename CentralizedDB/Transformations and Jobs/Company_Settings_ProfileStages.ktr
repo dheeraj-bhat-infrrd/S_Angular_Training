@@ -10,16 +10,6 @@
     <directory>&#x2f;</directory>
     <parameters>
         <parameter>
-            <name>mongo_host </name>
-            <default_value>localhost</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mongo_port </name>
-            <default_value>27017 </default_value>
-            <description/>
-        </parameter>
-        <parameter>
             <name>mysql_host </name>
             <default_value>localhost</default_value>
             <description/>
@@ -257,6 +247,39 @@
     </step>
 
   <step>
+    <name>Constant SocialMediaToken</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>stepName</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Company_Settings_Update_SocialMediaToken</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>211</xloc>
+      <yloc>388</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Json Input CompanyId</name>
     <type>JsonInput</type>
     <description/>
@@ -357,14 +380,14 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <hostname>&#x24;&#x7b;mongo_host &#x7d;</hostname>
-    <port>&#x24;&#x7b;mongo_port &#x7d;</port>
+    <hostname>&#x24;&#x7b;mongo_host&#x7d;</hostname>
+    <port>&#x24;&#x7b;mongo_port&#x7d;</port>
     <use_all_replica_members>N</use_all_replica_members>
     <db_name>ss_db</db_name>
     <fields_name/>
     <collection>COMPANY_SETTINGS</collection>
     <json_field_name>json</json_field_name>
-    <json_query/>
+    <json_query>&#x7b;&#x24;query&#x3a;&#x7b;&#x22;modifiedOn&#x22; &#x3a;&#x7b;&#x24;gte&#x3a;&#x24;&#x7b;modifiedOnSettings&#x7d;&#x7d;&#x7d;&#x7d;</json_query>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -1405,125 +1428,6 @@
     </step>
 
   <step>
-    <name>UUID_ProfileStages</name>
-    <type>RandomValue</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>PROFILE_STAGES_ID</name>
-        <type>random uuid</type>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>497</xloc>
-      <yloc>283</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update ProfileStages</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>Local instance MySQL57</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>profile_stages</table>
-      <key>
-        <name>COMPANY_SETTINGS_ID</name>
-        <field>COMPANY_SETTINGS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>profileStageKey</name>
-        <field>PROFILE_STAGE_KEY</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>ORDER</name>
-        <rename>order</rename>
-        </value>
-      <value>
-        <name>STATUS</name>
-        <rename>status</rename>
-        </value>
-      <value>
-        <name>PROFILE_STAGE_KEY</name>
-        <rename>profileStageKey</rename>
-        </value>
-      <value>
-        <name>PROFILE_STAGES_ID</name>
-        <rename>PROFILE_STAGES_ID</rename>
-        </value>
-      <value>
-        <name>COMPANY_SETTINGS_ID</name>
-        <rename>COMPANY_SETTINGS_ID</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>362</xloc>
-      <yloc>388</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant SocialMediaToken</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Company_Settings_Update_SocialMediaToken</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>211</xloc>
-      <yloc>388</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Text file output</name>
     <type>TextFileOutput</type>
     <description/>
@@ -1630,6 +1534,92 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>72</xloc>
+      <yloc>388</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>UUID_ProfileStages</name>
+    <type>RandomValue</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>PROFILE_STAGES_ID</name>
+        <type>random uuid</type>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>497</xloc>
+      <yloc>283</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Update ProfileStages</name>
+    <type>Update</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>Local instance MySQL57</connection>
+    <skip_lookup>N</skip_lookup>
+    <commit>100</commit>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>profile_stages</table>
+      <key>
+        <name>COMPANY_SETTINGS_ID</name>
+        <field>COMPANY_SETTINGS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>profileStageKey</name>
+        <field>PROFILE_STAGE_KEY</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>ORDER</name>
+        <rename>order</rename>
+        </value>
+      <value>
+        <name>STATUS</name>
+        <rename>status</rename>
+        </value>
+      <value>
+        <name>PROFILE_STAGE_KEY</name>
+        <rename>profileStageKey</rename>
+        </value>
+      <value>
+        <name>PROFILE_STAGES_ID</name>
+        <rename>PROFILE_STAGES_ID</rename>
+        </value>
+      <value>
+        <name>COMPANY_SETTINGS_ID</name>
+        <rename>COMPANY_SETTINGS_ID</rename>
+        </value>
+      </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>362</xloc>
       <yloc>388</yloc>
       <draw>Y</draw>
       </GUI>
