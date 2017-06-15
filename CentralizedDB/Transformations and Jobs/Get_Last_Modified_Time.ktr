@@ -265,11 +265,25 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
+<<<<<<< HEAD
         <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;function convertToDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;if&#x28;milliValue&#x21;&#x3d;null &#x26;&#x26; milliValue&#x21;&#x3d;&#x22;undefined&#x22;&#x29;&#x7b;&#xd;&#xa;var date_string &#x3d; milliValue.toString&#x28;&#x29;&#xd;&#xa;var date &#x3d; date_string.substring&#x28;0,10&#x29;&#x3b;&#xd;&#xa;var time &#x3d; date_string.substring&#x28;11,19&#x29;&#x3b;&#xd;&#xa;var millisec &#x3d; date_string.substring&#x28;20,21&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;return &#x22;ISODate&#x28;&#x5c;&#x22;&#x22;&#x2b;date&#x2b;&#x22;T&#x22;&#x2b;time&#x2b;&#x22;.&#x22;&#x2b;millisec&#x2b;&#x22;00Z&#x5c;&#x22;&#x29;&#x22;&#x3b;&#xd;&#xa; &#x7d;&#xd;&#xa;&#xd;&#xa;return null&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;var modifiedOnSurveyDetails &#x3d; convertToDate&#x28;lastModifiedTime&#x29;&#x3b;</jsScript_script>
       </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
         <jsScript_name>substr_Sample</jsScript_name>
         <jsScript_script>&#x2f;&#x2f; Perform the substring function&#xa;&#x2f;&#x2f; &#xa;&#x2f;&#x2f; Usage&#x3a;&#xa;&#x2f;&#x2f; substr&#x28;var, from&#x29;&#x3b;&#xa;&#x2f;&#x2f; substr&#x28;var, from, to&#x29;&#x3b;&#xa;&#x2f;&#x2f;&#xa;&#x2f;&#x2f; 2007-01-25&#xa;&#x2f;&#x2f;&#xa;var str1&#x3d; &#x22;Hello Pentaho&#x21;&#x22;&#x3b;&#xa;var str2&#x3d; substr&#x28;str1, 6&#x29;&#x3b;&#xa;var str3&#x3d; substr&#x28;str1, 6, 7&#x29;&#x3b;&#xa;Alert&#x28;&#x22;Input &#x3a; &#x22; &#x2b; str1&#x29;&#x3b;&#xa;Alert&#x28;&#x22;From position 6&#x3a; &#x22; &#x2b; str2&#x29;&#x3b;&#xa;Alert&#x28;&#x22;From position 6 for 7 long &#x3a; &#x22; &#x2b; str3&#x29;&#x3b;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>modifiedOnSurveyDetails</name>
+=======
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;function convertToSurveyDate&#x28;IsoDate&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;if&#x28;IsoDate&#x21;&#x3d;null &#x26;&#x26; IsoDate&#x21;&#x3d;&#x22;undefined&#x22;&#x29;&#x7b;&#xd;&#xa;var date_string &#x3d; IsoDate.toString&#x28;&#x29;&#xd;&#xa;var date &#x3d; date_string.substring&#x28;0,10&#x29;&#x3b;&#xd;&#xa;var time &#x3d; date_string.substring&#x28;11,19&#x29;&#x3b;&#xd;&#xa;var millisec &#x3d; date_string.substring&#x28;20,21&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;return &#x22;&#x5c;&#x22;&#x22;&#x2b;date&#x2b;&#x22;T&#x22;&#x2b;time&#x2b;&#x22;.&#x22;&#x2b;millisec&#x2b;&#x22;00Z&#x5c;&#x22;&#x22;&#x3b;&#xd;&#xa; &#x7d;&#xd;&#xa;&#xd;&#xa;return null&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;function convertToSettingsDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;if&#x28;milliValue&#x21;&#x3d;null &#x26;&#x26; milliValue&#x21;&#x3d;&#x22;undefined&#x22;&#x29;&#x7b;&#xd;&#xa;var date_string &#x3d; milliValue.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var time &#x3d; date_string.substring&#x28;0,19&#x29;&#x3b;&#xd;&#xa;var time_replace &#x3d; time.replace&#x28;&#x22;-&#x22;,&#x22;&#x2f;&#x22;&#x29;&#x3b;&#xd;&#xa;var date &#x3d; new Date&#x28;time_replace&#x29;&#x3b;&#xd;&#xa;var mydate &#x3d; date.getTime&#x28;&#x29;&#x3b;&#xd;&#xa;return mydate&#x3b;&#xd;&#xa; &#x7d;&#xd;&#xa;return null&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var modifiedOnSettings &#x3d; convertToSettingsDate&#x28;lastModifiedTime&#x29;&#x3b;&#xd;&#xa;var modifiedOnSurveyDetails &#x3d; convertToSurveyDate&#x28;lastModifiedTime&#x29;&#x3b;&#xd;&#xa;</jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
+        <jsScript_name>substr_Sample</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f; Perform the substring function&#xa;&#x2f;&#x2f; &#xa;&#x2f;&#x2f; Usage&#x3a;&#xa;&#x2f;&#x2f; substr&#x28;var, from&#x29;&#x3b;&#xa;&#x2f;&#x2f; substr&#x28;var, from, to&#x29;&#x3b;&#xa;&#x2f;&#x2f;&#xa;&#x2f;&#x2f; 2007-01-25&#xa;&#x2f;&#x2f;&#xa;var str1&#x3d; &#x22;Hello Pentaho&#x21;&#x22;&#x3b;&#xa;var str2&#x3d; substr&#x28;str1, 6&#x29;&#x3b;&#xa;var str3&#x3d; substr&#x28;str1, 6, 7&#x29;&#x3b;&#xa;Alert&#x28;&#x22;Input &#x3a; &#x22; &#x2b; str1&#x29;&#x3b;&#xa;Alert&#x28;&#x22;From position 6&#x3a; &#x22; &#x2b; str2&#x29;&#x3b;&#xa;Alert&#x28;&#x22;From position 6 for 7 long &#x3a; &#x22; &#x2b; str3&#x29;&#x3b;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>modifiedOnSettings</name>
+        <rename>modifiedOnSettings</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>modifiedOnSurveyDetails</name>
+>>>>>>> 2cd7c471261ef17f526991dfa31d2584f1bb1bbc
         <rename>modifiedOnSurveyDetails</rename>
         <type>String</type>
         <length>-1</length>
@@ -277,8 +291,13 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+<<<<<<< HEAD
       <xloc>258</xloc>
       <yloc>110</yloc>
+=======
+      <xloc>259</xloc>
+      <yloc>109</yloc>
+>>>>>>> 2cd7c471261ef17f526991dfa31d2584f1bb1bbc
       <draw>Y</draw>
       </GUI>
     </step>
@@ -302,6 +321,10 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>modifiedOnSettings</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
       <meta>        <name>lastModifiedTime</name>
         <rename>lastModifiedTime</rename>
@@ -320,6 +343,21 @@
         <storage_type/>
       </meta>      <meta>        <name>modifiedOnSurveyDetails</name>
         <rename>modifiedOnSurveyDetails</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>modifiedOnSettings</name>
+        <rename>modifiedOnSettings</rename>
         <type>None</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -365,6 +403,12 @@
         <variable_type>PARENT_JOB</variable_type>
         <default_value/>
         </field>
+      <field>
+        <field_name>modifiedOnSettings</field_name>
+        <variable_name>modifiedOnSettings</variable_name>
+        <variable_type>PARENT_JOB</variable_type>
+        <default_value/>
+        </field>
       </fields>
     <use_formatting>N</use_formatting>
      <cluster_schema/>
@@ -375,6 +419,44 @@
       </GUI>
     </step>
 
+<<<<<<< HEAD
+=======
+  <step>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <loglevel>log_level_basic</loglevel>
+      <displayHeader>Y</displayHeader>
+      <limitRows>N</limitRows>
+      <limitRowsNumber>0</limitRowsNumber>
+      <logmessage/>
+    <fields>
+      <field>
+        <name>lastModifiedTime</name>
+        </field>
+      <field>
+        <name>modifiedOnSurveyDetails</name>
+        </field>
+      <field>
+        <name>modifiedOnSettings</name>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>653</xloc>
+      <yloc>113</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+>>>>>>> 2cd7c471261ef17f526991dfa31d2584f1bb1bbc
   <step_error_handling>
   </step_error_handling>
    <slave-step-copy-partition-distribution>

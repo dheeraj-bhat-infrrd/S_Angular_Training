@@ -10,16 +10,6 @@
     <directory>&#x2f;</directory>
     <parameters>
         <parameter>
-            <name>mongo_host </name>
-            <default_value>localhost</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mongo_port </name>
-            <default_value>27017 </default_value>
-            <description/>
-        </parameter>
-        <parameter>
             <name>mysql_host </name>
             <default_value>localhost</default_value>
             <description/>
@@ -545,14 +535,14 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <hostname>&#x24;&#x7b;mongo_host &#x7d;</hostname>
-    <port>&#x24;&#x7b;mongo_port &#x7d;</port>
+    <hostname>&#x24;&#x7b;mongo_host&#x7d;</hostname>
+    <port>&#x24;&#x7b;mongo_port&#x7d;</port>
     <use_all_replica_members>N</use_all_replica_members>
     <db_name>ss_db</db_name>
     <fields_name/>
     <collection>SURVEY_DETAILS</collection>
     <json_field_name>json</json_field_name>
-    <json_query>&#x7b;&#x24;query &#x3a; &#x7b; &#x24;and&#x3a; &#x5b;&#x7b;&#x22;surveyResponse&#x22;&#x3a;&#x7b;&#x24;exists&#x3a;true&#x7d;&#x7d;,&#x7b;&#x22;_id&#x22;&#x3a;&#x7b;&#x24;exists&#x3a;true&#x7d;&#x7d; &#x5d; &#x7d;&#x7d;</json_query>
+    <json_query>&#x7b;&#x24;query &#x3a; &#x7b; &#x24;and&#x3a; &#x5b;&#x7b;&#x22;surveyResponse&#x22;&#x3a;&#x7b;&#x24;exists&#x3a;true&#x7d;&#x7d;,&#x7b;&#x22;_id&#x22;&#x3a;&#x7b;&#x24;exists&#x3a;true&#x7d;&#x7d;,&#x7b;&#x22;modifiedOn&#x22; &#x3a;&#x7b;&#x24;gte&#x3a;&#x24;&#x7b;modifiedOnSurveyDetails&#x7d;&#x7d;&#x7d; &#x5d; &#x7d;&#x7d;</json_query>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
