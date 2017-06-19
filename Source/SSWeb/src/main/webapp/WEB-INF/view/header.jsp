@@ -232,6 +232,7 @@
 				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
 				</c:if>
 				<div class="header-links-item" onclick="showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></div>
+				<div class="header-links-item" onclick="showMainContent('./showreportingpage.do')"><spring:message code="label.reporting.key"/></div>
 				<div class="header-links-item" onclick="showMainContent('./showhelppage.do')"><spring:message code="label.help.key"/></div>
 				<c:choose>
 					<c:when test="${ not empty realTechAdminId }">
@@ -361,6 +362,9 @@
 					<a href="javascript:showMainContent('./showprofilepage.do')" onclick="showOverlay();"><spring:message code="label.editprofile.key" /></a>
 				</div>
 				</c:if>
+				<div class="hdr-link-item">
+					<a href="javascript:showMainContent('./showreportingpage.do')" onclick="showOverlay();"><spring:message code="label.reporting.key" /></a>
+				</div>
 				<div class="hdr-link-item">
 					<a href="javascript:showMainContent('./showhelppage.do')" onclick="showOverlay();"><spring:message code="label.help.key" /></a>
 				</div>
