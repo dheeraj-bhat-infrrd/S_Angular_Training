@@ -142,7 +142,7 @@ public class ReportingWebController
 
         model.addAttribute( "userId", user.getUserId() );
         model.addAttribute( "dest", "Loan Consultant" );
-        model.addAttribute( "NMLS", "NMLS#8794657" );
+        model.addAttribute( "NMLS", CommonConstants.USER_ZILLOW_NMLS_ID );
         model.addAttribute( "rating", "4.5");
         
         boolean allowOverrideForSocialMedia = false;
@@ -154,7 +154,7 @@ public class ReportingWebController
         List<SettingsDetails> settingsDetailsList = null;
         OrganizationUnitSettings profileSettings = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
-        //Get the hierarchy details associated with the current profile
+        //Get the hierarchy details associated with the current profile get all the id's like companyId, regionId , branchId
         try {
             Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
             if ( hierarchyDetails == null ) {
@@ -166,6 +166,7 @@ public class ReportingWebController
             regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
             companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
             agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            //Sorting out the default region's and branche's in the list 
             settingsDetailsList = settingsManager.getScoreForCompleteHeirarchy( companyId, branchId, regionId );
             LOG.debug( "Company ID : " + companyId + " Region ID : " + regionId + " Branch ID : " + branchId + " Agent ID : "
                 + agentId );
@@ -178,9 +179,9 @@ public class ReportingWebController
             return JspResolver.NO_PROFILES_FOUND;
         }
 
+        //get unitSetting's and set session attribute column's 
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
-
-        // fetching details from profile
+        // fetching details from profile based on type 
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             //If the profile is a company profile
             model.addAttribute( "columnName", entityType );
@@ -494,7 +495,7 @@ public class ReportingWebController
 
             boolean allowOverrideForSocialMedia = false;
             boolean hiddenSection = false;
-            //Code to determine if social media can be overridden during autologin
+            //Code to determine if social media can be overridden during autologin and the value for hiddenSection
             if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 allowOverrideForSocialMedia = unitSettings.isAllowOverrideForSocialMedia();
                 hiddenSection = unitSettings.isHiddenSection();
@@ -507,59 +508,11 @@ public class ReportingWebController
             model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
             model.addAttribute( "hiddenSection", hiddenSection );
 
-            // calculating details for circles
-            int numberOfDays = -1;
-            try {
-                if ( request.getParameter( "numberOfDays" ) != null && !request.getParameter( "numberOfDays" ).isEmpty() ) {
-                    numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
-                }
-            } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught in getProfileDetails() while converting numberOfDays." );
-                throw e;
-            }
-
-            if ( realtechAdmin ) {
-                columnName = null;
-            }
-            LOG.debug( "Getting the survey score." );
-            double surveyScore = dashboardService.getSurveyScore( columnName, columnValue, numberOfDays, realtechAdmin );
-            //get formatted survey score using rating format  
-            surveyScore = surveyHandler.getFormattedSurveyScore( surveyScore );
-            LOG.debug( "Getting the sent surveys count." );
-            int sentSurveyCount = (int) dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays );
-            LOG.debug( "Getting the social posts count with hierarchy." );
-            int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
-                numberOfDays );
-            int profileCompleteness = 0;
-            if ( !realtechAdmin ) {
-                LOG.debug( "Getting profile completeness." );
-                profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue,
-                    unitSettings );
-            }
-            model.addAttribute( "socialScore", surveyScore );
-            if ( sentSurveyCount > 999 ) {
-                int quotient = sentSurveyCount / 1000;
-                model.addAttribute( "surveyCount", quotient + "K+" );
-            } else {
-                model.addAttribute( "surveyCount", sentSurveyCount );
-            }
-            if ( socialPostsCount > 999 ) {
-                int quotient = socialPostsCount / 1000;
-                model.addAttribute( "socialPosts", quotient + "K+" );
-            } else {
-                model.addAttribute( "socialPosts", socialPostsCount );
-            }
-
-            model.addAttribute( "profileCompleteness", profileCompleteness );
-            LOG.debug( "Getting the badges." );
-            model.addAttribute( "badges",
-                dashboardService.getBadges( surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness ) );
-
             model.addAttribute( "columnName", columnName );
             model.addAttribute( "columnValue", columnValue );
 
             LOG.info( "Method to get profile of company/region/branch/agent getProfileDetails() finished" );
-            return JspResolver.DASHBOARD_PROFILEDETAIL;
+            return JspResolver.REPORTING_PROFILE;
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
