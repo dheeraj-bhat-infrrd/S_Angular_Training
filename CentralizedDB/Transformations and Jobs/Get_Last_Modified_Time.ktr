@@ -166,6 +166,33 @@
     </attributes>
   </connection>
   <connection>
+    <name>MySql_Con</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>sakila</database>
+    <port>3306</port>
+    <username>&#x24;&#x7b;db_user_name&#x7d;</username>
+    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
     <name>SS_Centralized_Mysql_Conn</name>
     <server>&#x24;&#x7b;mysql_host&#x7d;</server>
     <type>MYSQL</type>
@@ -194,13 +221,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
+    <server>localhost</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
-    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
+    <database>ss_user</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -210,7 +237,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -220,6 +247,7 @@
     </attributes>
   </connection>
   <order>
+  <hop> <from>Set Variables</from><to>Write to log</to><enabled>Y</enabled> </hop>
   <hop> <from>LastModifiedTime</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>Set Variables</to><enabled>Y</enabled> </hop>
@@ -245,7 +273,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>98</xloc>
-      <yloc>112</yloc>
+      <yloc>113</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -265,13 +293,6 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-<<<<<<< HEAD
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;function convertToDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;if&#x28;milliValue&#x21;&#x3d;null &#x26;&#x26; milliValue&#x21;&#x3d;&#x22;undefined&#x22;&#x29;&#x7b;&#xd;&#xa;var date_string &#x3d; milliValue.toString&#x28;&#x29;&#xd;&#xa;var date &#x3d; date_string.substring&#x28;0,10&#x29;&#x3b;&#xd;&#xa;var time &#x3d; date_string.substring&#x28;11,19&#x29;&#x3b;&#xd;&#xa;var millisec &#x3d; date_string.substring&#x28;20,21&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;return &#x22;ISODate&#x28;&#x5c;&#x22;&#x22;&#x2b;date&#x2b;&#x22;T&#x22;&#x2b;time&#x2b;&#x22;.&#x22;&#x2b;millisec&#x2b;&#x22;00Z&#x5c;&#x22;&#x29;&#x22;&#x3b;&#xd;&#xa; &#x7d;&#xd;&#xa;&#xd;&#xa;return null&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;var modifiedOnSurveyDetails &#x3d; convertToDate&#x28;lastModifiedTime&#x29;&#x3b;</jsScript_script>
-      </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
-        <jsScript_name>substr_Sample</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f; Perform the substring function&#xa;&#x2f;&#x2f; &#xa;&#x2f;&#x2f; Usage&#x3a;&#xa;&#x2f;&#x2f; substr&#x28;var, from&#x29;&#x3b;&#xa;&#x2f;&#x2f; substr&#x28;var, from, to&#x29;&#x3b;&#xa;&#x2f;&#x2f;&#xa;&#x2f;&#x2f; 2007-01-25&#xa;&#x2f;&#x2f;&#xa;var str1&#x3d; &#x22;Hello Pentaho&#x21;&#x22;&#x3b;&#xa;var str2&#x3d; substr&#x28;str1, 6&#x29;&#x3b;&#xa;var str3&#x3d; substr&#x28;str1, 6, 7&#x29;&#x3b;&#xa;Alert&#x28;&#x22;Input &#x3a; &#x22; &#x2b; str1&#x29;&#x3b;&#xa;Alert&#x28;&#x22;From position 6&#x3a; &#x22; &#x2b; str2&#x29;&#x3b;&#xa;Alert&#x28;&#x22;From position 6 for 7 long &#x3a; &#x22; &#x2b; str3&#x29;&#x3b;&#xa;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>modifiedOnSurveyDetails</name>
-=======
         <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;function convertToSurveyDate&#x28;IsoDate&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;if&#x28;IsoDate&#x21;&#x3d;null &#x26;&#x26; IsoDate&#x21;&#x3d;&#x22;undefined&#x22;&#x29;&#x7b;&#xd;&#xa;var date_string &#x3d; IsoDate.toString&#x28;&#x29;&#xd;&#xa;var date &#x3d; date_string.substring&#x28;0,10&#x29;&#x3b;&#xd;&#xa;var time &#x3d; date_string.substring&#x28;11,19&#x29;&#x3b;&#xd;&#xa;var millisec &#x3d; date_string.substring&#x28;20,21&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;return &#x22;&#x5c;&#x22;&#x22;&#x2b;date&#x2b;&#x22;T&#x22;&#x2b;time&#x2b;&#x22;.&#x22;&#x2b;millisec&#x2b;&#x22;00Z&#x5c;&#x22;&#x22;&#x3b;&#xd;&#xa; &#x7d;&#xd;&#xa;&#xd;&#xa;return null&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;function convertToSettingsDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;if&#x28;milliValue&#x21;&#x3d;null &#x26;&#x26; milliValue&#x21;&#x3d;&#x22;undefined&#x22;&#x29;&#x7b;&#xd;&#xa;var date_string &#x3d; milliValue.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var time &#x3d; date_string.substring&#x28;0,19&#x29;&#x3b;&#xd;&#xa;var time_replace &#x3d; time.replace&#x28;&#x22;-&#x22;,&#x22;&#x2f;&#x22;&#x29;&#x3b;&#xd;&#xa;var date &#x3d; new Date&#x28;time_replace&#x29;&#x3b;&#xd;&#xa;var mydate &#x3d; date.getTime&#x28;&#x29;&#x3b;&#xd;&#xa;return mydate&#x3b;&#xd;&#xa; &#x7d;&#xd;&#xa;return null&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var modifiedOnSettings &#x3d; convertToSettingsDate&#x28;lastModifiedTime&#x29;&#x3b;&#xd;&#xa;var modifiedOnSurveyDetails &#x3d; convertToSurveyDate&#x28;lastModifiedTime&#x29;&#x3b;&#xd;&#xa;</jsScript_script>
       </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
         <jsScript_name>substr_Sample</jsScript_name>
@@ -283,7 +304,6 @@
         <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>modifiedOnSurveyDetails</name>
->>>>>>> 2cd7c471261ef17f526991dfa31d2584f1bb1bbc
         <rename>modifiedOnSurveyDetails</rename>
         <type>String</type>
         <length>-1</length>
@@ -291,13 +311,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-<<<<<<< HEAD
-      <xloc>258</xloc>
-      <yloc>110</yloc>
-=======
       <xloc>259</xloc>
-      <yloc>109</yloc>
->>>>>>> 2cd7c471261ef17f526991dfa31d2584f1bb1bbc
+      <yloc>113</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -374,7 +389,7 @@
       </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>359</xloc>
-      <yloc>80</yloc>
+      <yloc>113</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -419,8 +434,6 @@
       </GUI>
     </step>
 
-<<<<<<< HEAD
-=======
   <step>
     <name>Write to log</name>
     <type>WriteToLog</type>
@@ -456,7 +469,6 @@
       </GUI>
     </step>
 
->>>>>>> 2cd7c471261ef17f526991dfa31d2584f1bb1bbc
   <step_error_handling>
   </step_error_handling>
    <slave-step-copy-partition-distribution>

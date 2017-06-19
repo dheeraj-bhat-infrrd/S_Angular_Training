@@ -7751,6 +7751,42 @@ function paintForProfile() {
 	fetchReviewsOnEditProfile(attrName, attrVal, false);
 }
 
+function paintForReportingDash() {
+	profileId = $('#profile-id').val();
+	var companyId = $('#prof-company-id').val();
+	var regionId = $('#prof-region-id').val();
+	var branchId = $('#prof-branch-id').val();
+	var agentId = $('#prof-agent-id').val();
+
+	if (companyId != undefined) {
+		attrName = "companyId";
+		attrVal = companyId;
+
+		fetchHierarchy("companyProfileName", $("#company-profile-name").val());
+	} else if (regionId != undefined) {
+		attrName = "regionId";
+		attrVal = regionId;
+
+		fetchHierarchy(attrName, attrVal);
+	} else if (branchId != undefined) {
+		attrName = "branchId";
+		attrVal = branchId;
+
+		fetchHierarchy(attrName, attrVal);
+	} else if (agentId != undefined) {
+		attrName = "agentId";
+		attrVal = agentId;
+	}
+	startIndex = 0;
+	doStopReviewsPaginationEditProfile = false;
+	isReviewsRequestRunningEditProfile = false;
+	$('#prof-review-item').html('');
+	// Common call for all cases
+	fetchAvgRating(attrName, attrVal);
+	fetchReviewCount(attrName, attrVal, minScore);
+	fetchReviewsOnEditProfile(attrName, attrVal, false);
+}
+
 function focusOnElement() {
 	if (editProfileForYelp) {
 		$('#social-token-text').show();
