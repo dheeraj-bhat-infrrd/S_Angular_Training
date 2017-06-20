@@ -530,6 +530,33 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-grph-sel-item');
 }
 
+function paintReportingDashboard(profileMasterId, newProfileName, newProfileValue, typeoOfAccount) {
+	accountType = typeoOfAccount;
+	startIndexCmp = 0;
+	batchSizeCmp = 5;
+	doStopPaginationDashboard = false;
+	isDashboardReviewRequestRunning = false;
+	reviewsFetchedSoFar = 0;
+	startIndexInc = 0;
+	batchSizeInc = 6;
+	totalReviewsInc = 0;
+	surveyFetchedSoFarInc = 0;
+
+	lastColNameForCount = newProfileName;
+	lastColValueForCount = newProfileValue;
+
+	colName = newProfileName;
+	colValue = newProfileValue;
+
+	if (newProfileName != null) {
+		showDashboardButtons(newProfileName, newProfileValue);
+	}
+}
+
+function reportingSocialMediaButtons(data){
+	
+}
+
 function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
 	// Bind keyup on search for region, branch, individual for dashboard
 	$('#' + elementId).on('keyup', function(e) {

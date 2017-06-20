@@ -53,6 +53,14 @@
 	</div>
 </div>
 
+<div id="prof-container" data-profile-master-id="${profileMasterId}"
+			data-column-name="${columnName}" data-account-type="${accounttype}"
+			data-column-value="${columnValue}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
+			<div id="top-dash" class="hide" ></div>
+			<div id="dash-profile-detail-circles" class="row row-dash-top-adj" >
+				<!-- Populated by dashboard_profiledetail.jsp -->
+			</div>
+</div>
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div>
 		<div class="container pos-relative">
@@ -69,7 +77,9 @@
 					</div>
 				</div>
 				<div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper float-right">
-					
+					<div id="prof-basic-container" class="prof-name-container">
+						<jsp:include page="reporting_dashbuttons.jsp"></jsp:include>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -101,5 +111,12 @@ $(document).ready(function() {
 	paintForReportingDash();
 	
 	updateViewAsScroll();
+	
+	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
+	var currentProfileName = $('#prof-container').attr('data-column-name');
+	var currentProfileValue = $('#prof-container').attr('data-column-value');
+	var accountType = $('#prof-container').attr('data-account-type');
+	
+	paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
 });
 </script>
