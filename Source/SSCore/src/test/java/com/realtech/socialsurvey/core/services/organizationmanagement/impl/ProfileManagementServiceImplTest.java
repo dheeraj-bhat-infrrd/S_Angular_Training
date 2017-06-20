@@ -1855,5 +1855,29 @@ public class ProfileManagementServiceImplTest
         Mockito.when( userManagementService.getCompanyAdmin(Mockito.anyLong()) ).thenReturn( null );
         profileManagementServiceImpl.generateAndSendEmailVerificationRequestLinkToAdmin( new ArrayList<MiscValues>(), 1, "test", new OrganizationUnitSettings() );
     }
-    
+
+
+    @Test ( expected = InvalidInputException.class)
+      public void testFetchAndSaveNmlsIdWithNullProfile() throws InvalidInputException, UnavailableException
+      {
+          profileManagementServiceImpl.fetchAndSaveNmlsId( null, TestConstants.TEST_STRING, 0, false, false );
+
+      }
+
+
+      @Test ( expected = InvalidInputException.class)
+      public void testFetchAndSaveNmlsIdWithNullCollectionName() throws InvalidInputException, UnavailableException
+      {
+          profileManagementServiceImpl.fetchAndSaveNmlsId( new OrganizationUnitSettings(), null, 0, false, false );
+      }
+
+
+      @Test ( expected = InvalidInputException.class)
+      public void testFetchAndSaveNmlsIdWithEmptyCollectionName() throws InvalidInputException, UnavailableException
+      {
+          profileManagementServiceImpl.fetchAndSaveNmlsId( new OrganizationUnitSettings(), TestConstants.TEST_EMPTY_STRING,
+              0, false, false );
+      }
+
+
 }
