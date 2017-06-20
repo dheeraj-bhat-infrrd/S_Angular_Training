@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
@@ -22,6 +23,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -142,7 +144,6 @@ public class ReportingWebController
 
         model.addAttribute( "userId", user.getUserId() );
         model.addAttribute( "dest", "Loan Consultant" );
-        model.addAttribute( "NMLS", CommonConstants.USER_ZILLOW_NMLS_ID );
         model.addAttribute( "rating", "4.5");
         
         boolean allowOverrideForSocialMedia = false;
@@ -398,6 +399,16 @@ public class ReportingWebController
                 model.addAttribute( "reviewsCount", reviewsCount );
 
                 profileSettings = individualProfile;
+                
+              //fetch nmls-id
+                try {
+                    Integer nmlsId = null;
+                    nmlsId = profileManagementService.fetchAndSaveNmlsId( individualProfile,
+                        CommonConstants.AGENT_SETTINGS_COLLECTION, user.getCompany().getCompanyId(), false, true );
+                  model.addAttribute( "NMLS", nmlsId );
+                } catch ( UnavailableException e ) {
+                    LOG.error( "UnavailableException: message : " + e.getMessage(), e );
+                }
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
                 model.addAttribute( "message",
@@ -410,6 +421,7 @@ public class ReportingWebController
 
         }
 
+        
         model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
         model.addAttribute( "profileSettings", profileSettings );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
