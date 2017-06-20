@@ -145,6 +145,20 @@ public class ReportingWebController
         model.addAttribute( "userId", user.getUserId() );
         model.addAttribute( "dest", "Loan Consultant" );
         model.addAttribute( "rating", "4.5");
+        //adding dummy feilds for the overview header
+        model.addAttribute( "SPS_score", "32.9" );
+        model.addAttribute("detractor","11.9");
+        model.addAttribute( "passives", "43.3" );
+        model.addAttribute( "promoters", "44.8" );
+        model.addAttribute( "total_incomplete_transactions", "64000" );
+        model.addAttribute( "corrupted", "25" );
+        model.addAttribute( "duplicate", "18" );
+        model.addAttribute( "archieved", "9" );
+        model.addAttribute( "mismatched", "49" );
+        model.addAttribute( "Survey_sent", "39" );
+        model.addAttribute( "Survey_completed", "23" );
+        model.addAttribute( "Social_posts", "167" );
+        model.addAttribute( "Zillow_reviews", "10" );
         
         boolean allowOverrideForSocialMedia = false;
         long branchId = 0;
@@ -191,6 +205,15 @@ public class ReportingWebController
             try {
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
                 //set setting detail by company Setting
+              //fetch nmls-id
+                try {
+                    Integer nmlsId = null;
+                    nmlsId = profileManagementService.fetchAndSaveNmlsId( companyProfile,
+                        CommonConstants.COMPANY_SETTINGS_COLLECTION, user.getCompany().getCompanyId(), false, true );
+                  model.addAttribute( "NMLS", nmlsId );
+                } catch ( UnavailableException e ) {
+                    LOG.error( "UnavailableException: message : " + e.getMessage(), e );
+                }
                 setSettingSetByEntityInModel( model, companyProfile );
                 String json = new Gson().toJson( companyProfile );
                 model.addAttribute( "profileJson", json );
@@ -221,6 +244,15 @@ public class ReportingWebController
             try {
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
+                //fetch nmls-id
+                try {
+                    Integer nmlsId = null;
+                    nmlsId = profileManagementService.fetchAndSaveNmlsId( regionProfile,
+                        CommonConstants.REGION_SETTINGS_COLLECTION, user.getCompany().getCompanyId(), false, true );
+                  model.addAttribute( "NMLS", nmlsId );
+                } catch ( UnavailableException e ) {
+                    LOG.error( "UnavailableException: message : " + e.getMessage(), e );
+                }
                 //set setting detail by region Setting
                 setSettingSetByEntityInModel( model, regionProfile );
                 //Check if social media override is allowed
@@ -285,6 +317,15 @@ public class ReportingWebController
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
                 branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
+                //fetch nmls-id
+                try {
+                    Integer nmlsId = null;
+                    nmlsId = profileManagementService.fetchAndSaveNmlsId( branchProfile,
+                        CommonConstants.BRANCH_SETTINGS_COLLECTION, user.getCompany().getCompanyId(), false, true );
+                  model.addAttribute( "NMLS", nmlsId );
+                } catch ( UnavailableException e ) {
+                    LOG.error( "UnavailableException: message : " + e.getMessage(), e );
+                }
 
                 //set setting detail by branch Setting
                 setSettingSetByEntityInModel( model, branchProfile );
@@ -326,6 +367,7 @@ public class ReportingWebController
                 long reviewsCount = profileManagementService.getReviewsCount( branchId, CommonConstants.MIN_RATING_SCORE,
                     CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
+              
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException(
                     new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
