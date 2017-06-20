@@ -145,6 +145,20 @@ public class ReportingWebController
         model.addAttribute( "userId", user.getUserId() );
         model.addAttribute( "dest", "Loan Consultant" );
         model.addAttribute( "rating", "4.5");
+        //adding dummy feilds for the overview header
+        model.addAttribute( "SPS_score", "32.9" );
+        model.addAttribute("detractor","11.9");
+        model.addAttribute( "passives", "43.3" );
+        model.addAttribute( "promoters", "44.8" );
+        model.addAttribute( "total_incomplete_transactions", "64000" );
+        model.addAttribute( "corrupted", "25" );
+        model.addAttribute( "duplicate", "18" );
+        model.addAttribute( "archieved", "9" );
+        model.addAttribute( "mismatched", "49" );
+        model.addAttribute( "Survey_sent", "39" );
+        model.addAttribute( "Survey_completed", "23" );
+        model.addAttribute( "Social_posts", "167" );
+        model.addAttribute( "Zillow_reviews", "10" );
         
         boolean allowOverrideForSocialMedia = false;
         long branchId = 0;
