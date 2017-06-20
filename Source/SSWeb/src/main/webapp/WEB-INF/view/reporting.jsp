@@ -17,7 +17,13 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-
+<c:set value="${detractor}" var="detractors"></c:set>
+<c:set value="${passives}" var="passives"></c:set>
+<c:set value="${promoters}" var="promoters"></c:set>
+<c:set value="${Survey_sent}" var="surveysSent"></c:set>
+<c:set value="${Survey_completed}" var="surveysCompleted"></c:set>
+<c:set value="${Social_posts}" var="socialPosts"></c:set>
+<c:set value="${Zillow_reviews}" var="zillowReviews"></c:set>
 
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
 	<div>
@@ -82,10 +88,72 @@
 					</div>
 				</div>
 			</div>
+			<div>
+			<button type="button" class="btn btn-secondary">Overview</button>
+			<button type="button" class="btn btn-secondary">LeaderBoard</button>
+			<button type="button" class="btn btn-secondary">Score Stats</button>
+			<button type="button" class="btn btn-secondary" style="margin-left:-3px !important">Activity</button>
+			<button type="button" class="btn btn-secondary" style="margin-left:-3px !important">Reviews</button>
+			<button type="button" class="btn btn-secondary" style="margin-left:-3px !important">Incomplete Surveys</button>
+			</div>
+			<div id="overviewTab" style="border-top:1px solid gray">
+				<div class="col-lg-3 col-md-3 col-sm-3">
+				
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3" style="display:grid; margin-top:20px;">
+					<div style="display:inline-flex; margin-top:10px">
+						<div class="float-left dash-sel-lbl">Detractors</div>
+						<div class="float-left dash-sel-lbl" style="width:${detractors}%;; height:65%; background:red; margin:auto 2px"></div>
+						<div class="float-left dash-sel-lbl" style="color:red;">${detractors}%</div>
+					</div>
+					<div style="display:inline-flex; margin-top:10px">
+						<div class="float-left dash-sel-lbl">Passives</div>
+						<div class="float-left dash-sel-lbl" style="width:${passives}%; height:65%; background:gray; margin:auto 2px"></div>
+						<div class="float-left dash-sel-lbl" style="color:gray;">${passives}%</div>
+					</div>
+					<div style="display:inline-flex; margin-top:10px">
+						<div class="float-left dash-sel-lbl">Promotors</div>
+						<div class="float-left dash-sel-lbl" style="width:${promoters}%;; height:65%; background:green; margin:auto 2px"></div>
+						<div class="float-left dash-sel-lbl" style="color:green;">${promoters}%</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3 donut-chart">
+				
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3">
+					<div class="col-lg-6 col-md-6 col-sm-6" style="margin-top:10px">
+						<div class="row-lg-6 row-md-6 row-sm-6" style="font-weight:bold !important; font-size:medium">
+							Surveys Sent
+							<div style="font-size:-webkit-xxx-large">${surveysSent}</div>
+						</div>
+						<div class="row-lg-6 row-md-6 row-sm-6" style="font-weight:bold !important; font-size:medium">
+							Surveys Completed
+							<div style="font-size:-webkit-xxx-large">${surveysCompleted}</div>
+						</div>						
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-6" style="margin-top:10px">
+						<div class="row-lg-6 row-md-6 row-sm-6" style="font-weight:bold !important; font-size:medium">
+							Social Posts
+							<div style="font-size:-webkit-xxx-large">${socialPosts}</div>
+						</div>
+						<div class="row-lg-6 row-md-6 row-sm-6" style="font-weight:bold !important; font-size:medium">
+							Zillow Reviews
+							<div style="font-size:-webkit-xxx-large">${zillowReviews}</div>
+						</div>
+					</div>
+				</div>
+				<div>
+					<button type="button" class="btn btn-secondary">SPS Stats</button>
+					<button type="button" class="btn btn-secondary" style="margin-left:-3px !important">Average Rating</button>
+					<button type="button" class="btn btn-secondary" style="margin-left:-3px !important">Completion Rate</button>
+				</div>
+			</div>
 		</div>
+		
 	</div>
-</div>
 
+</div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 $(document).ready(function() {
 	$(document).attr("title", "Reporting Dashboard");
@@ -118,5 +186,7 @@ $(document).ready(function() {
 	var accountType = $('#prof-container').attr('data-account-type');
 	
 	paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
+	
+	
 });
 </script>
