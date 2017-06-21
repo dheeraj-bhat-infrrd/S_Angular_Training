@@ -10,11 +10,11 @@
 	<c:set value="${profileSettings.vertical}" var="companyvertical"></c:set>
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
 </c:if>
-<%--c:if test="${not empty USER_ZILLOW_NMLS_ID}">
-	<c:set value="${USER_ZILLOW_NMLS_ID}" var="nmls"/>
-</c:if --%>
+<c:if test="${not empty NMLS}">
+	<c:set value="${NMLS}" var="nmls"/>
+</c:if>
 
-<c:set value="${NMLS}" var="nmls"/>
+<%--c:set value="${NMLS}" var="nmls"/--%>
 <c:choose>
 	<c:when test="${entityType == 'companyId'}">
 		<c:set value="1" var="profilemasterid"></c:set>
@@ -37,13 +37,16 @@
 	<div id="name" class="prof-name prof-name-txt rep-dsh-large-text dsh-txt-1">${contactdetail.name}</div>
 </div>
 <div id="prof-name-container" class="lp-edit-wrapper clearfix prof-edditable-cont">
-	<div id="designation-nmls" class="prof-addline2 prof-name-txt rep-dsh-medium-text dsh-txt-2" >${contactdetail.title}| ${nmls}</div>
+	<div id="designation-nmls" class="prof-addline2 prof-name-txt rep-dsh-medium-text dsh-txt-2" >${contactdetail.title}
+	<c:if test="${not empty nmls}">
+		| ${nmls}
+	</c:if>
+	</div>
 </div>
-<div id="prof-rating-review-count" class="prof-rating clearfix">
+<div id="prof-rating-review-count" class="prof-rating clearfix" style="margin-top:40px">
 	<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp"></div>
 	<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>
 </div>
-<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}" style="margin:0">
+<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}" style=" margin:0; margin-top:10px !important;">
 	<div id="dsh-btn1" class="dsh-btn-complete float-left"><spring:message code="label.sendsurvey.btn.key" /></div>
 </div>
-
