@@ -329,7 +329,7 @@
       <field>
         <name>modifiedOnSurveyDetails</name>
         <variable>&#x24;&#x7b;modifiedOnSurveyDetails&#x7d;</variable>
-        <type>None</type>
+        <type>String</type>
         <format/>
         <currency/>
         <decimal/>
