@@ -87,6 +87,10 @@
 				<value>com.realtech.socialsurvey.core.entities.Event</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyHiddenNotification</value>
 				<value>com.realtech.socialsurvey.core.entities.VendastaSingleSignOnTicket</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewUser</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewCompany</value>
 			</list>
 		</property>
 	</bean>
