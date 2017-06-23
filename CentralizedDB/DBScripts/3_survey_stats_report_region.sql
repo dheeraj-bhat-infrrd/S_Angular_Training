@@ -1,9 +1,9 @@
 USE `ss_centralized_mongodb`;
-CREATE TABLE `survey_stats_report` (
+CREATE TABLE `survey_stats_report_region` (
   `survey_stats_report_id` varchar(45) NOT NULL,
   `Id` text,
   `company_id` int(10) unsigned DEFAULT NULL,
-  `branch_id` int(10) unsigned NOT NULL,
+  `region_id` int(10) unsigned NOT NULL,
   `trx_month` varchar(10) DEFAULT NULL,
   `trx_rcvd` int(11) DEFAULT '0',
   `pending` int(11) DEFAULT '0',
@@ -26,11 +26,8 @@ CREATE TABLE `survey_stats_report` (
   `detractors` int(11) DEFAULT NULL,
   `passives` int(11) DEFAULT NULL,
   `promoters` int(11) DEFAULT NULL,
-  `branch_name` varchar(250) DEFAULT NULL,
+  `region_name` varchar(250) DEFAULT NULL,
   `company_name` varchar(250) DEFAULT NULL,
   `incomplete` int(11) DEFAULT NULL,
-  PRIMARY KEY (`year`,`branch_id`,`month`),
-  KEY `FK_BRANCH_idx` (`branch_id`),
-  KEY `FK_COMPANY_idx` (`company_id`),
-  CONSTRAINT `FK_BRANCH` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`year`,`region_id`,`month`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
