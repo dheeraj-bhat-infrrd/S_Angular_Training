@@ -203,10 +203,11 @@
   <hop> <from>Select All Values</from><to>jsForMainAgent</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForMainAgent</from><to>UUID_overview_user</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_overview_user</from><to>Select values 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Write to log</from><to>overview_user_output</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForPercentage</from><to>jsForIncompleteSurveys</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForIncompleteSurveys</from><to>Write to log</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 2</from><to>jsForPercentage</to><enabled>Y</enabled> </hop>
+  <hop> <from>Write to log</from><to>jsToConvertNullToZero</to><enabled>Y</enabled> </hop>
+  <hop> <from>jsToConvertNullToZero</from><to>overview_user_output</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>FilterForZillow</name>
@@ -829,15 +830,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>      <field>        <name>AGENT_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>sent_count</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_1</name>
+    <fields>      <field>        <name>sent_count</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -869,15 +862,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>ENTITY_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
       </field>      <field>        <name>total_shared_by</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_2</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -890,10 +875,6 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>total_promoters</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_3</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1296,6 +1277,104 @@
     </step>
 
   <step>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <loglevel>log_level_basic</loglevel>
+      <displayHeader>Y</displayHeader>
+      <limitRows>N</limitRows>
+      <limitRowsNumber>0</limitRowsNumber>
+      <logmessage/>
+    <fields>
+      <field>
+        <name>sent_count</name>
+        </field>
+      <field>
+        <name>total_archieved</name>
+        </field>
+      <field>
+        <name>total_completed</name>
+        </field>
+      <field>
+        <name>total_corrupted</name>
+        </field>
+      <field>
+        <name>total_duplicate</name>
+        </field>
+      <field>
+        <name>total_initiate</name>
+        </field>
+      <field>
+        <name>total_mismatched</name>
+        </field>
+      <field>
+        <name>total_pre</name>
+        </field>
+      <field>
+        <name>total_shared_by</name>
+        </field>
+      <field>
+        <name>total_detractors</name>
+        </field>
+      <field>
+        <name>total_passives</name>
+        </field>
+      <field>
+        <name>total_promoters</name>
+        </field>
+      <field>
+        <name>zillow_count</name>
+        </field>
+      <field>
+        <name>main_AgentId</name>
+        </field>
+      <field>
+        <name>overview_user_id</name>
+        </field>
+      <field>
+        <name>sps_score_var</name>
+        </field>
+      <field>
+        <name>detractors_percentage_var</name>
+        </field>
+      <field>
+        <name>passives_percentage_var</name>
+        </field>
+      <field>
+        <name>promoter_percentage_var</name>
+        </field>
+      <field>
+        <name>total_incomplete_transactions_var</name>
+        </field>
+      <field>
+        <name>corrupted_percentage_var</name>
+        </field>
+      <field>
+        <name>mismatched_percentage_var</name>
+        </field>
+      <field>
+        <name>duplicate_percentage_var</name>
+        </field>
+      <field>
+        <name>archieved_percentage_var</name>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>753</xloc>
+      <yloc>679</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>ZillowLog</name>
     <type>WriteToLog</type>
     <description/>
@@ -1323,6 +1402,54 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>668</xloc>
       <yloc>542</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>jsForIncompleteSurveys</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var corrupted_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var mismatched_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var duplicate_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var archieved_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;total_incomplete_transactions_var &#x21;&#x3d; 0&#x29;&#x7b;&#xd;&#xa;		corrupted_percentage_var &#x3d; &#x28;total_corrupted&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;		mismatched_percentage_var &#x3d; &#x28;total_mismatched&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;		duplicate_percentage_var &#x3d; &#x28;total_duplicate&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;		archieved_percentage_var &#x3d; &#x28;total_archieved&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>corrupted_percentage_var</name>
+        <rename>corrupted_percentage_var</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>mismatched_percentage_var</name>
+        <rename>mismatched_percentage_var</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>duplicate_percentage_var</name>
+        <rename>duplicate_percentage_var</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>archieved_percentage_var</name>
+        <rename>archieved_percentage_var</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>972</xloc>
+      <yloc>681</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1395,6 +1522,60 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>540</xloc>
       <yloc>437</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>jsForPercentage</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var sps_score_var &#x3d; 0&#x3b;&#xd;&#xa;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var passives_percentage_var &#x3d;0&#x3b;&#xd;&#xa;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;total_completed &#x21;&#x3d; 0 &#x26;&#x26; total_completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	sps_score_var&#x3d;&#x28; &#x28;total_promoters-total_detractors&#x29;&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	detractors_percentage_var &#x3d; &#x28;total_detractors&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	passives_percentage_var &#x3d; &#x28;total_passives&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	promoter_percentage_var &#x3d; &#x28;total_promoters&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	total_incomplete_transactions_var &#x3d; sent_count- total_completed&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>sps_score_var</name>
+        <rename>sps_score_var</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>detractors_percentage_var</name>
+        <rename>detractors_percentage_var</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>passives_percentage_var</name>
+        <rename>passives_percentage_var</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>promoter_percentage_var</name>
+        <rename>promoter_percentage_var</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>total_incomplete_transactions_var</name>
+        <rename>total_incomplete_transactions_var</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1164</xloc>
+      <yloc>605</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1491,6 +1672,132 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>223</xloc>
       <yloc>340</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>overview_user_output</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_INFO_CONNECTION</connection>
+    <schema/>
+    <table>overview_user</table>
+    <commit>1000</commit>
+    <truncate>Y</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>sps_score</column_name>
+          <stream_name>sps_score_var</stream_name>
+        </field>
+        <field>
+          <column_name>detractors_percentage</column_name>
+          <stream_name>detractors_percentage_var</stream_name>
+        </field>
+        <field>
+          <column_name>passives_percentage</column_name>
+          <stream_name>passives_percentage_var</stream_name>
+        </field>
+        <field>
+          <column_name>promoter_percentage</column_name>
+          <stream_name>promoter_percentage_var</stream_name>
+        </field>
+        <field>
+          <column_name>total_incomplete_transactions</column_name>
+          <stream_name>total_incomplete_transactions_var</stream_name>
+        </field>
+        <field>
+          <column_name>overview_user_id</column_name>
+          <stream_name>overview_user_id</stream_name>
+        </field>
+        <field>
+          <column_name>corrupted_percentage</column_name>
+          <stream_name>corrupted_percentage_var</stream_name>
+        </field>
+        <field>
+          <column_name>mismatched_percentage</column_name>
+          <stream_name>mismatched_percentage_var</stream_name>
+        </field>
+        <field>
+          <column_name>duplicate_percentage</column_name>
+          <stream_name>duplicate_percentage_var</stream_name>
+        </field>
+        <field>
+          <column_name>archieved_percentage</column_name>
+          <stream_name>archieved_percentage_var</stream_name>
+        </field>
+        <field>
+          <column_name>user_id</column_name>
+          <stream_name>main_AgentId</stream_name>
+        </field>
+        <field>
+          <column_name>total_archieved</column_name>
+          <stream_name>total_archieved</stream_name>
+        </field>
+        <field>
+          <column_name>total_survey_sent</column_name>
+          <stream_name>sent_count</stream_name>
+        </field>
+        <field>
+          <column_name>total_survey_completed</column_name>
+          <stream_name>total_completed</stream_name>
+        </field>
+        <field>
+          <column_name>total_corrupted</column_name>
+          <stream_name>total_corrupted</stream_name>
+        </field>
+        <field>
+          <column_name>total_mismatched</column_name>
+          <stream_name>total_mismatched</stream_name>
+        </field>
+        <field>
+          <column_name>total_duplicate</column_name>
+          <stream_name>total_duplicate</stream_name>
+        </field>
+        <field>
+          <column_name>total_social_post</column_name>
+          <stream_name>total_shared_by</stream_name>
+        </field>
+        <field>
+          <column_name>total_zillow_reviews</column_name>
+          <stream_name>zillow_count</stream_name>
+        </field>
+        <field>
+          <column_name>total_promoters</column_name>
+          <stream_name>total_promoters</stream_name>
+        </field>
+        <field>
+          <column_name>total_passives</column_name>
+          <stream_name>total_passives</stream_name>
+        </field>
+        <field>
+          <column_name>total_detractors</column_name>
+          <stream_name>total_detractors</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>390</xloc>
+      <yloc>675</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1681,120 +1988,7 @@
     </step>
 
   <step>
-    <name>Write to log</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>AGENT_ID</name>
-        </field>
-      <field>
-        <name>sent_count</name>
-        </field>
-      <field>
-        <name>AGENT_ID_1</name>
-        </field>
-      <field>
-        <name>total_archieved</name>
-        </field>
-      <field>
-        <name>total_completed</name>
-        </field>
-      <field>
-        <name>total_corrupted</name>
-        </field>
-      <field>
-        <name>total_duplicate</name>
-        </field>
-      <field>
-        <name>total_initiate</name>
-        </field>
-      <field>
-        <name>total_mismatched</name>
-        </field>
-      <field>
-        <name>total_pre</name>
-        </field>
-      <field>
-        <name>ENTITY_ID</name>
-        </field>
-      <field>
-        <name>total_shared_by</name>
-        </field>
-      <field>
-        <name>AGENT_ID_2</name>
-        </field>
-      <field>
-        <name>total_detractors</name>
-        </field>
-      <field>
-        <name>total_passives</name>
-        </field>
-      <field>
-        <name>total_promoters</name>
-        </field>
-      <field>
-        <name>AGENT_ID_3</name>
-        </field>
-      <field>
-        <name>zillow_count</name>
-        </field>
-      <field>
-        <name>main_AgentId</name>
-        </field>
-      <field>
-        <name>overview_user_id</name>
-        </field>
-      <field>
-        <name>sps_score_var</name>
-        </field>
-      <field>
-        <name>detractors_percentage_var</name>
-        </field>
-      <field>
-        <name>passives_percentage_var</name>
-        </field>
-      <field>
-        <name>promoter_percentage_var</name>
-        </field>
-      <field>
-        <name>total_incomplete_transactions_var</name>
-        </field>
-      <field>
-        <name>corrupted_percentage_var</name>
-        </field>
-      <field>
-        <name>mismatched_percentage_var</name>
-        </field>
-      <field>
-        <name>duplicate_percentage_var</name>
-        </field>
-      <field>
-        <name>archieved_percentage_var</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>748</xloc>
-      <yloc>701</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>jsForPercentage</name>
+    <name>jsToConvertNullToZero</name>
     <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
@@ -1808,215 +2002,143 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var sps_score_var &#x3d; 0&#x3b;&#xd;&#xa;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var passives_percentage_var &#x3d;0&#x3b;&#xd;&#xa;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;total_completed &#x21;&#x3d; 0 &#x26;&#x26; total_completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	sps_score_var&#x3d;&#x28; &#x28;total_promoters-total_detractors&#x29;&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	detractors_percentage_var &#x3d; &#x28;total_detractors&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	passives_percentage_var &#x3d; &#x28;total_passives&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	promoter_percentage_var &#x3d; &#x28;total_promoters&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	total_incomplete_transactions_var &#x3d; sent_count- total_completed&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>sps_score_var</name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;sent_count &#x3d;&#x3d; null&#x29;var  sent_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_archieved &#x3d;&#x3d; null&#x29;var total_archieved &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_completed &#x3d;&#x3d; null&#x29;var total_completed &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_corrupted &#x3d;&#x3d; null&#x29;var total_corrupted &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_duplicate &#x3d;&#x3d; null&#x29;var total_duplicate &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_initiate &#x3d;&#x3d; null&#x29;var total_initiate &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_mismatched &#x3d;&#x3d; null&#x29;var total_mismatched&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_pre&#x3d;&#x3d; null&#x29;var total_pre &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_shared_by&#x3d;&#x3d; null&#x29;var total_shared_by &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_detractors &#x3d;&#x3d; null&#x29;var total_detractors&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_passives &#x3d;&#x3d; null&#x29;var total_passives &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_promoters &#x3d;&#x3d; null&#x29;var total_promoters &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;zillow_count &#x3d;&#x3d; null&#x29;var zillow_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;sps_score_var &#x3d;&#x3d; null&#x29;var sps_score_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;detractors_percentage_var &#x3d;&#x3d; null&#x29;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;passives_percentage_var &#x3d;&#x3d; null&#x29;var passives_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;promoter_percentage_var &#x3d;&#x3d; null&#x29;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_incomplete_transactions_var&#x3d;&#x3d; null&#x29;var total_incomplete_transactions_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;corrupted_percentage_var &#x3d;&#x3d; null&#x29;var corrupted_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;mismatched_percentage_var &#x3d;&#x3d; null&#x29;var mismatched_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;duplicate_percentage_var &#x3d;&#x3d; null&#x29;var duplicate_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;archieved_percentage_var &#x3d;&#x3d; null&#x29;var archieved_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>sent_count</name>
+        <rename>sent_count</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_archieved</name>
+        <rename>total_archieved</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_completed</name>
+        <rename>total_completed</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_corrupted</name>
+        <rename>total_corrupted</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_duplicate</name>
+        <rename>total_duplicate</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_initiate</name>
+        <rename>total_initiate</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_mismatched</name>
+        <rename>total_mismatched</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_pre</name>
+        <rename>total_pre</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_shared_by</name>
+        <rename>total_shared_by</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_detractors</name>
+        <rename>total_detractors</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_passives</name>
+        <rename>total_passives</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_promoters</name>
+        <rename>total_promoters</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>zillow_count</name>
+        <rename>zillow_count</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>sps_score_var</name>
         <rename>sps_score_var</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>      <field>        <name>detractors_percentage_var</name>
         <rename>detractors_percentage_var</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>      <field>        <name>passives_percentage_var</name>
         <rename>passives_percentage_var</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>      <field>        <name>promoter_percentage_var</name>
         <rename>promoter_percentage_var</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>      <field>        <name>total_incomplete_transactions_var</name>
         <rename>total_incomplete_transactions_var</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1164</xloc>
-      <yloc>605</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>overview_user_output</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_INFO_CONNECTION</connection>
-    <schema/>
-    <table>overview_user</table>
-    <commit>1000</commit>
-    <truncate>Y</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>sps_score</column_name>
-          <stream_name>sps_score_var</stream_name>
-        </field>
-        <field>
-          <column_name>detractors_percentage</column_name>
-          <stream_name>detractors_percentage_var</stream_name>
-        </field>
-        <field>
-          <column_name>passives_percentage</column_name>
-          <stream_name>passives_percentage_var</stream_name>
-        </field>
-        <field>
-          <column_name>promoter_percentage</column_name>
-          <stream_name>promoter_percentage_var</stream_name>
-        </field>
-        <field>
-          <column_name>total_incomplete_transactions</column_name>
-          <stream_name>total_incomplete_transactions_var</stream_name>
-        </field>
-        <field>
-          <column_name>overview_user_id</column_name>
-          <stream_name>overview_user_id</stream_name>
-        </field>
-        <field>
-          <column_name>corrupted_percentage</column_name>
-          <stream_name>corrupted_percentage_var</stream_name>
-        </field>
-        <field>
-          <column_name>mismatched_percentage</column_name>
-          <stream_name>mismatched_percentage_var</stream_name>
-        </field>
-        <field>
-          <column_name>duplicate_percentage</column_name>
-          <stream_name>duplicate_percentage_var</stream_name>
-        </field>
-        <field>
-          <column_name>archieved_percentage</column_name>
-          <stream_name>archieved_percentage_var</stream_name>
-        </field>
-        <field>
-          <column_name>user_id</column_name>
-          <stream_name>main_AgentId</stream_name>
-        </field>
-        <field>
-          <column_name>total_archieved</column_name>
-          <stream_name>total_archieved</stream_name>
-        </field>
-        <field>
-          <column_name>total_survey_sent</column_name>
-          <stream_name>sent_count</stream_name>
-        </field>
-        <field>
-          <column_name>total_survey_completed</column_name>
-          <stream_name>total_completed</stream_name>
-        </field>
-        <field>
-          <column_name>total_corrupted</column_name>
-          <stream_name>total_corrupted</stream_name>
-        </field>
-        <field>
-          <column_name>total_mismatched</column_name>
-          <stream_name>total_mismatched</stream_name>
-        </field>
-        <field>
-          <column_name>total_duplicate</column_name>
-          <stream_name>total_duplicate</stream_name>
-        </field>
-        <field>
-          <column_name>total_social_post</column_name>
-          <stream_name>total_shared_by</stream_name>
-        </field>
-        <field>
-          <column_name>total_zillow_reviews</column_name>
-          <stream_name>zillow_count</stream_name>
-        </field>
-        <field>
-          <column_name>total_promoters</column_name>
-          <stream_name>total_promoters</stream_name>
-        </field>
-        <field>
-          <column_name>total_passives</column_name>
-          <stream_name>total_passives</stream_name>
-        </field>
-        <field>
-          <column_name>total_detractors</column_name>
-          <stream_name>total_detractors</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>580</xloc>
-      <yloc>700</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>jsForIncompleteSurveys</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var corrupted_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var mismatched_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var duplicate_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var archieved_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;total_incomplete_transactions_var &#x21;&#x3d; 0&#x29;&#x7b;&#xd;&#xa;		corrupted_percentage_var &#x3d; &#x28;total_corrupted&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;		mismatched_percentage_var &#x3d; &#x28;total_mismatched&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;		duplicate_percentage_var &#x3d; &#x28;total_duplicate&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;		archieved_percentage_var &#x3d; &#x28;total_archieved&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>corrupted_percentage_var</name>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>corrupted_percentage_var</name>
         <rename>corrupted_percentage_var</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>      <field>        <name>mismatched_percentage_var</name>
         <rename>mismatched_percentage_var</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>      <field>        <name>duplicate_percentage_var</name>
         <rename>duplicate_percentage_var</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>      <field>        <name>archieved_percentage_var</name>
         <rename>archieved_percentage_var</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>968</xloc>
-      <yloc>687</yloc>
+      <xloc>590</xloc>
+      <yloc>678</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2024,7 +2146,7 @@
   <step_error_handling>
       <error>
         <source_step>overview_user_output</source_step>
-        <target_step>Update</target_step>
+        <target_step/>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
