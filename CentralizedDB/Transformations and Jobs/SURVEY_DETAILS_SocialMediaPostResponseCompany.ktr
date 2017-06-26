@@ -184,13 +184,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>localhost</server>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>ss_user</database>
-    <port>3306</port>
-    <username>root</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -200,7 +200,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -215,15 +215,10 @@
   <hop> <from>Mongo_Survey_details</from><to>Parse_id_companyId</to><enabled>Y</enabled> </hop>
   <hop> <from>Parse_id_companyId</from><to>parse_companyMediaPostResponseDetails</to><enabled>Y</enabled> </hop>
   <hop> <from>Twitter output</from><to>TwitterUpdate</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_FACEBOOK_POST_RESPONSE_LIST</from><to>fb_log</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_LINKEDIN_POST_RESPONSE_LIST</from><to>link_log</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_TWITTER_POST_RESPONSE_LIST</from><to>twit_log 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>fb_log</from><to>modify_facebook_date</to><enabled>Y</enabled> </hop>
   <hop> <from>fb_stream</from><to>FBTable output</to><enabled>Y</enabled> </hop>
   <hop> <from>filter_facebook_null</from><to>parse_facebook</to><enabled>Y</enabled> </hop>
   <hop> <from>filter_linkedin_null</from><to>parse_linkedin</to><enabled>Y</enabled> </hop>
   <hop> <from>filter_twitter_null</from><to>parse_twitter</to><enabled>Y</enabled> </hop>
-  <hop> <from>link_log</from><to>modify_linkedin_date</to><enabled>Y</enabled> </hop>
   <hop> <from>link_stream</from><to>LINKoutput</to><enabled>Y</enabled> </hop>
   <hop> <from>modify_facebook_date</from><to>fb_stream</to><enabled>Y</enabled> </hop>
   <hop> <from>modify_linkedin_date</from><to>link_stream</to><enabled>Y</enabled> </hop>
@@ -232,7 +227,6 @@
   <hop> <from>parse_facebook</from><to>UUID_FACEBOOK_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_linkedin</from><to>UUID_LINKEDIN_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_twitter</from><to>UUID_TWITTER_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
-  <hop> <from>twit_log 2</from><to>modify_twitter_date</to><enabled>Y</enabled> </hop>
   <hop> <from>twitter_stream </from><to>Twitter output</to><enabled>Y</enabled> </hop>
   <hop> <from>type_constants</from><to>filter_facebook_null</to><enabled>Y</enabled> </hop>
   <hop> <from>type_constants</from><to>filter_linkedin_null</to><enabled>Y</enabled> </hop>
@@ -243,6 +237,9 @@
   <hop> <from>FBUpdate</from><to>Add constants 2</to><enabled>Y</enabled> </hop>
   <hop> <from>LinkUpdate</from><to>Add constants 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>TwitterUpdate</from><to>Add constants 2 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_FACEBOOK_POST_RESPONSE_LIST</from><to>modify_facebook_date</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_LINKEDIN_POST_RESPONSE_LIST</from><to>modify_linkedin_date</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_TWITTER_POST_RESPONSE_LIST</from><to>modify_twitter_date</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Add constants 2</name>
@@ -612,8 +609,8 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <hostname>&#x24;&#x7b;mongo_host&#x7d;</hostname>
-    <port>&#x24;&#x7b;mongo_port&#x7d;</port>
+    <hostname>&#x24;&#x7b;MONGO_HOST&#x7d;</hostname>
+    <port>&#x24;&#x7b;MONGO_PORT&#x7d;</port>
     <use_all_replica_members>N</use_all_replica_members>
     <db_name>ss_db</db_name>
     <fields_name/>
@@ -1025,38 +1022,6 @@
     </step>
 
   <step>
-    <name>fb_log</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>companyId</name>
-        </field>
-      <field>
-        <name>FACEBOOK_POST_RESPONSE_LIST_ID</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>861</xloc>
-      <yloc>73</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>fb_stream</name>
     <type>SelectValues</type>
     <description/>
@@ -1202,38 +1167,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>375</xloc>
       <yloc>375</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>link_log</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>companyId</name>
-        </field>
-      <field>
-        <name>LINKEDIN_POST_RESPONSE_LIST_ID</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>861</xloc>
-      <yloc>236</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1776,38 +1709,6 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>524</xloc>
-      <yloc>375</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>twit_log 2</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>companyId</name>
-        </field>
-      <field>
-        <name>TWITTER_POST_RESPONSE_LIST_ID</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>861</xloc>
       <yloc>375</yloc>
       <draw>Y</draw>
       </GUI>
