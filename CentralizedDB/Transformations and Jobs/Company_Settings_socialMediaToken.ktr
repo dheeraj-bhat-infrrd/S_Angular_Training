@@ -154,13 +154,13 @@
   </connection>
   <connection>
     <name>SS_Centralized_Mysql_Conn</name>
-    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
+    <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;mysql_schema_name&#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
-    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
+    <database>&#x24;&#x7b;CENTRALIZED_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;CENTRALIZED_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;CENTRALIZED_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;CENTRALIZED_MYSQL_PASSWORD&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -170,7 +170,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;CENTRALIZED_MYSQL_PORT&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -181,13 +181,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>localhost</server>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>ss_user</database>
-    <port>3306</port>
-    <username>root</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -197,7 +197,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -1065,7 +1065,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>facebook_token</table>
     <commit>1000</commit>
@@ -1479,7 +1479,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -1554,7 +1554,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>google_business_token</table>
     <commit>1000</commit>
@@ -1664,7 +1664,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>google_token</table>
     <commit>1000</commit>
@@ -1774,7 +1774,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>lending_tree_token</table>
     <commit>1000</commit>
@@ -1868,7 +1868,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>linked_in_token</table>
     <commit>1000</commit>
@@ -3095,7 +3095,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>realtor_token</table>
     <commit>1000</commit>
@@ -3301,7 +3301,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>twitter_token</table>
     <commit>1000</commit>
@@ -3644,7 +3644,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>Y</use_batch>
@@ -3723,7 +3723,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -3768,7 +3768,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -3813,7 +3813,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>Y</use_batch>
@@ -3872,7 +3872,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -3917,7 +3917,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -3976,7 +3976,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -4021,7 +4021,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -4096,7 +4096,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -4141,7 +4141,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -4200,7 +4200,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -4245,7 +4245,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -4316,7 +4316,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -4361,7 +4361,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -4420,7 +4420,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -4465,7 +4465,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -4532,7 +4532,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -4577,7 +4577,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>yelp_token</table>
     <commit>1000</commit>
@@ -4671,7 +4671,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>zillow_token</table>
     <commit>1000</commit>

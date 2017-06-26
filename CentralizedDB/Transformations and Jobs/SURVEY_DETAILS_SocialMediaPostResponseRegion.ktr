@@ -181,13 +181,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>localhost</server>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>ss_user</database>
-    <port>3306</port>
-    <username>root</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -197,7 +197,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -354,7 +354,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>facebook_post_response_list</table>
     <commit>1000</commit>
@@ -420,7 +420,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -479,7 +479,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>linkedin_post_response_list</table>
     <commit>1000</commit>
@@ -549,7 +549,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
@@ -884,7 +884,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>twitter_post_response_list</table>
     <commit>1000</commit>
@@ -950,7 +950,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>N</use_batch>
