@@ -10,13 +10,12 @@ import com.realtech.socialsurvey.core.dao.OverviewCompanyDao;
 import com.realtech.socialsurvey.core.entities.OverviewCompany;
 
 @Component
-public class OverviewCompanyDaoImpl extends GenericDaoImpl<OverviewCompany, String> implements OverviewCompanyDao
+public class OverviewCompanyDaoImpl extends GenericReportingDaoImpl<OverviewCompany, String> implements OverviewCompanyDao
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(OverviewCompanyDaoImpl.class);
 
     @Override
-    @Transactional
     public String getOverviewCompanyId( Long companyid )
     {
         LOG.info("Method to get OverviewCompanyId from CompanyId, getOverviewCompanyId() started." );
@@ -31,7 +30,6 @@ public class OverviewCompanyDaoImpl extends GenericDaoImpl<OverviewCompany, Stri
     }
 
     @Override
-    @Transactional
     public OverviewCompany findOverviewCompany( Class<OverviewCompany> entityClass, String overviewCompanyid )
     {
         return super.findById( entityClass, overviewCompanyid );

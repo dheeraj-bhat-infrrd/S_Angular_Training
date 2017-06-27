@@ -10,13 +10,12 @@ import com.realtech.socialsurvey.core.dao.OverviewRegionDao;
 import com.realtech.socialsurvey.core.entities.OverviewRegion;
 
 @Component
-public class OverviewRegionDaoImpl extends GenericDaoImpl<OverviewRegion, String> implements OverviewRegionDao
+public class OverviewRegionDaoImpl extends GenericReportingDaoImpl<OverviewRegion, String> implements OverviewRegionDao
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(OverviewRegionDaoImpl.class);
 
     @Override
-    @Transactional
     public String getOverviewRegionId( Long regionId )
     {
         LOG.info("Method to get OverviewRegionId from RegionId, getOverviewRegionId() started." );
@@ -30,7 +29,6 @@ public class OverviewRegionDaoImpl extends GenericDaoImpl<OverviewRegion, String
     }
 
     @Override
-    @Transactional
     public OverviewRegion findOverviewRegion( Class<OverviewRegion> entityClass, String overviewRegionId )
     {
         return super.findById( entityClass, overviewRegionId );

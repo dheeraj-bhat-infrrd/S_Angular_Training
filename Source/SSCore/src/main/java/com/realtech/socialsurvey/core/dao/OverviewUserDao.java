@@ -2,7 +2,7 @@ package com.realtech.socialsurvey.core.dao;
 
 import com.realtech.socialsurvey.core.entities.OverviewUser;
 
-public interface OverviewUserDao extends GenericDao<OverviewUser, String>
+public interface OverviewUserDao extends GenericReportingDao<OverviewUser, String>
 {
     public String getOverviewUserId( Long userId );
     

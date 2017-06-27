@@ -10,12 +10,11 @@ import com.realtech.socialsurvey.core.dao.OverviewBranchDao;
 import com.realtech.socialsurvey.core.entities.OverviewBranch;
 
 @Component
-public class OverviewBranchDaoImpl extends GenericDaoImpl<OverviewBranch, String> implements OverviewBranchDao
+public class OverviewBranchDaoImpl extends GenericReportingDaoImpl<OverviewBranch, String> implements OverviewBranchDao
 {
     private static final Logger LOG = LoggerFactory.getLogger(OverviewBranchDaoImpl.class);
 
     @Override
-    @Transactional
     public String getOverviewBranchId( Long branchid )
     {
         LOG.info("Method to get OverviewBranchId from branchid, getOverviewBranchId() started." );
@@ -29,7 +28,6 @@ public class OverviewBranchDaoImpl extends GenericDaoImpl<OverviewBranch, String
     }
 
     @Override
-    @Transactional
     public OverviewBranch findOverviewBranch( Class<OverviewBranch> entityClass, String overviewBranchid )
     {
         return super.findById( entityClass, overviewBranchid );
