@@ -42,9 +42,3 @@
 		<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer"></div>
 	</c:otherwise>
 </c:choose>
-
-<script>
-$(document).ready(function() {
-	console.log("profileSettings: " + '${profilesettings}');
-});
-</script>

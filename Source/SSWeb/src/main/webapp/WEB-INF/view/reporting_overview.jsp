@@ -12,7 +12,6 @@
 <c:set value="${Zillow_reviews}" var="zillowReviews"></c:set>
 
 <script src="${initParam.resourcesPath}/resources/js/googleloader.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/jquery-gauge.min.js"></script>
 <div class="col-lg-3 col-md-3 col-sm-3">
 	<jsp:include page="reporting_spsGauge.jsp"></jsp:include>
 </div>
