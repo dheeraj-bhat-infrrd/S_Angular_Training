@@ -181,13 +181,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>localhost</server>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>ss_user</database>
-    <port>3306</port>
-    <username>root</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -197,7 +197,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -208,14 +208,12 @@
   </connection>
   <order>
   <hop> <from>MongoDB Input</from><to>Select values</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select values</from><to>Write to log</to><enabled>Y</enabled> </hop>
-  <hop> <from>Write to log</from><to>DateConverter</to><enabled>Y</enabled> </hop>
-  <hop> <from>DateConverter</from><to>Loging</to><enabled>Y</enabled> </hop>
-  <hop> <from>Loging</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_details_insert</from><to>survey_details_Update</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 2</from><to>survey_details_insert</to><enabled>Y</enabled> </hop>
   <hop> <from>Add constants 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_details_Update</from><to>Add constants 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values</from><to>DateConverter</to><enabled>Y</enabled> </hop>
+  <hop> <from>DateConverter</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Add constants 2</name>
@@ -305,35 +303,6 @@
     </step>
 
   <step>
-    <name>Loging</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>createdOnStr</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>487</xloc>
-      <yloc>126</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>MongoDB Input</name>
     <type>MongoDbInput</type>
     <description/>
@@ -344,8 +313,8 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <hostname>&#x24;&#x7b;mongo_host&#x7d;</hostname>
-    <port>&#x24;&#x7b;mongo_port&#x7d;</port>
+    <hostname>&#x24;&#x7b;MONGO_HOST&#x7d;</hostname>
+    <port>&#x24;&#x7b;MONGO_PORT&#x7d;</port>
     <use_all_replica_members>N</use_all_replica_members>
     <db_name>ss_db</db_name>
     <fields_name/>
@@ -3753,38 +3722,6 @@
     </step>
 
   <step>
-    <name>Write to log</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>createdOn</name>
-        </field>
-      <field>
-        <name>modifiedOn</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>266</xloc>
-      <yloc>126</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>survey_details_Update</name>
     <type>Update</type>
     <description/>
@@ -3795,7 +3732,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
     <commit>100</commit>
     <use_batch>Y</use_batch>
@@ -3978,7 +3915,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>Local instance MySQL57</connection>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>survey_details</table>
     <commit>1000</commit>
