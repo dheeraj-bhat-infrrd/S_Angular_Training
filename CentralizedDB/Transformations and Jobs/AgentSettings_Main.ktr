@@ -9,66 +9,6 @@
     <trans_status>0</trans_status>
     <directory>&#x2f;</directory>
     <parameters>
-        <parameter>
-            <name>mongo_host</name>
-            <default_value>localhost</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mongo_port</name>
-            <default_value>27017</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_host</name>
-            <default_value>localhost</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_host</name>
-            <default_value>ss-rdbms-demo.c3n1qsdsmjxc.us-west-2.rds.amazonaws.com</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_password</name>
-            <default_value>shipra744772</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_port_no</name>
-            <default_value>3306</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_schema_name</name>
-            <default_value>ss_user</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_user_name</name>
-            <default_value>shipra</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_password</name>
-            <default_value>root</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_port_no</name>
-            <default_value>3306</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_schema_name</name>
-            <default_value>ss_centralized_mongodb</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_user_name</name>
-            <default_value>root</default_value>
-            <description/>
-        </parameter>
     </parameters>
     <log>
 <trans-log-table><connection/>

@@ -213,7 +213,6 @@
   <hop> <from>FBTable output</from><to>FBUpdate</to><enabled>Y</enabled> </hop>
   <hop> <from>LINKoutput</from><to>LinkUpdate</to><enabled>Y</enabled> </hop>
   <hop> <from>Mongo_Survey_details</from><to>Parse_id_companyId</to><enabled>Y</enabled> </hop>
-  <hop> <from>Parse_id_companyId</from><to>parse_companyMediaPostResponseDetails</to><enabled>Y</enabled> </hop>
   <hop> <from>Twitter output</from><to>TwitterUpdate</to><enabled>Y</enabled> </hop>
   <hop> <from>fb_stream</from><to>FBTable output</to><enabled>Y</enabled> </hop>
   <hop> <from>filter_facebook_null</from><to>parse_facebook</to><enabled>Y</enabled> </hop>
@@ -223,123 +222,22 @@
   <hop> <from>modify_facebook_date</from><to>fb_stream</to><enabled>Y</enabled> </hop>
   <hop> <from>modify_linkedin_date</from><to>link_stream</to><enabled>Y</enabled> </hop>
   <hop> <from>modify_twitter_date</from><to>twitter_stream </to><enabled>Y</enabled> </hop>
-  <hop> <from>parse_companyMediaPostResponseDetails</from><to>type_constants</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_facebook</from><to>UUID_FACEBOOK_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_linkedin</from><to>UUID_LINKEDIN_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_twitter</from><to>UUID_TWITTER_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
   <hop> <from>twitter_stream </from><to>Twitter output</to><enabled>Y</enabled> </hop>
-  <hop> <from>type_constants</from><to>filter_facebook_null</to><enabled>Y</enabled> </hop>
-  <hop> <from>type_constants</from><to>filter_linkedin_null</to><enabled>Y</enabled> </hop>
-  <hop> <from>type_constants</from><to>filter_twitter_null</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2 3</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>FBUpdate</from><to>Add constants 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>LinkUpdate</from><to>Add constants 2 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>TwitterUpdate</from><to>Add constants 2 3</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_FACEBOOK_POST_RESPONSE_LIST</from><to>modify_facebook_date</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_LINKEDIN_POST_RESPONSE_LIST</from><to>modify_linkedin_date</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_TWITTER_POST_RESPONSE_LIST</from><to>modify_twitter_date</to><enabled>Y</enabled> </hop>
+  <hop> <from>Parse_id_companyId</from><to>Write to log</to><enabled>Y</enabled> </hop>
+  <hop> <from>Write to log</from><to>type_constants</to><enabled>Y</enabled> </hop>
+  <hop> <from>type_constants</from><to>parse_companyMediaPostResponseDetails facebook details</to><enabled>Y</enabled> </hop>
+  <hop> <from>type_constants</from><to>parse_companyMediaPostResponseDetails_linkedInDetails</to><enabled>Y</enabled> </hop>
+  <hop> <from>type_constants</from><to>parse_companyMediaPostResponseDetails twitter details</to><enabled>Y</enabled> </hop>
+  <hop> <from>parse_companyMediaPostResponseDetails facebook details</from><to>filter_facebook_null</to><enabled>Y</enabled> </hop>
+  <hop> <from>parse_companyMediaPostResponseDetails_linkedInDetails</from><to>filter_linkedin_null</to><enabled>Y</enabled> </hop>
+  <hop> <from>parse_companyMediaPostResponseDetails twitter details</from><to>filter_twitter_null</to><enabled>Y</enabled> </hop>
   </order>
-  <step>
-    <name>Add constants 2</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>SurveyDetails_SocialMediaPostResponseCompany_FBUpdate</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1553</xloc>
-      <yloc>73</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Add constants 2 2</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>SurveyDetails_SocialMediaPostResponseCompany_LinkedInUpdate</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1553</xloc>
-      <yloc>236</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Add constants 2 3</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>SurveyDetails_SocialMediaPostResponseCompany_TwitterUpdate</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1553</xloc>
-      <yloc>375</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step>
     <name>FBTable output</name>
     <type>TableOutput</type>
@@ -628,7 +526,7 @@
     <execute_for_each_row>N</execute_for_each_row>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>89</xloc>
+      <xloc>87</xloc>
       <yloc>30</yloc>
       <draw>Y</draw>
       </GUI>
@@ -664,7 +562,7 @@
     <fields>
       <field>
         <name>companyId</name>
-        <path>&#x24;.socialMediaPostDetails.companyMediaPostDetails.companyId</path>
+        <path>&#x24;.socialMediaPostResponseDetails.companyMediaPostResponseDetails.companyId</path>
         <type>None</type>
         <format/>
         <currency/>
@@ -703,120 +601,8 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>89</xloc>
-      <yloc>131</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Text file output</name>
-    <type>TextFileOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <separator>&#x3b;</separator>
-    <enclosure>&#x22;</enclosure>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>Y</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding/>
-    <endedLine/>
-    <fileNameInField>N</fileNameInField>
-    <fileNameField/>
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
-      <is_command>N</is_command>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>txt</extention>
-      <append>Y</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>Y</add_date>
-      <add_time>Y</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>NumOfError</name>
-        <type>Integer</type>
-        <format>&#x23;&#x3b;-&#x23;</format>
-        <currency/>
-        <decimal>.</decimal>
-        <group>,</group>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>3</length>
-        <precision>0</precision>
-      </field>
-      <field>
-        <name>ErrorDesc</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorFields</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorCode</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1769</xloc>
-      <yloc>236</yloc>
+      <xloc>87</xloc>
+      <yloc>117</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1017,6 +803,41 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>698</xloc>
       <yloc>375</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <loglevel>log_level_basic</loglevel>
+      <displayHeader>Y</displayHeader>
+      <limitRows>N</limitRows>
+      <limitRowsNumber>0</limitRowsNumber>
+      <logmessage/>
+    <fields>
+      <field>
+        <name>json</name>
+        </field>
+      <field>
+        <name>companyId</name>
+        </field>
+      <field>
+        <name>survey_details_id</name>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>87</xloc>
+      <yloc>176</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1345,94 +1166,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>973</xloc>
       <yloc>375</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>parse_companyMediaPostResponseDetails</name>
-    <type>JsonInput</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <include>N</include>
-    <include_field/>
-    <rownum>N</rownum>
-    <addresultfile>N</addresultfile>
-    <readurl>N</readurl>
-    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
-    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>Y</ignoreMissingPath>
-    <rownum_field/>
-    <file>
-      <name/>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
-    <fields>
-      <field>
-        <name>company_facebook</name>
-        <path>&#x24;.socialMediaPostResponseDetails.companyMediaPostResponseDetails.facebookPostResponseList&#x5b;&#x2a;&#x5d;</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>company_linkedin</name>
-        <path>&#x24;.socialMediaPostResponseDetails.companyMediaPostResponseDetails.linkedinPostResponseList&#x5b;&#x2a;&#x5d;</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>company_twitter</name>
-        <path>&#x24;.socialMediaPostResponseDetails.companyMediaPostResponseDetails.twitterPostResponseList&#x5b;&#x2a;&#x5d;</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-    </fields>
-    <limit>0</limit>
-    <IsInFields>Y</IsInFields>
-    <IsAFile>N</IsAFile>
-    <valueField>json</valueField>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>89</xloc>
-      <yloc>236</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1819,8 +1552,194 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>287</xloc>
-      <yloc>236</yloc>
+      <xloc>87</xloc>
+      <yloc>263</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>parse_companyMediaPostResponseDetails facebook details</name>
+    <type>JsonInput</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <addresultfile>N</addresultfile>
+    <readurl>N</readurl>
+    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
+    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
+    <ignoreMissingPath>Y</ignoreMissingPath>
+    <rownum_field/>
+    <file>
+      <name/>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <fields>
+      <field>
+        <name>company_facebook</name>
+        <path>&#x24;.socialMediaPostResponseDetails.companyMediaPostResponseDetails.facebookPostResponseList&#x5b;&#x2a;&#x5d;</path>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <IsInFields>Y</IsInFields>
+    <IsAFile>N</IsAFile>
+    <valueField>json</valueField>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>282</xloc>
+      <yloc>136</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>parse_companyMediaPostResponseDetails_linkedInDetails</name>
+    <type>JsonInput</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <addresultfile>N</addresultfile>
+    <readurl>N</readurl>
+    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
+    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
+    <ignoreMissingPath>Y</ignoreMissingPath>
+    <rownum_field/>
+    <file>
+      <name/>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <fields>
+      <field>
+        <name>company_linkedin</name>
+        <path>&#x24;.socialMediaPostResponseDetails.companyMediaPostResponseDetails.linkedinPostResponseList&#x5b;&#x2a;&#x5d;</path>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <IsInFields>Y</IsInFields>
+    <IsAFile>N</IsAFile>
+    <valueField>json</valueField>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>276</xloc>
+      <yloc>282</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>parse_companyMediaPostResponseDetails twitter details</name>
+    <type>JsonInput</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <addresultfile>N</addresultfile>
+    <readurl>N</readurl>
+    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
+    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
+    <ignoreMissingPath>Y</ignoreMissingPath>
+    <rownum_field/>
+    <file>
+      <name/>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <fields>
+      <field>
+        <name>company_twitter</name>
+        <path>&#x24;.socialMediaPostResponseDetails.companyMediaPostResponseDetails.twitterPostResponseList&#x5b;&#x2a;&#x5d;</path>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <IsInFields>Y</IsInFields>
+    <IsAFile>N</IsAFile>
+    <valueField>json</valueField>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>275</xloc>
+      <yloc>421</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1841,7 +1760,7 @@
       <error>
         <source_step>FBUpdate</source_step>
         <target_step>Add constants 2</target_step>
-        <is_enabled>Y</is_enabled>
+        <is_enabled>N</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
         <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
@@ -1865,7 +1784,7 @@
       <error>
         <source_step>LinkUpdate</source_step>
         <target_step>Add constants 2 2</target_step>
-        <is_enabled>Y</is_enabled>
+        <is_enabled>N</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
         <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
@@ -1889,7 +1808,7 @@
       <error>
         <source_step>TwitterUpdate</source_step>
         <target_step>Add constants 2 3</target_step>
-        <is_enabled>Y</is_enabled>
+        <is_enabled>N</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
         <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
