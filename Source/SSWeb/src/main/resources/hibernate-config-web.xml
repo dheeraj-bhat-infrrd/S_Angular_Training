@@ -20,4 +20,9 @@
 		 <value>${JNDI_NAME}</value>
 		 </property>
 	</bean>
+	<bean id="dataSourceForReporting" class="org.springframework.jndi.JndiObjectFactoryBean">
+		 <property name="jndiName">
+		 <value>${REPORTING_JNDI_NAME}</value>
+		 </property>
+	</bean>
 </beans>

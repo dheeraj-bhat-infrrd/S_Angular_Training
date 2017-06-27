@@ -248,6 +248,8 @@
   <hop> <from>Complaint_resUpdate</from><to>Constant Complaint Response</to><enabled>Y</enabled> </hop>
   <hop> <from>Constant Phone1</from><to>Text file output</to><enabled>Y</enabled> </hop>
   <hop> <from>Constant Complaint Response</from><to>Text file output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Parsing for Phone</from><to>Constant Phone2 Json</to><enabled>Y</enabled> </hop>
+  <hop> <from>Constant Phone2 Json</from><to>Text file output</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>CompanySettings Input</name>
@@ -3084,7 +3086,7 @@
     <name>Parsing for Phone</name>
     <type>JsonInput</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -4772,10 +4774,55 @@
       </GUI>
     </step>
 
+  <step>
+    <name>Constant Phone2 Json</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>stepName</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>CompanySettingsContactDetailsPhone_Phone2_Json Parsing</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1276</xloc>
+      <yloc>525</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step_error_handling>
       <error>
         <source_step>Complaint_resUpdate</source_step>
         <target_step>Constant Complaint Response</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
+        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
+        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
+        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Parsing for Phone</source_step>
+        <target_step>Constant Phone2 Json</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
