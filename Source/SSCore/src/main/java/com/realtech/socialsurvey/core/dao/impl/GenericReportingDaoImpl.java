@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -20,37 +21,29 @@ import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
-
-// JIRA: SS-8: By RM05: BOC
-
-/**
- * This is the base Dao which needs to be extended by each Dao. It contains implementation for basic
- * CRUD methods required by every Dao.
- */
-@Primary
-@Component ( "generic")
-@Transactional
-public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T, ID>
+@Component ( "genericReporting")
+@Transactional(value = "transactionManagerForReporting")
+public class GenericReportingDaoImpl<T, ID extends Serializable> implements GenericReportingDao<T, ID>
 {
-
     private static final Logger LOG = LoggerFactory.getLogger( GenericDaoImpl.class );
     private Class<T> persistentClass;
     @Autowired
-    private SessionFactory sessionFactory;
+    private SessionFactory sessionFactoryForReporting;
 
 
     protected Session getSession()
     {
         Session session;
         try {
-            session = sessionFactory.getCurrentSession();
+            session = sessionFactoryForReporting.getCurrentSession();
         } catch ( HibernateException hibernateException ) {
             LOG.error( "HibernateException caught while getting session. ", hibernateException );
             throw new DatabaseException( "HibernateException caught while getting session. ", hibernateException );
@@ -73,7 +66,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
-    @Transactional
     public T findById( Class<T> entityClass, ID id )
     {
         T entity;
@@ -89,7 +81,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @SuppressWarnings ( "unchecked")
     @Override
-    @Transactional
     public List<T> findAll( Class<T> entityClass )
     {
         try {
@@ -104,7 +95,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
-    @Transactional
     public List<T> findByExample( T exampleInstance, String[] excludeProperty )
     {
         Criteria crit = getSession().createCriteria( getPersistentClass() );
@@ -120,83 +110,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
         }
         return crit.list();
     }
-
-
-    @Override
-    @Transactional
-    public T saveOrUpdate( T entity )
-    {
-        try {
-            getSession().saveOrUpdate( entity );
-        } catch ( HibernateException hibernateException ) {
-            LOG.error( "HibernateException caught in saveOrUpdate().", hibernateException );
-            throw new DatabaseException( "HibernateException caught in saveOrUpdate().", hibernateException );
-        }
-        return entity;
-    }
-
-
-    @Override
-    @Transactional
-    public T save( T entity )
-    {
-        try {
-            getSession().save( entity );
-        } catch ( HibernateException hibernateException ) {
-            LOG.error( "HibernateException caught in save().", hibernateException );
-            throw new DatabaseException( "HibernateException caught in save().", hibernateException );
-        }
-        return entity;
-    }
-
-
-    @Override
-    @Transactional
-    public void update( T entity )
-    {
-        try {
-            getSession().update( entity );
-        } catch ( HibernateException hibernateException ) {
-            LOG.error( "HibernateException caught in update().", hibernateException );
-            throw new DatabaseException( "HibernateException caught in update().", hibernateException );
-        }
-    }
-
-
-    @Override
-    @Transactional
-    public void delete( T entity )
-    {
-        try {
-            getSession().delete( entity );
-        } catch ( HibernateException hibernateException ) {
-            LOG.error( "HibernateException caught in delete(). ", hibernateException );
-            throw new DatabaseException( "HibernateException caught in delete(). ", hibernateException );
-        }
-    }
-
-
-    @Override
-    @Transactional
-    public void deleteByCondition( String entity, List<String> conditions )
-    {
-        String deleteQuery = "delete from " + entity + " where ";
-        for ( String condition : conditions ) {
-            deleteQuery += condition;
-            deleteQuery += " and ";
-        }
-        int index = deleteQuery.lastIndexOf( "and" );
-        if ( index != -1 )
-            deleteQuery = deleteQuery.substring( 0, index );
-        try {
-            Query query = getSession().createQuery( deleteQuery );
-            query.executeUpdate();
-        } catch ( HibernateException hibernateException ) {
-            LOG.error( "HibernateException caught in findByCriteria().", hibernateException );
-            throw new DatabaseException( "HibernateException caught in findByCriteria().", hibernateException );
-        }
-    }
-
 
     @Override
     public void flush()
@@ -224,7 +137,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
-    @Transactional
     public List<T> findByCriteria( Class<T> dataClass, Criterion... criterion )
     {
         Criteria crit = getSession().createCriteria( dataClass );
@@ -242,7 +154,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
-    @Transactional
     public List<T> findByKeyValue( Class<T> dataClass, Map<String, Object> queries )
     {
         Criteria criteria = getSession().createCriteria( dataClass );
@@ -260,7 +171,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
-    @Transactional
     public List<T> findByColumn( Class<T> dataClass, String column, Object value )
     {
         Criteria criteria = getSession().createCriteria( dataClass );
@@ -276,7 +186,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
-    @Transactional
     public List<T> findByColumnForMultipleValues( Class<T> dataClass, String column, List<?> values )
     {
         Criteria criteria = getSession().createCriteria( dataClass );
@@ -291,7 +200,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
-    @Transactional
     public long findNumberOfRows( Class<T> dataClass )
     {
         try {
@@ -304,7 +212,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
-    @Transactional
     public long findNumberOfRowsByKeyValue( Class<T> dataClass, Map<String, Object> queries )
     {
         Criteria criteria = getSession().createCriteria( dataClass );
@@ -320,23 +227,10 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
     }
 
 
-    @Override
-    @Transactional
-    public void merge( T entity )
-    {
-
-        try {
-            getSession().merge( entity );
-        } catch ( HibernateException hibernateException ) {
-            LOG.error( "HibernateException caught in merge().", hibernateException );
-            throw new DatabaseException( "HibernateException caught in merge().", hibernateException );
-        }
-    }
 
 
     @SuppressWarnings ( "unchecked")
     @Override
-    @Transactional
     public List<T> findAllActive( Class<T> entityClass )
     {
         try {
@@ -352,7 +246,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
-    @Transactional
     public List<T> findByKeyValueAscending( Class<T> dataClass, Map<String, Object> queries, String ascendingColumn )
     {
         Criteria criteria = getSession().createCriteria( dataClass );
@@ -370,7 +263,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
-    @Transactional
     public List<T> findByKeyValueAscendingWithAlias( Class<T> dataClass, Map<String, Object> queries, String ascendingColumn,
         String alias )
     {
@@ -380,7 +272,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
-    @Transactional
     public List<T> findByKeyValueAscendingWithAlias( Class<T> dataClass, Map<String, Object> queries,
         List<String> ascendingColumns, String alias )
     {
@@ -404,7 +295,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
-    @Transactional
     public List<T> findProjectionsByKeyValue( Class<T> dataClass, List<String> columnNames, Map<String, Object> queries )
     {
         return findProjectionsByKeyValue( dataClass, columnNames, queries, null );
@@ -413,7 +303,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @SuppressWarnings ( "unchecked")
     @Override
-    @Transactional
     public List<T> findProjectionsByKeyValue( Class<T> dataClass, List<String> columnNames, Map<String, Object> queries,
         String orderColumnName )
     {
@@ -441,7 +330,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @SuppressWarnings ( "unchecked")
     @Override
-    @Transactional
     public List<T> findProjectionsAscOrderByKeyValue( Class<T> dataClass, List<String> columnNames,
         Map<String, Object> queries, String columnToOrder )
     {
@@ -464,5 +352,5 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
         }
         return crit.setResultTransformer( Transformers.aliasToBean( dataClass ) ).list();
     }
+
 }
-// JIRA: SS-8: By RM05: EOC

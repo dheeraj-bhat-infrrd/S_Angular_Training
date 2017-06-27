@@ -2,10 +2,13 @@ package com.realtech.socialsurvey.api.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jndi.JndiObjectFactoryBean;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -30,12 +33,21 @@ public class ApiConfig extends WebMvcConfigurerAdapter
     }
 
 
+    @Primary
     @Bean ( name = "dataSource")
     public JndiObjectFactoryBean dataSource()
     {
         JndiObjectFactoryBean dataSource = new JndiObjectFactoryBean();
         dataSource.setJndiName( "java:/env/datasources/ss_user" );
         return dataSource;
+    }
+    
+    @Bean ( name = "dataSourceForReporting")
+    public JndiObjectFactoryBean dataSourceForReporting()
+    {
+        JndiObjectFactoryBean dataSourceForReporting = new JndiObjectFactoryBean();
+        dataSourceForReporting.setJndiName( "java:/env/datasources/ss_centralized_mongodb" );
+        return dataSourceForReporting;
     }
 
 
