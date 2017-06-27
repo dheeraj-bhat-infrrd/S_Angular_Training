@@ -44,7 +44,7 @@
     width: 50px;
     height: 35px;
     padding: 5px;
-    border-radius: 7px;">32</div></div>
+    border-radius: 7px;">${spsScore}</div></div>
 
     
   <svg id="meter">
