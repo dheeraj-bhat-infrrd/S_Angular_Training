@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -25,6 +28,7 @@ import com.realtech.socialsurvey.core.entities.OverviewCompany;
 import com.realtech.socialsurvey.core.entities.OverviewRegion;
 import com.realtech.socialsurvey.core.entities.OverviewUser;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
+import com.realtech.socialsurvey.core.entities.SurveyStatsReportCompany;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -39,6 +43,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
@@ -75,6 +80,9 @@ public class ReportingWebController
     
     @Autowired
     private OverviewManagement overviewManagement;
+    
+    @Autowired
+    private DashboardGraphManagement DashboardGraphManagement;
     
     
 
@@ -579,13 +587,8 @@ public class ReportingWebController
             model.addAttribute( "Survey_completed", overviewCompany.getTotalSurveyCompleted() );
             model.addAttribute( "Social_posts", overviewCompany.getTotalSocialPost() );
             model.addAttribute( "Zillow_reviews", overviewCompany.getTotalZillowReviews() );    
-        }
-        
-        
-        
-        return JspResolver.REPORTING_DASHBOARD;
-        
-        
+        }   
+        return JspResolver.REPORTING_DASHBOARD; 
     }   
   
     /*
@@ -700,6 +703,89 @@ public class ReportingWebController
         return JspResolver.REPORTING_PROFILE_IMAGE;
     }
     
+   @ResponseBody
+   @RequestMapping( value = "/fetchaveragereportingrating", method = RequestMethod.GET)
+   public String fetchAverageRating( Model model, HttpServletRequest request ) throws NonFatalException 
+   {
+        LOG.info( "Fetching Average Rating Graph" );
+        HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
+        String json = null;
+
+        if ( user == null ) {
+            throw new NonFatalException( "NonFatalException while logging in. " );
+        }    
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+            List<List <Object>> averageRating = DashboardGraphManagement.getAverageReviewRating( entityId , entityType );
+            json = new Gson().toJson( averageRating );
+        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
+            List<List <Object>> averageRating = DashboardGraphManagement.getAverageReviewRating( entityId , entityType );
+            json = new Gson().toJson( averageRating );
+        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
+            List<List <Object>> averageRating = DashboardGraphManagement.getAverageReviewRating( entityId , entityType );
+            json = new Gson().toJson( averageRating );
+        }
+    return json;
+        
+   }
+   
+   @ResponseBody
+   @RequestMapping( value = "/fetchreportingspsstats", method = RequestMethod.GET)
+   public String fetchSpsStats( Model model, HttpServletRequest request ) throws NonFatalException 
+   {
+        LOG.info( "Fetching Average Rating Graph" );
+        HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
+        String json = null;
+
+        if ( user == null ) {
+            throw new NonFatalException( "NonFatalException while logging in. " );
+        }    
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+            List<List <Object>> averageRating = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
+            json = new Gson().toJson( averageRating );
+        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
+            List<List <Object>> averageRating = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
+            json = new Gson().toJson( averageRating );
+        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
+            List<List <Object>> averageRating = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
+            json = new Gson().toJson( averageRating );
+        }
+    return json;
+        
+   }
+   
+   @ResponseBody
+   @RequestMapping( value = "/fetchreportingcompletionrate", method = RequestMethod.GET)
+   public String fetchCompletionRate( Model model, HttpServletRequest request ) throws NonFatalException 
+   {
+        LOG.info( "Fetching Average Rating Graph" );
+        HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
+        String json = null;
+
+        if ( user == null ) {
+            throw new NonFatalException( "NonFatalException while logging in. " );
+        }    
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+            List<List <Object>> averageRating = DashboardGraphManagement.getCompletionRate( entityId , entityType );
+            json = new Gson().toJson( averageRating );
+        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
+            List<List <Object>> averageRating = DashboardGraphManagement.getCompletionRate( entityId , entityType );
+            json = new Gson().toJson( averageRating );
+        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
+            List<List <Object>> averageRating = DashboardGraphManagement.getCompletionRate( entityId , entityType );
+            json = new Gson().toJson( averageRating );
+        }
+    return json;
+        
+   }
     /**
     *
     * @param model
