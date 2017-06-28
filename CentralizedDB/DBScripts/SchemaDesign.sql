@@ -3267,6 +3267,9 @@ CREATE TABLE `job_log_details` (
   UNIQUE KEY `JOB_UUID_UNIQUE` (`JOB_UUID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
+insert into job_log_details(JOB_NAME,STATUS,JOB_START_TIME,JOB_END_TIME,CURRENT_JOB_NAME,JOB_UUID) 
+values('Dummy Job','Dummy','1980-01-01 00:00:01','1980-01-01 00:00:01','Dummy','xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
+
 --
 -- Dumping events for database 'ss_centralized_mongodb'
 --

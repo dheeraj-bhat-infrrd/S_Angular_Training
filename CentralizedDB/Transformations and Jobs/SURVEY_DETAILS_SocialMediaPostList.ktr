@@ -243,8 +243,8 @@
   <hop> <from>parse_id</from><to>parse_region</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_branch</from><to>branch_null_check</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_region</from><to>region_null_check</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Add constants 2 2</from><to>Text file output</to><enabled>N</enabled> </hop>
   <hop> <from>branch_update</from><to>Add constants 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Update</from><to>Add constants 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>branch_null_check</from><to>branch_input</to><enabled>Y</enabled> </hop>
