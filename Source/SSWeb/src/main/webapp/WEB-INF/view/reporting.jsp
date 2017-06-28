@@ -108,8 +108,6 @@
 $(document).ready(function() {
 	$(document).attr("title", "Reporting Dashboard");
 	
-	
-	
 	$('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
 		e.stopPropagation();
 		if (colName == 'agentId') {

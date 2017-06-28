@@ -45,11 +45,8 @@ font-size: small;
       var archived= ('${archievedTrans}'/100) * totalIncompleteTransactions;
       var mismatched= ('${mismatchedTrans}'/100) * totalIncompleteTransactions;
       
-      console.log('${corruptedTrans}');
-      console.log('${corruptedTrans}'/100);
-      console.log(('${corruptedTrans}'/100) * totalIncompleteTransactions);
       function drawChart() {
-    	  console.log('${mismatchedTrans}')
+    	 
         var data = google.visualization.arrayToDataTable([
           ['Task', 'Hours per Day'],
           ['Mismatched', mismatched],

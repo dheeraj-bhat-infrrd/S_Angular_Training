@@ -15,7 +15,7 @@
 		var data = google
 					.visualization.arrayToDataTable([
 		                ['SPS', 'Detractors', 'Passives', 'Promoters',{ role: 'annotation' } ],
-		                ['2016', 20, 30, 40,''],
+		                ['Jan', 20, 30, 40,''],
 		                ['Feb', 40, 20, 40,''],
 		                ['Mar', 40, 20, 50,''],
 		                ['Apr', 30, 20, 30,''],

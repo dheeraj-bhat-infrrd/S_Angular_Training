@@ -135,20 +135,67 @@ public class ReportingWebController
         model.addAttribute( "userId", user.getUserId() );
         model.addAttribute( "dest", "Loan Consultant" );
         model.addAttribute( "rating", "4.5");
-        //adding dummy feilds for the overview header
-        model.addAttribute( "SPS_score","20" );
-        model.addAttribute("detractor","11.9");
-        model.addAttribute( "passives", "43.3" );
-        model.addAttribute( "promoters", "44.8" );
-        model.addAttribute( "total_incomplete_transactions", "64000" );
-        model.addAttribute( "corrupted", "25" );
-        model.addAttribute( "duplicate", "18" );
-        model.addAttribute( "archieved", "9" );
-        model.addAttribute( "mismatched", "49" );
-        model.addAttribute( "Survey_sent", "39" );
-        model.addAttribute( "Survey_completed", "23" );
-        model.addAttribute( "Social_posts", "167" );
-        model.addAttribute( "Zillow_reviews", "10" );
+        if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
+            OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType);      
+            model.addAttribute( "SPS_score",overviewUser.getSpsScore() );
+            model.addAttribute("detractor",overviewUser.getDetractorPercentage());
+            model.addAttribute( "passives", overviewUser.getPassivesPercentage() );
+            model.addAttribute( "promoters", overviewUser.getPromoterPercentage() );
+            model.addAttribute( "total_incomplete_transactions", overviewUser.getTotalIncompleteTransactions() );
+            model.addAttribute( "corrupted", overviewUser.getCorruptedPercentage() );
+            model.addAttribute( "duplicate", overviewUser.getDuplicatePercentage() );
+            model.addAttribute( "archieved", overviewUser.getArchievedPercentage());
+            model.addAttribute( "mismatched", overviewUser.getMismatchedPercentage());
+            model.addAttribute( "Survey_sent", overviewUser.getTotalSurveySent() );
+            model.addAttribute( "Survey_completed", overviewUser.getTotalSurveyCompleted() );
+            model.addAttribute( "Social_posts", overviewUser.getTotalSocialPost() );
+            model.addAttribute( "Zillow_reviews", overviewUser.getTotalZillowReviews() );
+        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
+            OverviewBranch overviewBranch = overviewManagement.fetchOverviewBranchDetails( entityId, entityType );
+            model.addAttribute( "SPS_score",overviewBranch.getSpsScore() );
+            model.addAttribute("detractor",overviewBranch.getDetractorPercentage());
+            model.addAttribute( "passives", overviewBranch.getPassivesPercentage() );
+            model.addAttribute( "promoters", overviewBranch.getPromoterPercentage() );
+            model.addAttribute( "total_incomplete_transactions", overviewBranch.getTotalIncompleteTransactions() );
+            model.addAttribute( "corrupted", overviewBranch.getCorruptedPercentage() );
+            model.addAttribute( "duplicate", overviewBranch.getDuplicatePercentage() );
+            model.addAttribute( "archieved", overviewBranch.getArchievedPercentage());
+            model.addAttribute( "mismatched", overviewBranch.getMismatchedPercentage());
+            model.addAttribute( "Survey_sent", overviewBranch.getTotalSurveySent() );
+            model.addAttribute( "Survey_completed", overviewBranch.getTotalSurveyCompleted() );
+            model.addAttribute( "Social_posts", overviewBranch.getTotalSocialPost() );
+            model.addAttribute( "Zillow_reviews", overviewBranch.getTotalZillowReviews() );
+        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
+            OverviewRegion overviewRegion = overviewManagement.fetchOverviewRegionDetails( entityId, entityType );
+            model.addAttribute( "SPS_score",overviewRegion.getSpsScore() );
+            model.addAttribute("detractor",overviewRegion.getDetractorPercentage());
+            model.addAttribute( "passives", overviewRegion.getPassivesPercentage() );
+            model.addAttribute( "promoters", overviewRegion.getPromoterPercentage() );
+            model.addAttribute( "total_incomplete_transactions", overviewRegion.getTotalIncompleteTransactions() );
+            model.addAttribute( "corrupted", overviewRegion.getCorruptedPercentage() );
+            model.addAttribute( "duplicate", overviewRegion.getDuplicatePercentage() );
+            model.addAttribute( "archieved", overviewRegion.getArchievedPercentage());
+            model.addAttribute( "mismatched", overviewRegion.getMismatchedPercentage());
+            model.addAttribute( "Survey_sent", overviewRegion.getTotalSurveySent() );
+            model.addAttribute( "Survey_completed", overviewRegion.getTotalSurveyCompleted() );
+            model.addAttribute( "Social_posts", overviewRegion.getTotalSocialPost() );
+            model.addAttribute( "Zillow_reviews", overviewRegion.getTotalZillowReviews() );
+        }else if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+            OverviewCompany overviewCompany = overviewManagement.fetchOverviewCompanyDetails( entityId, entityType );
+            model.addAttribute( "SPS_score",overviewCompany.getSpsScore() );
+            model.addAttribute("detractor",overviewCompany.getDetractorPercentage());
+            model.addAttribute( "passives", overviewCompany.getPassivesPercentage() );
+            model.addAttribute( "promoters", overviewCompany.getPromoterPercentage() );
+            model.addAttribute( "total_incomplete_transactions", overviewCompany.getTotalIncompleteTransactions() );
+            model.addAttribute( "corrupted", overviewCompany.getCorruptedPercentage() );
+            model.addAttribute( "duplicate", overviewCompany.getDuplicatePercentage() );
+            model.addAttribute( "archieved", overviewCompany.getArchievedPercentage());
+            model.addAttribute( "mismatched", overviewCompany.getMismatchedPercentage());
+            model.addAttribute( "Survey_sent", overviewCompany.getTotalSurveySent() );
+            model.addAttribute( "Survey_completed", overviewCompany.getTotalSurveyCompleted() );
+            model.addAttribute( "Social_posts", overviewCompany.getTotalSocialPost() );
+            model.addAttribute( "Zillow_reviews", overviewCompany.getTotalZillowReviews() );    
+        }
       
         boolean allowOverrideForSocialMedia = false;
         long branchId = 0;
