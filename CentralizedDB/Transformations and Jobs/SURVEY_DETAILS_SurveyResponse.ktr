@@ -239,7 +239,7 @@
   <hop> <from>SortSelect</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort input</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Synchronize after merge</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>N</enabled> </hop>
   <hop> <from>Synchronize after merge</from><to>Add constants 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Input 2</from><to>UUID_SURVEY_RESPONSE_ID</to><enabled>Y</enabled> </hop>
   </order>

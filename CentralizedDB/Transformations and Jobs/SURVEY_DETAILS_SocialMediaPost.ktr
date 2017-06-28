@@ -239,10 +239,10 @@
   <hop> <from>random_company_post_id</from><to>company_sharedOn</to><enabled>Y</enabled> </hop>
   <hop> <from>set_type_boolean</from><to>agent_insert</to><enabled>Y</enabled> </hop>
   <hop> <from>set_type_boolean 2</from><to>company_insert</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>N</enabled> </hop>
   <hop> <from>agent_update</from><to>Add constants 2</to><enabled>Y</enabled> </hop>
   <hop> <from>company_update</from><to>Add constants 2 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add constants 2 2</from><to>Text file output</to><enabled>N</enabled> </hop>
   <hop> <from>Select_agent_company_values</from><to>random_agent_post_id</to><enabled>Y</enabled> </hop>
   <hop> <from>Select_agent_company_values</from><to>random_company_post_id</to><enabled>Y</enabled> </hop>
   <hop> <from>agent_sharedOn</from><to>set_type_boolean</to><enabled>Y</enabled> </hop>
