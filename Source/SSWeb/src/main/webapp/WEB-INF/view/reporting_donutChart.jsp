@@ -44,15 +44,18 @@ font-size: small;
       var duplicate= ('${duplicateTrans}'/100) * totalIncompleteTransactions;
       var archived= ('${archievedTrans}'/100) * totalIncompleteTransactions;
       var mismatched= ('${mismatchedTrans}'/100) * totalIncompleteTransactions;
+      var totalOfCorDupArcMis = corrupted + duplicate + archived + mismatched;
+      var other = totalIncompleteTransactions - totalOfCorDupArcMis;
       
       function drawChart() {
     	 
         var data = google.visualization.arrayToDataTable([
           ['Task', 'Hours per Day'],
           ['Mismatched', mismatched],
-          ['Corrupted',  corrupted],
-          ['Duplicate',  duplicate],
+          ['Corrupted', corrupted],
+          ['Duplicate', duplicate],
           ['Archived', archived],
+          ['Other', other]
         ]);
 
         var options = {
@@ -64,7 +67,8 @@ font-size: small;
       	  chartArea:{
       		  width:'95%',
       		  height:'95%'
-      	  }
+      	  },
+      	slices: [{color : '#009fe0'},{color: '#E8341F'}, {color: '#985698'}, {color: '#7ab400'}, {color: '#f4ad42'}]
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('donutchart'));

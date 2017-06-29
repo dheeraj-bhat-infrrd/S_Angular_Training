@@ -36,7 +36,7 @@
 		   isStacked: true,
 		   height:300,
 	       vAxis: { gridlines: { count: 14 } },
-	       colors:['#dc3912','#a7abb2','#109618']
+	       colors:['#E8341F','#999999','#7ab400']
 		};
 
       var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
