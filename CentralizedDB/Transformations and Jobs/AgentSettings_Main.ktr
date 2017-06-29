@@ -70,6 +70,8 @@
   <created_date>2017&#x2f;06&#x2f;05 11&#x3a;48&#x3a;47.874</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;06&#x2f;05 11&#x3a;48&#x3a;47.874</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+    <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
@@ -259,24 +261,33 @@
   <hop> <from>Update isDeleted twitter</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Update isDeleted Realtor</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Update isDeleted Yelp</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant FB Token</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Google Token</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant GoogleBusiness</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Lending Tree</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant LinkedIn</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Realtor</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Twitter</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Yelp</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Zillow</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update FB Token</from><to>Constant FB Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update GB Token</from><to>Constant GoogleBusiness</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Google Token</from><to>Constant Google Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LendingTree token</from><to>Constant Lending Tree</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LinkdIn Token</from><to>Constant LinkedIn</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Realtor Token</from><to>Constant Realtor</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Yelp Token</from><to>Constant Yelp</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Twitter Token</from><to>Constant Twitter</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Zillow Token</from><to>Constant Zillow</to><enabled>Y</enabled> </hop>
+  <hop> <from>Constant FB Token</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Google Token</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant GoogleBusiness</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Lending Tree</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant LinkedIn</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Realtor</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Twitter</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Yelp</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Zillow</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Update FB Token</from><to>Constant FB Token</to><enabled>N</enabled> </hop>
+  <hop> <from>Update GB Token</from><to>Constant GoogleBusiness</to><enabled>N</enabled> </hop>
+  <hop> <from>Update Google Token</from><to>Constant Google Token</to><enabled>N</enabled> </hop>
+  <hop> <from>Update LendingTree token</from><to>Constant Lending Tree</to><enabled>N</enabled> </hop>
+  <hop> <from>Update LinkdIn Token</from><to>Constant LinkedIn</to><enabled>N</enabled> </hop>
+  <hop> <from>Update Realtor Token</from><to>Constant Realtor</to><enabled>N</enabled> </hop>
+  <hop> <from>Update Yelp Token</from><to>Constant Yelp</to><enabled>N</enabled> </hop>
+  <hop> <from>Update Twitter Token</from><to>Constant Twitter</to><enabled>N</enabled> </hop>
+  <hop> <from>Update Zillow Token</from><to>Constant Zillow</to><enabled>N</enabled> </hop>
+  <hop> <from>Update FB Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update GB Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update Google Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update LendingTree token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update LinkdIn Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update Realtor Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update Yelp Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update Twitter Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update Zillow Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AgentConstant</name>
@@ -1029,8 +1040,8 @@
            </partitioning>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1474</xloc>
-      <yloc>714</yloc>
+      <xloc>1728</xloc>
+      <yloc>662</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4606,7 +4617,7 @@
       </error>
       <error>
         <source_step>Update FB Token</source_step>
-        <target_step>Constant FB Token</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -4618,7 +4629,7 @@
       </error>
       <error>
         <source_step>Update GB Token</source_step>
-        <target_step>Constant GoogleBusiness</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -4630,7 +4641,7 @@
       </error>
       <error>
         <source_step>Update Google Token</source_step>
-        <target_step>Constant Google Token</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -4642,7 +4653,7 @@
       </error>
       <error>
         <source_step>Update LendingTree token</source_step>
-        <target_step>Constant Lending Tree</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -4654,7 +4665,7 @@
       </error>
       <error>
         <source_step>Update LinkdIn Token</source_step>
-        <target_step>Constant LinkedIn</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -4666,7 +4677,7 @@
       </error>
       <error>
         <source_step>Update Realtor Token</source_step>
-        <target_step>Constant Realtor</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -4678,7 +4689,7 @@
       </error>
       <error>
         <source_step>Update Twitter Token</source_step>
-        <target_step>Constant Twitter</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -4690,7 +4701,7 @@
       </error>
       <error>
         <source_step>Update Yelp Token</source_step>
-        <target_step>Constant Yelp</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -4702,7 +4713,7 @@
       </error>
       <error>
         <source_step>Update Zillow Token</source_step>
-        <target_step>Constant Zillow</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>

@@ -105,6 +105,8 @@
   <created_date>2017&#x2f;06&#x2f;09 12&#x3a;16&#x3a;52.745</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;06&#x2f;09 12&#x3a;16&#x3a;52.745</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+    <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
@@ -194,8 +196,9 @@
   <hop> <from>MongoDB I - LinkdInData</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>UUID_LinkdInLoc</to><enabled>Y</enabled> </hop>
   <hop> <from>LinkdIn Location</from><to>Update LinkdIn Location</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant SocialMediaToken</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LinkdIn Location</from><to>Constant SocialMediaToken</to><enabled>Y</enabled> </hop>
+  <hop> <from>Constant SocialMediaToken</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Update LinkdIn Location</from><to>Constant SocialMediaToken</to><enabled>N</enabled> </hop>
+  <hop> <from>Update LinkdIn Location</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Constant SocialMediaToken</name>
@@ -1779,6 +1782,25 @@
       </GUI>
     </step>
 
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>717</xloc>
+      <yloc>47</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step_error_handling>
       <error>
         <source_step>LinkdIn Location</source_step>
@@ -1794,7 +1816,7 @@
       </error>
       <error>
         <source_step>Update LinkdIn Location</source_step>
-        <target_step>Constant SocialMediaToken</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>

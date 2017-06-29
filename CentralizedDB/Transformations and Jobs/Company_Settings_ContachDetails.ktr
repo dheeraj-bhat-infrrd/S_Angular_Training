@@ -95,6 +95,8 @@
   <created_date>2017&#x2f;06&#x2f;05 22&#x3a;46&#x3a;20.130</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;06&#x2f;05 22&#x3a;46&#x3a;20.130</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+    <is_key_private>N</is_key_private>
   </info>
   <notepads>
     <notepad>
@@ -261,18 +263,24 @@
   <hop> <from>vendasta_rm</from><to>Update VendestaRm</to><enabled>Y</enabled> </hop>
   <hop> <from>SelectVendestaRm</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>vendasta_rm</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant SurveySettings</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant ContactNumber</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Lock Settings</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Vendesta RM</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Mail</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant WebAddress</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LockSettings</from><to>Constant Lock Settings</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update SurveySettings</from><to>Constant SurveySettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update VendestaRm</from><to>Constant Vendesta RM</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update ContactNumber</from><to>Constant ContactNumber</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Mail</from><to>Constant Mail</to><enabled>Y</enabled> </hop>
-  <hop> <from>UpdateWebAddress</from><to>Constant WebAddress</to><enabled>Y</enabled> </hop>
+  <hop> <from>Constant SurveySettings</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant ContactNumber</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Lock Settings</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Vendesta RM</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Mail</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant WebAddress</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Update LockSettings</from><to>Constant Lock Settings</to><enabled>N</enabled> </hop>
+  <hop> <from>Update SurveySettings</from><to>Constant SurveySettings</to><enabled>N</enabled> </hop>
+  <hop> <from>Update VendestaRm</from><to>Constant Vendesta RM</to><enabled>N</enabled> </hop>
+  <hop> <from>Update ContactNumber</from><to>Constant ContactNumber</to><enabled>N</enabled> </hop>
+  <hop> <from>Update Mail</from><to>Constant Mail</to><enabled>N</enabled> </hop>
+  <hop> <from>UpdateWebAddress</from><to>Constant WebAddress</to><enabled>N</enabled> </hop>
+  <hop> <from>Update VendestaRm</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update SurveySettings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update LockSettings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update ContactNumber</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update Mail</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>UpdateWebAddress</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>CompanySettings Input</name>
@@ -327,8 +335,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1504</xloc>
-      <yloc>601</yloc>
+      <xloc>1826</xloc>
+      <yloc>619</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -360,8 +368,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1474</xloc>
-      <yloc>68</yloc>
+      <xloc>1796</xloc>
+      <yloc>86</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -393,8 +401,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1518</xloc>
-      <yloc>782</yloc>
+      <xloc>1840</xloc>
+      <yloc>800</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -426,8 +434,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1466</xloc>
-      <yloc>208</yloc>
+      <xloc>1788</xloc>
+      <yloc>226</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -459,8 +467,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1492</xloc>
-      <yloc>474</yloc>
+      <xloc>1814</xloc>
+      <yloc>492</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -492,8 +500,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1532</xloc>
-      <yloc>926</yloc>
+      <xloc>1854</xloc>
+      <yloc>944</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2834,8 +2842,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1893</xloc>
-      <yloc>474</yloc>
+      <xloc>2215</xloc>
+      <yloc>492</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3476,6 +3484,25 @@
       </GUI>
     </step>
 
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1584</xloc>
+      <yloc>542</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step_error_handling>
       <error>
         <source_step>ContactNumbers OP</source_step>
@@ -3527,7 +3554,7 @@
       </error>
       <error>
         <source_step>Update ContactNumber</source_step>
-        <target_step>Constant ContactNumber</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -3539,7 +3566,7 @@
       </error>
       <error>
         <source_step>Update LockSettings</source_step>
-        <target_step>Constant Lock Settings</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -3551,7 +3578,7 @@
       </error>
       <error>
         <source_step>Update Mail</source_step>
-        <target_step>Constant Mail</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -3563,7 +3590,7 @@
       </error>
       <error>
         <source_step>Update SurveySettings</source_step>
-        <target_step>Constant SurveySettings</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -3575,7 +3602,7 @@
       </error>
       <error>
         <source_step>Update VendestaRm</source_step>
-        <target_step>Constant Vendesta RM</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -3587,7 +3614,7 @@
       </error>
       <error>
         <source_step>UpdateWebAddress</source_step>
-        <target_step>Constant WebAddress</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
