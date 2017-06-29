@@ -203,7 +203,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>424</xloc>
-      <yloc>206</yloc>
+      <yloc>257</yloc>
       </entry>
     <entry>
       <name>CreateJobLog</name>
@@ -305,7 +305,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>550</xloc>
-      <yloc>219</yloc>
+      <yloc>257</yloc>
       </entry>
     <entry>
       <name>BranchSettings</name>
@@ -337,7 +337,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>672</xloc>
-      <yloc>210</yloc>
+      <yloc>257</yloc>
       </entry>
     <entry>
       <name>CompanySettings</name>
@@ -401,7 +401,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>766</xloc>
-      <yloc>211</yloc>
+      <yloc>257</yloc>
       </entry>
     <entry>
       <name>AgentSettings</name>
@@ -433,7 +433,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>863</xloc>
-      <yloc>213</yloc>
+      <yloc>257</yloc>
       </entry>
     <entry>
       <name>FinishJobLog</name>
