@@ -2122,6 +2122,7 @@ button.paypal.is-active {
 	line-height: 22px;
 	font-size:15px;
 	padding-top: 10px;
+	text-align:left;
 }
 
 .rev-ppl-share-wrapper {

@@ -48,13 +48,25 @@
 
     
   <svg id="meter">
-<path id="arc1" fill="none" stroke="#dc3912" stroke-width="40" />
-<path id="arc2" fill="none" stroke="#a7abb2" stroke-width="40" />
-<path id="arc3" fill="none" stroke="#109618" stroke-width="40" />
+<path id="arc1" fill="none" stroke="#E8341F" stroke-width="40" />
+<path id="arc2" fill="none" stroke="#999999" stroke-width="40" />
+<path id="arc3" fill="none" stroke="#7ab400" stroke-width="40" />
+<path id="arc4" fill="none" stroke="#E8341F" stroke-width="40" />
+<path id="arc5" fill="none" stroke="#999999" stroke-width="40" />
+<path id="arc6" fill="none" stroke="#7ab400" stroke-width="40" />
   </svg>
 
 </div>
 <script>
+	
+var detractorEndAngle;
+var passivesEndAngle;
+var promotersEndAngle;
+var detractorStartAngle;
+var passivesStartAngle;
+var promotersStartAngle;
+var gaugeStartAngle = 250;
+var gaugeEndAngle = 110;
 
 	function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
 		var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
@@ -77,24 +89,127 @@
 
 		return d;
 	}
+	
+	function getGaugeEndAngles(){
+		var detractors = '${detractors}';
+		var passives =   '${passives}';
+		var promoters =  '${promoters}';
+		var totalDegree = (360-gaugeStartAngle)+gaugeEndAngle;
+		var degRequired = 0;
+		
+		//Detractor Start And End Angles
+		detractorStartAngle = gaugeStartAngle;
+		if(detractors == 0){
+			detractorEndAngle = detractorStartAngle;
+		}else if(detractors == 50){
+			detractorEndAngle = 0;
+		}else{
+			degRequired = (detractors/100)*totalDegree;
+			detractorEndAngle = (detractorStartAngle + degRequired)%360;
+		}
+		
+		if(detractors > 50){
+			document.getElementById("arc1").setAttribute("d", describeArc(150, 150, 70, detractorStartAngle, 0));
+			document.getElementById("arc4").setAttribute("d", describeArc(150, 150, 70, 0, detractorEndAngle));
+		}else{
+			document.getElementById("arc1").setAttribute("d", describeArc(150, 150, 70, detractorStartAngle, detractorEndAngle));
+		}
+		
+		//Passives Start and End Angles
+		if(detractors==0){
+			passivesStartAngle = gaugeStartAngle;
+		}else{
+			passivesStartAngle = detractorEndAngle + 2;
+		}
+		
+		if(passives == 0){
+			passivesEndAngle = passivesStartAngle;
+		}else{
+			degRequired = (passives/100)*totalDegree;
+			passivesEndAngle = (passivesStartAngle + degRequired)%360;
+		}
+		
+		if(passivesStartAngle >= gaugeStartAngle){
+			if(passivesEndAngle >= gaugeStartAngle){
+				document.getElementById("arc2").setAttribute("d", describeArc(150, 150, 70, passivesStartAngle, passivesEndAngle));
+			}else{
+				document.getElementById("arc2").setAttribute("d", describeArc(150, 150, 70, passivesStartAngle, 0));
+				document.getElementById("arc5").setAttribute("d", describeArc(150, 150, 70, 0, passivesEndAngle));
+			}
+		}else{
+			document.getElementById("arc5").setAttribute("d", describeArc(150, 150, 70, passivesStartAngle, passivesEndAngle));
+		}
+		
+		//Promoters Start and End Angles
+		promotersEndAngle =  gaugeEndAngle;
+		
+		if(promoters == 0){
+			promotersStartAngle = promotersEndAngle;
+		}else if(detractors == 0 && passives == 0){
+			promotersStartAngle = gaugeStartAngle;
+		}else{
+			promotersStartAngle = passivesEndAngle +2;
+		}
+		
+		if(promotersStartAngle >= gaugeStartAngle){
+			if(promotersEndAngle >= gaugeStartAngle){
+				document.getElementById("arc3").setAttribute("d", describeArc(150, 150, 70, promotersStartAngle, promotersEndAngle));
+			}else{
+				document.getElementById("arc3").setAttribute("d", describeArc(150, 150, 70, promotersStartAngle, 0));
+				document.getElementById("arc6").setAttribute("d", describeArc(150, 150, 70, 0, promotersEndAngle));
+			}
+		}else{
+			document.getElementById("arc6").setAttribute("d", describeArc(150, 150, 70, promotersStartAngle, promotersEndAngle));
+		}
+	}
 
 	$(document).ready(function() {
-		var detractorEndAngle = ('${detractors}'/100)*110;
-		var passivesEndAngle = (('${passives}'/100)*110)+detractorEndAngle;
-		var promotersEndAngle = (('${promoters}'/100)*110)+passivesEndAngle;
 		var spsScore = '${spsScore}';
+		
 		
 		var marginLeft = parseInt($("#metre-needle").css("margin-left"));
 		var marginTop = parseInt($("#metre-needle").css("margin-top"));
 		
-		$('#metre-needle').css({'transform':'rotate(' + spsScore + 'deg)'});
-		var needleDegree = Math.abs(spsScore - 20)/2;
 		
-		$("#metre-needle").css("margin-left",marginLeft+needleDegree+'px');
-		$("#metre-needle").css("margin-top",marginTop+needleDegree+'px');
+		var needleDegree;
+		var marginNeedle = Math.abs(spsScore - 20)/2;
 		
-		document.getElementById("arc1").setAttribute("d", describeArc(150, 150, 70, 250, detractorEndAngle));
-		document.getElementById("arc2").setAttribute("d", describeArc(150, 150, 70, detractorEndAngle+2, passivesEndAngle));
-		document.getElementById("arc3").setAttribute("d", describeArc(150, 150, 70, passivesEndAngle+2, promotersEndAngle));
+		if(spsScore < 0){
+			
+				needleDegree = 360-(Math.abs(spsScore)*1.1);
+				if(spsScore < -87){
+					$("#metre-needle").css("margin-left",marginLeft-marginNeedle+5+'px');
+				}else{
+					$("#metre-needle").css("margin-left",marginLeft-marginNeedle-5+'px');
+				}
+				$("#metre-needle").css("margin-top",marginTop+marginNeedle-20+'px');
+				
+		}else if(spsScore > 15){
+			
+			needleDegree = Math.abs(spsScore)*1.1;
+			if(spsScore > 87){
+				$("#metre-needle").css("margin-left",marginLeft+marginNeedle-10+'px');
+			}else{
+				$("#metre-needle").css("margin-left",marginLeft+marginNeedle+'px');
+			}
+			$("#metre-needle").css("margin-top",marginTop+marginNeedle+'px');
+			
+		}else if(spsScore > 7 && spsScore <=15){
+			
+			needleDegree = Math.abs(spsScore)*1.1;
+			$("#metre-needle").css("margin-left",marginLeft-5+'px');
+			
+		}else if(spsScore == 0 || (spsScore > 0 && spsScore <= 7)){
+			needleDegree = Math.abs(spsScore)*1.1;
+			$("#metre-needle").css("margin-left",marginLeft-13+'px');
+		}
+		
+		$('#metre-needle').css({'transform':'rotate(' + needleDegree + 'deg)'});
+			
+		getGaugeEndAngles();
+		
+		//document.getElementById("arc1").setAttribute("d", describeArc(150, 150, 70, detractorStartAngle, detractorEndAngle));
+		//document.getElementById("arc2").setAttribute("d", describeArc(150, 150, 70, passivesStartAngle, passivesEndAngle));
+		//document.getElementById("arc3").setAttribute("d", describeArc(150, 150, 70, promotersStartAngle, promotersEndAngle));
 	});
 </script>

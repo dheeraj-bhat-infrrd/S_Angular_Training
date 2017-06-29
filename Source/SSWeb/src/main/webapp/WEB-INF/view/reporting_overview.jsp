@@ -11,34 +11,71 @@
 <c:set value="${Social_posts}" var="socialPosts"></c:set>
 <c:set value="${Zillow_reviews}" var="zillowReviews"></c:set>
 
+<style>
+	.incomplete-trans-span{
+		text-align:center;
+		font-family: cursive;
+		font-size: small;
+		font-style: italic;
+		font-variant: small-caps;
+		font-weight: bold !important;
+		line-height: 15px;
+	}
+</style>
 <script src="${initParam.resourcesPath}/resources/js/googleloader.js"></script>
 <div class="col-lg-3 col-md-3 col-sm-3">
-	<jsp:include page="reporting_spsGauge.jsp"></jsp:include>
+	<c:if test="${detractors !=0 || passives !=0 || promoters !=0}">
+		<jsp:include page="reporting_spsGauge.jsp"></jsp:include>
+	</c:if>
+	<c:if test="${detractors == 0 && passives == 0 && promoters == 0}">
+		<div style="text-align:center; margin:30% auto">
+			<span class="incomplete-trans-span">There are No</span>
+			<div style="clear: both">
+				<span class="incomplete-trans-span">Detractors, Passives and Promoters</span> 
+			</div>
+			<div style="clear:both">
+				<span class="incomplete-trans-span">SPS score is 0</span>
+			</div>
+		</div>
+	</c:if>
 </div>
 <div class="col-lg-3 col-md-3 col-sm-3"
 	style="display: grid; margin-top: 20px;">
 	<div style="display: inline-flex; margin-top: 10px">
 		<div class="float-left dash-sel-lbl" style="text-align:center">Detractors</div>
 		<div class="float-left dash-sel-lbl"
-			style="width:${detractors}%;; height:65%; background:#dc3912; margin:auto -5px;"></div>
-		<div class="float-left dash-sel-lbl" style="color: #dc3912;">${detractors}%</div>
+			style="width:${detractors}%;; height:65%; background:#E8341F; margin:auto -5px;"></div>
+		<div class="float-left dash-sel-lbl" style="color: #E8341F;">${detractors}%</div>
 	</div>
 	<div style="display: inline-flex; margin-top: 10px">
 		<div class="float-left dash-sel-lbl">Passives</div>
 		<div class="float-left dash-sel-lbl"
-			style="width:${passives}%; height:65%; background:#a7abb2; margin:auto 2px"></div>
-		<div class="float-left dash-sel-lbl" style="color: #a7abb2;">${passives}%</div>
+			style="width:${passives}%; height:65%; background:#999999; margin:auto 2px"></div>
+		<div class="float-left dash-sel-lbl" style="color: #999999;">${passives}%</div>
 	</div>
 	<div style="display: inline-flex; margin-top: 10px">
 		<div class="float-left dash-sel-lbl">Promotors</div>
 		<div class="float-left dash-sel-lbl"
-			style="width:${promoters}%;; height:65%; background:#109618; margin:auto 2px"></div>
-		<div class="float-left dash-sel-lbl" style="color: #109618;">${promoters}%</div>
+			style="width:${promoters}%;; height:65%; background:#7ab400; margin:auto 2px"></div>
+		<div class="float-left dash-sel-lbl" style="color: #7ab400;">${promoters}%</div>
 	</div>
 </div>
+
 <div class="col-lg-3 col-md-3 col-sm-3 donut-chart">
-	<jsp:include page="reporting_donutChart.jsp"></jsp:include>
+	<c:if test="${total_incomplete_transactions > 0}">
+		<jsp:include page="reporting_donutChart.jsp"></jsp:include>
+	</c:if>
+	<c:if test="${total_incomplete_transactions <= 0}">
+		<div style="text-align:center; margin:30% auto">
+			<span class="incomplete-trans-span">Congratulations</span>
+			<div style="clear: both">
+				<span class="incomplete-trans-span">You have No</span> 
+				<span class="incomplete-trans-span">Incomplete Transactions</span>
+			</div>
+		</div>
+	</c:if>
 </div>
+
 <div class="col-lg-3 col-md-3 col-sm-3">
 	<div class="col-lg-6 col-md-6 col-sm-6" style="margin-top: 10px">
 		<div class="row-lg-6 row-md-6 row-sm-6"

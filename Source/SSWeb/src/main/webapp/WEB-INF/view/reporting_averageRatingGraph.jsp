@@ -7,36 +7,58 @@
 google.charts.load("current", {packages:["corechart"]});
 google.charts.setOnLoadCallback(drawChart);
 function drawChart() {
-  var data = google.visualization.arrayToDataTable
-      ([['X', 'Y'],
-        ['Jan', 24000],
-        ['Feb', 25000],
-        ['Mar', 26000],
-        ['Apr', 25000],
-        ['May', 26000],
-        ['Jun', 25000],
-        ['Jul', 24000],
-        ['Aug', 23000],
-        ['Sep', 25000],
-        ['Oct', 26000],
-        ['Nov', 27000],
-        ['Dec', 23000],
-  ]);
+	
+	$.ajax({
+		url : "/fetchaveragereportingrating.do",
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			chartData = data;
+			
+			var avgRatingChartData = new Array(chartData.length+1);
+			for (var k = 0; k <= chartData.length; k++) {
+				avgRatingChartData[k] = new Array(2);
+			}
+			avgRatingChartData[0] = ['X','Y'];
+			
+			for(var i=1;i<=chartData.length;i++){
+				avgRatingChartData[i][0] = chartData[i-1][1] + "/" + chartData[i-1][0];
+				avgRatingChartData[i][1] = chartData[i-1][2];	
+			}
+			
+			
+  		var data = google.visualization.arrayToDataTable(avgRatingChartData);
 
-  var options = {
-  	title:'Average Rating',
-    legend: 'none',
-    height:300,
-    width:1000,
-    hAxis: {  maxValue: 9 },
-    vAxis: { minValue:21000, maxValue:28000},
-    colors: ['009fe0'],
-    pointSize: 5
- };
+  		var options = {
+  			legend: 'none',
+    		height:300,
+    		width:1000,
+    		vAxis: { 
+    				title:'Average Rating',
+    				minValue:0, 
+    				maxValue:6,
+    				gridlines : {
+      					count : 7
+      				}
+  		   		},
+    		colors: ['009fe0'],
+    		pointSize: 5
+ 		};
 
-  var chart = new google.visualization.LineChart(document.getElementById('average_chart_div'));
-  chart.draw(data, options);
+  		var chart = new google.visualization.LineChart(document.getElementById('average_chart_div'));
+  		chart.draw(data, options);
+	},
+	error : function(e) {
+		if (e.status == 504) {
+			redirectToLoginPageOnSessionTimeOut(e.status);
+			return;
+		}
+		redirectErrorpage();
+	}
+	});
 }
+
 </script>
 
   <div id="average_chart_div" style="width:100%"></div>

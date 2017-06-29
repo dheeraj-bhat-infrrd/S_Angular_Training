@@ -93,8 +93,29 @@
 					<div class="tab-pane fade" id="leaderboard-tab"></div>
 					<div class="tab-pane fade" id="score-stats-tab"></div>
 					<div class="tab-pane fade" id="activity-tab"></div>
-					<div class="tab-pane fade" id="reviews-tab"></div>
-					<div class="tab-pane fade" id="incomplete-surveys-tab"></div>
+					<div class="tab-pane fade" id="reviews-tab">
+						<div class="people-say-wrapper rt-content-main rt-content-main-adj">
+						<div class="main-con-header clearfix pad-bot-10-resp" style="display: block;border-bottom: 1px solid #dcdcdc;padding: 15px 0;">
+							<div id="review-desc" class="float-left dash-ppl-say-lbl" data-profile-name="${profileName}">
+							</div>
+						</div>
+						<div id="review-details" class="ppl-review-item-wrapper">
+							<!-- Populated with dashboard_reviews.jsp -->
+						</div>
+					</div>
+					</div>
+					<div class="tab-pane fade" id="incomplete-surveys-tab">
+						<div id="dash-survey-incomplete" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
+							<div class="dash-lp-header clearfix" id="incomplete-survey-header">
+								<div class="float-left"><spring:message code="label.incompletesurveys.key" /></div>
+								<div class="float-right dash-sur-link" onclick="showIncompleteSurveyListPopup(event)">View All</div>
+							</div>
+							<div id="dsh-inc-srvey" class="dash-lp-item-grp clearfix" data-total="0">
+								<!-- Populated with dashboard_incompletesurveys.jsp -->
+							</div>
+							<%-- <div id="dsh-inc-dwnld" class="dash-btn-sur-data hide"><spring:message code="label.incompletesurveydata.key" /></div> --%>
+						</div>
+					</div>
 				</div>
 			</div>
 			
@@ -119,9 +140,26 @@ $(document).ready(function() {
 		}
 	});
 	
-	paintForReportingDash();
+	$(window).off('scroll');
+	$(window).scroll(function() {
+		if(window.location.hash.substr(1) == "dashboard") {
+			dashbaordReviewScroll();		
+		}
+	});
+	
+	var scrollContainer = document.getElementById('dsh-inc-srvey');
+	scrollContainer.onscroll = function() {
+		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) - scrollContainer.clientHeight)) {
+			if(!doStopIncompleteSurveyPostAjaxRequest || $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
+					fetchIncompleteSurvey(false);
+					$('#dsh-inc-srvey').perfectScrollbar('update');
+			}
+		}
+	};
 	
 	updateViewAsScroll();
+	
+	paintForReportingDash();
 	
 	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
 	var currentProfileName = $('#prof-container').attr('data-column-name');

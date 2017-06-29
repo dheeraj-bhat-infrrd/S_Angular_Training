@@ -140,9 +140,9 @@ public class ReportingWebController
             }
         }
 
+        model.addAttribute( "profileName", profileName );
         model.addAttribute( "userId", user.getUserId() );
-        model.addAttribute( "dest", "Loan Consultant" );
-        model.addAttribute( "rating", "4.5");
+        
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
             OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType);      
             model.addAttribute( "SPS_score",overviewUser.getSpsScore() );
