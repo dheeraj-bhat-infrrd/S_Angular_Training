@@ -24,7 +24,20 @@
 </style>
 <script src="${initParam.resourcesPath}/resources/js/googleloader.js"></script>
 <div class="col-lg-3 col-md-3 col-sm-3">
-	<jsp:include page="reporting_spsGauge.jsp"></jsp:include>
+	<c:if test="${detractors !=0 || passives !=0 || promoters !=0}">
+		<jsp:include page="reporting_spsGauge.jsp"></jsp:include>
+	</c:if>
+	<c:if test="${detractors == 0 && passives == 0 && promoters == 0}">
+		<div style="text-align:center; margin:30% auto">
+			<span class="incomplete-trans-span">There are No</span>
+			<div style="clear: both">
+				<span class="incomplete-trans-span">Detractors, Passives and Promoters</span> 
+			</div>
+			<div style="clear:both">
+				<span class="incomplete-trans-span">SPS score is 0</span>
+			</div>
+		</div>
+	</c:if>
 </div>
 <div class="col-lg-3 col-md-3 col-sm-3"
 	style="display: grid; margin-top: 20px;">
