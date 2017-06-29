@@ -304,7 +304,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>556</xloc>
+      <xloc>550</xloc>
       <yloc>257</yloc>
       </entry>
     <entry>
@@ -336,7 +336,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>675</xloc>
+      <xloc>672</xloc>
       <yloc>257</yloc>
       </entry>
     <entry>
@@ -400,7 +400,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>781</xloc>
+      <xloc>766</xloc>
       <yloc>257</yloc>
       </entry>
     <entry>
@@ -432,7 +432,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>880</xloc>
+      <xloc>863</xloc>
       <yloc>257</yloc>
       </entry>
     <entry>
@@ -552,24 +552,6 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>SurveyDetails</from>
-      <to>AgentSettings</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>BranchSettings</from>
-      <to>SurveyDetails</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>RegionSettings</from>
       <to>BranchSettings</to>
       <from_nr>0</from_nr>
@@ -590,6 +572,24 @@
     <hop>
       <from>Mysql MasterTable Updates</from>
       <to>RegionSettings</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>BranchSettings</from>
+      <to>SurveyDetails</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>SurveyDetails</from>
+      <to>AgentSettings</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

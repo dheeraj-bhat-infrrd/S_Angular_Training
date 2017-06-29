@@ -197,8 +197,8 @@
   <hop> <from>Filter crmInfo</from><to>break crm info</to><enabled>Y</enabled> </hop>
   <hop> <from>CRM info OP</from><to>Update CrmInfo</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID-crm-info</from><to>CRM info OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update CrmInfo</from><to>Add constants</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add constants</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Update CrmInfo</from><to>Add constants</to><enabled>N</enabled> </hop>
   </order>
   <step>
     <name>Add constants</name>

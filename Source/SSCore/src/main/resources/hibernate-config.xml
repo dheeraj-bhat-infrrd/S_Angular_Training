@@ -115,6 +115,9 @@
 				<value>com.realtech.socialsurvey.core.entities.OverviewBranch</value>
 				<value>com.realtech.socialsurvey.core.entities.OverviewRegion</value>
 				<value>com.realtech.socialsurvey.core.entities.OverviewCompany</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyStatsReportRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyStatsReportCompany</value>
 			</list>
 		</property>
 	</bean>

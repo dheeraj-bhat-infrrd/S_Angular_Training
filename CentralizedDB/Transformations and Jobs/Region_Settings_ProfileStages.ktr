@@ -200,8 +200,8 @@
   <hop> <from>UUID ProfileStages</from><to>ProfileStages OP</to><enabled>Y</enabled> </hop>
   <hop> <from>ProfileStages OP</from><to>Update ProfileStages</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB RegionSettings</from><to>Json Input BranchId</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant ProfileStages</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update ProfileStages</from><to>Constant ProfileStages</to><enabled>Y</enabled> </hop>
+  <hop> <from>Constant ProfileStages</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Update ProfileStages</from><to>Constant ProfileStages</to><enabled>N</enabled> </hop>
   </order>
   <step>
     <name>Constant ProfileStages</name>

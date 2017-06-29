@@ -221,8 +221,8 @@
   <hop> <from>linkedin input</from><to>Sort_linkedin_rows</to><enabled>Y</enabled> </hop>
   <hop> <from>twitterInput</from><to>sort_twitter_rows</to><enabled>Y</enabled> </hop>
   <hop> <from>social_insert</from><to>social_update</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>social_update</from><to>Add constants 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>social_update</from><to>Add constants 2</to><enabled>N</enabled> </hop>
   <hop> <from>Filter rows</from><to>social_insert</to><enabled>Y</enabled> </hop>
   </order>
   <step>

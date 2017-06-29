@@ -231,9 +231,9 @@
   <hop> <from>type_constants</from><to>filter_facebook_null</to><enabled>Y</enabled> </hop>
   <hop> <from>type_constants</from><to>filter_linkedin_null</to><enabled>Y</enabled> </hop>
   <hop> <from>type_constants</from><to>filter_twitter_null</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2 2</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2 3</from><to>Text file output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Add constants 2 2</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Add constants 2 3</from><to>Text file output</to><enabled>N</enabled> </hop>
   <hop> <from>FBUpdate</from><to>Add constants 2</to><enabled>Y</enabled> </hop>
   <hop> <from>LinkUpdate</from><to>Add constants 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>TwitterUpdate</from><to>Add constants 2 3</to><enabled>Y</enabled> </hop>

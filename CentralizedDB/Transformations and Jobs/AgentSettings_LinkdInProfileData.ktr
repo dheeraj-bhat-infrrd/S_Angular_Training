@@ -192,13 +192,13 @@
   <order>
   <hop> <from>MongoDB I - LinkdInData</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>LinkdIn Profile Data OP</from><to>Update LinkdIn Profile data</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows</from><to>LinkedIn Constant</to><enabled>Y</enabled> </hop>
   <hop> <from>LinkedIn Constant</from><to>LinkdIn Profile Data OP</to><enabled>Y</enabled> </hop>
   <hop> <from>LinkedIn Constant 2</from><to>Update LinkdIn Profile data 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>LinkedIn Constant 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Update LinkdIn Profile data 2</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Constant SocialMediaToken</from><to>Text file output</to><enabled>Y</enabled> </hop>
   <hop> <from>Update LinkdIn Profile data</from><to>Constant SocialMediaToken</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows</from><to>LinkedIn Constant</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Constant SocialMediaToken</name>
@@ -263,7 +263,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to/>
+<send_true_to>LinkedIn Constant</send_true_to>
 <send_false_to>LinkedIn Constant 2</send_false_to>
     <compare>
 <condition>
