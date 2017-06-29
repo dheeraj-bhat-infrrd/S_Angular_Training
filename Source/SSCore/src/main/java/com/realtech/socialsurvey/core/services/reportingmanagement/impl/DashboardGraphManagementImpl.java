@@ -42,21 +42,24 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId ) ){
                 List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportCompany.getTrxMonth() );
+                list.add( SurveyStatsReportCompany.getYear() );
+                list.add( SurveyStatsReportCompany.getMonth() );
                 list.add( SurveyStatsReportCompany.getAvgRating() );
                 averageRating.add( list );
             }
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
             for(SurveyStatsReportRegion SurveyStatsReportRegion : SurveyStatsReportRegionDao.fetchRegionSurveyStatsById(entityId) ){
                 List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportRegion.getTrxMonth() );
+                list.add( SurveyStatsReportRegion.getYear() );
+                list.add( SurveyStatsReportRegion.getMonth() );
                 list.add( SurveyStatsReportRegion.getAvgRating() );
                 averageRating.add( list );
             }
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
             for(SurveyStatsReportBranch SurveyStatsReportBranch : SurveyStatsReportBranchDao.fetchBranchSurveyStatsById(entityId ) ){
                 List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportBranch.getTrxMonth() );
+                list.add( SurveyStatsReportBranch.getYear() );
+                list.add( SurveyStatsReportBranch.getMonth() );
                 list.add( SurveyStatsReportBranch.getAvgRating() );
                 averageRating.add( list );
             }
@@ -73,7 +76,8 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId ) ){
                 List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportCompany.getTrxMonth() );
+                list.add( SurveyStatsReportCompany.getYear() );
+                list.add( SurveyStatsReportCompany.getMonth() );
                 list.add( SurveyStatsReportCompany.getDetractors() );
                 list.add( SurveyStatsReportCompany.getPassives() );
                 list.add( SurveyStatsReportCompany.getPromoters() );            
@@ -82,7 +86,8 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
             for(SurveyStatsReportRegion SurveyStatsReportRegion : SurveyStatsReportRegionDao.fetchRegionSurveyStatsById(entityId) ){
                 List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportRegion.getTrxMonth() );
+                list.add( SurveyStatsReportRegion.getYear() );
+                list.add( SurveyStatsReportRegion.getMonth() );
                 list.add( SurveyStatsReportRegion.getDetractors() );
                 list.add( SurveyStatsReportRegion.getPassives() );
                 list.add( SurveyStatsReportRegion.getPromoters() );            
@@ -91,7 +96,8 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
             for(SurveyStatsReportBranch SurveyStatsReportBranch : SurveyStatsReportBranchDao.fetchBranchSurveyStatsById(entityId ) ){
                 List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportBranch.getTrxMonth() );
+                list.add( SurveyStatsReportBranch.getYear() );
+                list.add( SurveyStatsReportBranch.getMonth() );
                 list.add( SurveyStatsReportBranch.getDetractors() );
                 list.add( SurveyStatsReportBranch.getPassives() );
                 list.add( SurveyStatsReportBranch.getPromoters() );            
@@ -110,7 +116,8 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId ) ){
                 List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportCompany.getTrxMonth() );
+                list.add( SurveyStatsReportCompany.getYear() );
+                list.add( SurveyStatsReportCompany.getMonth() );
                 list.add( SurveyStatsReportCompany.getCompleted() );
                 list.add( SurveyStatsReportCompany.getIncomplete() );            
                 completionRate.add( list );
@@ -118,7 +125,8 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
             for(SurveyStatsReportRegion SurveyStatsReportRegion : SurveyStatsReportRegionDao.fetchRegionSurveyStatsById(entityId) ){
                 List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportRegion.getTrxMonth() );
+                list.add( SurveyStatsReportRegion.getYear() );
+                list.add( SurveyStatsReportRegion.getMonth() );
                 list.add( SurveyStatsReportRegion.getCompleted() );
                 list.add( SurveyStatsReportRegion.getIncomplete() );            
                 completionRate.add( list );
@@ -126,7 +134,8 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
             for(SurveyStatsReportBranch SurveyStatsReportBranch : SurveyStatsReportBranchDao.fetchBranchSurveyStatsById(entityId ) ){
                 List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportBranch.getTrxMonth() );
+                list.add( SurveyStatsReportBranch.getYear() );
+                list.add( SurveyStatsReportBranch.getMonth() );
                 list.add( SurveyStatsReportBranch.getCompleted() );
                 list.add( SurveyStatsReportBranch.getIncomplete() );            
                 completionRate.add( list );
