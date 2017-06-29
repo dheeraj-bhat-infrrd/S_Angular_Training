@@ -8,39 +8,60 @@
 <c:set value="${promoters}" var="promoters"></c:set>
 
 <script>
-	google.charts.load('current', {packages: ['corechart', 'bar']});
+	var chartData;
+	var spsChartData = [[ 'SPS', 'Detractors', 'Passives', 'Promoters'],[]];
+	google.charts.load('current', {	packages : [ 'corechart', 'bar' ]});
 	google.charts.setOnLoadCallback(drawStacked);
 	
 	function drawStacked() {
-		var data = google
-					.visualization.arrayToDataTable([
-		                ['SPS', 'Detractors', 'Passives', 'Promoters',{ role: 'annotation' } ],
-		                ['Jan', 20, 30, 40,''],
-		                ['Feb', 40, 20, 40,''],
-		                ['Mar', 40, 20, 50,''],
-		                ['Apr', 30, 20, 30,''],
-		                ['May', 40, 20, 50,''],
-		                ['Jun', 60, 30, 50,''],
-		                ['Jul', 70, 40, 50,''],
-		                ['Aug', 100,20, 30,''],
-		                ['Sep', 70, 30, 100,''],
-		                ['Oct', 90, 20, 120,''],
-		                ['Nov', 60, 40, 50,''],
-		                ['Dec', 50, 20, 90,''],
-		               ]);
+		
+		$.ajax({
+			url : "/fetchreportingspsstats.do",
+			type : "GET",
+			cache : false,
+			dataType : "json",
+			success : function(data) {
+				chartData = data;
+				
+				var spsChartData = new Array(chartData.length+1);
+				for (var k = 0; k <= chartData.length; k++) {
+					  spsChartData[k] = new Array(4);
+				}
+				spsChartData[0] = [ 'SPS', 'Detractors', 'Passives', 'Promoters'];
+				
+				for(var i=1;i<=chartData.length;i++){
+					spsChartData[i][0] = chartData[i-1][1] + "/" + chartData[i-1][0];
+					spsChartData[i][1] = chartData[i-1][2];	
+					spsChartData[i][2] = chartData[i-1][3];
+					spsChartData[i][3] = chartData[i-1][4];
+				}
+				
+				var data = google.visualization.arrayToDataTable(spsChartData);
 
-		var options = {
-		   title:'SPS Stats',
-		   legend: { position: 'none' },
-		   bar: { groupWidth: '50%' },
-		   isStacked: true,
-		   height:300,
-	       vAxis: { gridlines: { count: 14 } },
-	       colors:['#E8341F','#999999','#7ab400']
-		};
+				var options = { title : 'SPS Stats',
+				                legend : {position : 'none'},
+				                bar : {groupWidth : '40%'},
+				                isStacked : true,
+				                height : 300,
+				                vAxis : {
+				                         	gridlines : {
+				                                  			count : 14
+				                                  		}
+				                        },
+				                colors : [ '#E8341F', '#999999', '#7ab400' ]
+				               };
 
-      var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
-    }
+				var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+				chart.draw(data, options);
+			},
+			error : function(e) {
+				if (e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
+				redirectErrorpage();
+			}
+		});
+	}
 </script>
  <div id="chart_div" style="width:100%"></div>

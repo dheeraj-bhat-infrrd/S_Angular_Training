@@ -551,6 +551,8 @@ function paintReportingDashboard(profileMasterId, newProfileName, newProfileValu
 	if (newProfileName != null) {
 		showDashboardButtons(newProfileName, newProfileValue);
 	}
+	
+	fetchReviewsOnDashboard(false);
 }
 
 function reportingSocialMediaButtons(data){
@@ -7808,6 +7810,7 @@ function paintForReportingDash() {
 	doStopReviewsPaginationEditProfile = false;
 	isReviewsRequestRunningEditProfile = false;
 	$('#prof-review-item').html('');
+	
 	// Common call for all cases
 	fetchAvgRating(attrName, attrVal);
 	fetchReviewCount(attrName, attrVal, minScore);

@@ -8,35 +8,67 @@ google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(drawChart);
 
 function drawChart() {
-  var data = google.visualization.arrayToDataTable([
-    ['Month', 'Completed Transactions ', 'Incomplete Transactions '],
-    ['Jan', 24000,22000],
-  	['Feb', 25000,23000],
- 	['Mar', 26000,24000],
-  	['Apr', 25000,23000],
-  	['May', 26000,24000],
-  	['Jun', 25000,23000],
-  	['Jul', 24000,22000],
-  	['Aug', 23000,23000],
-  	['Sep', 25000,24000],
-  	['Oct', 26000,23000],
-  	['Nov', 27000,25000],
-  	['Dec', 23000,22000],
-  ]);
+	
+	$.ajax({
+		url : "/fetchreportingcompletionrate.do",
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			chartData = data;
+			var maxTransactionValue = 0;
+			var compRateChartData = new Array(chartData.length+1);
+			for (var k = 0; k <= chartData.length; k++) {
+				compRateChartData[k] = new Array(3);
+			}
+			compRateChartData[0] = ['Month', 'Completed Transactions ', 'Incomplete Transactions '];
+			
+			for(var i=1;i<=chartData.length;i++){
+				compRateChartData[i][0] = chartData[i-1][1] + "/" + chartData[i-1][0];
+				compRateChartData[i][1] = chartData[i-1][2];
+				compRateChartData[i][2] = chartData[i-1][3];
+				
+				if(compRateChartData[i][1] > maxTransactionValue){
+					maxTransactionValue =  compRateChartData[i][1];
+				}
+				
+				if(compRateChartData[i][2] > maxTransactionValue){
+					maxTransactionValue =  compRateChartData[i][2];
+				}
+			}
+		
+			var maxVAxisValue = 0;
+			
+			if(maxTransactionValue<10){
+				maxVAxisValue = maxTransactionValue + 5;
+			}else{
+				maxVAxisValue = maxTransactionValue + 10;
+			}
+			
+  		var data = google.visualization.arrayToDataTable(compRateChartData);
 
-  var options = {
-    title: 'Completion Rate',
-    height:300,
-    width:1100,
-    chartArea:{width:'78%'},
-    vAxis: { minValue:21000, maxValue:28000},
-    legend: { position: 'right',alignment:'center',maxLines:2},
-    pointSize:5
-  };
+  		var options = {
+    		title: 'Completion Rate',
+    		height:300,
+    		width:1100,
+    		chartArea:{width:'78%'},
+    		vAxis: { minValue:0, maxValue: maxVAxisValue ,gridlines : {count : 6	}},
+    		legend: { position: 'right',alignment:'center',maxLines:2},
+    		pointSize:5
+  		};
 
-  var chart = new google.visualization.LineChart(document.getElementById('completion_chart_div'));
+ 		 var chart = new google.visualization.LineChart(document.getElementById('completion_chart_div'));
 
-  chart.draw(data, options);
+  		chart.draw(data, options);
+		},
+	error : function(e) {
+		if (e.status == 504) {
+			redirectToLoginPageOnSessionTimeOut(e.status);
+			return;
+		}
+		redirectErrorpage();
+	}
+	});
 }
 </script>
 

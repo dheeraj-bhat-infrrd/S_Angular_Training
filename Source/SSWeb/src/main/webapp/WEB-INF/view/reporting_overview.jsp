@@ -12,7 +12,7 @@
 <c:set value="${Zillow_reviews}" var="zillowReviews"></c:set>
 
 <style>
-	span{
+	.incomplete-trans-span{
 		text-align:center;
 		font-family: cursive;
 		font-size: small;
@@ -54,9 +54,10 @@
 	</c:if>
 	<c:if test="${total_incomplete_transactions <= 0}">
 		<div style="text-align:center; margin:30% auto">
-			<span>Congratulations</span>
+			<span class="incomplete-trans-span">Congratulations</span>
 			<div style="clear: both">
-				<span>You have No</span> <span>Incomplete Transactions</span>
+				<span class="incomplete-trans-span">You have No</span> 
+				<span class="incomplete-trans-span">Incomplete Transactions</span>
 			</div>
 		</div>
 	</c:if>
