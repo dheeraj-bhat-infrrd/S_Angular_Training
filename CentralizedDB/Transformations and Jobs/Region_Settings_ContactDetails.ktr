@@ -218,16 +218,16 @@
   <hop> <from>Mail OP</from><to>Update mail</to><enabled>Y</enabled> </hop>
   <hop> <from>WebAddress OP </from><to>Update WebAddress</to><enabled>Y</enabled> </hop>
   <hop> <from>ContactNumbers OP</from><to>Update ContactNumbers</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant ContactNumbers</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant LockSettings</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Mail</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Survey Settings</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Web Address</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update SurveySettings</from><to>Constant Survey Settings</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LockSettings</from><to>Constant LockSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update ContactNumbers</from><to>Constant ContactNumbers</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update WebAddress</from><to>Constant Web Address</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update mail</from><to>Constant Mail</to><enabled>Y</enabled> </hop>
+  <hop> <from>Constant ContactNumbers</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant LockSettings</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Mail</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Survey Settings</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant Web Address</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Update SurveySettings</from><to>Constant Survey Settings</to><enabled>N</enabled> </hop>
+  <hop> <from>Update LockSettings</from><to>Constant LockSettings</to><enabled>N</enabled> </hop>
+  <hop> <from>Update ContactNumbers</from><to>Constant ContactNumbers</to><enabled>N</enabled> </hop>
+  <hop> <from>Update WebAddress</from><to>Constant Web Address</to><enabled>N</enabled> </hop>
+  <hop> <from>Update mail</from><to>Constant Mail</to><enabled>N</enabled> </hop>
   </order>
   <step>
     <name>Constant ContactNumbers</name>
