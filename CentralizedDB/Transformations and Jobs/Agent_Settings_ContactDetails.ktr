@@ -105,6 +105,8 @@
   <created_date>2017&#x2f;06&#x2f;07 16&#x3a;23&#x3a;41.371</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;06&#x2f;07 16&#x3a;23&#x3a;41.371</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+    <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
@@ -251,6 +253,10 @@
   <hop> <from>Insert &#x2f; Update 2</from><to>Update Mail</to><enabled>N</enabled> </hop>
   <hop> <from>UUID_WebAddress</from><to>Insert &#x2f; Update 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Insert &#x2f; Update 2 2</from><to>Update Web Address</to><enabled>N</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update 2 2</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update 2</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update ContactNumbers</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AgentSettings Input</name>
@@ -510,7 +516,7 @@
       <table>mail</table>
       <key>
         <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS _ID</field>
+        <field>CONTACT_DETAILS_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
       </key>
@@ -520,7 +526,7 @@
         <update>N</update>
       </value>
       <value>
-        <name>CONTACT_DETAILS _ID</name>
+        <name>CONTACT_DETAILS_ID</name>
         <rename>CONTACT_DETAILS_ID</rename>
         <update>N</update>
       </value>
@@ -577,7 +583,7 @@
       <table>web_addresses</table>
       <key>
         <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS _ID</field>
+        <field>CONTACT_DETAILS_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
       </key>
@@ -587,7 +593,7 @@
         <update>N</update>
       </value>
       <value>
-        <name>CONTACT_DETAILS _ID</name>
+        <name>CONTACT_DETAILS_ID</name>
         <rename>CONTACT_DETAILS_ID</rename>
         <update>N</update>
       </value>
@@ -2420,7 +2426,7 @@
       <table>mail</table>
       <key>
         <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS _ID</field>
+        <field>CONTACT_DETAILS_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
         </key>
@@ -2554,7 +2560,7 @@
       <table>web_addresses</table>
       <key>
         <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS _ID</field>
+        <field>CONTACT_DETAILS_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
         </key>
@@ -2653,10 +2659,65 @@
       </GUI>
     </step>
 
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>572</xloc>
+      <yloc>728</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step_error_handling>
       <error>
         <source_step>ContactNumbers OP</source_step>
         <target_step>Update ContactNumbers</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Insert &#x2f; Update</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Insert &#x2f; Update 2</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Insert &#x2f; Update 2 2</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -2692,7 +2753,7 @@
       </error>
       <error>
         <source_step>Update ContactNumbers</source_step>
-        <target_step/>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>

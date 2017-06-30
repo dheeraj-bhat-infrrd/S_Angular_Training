@@ -105,6 +105,8 @@
   <created_date>2017&#x2f;06&#x2f;06 19&#x3a;08&#x3a;54.886</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;06&#x2f;06 19&#x3a;08&#x3a;54.886</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+    <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
@@ -137,13 +139,13 @@
   </connection>
   <connection>
     <name>SS_Centralized_Mysql_Conn</name>
-    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
+    <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;mysql_schema_name&#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
-    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
+    <database>&#x24;&#x7b;CENTRALIZED_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;CENTRALIZED_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;CENTRALIZED_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;CENTRALIZED_MYSQL_PASSWORD&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -153,7 +155,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;CENTRALIZED_MYSQL_PORT&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -164,13 +166,13 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>localhost</server>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>ss_user</database>
-    <port>3306</port>
-    <username>root</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -180,7 +182,7 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -214,8 +216,9 @@
   <hop> <from>Modified Java Script Value</from><to>Filter SocialMediaToken</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter SocialMediaToken</from><to>SocialMediaToken OP</to><enabled>Y</enabled> </hop>
   <hop> <from>SocialMediaToken OP</from><to>Update SocialMediaToken</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant SocialMediaToken</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update SocialMediaToken</from><to>Constant SocialMediaToken</to><enabled>Y</enabled> </hop>
+  <hop> <from>Constant SocialMediaToken</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Update SocialMediaToken</from><to>Constant SocialMediaToken</to><enabled>N</enabled> </hop>
+  <hop> <from>Update SocialMediaToken</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Constant SocialMediaToken</name>
@@ -456,16 +459,16 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<join_type>FULL OUTER</join_type>
-<step0>Sort FB</step0>
-<step1>Sort GB</step1>
-<step2>Sort Google</step2>
-<step3>Sort LendingTree</step3>
-<step4>Sort LinkdIn</step4>
-<step5>Sort Realtor</step5>
-<step6>Sort Yelp</step6>
-<step7>Sort twitter</step7>
-<step8>Sort Zillow</step8>
+    <join_type>FULL OUTER</join_type>
+    <step0>Sort FB</step0>
+    <step1>Sort GB</step1>
+    <step2>Sort Google</step2>
+    <step3>Sort LendingTree</step3>
+    <step4>Sort LinkdIn</step4>
+    <step5>Sort Realtor</step5>
+    <step6>Sort Yelp</step6>
+    <step7>Sort twitter</step7>
+    <step8>Sort Zillow</step8>
     <number_input>9</number_input>
     <keys>
       <key>id</key>
@@ -1292,6 +1295,25 @@
       </GUI>
     </step>
 
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>277</xloc>
+      <yloc>796</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step_error_handling>
       <error>
         <source_step>SocialMediaToken OP</source_step>
@@ -1307,7 +1329,7 @@
       </error>
       <error>
         <source_step>Update SocialMediaToken</source_step>
-        <target_step>Constant SocialMediaToken</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>

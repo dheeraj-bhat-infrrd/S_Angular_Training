@@ -95,6 +95,8 @@
   <created_date>2017&#x2f;06&#x2f;08 05&#x3a;17&#x3a;58.433</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;06&#x2f;08 05&#x3a;17&#x3a;58.433</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+    <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
@@ -215,10 +217,11 @@
   <hop> <from>Json Input</from><to>Filter rows Facebook Pages</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows Facebook Pages</from><to>Sort rows FB Pages</to><enabled>Y</enabled> </hop>
   <hop> <from>FacebookPages Table OP</from><to>Update FacebookPages</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant FB Pages</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update FacebookPages</from><to>Constant FB Pages</to><enabled>Y</enabled> </hop>
+  <hop> <from>Constant FB Pages</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Update FacebookPages</from><to>Constant FB Pages</to><enabled>N</enabled> </hop>
   <hop> <from>MongoDB Input</from><to>Write to log</to><enabled>Y</enabled> </hop>
   <hop> <from>Write to log</from><to>Json Input CompanyId</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update FacebookPages</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Constant FB Pages</name>
@@ -522,7 +525,7 @@
         <group/>
         <length>-1</length>
         <precision>-1</precision>
-        <trim_type>none</trim_type>
+        <trim_type>both</trim_type>
         <repeat>N</repeat>
       </field>
     </fields>
@@ -592,7 +595,7 @@
     <fields_name/>
     <collection>COMPANY_SETTINGS</collection>
     <json_field_name>json</json_field_name>
-    <json_query>&#x7b;&#x24;query&#x3a;&#x7b;&#x22;modifiedOn&#x22; &#x3a;&#x7b;&#x24;gte&#x3a;&#x24;&#x7b;modifiedOnSettings&#x7d;&#x7d;&#x7d;&#x7d;</json_query>
+    <json_query/>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -1688,6 +1691,25 @@
       </GUI>
     </step>
 
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>326</xloc>
+      <yloc>471</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step_error_handling>
       <error>
         <source_step>FacebookPages Table OP</source_step>
@@ -1703,7 +1725,7 @@
       </error>
       <error>
         <source_step>Update FacebookPages</source_step>
-        <target_step>Constant FB Pages</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>

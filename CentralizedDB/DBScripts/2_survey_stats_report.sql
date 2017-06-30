@@ -1,4 +1,4 @@
-USE `ss_centralized_mongodb`;
+USE `ss_report_demo`;
 CREATE TABLE `survey_stats_report` (
   `survey_stats_report_id` varchar(45) NOT NULL,
   `Id` text,

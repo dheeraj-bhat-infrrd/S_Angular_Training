@@ -105,6 +105,8 @@
   <created_date>2017&#x2f;06&#x2f;07 11&#x3a;50&#x3a;51.947</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;06&#x2f;07 11&#x3a;50&#x3a;51.947</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+    <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
@@ -229,8 +231,9 @@
   <hop> <from>Sort rows 2 2 2 2</from><to>Group Licenses</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB I - AgentSettings 2</from><to>Json Licenses 1</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Licenses</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update AgentSettings</from><to>Add constants</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add constants</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Update AgentSettings</from><to>Add constants</to><enabled>N</enabled> </hop>
+  <hop> <from>Update AgentSettings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Add constants</name>
@@ -4215,13 +4218,13 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<join_type>FULL OUTER</join_type>
-<step0>Merge Join</step0>
-<step1>Group Associations</step1>
-<step2>Group Achievments</step2>
-<step3>Group Hobies</step3>
-<step4>Group Experties</step4>
-<step5>Group Licenses</step5>
+    <join_type>FULL OUTER</join_type>
+    <step0>Merge Join</step0>
+    <step1>Group Associations</step1>
+    <step2>Group Achievments</step2>
+    <step3>Group Hobies</step3>
+    <step4>Group Experties</step4>
+    <step5>Group Licenses</step5>
     <number_input>6</number_input>
     <keys>
       <key>AgentId</key>
@@ -4806,6 +4809,25 @@
       </GUI>
     </step>
 
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>943</xloc>
+      <yloc>497</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step_error_handling>
       <error>
         <source_step>AgentSettings Table OP</source_step>
@@ -4821,7 +4843,7 @@
       </error>
       <error>
         <source_step>Update AgentSettings</source_step>
-        <target_step>Add constants</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>

@@ -105,6 +105,8 @@
   <created_date>2017&#x2f;06&#x2f;09 12&#x3a;23&#x3a;21.466</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;06&#x2f;09 12&#x3a;23&#x3a;21.466</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+    <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
@@ -204,11 +206,13 @@
   <hop> <from>Sort rows</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>LinkdIn Company OP</from><to>Update LinkdIn Company</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant Company</from><to>Text file output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LinkdIn Company</from><to>Constant Company</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LinkdIn Start Date</from><to>Constant StartDate</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant StartDate</from><to>Text file output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Constant Company</from><to>Text file output</to><enabled>N</enabled> </hop>
+  <hop> <from>Update LinkdIn Company</from><to>Constant Company</to><enabled>N</enabled> </hop>
+  <hop> <from>Update LinkdIn Start Date</from><to>Constant StartDate</to><enabled>N</enabled> </hop>
+  <hop> <from>Constant StartDate</from><to>Text file output</to><enabled>N</enabled> </hop>
   <hop> <from>Merge Join</from><to>LinkdIn Company</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update LinkdIn Start Date</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update LinkdIn Company</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Constant Company</name>
@@ -2487,6 +2491,25 @@
       </GUI>
     </step>
 
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>445</xloc>
+      <yloc>5</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step_error_handling>
       <error>
         <source_step>LinkdIn Company OP</source_step>
@@ -2514,7 +2537,7 @@
       </error>
       <error>
         <source_step>Update LinkdIn Company</source_step>
-        <target_step>Constant Company</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
@@ -2526,7 +2549,7 @@
       </error>
       <error>
         <source_step>Update LinkdIn Start Date</source_step>
-        <target_step>Constant StartDate</target_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
         <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
