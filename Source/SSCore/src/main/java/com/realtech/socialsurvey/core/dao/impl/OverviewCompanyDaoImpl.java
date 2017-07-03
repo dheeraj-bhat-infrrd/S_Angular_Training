@@ -24,13 +24,12 @@ public class OverviewCompanyDaoImpl extends GenericReportingDaoImpl<OverviewComp
         query.setParameter( "companyId", companyid  );
         String OverviewCompanyId = (String) query.uniqueResult();
         
-        LOG.info(
-            "Method to get OverviewCompanyId from CompanyId, getOverviewCompanyId() finished." );
+        LOG.info("Method to get OverviewCompanyId from CompanyId, getOverviewCompanyId() finished." );
         return OverviewCompanyId;
     }
 
     @Override
-    public OverviewCompany findOverviewCompany( Class<OverviewCompany> entityClass, String overviewCompanyid )
+    public OverviewCompany findOverviewCompany( Class<OverviewCompany> entityClass, String overviewCompanyid )throws IllegalArgumentException
     {
         return super.findById( entityClass, overviewCompanyid );
     }

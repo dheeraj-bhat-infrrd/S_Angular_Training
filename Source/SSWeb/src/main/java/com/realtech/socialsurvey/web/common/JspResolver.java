@@ -186,4 +186,5 @@ public interface JspResolver
     public static final String REPORTING_DASHBOARD = "reporting";
     public static final String REPORTING_PROFILE = "reportingprofiledetails";
     public static final String REPORTING_PROFILE_IMAGE = "reporting_profileimage";
+    public static final String REPORTS = "reporting_reports";
 }

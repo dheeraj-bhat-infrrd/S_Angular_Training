@@ -29,7 +29,7 @@ public class SurveyStatsReportRegionDaoImpl extends GenericReportingDaoImpl<Surv
         try {
             criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
         } catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchCompanySurveyStatsById() ", hibernateException );
+            LOG.error( "Exception caught in fetchRegionSurveyStatsById() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchRegionSurveyStatsById() ", hibernateException );
         }
 

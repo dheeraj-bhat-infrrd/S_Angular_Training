@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.core.entities.OverviewBranch;
 import com.realtech.socialsurvey.core.entities.OverviewCompany;
 import com.realtech.socialsurvey.core.entities.OverviewRegion;
 import com.realtech.socialsurvey.core.entities.OverviewUser;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 
 @DependsOn ( "generic")
@@ -36,32 +37,47 @@ public class OverviewManagementImpl implements OverviewManagement
     
     
     @Override
-    public OverviewUser fetchOverviewUserDetails(long entityId , String entityType){
+    public OverviewUser fetchOverviewUserDetails(long entityId , String entityType)throws NonFatalException{
         String overviewUserId = OverviewUserDao.getOverviewUserId( entityId );
+        if(overviewUserId == null){
+          throw new  NonFatalException(); 
+        }
         OverviewUser overviewUser =  OverviewUserDao.findOverviewUser( OverviewUser.class, overviewUserId ); 
         return overviewUser;
     }
 
 
     @Override
-    public OverviewBranch fetchOverviewBranchDetails( long entityId, String entityType ){
-       String overviewBranchId = OverviewBranchDao.getOverviewBranchId( entityId );
-       OverviewBranch overviewBranch = OverviewBranchDao.findOverviewBranch( OverviewBranch.class , overviewBranchId );
-       return overviewBranch;
+    public OverviewBranch fetchOverviewBranchDetails( long entityId, String entityType )throws NonFatalException{
+      
+      
+           String overviewBranchId = OverviewBranchDao.getOverviewBranchId( entityId );
+           if(overviewBranchId == null){
+               throw new  NonFatalException(); 
+            }
+           OverviewBranch overviewBranch = OverviewBranchDao.findOverviewBranch( OverviewBranch.class , overviewBranchId ); 
+           return overviewBranch;
+       
     }
 
 
     @Override
-    public OverviewRegion fetchOverviewRegionDetails( long entityId, String entityType ){
+    public OverviewRegion fetchOverviewRegionDetails( long entityId, String entityType )throws NonFatalException{
        String overviewRegionId = OverviewRegionDao.getOverviewRegionId( entityId );
+       if(overviewRegionId == null){
+           throw new  NonFatalException(); 
+        }
        OverviewRegion overviewRegion = OverviewRegionDao.findOverviewRegion( OverviewRegion.class, overviewRegionId );
        return overviewRegion;
     }
 
 
     @Override
-    public OverviewCompany fetchOverviewCompanyDetails( long entityId, String entityType ){
+    public OverviewCompany fetchOverviewCompanyDetails( long entityId, String entityType )throws NonFatalException{
         String overviewCompanyId = OverviewCompanyDao.getOverviewCompanyId( entityId );
+        if(overviewCompanyId == null){
+            throw new  NonFatalException(); 
+         }
         OverviewCompany overviewCompany = OverviewCompanyDao.findOverviewCompany( OverviewCompany.class, overviewCompanyId );
         return overviewCompany;
     }

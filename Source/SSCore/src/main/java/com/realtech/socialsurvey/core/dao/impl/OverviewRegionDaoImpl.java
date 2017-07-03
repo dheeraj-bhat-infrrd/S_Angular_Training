@@ -29,7 +29,7 @@ public class OverviewRegionDaoImpl extends GenericReportingDaoImpl<OverviewRegio
     }
 
     @Override
-    public OverviewRegion findOverviewRegion( Class<OverviewRegion> entityClass, String overviewRegionId )
+    public OverviewRegion findOverviewRegion( Class<OverviewRegion> entityClass, String overviewRegionId )throws IllegalArgumentException
     {
         return super.findById( entityClass, overviewRegionId );
     }

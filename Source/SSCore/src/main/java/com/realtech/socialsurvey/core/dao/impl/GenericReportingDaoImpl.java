@@ -65,6 +65,47 @@ public class GenericReportingDaoImpl<T, ID extends Serializable> implements Gene
 
 
     @Override
+    @Transactional("transactionManagerForReporting")
+    public T saveOrUpdate( T entity )
+    {
+        try {
+            getSession().saveOrUpdate( entity );
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "HibernateException caught in saveOrUpdate().", hibernateException );
+            throw new DatabaseException( "HibernateException caught in saveOrUpdate().", hibernateException );
+        }
+        return entity;
+    }
+
+
+    @Override
+    @Transactional(value = "transactionManagerForReporting")
+    public T save( T entity )
+    {
+        try {
+            getSession().save( entity );
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "HibernateException caught in save().", hibernateException );
+            throw new DatabaseException( "HibernateException caught in save().", hibernateException );
+        }
+        return entity;
+    }
+
+
+    @Override
+    @Transactional("transactionManagerForReporting")
+    public void update( T entity )
+    {
+        try {
+            getSession().update( entity );
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "HibernateException caught in update().", hibernateException );
+            throw new DatabaseException( "HibernateException caught in update().", hibernateException );
+        }
+    }
+
+
+    @Override
     @SuppressWarnings ( "unchecked")
     public T findById( Class<T> entityClass, ID id )
     {
