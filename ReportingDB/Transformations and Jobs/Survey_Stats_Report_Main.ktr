@@ -1943,6 +1943,12 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1964,7 +1970,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
@@ -2131,6 +2137,11 @@
         <name>incomplete</name>
         <rename>incomplete</rename>
         <update>Y</update>
+      </value>
+      <value>
+        <name>region_id</name>
+        <rename>region_id</rename>
+        <update>N</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -3103,6 +3114,10 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>region_id</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
       <meta>        <name>Abusive</name>
         <rename>Abusive</rename>
@@ -3511,6 +3526,21 @@
         <storage_type/>
       </meta>      <meta>        <name>incomplete</name>
         <rename>incomplete</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>region_id</name>
+        <rename>region_id</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -5011,6 +5041,9 @@
     <fields>
       <field>
         <name>Pending</name>
+        </field>
+      <field>
+        <name>region_id</name>
         </field>
       </fields>
      <cluster_schema/>

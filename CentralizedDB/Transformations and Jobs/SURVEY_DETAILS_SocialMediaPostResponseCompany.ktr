@@ -212,21 +212,16 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>FBTable output</from><to>FBUpdate</to><enabled>Y</enabled> </hop>
   <hop> <from>Mongo_Survey_details</from><to>Parse_id_companyId</to><enabled>Y</enabled> </hop>
-  <hop> <from>Twitter output</from><to>TwitterUpdate</to><enabled>Y</enabled> </hop>
-  <hop> <from>fb_stream</from><to>FBTable output</to><enabled>Y</enabled> </hop>
   <hop> <from>filter_facebook_null</from><to>parse_facebook</to><enabled>Y</enabled> </hop>
   <hop> <from>filter_linkedin_null</from><to>parse_linkedin</to><enabled>Y</enabled> </hop>
   <hop> <from>filter_twitter_null</from><to>parse_twitter</to><enabled>Y</enabled> </hop>
-  <hop> <from>link_stream</from><to>LINKoutput</to><enabled>Y</enabled> </hop>
   <hop> <from>modify_facebook_date</from><to>fb_stream</to><enabled>Y</enabled> </hop>
   <hop> <from>modify_linkedin_date</from><to>link_stream</to><enabled>Y</enabled> </hop>
   <hop> <from>modify_twitter_date</from><to>twitter_stream </to><enabled>Y</enabled> </hop>
   <hop> <from>parse_facebook</from><to>UUID_FACEBOOK_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_linkedin</from><to>UUID_LINKEDIN_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_twitter</from><to>UUID_TWITTER_POST_RESPONSE_LIST</to><enabled>Y</enabled> </hop>
-  <hop> <from>twitter_stream </from><to>Twitter output</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_FACEBOOK_POST_RESPONSE_LIST</from><to>modify_facebook_date</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_LINKEDIN_POST_RESPONSE_LIST</from><to>modify_linkedin_date</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_TWITTER_POST_RESPONSE_LIST</from><to>modify_twitter_date</to><enabled>Y</enabled> </hop>
@@ -238,20 +233,16 @@
   <hop> <from>parse_companyMediaPostResponseDetails facebook details</from><to>filter_facebook_null</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_companyMediaPostResponseDetails_linkedInDetails</from><to>filter_linkedin_null</to><enabled>Y</enabled> </hop>
   <hop> <from>parse_companyMediaPostResponseDetails twitter details</from><to>filter_twitter_null</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants 2</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Add constants 2 2</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Add constants 2 3</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>FBUpdate</from><to>Add constants 2</to><enabled>N</enabled> </hop>
-  <hop> <from>LinkUpdate</from><to>Add constants 2 2</to><enabled>N</enabled> </hop>
-  <hop> <from>TwitterUpdate</from><to>Add constants 2 3</to><enabled>N</enabled> </hop>
-  <hop> <from>LINKoutput</from><to>LinkUpdate</to><enabled>Y</enabled> </hop>
-  <hop> <from>FBUpdate</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>LinkUpdate</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>TwitterUpdate</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>fb_stream</from><to>Insert &#x2f; Update FB </to><enabled>Y</enabled> </hop>
+  <hop> <from>link_stream</from><to>Insert &#x2f; Update LikedIn</to><enabled>Y</enabled> </hop>
+  <hop> <from>twitter_stream </from><to>Insert &#x2f; Update twitter</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update twitter</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update LikedIn</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update FB </from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>Add constants 2</name>
-    <type>Constant</type>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -260,348 +251,10 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>SurveyDetails_SocialMediaPostResponseCompany_FBUpdate</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1823</xloc>
-      <yloc>70</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Add constants 2 2</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>SurveyDetails_SocialMediaPostResponseCompany_LinkedInUpdate</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1823</xloc>
-      <yloc>233</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Add constants 2 3</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>SurveyDetails_SocialMediaPostResponseCompany_TwitterUpdate</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1823</xloc>
-      <yloc>372</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>FBTable output</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>facebook_post_response_list</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>ACCESS_TOKEN</column_name>
-          <stream_name>ACCESS_TOKEN</stream_name>
-        </field>
-        <field>
-          <column_name>POST_DATE</column_name>
-          <stream_name>POST_DATE</stream_name>
-        </field>
-        <field>
-          <column_name>RESPONSE_MESSAGE</column_name>
-          <stream_name>RESPONSE_MESSAGE</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_DETAILS_ID</column_name>
-          <stream_name>SURVEY_DETAILS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>FACEBOOK_POST_RESPONSE_LIST_ID</column_name>
-          <stream_name>FACEBOOK_POST_RESPONSE_LIST_ID</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>id</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1265</xloc>
-      <yloc>73</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>FBUpdate</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>facebook_post_response_list</table>
-      <key>
-        <name>id</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>SURVEY_DETAILS_ID</name>
-        <field>SURVEY_DETAILS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>ACCESS_TOKEN</name>
-        <rename>ACCESS_TOKEN</rename>
-        </value>
-      <value>
-        <name>POST_DATE</name>
-        <rename>POST_DATE</rename>
-        </value>
-      <value>
-        <name>RESPONSE_MESSAGE</name>
-        <rename>RESPONSE_MESSAGE</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1425</xloc>
-      <yloc>73</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>LINKoutput</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>linkedin_post_response_list</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>LINKEDIN_POST_RESPONSE_LIST_ID</column_name>
-          <stream_name>LINKEDIN_POST_RESPONSE_LIST_ID</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>id</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>ACCESS_TOKEN</column_name>
-          <stream_name>ACCESS_TOKEN</stream_name>
-        </field>
-        <field>
-          <column_name>POST_DATE</column_name>
-          <stream_name>POST_DATE</stream_name>
-        </field>
-        <field>
-          <column_name>REFERENCE_URL</column_name>
-          <stream_name>REFERENCE_URL</stream_name>
-        </field>
-        <field>
-          <column_name>RESPONSE_MESSAGE</column_name>
-          <stream_name>RESPONSE_MESSAGE</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_DETAILS_ID</column_name>
-          <stream_name>SURVEY_DETAILS_ID</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1265</xloc>
-      <yloc>236</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>LinkUpdate</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>linkedin_post_response_list</table>
-      <key>
-        <name>id</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>SURVEY_DETAILS_ID</name>
-        <field>SURVEY_DETAILS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>ACCESS_TOKEN</name>
-        <rename>ACCESS_TOKEN</rename>
-        </value>
-      <value>
-        <name>POST_DATE</name>
-        <rename>POST_DATE</rename>
-        </value>
-      <value>
-        <name>REFERENCE_URL</name>
-        <rename>REFERENCE_URL</rename>
-        </value>
-      <value>
-        <name>RESPONSE_MESSAGE</name>
-        <rename>RESPONSE_MESSAGE</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1425</xloc>
-      <yloc>236</yloc>
+      <xloc>1469</xloc>
+      <yloc>227</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -713,243 +366,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>87</xloc>
       <yloc>117</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Text file output</name>
-    <type>TextFileOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <separator>&#x3b;</separator>
-    <enclosure>&#x22;</enclosure>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>Y</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding/>
-    <endedLine/>
-    <fileNameInField>N</fileNameInField>
-    <fileNameField/>
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
-      <is_command>N</is_command>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>txt</extention>
-      <append>Y</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>Y</add_date>
-      <add_time>Y</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>NumOfError</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal>.</decimal>
-        <group>,</group>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>11</length>
-        <precision>0</precision>
-      </field>
-      <field>
-        <name>ErrorDesc</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorFields</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorCode</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2039</xloc>
-      <yloc>233</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Twitter output</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>twitter_post_response_list</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>TWITTER_POST_RESPONSE_LIST_ID</column_name>
-          <stream_name>TWITTER_POST_RESPONSE_LIST_ID</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>id</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>ACCESS_TOKEN</column_name>
-          <stream_name>ACCESS_TOKEN</stream_name>
-        </field>
-        <field>
-          <column_name>POST_DATE</column_name>
-          <stream_name>POST_DATE</stream_name>
-        </field>
-        <field>
-          <column_name>RESPONSE_MESSAGE</column_name>
-          <stream_name>RESPONSE_MESSAGE</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_DETAILS_ID</column_name>
-          <stream_name>SURVEY_DETAILS_ID</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1265</xloc>
-      <yloc>375</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>TwitterUpdate</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>twitter_post_response_list</table>
-      <key>
-        <name>id</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>SURVEY_DETAILS_ID</name>
-        <field>SURVEY_DETAILS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>ACCESS_TOKEN</name>
-        <rename>ACCESS_TOKEN</rename>
-        </value>
-      <value>
-        <name>POST_DATE</name>
-        <rename>POST_DATE</rename>
-        </value>
-      <value>
-        <name>RESPONSE_MESSAGE</name>
-        <rename>RESPONSE_MESSAGE</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1425</xloc>
-      <yloc>375</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1967,8 +1383,8 @@
     </step>
 
   <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
+    <name>Insert &#x2f; Update FB </name>
+    <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1977,18 +1393,241 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>facebook_post_response_list</table>
+      <key>
+        <name>id</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>SURVEY_DETAILS_ID</name>
+        <field>SURVEY_DETAILS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ACCESS_TOKEN</name>
+        <rename>ACCESS_TOKEN</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>POST_DATE</name>
+        <rename>POST_DATE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>RESPONSE_MESSAGE</name>
+        <rename>RESPONSE_MESSAGE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SURVEY_DETAILS_ID</name>
+        <rename>SURVEY_DETAILS_ID</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>FACEBOOK_POST_RESPONSE_LIST_ID</name>
+        <rename>FACEBOOK_POST_RESPONSE_LIST_ID</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>id</rename>
+        <update>N</update>
+      </value>
+    </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1610</xloc>
-      <yloc>207</yloc>
+      <xloc>1276</xloc>
+      <yloc>71</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update LikedIn</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>linkedin_post_response_list</table>
+      <key>
+        <name>id</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>SURVEY_DETAILS_ID</name>
+        <field>SURVEY_DETAILS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>LINKEDIN_POST_RESPONSE_LIST_ID</name>
+        <rename>LINKEDIN_POST_RESPONSE_LIST_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ACCESS_TOKEN</name>
+        <rename>ACCESS_TOKEN</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>POST_DATE</name>
+        <rename>POST_DATE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>REFERENCE_URL</name>
+        <rename>REFERENCE_URL</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>RESPONSE_MESSAGE</name>
+        <rename>RESPONSE_MESSAGE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SURVEY_DETAILS_ID</name>
+        <rename>SURVEY_DETAILS_ID</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1278</xloc>
+      <yloc>235</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update twitter</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>twitter_post_response_list</table>
+      <key>
+        <name>id</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>SURVEY_DETAILS_ID</name>
+        <field>SURVEY_DETAILS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>TWITTER_POST_RESPONSE_LIST_ID</name>
+        <rename>TWITTER_POST_RESPONSE_LIST_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ACCESS_TOKEN</name>
+        <rename>ACCESS_TOKEN</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>POST_DATE</name>
+        <rename>POST_DATE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>RESPONSE_MESSAGE</name>
+        <rename>RESPONSE_MESSAGE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SURVEY_DETAILS_ID</name>
+        <rename>SURVEY_DETAILS_ID</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1279</xloc>
+      <yloc>373</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
       <error>
-        <source_step>FBTable output</source_step>
-        <target_step>FBUpdate</target_step>
+        <source_step>Insert &#x2f; Update FB </source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -1999,20 +1638,8 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>FBUpdate</source_step>
+        <source_step>Insert &#x2f; Update LikedIn</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>LINKoutput</source_step>
-        <target_step>LinkUpdate</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -2023,37 +1650,13 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>LinkUpdate</source_step>
+        <source_step>Insert &#x2f; Update twitter</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Twitter output</source_step>
-        <target_step>TwitterUpdate</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
         <fields_valuename/>
         <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>TwitterUpdate</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
         <max_errors/>
         <max_pct_errors/>
         <min_pct_rows/>

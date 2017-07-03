@@ -198,16 +198,14 @@
   <hop> <from>FacebookPages Parsing</from><to>Filter rows facebook pages</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows facebook pages</from><to>Sort rows FB Pages</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Input BranchId</from><to>FacebookPages Parsing</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>FacebookPages Table OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>FacebookPages Table OP</from><to>Update FB Pages</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant FB Pages</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Update FB Pages</from><to>Constant FB Pages</to><enabled>N</enabled> </hop>
   <hop> <from>Sort rows FB Pages</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update FB Pages</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Insert &#x2f; Update FB PAges</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update FB PAges</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows facebook pages</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>Constant FB Pages</name>
-    <type>Constant</type>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -216,24 +214,10 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Branch_Settings_Update_FB_Pages</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>217</xloc>
-      <yloc>421</yloc>
+      <xloc>596</xloc>
+      <yloc>337</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -258,8 +242,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>61</xloc>
-      <yloc>191</yloc>
+      <xloc>60</xloc>
+      <yloc>218</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -379,68 +363,6 @@
     </step>
 
   <step>
-    <name>FacebookPages Table OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>facebook_pages</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>FACEBOOK_TOKEN_ID</column_name>
-          <stream_name>FACEBOOK_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>NAME</column_name>
-          <stream_name>name</stream_name>
-        </field>
-        <field>
-          <column_name>CATEGORY</column_name>
-          <stream_name>category</stream_name>
-        </field>
-        <field>
-          <column_name>ACCESS_TOKEN</column_name>
-          <stream_name>accessToken</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_URL</column_name>
-          <stream_name>profileUrl</stream_name>
-        </field>
-        <field>
-          <column_name>FACEBOOK_PAGES_ID</column_name>
-          <stream_name>_id</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>354</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Filter rows facebook pages</name>
     <type>FilterRows</type>
     <description/>
@@ -452,7 +374,7 @@
            <schema_name/>
            </partitioning>
 <send_true_to>Sort rows FB Pages</send_true_to>
-<send_false_to/>
+<send_false_to>Dummy &#x28;do nothing&#x29;</send_false_to>
     <compare>
 <condition>
  <negated>N</negated>
@@ -553,8 +475,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>354</xloc>
-      <yloc>192</yloc>
+      <xloc>357</xloc>
+      <yloc>219</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1441,8 +1363,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>201</xloc>
-      <yloc>191</yloc>
+      <xloc>200</xloc>
+      <yloc>218</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1475,127 +1397,15 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>596</xloc>
-      <yloc>191</yloc>
+      <xloc>357</xloc>
+      <yloc>125</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Text file output</name>
-    <type>TextFileOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <separator>&#x3b;</separator>
-    <enclosure>&#x22;</enclosure>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>Y</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding/>
-    <endedLine/>
-    <fileNameInField>N</fileNameInField>
-    <fileNameField/>
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
-      <is_command>N</is_command>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>txt</extention>
-      <append>Y</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>Y</add_date>
-      <add_time>Y</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>NumOfError</name>
-        <type>Integer</type>
-        <format>&#x23;&#x3b;-&#x23;</format>
-        <currency/>
-        <decimal>.</decimal>
-        <group>,</group>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>3</length>
-        <precision>0</precision>
-      </field>
-      <field>
-        <name>ErrorDesc</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorFields</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorCode</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>370</xloc>
-      <yloc>421</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update FB Pages</name>
-    <type>Update</type>
+    <name>Insert &#x2f; Update FB PAges</name>
+    <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1605,11 +1415,8 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
       <table>facebook_pages</table>
@@ -1618,78 +1425,61 @@
         <field>FACEBOOK_TOKEN_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
-        </key>
+      </key>
       <key>
         <name>_id</name>
         <field>FACEBOOK_PAGES_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
-        </key>
+      </key>
+      <value>
+        <name>FACEBOOK_TOKEN_ID</name>
+        <rename>FACEBOOK_TOKEN_ID</rename>
+        <update>N</update>
+      </value>
       <value>
         <name>NAME</name>
         <rename>name</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>CATEGORY</name>
         <rename>category</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>ACCESS_TOKEN</name>
         <rename>accessToken</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>PROFILE_URL</name>
         <rename>profileUrl</rename>
-        </value>
-      </lookup>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>FACEBOOK_PAGES_ID</name>
+        <rename>_id</rename>
+        <update>N</update>
+      </value>
+    </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>216</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>65</xloc>
-      <yloc>297</yloc>
+      <xloc>357</xloc>
+      <yloc>337</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
       <error>
-        <source_step>FacebookPages Table OP</source_step>
-        <target_step>Update FB Pages</target_step>
+        <source_step>Insert &#x2f; Update FB PAges</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
         <fields_valuename/>
         <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update FB Pages</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
         <max_errors/>
         <max_pct_errors/>
         <min_pct_rows/>
