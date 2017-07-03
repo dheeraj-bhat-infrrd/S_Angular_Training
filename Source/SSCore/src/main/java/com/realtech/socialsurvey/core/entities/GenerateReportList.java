@@ -25,8 +25,8 @@ public class GenerateReportList implements Serializable
     @Column ( name = "generate_report_list_id")
     private long generateReportListId;
     
-    @Column ( name = "current_date")
-    private Timestamp currentDate;
+    @Column ( name = "created_on")
+    private Timestamp createdOn;
     
     @Column ( name = "report_name")
     private String reportName;
@@ -65,15 +65,15 @@ public class GenerateReportList implements Serializable
     }
 
 
-    public Timestamp getCurrentDate()
+    public Timestamp getCreatedOn()
     {
-        return currentDate;
+        return createdOn;
     }
 
 
-    public void setCurrentDate( Timestamp currentDate )
+    public void setCreatedOn( Timestamp createdOn )
     {
-        this.currentDate = currentDate;
+        this.createdOn = createdOn;
     }
 
 
@@ -181,7 +181,7 @@ public class GenerateReportList implements Serializable
 
     @Override
     public String toString() {
-        return "GenerateReportList [generateReportListId=" +generateReportListId +"currentDate=" + currentDate + ", reportName=" + reportName + ", startDate=" + startDate
+        return "GenerateReportList [generateReportListId=" +generateReportListId +",createdOn=" + createdOn + ", reportName=" + reportName + ", startDate=" + startDate
                 + ", endDate=" + endDate + ", firstName=" + firstName + ", lastName=" + lastName 
                 + ", entityId=" + entityId + ", entityType="  + entityType + ", status="+status + "]";
     }

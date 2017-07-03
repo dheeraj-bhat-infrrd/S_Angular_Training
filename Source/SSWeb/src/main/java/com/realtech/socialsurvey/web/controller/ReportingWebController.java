@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -476,68 +477,69 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         List<Object> overview = new ArrayList<>();
+        Map<String,Object> overview_map = new HashMap<String,Object>();
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
             OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType); 
-            overview.add( overviewUser.getSpsScore() );
-            overview.add( overviewUser.getDetractorPercentage());
-            overview.add( overviewUser.getPassivesPercentage() );
-            overview.add( overviewUser.getPromoterPercentage() );
-            overview.add( overviewUser.getTotalIncompleteTransactions() );
-            overview.add( overviewUser.getCorruptedPercentage() );
-            overview.add( overviewUser.getDuplicatePercentage() );
-            overview.add( overviewUser.getArchievedPercentage());
-            overview.add( overviewUser.getMismatchedPercentage());
-            overview.add( overviewUser.getTotalSurveySent() );
-            overview.add( overviewUser.getTotalSurveyCompleted() );
-            overview.add( overviewUser.getTotalSocialPost() );
-            overview.add( overviewUser.getTotalZillowReviews() );
+            overview_map.put( "SpsScore", overviewUser.getSpsScore() );
+            overview_map.put( "DetractorPercentage", overviewUser.getDetractorPercentage());
+            overview_map.put( "PassivesPercentage",  overviewUser.getPassivesPercentage() );
+            overview_map.put( "PromoterPercentage", overviewUser.getPromoterPercentage() );
+            overview_map.put( "TotalIncompleteTransactions", overviewUser.getTotalIncompleteTransactions() );
+            overview_map.put( "CorruptedPercentage", overviewUser.getCorruptedPercentage() );
+            overview_map.put( "DuplicatePercentage", overviewUser.getDuplicatePercentage());
+            overview_map.put( "ArchievedPercentage", overviewUser.getArchievedPercentage() );
+            overview_map.put( "MismatchedPercentage", overviewUser.getMismatchedPercentage() );
+            overview_map.put( "TotalSurveySent",overviewUser.getTotalSurveySent() );
+            overview_map.put( "TotalSurveyCompleted",overviewUser.getTotalSurveyCompleted() );
+            overview_map.put( "TotalSocialPost", overviewUser.getTotalSocialPost() );
+            overview_map.put( "TotalZillowReviews", overviewUser.getTotalZillowReviews() );
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
             OverviewBranch overviewBranch = overviewManagement.fetchOverviewBranchDetails( entityId, entityType );
-            overview.add( overviewBranch.getSpsScore() );
-            overview.add( overviewBranch.getDetractorPercentage());
-            overview.add( overviewBranch.getPassivesPercentage() );
-            overview.add( overviewBranch.getPromoterPercentage() );
-            overview.add( overviewBranch.getTotalIncompleteTransactions() );
-            overview.add( overviewBranch.getCorruptedPercentage() );
-            overview.add( overviewBranch.getDuplicatePercentage() );
-            overview.add( overviewBranch.getArchievedPercentage());
-            overview.add( overviewBranch.getMismatchedPercentage());
-            overview.add( overviewBranch.getTotalSurveySent() );
-            overview.add( overviewBranch.getTotalSurveyCompleted() );
-            overview.add( overviewBranch.getTotalSocialPost() );
-            overview.add( overviewBranch.getTotalZillowReviews() );
+            overview_map.put( "SpsScore", overviewBranch.getSpsScore() );
+            overview_map.put( "DetractorPercentage", overviewBranch.getDetractorPercentage());
+            overview_map.put( "PassivesPercentage",  overviewBranch.getPassivesPercentage() );
+            overview_map.put( "PromoterPercentage", overviewBranch.getPromoterPercentage() );
+            overview_map.put( "TotalIncompleteTransactions", overviewBranch.getTotalIncompleteTransactions() );
+            overview_map.put( "CorruptedPercentage", overviewBranch.getCorruptedPercentage() );
+            overview_map.put( "DuplicatePercentage", overviewBranch.getDuplicatePercentage());
+            overview_map.put( "ArchievedPercentage", overviewBranch.getArchievedPercentage() );
+            overview_map.put( "MismatchedPercentage", overviewBranch.getMismatchedPercentage() );
+            overview_map.put( "TotalSurveySent",overviewBranch.getTotalSurveySent() );
+            overview_map.put( "TotalSurveyCompleted",overviewBranch.getTotalSurveyCompleted() );
+            overview_map.put( "TotalSocialPost", overviewBranch.getTotalSocialPost() );
+            overview_map.put( "TotalZillowReviews", overviewBranch.getTotalZillowReviews() );
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
            OverviewRegion overviewRegion = overviewManagement.fetchOverviewRegionDetails( entityId, entityType );
-           overview.add( overviewRegion.getSpsScore() );
-           overview.add( overviewRegion.getDetractorPercentage());
-           overview.add( overviewRegion.getPassivesPercentage() );
-           overview.add( overviewRegion.getPromoterPercentage() );
-           overview.add( overviewRegion.getTotalIncompleteTransactions() );
-           overview.add( overviewRegion.getCorruptedPercentage() );
-           overview.add( overviewRegion.getDuplicatePercentage() );
-           overview.add( overviewRegion.getArchievedPercentage());
-           overview.add( overviewRegion.getMismatchedPercentage());
-           overview.add( overviewRegion.getTotalSurveySent() );
-           overview.add( overviewRegion.getTotalSurveyCompleted() );
-           overview.add( overviewRegion.getTotalSocialPost() );
-           overview.add( overviewRegion.getTotalZillowReviews() );
+           overview_map.put( "SpsScore", overviewRegion.getSpsScore() );
+           overview_map.put( "DetractorPercentage", overviewRegion.getDetractorPercentage());
+           overview_map.put( "PassivesPercentage",  overviewRegion.getPassivesPercentage() );
+           overview_map.put( "PromoterPercentage", overviewRegion.getPromoterPercentage() );
+           overview_map.put( "TotalIncompleteTransactions", overviewRegion.getTotalIncompleteTransactions() );
+           overview_map.put( "CorruptedPercentage", overviewRegion.getCorruptedPercentage() );
+           overview_map.put( "DuplicatePercentage", overviewRegion.getDuplicatePercentage());
+           overview_map.put( "ArchievedPercentage", overviewRegion.getArchievedPercentage() );
+           overview_map.put( "MismatchedPercentage", overviewRegion.getMismatchedPercentage() );
+           overview_map.put( "TotalSurveySent",overviewRegion.getTotalSurveySent() );
+           overview_map.put( "TotalSurveyCompleted",overviewRegion.getTotalSurveyCompleted() );
+           overview_map.put( "TotalSocialPost", overviewRegion.getTotalSocialPost() );
+           overview_map.put( "TotalZillowReviews", overviewRegion.getTotalZillowReviews() );
         }else if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             OverviewCompany overviewCompany = overviewManagement.fetchOverviewCompanyDetails( entityId, entityType );
-            overview.add( overviewCompany.getSpsScore() );
-            overview.add( overviewCompany.getDetractorPercentage());
-            overview.add( overviewCompany.getPassivesPercentage() );
-            overview.add( overviewCompany.getPromoterPercentage() );
-            overview.add( overviewCompany.getTotalIncompleteTransactions() );
-            overview.add( overviewCompany.getCorruptedPercentage() );
-            overview.add( overviewCompany.getDuplicatePercentage() );
-            overview.add( overviewCompany.getArchievedPercentage());
-            overview.add( overviewCompany.getMismatchedPercentage());
-            overview.add( overviewCompany.getTotalSurveySent() );
-            overview.add( overviewCompany.getTotalSurveyCompleted() );
-            overview.add( overviewCompany.getTotalSocialPost() );
-            overview.add( overviewCompany.getTotalZillowReviews() );
+            overview_map.put( "SpsScore", overviewCompany.getSpsScore() );
+            overview_map.put( "DetractorPercentage", overviewCompany.getDetractorPercentage());
+            overview_map.put( "PassivesPercentage",  overviewCompany.getPassivesPercentage() );
+            overview_map.put( "PromoterPercentage", overviewCompany.getPromoterPercentage() );
+            overview_map.put( "TotalIncompleteTransactions", overviewCompany.getTotalIncompleteTransactions() );
+            overview_map.put( "CorruptedPercentage", overviewCompany.getCorruptedPercentage() );
+            overview_map.put( "DuplicatePercentage", overviewCompany.getDuplicatePercentage());
+            overview_map.put( "ArchievedPercentage", overviewCompany.getArchievedPercentage() );
+            overview_map.put( "MismatchedPercentage", overviewCompany.getMismatchedPercentage() );
+            overview_map.put( "TotalSurveySent",overviewCompany.getTotalSurveySent() );
+            overview_map.put( "TotalSurveyCompleted",overviewCompany.getTotalSurveyCompleted() );
+            overview_map.put( "TotalSocialPost", overviewCompany.getTotalSocialPost() );
+            overview_map.put( "TotalZillowReviews", overviewCompany.getTotalZillowReviews() );
         }
-        json = new Gson().toJson( overview );
+        json = new Gson().toJson( overview_map );
         if(json == null && json.length() <= 0){
             throw new NonFatalException( "NonFatalException while fetching data. " );
         }
@@ -765,10 +767,10 @@ public class ReportingWebController
        if ( user == null ) {
            throw new NonFatalException( "NonFatalException while logging in. " );
        } 
-       Date currentDate = null;
-       String currentDateStr = request.getParameter( "currentDate" );
-       if ( currentDateStr != null && !currentDateStr.isEmpty() ) {
-           currentDate =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse( currentDateStr ) ;
+       Date createdOn = null;
+       String createdOnStr = request.getParameter( "createdOn" );
+       if ( createdOnStr != null && !createdOnStr.isEmpty() ) {
+           createdOn =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse( createdOnStr ) ;
            //String formattedCurrentDate = new SimpleDateFormat("yyyyMMdd").format(currentDate);
        }
        Date startDate = null;
@@ -796,7 +798,7 @@ public class ReportingWebController
        String lastName = user.getLastName();
        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-       ReportingDashboardManagement.generateReports( reportId, startDate, endDate, currentDate, firstName, lastName, entityId, entityType );
+       ReportingDashboardManagement.generateReports( reportId, startDate, endDate, createdOn, firstName, lastName, entityId, entityType );
        message = "the report is being generated";
        return message;
        

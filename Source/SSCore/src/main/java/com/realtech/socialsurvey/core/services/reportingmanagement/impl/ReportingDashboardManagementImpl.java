@@ -25,22 +25,22 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     private GenericReportingDao<GenerateReportList, Long> GenerateReportListDao;
     
     @Override
-    public void generateReports(int reportId , Date startDate , Date endDate , Date currentDate , String firstName , String lastName , Long entityId , String entityType){
+    public void generateReports(int reportId , Date startDate , Date endDate , Date createdOn , String firstName , String lastName , Long entityId , String entityType){
         //adding entry in the feild and set status to pending
-        createEntryinGenerateReportList(reportId,startDate,endDate,currentDate,firstName,lastName,entityId,entityType);
+        createEntryinGenerateReportList(reportId,startDate,endDate,createdOn,firstName,lastName,entityId,entityType);
         
     }
     
     @Override
     @Transactional(value = "transactionManagerForReporting")
-    public void createEntryinGenerateReportList(int reportId , Date startDate , Date endDate , Date currentDate , String firstName , String lastName , Long entityId , String entityType){
+    public void createEntryinGenerateReportList(int reportId , Date startDate , Date endDate , Date createdOn , String firstName , String lastName , Long entityId , String entityType){
         LOG.info( "method to insert data into the generateReportList and save in aws server" );
         //input value into the generateReportList table 
         GenerateReportList generateReportEntity = new GenerateReportList();
        
        
-        if ( currentDate != null ) {
-            generateReportEntity.setCurrentDate(new Timestamp(currentDate.getTime()) );          
+        if ( createdOn != null ) {
+            generateReportEntity.setCreatedOn(new Timestamp(createdOn.getTime()) );          
         }
         if(reportId == CommonConstants.SURVEY_STATS_REPORT_ID){
             generateReportEntity.setReportName( CommonConstants.SURVEY_STATS_REPORT_NAME );
