@@ -5,11 +5,11 @@ import java.util.Date;
 
 public interface ReportingDashboardManagement
 {
-    public void generateReports( int reportId, Date startDate, Date endDate, Date currentDate,
+    public void generateReports( int reportId, Date startDate, Date endDate, Date createdOn,
         String firstName, String lastName, Long entityId, String entityType );
 
     public void createEntryinGenerateReportList( int reportId, Date startDate, Date endDate,
-        Date currentDate, String firstName, String lastName, Long entityId, String entityType );
+        Date createdOn, String firstName, String lastName, Long entityId, String entityType );
 
 
 }
