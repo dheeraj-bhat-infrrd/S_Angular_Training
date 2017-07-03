@@ -260,7 +260,7 @@
   <hop> <from>Users</from><to>Merge Join Company</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Company Id</from><to>Join User Survey</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join Company</from><to>Sort Company Id</to><enabled>Y</enabled> </hop>
-  <hop> <from>survey_stats_report_id</from><to>Insert &#x2f; Update Survey Stats Report Company</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey_stats_report_id</from><to>Insert &#x2f; Update Survey_Stats_Report_Company</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>survey_stats_report_id</to><enabled>Y</enabled> </hop>
   </order>
   <step>
@@ -1749,7 +1749,7 @@
     </step>
 
   <step>
-    <name>Insert &#x2f; Update Survey Stats Report Company</name>
+    <name>Insert &#x2f; Update Survey_Stats_Report_Company</name>
     <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
