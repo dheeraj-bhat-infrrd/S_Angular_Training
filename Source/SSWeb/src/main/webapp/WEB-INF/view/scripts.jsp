@@ -20,4 +20,5 @@
 <script src="${initParam.resourcesPath}/resources/js/countrydata.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/zipcoderegex.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/application.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/reporting.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/phoneFormat.js"></script>

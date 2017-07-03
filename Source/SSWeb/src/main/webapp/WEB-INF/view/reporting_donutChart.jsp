@@ -13,8 +13,9 @@ position: absolute;
 top: 0px;  /* chartArea top  */
 left: 0px; /* chartArea left */
 font-size: small;
-margin: 80px 25%;
+margin: 80px 28%;
 background:none;
+font-weight:600 !important
 }
 .overlay-label-trans{
     display:block;
@@ -25,58 +26,20 @@ vertical-align: middle;
 position: absolute;
 top: 0px;  /* chartArea top  */
 left: 0px; /* chartArea left */
-margin: 100px 25%;
+margin: 100px 28%;
 font-size: small;
+font-weight:600 !important
 }
 </style>
-<c:set value="${total_incomplete_transactions}" var="totalIncompleteTrans"></c:set>
-<c:set value="${corrupted}" var="corruptedTrans"></c:set>
-<c:set value="${duplicate}" var="duplicateTrans"></c:set>
-<c:set value="${archieved}" var="archievedTrans"></c:set>
-<c:set value="${mismatched}" var="mismatchedTrans"></c:set>
 
-<script type="text/javascript">
-      google.charts.load("current", {packages:["corechart"]});
-      google.charts.setOnLoadCallback(drawChart);
-      
-      var totalIncompleteTransactions = '${totalIncompleteTrans}' 
-      var corrupted= ('${corruptedTrans}'/100) * totalIncompleteTransactions;
-      var duplicate= ('${duplicateTrans}'/100) * totalIncompleteTransactions;
-      var archived= ('${archievedTrans}'/100) * totalIncompleteTransactions;
-      var mismatched= ('${mismatchedTrans}'/100) * totalIncompleteTransactions;
-      var totalOfCorDupArcMis = corrupted + duplicate + archived + mismatched;
-      var other = totalIncompleteTransactions - totalOfCorDupArcMis;
-      
-      function drawChart() {
-    	 
-        var data = google.visualization.arrayToDataTable([
-          ['Task', 'Hours per Day'],
-          ['Mismatched', mismatched],
-          ['Corrupted', corrupted],
-          ['Duplicate', duplicate],
-          ['Archived', archived],
-          ['Other', other]
-        ]);
-
-        var options = {
-          pieHole: 0.5,
-          legend: { 
-      	    position : 'none'
-      	  },
-      	  pieSliceText:'none',
-      	  chartArea:{
-      		  width:'95%',
-      		  height:'95%'
-      	  },
-      	slices: [{color : '#009fe0'},{color: '#E8341F'}, {color: '#985698'}, {color: '#7ab400'}, {color: '#f4ad42'}]
-        };
-
-        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
-        chart.draw(data, options);
-      }
+<script>
+drawDonutChart();
 </script>
+
 <div id="JSFiddle" style="position:relative">
 <div id="donutchart" style="width: 95%; height: 90%;"></div>
-<div id="cnt" class="overlay-incomplete-trans">${totalIncompleteTrans}</div>
+<div>
+<div id="incompleteTransValue" class="overlay-incomplete-trans" ></div>
 <div class="overlay-label-trans">Transactions</div>
+</div>
 </div>

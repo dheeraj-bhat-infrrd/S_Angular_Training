@@ -9427,6 +9427,18 @@ $(document).on('click', '.hdr-link-item-dropdown-item-sm', function(e) {
 	showOverlay();
 });
 
+$(document).on('click', '#hdr-dashboard-dropdown', function(e) {
+	$('#hdr-link-item-dropdown-dash').toggle();
+});
+
+$(document).on('mouseover', '#hdr-dashboard-item', function(e) {
+	$('#hdr-link-item-dropdown-dash').show();
+});
+
+$(document).on('mouseout', '#hdr-dashboard-item', function(e) {
+	$('#hdr-link-item-dropdown-dash').hide();
+});
+
 // Help page onclick function
 $(document).on('click', '#send-help-mail-button', function() {
 	var subject = "";

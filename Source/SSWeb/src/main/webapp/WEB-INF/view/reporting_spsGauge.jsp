@@ -3,11 +3,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<c:set value="${detractor}" var="detractors"></c:set>
-<c:set value="${passives}" var="passives"></c:set>
-<c:set value="${promoters}" var="promoters"></c:set>
-<c:set value="${SPS_score}" var="spsScore"></c:set>
-
 <style>
 #wrapper{
   width: 350px;
@@ -37,14 +32,14 @@
     font-weight: bold !important;
     font-size: medium;    
     position: absolute;">SPS
-<div style="font-weight: bold !important;
+<div id="spsScorebox" style="font-weight: bold !important;
     font-size: medium;
     color: white;
     background: #5e5e5e;
     width: 50px;
     height: 35px;
     padding: 5px;
-    border-radius: 7px;">${spsScore}</div></div>
+    border-radius: 7px;"></div></div>
 
     
   <svg id="meter">
@@ -58,7 +53,9 @@
 
 </div>
 <script>
-	
+var overviewData = getOverviewData();	
+
+if(overviewData != null){
 var detractorEndAngle;
 var passivesEndAngle;
 var promotersEndAngle;
@@ -91,11 +88,17 @@ var gaugeEndAngle = 110;
 	}
 	
 	function getGaugeEndAngles(){
-		var detractors = '${detractors}';
-		var passives =   '${passives}';
-		var promoters =  '${promoters}';
-		var totalDegree = (360-gaugeStartAngle)+gaugeEndAngle;
-		var degRequired = 0;
+				
+		var spsScore = overviewData.SpsScore;
+		
+		if(overviewData != null){
+			
+			$('#spsScorebox').html(spsScore);
+			var detractors = overviewData.DetractorPercentage;
+			var passives =   overviewData.PassivesPercentage;
+			var promoters =  overviewData.PromoterPercentage;
+			var totalDegree = (360-gaugeStartAngle)+gaugeEndAngle;
+			var degRequired = 0;
 		
 		//Detractor Start And End Angles
 		detractorStartAngle = gaugeStartAngle;
@@ -162,9 +165,10 @@ var gaugeEndAngle = 110;
 			document.getElementById("arc6").setAttribute("d", describeArc(150, 150, 70, promotersStartAngle, promotersEndAngle));
 		}
 	}
+}
 
 	$(document).ready(function() {
-		var spsScore = '${spsScore}';
+		var spsScore = overviewData.SpsScore;
 		
 		
 		var marginLeft = parseInt($("#metre-needle").css("margin-left"));
@@ -212,4 +216,5 @@ var gaugeEndAngle = 110;
 		//document.getElementById("arc2").setAttribute("d", describeArc(150, 150, 70, passivesStartAngle, passivesEndAngle));
 		//document.getElementById("arc3").setAttribute("d", describeArc(150, 150, 70, promotersStartAngle, promotersEndAngle));
 	});
+}
 </script>

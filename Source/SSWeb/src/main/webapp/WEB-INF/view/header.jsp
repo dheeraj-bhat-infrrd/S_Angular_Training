@@ -177,6 +177,7 @@
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item" onclick="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></div>
+				<div class="header-links-item" onclick="showMainContent('./showreportingpage.do')"><spring:message code="label.reporting.key"/></div>
 				<c:if test="${(accountMasterId == 2 || accountMasterId == 3 || accountMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
 					<div class="header-links-item" onclick="showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></div>
 				</c:if>
@@ -232,7 +233,6 @@
 				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
 				</c:if>
 				<div class="header-links-item" onclick="showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></div>
-				<div class="header-links-item" onclick="showMainContent('./showreportingpage.do')"><spring:message code="label.reporting.key"/></div>
 				<div class="header-links-item" onclick="showMainContent('./showhelppage.do')"><spring:message code="label.help.key"/></div>
 				<c:choose>
 					<c:when test="${ not empty realTechAdminId }">
@@ -253,8 +253,17 @@
 		<div class="container hdr-container clearfix">
 			<div class="float-left hdr-logo cursor-pointer"></div>
 			<div class="float-left hdr-links clearfix">
-				<div class="hdr-link-item hdr-link-active">
+				<div id="hdr-dashboard-item" class="hdr-link-item hdr-link-active hdr-link-item hdr-link-item-config pos-relative">
 					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')" onclick="showOverlay();"><spring:message code="label.header.dashboard.key" /></a>
+					<div id="hdr-dashboard-dropdown" class="hdr-link-item-dropdown-icn"></div>
+						<div id="hdr-link-item-dropdown-dash" class="hdr-link-item-dropdown hide">
+							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./dashboard.do');">
+								<spring:message code="label.header.dashboard.key" />
+							</div>
+							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportingpage.do');">
+								<spring:message code="label.reporting.key" />
+							</div>
+						</div>
 				</div>
 				<c:if test="${accountMasterId > 1 && accountMasterId < 5 && highestrole != 4 }">
 					<div class="hdr-link-item">
@@ -362,9 +371,7 @@
 					<a href="javascript:showMainContent('./showprofilepage.do')" onclick="showOverlay();"><spring:message code="label.editprofile.key" /></a>
 				</div>
 				</c:if>
-				<div class="hdr-link-item">
-					<a href="javascript:showMainContent('./showreportingpage.do')" onclick="showOverlay();"><spring:message code="label.reporting.key" /></a>
-				</div>
+				
 				<div class="hdr-link-item">
 					<a href="javascript:showMainContent('./showhelppage.do')" onclick="showOverlay();"><spring:message code="label.help.key" /></a>
 				</div>
