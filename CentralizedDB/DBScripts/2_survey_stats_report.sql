@@ -1,8 +1,8 @@
-USE `ss_report_demo`;
 CREATE TABLE `survey_stats_report` (
   `survey_stats_report_id` varchar(45) NOT NULL,
   `Id` text,
   `company_id` int(10) unsigned DEFAULT NULL,
+  `region_id` int(11) DEFAULT NULL,
   `branch_id` int(10) unsigned NOT NULL,
   `trx_month` varchar(10) DEFAULT NULL,
   `trx_rcvd` int(11) DEFAULT '0',
@@ -29,7 +29,7 @@ CREATE TABLE `survey_stats_report` (
   `branch_name` varchar(250) DEFAULT NULL,
   `company_name` varchar(250) DEFAULT NULL,
   `incomplete` int(11) DEFAULT NULL,
-  PRIMARY KEY (`year`,`branch_id`,`month`),
+  PRIMARY KEY (`branch_id`,`year`,`month`),
   KEY `FK_BRANCH_idx` (`branch_id`),
   KEY `FK_COMPANY_idx` (`company_id`),
   CONSTRAINT `FK_BRANCH` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION

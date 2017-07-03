@@ -234,53 +234,29 @@
   <hop> <from>MongoDB I - Company Settings_2</from><to>Sort Company Settings Mongo</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Company Settings Mongo</from><to>Merge Join CompanySettings</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort CompanySettings Table</from><to>Merge Join CompanySettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>ContactDetails</from><to>Sort rows ContactDetails</to><enabled>Y</enabled> </hop>
   <hop> <from>Join Contact Details</from><to>UUID_ContactNumbers</to><enabled>Y</enabled> </hop>
   <hop> <from>Join Contact Details</from><to>UUID_Mail</to><enabled>Y</enabled> </hop>
   <hop> <from>Join Contact Details</from><to>UUID_WebAddress</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows CompanySettingsId</from><to>Join Contact Details</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows ContactDetails</from><to>Join Contact Details</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_ContactNumbers</from><to>ContactNumbers</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_Mail</from><to>Mail</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_WebAddress</from><to>WebAddress</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join CompanySettings</from><to>Sort rows CompanySettingsId</to><enabled>Y</enabled> </hop>
-  <hop> <from>SurveySettings</from><to>SurveySettings_TableOP</to><enabled>Y</enabled> </hop>
-  <hop> <from>SurveySettings_TableOP</from><to>Update SurveySettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_SurveySettings</from><to>SurveySettings</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join CompanySettings</from><to>UUID_SurveySettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>LockSettings</from><to>LockSettings_TableOP</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID_LockSettings</from><to>LockSettings</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join CompanySettings</from><to>UUID_LockSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>LockSettings_TableOP</from><to>Update LockSettings</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join CompanySettings</from><to>UUID-vendestaRmSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID-vendestaRmSettings</from><to>SelectVendestaRm</to><enabled>Y</enabled> </hop>
-  <hop> <from>ContactNumbers</from><to>ContactNumbers OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Mail</from><to>Mail TableOP</to><enabled>Y</enabled> </hop>
-  <hop> <from>WebAddress</from><to>WebAddresss OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Mail TableOP</from><to>Update Mail</to><enabled>Y</enabled> </hop>
-  <hop> <from>ContactNumbers OP</from><to>Update ContactNumber</to><enabled>Y</enabled> </hop>
-  <hop> <from>WebAddresss OP</from><to>UpdateWebAddress</to><enabled>Y</enabled> </hop>
-  <hop> <from>vendasta_rm</from><to>Update VendestaRm</to><enabled>Y</enabled> </hop>
-  <hop> <from>SelectVendestaRm</from><to>Filter rows</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows</from><to>vendasta_rm</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant SurveySettings</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant ContactNumber</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant Lock Settings</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant Vendesta RM</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant Mail</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant WebAddress</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Update LockSettings</from><to>Constant Lock Settings</to><enabled>N</enabled> </hop>
-  <hop> <from>Update SurveySettings</from><to>Constant SurveySettings</to><enabled>N</enabled> </hop>
-  <hop> <from>Update VendestaRm</from><to>Constant Vendesta RM</to><enabled>N</enabled> </hop>
-  <hop> <from>Update ContactNumber</from><to>Constant ContactNumber</to><enabled>N</enabled> </hop>
-  <hop> <from>Update Mail</from><to>Constant Mail</to><enabled>N</enabled> </hop>
-  <hop> <from>UpdateWebAddress</from><to>Constant WebAddress</to><enabled>N</enabled> </hop>
-  <hop> <from>Update VendestaRm</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update SurveySettings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LockSettings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update ContactNumber</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Mail</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>UpdateWebAddress</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_LockSettings</from><to>Insert &#x2f; Update Lock Settings</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_Mail</from><to>Insert &#x2f; Update Mail</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_WebAddress</from><to>Insert &#x2f; Update Web Address</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_ContactNumbers</from><to>Insert &#x2f; Update Contact Numbers</to><enabled>Y</enabled> </hop>
+  <hop> <from>ContactDetails</from><to>Join Contact Details</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID_SurveySettings</from><to>Insert &#x2f; Update Survey Settings</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID-vendestaRmSettings</from><to>Filter rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows</from><to>Insert &#x2f; Update Vendesta</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Mail</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Web Address</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Contact Numbers</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Vendesta</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Survey Settings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Lock Settings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>CompanySettings Input</name>
@@ -309,204 +285,6 @@
     </step>
 
   <step>
-    <name>Constant ContactNumber</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>CompanySettingsContactDetails_ContactNumber</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1826</xloc>
-      <yloc>619</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant Lock Settings</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>CompanySettingsContactDetails_LockSettings</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1796</xloc>
-      <yloc>86</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant Mail</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>CompanySettingsContactDetails_Mail</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1840</xloc>
-      <yloc>800</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant SurveySettings</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>CompanySettingsContactDetails_SurveySettings</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1788</xloc>
-      <yloc>226</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant Vendesta RM</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>CompanySettingsContactDetails_VendestaRM</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1814</xloc>
-      <yloc>492</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant WebAddress</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>CompanySettingsContactDetails_WebAddress</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1854</xloc>
-      <yloc>944</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>ContactDetails</name>
     <type>TableInput</type>
     <description/>
@@ -518,7 +296,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  CONTACT_DETAILS_ID&#xd;&#xa;, COMPANY_SETTINGS_ID&#xd;&#xa;FROM contact_details&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  CONTACT_DETAILS_ID&#xd;&#xa;, COMPANY_SETTINGS_ID&#xd;&#xa;FROM contact_details&#xd;&#xa;order by COMPANY_SETTINGS_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -526,15 +304,15 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1012</xloc>
-      <yloc>471</yloc>
+      <xloc>800</xloc>
+      <yloc>470</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>ContactNumbers</name>
-    <type>SelectValues</type>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -543,73 +321,10 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>      <field>        <name>CONTACT_DETAILS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>36</precision>
-      </field>      <field>        <name>CONTACT_NUMBERS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>work</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>316</xloc>
-      <yloc>471</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>ContactNumbers OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>contact_numbers</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>CONTACT_DETAILS_ID</column_name>
-          <stream_name>CONTACT_DETAILS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>CONTACT_NUMBERS_ID</column_name>
-          <stream_name>CONTACT_NUMBERS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>WORK</column_name>
-          <stream_name>work</stream_name>
-        </field>
-    </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>187</xloc>
-      <yloc>471</yloc>
+      <xloc>608</xloc>
+      <yloc>874</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -625,8 +340,8 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>vendasta_rm</send_true_to>
-<send_false_to/>
+<send_true_to>Insert &#x2f; Update Vendesta</send_true_to>
+<send_false_to>Dummy &#x28;do nothing&#x29;</send_false_to>
     <compare>
 <condition>
  <negated>N</negated>
@@ -637,8 +352,435 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1148</xloc>
-      <yloc>362</yloc>
+      <xloc>1145</xloc>
+      <yloc>238</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Contact Numbers</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>contact_numbers</table>
+      <key>
+        <name>CONTACT_DETAILS_ID</name>
+        <field>CONTACT_DETAILS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>CONTACT_DETAILS_ID</name>
+        <rename>CONTACT_DETAILS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>CONTACT_NUMBERS_ID</name>
+        <rename>CONTACT_NUMBERS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>WORK</name>
+        <rename>work</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>151</xloc>
+      <yloc>472</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Lock Settings</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>lock_settings</table>
+      <key>
+        <name>COMPANY_SETTINGS_ID</name>
+        <field>COMPANY_SETTINGS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>COMPANY_SETTINGS_ID</name>
+        <rename>COMPANY_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LOCK_SETTINGS_ID</name>
+        <rename>LOCK_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_ABOUT_ME_LOCKED</name>
+        <rename>isAboutMeLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_ADDRESS_LOCKED</name>
+        <rename>isAddressLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_BLOG_ADDRESS_LOCKED</name>
+        <rename>isBlogAddressLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_FAX_PHONE_LOCKED</name>
+        <rename>isFaxPhoneLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_LOGO_LOCKED</name>
+        <rename>isLogoLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_MIN_SCORE_LOCKED</name>
+        <rename>isMinScoreLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_PERSONAL_PHONE_LOCKED</name>
+        <rename>isPersonalPhoneLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_WEB_ADDRESS_LOCKED</name>
+        <rename>isWebAddressLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_WORK_EMAIL_LOCKED</name>
+        <rename>isWorkEmailLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_WORK_PHONE_LOCKED</name>
+        <rename>isWorkPhoneLocked</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>259</xloc>
+      <yloc>143</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Mail</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>mail</table>
+      <key>
+        <name>CONTACT_DETAILS_ID</name>
+        <field>CONTACT_DETAILS _ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>MAIL_IDS</name>
+        <rename>MAIL_IDS</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>CONTACT_DETAILS _ID</name>
+        <rename>CONTACT_DETAILS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_PERSONAL_EMAIL_VERIFIED</name>
+        <rename>isPersonalEmailVerified</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_WORK_EMAIL_VERIFIED</name>
+        <rename>isWorkEmailVerified</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_WORK_MAIL_VERIFIED_BY_ADMIN</name>
+        <rename>isWorkMailVerifiedByAdmin</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>WORK_EMAIL_TO_VERIFY</name>
+        <rename>workEmailToVerify</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>WORK</name>
+        <rename>work</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>446</xloc>
+      <yloc>678</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Survey Settings</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>survey_settings</table>
+      <key>
+        <name>COMPANY_SETTINGS_ID</name>
+        <field>COMPANY_SETTINGS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>AUTO_POST_ENABLED</name>
+        <rename>autoPostEnabled</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>AUTO_POST_LINK_TO_USER_SITE_ENABLED</name>
+        <rename>autoPostLinkToUserSiteEnabled</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>AUTO_POST_SCORE</name>
+        <rename>auto_post_score</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>COMPANY_SETTINGS_ID</name>
+        <rename>COMPANY_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>DUPLICATE_SURVEY_INTERVAL</name>
+        <rename>duplicateSurveyInterval</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>HAPPY_TEXT</name>
+        <rename>happyText</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>HAPPY_TEXT_COMPLETE</name>
+        <rename>happyTextComplete</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_REMINDER_DISABLED</name>
+        <rename>isReminderDisabled</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_SOCIAL_POST_REMINDER_DISABLED</name>
+        <rename>isSocialPostReminderDisabled</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MAX_NUMBER_OF_SOCIAL_POS_REMINDERS</name>
+        <rename>max_number_of_social_pos_reminders</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MAX_NUMBER_OF_SURVEY_REMINDERS</name>
+        <rename>max_number_of_survey_reminders</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>NEUTRAL_TEXT</name>
+        <rename>neutralText</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>NEUTRAL_TEXT_COMPLETE</name>
+        <rename>neutralTextComplete</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SAD_TEXT</name>
+        <rename>sadText</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SAD_TEXT_COMPLETE</name>
+        <rename>sadTextComplete</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SHOW_SURVEY_ABOVE_SCORE</name>
+        <rename>show_survey_above_score</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SOCIAL_POST_REMINDER_INTERVAL_IN_DAYS</name>
+        <rename>social_post_reminder_interval_in_days</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SURVEY_REMINDER_INTERVAL_IN_DAYS</name>
+        <rename>survey_reminder_interval_in_days</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SURVEY_SETTINGS_ID</name>
+        <rename>SURVEY_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>809</xloc>
+      <yloc>250</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Vendesta</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>vendasta_rm_settings</table>
+      <key>
+        <name>COMPANY_SETTINGS_ID</name>
+        <field>COMPANY_SETTINGS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>VENDASTA_RM_SETTINGS_ID</name>
+        <rename>VENDASTA_RM_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ACCOUNT_ID</name>
+        <rename>accountId</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>COMPANY_SETTINGS_ID</name>
+        <rename>COMPANY_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1151</xloc>
+      <yloc>398</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Web Address</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>web_addresses</table>
+      <key>
+        <name>CONTACT_DETAILS_ID</name>
+        <field>CONTACT_DETAILS _ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>WEB_ADDRESSES_ID</name>
+        <rename>WEB_ADDRESSES_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>CONTACT_DETAILS _ID</name>
+        <rename>CONTACT_DETAILS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>WORK</name>
+        <rename>work_1</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>805</xloc>
+      <yloc>678</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -656,7 +798,7 @@
            </partitioning>
 <join_type>INNER</join_type>
 <step1>Sort rows CompanySettingsId</step1>
-<step2>Sort rows ContactDetails</step2>
+<step2>ContactDetails</step2>
     <keys_1>
       <key>COMPANY_SETTINGS_ID</key>
     </keys_1>
@@ -667,488 +809,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>587</xloc>
       <yloc>471</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>LockSettings</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>      <field>        <name>COMPANY_SETTINGS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>LOCK_SETTINGS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isAboutMeLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isAddressLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isBlogAddressLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isFaxPhoneLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isLogoLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isMinScoreLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isPersonalPhoneLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWebAddressLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWorkEmailLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWorkPhoneLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isDisplayNameLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>isAboutMeLocked</name>
-        <rename>isAboutMeLocked</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isAddressLocked</name>
-        <rename>isAddressLocked</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isBlogAddressLocked</name>
-        <rename>isBlogAddressLocked</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isFaxPhoneLocked</name>
-        <rename>isFaxPhoneLocked</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isLogoLocked</name>
-        <rename>isLogoLocked</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isMinScoreLocked</name>
-        <rename>isMinScoreLocked</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isPersonalPhoneLocked</name>
-        <rename>isPersonalPhoneLocked</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isWebAddressLocked</name>
-        <rename>isWebAddressLocked</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isWorkEmailLocked</name>
-        <rename>isWorkEmailLocked</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isWorkPhoneLocked</name>
-        <rename>isWorkPhoneLocked</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isDisplayNameLocked</name>
-        <rename>isDisplayNameLocked</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>408</xloc>
-      <yloc>252</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>LockSettings_TableOP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>lock_settings</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>COMPANY_SETTINGS_ID</column_name>
-          <stream_name>COMPANY_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>LOCK_SETTINGS_ID</column_name>
-          <stream_name>LOCK_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>IS_ABOUT_ME_LOCKED</column_name>
-          <stream_name>isAboutMeLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_ADDRESS_LOCKED</column_name>
-          <stream_name>isAddressLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_BLOG_ADDRESS_LOCKED</column_name>
-          <stream_name>isBlogAddressLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_FAX_PHONE_LOCKED</column_name>
-          <stream_name>isFaxPhoneLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_LOGO_LOCKED</column_name>
-          <stream_name>isLogoLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_MIN_SCORE_LOCKED</column_name>
-          <stream_name>isMinScoreLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_PERSONAL_PHONE_LOCKED</column_name>
-          <stream_name>isPersonalPhoneLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_WEB_ADDRESS_LOCKED</column_name>
-          <stream_name>isWebAddressLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_WORK_EMAIL_LOCKED</column_name>
-          <stream_name>isWorkEmailLocked</stream_name>
-        </field>
-        <field>
-          <column_name>IS_WORK_PHONE_LOCKED</column_name>
-          <stream_name>isWorkPhoneLocked</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>408</xloc>
-      <yloc>362</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Mail</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>      <field>        <name>CONTACT_DETAILS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>MAIL_IDS</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isPersonalEmailVerified</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWorkEmailVerified</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWorkMailVerifiedByAdmin</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>workEmailToVerify</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>work</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>isPersonalEmailVerified</name>
-        <rename>isPersonalEmailVerified</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isWorkEmailVerified</name>
-        <rename>isWorkEmailVerified</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isWorkMailVerifiedByAdmin</name>
-        <rename>isWorkMailVerifiedByAdmin</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>449</xloc>
-      <yloc>648</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Mail TableOP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>mail</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>MAIL_IDS</column_name>
-          <stream_name>MAIL_IDS</stream_name>
-        </field>
-        <field>
-          <column_name>CONTACT_DETAILS _ID</column_name>
-          <stream_name>CONTACT_DETAILS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>IS_PERSONAL_EMAIL_VERIFIED</column_name>
-          <stream_name>isPersonalEmailVerified</stream_name>
-        </field>
-        <field>
-          <column_name>IS_WORK_EMAIL_VERIFIED</column_name>
-          <stream_name>isWorkEmailVerified</stream_name>
-        </field>
-        <field>
-          <column_name>IS_WORK_MAIL_VERIFIED_BY_ADMIN</column_name>
-          <stream_name>isWorkMailVerifiedByAdmin</stream_name>
-        </field>
-        <field>
-          <column_name>WORK_EMAIL_TO_VERIFY</column_name>
-          <stream_name>workEmailToVerify</stream_name>
-        </field>
-        <field>
-          <column_name>WORK</column_name>
-          <stream_name>work</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>449</xloc>
-      <yloc>784</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1185,7 +845,7 @@
     <name>MongoDB I - Company Settings_2</name>
     <type>MongoDbInput</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -2268,38 +1928,6 @@
     </step>
 
   <step>
-    <name>SelectVendestaRm</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>      <field>        <name>VENDASTA_RM_SETTINGS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>accountId</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>COMPANY_SETTINGS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1142</xloc>
-      <yloc>241</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Sort Company Settings Mongo</name>
     <type>SortRows</type>
     <description/>
@@ -2402,453 +2030,6 @@
     </step>
 
   <step>
-    <name>Sort rows ContactDetails</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>COMPANY_SETTINGS_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>804</xloc>
-      <yloc>471</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>SurveySettings</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>      <field>        <name>COMPANY_SETTINGS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>SURVEY_SETTINGS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>autoPostEnabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>autoPostLinkToUserSiteEnabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>auto_post_score</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>duplicateSurveyInterval</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isReminderDisabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isSocialPostReminderDisabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>max_number_of_social_pos_reminders</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>max_number_of_survey_reminders</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>show_survey_above_score</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>social_post_reminder_interval_in_days</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>survey_reminder_interval_in_days</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>enabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>mailId</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>mood</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>rating</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>happyText</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>happyTextComplete</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>neutralText</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>neutralTextComplete</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>sadText</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>sadTextComplete</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>autoPostEnabled</name>
-        <rename>autoPostEnabled</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>autoPostLinkToUserSiteEnabled</name>
-        <rename>autoPostLinkToUserSiteEnabled</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isReminderDisabled</name>
-        <rename>isReminderDisabled</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isSocialPostReminderDisabled</name>
-        <rename>isSocialPostReminderDisabled</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>enabled</name>
-        <rename>enabled</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>804</xloc>
-      <yloc>250</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>SurveySettings_TableOP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>survey_settings</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>COMPANY_SETTINGS_ID</column_name>
-          <stream_name>COMPANY_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_SETTINGS_ID</column_name>
-          <stream_name>SURVEY_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>AUTO_POST_SCORE</column_name>
-          <stream_name>auto_post_score</stream_name>
-        </field>
-        <field>
-          <column_name>MAX_NUMBER_OF_SOCIAL_POS_REMINDERS</column_name>
-          <stream_name>max_number_of_social_pos_reminders</stream_name>
-        </field>
-        <field>
-          <column_name>MAX_NUMBER_OF_SURVEY_REMINDERS</column_name>
-          <stream_name>max_number_of_survey_reminders</stream_name>
-        </field>
-        <field>
-          <column_name>SHOW_SURVEY_ABOVE_SCORE</column_name>
-          <stream_name>show_survey_above_score</stream_name>
-        </field>
-        <field>
-          <column_name>SOCIAL_POST_REMINDER_INTERVAL_IN_DAYS</column_name>
-          <stream_name>social_post_reminder_interval_in_days</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_REMINDER_INTERVAL_IN_DAYS</column_name>
-          <stream_name>survey_reminder_interval_in_days</stream_name>
-        </field>
-        <field>
-          <column_name>AUTO_POST_ENABLED</column_name>
-          <stream_name>autoPostEnabled</stream_name>
-        </field>
-        <field>
-          <column_name>AUTO_POST_LINK_TO_USER_SITE_ENABLED</column_name>
-          <stream_name>autoPostLinkToUserSiteEnabled</stream_name>
-        </field>
-        <field>
-          <column_name>DUPLICATE_SURVEY_INTERVAL</column_name>
-          <stream_name>duplicateSurveyInterval</stream_name>
-        </field>
-        <field>
-          <column_name>IS_REMINDER_DISABLED</column_name>
-          <stream_name>isReminderDisabled</stream_name>
-        </field>
-        <field>
-          <column_name>IS_SOCIAL_POST_REMINDER_DISABLED</column_name>
-          <stream_name>isSocialPostReminderDisabled</stream_name>
-        </field>
-        <field>
-          <column_name>HAPPY_TEXT</column_name>
-          <stream_name>happyText</stream_name>
-        </field>
-        <field>
-          <column_name>HAPPY_TEXT_COMPLETE</column_name>
-          <stream_name>happyTextComplete</stream_name>
-        </field>
-        <field>
-          <column_name>NEUTRAL_TEXT</column_name>
-          <stream_name>neutralText</stream_name>
-        </field>
-        <field>
-          <column_name>NEUTRAL_TEXT_COMPLETE</column_name>
-          <stream_name>neutralTextComplete</stream_name>
-        </field>
-        <field>
-          <column_name>SAD_TEXT</column_name>
-          <stream_name>sadText</stream_name>
-        </field>
-        <field>
-          <column_name>SAD_TEXT_COMPLETE</column_name>
-          <stream_name>sadTextComplete</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>804</xloc>
-      <yloc>362</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Text file output</name>
-    <type>TextFileOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <separator>&#x3b;</separator>
-    <enclosure>&#x22;</enclosure>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>Y</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding/>
-    <endedLine/>
-    <fileNameInField>N</fileNameInField>
-    <fileNameField/>
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
-      <is_command>N</is_command>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>txt</extention>
-      <append>Y</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>Y</add_date>
-      <add_time>Y</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>NumOfError</name>
-        <type>Integer</type>
-        <format>&#x23;&#x3b;-&#x23;</format>
-        <currency/>
-        <decimal>.</decimal>
-        <group>,</group>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>3</length>
-        <precision>0</precision>
-      </field>
-      <field>
-        <name>ErrorDesc</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorFields</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorCode</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2215</xloc>
-      <yloc>492</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>UUID-vendestaRmSettings</name>
     <type>RandomValue</type>
     <description/>
@@ -2892,8 +2073,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>449</xloc>
-      <yloc>471</yloc>
+      <xloc>369</xloc>
+      <yloc>475</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2998,515 +2179,10 @@
       </GUI>
     </step>
 
-  <step>
-    <name>Update ContactNumber</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>contact_numbers</table>
-      <key>
-        <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>work</name>
-        <rename>work</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>187</xloc>
-      <yloc>604</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update LockSettings</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>lock_settings</table>
-      <key>
-        <name>COMPANY_SETTINGS_ID</name>
-        <field>COMPANY_SETTINGS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>IS_ABOUT_ME_LOCKED</name>
-        <rename>isAboutMeLocked</rename>
-        </value>
-      <value>
-        <name>IS_ADDRESS_LOCKED</name>
-        <rename>isAddressLocked</rename>
-        </value>
-      <value>
-        <name>IS_BLOG_ADDRESS_LOCKED</name>
-        <rename>isBlogAddressLocked</rename>
-        </value>
-      <value>
-        <name>IS_FAX_PHONE_LOCKED</name>
-        <rename>isFaxPhoneLocked</rename>
-        </value>
-      <value>
-        <name>IS_LOGO_LOCKED</name>
-        <rename>isLogoLocked</rename>
-        </value>
-      <value>
-        <name>IS_MIN_SCORE_LOCKED</name>
-        <rename>isMinScoreLocked</rename>
-        </value>
-      <value>
-        <name>IS_PERSONAL_PHONE_LOCKED</name>
-        <rename>isPersonalPhoneLocked</rename>
-        </value>
-      <value>
-        <name>IS_WEB_ADDRESS_LOCKED</name>
-        <rename>isWebAddressLocked</rename>
-        </value>
-      <value>
-        <name>IS_WORK_EMAIL_LOCKED</name>
-        <rename>isWorkEmailLocked</rename>
-        </value>
-      <value>
-        <name>IS_WORK_PHONE_LOCKED</name>
-        <rename>isWorkPhoneLocked</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>262</xloc>
-      <yloc>362</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update Mail</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>mail</table>
-      <key>
-        <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS _ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>IS_PERSONAL_EMAIL_VERIFIED</name>
-        <rename>isPersonalEmailVerified</rename>
-        </value>
-      <value>
-        <name>IS_WORK_EMAIL_VERIFIED</name>
-        <rename>isWorkEmailVerified</rename>
-        </value>
-      <value>
-        <name>IS_WORK_MAIL_VERIFIED_BY_ADMIN</name>
-        <rename>isWorkMailVerifiedByAdmin</rename>
-        </value>
-      <value>
-        <name>WORK_EMAIL_TO_VERIFY</name>
-        <rename>workEmailToVerify</rename>
-        </value>
-      <value>
-        <name>WORK</name>
-        <rename>work</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>449</xloc>
-      <yloc>903</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update SurveySettings</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>survey_settings</table>
-      <key>
-        <name>COMPANY_SETTINGS_ID</name>
-        <field>COMPANY_SETTINGS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>AUTO_POST_SCORE</name>
-        <rename>auto_post_score</rename>
-        </value>
-      <value>
-        <name>MAX_NUMBER_OF_SOCIAL_POS_REMINDERS</name>
-        <rename>max_number_of_social_pos_reminders</rename>
-        </value>
-      <value>
-        <name>MAX_NUMBER_OF_SURVEY_REMINDERS</name>
-        <rename>max_number_of_survey_reminders</rename>
-        </value>
-      <value>
-        <name>SHOW_SURVEY_ABOVE_SCORE</name>
-        <rename>show_survey_above_score</rename>
-        </value>
-      <value>
-        <name>SOCIAL_POST_REMINDER_INTERVAL_IN_DAYS</name>
-        <rename>social_post_reminder_interval_in_days</rename>
-        </value>
-      <value>
-        <name>SURVEY_REMINDER_INTERVAL_IN_DAYS</name>
-        <rename>survey_reminder_interval_in_days</rename>
-        </value>
-      <value>
-        <name>AUTO_POST_ENABLED</name>
-        <rename>autoPostEnabled</rename>
-        </value>
-      <value>
-        <name>AUTO_POST_LINK_TO_USER_SITE_ENABLED</name>
-        <rename>autoPostLinkToUserSiteEnabled</rename>
-        </value>
-      <value>
-        <name>DUPLICATE_SURVEY_INTERVAL</name>
-        <rename>duplicateSurveyInterval</rename>
-        </value>
-      <value>
-        <name>IS_REMINDER_DISABLED</name>
-        <rename>isReminderDisabled</rename>
-        </value>
-      <value>
-        <name>IS_SOCIAL_POST_REMINDER_DISABLED</name>
-        <rename>isSocialPostReminderDisabled</rename>
-        </value>
-      <value>
-        <name>HAPPY_TEXT</name>
-        <rename>happyText</rename>
-        </value>
-      <value>
-        <name>HAPPY_TEXT_COMPLETE</name>
-        <rename>happyTextComplete</rename>
-        </value>
-      <value>
-        <name>NEUTRAL_TEXT</name>
-        <rename>neutralText</rename>
-        </value>
-      <value>
-        <name>NEUTRAL_TEXT_COMPLETE</name>
-        <rename>neutralTextComplete</rename>
-        </value>
-      <value>
-        <name>SAD_TEXT</name>
-        <rename>sadText</rename>
-        </value>
-      <value>
-        <name>SAD_TEXT_COMPLETE</name>
-        <rename>sadTextComplete</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1012</xloc>
-      <yloc>362</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update VendestaRm</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>vendasta_rm_settings</table>
-      <key>
-        <name>COMPANY_SETTINGS_ID</name>
-        <field>COMPANY_SETTINGS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>VENDASTA_RM_SETTINGS_ID</name>
-        <rename>VENDASTA_RM_SETTINGS_ID</rename>
-        </value>
-      <value>
-        <name>ACCOUNT_ID</name>
-        <rename>accountId</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1266</xloc>
-      <yloc>474</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>UpdateWebAddress</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>web_addresses</table>
-      <key>
-        <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS _ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>WORK</name>
-        <rename>work_1</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>804</xloc>
-      <yloc>903</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>WebAddress</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>      <field>        <name>CONTACT_DETAILS_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>WEB_ADDRESSES_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>work_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>804</xloc>
-      <yloc>648</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>WebAddresss OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>web_addresses</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>WEB_ADDRESSES_ID</column_name>
-          <stream_name>WEB_ADDRESSES_ID</stream_name>
-        </field>
-        <field>
-          <column_name>CONTACT_DETAILS _ID</column_name>
-          <stream_name>CONTACT_DETAILS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>WORK</column_name>
-          <stream_name>work_1</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>804</xloc>
-      <yloc>784</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>vendasta_rm</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>vendasta_rm_settings</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>VENDASTA_RM_SETTINGS_ID</column_name>
-          <stream_name>VENDASTA_RM_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>ACCOUNT_ID</column_name>
-          <stream_name>accountId</stream_name>
-        </field>
-        <field>
-          <column_name>COMPANY_SETTINGS_ID</column_name>
-          <stream_name>COMPANY_SETTINGS_ID</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1267</xloc>
-      <yloc>362</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1584</xloc>
-      <yloc>542</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step_error_handling>
       <error>
-        <source_step>ContactNumbers OP</source_step>
-        <target_step>Update ContactNumber</target_step>
+        <source_step>Insert &#x2f; Update Contact Numbers</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -3517,8 +2193,8 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>LockSettings_TableOP</source_step>
-        <target_step>Update LockSettings</target_step>
+        <source_step>Insert &#x2f; Update Lock Settings</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -3529,8 +2205,8 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>Mail TableOP</source_step>
-        <target_step>Update Mail</target_step>
+        <source_step>Insert &#x2f; Update Mail</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -3541,8 +2217,8 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>SurveySettings_TableOP</source_step>
-        <target_step>Update SurveySettings</target_step>
+        <source_step>Insert &#x2f; Update Survey Settings</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -3553,80 +2229,8 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>Update ContactNumber</source_step>
+        <source_step>Insert &#x2f; Update Vendesta</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update LockSettings</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update Mail</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update SurveySettings</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update VendestaRm</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>UpdateWebAddress</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>WebAddresss OP</source_step>
-        <target_step>UpdateWebAddress</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -3637,8 +2241,8 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>vendasta_rm</source_step>
-        <target_step>Update VendestaRm</target_step>
+        <source_step>Insert &#x2f; Update Web Address</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>

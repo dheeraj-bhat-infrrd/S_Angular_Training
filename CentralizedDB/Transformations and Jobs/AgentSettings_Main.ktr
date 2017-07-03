@@ -187,16 +187,10 @@
   <hop> <from>MongoDB I - AgentSettings</from><to>AgentConstant</to><enabled>Y</enabled> </hop>
   <hop> <from>DateConverter FB Token</from><to>Filter rows FB Token</to><enabled>Y</enabled> </hop>
   <hop> <from>FBToken</from><to>DateConverter FB Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows FB Token</from><to>FB Token OP</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_FBToken</from><to>FBToken</to><enabled>Y</enabled> </hop>
   <hop> <from>AgentConstant</from><to>UUID_FBToken</to><enabled>Y</enabled> </hop>
   <hop> <from>DateConverter Google Token</from><to>Filter rows Google Token</to><enabled>Y</enabled> </hop>
   <hop> <from>DateConverter LinkedIn token</from><to>Filter rows LinkdIn</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows Google Token</from><to>GoogleToken OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows GoogleBusiness</from><to>GoogleBusiness OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows LinkdIn</from><to>LinkdIn Token OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows Realtor</from><to>Realtor Token OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows lending tree</from><to>Lending tree op</to><enabled>Y</enabled> </hop>
   <hop> <from>GoogleToken</from><to>DateConverter Google Token</to><enabled>Y</enabled> </hop>
   <hop> <from>Google_Business_Token</from><to>Filter rows GoogleBusiness</to><enabled>Y</enabled> </hop>
   <hop> <from>LendingTreeToken</from><to>Filter rows lending tree</to><enabled>Y</enabled> </hop>
@@ -208,9 +202,6 @@
   <hop> <from>UUID_LinkdIn</from><to>LinkdInToken</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_Realtor</from><to>RealtorToken</to><enabled>Y</enabled> </hop>
   <hop> <from>DateConverter Twitter token </from><to>Filter rows Twitter</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows Twitter</from><to>Twitter Token OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows Yelp</from><to>Yelp Token OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows Zillow Token</from><to>Zillow Table OP</to><enabled>Y</enabled> </hop>
   <hop> <from>TwitterToken</from><to>DateConverter Twitter token </to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_TwitterToken</from><to>TwitterToken</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_YelpToken</from><to>YelpToken</to><enabled>Y</enabled> </hop>
@@ -225,24 +216,7 @@
   <hop> <from>AgentConstant</from><to>UUID_YelpToken</to><enabled>Y</enabled> </hop>
   <hop> <from>AgentConstant</from><to>UUID_TwitterToken</to><enabled>Y</enabled> </hop>
   <hop> <from>AgentConstant</from><to>UUID_Zillow_Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>FB Token OP</from><to>Update FB Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>Zillow Table OP</from><to>Update Zillow Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>Twitter Token OP</from><to>Update Twitter Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>Yelp Token OP</from><to>Update Yelp Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>Realtor Token OP</from><to>Update Realtor Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>LinkdIn Token OP</from><to>Update LinkdIn Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>Lending tree op</from><to>Update LendingTree token</to><enabled>Y</enabled> </hop>
-  <hop> <from>GoogleToken OP</from><to>Update Google Token</to><enabled>Y</enabled> </hop>
-  <hop> <from>GoogleBusiness OP</from><to>Update GB Token</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows FB Token</from><to>Alter isDeleted FB</to><enabled>Y</enabled> </hop>
-  <hop> <from>Alter isDeleted FB</from><to>Update isDeleted FB</to><enabled>Y</enabled> </hop>
-  <hop> <from>Alter isDeleted GB</from><to>Update isDeleted GB</to><enabled>Y</enabled> </hop>
-  <hop> <from>Alter isDeleted Google</from><to>Update isDeleted Google </to><enabled>Y</enabled> </hop>
-  <hop> <from>Alter isDeleted LendingTree</from><to>Update isDeleted Lending Tree</to><enabled>Y</enabled> </hop>
-  <hop> <from>Alter isDeleted LinkdIn</from><to>Update isDeleted LinkdIn</to><enabled>Y</enabled> </hop>
-  <hop> <from>Alter isDeleted Realtor</from><to>Update isDeleted Realtor</to><enabled>Y</enabled> </hop>
-  <hop> <from>Alter isDeleted Yelp</from><to>Update isDeleted Yelp</to><enabled>Y</enabled> </hop>
-  <hop> <from>Alter isDeleted twitter</from><to>Update isDeleted twitter</to><enabled>Y</enabled> </hop>
   <hop> <from>Alter isDeleted Zillow</from><to>Update isDeleted Zillow</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows GoogleBusiness</from><to>Alter isDeleted GB</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows Google Token</from><to>Alter isDeleted Google</to><enabled>Y</enabled> </hop>
@@ -252,42 +226,42 @@
   <hop> <from>Filter rows Yelp</from><to>Alter isDeleted Yelp</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows Twitter</from><to>Alter isDeleted twitter</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows Zillow Token</from><to>Alter isDeleted Zillow</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update isDeleted FB</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update isDeleted Zillow</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update isDeleted GB</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update isDeleted Google </from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update isDeleted Lending Tree</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update isDeleted LinkdIn</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update isDeleted twitter</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update isDeleted Realtor</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update isDeleted Yelp</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant FB Token</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant Google Token</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant GoogleBusiness</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant Lending Tree</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant LinkedIn</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant Realtor</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant Twitter</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant Yelp</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant Zillow</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Update FB Token</from><to>Constant FB Token</to><enabled>N</enabled> </hop>
-  <hop> <from>Update GB Token</from><to>Constant GoogleBusiness</to><enabled>N</enabled> </hop>
-  <hop> <from>Update Google Token</from><to>Constant Google Token</to><enabled>N</enabled> </hop>
-  <hop> <from>Update LendingTree token</from><to>Constant Lending Tree</to><enabled>N</enabled> </hop>
-  <hop> <from>Update LinkdIn Token</from><to>Constant LinkedIn</to><enabled>N</enabled> </hop>
-  <hop> <from>Update Realtor Token</from><to>Constant Realtor</to><enabled>N</enabled> </hop>
-  <hop> <from>Update Yelp Token</from><to>Constant Yelp</to><enabled>N</enabled> </hop>
-  <hop> <from>Update Twitter Token</from><to>Constant Twitter</to><enabled>N</enabled> </hop>
-  <hop> <from>Update Zillow Token</from><to>Constant Zillow</to><enabled>N</enabled> </hop>
-  <hop> <from>Update FB Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update GB Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Google Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LendingTree token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LinkdIn Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Realtor Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Yelp Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Twitter Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update Zillow Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update FB Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Google Business Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Google Token</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update LendingTree</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update LinkedIn</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Realtor</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Twitter</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Yelp</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Zillow</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update FB isDeleted</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update GB isDeleted</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update GoogleToken isDeleted</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update LendingTree isDeleted</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update LinkdIn isDeleted</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update Realtor isDeleted </from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update Twitter isDeleted</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update Yelp isDeleted </from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update Zillow isDeleted</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Alter isDeleted FB</from><to>Update FB isDeleted</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows FB Token</from><to>Insert &#x2f; Update FB Token</to><enabled>Y</enabled> </hop>
+  <hop> <from>Alter isDeleted GB</from><to>Update GB isDeleted</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows GoogleBusiness</from><to>Insert &#x2f; Update Google Business Token</to><enabled>Y</enabled> </hop>
+  <hop> <from>Alter isDeleted Google</from><to>Update GoogleToken isDeleted</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows Google Token</from><to>Insert &#x2f; Update Google Token</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows lending tree</from><to>Insert &#x2f; Update LendingTree</to><enabled>Y</enabled> </hop>
+  <hop> <from>Alter isDeleted LendingTree</from><to>Update LendingTree isDeleted</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows LinkdIn</from><to>Insert &#x2f; Update LinkedIn</to><enabled>Y</enabled> </hop>
+  <hop> <from>Alter isDeleted LinkdIn</from><to>Update LinkdIn isDeleted</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows Realtor</from><to>Insert &#x2f; Update Realtor</to><enabled>Y</enabled> </hop>
+  <hop> <from>Alter isDeleted Realtor</from><to>Update Realtor isDeleted </to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows Yelp</from><to>Insert &#x2f; Update Yelp</to><enabled>Y</enabled> </hop>
+  <hop> <from>Alter isDeleted Yelp</from><to>Update Yelp isDeleted </to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows Twitter</from><to>Insert &#x2f; Update Twitter</to><enabled>Y</enabled> </hop>
+  <hop> <from>Alter isDeleted twitter</from><to>Update Twitter isDeleted</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows Zillow Token</from><to>Insert &#x2f; Update Zillow</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update isDeleted Zillow</from><to>Update Zillow isDeleted</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AgentConstant</name>
@@ -358,8 +332,8 @@
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>675</xloc>
-      <yloc>108</yloc>
+      <xloc>795</xloc>
+      <yloc>111</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -388,8 +362,8 @@
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>660</xloc>
-      <yloc>319</yloc>
+      <xloc>791</xloc>
+      <yloc>314</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -418,8 +392,8 @@
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>650</xloc>
-      <yloc>475</yloc>
+      <xloc>795</xloc>
+      <yloc>491</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -448,8 +422,8 @@
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>648</xloc>
-      <yloc>658</yloc>
+      <xloc>769</xloc>
+      <yloc>666</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -478,8 +452,8 @@
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>687</xloc>
-      <yloc>841</yloc>
+      <xloc>803</xloc>
+      <yloc>843</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -508,8 +482,8 @@
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>684</xloc>
-      <yloc>1013</yloc>
+      <xloc>790</xloc>
+      <yloc>1012</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -538,8 +512,8 @@
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>670</xloc>
-      <yloc>1141</yloc>
+      <xloc>787</xloc>
+      <yloc>1146</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -598,305 +572,8 @@
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>673</xloc>
-      <yloc>1301</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant FB Token</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Agent_Settings_Main_Update_FB_Token</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1543</xloc>
-      <yloc>100</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant Google Token</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Agent_Settings_Update_Google_Token</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1543</xloc>
-      <yloc>396</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant GoogleBusiness</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Agent_Settings_Main_Update_Google_Business_token</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1543</xloc>
-      <yloc>252</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant Lending Tree</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Agent_Settings_Update_Lending_Tree</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1543</xloc>
-      <yloc>470</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant LinkedIn</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Agent_Settings_Update_LinkedIn</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1543</xloc>
-      <yloc>617</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant Realtor</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Agent_Settings_Update_realtor</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1543</xloc>
-      <yloc>783</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant Twitter</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Agent_Settings_Update_Twitter</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1543</xloc>
-      <yloc>1065</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant Yelp</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Agent_Settings_Update_Yelp</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1543</xloc>
-      <yloc>902</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant Zillow</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>Agent_Settings_Update_Zillow</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1543</xloc>
-      <yloc>1193</yloc>
+      <xloc>806</xloc>
+      <yloc>1299</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1040,82 +717,8 @@
            </partitioning>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1728</xloc>
-      <yloc>662</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>FB Token OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>facebook_token</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>FACEBOOK_TOKEN_ID</column_name>
-          <stream_name>FACEBOOK_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>FACEBOOK_ACCESS_TOKEN</column_name>
-          <stream_name>facebookAccessToken</stream_name>
-        </field>
-        <field>
-          <column_name>FACEBOOK_ACCESS_TOKEN_TO_POST</column_name>
-          <stream_name>facebookAccessTokenToPost</stream_name>
-        </field>
-        <field>
-          <column_name>FACEBOOK_PAGE_LINK</column_name>
-          <stream_name>facebookPageLink</stream_name>
-        </field>
-        <field>
-          <column_name>TOKEN_EXPIRY_ALERT_SENT</column_name>
-          <stream_name>tokenExpiryAlertSent</stream_name>
-        </field>
-        <field>
-          <column_name>FACEBOOK_ACCESS_TOKEN_CREATED_ON</column_name>
-          <stream_name>createdOnStr</stream_name>
-        </field>
-        <field>
-          <column_name>FACEBOOK_ACCESS_TOKEN_EXPIRES_ON</column_name>
-          <stream_name>facebookAccessTokenExpiresOn</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>AgentId</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>889</xloc>
-      <yloc>29</yloc>
+      <xloc>2080</xloc>
+      <yloc>622</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1191,7 +794,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>FB Token OP</send_true_to>
+<send_true_to>Insert &#x2f; Update FB Token</send_true_to>
 <send_false_to>Alter isDeleted FB</send_false_to>
     <compare>
 <condition>
@@ -1220,7 +823,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>GoogleToken OP</send_true_to>
+<send_true_to>Insert &#x2f; Update Google Token</send_true_to>
 <send_false_to>Alter isDeleted Google</send_false_to>
     <compare>
 <condition>
@@ -1232,8 +835,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>711</xloc>
-      <yloc>401</yloc>
+      <xloc>738</xloc>
+      <yloc>402</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1249,7 +852,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>GoogleBusiness OP</send_true_to>
+<send_true_to>Insert &#x2f; Update Google Business Token</send_true_to>
 <send_false_to>Alter isDeleted GB</send_false_to>
     <compare>
 <condition>
@@ -1278,7 +881,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>LinkdIn Token OP</send_true_to>
+<send_true_to>Insert &#x2f; Update LinkedIn</send_true_to>
 <send_false_to>Alter isDeleted LinkdIn</send_false_to>
     <compare>
 <condition>
@@ -1307,7 +910,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>Realtor Token OP</send_true_to>
+<send_true_to>Insert &#x2f; Update Realtor</send_true_to>
 <send_false_to>Alter isDeleted Realtor</send_false_to>
     <compare>
 <condition>
@@ -1336,7 +939,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>Twitter Token OP</send_true_to>
+<send_true_to>Insert &#x2f; Update Twitter</send_true_to>
 <send_false_to>Alter isDeleted twitter</send_false_to>
     <compare>
 <condition>
@@ -1365,7 +968,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>Yelp Token OP</send_true_to>
+<send_true_to>Insert &#x2f; Update Yelp</send_true_to>
 <send_false_to>Alter isDeleted Yelp</send_false_to>
     <compare>
 <condition>
@@ -1394,7 +997,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>Zillow Table OP</send_true_to>
+<send_true_to>Insert &#x2f; Update Zillow</send_true_to>
 <send_false_to>Alter isDeleted Zillow</send_false_to>
     <compare>
 <condition>
@@ -1423,7 +1026,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>Lending tree op</send_true_to>
+<send_true_to>Insert &#x2f; Update LendingTree</send_true_to>
 <send_false_to>Alter isDeleted LendingTree</send_false_to>
     <compare>
 <condition>
@@ -1437,60 +1040,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>715</xloc>
       <yloc>591</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>GoogleBusiness OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>google_business_token</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>GOOGLE_BUSINESS_TOKEN_ID</column_name>
-          <stream_name>GOOGLE_BUSINESS_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>AgentId</stream_name>
-        </field>
-        <field>
-          <column_name>GOOGLE_BUSINESS_LINK</column_name>
-          <stream_name>googleBusinessLink</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>871</xloc>
-      <yloc>218</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1552,76 +1101,6 @@
     </step>
 
   <step>
-    <name>GoogleToken OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>google_token</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>GOOGLE_TOKEN_ID</column_name>
-          <stream_name>GOOGLE_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>GOOGLE_ACCESS_TOKEN</column_name>
-          <stream_name>googleAccessToken</stream_name>
-        </field>
-        <field>
-          <column_name>GOOGLE_ACCESS_TOKEN_CREATED_ON</column_name>
-          <stream_name>createdOnStr</stream_name>
-        </field>
-        <field>
-          <column_name>GOOGLE_ACCESS_TOKEN_EXPIRES_IN</column_name>
-          <stream_name>googleAccessTokenExpiresIn</stream_name>
-        </field>
-        <field>
-          <column_name>GOOGLE_REFRESH_TOKEN</column_name>
-          <stream_name>googleRefreshToken</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_LINK</column_name>
-          <stream_name>profileLink</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>AgentId</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>877</xloc>
-      <yloc>401</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Google_Business_Token</name>
     <type>SelectValues</type>
     <description/>
@@ -1662,10 +1141,10 @@
     </step>
 
   <step>
-    <name>Lending tree op</name>
-    <type>TableOutput</type>
+    <name>Insert &#x2f; Update FB Token</name>
+    <type>InsertUpdate</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -1673,44 +1152,617 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>lending_tree_token</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>LENDING_TREE_TOKEN_ID</column_name>
-          <stream_name>LENDING_TREE_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>LENDING_TREE_PROFILE_LINK</column_name>
-          <stream_name>lendingTreeProfileLink</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>AgentId</stream_name>
-        </field>
-    </fields>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>facebook_token</table>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>AgentId</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>FACEBOOK_TOKEN_ID</name>
+        <rename>FACEBOOK_TOKEN_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>AgentId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>FACEBOOK_ACCESS_TOKEN</name>
+        <rename>facebookAccessToken</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>FACEBOOK_ACCESS_TOKEN_EXPIRES_ON</name>
+        <rename>facebookAccessTokenExpiresOn</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>FACEBOOK_ACCESS_TOKEN_TO_POST</name>
+        <rename>facebookAccessTokenToPost</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>FACEBOOK_PAGE_LINK</name>
+        <rename>facebookPageLink</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>TOKEN_EXPIRY_ALERT_SENT</name>
+        <rename>tokenExpiryAlertSent</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>FACEBOOK_ACCESS_TOKEN_CREATED_ON</name>
+        <rename>createdOnStr</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_DELETED</name>
+        <rename>isDeleted</rename>
+        <update>N</update>
+      </value>
+    </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>881</xloc>
-      <yloc>591</yloc>
+      <xloc>983</xloc>
+      <yloc>27</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Google Business Token</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>google_business_token</table>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>AgentId</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>GOOGLE_BUSINESS_TOKEN_ID</name>
+        <rename>GOOGLE_BUSINESS_TOKEN_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>AgentId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>GOOGLE_BUSINESS_LINK</name>
+        <rename>googleBusinessLink</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>983</xloc>
+      <yloc>216</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Google Token</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>google_token</table>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>AgentId</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>GOOGLE_TOKEN_ID</name>
+        <rename>GOOGLE_TOKEN_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>GOOGLE_ACCESS_TOKEN</name>
+        <rename>googleAccessToken</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>GOOGLE_ACCESS_TOKEN_CREATED_ON</name>
+        <rename>createdOnStr</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>GOOGLE_ACCESS_TOKEN_EXPIRES_IN</name>
+        <rename>googleAccessTokenExpiresIn</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>GOOGLE_REFRESH_TOKEN</name>
+        <rename>googleRefreshToken</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>PROFILE_LINK</name>
+        <rename>profileLink</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>AgentId</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>972</xloc>
+      <yloc>402</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update LendingTree</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>lending_tree_token</table>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>AgentId</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>LENDING_TREE_TOKEN_ID</name>
+        <rename>LENDING_TREE_TOKEN_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LENDING_TREE_PROFILE_LINK</name>
+        <rename>lendingTreeProfileLink</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>AgentId</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>974</xloc>
+      <yloc>581</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update LinkedIn</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>linked_in_token</table>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>AgentId</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>LINKED_IN_TOKEN_ID</name>
+        <rename>LINKED_IN_TOKEN_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LINKED_IN_ACCESS_TOKEN</name>
+        <rename>linkedInAccessToken</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LINKED_IN_ACCESS_TOKEN_CREATED_ON</name>
+        <rename>createdOnStr</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LINKED_IN_ACCESS_TOKEN_EXPIRES_IN</name>
+        <rename>linkedInAccessTokenExpiresIn</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LINKED_IN_PAGE_LINK</name>
+        <rename>linkedInPageLink</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>TOKEN_EXPIRY_ALERT_EMAIL</name>
+        <rename>tokenExpiryAlertSent</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>AgentId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_DELETED</name>
+        <rename>isDeleted</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>967</xloc>
+      <yloc>747</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Realtor</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>realtor_token</table>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>AgentId</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>REALTOR_TOKEN_ID</name>
+        <rename>REALTOR_TOKEN_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>REALTOR_PROFILE_LINK</name>
+        <rename>realtorProfileLink</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>AgentId</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>964</xloc>
+      <yloc>916</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Twitter</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>twitter_token</table>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>AgentId</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>TWITTER_TOKEN_ID</name>
+        <rename>TWITTER_TOKEN_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>TWITTER_ACCESS_TOKEN</name>
+        <rename>twitterAccessToken</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>TWITTER_ACCESS_TOKEN_CREATED_ON</name>
+        <rename>createdOnStr</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>TWITTER_ACCESS_TOKEN_SECRET</name>
+        <rename>twitterAccessTokenSecret</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>TWITTER_PAGE_LINK</name>
+        <rename>twitterPageLink</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>AgentId</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>960</xloc>
+      <yloc>1226</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Yelp</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>yelp_token</table>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>AgentId</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>YELP_TOKEN_ID</name>
+        <rename>YELP_TOKEN_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>YELP_PAGE_LINK</name>
+        <rename>yelpPageLink</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>AgentId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_DELETED</name>
+        <rename>isDeleted</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>956</xloc>
+      <yloc>1078</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Zillow</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>zillow_token</table>
+      <key>
+        <name>type</name>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>AgentId</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>ZILLOW_TOKEN_ID</name>
+        <rename>ZILLOW_TOKEN_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>type</name>
+        <rename>type</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ZILLOW_LENDER_ID</name>
+        <rename>zillowLenderId</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>ZILLOW_PROFILE_LINK</name>
+        <rename>zillowProfileLink</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>ZILLOW_SCREEN_NAME</name>
+        <rename>zillowScreenName</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id</name>
+        <rename>AgentId</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>953</xloc>
+      <yloc>1363</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1751,76 +1803,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>474</xloc>
       <yloc>591</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>LinkdIn Token OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>linked_in_token</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>LINKED_IN_TOKEN_ID</column_name>
-          <stream_name>LINKED_IN_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>AgentId</stream_name>
-        </field>
-        <field>
-          <column_name>LINKED_IN_ACCESS_TOKEN_CREATED_ON</column_name>
-          <stream_name>createdOnStr</stream_name>
-        </field>
-        <field>
-          <column_name>LINKED_IN_ACCESS_TOKEN</column_name>
-          <stream_name>linkedInAccessToken</stream_name>
-        </field>
-        <field>
-          <column_name>LINKED_IN_ACCESS_TOKEN_EXPIRES_IN</column_name>
-          <stream_name>linkedInAccessTokenExpiresIn</stream_name>
-        </field>
-        <field>
-          <column_name>LINKED_IN_PAGE_LINK</column_name>
-          <stream_name>linkedInPageLink</stream_name>
-        </field>
-        <field>
-          <column_name>TOKEN_EXPIRY_ALERT_SENT</column_name>
-          <stream_name>tokenExpiryAlertSent</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>891</xloc>
-      <yloc>757</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2872,60 +2854,6 @@
     </step>
 
   <step>
-    <name>Realtor Token OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>realtor_token</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>REALTOR_TOKEN_ID</column_name>
-          <stream_name>REALTOR_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>REALTOR_PROFILE_LINK</column_name>
-          <stream_name>realtorProfileLink</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>AgentId</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>893</xloc>
-      <yloc>914</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>RealtorToken</name>
     <type>SelectValues</type>
     <description/>
@@ -2961,184 +2889,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>486</xloc>
       <yloc>914</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Text file output</name>
-    <type>TextFileOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <separator>&#x3b;</separator>
-    <enclosure>&#x22;</enclosure>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>Y</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding/>
-    <endedLine/>
-    <fileNameInField>N</fileNameInField>
-    <fileNameField/>
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
-      <is_command>N</is_command>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>txt</extention>
-      <append>Y</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>Y</add_date>
-      <add_time>Y</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>NumOfError</name>
-        <type>Integer</type>
-        <format>&#x23;&#x3b;-&#x23;</format>
-        <currency/>
-        <decimal>.</decimal>
-        <group>,</group>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>3</length>
-        <precision>0</precision>
-      </field>
-      <field>
-        <name>ErrorDesc</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorFields</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorCode</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2355</xloc>
-      <yloc>637</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Twitter Token OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>twitter_token</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>TWITTER_TOKEN_ID</column_name>
-          <stream_name>TWITTER_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>TWITTER_ACCESS_TOKEN</column_name>
-          <stream_name>twitterAccessToken</stream_name>
-        </field>
-        <field>
-          <column_name>TWITTER_ACCESS_TOKEN_CREATED_ON</column_name>
-          <stream_name>createdOnStr</stream_name>
-        </field>
-        <field>
-          <column_name>TWITTER_ACCESS_TOKEN_SECRET</column_name>
-          <stream_name>twitterAccessTokenSecret</stream_name>
-        </field>
-        <field>
-          <column_name>TWITTER_PAGE_LINK</column_name>
-          <stream_name>twitterPageLink</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>AgentId</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>905</xloc>
-      <yloc>1227</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3421,7 +3171,7 @@
     </step>
 
   <step>
-    <name>Update FB Token</name>
+    <name>Update FB isDeleted</name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -3453,40 +3203,20 @@
         <name2/>
         </key>
       <value>
-        <name>FACEBOOK_ACCESS_TOKEN</name>
-        <rename>facebookAccessToken</rename>
-        </value>
-      <value>
-        <name>FACEBOOK_ACCESS_TOKEN_CREATED_ON</name>
-        <rename>createdOnStr</rename>
-        </value>
-      <value>
-        <name>FACEBOOK_ACCESS_TOKEN_EXPIRES_ON</name>
-        <rename>facebookAccessTokenExpiresOn</rename>
-        </value>
-      <value>
-        <name>FACEBOOK_ACCESS_TOKEN_TO_POST</name>
-        <rename>facebookAccessTokenToPost</rename>
-        </value>
-      <value>
-        <name>FACEBOOK_PAGE_LINK</name>
-        <rename>facebookPageLink</rename>
-        </value>
-      <value>
-        <name>TOKEN_EXPIRY_ALERT_SENT</name>
-        <rename>tokenExpiryAlertSent</rename>
+        <name>IS_DELETED</name>
+        <rename>isDeleted</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>988</xloc>
-      <yloc>87</yloc>
+      <xloc>975</xloc>
+      <yloc>111</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update GB Token</name>
+    <name>Update GB isDeleted</name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -3518,20 +3248,20 @@
         <name2/>
         </key>
       <value>
-        <name>GOOGLE_BUSINESS_LINK</name>
-        <rename>googleBusinessLink</rename>
+        <name>IS_DELETED</name>
+        <rename>isDeleted</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>969</xloc>
-      <yloc>285</yloc>
+      <xloc>977</xloc>
+      <yloc>311</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update Google Token</name>
+    <name>Update GoogleToken isDeleted</name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -3563,36 +3293,20 @@
         <name2/>
         </key>
       <value>
-        <name>GOOGLE_ACCESS_TOKEN</name>
-        <rename>googleAccessToken</rename>
-        </value>
-      <value>
-        <name>GOOGLE_ACCESS_TOKEN_CREATED_ON</name>
-        <rename>createdOnStr</rename>
-        </value>
-      <value>
-        <name>GOOGLE_ACCESS_TOKEN_EXPIRES_IN</name>
-        <rename>googleAccessTokenExpiresIn</rename>
-        </value>
-      <value>
-        <name>GOOGLE_REFRESH_TOKEN</name>
-        <rename>googleRefreshToken</rename>
-        </value>
-      <value>
-        <name>PROFILE_LINK</name>
-        <rename>profileLink</rename>
+        <name>IS_DELETED</name>
+        <rename>isDeleted</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>979</xloc>
-      <yloc>466</yloc>
+      <xloc>973</xloc>
+      <yloc>491</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update LendingTree token</name>
+    <name>Update LendingTree isDeleted</name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -3624,20 +3338,20 @@
         <name2/>
         </key>
       <value>
-        <name>LENDING_TREE_PROFILE_LINK</name>
-        <rename>lendingTreeProfileLink</rename>
+        <name>IS_DELETED</name>
+        <rename>isDeleted</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1013</xloc>
-      <yloc>634</yloc>
+      <xloc>970</xloc>
+      <yloc>658</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update LinkdIn Token</name>
+    <name>Update LinkdIn isDeleted</name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -3657,56 +3371,32 @@
       <schema/>
       <table>linked_in_token</table>
       <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
         <name>AgentId</name>
         <field>id</field>
         <condition>&#x3d;</condition>
         <name2/>
         </key>
-      <value>
-        <name>LINKED_IN_ACCESS_TOKEN</name>
-        <rename>linkedInAccessToken</rename>
-        </value>
-      <value>
-        <name>LINKED_IN_ACCESS_TOKEN_CREATED_ON</name>
-        <rename>createdOnStr</rename>
-        </value>
-      <value>
-        <name>LINKED_IN_ACCESS_TOKEN_EXPIRES_IN</name>
-        <rename>linkedInAccessTokenExpiresIn</rename>
-        </value>
-      <value>
-        <name>LINKED_IN_PAGE_LINK</name>
-        <rename>linkedInPageLink</rename>
-        </value>
-      <value>
-        <name>TOKEN_EXPIRY_ALERT_SENT</name>
-        <rename>tokenExpiryAlertSent</rename>
-        </value>
-      <value>
-        <name>id</name>
-        <rename>AgentId</rename>
-        </value>
-      <value>
+      <key>
         <name>type</name>
-        <rename>type</rename>
+        <field>type</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>IS_DELETED</name>
+        <rename>isDeleted</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>994</xloc>
-      <yloc>834</yloc>
+      <xloc>959</xloc>
+      <yloc>839</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update Realtor Token</name>
+    <name>Update Realtor isDeleted </name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -3738,20 +3428,20 @@
         <name2/>
         </key>
       <value>
-        <name>REALTOR_PROFILE_LINK</name>
-        <rename>realtorProfileLink</rename>
+        <name>IS_DELETED</name>
+        <rename>isDeleted</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>999</xloc>
-      <yloc>984</yloc>
+      <xloc>964</xloc>
+      <yloc>1007</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update Twitter Token</name>
+    <name>Update Twitter isDeleted</name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -3783,40 +3473,20 @@
         <name2/>
         </key>
       <value>
-        <name>TWITTER_ACCESS_TOKEN</name>
-        <rename>twitterAccessToken</rename>
-        </value>
-      <value>
-        <name>TWITTER_ACCESS_TOKEN_CREATED_ON</name>
-        <rename>createdOnStr</rename>
-        </value>
-      <value>
-        <name>TWITTER_ACCESS_TOKEN_SECRET</name>
-        <rename>twitterAccessTokenSecret</rename>
-        </value>
-      <value>
-        <name>TWITTER_PAGE_LINK</name>
-        <rename>twitterPageLink</rename>
-        </value>
-      <value>
-        <name>id</name>
-        <rename>AgentId</rename>
-        </value>
-      <value>
-        <name>type</name>
-        <rename>type</rename>
+        <name>IS_DELETED</name>
+        <rename>isDeleted</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1011</xloc>
-      <yloc>1293</yloc>
+      <xloc>958</xloc>
+      <yloc>1301</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update Yelp Token</name>
+    <name>Update Yelp isDeleted </name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -3848,20 +3518,20 @@
         <name2/>
         </key>
       <value>
-        <name>YELP_PAGE_LINK</name>
-        <rename>yelpPageLink</rename>
+        <name>IS_DELETED</name>
+        <rename>isDeleted</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>995</xloc>
-      <yloc>1084</yloc>
+      <xloc>959</xloc>
+      <yloc>1152</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update Zillow Token</name>
+    <name>Update Zillow isDeleted</name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -3893,345 +3563,14 @@
         <name2/>
         </key>
       <value>
-        <name>ZILLOW_LENDER_ID</name>
-        <rename>zillowLenderId</rename>
-        </value>
-      <value>
-        <name>ZILLOW_PROFILE_LINK</name>
-        <rename>zillowProfileLink</rename>
-        </value>
-      <value>
-        <name>ZILLOW_SCREEN_NAME</name>
-        <rename>zillowScreenName</rename>
-        </value>
-      <value>
-        <name>id</name>
-        <rename>AgentId</rename>
-        </value>
-      <value>
-        <name>type</name>
-        <rename>type</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1006</xloc>
-      <yloc>1425</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update isDeleted FB</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>facebook_token</table>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>AgentId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
         <name>IS_DELETED</name>
         <rename>isDeleted</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>808</xloc>
-      <yloc>107</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update isDeleted GB</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>google_business_token</table>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>AgentId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>IS_DELETED</name>
-        <rename>isDeleted</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>793</xloc>
-      <yloc>318</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update isDeleted Google </name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>google_token</table>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>AgentId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>IS_DELETED</name>
-        <rename>isDeleted</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>783</xloc>
-      <yloc>474</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update isDeleted Lending Tree</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>lending_tree_token</table>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>AgentId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>IS_DELETED</name>
-        <rename>isDeleted</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>811</xloc>
-      <yloc>656</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update isDeleted LinkdIn</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>linked_in_token</table>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>AgentId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>IS_DELETED</name>
-        <rename>isDeleted</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>820</xloc>
-      <yloc>840</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update isDeleted Realtor</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>realtor_token</table>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>AgentId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>IS_DELETED</name>
-        <rename>isDeleted</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>817</xloc>
-      <yloc>1012</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update isDeleted Yelp</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>yelp_token</table>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>AgentId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>IS_DELETED</name>
-        <rename>isDeleted</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>803</xloc>
-      <yloc>1140</yloc>
+      <xloc>948</xloc>
+      <yloc>1434</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4282,105 +3621,6 @@
     </step>
 
   <step>
-    <name>Update isDeleted twitter</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>twitter_token</table>
-      <key>
-        <name>type</name>
-        <field>type</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>AgentId</name>
-        <field>id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>IS_DELETED</name>
-        <rename>isDeleted</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>806</xloc>
-      <yloc>1300</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Yelp Token OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>yelp_token</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>YELP_TOKEN_ID</column_name>
-          <stream_name>YELP_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>YELP_PAGE_LINK</column_name>
-          <stream_name>yelpPageLink</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>AgentId</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>897</xloc>
-      <yloc>1071</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>YelpToken</name>
     <type>SelectValues</type>
     <description/>
@@ -4416,68 +3656,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>490</xloc>
       <yloc>1071</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Zillow Table OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>zillow_token</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>ZILLOW_TOKEN_ID</column_name>
-          <stream_name>ZILLOW_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>type</column_name>
-          <stream_name>type</stream_name>
-        </field>
-        <field>
-          <column_name>ZILLOW_LENDER_ID</column_name>
-          <stream_name>zillowLenderId</stream_name>
-        </field>
-        <field>
-          <column_name>ZILLOW_PROFILE_LINK</column_name>
-          <stream_name>zillowProfileLink</stream_name>
-        </field>
-        <field>
-          <column_name>ZILLOW_SCREEN_NAME</column_name>
-          <stream_name>zillowScreenName</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>AgentId</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>903</xloc>
-      <yloc>1356</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4532,199 +3710,7 @@
 
   <step_error_handling>
       <error>
-        <source_step>FB Token OP</source_step>
-        <target_step>Update FB Token</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>GoogleBusiness OP</source_step>
-        <target_step>Update GB Token</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>GoogleToken OP</source_step>
-        <target_step>Update Google Token</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Lending tree op</source_step>
-        <target_step>Update LendingTree token</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>LinkdIn Token OP</source_step>
-        <target_step>Update LinkdIn Token</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Realtor Token OP</source_step>
-        <target_step>Update Realtor Token</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Twitter Token OP</source_step>
-        <target_step>Update Twitter Token</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update FB Token</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update GB Token</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update Google Token</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update LendingTree token</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update LinkdIn Token</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update Realtor Token</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update Twitter Token</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update Yelp Token</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update Zillow Token</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update isDeleted FB</source_step>
+        <source_step>Insert &#x2f; Update FB Token</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
@@ -4736,7 +3722,7 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>Update isDeleted GB</source_step>
+        <source_step>Insert &#x2f; Update Google Business Token</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
@@ -4748,7 +3734,7 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>Update isDeleted Google </source_step>
+        <source_step>Insert &#x2f; Update Google Token</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
@@ -4760,7 +3746,7 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>Update isDeleted Lending Tree</source_step>
+        <source_step>Insert &#x2f; Update LendingTree</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
@@ -4772,7 +3758,7 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>Update isDeleted LinkdIn</source_step>
+        <source_step>Insert &#x2f; Update LinkedIn</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
@@ -4784,7 +3770,7 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>Update isDeleted Realtor</source_step>
+        <source_step>Insert &#x2f; Update Realtor</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
@@ -4796,7 +3782,139 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>Update isDeleted Yelp</source_step>
+        <source_step>Insert &#x2f; Update Twitter</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Insert &#x2f; Update Yelp</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Insert &#x2f; Update Zillow</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update FB isDeleted</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update GB isDeleted</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update GoogleToken isDeleted</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update LendingTree isDeleted</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update LinkdIn isDeleted</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update Realtor isDeleted </source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update Twitter isDeleted</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update Yelp isDeleted </source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update Zillow isDeleted</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
@@ -4810,42 +3928,6 @@
       <error>
         <source_step>Update isDeleted Zillow</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update isDeleted twitter</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Yelp Token OP</source_step>
-        <target_step>Update Yelp Token</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Zillow Table OP</source_step>
-        <target_step>Update Zillow Token</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>

@@ -193,133 +193,25 @@
   </connection>
   <order>
   <hop> <from>Filter rows</from><to>Sort rows</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 2</from><to>Positions Values</to><enabled>Y</enabled> </hop>
   <hop> <from>Group by</from><to>UUID</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Id Parser</from><to>Filter rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Id Parser</from><to>Url Values</to><enabled>Y</enabled> </hop>
-  <hop> <from>LinkdIn Positions</from><to>LinkdIn Positions OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>LinkdIn Values</from><to>LinkdIn Values OP</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB I - LinkdInData json</from><to>Json Id Parser</to><enabled>Y</enabled> </hop>
   <hop> <from>Parse values</from><to>UUID_PosId</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows</from><to>Group by</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_PosId</from><to>LinkdIn Positions</to><enabled>Y</enabled> </hop>
   <hop> <from>Url Values</from><to>Filter rows</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID</from><to>LinkdIn Picture Urls OP</to><enabled>Y</enabled> </hop>
-  <hop> <from>LinkdIn Positions OP</from><to>Update LinkdIn positions</to><enabled>Y</enabled> </hop>
-  <hop> <from>LinkdIn Picture Urls OP</from><to>Update LinkdIn Picture Url</to><enabled>Y</enabled> </hop>
   <hop> <from>Positions Values</from><to>Parse values</to><enabled>Y</enabled> </hop>
-  <hop> <from>LinkdIn Values OP</from><to>Update LinkdIn Values</to><enabled>Y</enabled> </hop>
   <hop> <from>Parse values</from><to>UUID_Values</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_Values</from><to>LinkdIn Values</to><enabled>Y</enabled> </hop>
-  <hop> <from>Constant SocialMediaToken</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Update LinkdIn Picture Url</from><to>Constant SocialMediaToken</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant SocialMediaToken 2</from><to>Text file output 2</to><enabled>N</enabled> </hop>
-  <hop> <from>Constant SocialMediaToken 3</from><to>Text file output 3</to><enabled>N</enabled> </hop>
-  <hop> <from>Update LinkdIn positions</from><to>Constant SocialMediaToken 2</to><enabled>N</enabled> </hop>
-  <hop> <from>Update LinkdIn Values</from><to>Constant SocialMediaToken 3</to><enabled>N</enabled> </hop>
-  <hop> <from>Update LinkdIn Values</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LinkdIn positions</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update LinkdIn Picture Url</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>UUID</from><to>Insert &#x2f; Update LinkedIn Picture URLs</to><enabled>Y</enabled> </hop>
+  <hop> <from>LinkdIn Positions</from><to>Insert &#x2f; Update LinkedIn Positions</to><enabled>Y</enabled> </hop>
+  <hop> <from>LinkdIn Values</from><to>Insert &#x2f; Update LinkedIn Values</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update LinkedIn Picture URLs</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update LinkedIn Positions</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update LinkedIn Values</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows 2</from><to>Positions Values</to><enabled>Y</enabled> </hop>
   </order>
-  <step>
-    <name>Constant SocialMediaToken</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>AgentSettings_LinkedInProfileData_UpdateLinkedInPictureURLs</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1018</xloc>
-      <yloc>30</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant SocialMediaToken 2</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>AgentSettings_LinkedInProfileData_UpdateLinkedInPositions</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1050</xloc>
-      <yloc>195</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Constant SocialMediaToken 3</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>AgentSettings_LinkedInProfileData_UpdateLinkedInValues</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1051</xloc>
-      <yloc>309</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step>
     <name>Filter rows</name>
     <type>FilterRows</type>
@@ -360,7 +252,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to/>
+<send_true_to>Positions Values</send_true_to>
 <send_false_to/>
     <compare>
 <condition>
@@ -551,60 +443,6 @@
     </step>
 
   <step>
-    <name>LinkdIn Picture Urls OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>linked_in_picture_urls</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>LINKED_IN_PICTURE_URLS_ID</column_name>
-          <stream_name>LINKED_IN_PICTURE_URLS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>LINKED_IN_PROFILE_DATA_ID</column_name>
-          <stream_name>linkdInProfileDataId</stream_name>
-        </field>
-        <field>
-          <column_name>TOTAL</column_name>
-          <stream_name>pictureTotal</stream_name>
-        </field>
-        <field>
-          <column_name>VALUES</column_name>
-          <stream_name>urlvalue</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>707</xloc>
-      <yloc>30</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>LinkdIn Positions</name>
     <type>SelectValues</type>
     <description/>
@@ -631,56 +469,6 @@
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>652</xloc>
-      <yloc>195</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>LinkdIn Positions OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>linked_in_positions</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>LINKED_IN_POSITIONS_ID</column_name>
-          <stream_name>LINKED_IN_POSITIONS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>LINKED_IN_PROFILE_DATA_ID</column_name>
-          <stream_name>linkdInProfileDataId</stream_name>
-        </field>
-        <field>
-          <column_name>TOTAL</column_name>
-          <stream_name>positionsTotal</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>757</xloc>
       <yloc>195</yloc>
       <draw>Y</draw>
       </GUI>
@@ -729,72 +517,6 @@
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>654</xloc>
-      <yloc>309</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>LinkdIn Values OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>linked_in_profile_data_values</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>SUMMARY</column_name>
-          <stream_name>summary</stream_name>
-        </field>
-        <field>
-          <column_name>TITLE</column_name>
-          <stream_name>title</stream_name>
-        </field>
-        <field>
-          <column_name>LINKED_IN_PROFILE_DATA_ID</column_name>
-          <stream_name>linkdInProfileDataId</stream_name>
-        </field>
-        <field>
-          <column_name>IS_CURRENT</column_name>
-          <stream_name>isCurrent</stream_name>
-        </field>
-        <field>
-          <column_name>LINKED_IN_PROFILE_DATA_VALUES_ID</column_name>
-          <stream_name>id</stream_name>
-        </field>
-        <field>
-          <column_name>user_id</column_name>
-          <stream_name>agentId</stream_name>
-        </field>
-        <field>
-          <column_name>LINKED_IN_PROFILE_DATA_VALUES_PK</column_name>
-          <stream_name>LINKED_IN_PROFILE_DATA_VALUES_PK</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>759</xloc>
       <yloc>309</yloc>
       <draw>Y</draw>
       </GUI>
@@ -2344,342 +2066,6 @@
     </step>
 
   <step>
-    <name>Text file output</name>
-    <type>TextFileOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <separator>&#x3b;</separator>
-    <enclosure>&#x22;</enclosure>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>Y</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding/>
-    <endedLine/>
-    <fileNameInField>N</fileNameInField>
-    <fileNameField/>
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
-      <is_command>N</is_command>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>txt</extention>
-      <append>Y</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>Y</add_date>
-      <add_time>Y</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>NumOfError</name>
-        <type>Integer</type>
-        <format>&#x23;&#x3b;-&#x23;</format>
-        <currency/>
-        <decimal>.</decimal>
-        <group>,</group>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>3</length>
-        <precision>0</precision>
-      </field>
-      <field>
-        <name>ErrorDesc</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorFields</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorCode</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1146</xloc>
-      <yloc>30</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Text file output 2</name>
-    <type>TextFileOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <separator>&#x3b;</separator>
-    <enclosure>&#x22;</enclosure>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>Y</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding/>
-    <endedLine/>
-    <fileNameInField>N</fileNameInField>
-    <fileNameField/>
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
-      <is_command>N</is_command>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>txt</extention>
-      <append>Y</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>Y</add_date>
-      <add_time>Y</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>NumOfError</name>
-        <type>Integer</type>
-        <format>&#x23;&#x3b;-&#x23;</format>
-        <currency/>
-        <decimal>.</decimal>
-        <group>,</group>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>3</length>
-        <precision>0</precision>
-      </field>
-      <field>
-        <name>ErrorDesc</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorFields</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorCode</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1195</xloc>
-      <yloc>195</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Text file output 3</name>
-    <type>TextFileOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <separator>&#x3b;</separator>
-    <enclosure>&#x22;</enclosure>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>Y</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding/>
-    <endedLine/>
-    <fileNameInField>N</fileNameInField>
-    <fileNameField/>
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
-      <is_command>N</is_command>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>txt</extention>
-      <append>Y</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>Y</add_date>
-      <add_time>Y</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>NumOfError</name>
-        <type>Integer</type>
-        <format>&#x23;&#x3b;-&#x23;</format>
-        <currency/>
-        <decimal>.</decimal>
-        <group>,</group>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>3</length>
-        <precision>0</precision>
-      </field>
-      <field>
-        <name>ErrorDesc</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorFields</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorCode</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1211</xloc>
-      <yloc>309</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>UUID</name>
     <type>RandomValue</type>
     <description/>
@@ -2755,147 +2141,6 @@
     </step>
 
   <step>
-    <name>Update LinkdIn Picture Url</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>linked_in_picture_urls</table>
-      <key>
-        <name>linkdInProfileDataId</name>
-        <field>LINKED_IN_PROFILE_DATA_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>TOTAL</name>
-        <rename>pictureTotal</rename>
-        </value>
-      <value>
-        <name>VALUES</name>
-        <rename>urlvalue</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>859</xloc>
-      <yloc>30</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update LinkdIn Values</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>linked_in_profile_data_values</table>
-      <key>
-        <name>id</name>
-        <field>LINKED_IN_PROFILE_DATA_VALUES_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>linkdInProfileDataId</name>
-        <field>LINKED_IN_PROFILE_DATA_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <key>
-        <name>agentId</name>
-        <field>user_id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>IS_CURRENT</name>
-        <rename>isCurrent</rename>
-        </value>
-      <value>
-        <name>SUMMARY</name>
-        <rename>summary</rename>
-        </value>
-      <value>
-        <name>TITLE</name>
-        <rename>title</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>892</xloc>
-      <yloc>309</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update LinkdIn positions</name>
-    <type>Update</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>linked_in_positions</table>
-      <key>
-        <name>linkdInProfileDataId</name>
-        <field>LINKED_IN_PROFILE_DATA_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>TOTAL</name>
-        <rename>positionsTotal</rename>
-        </value>
-      </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>890</xloc>
-      <yloc>195</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Url Values</name>
     <type>JsonInput</type>
     <description/>
@@ -2958,6 +2203,184 @@
     </step>
 
   <step>
+    <name>Insert &#x2f; Update LinkedIn Picture URLs</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>linked_in_picture_urls</table>
+      <key>
+        <name>linkdInProfileDataId</name>
+        <field>LINKED_IN_PROFILE_DATA_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>LINKED_IN_PICTURE_URLS_ID</name>
+        <rename>LINKED_IN_PICTURE_URLS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LINKED_IN_PROFILE_DATA_ID</name>
+        <rename>linkdInProfileDataId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>TOTAL</name>
+        <rename>pictureTotal</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>VALUES</name>
+        <rename>urlvalue</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>796</xloc>
+      <yloc>32</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update LinkedIn Positions</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>linked_in_positions</table>
+      <key>
+        <name>linkdInProfileDataId</name>
+        <field>LINKED_IN_PROFILE_DATA_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>LINKED_IN_POSITIONS_ID</name>
+        <rename>LINKED_IN_POSITIONS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LINKED_IN_PROFILE_DATA_ID</name>
+        <rename>linkdInProfileDataId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>TOTAL</name>
+        <rename>positionsTotal</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>799</xloc>
+      <yloc>195</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update LinkedIn Values</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>linked_in_profile_data_values</table>
+      <key>
+        <name>id</name>
+        <field>LINKED_IN_PROFILE_DATA_VALUES_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>linkdInProfileDataId</name>
+        <field>LINKED_IN_PROFILE_DATA_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>agentId</name>
+        <field>user_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>IS_CURRENT</name>
+        <rename>isCurrent</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>LINKED_IN_PROFILE_DATA_ID</name>
+        <rename>linkdInProfileDataId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LINKED_IN_PROFILE_DATA_VALUES_ID</name>
+        <rename>id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LINKED_IN_PROFILE_DATA_VALUES_PK</name>
+        <rename>LINKED_IN_PROFILE_DATA_VALUES_PK</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>SUMMARY</name>
+        <rename>summary</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>TITLE</name>
+        <rename>title</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>user_id</name>
+        <rename>agentId</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>801</xloc>
+      <yloc>311</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Dummy &#x28;do nothing&#x29;</name>
     <type>Dummy</type>
     <description/>
@@ -2970,16 +2393,16 @@
            </partitioning>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>997</xloc>
-      <yloc>151</yloc>
+      <xloc>999</xloc>
+      <yloc>181</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
       <error>
-        <source_step>LinkdIn Picture Urls OP</source_step>
-        <target_step>Update LinkdIn Picture Url</target_step>
+        <source_step>Insert &#x2f; Update LinkedIn Picture URLs</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -2990,8 +2413,8 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>LinkdIn Positions OP</source_step>
-        <target_step>Update LinkdIn positions</target_step>
+        <source_step>Insert &#x2f; Update LinkedIn Positions</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
@@ -3002,49 +2425,13 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>LinkdIn Values OP</source_step>
-        <target_step>Update LinkdIn Values</target_step>
+        <source_step>Insert &#x2f; Update LinkedIn Values</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
         <fields_valuename/>
         <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update LinkdIn Picture Url</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update LinkdIn Values</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update LinkdIn positions</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
         <max_errors/>
         <max_pct_errors/>
         <min_pct_rows/>

@@ -196,16 +196,15 @@
   <hop> <from>Sort FBPages</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>FBToken IP</from><to>Sort rows FBToken</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows FBToken</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>FBPages OP</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Input RegionId</from><to>Json Input FacebookPages</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Input FacebookPages</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>Sort FBPages</to><enabled>Y</enabled> </hop>
-  <hop> <from>FBPages OP</from><to>Update FaceBookPages</to><enabled>Y</enabled> </hop>
-  <hop> <from>Update FaceBookPages</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Insert &#x2f; Update RegionSettings FB Pages</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update RegionSettings FB Pages</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>FBPages OP</name>
-    <type>TableOutput</type>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -214,53 +213,10 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>facebook_pages</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>FACEBOOK_TOKEN_ID</column_name>
-          <stream_name>FACEBOOK_TOKEN_ID</stream_name>
-        </field>
-        <field>
-          <column_name>NAME</column_name>
-          <stream_name>name</stream_name>
-        </field>
-        <field>
-          <column_name>CATEGORY</column_name>
-          <stream_name>category</stream_name>
-        </field>
-        <field>
-          <column_name>FACEBOOK_PAGES_ID</column_name>
-          <stream_name>_id</stream_name>
-        </field>
-        <field>
-          <column_name>ACCESS_TOKEN</column_name>
-          <stream_name>accessToken</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_URL</column_name>
-          <stream_name>profileUrl</stream_name>
-        </field>
-    </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>468</xloc>
-      <yloc>349</yloc>
+      <xloc>642</xloc>
+      <yloc>332</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -314,7 +270,7 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>625</xloc>
+      <xloc>642</xloc>
       <yloc>108</yloc>
       <draw>Y</draw>
       </GUI>
@@ -1462,7 +1418,7 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>625</xloc>
+      <xloc>642</xloc>
       <yloc>225</yloc>
       <draw>Y</draw>
       </GUI>
@@ -1503,8 +1459,8 @@
     </step>
 
   <step>
-    <name>Update FaceBookPages</name>
-    <type>Update</type>
+    <name>Insert &#x2f; Update RegionSettings FB Pages</name>
+    <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1514,11 +1470,8 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
     <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
+    <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
       <table>facebook_pages</table>
@@ -1527,72 +1480,55 @@
         <field>FACEBOOK_PAGES_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
-        </key>
+      </key>
       <value>
-        <name>CATEGORY</name>
-        <rename>category</rename>
-        </value>
-      <value>
-        <name>ACCESS_TOKEN</name>
-        <rename>accessToken</rename>
-        </value>
-      <value>
-        <name>PROFILE_URL</name>
-        <rename>profileUrl</rename>
-        </value>
+        <name>FACEBOOK_TOKEN_ID</name>
+        <rename>FACEBOOK_TOKEN_ID</rename>
+        <update>N</update>
+      </value>
       <value>
         <name>NAME</name>
         <rename>name</rename>
-        </value>
-      </lookup>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>CATEGORY</name>
+        <rename>category</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>FACEBOOK_PAGES_ID</name>
+        <rename>_id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ACCESS_TOKEN</name>
+        <rename>accessToken</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>PROFILE_URL</name>
+        <rename>profileUrl</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>593</xloc>
-      <yloc>349</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>757</xloc>
-      <yloc>349</yloc>
+      <xloc>468</xloc>
+      <yloc>332</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
       <error>
-        <source_step>FBPages OP</source_step>
-        <target_step>Update FaceBookPages</target_step>
+        <source_step>Insert &#x2f; Update RegionSettings FB Pages</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
         <fields_valuename/>
         <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update FaceBookPages</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
         <max_errors/>
         <max_pct_errors/>
         <min_pct_rows/>

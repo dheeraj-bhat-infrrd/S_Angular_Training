@@ -193,7 +193,6 @@
   </connection>
   <order>
   <hop> <from>AgentSettings</from><to>Sort Mongo</to><enabled>Y</enabled> </hop>
-  <hop> <from>DateConverter </from><to>AgentSettings Table OP</to><enabled>Y</enabled> </hop>
   <hop> <from>SocialMediaToken</from><to>Sort DB</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort DB</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Mongo</from><to>Merge Join</to><enabled>Y</enabled> </hop>
@@ -202,11 +201,9 @@
   <hop> <from>Json Associations 1</from><to>Json Associations 2</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB I - AgentSettings 2</from><to>Json Associations 1</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows</from><to>Group Associations</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Achievments 2</from><to>Filter rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Achievments 1</from><to>Json Achievments 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2</from><to>Group Achievments</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 2</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Associations</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB I - AgentSettings 2</from><to>Json Achievments 1</to><enabled>Y</enabled> </hop>
@@ -214,60 +211,27 @@
   <hop> <from>Json Hobbies 2</from><to>Filter rows 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Hobbies 1</from><to>Json Hobbies 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2 2</from><to>Group Hobies</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 2 2</from><to>Sort rows 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB I - AgentSettings 2</from><to>Json Hobbies 1</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Hobies</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Experties 2</from><to>Filter rows 2 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Experties 1</from><to>Json Experties 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2 2 2</from><to>Group Experties</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 2 2 2</from><to>Sort rows 2 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Experties</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Multiway Merge Join</from><to>DateConverter </to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB I - AgentSettings 2</from><to>Json Experties 1</to><enabled>Y</enabled> </hop>
-  <hop> <from>AgentSettings Table OP</from><to>Update AgentSettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 2 2 2 2</from><to>Sort rows 2 2 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Licenses 1</from><to>Json Licenses 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Json Licenses 2</from><to>Filter rows 2 2 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2 2 2 2</from><to>Group Licenses</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB I - AgentSettings 2</from><to>Json Licenses 1</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Licenses</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Update AgentSettings</from><to>Add constants</to><enabled>N</enabled> </hop>
-  <hop> <from>Update AgentSettings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows 2</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows 2 2</from><to>Sort rows 2 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows 2 2 2</from><to>Sort rows 2 2 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows 2 2 2 2</from><to>Sort rows 2 2 2 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>DateConverter </from><to>Insert &#x2f; Update AgentSettings</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update AgentSettings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
-  <step>
-    <name>Add constants</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>AgentSettingsMain1_UpdateRegionSettings</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>816</xloc>
-      <yloc>489</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step>
     <name>AgentSettings</name>
     <type>SelectValues</type>
@@ -417,204 +381,6 @@
     </step>
 
   <step>
-    <name>AgentSettings Table OP</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>agent_settings</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>PROFILE_COMPLETION</column_name>
-          <stream_name>profile_completion</stream_name>
-        </field>
-        <field>
-          <column_name>STATUS</column_name>
-          <stream_name>status</stream_name>
-        </field>
-        <field>
-          <column_name>VERTICAL</column_name>
-          <stream_name>vertical</stream_name>
-        </field>
-        <field>
-          <column_name>AGENT_SETTINGS_ID</column_name>
-          <stream_name>AGENT_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>SOCIAL_MEDIA_TOKENS_ID</column_name>
-          <stream_name>SOCIAL_MEDIA_TOKENS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</column_name>
-          <stream_name>allowOverrideForSocialMedia</stream_name>
-        </field>
-        <field>
-          <column_name>ALLOW_ZILLOW_AUTO_POST</column_name>
-          <stream_name>allowZillowAutoPost</stream_name>
-        </field>
-        <field>
-          <column_name>CREATED_BY</column_name>
-          <stream_name>createdBy</stream_name>
-        </field>
-        <field>
-          <column_name>CREATED_ON_MONGO</column_name>
-          <stream_name>createdOn</stream_name>
-        </field>
-        <field>
-          <column_name>USER_ID</column_name>
-          <stream_name>AgentId</stream_name>
-        </field>
-        <field>
-          <column_name>HIDDEN_SECTION</column_name>
-          <stream_name>hiddenSection</stream_name>
-        </field>
-        <field>
-          <column_name>IS_ACCOUNT_DISABLED</column_name>
-          <stream_name>isAccountDisabled</stream_name>
-        </field>
-        <field>
-          <column_name>IS_DEFAULT_BY_SYSTEM</column_name>
-          <stream_name>isDefaultBySystem</stream_name>
-        </field>
-        <field>
-          <column_name>IS_LOCATION_ENABLED</column_name>
-          <stream_name>isLocationEnabled</stream_name>
-        </field>
-        <field>
-          <column_name>IS_LOGO_IMAGE_PROCESSED</column_name>
-          <stream_name>isLogoImageProcessed</stream_name>
-        </field>
-        <field>
-          <column_name>IS_PROFILE_IMAGE_PROCESSED</column_name>
-          <stream_name>isProfileImageProcessed</stream_name>
-        </field>
-        <field>
-          <column_name>IS_SEO_CONTENT_MODIFIED</column_name>
-          <stream_name>isSeoContentModified</stream_name>
-        </field>
-        <field>
-          <column_name>MODIFIED_BY</column_name>
-          <stream_name>modifiedBy</stream_name>
-        </field>
-        <field>
-          <column_name>MODIFIED_ON_MONGO</column_name>
-          <stream_name>modifiedOn</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_IMAGE_URL</column_name>
-          <stream_name>profileImageUrl</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_IMAGE_URL_THUMBNAIL</column_name>
-          <stream_name>profileImageUrlThumbnail</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_NAME</column_name>
-          <stream_name>profileName</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_URL</column_name>
-          <stream_name>profileUrl</stream_name>
-        </field>
-        <field>
-          <column_name>REVIEW_COUNT</column_name>
-          <stream_name>reviewCount</stream_name>
-        </field>
-        <field>
-          <column_name>SEND_EMAIL_FROM_COMPANY</column_name>
-          <stream_name>sendEmailFromCompany</stream_name>
-        </field>
-        <field>
-          <column_name>USER_ENCRYPTED_ID</column_name>
-          <stream_name>userEncryptedId</stream_name>
-        </field>
-        <field>
-          <column_name>VENDASTA_ACCESSIBLE</column_name>
-          <stream_name>vendastaAccessible</stream_name>
-        </field>
-        <field>
-          <column_name>CREATED_ON</column_name>
-          <stream_name>createdOnStr</stream_name>
-        </field>
-        <field>
-          <column_name>MODIFIED_ON</column_name>
-          <stream_name>modifiedOnStr</stream_name>
-        </field>
-        <field>
-          <column_name>DISCLAIMER</column_name>
-          <stream_name>disclaimer</stream_name>
-        </field>
-        <field>
-          <column_name>ASSOCIATIONS</column_name>
-          <stream_name>associations</stream_name>
-        </field>
-        <field>
-          <column_name>EXPERTISE</column_name>
-          <stream_name>experties</stream_name>
-        </field>
-        <field>
-          <column_name>HOBBIES</column_name>
-          <stream_name>hobies</stream_name>
-        </field>
-        <field>
-          <column_name>ACHIEVMENTS</column_name>
-          <stream_name>achievements</stream_name>
-        </field>
-        <field>
-          <column_name>LOGO</column_name>
-          <stream_name>logo</stream_name>
-        </field>
-        <field>
-          <column_name>LOGO_THUMBNAIL</column_name>
-          <stream_name>logoThumbnail</stream_name>
-        </field>
-        <field>
-          <column_name>ZILLOW_REVIEW_AVERAGE</column_name>
-          <stream_name>zillowReviewAverage</stream_name>
-        </field>
-        <field>
-          <column_name>ZILLOW_REVIEW_COUNT</column_name>
-          <stream_name>zillowReviewCount</stream_name>
-        </field>
-        <field>
-          <column_name>HIDDEN_AGENT_NAME</column_name>
-          <stream_name>hiddenAgentName</stream_name>
-        </field>
-        <field>
-          <column_name>LICENSES</column_name>
-          <stream_name>licenses</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>816</xloc>
-      <yloc>256</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>DateConverter </name>
     <type>ScriptValueMod</type>
     <description/>
@@ -644,8 +410,27 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>816</xloc>
-      <yloc>156</yloc>
+      <xloc>811</xloc>
+      <yloc>221</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>811</xloc>
+      <yloc>464</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -661,7 +446,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to/>
+<send_true_to>Sort rows</send_true_to>
 <send_false_to/>
     <compare>
 <condition>
@@ -690,7 +475,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to/>
+<send_true_to>Sort rows 2</send_true_to>
 <send_false_to/>
     <compare>
 <condition>
@@ -719,7 +504,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to/>
+<send_true_to>Sort rows 2 2</send_true_to>
 <send_false_to/>
     <compare>
 <condition>
@@ -748,7 +533,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to/>
+<send_true_to>Sort rows 2 2 2</send_true_to>
 <send_false_to/>
     <compare>
 <condition>
@@ -777,7 +562,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to/>
+<send_true_to>Sort rows 2 2 2 2</send_true_to>
 <send_false_to/>
     <compare>
 <condition>
@@ -4507,120 +4292,8 @@
     </step>
 
   <step>
-    <name>Text file output</name>
-    <type>TextFileOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <separator>&#x3b;</separator>
-    <enclosure>&#x22;</enclosure>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>Y</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding/>
-    <endedLine/>
-    <fileNameInField>N</fileNameInField>
-    <fileNameField/>
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
-      <is_command>N</is_command>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>txt</extention>
-      <append>N</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>Y</add_date>
-      <add_time>Y</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>NumOfError</name>
-        <type>Integer</type>
-        <format>&#x23;&#x3b;-&#x23;</format>
-        <currency/>
-        <decimal>.</decimal>
-        <group>,</group>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>3</length>
-        <precision>0</precision>
-      </field>
-      <field>
-        <name>ErrorDesc</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorFields</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorCode</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>816</xloc>
-      <yloc>617</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Update AgentSettings</name>
-    <type>Update</type>
+    <name>Insert &#x2f; Update AgentSettings</name>
+    <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -4630,11 +4303,8 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
     <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
+    <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
       <table>agent_settings</table>
@@ -4643,212 +4313,225 @@
         <field>USER_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
-        </key>
-      <value>
-        <name>ACHIEVMENTS</name>
-        <rename>achievements</rename>
-        </value>
-      <value>
-        <name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</name>
-        <rename>allowOverrideForSocialMedia</rename>
-        </value>
-      <value>
-        <name>ALLOW_ZILLOW_AUTO_POST</name>
-        <rename>allowZillowAutoPost</rename>
-        </value>
-      <value>
-        <name>ASSOCIATIONS</name>
-        <rename>associations</rename>
-        </value>
-      <value>
-        <name>CREATED_BY</name>
-        <rename>createdBy</rename>
-        </value>
-      <value>
-        <name>CREATED_ON</name>
-        <rename>createdOnStr</rename>
-        </value>
-      <value>
-        <name>CREATED_ON_MONGO</name>
-        <rename>createdOn</rename>
-        </value>
-      <value>
-        <name>DISCLAIMER</name>
-        <rename>disclaimer</rename>
-        </value>
-      <value>
-        <name>EXPERTISE</name>
-        <rename>experties</rename>
-        </value>
-      <value>
-        <name>HIDDEN_AGENT_NAME</name>
-        <rename>hiddenAgentName</rename>
-        </value>
-      <value>
-        <name>HIDDEN_SECTION</name>
-        <rename>hiddenSection</rename>
-        </value>
-      <value>
-        <name>HOBBIES</name>
-        <rename>hobies</rename>
-        </value>
-      <value>
-        <name>IS_ACCOUNT_DISABLED</name>
-        <rename>isAccountDisabled</rename>
-        </value>
-      <value>
-        <name>IS_DEFAULT_BY_SYSTEM</name>
-        <rename>isDefaultBySystem</rename>
-        </value>
-      <value>
-        <name>IS_LOCATION_ENABLED</name>
-        <rename>isLocationEnabled</rename>
-        </value>
-      <value>
-        <name>IS_LOGO_IMAGE_PROCESSED</name>
-        <rename>isLogoImageProcessed</rename>
-        </value>
-      <value>
-        <name>IS_PROFILE_IMAGE_PROCESSED</name>
-        <rename>isProfileImageProcessed</rename>
-        </value>
-      <value>
-        <name>IS_SEO_CONTENT_MODIFIED</name>
-        <rename>isSeoContentModified</rename>
-        </value>
-      <value>
-        <name>LOGO</name>
-        <rename>logo</rename>
-        </value>
-      <value>
-        <name>LOGO_THUMBNAIL</name>
-        <rename>logoThumbnail</rename>
-        </value>
-      <value>
-        <name>MODIFIED_BY</name>
-        <rename>modifiedBy</rename>
-        </value>
-      <value>
-        <name>MODIFIED_ON</name>
-        <rename>modifiedOnStr</rename>
-        </value>
-      <value>
-        <name>MODIFIED_ON_MONGO</name>
-        <rename>modifiedOn</rename>
-        </value>
+      </key>
       <value>
         <name>PROFILE_COMPLETION</name>
         <rename>profile_completion</rename>
-        </value>
-      <value>
-        <name>PROFILE_IMAGE_URL</name>
-        <rename>profileImageUrl</rename>
-        </value>
-      <value>
-        <name>PROFILE_IMAGE_URL_THUMBNAIL</name>
-        <rename>profileImageUrlThumbnail</rename>
-        </value>
-      <value>
-        <name>PROFILE_NAME</name>
-        <rename>profileName</rename>
-        </value>
-      <value>
-        <name>PROFILE_URL</name>
-        <rename>profileUrl</rename>
-        </value>
-      <value>
-        <name>REVIEW_COUNT</name>
-        <rename>reviewCount</rename>
-        </value>
-      <value>
-        <name>SEND_EMAIL_FROM_COMPANY</name>
-        <rename>sendEmailFromCompany</rename>
-        </value>
-      <value>
-        <name>SOCIAL_MEDIA_TOKENS_ID</name>
-        <rename>SOCIAL_MEDIA_TOKENS_ID</rename>
-        </value>
+        <update>N</update>
+      </value>
       <value>
         <name>STATUS</name>
         <rename>status</rename>
-        </value>
-      <value>
-        <name>USER_ENCRYPTED_ID</name>
-        <rename>userEncryptedId</rename>
-        </value>
-      <value>
-        <name>VENDASTA_ACCESSIBLE</name>
-        <rename>vendastaAccessible</rename>
-        </value>
+        <update>N</update>
+      </value>
       <value>
         <name>VERTICAL</name>
         <rename>vertical</rename>
-        </value>
+        <update>N</update>
+      </value>
+      <value>
+        <name>AGENT_SETTINGS_ID</name>
+        <rename>AGENT_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>SOCIAL_MEDIA_TOKENS_ID</name>
+        <rename>SOCIAL_MEDIA_TOKENS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</name>
+        <rename>allowOverrideForSocialMedia</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ALLOW_ZILLOW_AUTO_POST</name>
+        <rename>allowZillowAutoPost</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>CREATED_BY</name>
+        <rename>createdBy</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>CREATED_ON_MONGO</name>
+        <rename>createdOn</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>USER_ID</name>
+        <rename>AgentId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>HIDDEN_SECTION</name>
+        <rename>hiddenSection</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_ACCOUNT_DISABLED</name>
+        <rename>isAccountDisabled</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_DEFAULT_BY_SYSTEM</name>
+        <rename>isDefaultBySystem</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_LOCATION_ENABLED</name>
+        <rename>isLocationEnabled</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_LOGO_IMAGE_PROCESSED</name>
+        <rename>isLogoImageProcessed</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_PROFILE_IMAGE_PROCESSED</name>
+        <rename>isProfileImageProcessed</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_SEO_CONTENT_MODIFIED</name>
+        <rename>isSeoContentModified</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>MODIFIED_BY</name>
+        <rename>modifiedBy</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>MODIFIED_ON_MONGO</name>
+        <rename>modifiedOn</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>PROFILE_IMAGE_URL</name>
+        <rename>profileImageUrl</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>PROFILE_IMAGE_URL_THUMBNAIL</name>
+        <rename>profileImageUrlThumbnail</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>PROFILE_NAME</name>
+        <rename>profileName</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>PROFILE_URL</name>
+        <rename>profileUrl</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>REVIEW_COUNT</name>
+        <rename>reviewCount</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>SEND_EMAIL_FROM_COMPANY</name>
+        <rename>sendEmailFromCompany</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>USER_ENCRYPTED_ID</name>
+        <rename>userEncryptedId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>VENDASTA_ACCESSIBLE</name>
+        <rename>vendastaAccessible</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>CREATED_ON</name>
+        <rename>createdOnStr</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>MODIFIED_ON</name>
+        <rename>modifiedOnStr</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>DISCLAIMER</name>
+        <rename>disclaimer</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ASSOCIATIONS</name>
+        <rename>associations</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>EXPERTISE</name>
+        <rename>experties</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>HOBBIES</name>
+        <rename>hobies</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ACHIEVMENTS</name>
+        <rename>achievements</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LOGO</name>
+        <rename>logo</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LOGO_THUMBNAIL</name>
+        <rename>logoThumbnail</rename>
+        <update>N</update>
+      </value>
       <value>
         <name>ZILLOW_REVIEW_AVERAGE</name>
         <rename>zillowReviewAverage</rename>
-        </value>
+        <update>N</update>
+      </value>
       <value>
         <name>ZILLOW_REVIEW_COUNT</name>
         <rename>zillowReviewCount</rename>
-        </value>
+        <update>N</update>
+      </value>
+      <value>
+        <name>HIDDEN_AGENT_NAME</name>
+        <rename>hiddenAgentName</rename>
+        <update>N</update>
+      </value>
       <value>
         <name>LICENSES</name>
         <rename>licenses</rename>
-        </value>
-      <value>
-        <name>LICENSES</name>
-        <rename>licenses</rename>
-        </value>
-      </lookup>
+        <update>N</update>
+      </value>
+    </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>816</xloc>
-      <yloc>389</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>943</xloc>
-      <yloc>497</yloc>
+      <xloc>811</xloc>
+      <yloc>325</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
       <error>
-        <source_step>AgentSettings Table OP</source_step>
-        <target_step>Update AgentSettings</target_step>
+        <source_step>Insert &#x2f; Update AgentSettings</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
         <fields_valuename/>
         <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update AgentSettings</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
         <max_errors/>
         <max_pct_errors/>
         <min_pct_rows/>

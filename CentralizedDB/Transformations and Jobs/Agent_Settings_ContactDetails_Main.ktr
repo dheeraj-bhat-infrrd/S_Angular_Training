@@ -193,50 +193,14 @@
   </connection>
   <order>
   <hop> <from>AgentSettings Input</from><to>Sort AgentSettings Table</to><enabled>Y</enabled> </hop>
-  <hop> <from>ContactDetails</from><to>ContactDetails OP</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join AgentSettings</from><to>UUID_ContactDetails</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB I - Agent Settings_2</from><to>Sort AgentSettings Mongo</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort AgentSettings Mongo</from><to>Merge Join AgentSettings</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort AgentSettings Table</from><to>Merge Join AgentSettings</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_ContactDetails</from><to>ContactDetails</to><enabled>Y</enabled> </hop>
-  <hop> <from>ContactDetails OP</from><to>Update ContactDetails</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants</from><to>Text file output</to><enabled>N</enabled> </hop>
-  <hop> <from>Update ContactDetails</from><to>Add constants</to><enabled>N</enabled> </hop>
-  <hop> <from>Update ContactDetails</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>ContactDetails</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
-  <step>
-    <name>Add constants</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>AgentSettingsMain_UpdateContactDetails</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>183</xloc>
-      <yloc>154</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step>
     <name>AgentSettings Input</name>
     <type>TableInput</type>
@@ -346,14 +310,14 @@
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>421</xloc>
-      <yloc>260</yloc>
+      <yloc>265</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>ContactDetails OP</name>
-    <type>TableOutput</type>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -362,97 +326,10 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>contact_details</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>AGENT_SETTINGS_ID</column_name>
-          <stream_name>AGENT_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>CONTACT_DETAILS_ID</column_name>
-          <stream_name>CONTACT_DETAILS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>ABOUT_ME</column_name>
-          <stream_name>about_me</stream_name>
-        </field>
-        <field>
-          <column_name>ADDRESS</column_name>
-          <stream_name>address</stream_name>
-        </field>
-        <field>
-          <column_name>ADDRESS1</column_name>
-          <stream_name>address1</stream_name>
-        </field>
-        <field>
-          <column_name>ADDRESS2</column_name>
-          <stream_name>address2</stream_name>
-        </field>
-        <field>
-          <column_name>CITY</column_name>
-          <stream_name>city</stream_name>
-        </field>
-        <field>
-          <column_name>COUNTRY</column_name>
-          <stream_name>country</stream_name>
-        </field>
-        <field>
-          <column_name>INDUSTRY</column_name>
-          <stream_name>industry</stream_name>
-        </field>
-        <field>
-          <column_name>LOCATION</column_name>
-          <stream_name>location</stream_name>
-        </field>
-        <field>
-          <column_name>NAME</column_name>
-          <stream_name>name</stream_name>
-        </field>
-        <field>
-          <column_name>STATE</column_name>
-          <stream_name>state</stream_name>
-        </field>
-        <field>
-          <column_name>TITLE</column_name>
-          <stream_name>title</stream_name>
-        </field>
-        <field>
-          <column_name>ZIPCODE</column_name>
-          <stream_name>zipcode</stream_name>
-        </field>
-        <field>
-          <column_name>COUNTRY_CODE</column_name>
-          <stream_name>countryCode</stream_name>
-        </field>
-        <field>
-          <column_name>FIRST_NAME</column_name>
-          <stream_name>firstName</stream_name>
-        </field>
-        <field>
-          <column_name>LAST_NAME</column_name>
-          <stream_name>lastName</stream_name>
-        </field>
-    </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>323</xloc>
-      <yloc>260</yloc>
+      <xloc>145</xloc>
+      <yloc>265</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1688,118 +1565,6 @@
     </step>
 
   <step>
-    <name>Text file output</name>
-    <type>TextFileOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <separator>&#x3b;</separator>
-    <enclosure>&#x22;</enclosure>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>Y</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding/>
-    <endedLine/>
-    <fileNameInField>N</fileNameInField>
-    <fileNameField/>
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name>&#x24;&#x7b;ERROR_FILE_LOCATION&#x7d;&#x5c;Error_Log</name>
-      <is_command>N</is_command>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>txt</extention>
-      <append>Y</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>Y</add_date>
-      <add_time>Y</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>NumOfError</name>
-        <type>Integer</type>
-        <format>&#x23;&#x3b;-&#x23;</format>
-        <currency/>
-        <decimal>.</decimal>
-        <group>,</group>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>3</length>
-        <precision>0</precision>
-      </field>
-      <field>
-        <name>ErrorDesc</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorFields</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>ErrorCode</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>stepName</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>74</xloc>
-      <yloc>154</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>UUID_ContactDetails</name>
     <type>RandomValue</type>
     <description/>
@@ -1825,8 +1590,8 @@
     </step>
 
   <step>
-    <name>Update ContactDetails</name>
-    <type>Update</type>
+    <name>Insert &#x2f; Update</name>
+    <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1836,11 +1601,8 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
       <table>contact_details</table>
@@ -1849,112 +1611,110 @@
         <field>AGENT_SETTINGS_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
-        </key>
+      </key>
       <value>
         <name>ABOUT_ME</name>
         <rename>about_me</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>ADDRESS</name>
         <rename>address</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>ADDRESS1</name>
         <rename>address1</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>ADDRESS2</name>
         <rename>address2</rename>
-        </value>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>AGENT_SETTINGS_ID</name>
+        <rename>AGENT_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
       <value>
         <name>CITY</name>
         <rename>city</rename>
-        </value>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>CONTACT_DETAILS_ID</name>
+        <rename>CONTACT_DETAILS_ID</rename>
+        <update>N</update>
+      </value>
       <value>
         <name>COUNTRY</name>
         <rename>country</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>COUNTRY_CODE</name>
         <rename>countryCode</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>FIRST_NAME</name>
         <rename>firstName</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>INDUSTRY</name>
         <rename>industry</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>LAST_NAME</name>
         <rename>lastName</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>LOCATION</name>
         <rename>location</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>NAME</name>
         <rename>name</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>STATE</name>
         <rename>state</rename>
-        </value>
+        <update>Y</update>
+      </value>
       <value>
         <name>TITLE</name>
         <rename>title</rename>
-        </value>
-      </lookup>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>ZIPCODE</name>
+        <rename>zipcode</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>183</xloc>
-      <yloc>260</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>55</xloc>
-      <yloc>255</yloc>
+      <xloc>296</xloc>
+      <yloc>265</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
       <error>
-        <source_step>ContactDetails OP</source_step>
-        <target_step>Update ContactDetails</target_step>
+        <source_step>Insert &#x2f; Update</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
         <fields_valuename/>
         <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Update ContactDetails</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
         <max_errors/>
         <max_pct_errors/>
         <min_pct_rows/>
