@@ -30,7 +30,7 @@ public class OverviewUserDaoImpl extends GenericReportingDaoImpl<OverviewUser, S
         
     }
     @Override
-    public OverviewUser findOverviewUser( Class<OverviewUser> entityClass, String overviewUserId )
+    public OverviewUser findOverviewUser( Class<OverviewUser> entityClass, String overviewUserId )throws IllegalArgumentException
     {
         return super.findById( entityClass, overviewUserId );
     }

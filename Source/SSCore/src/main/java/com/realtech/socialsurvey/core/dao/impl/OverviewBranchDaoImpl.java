@@ -28,7 +28,7 @@ public class OverviewBranchDaoImpl extends GenericReportingDaoImpl<OverviewBranc
     }
 
     @Override
-    public OverviewBranch findOverviewBranch( Class<OverviewBranch> entityClass, String overviewBranchid )
+    public OverviewBranch findOverviewBranch( Class<OverviewBranch> entityClass, String overviewBranchid )throws IllegalArgumentException
     {
         return super.findById( entityClass, overviewBranchid );
     }

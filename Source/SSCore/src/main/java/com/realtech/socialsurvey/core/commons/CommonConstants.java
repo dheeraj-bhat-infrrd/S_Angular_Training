@@ -1296,4 +1296,13 @@ public interface CommonConstants
     public static final String SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION = "Authorization";
     public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
     public static final String SURVEY_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    
+    //Reporting Status
+    public static final long REPORT_STATUS_PENDING = 0;
+    public static final long REPORT_STATUS_FAILED = 1;
+    public static final long REPORT_STATUS_COMPLETED = 2;
+    public static final String SURVEY_STATS_REPORT_NAME = "SurveyStatsReport";
+    public static final long SURVEY_STATS_REPORT_ID = 1;
+    public static final String REPORTING_API_DATE_FORMAT = "YYYY-MM-DD";
+    public static final String REPORTING_API_DATE_TIME_FORMAT = "YYYY-MM-DD HH:MM:SS";
 }

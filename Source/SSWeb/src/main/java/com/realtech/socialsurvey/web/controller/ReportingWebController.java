@@ -1,11 +1,17 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -45,6 +51,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
+import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
@@ -84,6 +91,8 @@ public class ReportingWebController
     @Autowired
     private DashboardGraphManagement DashboardGraphManagement;
     
+    @Autowired
+    private ReportingDashboardManagement ReportingDashboardManagement;
     
 
     @RequestMapping ( value = "/showreportingpage", method = RequestMethod.GET)
@@ -142,69 +151,6 @@ public class ReportingWebController
 
         model.addAttribute( "profileName", profileName );
         model.addAttribute( "userId", user.getUserId() );
-        
-        if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
-            OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType);      
-            model.addAttribute( "SPS_score",overviewUser.getSpsScore() );
-            model.addAttribute("detractor",overviewUser.getDetractorPercentage());
-            model.addAttribute( "passives", overviewUser.getPassivesPercentage() );
-            model.addAttribute( "promoters", overviewUser.getPromoterPercentage() );
-            model.addAttribute( "total_incomplete_transactions", overviewUser.getTotalIncompleteTransactions() );
-            model.addAttribute( "corrupted", overviewUser.getCorruptedPercentage() );
-            model.addAttribute( "duplicate", overviewUser.getDuplicatePercentage() );
-            model.addAttribute( "archieved", overviewUser.getArchievedPercentage());
-            model.addAttribute( "mismatched", overviewUser.getMismatchedPercentage());
-            model.addAttribute( "Survey_sent", overviewUser.getTotalSurveySent() );
-            model.addAttribute( "Survey_completed", overviewUser.getTotalSurveyCompleted() );
-            model.addAttribute( "Social_posts", overviewUser.getTotalSocialPost() );
-            model.addAttribute( "Zillow_reviews", overviewUser.getTotalZillowReviews() );
-        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
-            OverviewBranch overviewBranch = overviewManagement.fetchOverviewBranchDetails( entityId, entityType );
-            model.addAttribute( "SPS_score",overviewBranch.getSpsScore() );
-            model.addAttribute("detractor",overviewBranch.getDetractorPercentage());
-            model.addAttribute( "passives", overviewBranch.getPassivesPercentage() );
-            model.addAttribute( "promoters", overviewBranch.getPromoterPercentage() );
-            model.addAttribute( "total_incomplete_transactions", overviewBranch.getTotalIncompleteTransactions() );
-            model.addAttribute( "corrupted", overviewBranch.getCorruptedPercentage() );
-            model.addAttribute( "duplicate", overviewBranch.getDuplicatePercentage() );
-            model.addAttribute( "archieved", overviewBranch.getArchievedPercentage());
-            model.addAttribute( "mismatched", overviewBranch.getMismatchedPercentage());
-            model.addAttribute( "Survey_sent", overviewBranch.getTotalSurveySent() );
-            model.addAttribute( "Survey_completed", overviewBranch.getTotalSurveyCompleted() );
-            model.addAttribute( "Social_posts", overviewBranch.getTotalSocialPost() );
-            model.addAttribute( "Zillow_reviews", overviewBranch.getTotalZillowReviews() );
-        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
-            OverviewRegion overviewRegion = overviewManagement.fetchOverviewRegionDetails( entityId, entityType );
-            model.addAttribute( "SPS_score",overviewRegion.getSpsScore() );
-            model.addAttribute("detractor",overviewRegion.getDetractorPercentage());
-            model.addAttribute( "passives", overviewRegion.getPassivesPercentage() );
-            model.addAttribute( "promoters", overviewRegion.getPromoterPercentage() );
-            model.addAttribute( "total_incomplete_transactions", overviewRegion.getTotalIncompleteTransactions() );
-            model.addAttribute( "corrupted", overviewRegion.getCorruptedPercentage() );
-            model.addAttribute( "duplicate", overviewRegion.getDuplicatePercentage() );
-            model.addAttribute( "archieved", overviewRegion.getArchievedPercentage());
-            model.addAttribute( "mismatched", overviewRegion.getMismatchedPercentage());
-            model.addAttribute( "Survey_sent", overviewRegion.getTotalSurveySent() );
-            model.addAttribute( "Survey_completed", overviewRegion.getTotalSurveyCompleted() );
-            model.addAttribute( "Social_posts", overviewRegion.getTotalSocialPost() );
-            model.addAttribute( "Zillow_reviews", overviewRegion.getTotalZillowReviews() );
-        }else if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
-            OverviewCompany overviewCompany = overviewManagement.fetchOverviewCompanyDetails( entityId, entityType );
-            model.addAttribute( "SPS_score",overviewCompany.getSpsScore() );
-            model.addAttribute("detractor",overviewCompany.getDetractorPercentage());
-            model.addAttribute( "passives", overviewCompany.getPassivesPercentage() );
-            model.addAttribute( "promoters", overviewCompany.getPromoterPercentage() );
-            model.addAttribute( "total_incomplete_transactions", overviewCompany.getTotalIncompleteTransactions() );
-            model.addAttribute( "corrupted", overviewCompany.getCorruptedPercentage() );
-            model.addAttribute( "duplicate", overviewCompany.getDuplicatePercentage() );
-            model.addAttribute( "archieved", overviewCompany.getArchievedPercentage());
-            model.addAttribute( "mismatched", overviewCompany.getMismatchedPercentage());
-            model.addAttribute( "Survey_sent", overviewCompany.getTotalSurveySent() );
-            model.addAttribute( "Survey_completed", overviewCompany.getTotalSurveyCompleted() );
-            model.addAttribute( "Social_posts", overviewCompany.getTotalSocialPost() );
-            model.addAttribute( "Zillow_reviews", overviewCompany.getTotalZillowReviews() );    
-        }
-      
         boolean allowOverrideForSocialMedia = false;
         long branchId = 0;
         long regionId = 0;
@@ -515,6 +461,7 @@ public class ReportingWebController
         return JspResolver.REPORTING_DASHBOARD; 
     }
     
+    @ResponseBody
     @RequestMapping ( value = "/showreportingoverview", method = RequestMethod.GET)
     public String reportingOverviewStats(Model model, HttpServletRequest request) throws NonFatalException
     {
@@ -522,73 +469,79 @@ public class ReportingWebController
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
 
+        String json = null;
         if ( user == null ) {
             throw new NonFatalException( "NonFatalException while logging in. " );
         }    
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        List<Object> overview = new ArrayList<>();
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
-            OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType);      
-            model.addAttribute( "SPS_score",overviewUser.getSpsScore() );
-            model.addAttribute("detractor",overviewUser.getDetractorPercentage());
-            model.addAttribute( "passives", overviewUser.getPassivesPercentage() );
-            model.addAttribute( "promoters", overviewUser.getPromoterPercentage() );
-            model.addAttribute( "total_incomplete_transactions", overviewUser.getTotalIncompleteTransactions() );
-            model.addAttribute( "corrupted", overviewUser.getCorruptedPercentage() );
-            model.addAttribute( "duplicate", overviewUser.getDuplicatePercentage() );
-            model.addAttribute( "archieved", overviewUser.getArchievedPercentage());
-            model.addAttribute( "mismatched", overviewUser.getMismatchedPercentage());
-            model.addAttribute( "Survey_sent", overviewUser.getTotalSurveySent() );
-            model.addAttribute( "Survey_completed", overviewUser.getTotalSurveyCompleted() );
-            model.addAttribute( "Social_posts", overviewUser.getTotalSocialPost() );
-            model.addAttribute( "Zillow_reviews", overviewUser.getTotalZillowReviews() );
+            OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType); 
+            overview.add( overviewUser.getSpsScore() );
+            overview.add( overviewUser.getDetractorPercentage());
+            overview.add( overviewUser.getPassivesPercentage() );
+            overview.add( overviewUser.getPromoterPercentage() );
+            overview.add( overviewUser.getTotalIncompleteTransactions() );
+            overview.add( overviewUser.getCorruptedPercentage() );
+            overview.add( overviewUser.getDuplicatePercentage() );
+            overview.add( overviewUser.getArchievedPercentage());
+            overview.add( overviewUser.getMismatchedPercentage());
+            overview.add( overviewUser.getTotalSurveySent() );
+            overview.add( overviewUser.getTotalSurveyCompleted() );
+            overview.add( overviewUser.getTotalSocialPost() );
+            overview.add( overviewUser.getTotalZillowReviews() );
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
             OverviewBranch overviewBranch = overviewManagement.fetchOverviewBranchDetails( entityId, entityType );
-            model.addAttribute( "SPS_score",overviewBranch.getSpsScore() );
-            model.addAttribute("detractor",overviewBranch.getDetractorPercentage());
-            model.addAttribute( "passives", overviewBranch.getPassivesPercentage() );
-            model.addAttribute( "promoters", overviewBranch.getPromoterPercentage() );
-            model.addAttribute( "total_incomplete_transactions", overviewBranch.getTotalIncompleteTransactions() );
-            model.addAttribute( "corrupted", overviewBranch.getCorruptedPercentage() );
-            model.addAttribute( "duplicate", overviewBranch.getDuplicatePercentage() );
-            model.addAttribute( "archieved", overviewBranch.getArchievedPercentage());
-            model.addAttribute( "mismatched", overviewBranch.getMismatchedPercentage());
-            model.addAttribute( "Survey_sent", overviewBranch.getTotalSurveySent() );
-            model.addAttribute( "Survey_completed", overviewBranch.getTotalSurveyCompleted() );
-            model.addAttribute( "Social_posts", overviewBranch.getTotalSocialPost() );
-            model.addAttribute( "Zillow_reviews", overviewBranch.getTotalZillowReviews() );
+            overview.add( overviewBranch.getSpsScore() );
+            overview.add( overviewBranch.getDetractorPercentage());
+            overview.add( overviewBranch.getPassivesPercentage() );
+            overview.add( overviewBranch.getPromoterPercentage() );
+            overview.add( overviewBranch.getTotalIncompleteTransactions() );
+            overview.add( overviewBranch.getCorruptedPercentage() );
+            overview.add( overviewBranch.getDuplicatePercentage() );
+            overview.add( overviewBranch.getArchievedPercentage());
+            overview.add( overviewBranch.getMismatchedPercentage());
+            overview.add( overviewBranch.getTotalSurveySent() );
+            overview.add( overviewBranch.getTotalSurveyCompleted() );
+            overview.add( overviewBranch.getTotalSocialPost() );
+            overview.add( overviewBranch.getTotalZillowReviews() );
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
-            OverviewRegion overviewRegion = overviewManagement.fetchOverviewRegionDetails( entityId, entityType );
-            model.addAttribute( "SPS_score",overviewRegion.getSpsScore() );
-            model.addAttribute("detractor",overviewRegion.getDetractorPercentage());
-            model.addAttribute( "passives", overviewRegion.getPassivesPercentage() );
-            model.addAttribute( "promoters", overviewRegion.getPromoterPercentage() );
-            model.addAttribute( "total_incomplete_transactions", overviewRegion.getTotalIncompleteTransactions() );
-            model.addAttribute( "corrupted", overviewRegion.getCorruptedPercentage() );
-            model.addAttribute( "duplicate", overviewRegion.getDuplicatePercentage() );
-            model.addAttribute( "archieved", overviewRegion.getArchievedPercentage());
-            model.addAttribute( "mismatched", overviewRegion.getMismatchedPercentage());
-            model.addAttribute( "Survey_sent", overviewRegion.getTotalSurveySent() );
-            model.addAttribute( "Survey_completed", overviewRegion.getTotalSurveyCompleted() );
-            model.addAttribute( "Social_posts", overviewRegion.getTotalSocialPost() );
-            model.addAttribute( "Zillow_reviews", overviewRegion.getTotalZillowReviews() );
+           OverviewRegion overviewRegion = overviewManagement.fetchOverviewRegionDetails( entityId, entityType );
+           overview.add( overviewRegion.getSpsScore() );
+           overview.add( overviewRegion.getDetractorPercentage());
+           overview.add( overviewRegion.getPassivesPercentage() );
+           overview.add( overviewRegion.getPromoterPercentage() );
+           overview.add( overviewRegion.getTotalIncompleteTransactions() );
+           overview.add( overviewRegion.getCorruptedPercentage() );
+           overview.add( overviewRegion.getDuplicatePercentage() );
+           overview.add( overviewRegion.getArchievedPercentage());
+           overview.add( overviewRegion.getMismatchedPercentage());
+           overview.add( overviewRegion.getTotalSurveySent() );
+           overview.add( overviewRegion.getTotalSurveyCompleted() );
+           overview.add( overviewRegion.getTotalSocialPost() );
+           overview.add( overviewRegion.getTotalZillowReviews() );
         }else if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             OverviewCompany overviewCompany = overviewManagement.fetchOverviewCompanyDetails( entityId, entityType );
-            model.addAttribute( "SPS_score",overviewCompany.getSpsScore() );
-            model.addAttribute("detractor",overviewCompany.getDetractorPercentage());
-            model.addAttribute( "passives", overviewCompany.getPassivesPercentage() );
-            model.addAttribute( "promoters", overviewCompany.getPromoterPercentage() );
-            model.addAttribute( "total_incomplete_transactions", overviewCompany.getTotalIncompleteTransactions() );
-            model.addAttribute( "corrupted", overviewCompany.getCorruptedPercentage() );
-            model.addAttribute( "duplicate", overviewCompany.getDuplicatePercentage() );
-            model.addAttribute( "archieved", overviewCompany.getArchievedPercentage());
-            model.addAttribute( "mismatched", overviewCompany.getMismatchedPercentage());
-            model.addAttribute( "Survey_sent", overviewCompany.getTotalSurveySent() );
-            model.addAttribute( "Survey_completed", overviewCompany.getTotalSurveyCompleted() );
-            model.addAttribute( "Social_posts", overviewCompany.getTotalSocialPost() );
-            model.addAttribute( "Zillow_reviews", overviewCompany.getTotalZillowReviews() );    
-        }   
-        return JspResolver.REPORTING_DASHBOARD; 
+            overview.add( overviewCompany.getSpsScore() );
+            overview.add( overviewCompany.getDetractorPercentage());
+            overview.add( overviewCompany.getPassivesPercentage() );
+            overview.add( overviewCompany.getPromoterPercentage() );
+            overview.add( overviewCompany.getTotalIncompleteTransactions() );
+            overview.add( overviewCompany.getCorruptedPercentage() );
+            overview.add( overviewCompany.getDuplicatePercentage() );
+            overview.add( overviewCompany.getArchievedPercentage());
+            overview.add( overviewCompany.getMismatchedPercentage());
+            overview.add( overviewCompany.getTotalSurveySent() );
+            overview.add( overviewCompany.getTotalSurveyCompleted() );
+            overview.add( overviewCompany.getTotalSocialPost() );
+            overview.add( overviewCompany.getTotalZillowReviews() );
+        }
+        json = new Gson().toJson( overview );
+        if(json == null && json.length() <= 0){
+            throw new NonFatalException( "NonFatalException while fetching data. " );
+        }
+        return json; 
     }   
   
     /*
@@ -726,6 +679,9 @@ public class ReportingWebController
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
             List<List <Object>> averageRating = DashboardGraphManagement.getAverageReviewRating( entityId , entityType );
             json = new Gson().toJson( averageRating );
+        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
+            List<List <Object>> averageRating = DashboardGraphManagement.getAverageReviewRating( entityId , entityType );
+            json = new Gson().toJson( averageRating );
         }
     return json;
         
@@ -735,7 +691,7 @@ public class ReportingWebController
    @RequestMapping( value = "/fetchreportingspsstats", method = RequestMethod.GET)
    public String fetchSpsStats( Model model, HttpServletRequest request ) throws NonFatalException 
    {
-        LOG.info( "Fetching Average Rating Graph" );
+        LOG.info( "Fetching Sps Stats Graph" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
         String json = null;
@@ -746,14 +702,17 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
-            List<List <Object>> averageRating = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
-            json = new Gson().toJson( averageRating );
+            List<List <Object>> spsStats = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
+            json = new Gson().toJson( spsStats );
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
-            List<List <Object>> averageRating = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
-            json = new Gson().toJson( averageRating );
+            List<List <Object>> spsStats = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
+            json = new Gson().toJson( spsStats );
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
-            List<List <Object>> averageRating = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
-            json = new Gson().toJson( averageRating );
+            List<List <Object>> spsStats = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
+            json = new Gson().toJson( spsStats );
+        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
+            List<List <Object>> spsStats = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
+            json = new Gson().toJson( spsStats );
         }
     return json;
         
@@ -763,7 +722,7 @@ public class ReportingWebController
    @RequestMapping( value = "/fetchreportingcompletionrate", method = RequestMethod.GET)
    public String fetchCompletionRate( Model model, HttpServletRequest request ) throws NonFatalException 
    {
-        LOG.info( "Fetching Average Rating Graph" );
+        LOG.info( "Fetching Completion Rate Graph" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
         String json = null;
@@ -774,17 +733,81 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
-            List<List <Object>> averageRating = DashboardGraphManagement.getCompletionRate( entityId , entityType );
-            json = new Gson().toJson( averageRating );
+            List<List <Object>> completionRate = DashboardGraphManagement.getCompletionRate( entityId , entityType );
+            json = new Gson().toJson( completionRate );
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
-            List<List <Object>> averageRating = DashboardGraphManagement.getCompletionRate( entityId , entityType );
-            json = new Gson().toJson( averageRating );
+            List<List <Object>> completionRate = DashboardGraphManagement.getCompletionRate( entityId , entityType );
+            json = new Gson().toJson( completionRate );
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
-            List<List <Object>> averageRating = DashboardGraphManagement.getCompletionRate( entityId , entityType );
-            json = new Gson().toJson( averageRating );
+            List<List <Object>> completionRate = DashboardGraphManagement.getCompletionRate( entityId , entityType );
+            json = new Gson().toJson( completionRate );
+        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
+            List<List <Object>> completionRate = DashboardGraphManagement.getCompletionRate( entityId , entityType );
+            json = new Gson().toJson( completionRate );
         }
     return json;
         
+   }
+   
+   /*
+    * Generate Reports For the reporting UI
+    */
+   @SuppressWarnings ( "deprecation")
+   @ResponseBody
+   @RequestMapping( value = "/generatereportingreports", method = RequestMethod.GET)
+   public String generateReportingReports( Model model, HttpServletRequest request, HttpServletResponse response ) throws NonFatalException, ParseException{
+       LOG.info( "the step to generate reporting reports :generateReportingReports started " );
+       HttpSession session = request.getSession( false );
+       User user = sessionHelper.getCurrentUser();
+       String message = "";
+       //since we need to store the current time stamp
+       
+       if ( user == null ) {
+           throw new NonFatalException( "NonFatalException while logging in. " );
+       } 
+       Date currentDate = null;
+       String currentDateStr = request.getParameter( "currentDate" );
+       if ( currentDateStr != null && !currentDateStr.isEmpty() ) {
+           currentDate =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse( currentDateStr ) ;
+           //String formattedCurrentDate = new SimpleDateFormat("yyyyMMdd").format(currentDate);
+       }
+       Date startDate = null;
+       String startDateStr = request.getParameter( "startDate" );
+       if ( startDateStr != null && !startDateStr.isEmpty() ) {
+           startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse( startDateStr );
+       }
+       Date endDate = null;
+       String endDateStr = request.getParameter( "endDate" );
+       if( endDateStr != null && !endDateStr.isEmpty()){
+           endDate =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse( endDateStr ) ;
+       }
+       //check if only endDate is present
+       if(endDate!= null && startDate == null){
+           message = "The StartDate needs to be present";
+       }
+       //check if enddate is greater the start date 
+       if( endDate != null && startDate != null){
+           message = "The EndDate Should be lesser then the StartDate";
+       }
+       String reportIdString = request.getParameter( "reportId" );
+       int reportId = Integer.parseInt( reportIdString );
+       Long userId = user.getUserId();
+       String firstName = user.getFirstName();
+       String lastName = user.getLastName();
+       long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+       String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+       ReportingDashboardManagement.generateReports( reportId, startDate, endDate, currentDate, firstName, lastName, entityId, entityType );
+       message = "the report is being generated";
+       return message;
+       
+   }
+   
+   //TO SHOW REPORTING UI
+   @RequestMapping ( value = "/showreportspage", method = RequestMethod.GET)
+   public String showReportsPage( Model model, HttpServletRequest request )
+   {
+       LOG.info( "Showing reports page" );
+       return JspResolver.REPORTS;
    }
     /**
     *

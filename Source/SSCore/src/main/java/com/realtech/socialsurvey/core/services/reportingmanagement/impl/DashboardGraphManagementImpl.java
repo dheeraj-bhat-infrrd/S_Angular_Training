@@ -13,9 +13,11 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportCompanyDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportRegionDao;
+import com.realtech.socialsurvey.core.dao.SurveyStatsReportUserDao;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportCompany;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportRegion;
+import com.realtech.socialsurvey.core.entities.SurveyStatsReportUser;
 
 @Component
 public class DashboardGraphManagementImpl implements DashboardGraphManagement
@@ -31,6 +33,9 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
     
     @Autowired
     private SurveyStatsReportRegionDao SurveyStatsReportRegionDao;
+    
+    @Autowired
+    private SurveyStatsReportUserDao SurveyStatsReportUserDao;
 
 
     @Override
@@ -61,6 +66,14 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 list.add( SurveyStatsReportBranch.getYear() );
                 list.add( SurveyStatsReportBranch.getMonth() );
                 list.add( SurveyStatsReportBranch.getAvgRating() );
+                averageRating.add( list );
+            }
+        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
+            for(SurveyStatsReportUser SurveyStatsReportUser : SurveyStatsReportUserDao.fetchUserSurveyStatsById( entityId ) ){
+                List<Object> list = new ArrayList<>();
+                list.add( SurveyStatsReportUser.getYear() );
+                list.add( SurveyStatsReportUser.getMonth() );
+                list.add( SurveyStatsReportUser.getAvgRating() );
                 averageRating.add( list );
             }
         }
@@ -103,6 +116,16 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 list.add( SurveyStatsReportBranch.getPromoters() );            
                 spsStats.add( list );
             }
+        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
+            for(SurveyStatsReportUser SurveyStatsReportUser : SurveyStatsReportUserDao.fetchUserSurveyStatsById( entityId ) ){
+                List<Object> list = new ArrayList<>();
+                list.add( SurveyStatsReportUser.getYear() );
+                list.add( SurveyStatsReportUser.getMonth() );
+                list.add( SurveyStatsReportUser.getDetractors() );
+                list.add( SurveyStatsReportUser.getPassives() );
+                list.add( SurveyStatsReportUser.getPromoters() );   
+                spsStats.add( list );
+            }
         }
         return spsStats;
     }
@@ -138,6 +161,15 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 list.add( SurveyStatsReportBranch.getMonth() );
                 list.add( SurveyStatsReportBranch.getCompleted() );
                 list.add( SurveyStatsReportBranch.getIncomplete() );            
+                completionRate.add( list );
+            }
+        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
+            for(SurveyStatsReportUser SurveyStatsReportUser : SurveyStatsReportUserDao.fetchUserSurveyStatsById( entityId ) ){
+                List<Object> list = new ArrayList<>();
+                list.add( SurveyStatsReportUser.getYear() );
+                list.add( SurveyStatsReportUser.getMonth() );
+                list.add( SurveyStatsReportUser.getCompleted() );
+                list.add( SurveyStatsReportUser.getIncomplete() );     
                 completionRate.add( list );
             }
         }

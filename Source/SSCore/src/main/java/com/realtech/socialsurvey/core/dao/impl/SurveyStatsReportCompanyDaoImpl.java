@@ -25,6 +25,7 @@ public class SurveyStatsReportCompanyDaoImpl extends GenericReportingDaoImpl<Sur
     private static final Logger LOG = LoggerFactory.getLogger( SurveyStatsReportCompanyDaoImpl.class );
 
 
+    @SuppressWarnings ( "unchecked")
     @Override
     public List<SurveyStatsReportCompany> fetchCompanySurveyStatsById( Long companyId )
     {
@@ -37,7 +38,7 @@ public class SurveyStatsReportCompanyDaoImpl extends GenericReportingDaoImpl<Sur
             throw new DatabaseException( "Exception caught in fetchCompanySurveyStatsById() ", hibernateException );
         }
 
-        LOG.info( "Method to fetch all the users by email id, fetchUsersBySimilarEmailId() finished." );
+        LOG.info( "Method to fetch all the users by email id, fetchCompanySurveyStatsById() finished." );
 
         return (List<SurveyStatsReportCompany>) criteria.list();
     }

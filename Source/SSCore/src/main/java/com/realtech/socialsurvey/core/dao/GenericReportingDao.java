@@ -9,7 +9,12 @@ import org.hibernate.criterion.Criterion;
 public interface GenericReportingDao<T, ID extends Serializable>{
 
     public List<T> findAll(Class<T> entityClass);
+    
+    public T saveOrUpdate(T entity);
 
+    public T save(T entity);
+
+    public void update(T entity);
 
     public List<T> findByExample(T exampleInstance, String[] excludeProperty);
 
