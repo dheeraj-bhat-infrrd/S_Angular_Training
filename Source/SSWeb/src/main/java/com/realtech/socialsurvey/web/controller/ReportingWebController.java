@@ -1,12 +1,10 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,13 +26,9 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.OverviewBranch;
-import com.realtech.socialsurvey.core.entities.OverviewCompany;
-import com.realtech.socialsurvey.core.entities.OverviewRegion;
-import com.realtech.socialsurvey.core.entities.OverviewUser;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
-import com.realtech.socialsurvey.core.entities.SurveyStatsReportCompany;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -50,15 +43,16 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
-import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.common.JspResolver;
+
+import retrofit.client.Response;
 
 @Controller
 public class ReportingWebController
@@ -87,13 +81,10 @@ public class ReportingWebController
     private SettingsManager settingsManager;
     
     @Autowired
-    private OverviewManagement overviewManagement;
+    private SSApiIntergrationBuilder ssApiIntergrationBuilder;
     
     @Autowired
-    private DashboardGraphManagement DashboardGraphManagement;
-    
-    @Autowired
-    private ReportingDashboardManagement ReportingDashboardManagement;
+    private ReportingDashboardManagement reportingDashboardManagement;
     
 
     @RequestMapping ( value = "/showreportingpage", method = RequestMethod.GET)
@@ -463,87 +454,22 @@ public class ReportingWebController
     }
     
     @ResponseBody
-    @RequestMapping ( value = "/showreportingoverview", method = RequestMethod.GET)
-    public String reportingOverviewStats(Model model, HttpServletRequest request) throws NonFatalException
+    @RequestMapping ( value = "/fetchreportingoverview", method = RequestMethod.GET)
+    public Response reportingOverviewStats(Model model, HttpServletRequest request) throws NonFatalException
     {
         LOG.info( "Reporting Dashboard Page started" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
 
-        String json = null;
+        Response response = null;
         if ( user == null ) {
             throw new NonFatalException( "NonFatalException while logging in. " );
         }    
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        List<Object> overview = new ArrayList<>();
-        Map<String,Object> overview_map = new HashMap<String,Object>();
-        if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
-            OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType); 
-            overview_map.put( "SpsScore", overviewUser.getSpsScore() );
-            overview_map.put( "DetractorPercentage", overviewUser.getDetractorPercentage());
-            overview_map.put( "PassivesPercentage",  overviewUser.getPassivesPercentage() );
-            overview_map.put( "PromoterPercentage", overviewUser.getPromoterPercentage() );
-            overview_map.put( "TotalIncompleteTransactions", overviewUser.getTotalIncompleteTransactions() );
-            overview_map.put( "CorruptedPercentage", overviewUser.getCorruptedPercentage() );
-            overview_map.put( "DuplicatePercentage", overviewUser.getDuplicatePercentage());
-            overview_map.put( "ArchievedPercentage", overviewUser.getArchievedPercentage() );
-            overview_map.put( "MismatchedPercentage", overviewUser.getMismatchedPercentage() );
-            overview_map.put( "TotalSurveySent",overviewUser.getTotalSurveySent() );
-            overview_map.put( "TotalSurveyCompleted",overviewUser.getTotalSurveyCompleted() );
-            overview_map.put( "TotalSocialPost", overviewUser.getTotalSocialPost() );
-            overview_map.put( "TotalZillowReviews", overviewUser.getTotalZillowReviews() );
-        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
-            OverviewBranch overviewBranch = overviewManagement.fetchOverviewBranchDetails( entityId, entityType );
-            overview_map.put( "SpsScore", overviewBranch.getSpsScore() );
-            overview_map.put( "DetractorPercentage", overviewBranch.getDetractorPercentage());
-            overview_map.put( "PassivesPercentage",  overviewBranch.getPassivesPercentage() );
-            overview_map.put( "PromoterPercentage", overviewBranch.getPromoterPercentage() );
-            overview_map.put( "TotalIncompleteTransactions", overviewBranch.getTotalIncompleteTransactions() );
-            overview_map.put( "CorruptedPercentage", overviewBranch.getCorruptedPercentage() );
-            overview_map.put( "DuplicatePercentage", overviewBranch.getDuplicatePercentage());
-            overview_map.put( "ArchievedPercentage", overviewBranch.getArchievedPercentage() );
-            overview_map.put( "MismatchedPercentage", overviewBranch.getMismatchedPercentage() );
-            overview_map.put( "TotalSurveySent",overviewBranch.getTotalSurveySent() );
-            overview_map.put( "TotalSurveyCompleted",overviewBranch.getTotalSurveyCompleted() );
-            overview_map.put( "TotalSocialPost", overviewBranch.getTotalSocialPost() );
-            overview_map.put( "TotalZillowReviews", overviewBranch.getTotalZillowReviews() );
-        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
-           OverviewRegion overviewRegion = overviewManagement.fetchOverviewRegionDetails( entityId, entityType );
-           overview_map.put( "SpsScore", overviewRegion.getSpsScore() );
-           overview_map.put( "DetractorPercentage", overviewRegion.getDetractorPercentage());
-           overview_map.put( "PassivesPercentage",  overviewRegion.getPassivesPercentage() );
-           overview_map.put( "PromoterPercentage", overviewRegion.getPromoterPercentage() );
-           overview_map.put( "TotalIncompleteTransactions", overviewRegion.getTotalIncompleteTransactions() );
-           overview_map.put( "CorruptedPercentage", overviewRegion.getCorruptedPercentage() );
-           overview_map.put( "DuplicatePercentage", overviewRegion.getDuplicatePercentage());
-           overview_map.put( "ArchievedPercentage", overviewRegion.getArchievedPercentage() );
-           overview_map.put( "MismatchedPercentage", overviewRegion.getMismatchedPercentage() );
-           overview_map.put( "TotalSurveySent",overviewRegion.getTotalSurveySent() );
-           overview_map.put( "TotalSurveyCompleted",overviewRegion.getTotalSurveyCompleted() );
-           overview_map.put( "TotalSocialPost", overviewRegion.getTotalSocialPost() );
-           overview_map.put( "TotalZillowReviews", overviewRegion.getTotalZillowReviews() );
-        }else if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
-            OverviewCompany overviewCompany = overviewManagement.fetchOverviewCompanyDetails( entityId, entityType );
-            overview_map.put( "SpsScore", overviewCompany.getSpsScore() );
-            overview_map.put( "DetractorPercentage", overviewCompany.getDetractorPercentage());
-            overview_map.put( "PassivesPercentage",  overviewCompany.getPassivesPercentage() );
-            overview_map.put( "PromoterPercentage", overviewCompany.getPromoterPercentage() );
-            overview_map.put( "TotalIncompleteTransactions", overviewCompany.getTotalIncompleteTransactions() );
-            overview_map.put( "CorruptedPercentage", overviewCompany.getCorruptedPercentage() );
-            overview_map.put( "DuplicatePercentage", overviewCompany.getDuplicatePercentage());
-            overview_map.put( "ArchievedPercentage", overviewCompany.getArchievedPercentage() );
-            overview_map.put( "MismatchedPercentage", overviewCompany.getMismatchedPercentage() );
-            overview_map.put( "TotalSurveySent",overviewCompany.getTotalSurveySent() );
-            overview_map.put( "TotalSurveyCompleted",overviewCompany.getTotalSurveyCompleted() );
-            overview_map.put( "TotalSocialPost", overviewCompany.getTotalSocialPost() );
-            overview_map.put( "TotalZillowReviews", overviewCompany.getTotalZillowReviews() );
-        }
-        json = new Gson().toJson( overview_map );
-        if(json == null && json.length() <= 0){
-            throw new NonFatalException( "NonFatalException while fetching data. " );
-        }
-        return json; 
+        response = ssApiIntergrationBuilder.getIntegrationApi().getReportingOverview( entityId, entityType );
+        return response;
+        
     }   
   
     /*
@@ -660,104 +586,67 @@ public class ReportingWebController
     
    @ResponseBody
    @RequestMapping( value = "/fetchaveragereportingrating", method = RequestMethod.GET)
-   public String fetchAverageRating( Model model, HttpServletRequest request ) throws NonFatalException 
+   public Response fetchAverageRating( Model model, HttpServletRequest request ) throws NonFatalException 
    {
         LOG.info( "Fetching Average Rating Graph" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
-        String json = null;
+        Response response = null;
 
         if ( user == null ) {
             throw new NonFatalException( "NonFatalException while logging in. " );
         }    
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
-            List<List <Object>> averageRating = DashboardGraphManagement.getAverageReviewRating( entityId , entityType );
-            json = new Gson().toJson( averageRating );
-        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
-            List<List <Object>> averageRating = DashboardGraphManagement.getAverageReviewRating( entityId , entityType );
-            json = new Gson().toJson( averageRating );
-        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
-            List<List <Object>> averageRating = DashboardGraphManagement.getAverageReviewRating( entityId , entityType );
-            json = new Gson().toJson( averageRating );
-        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
-            List<List <Object>> averageRating = DashboardGraphManagement.getAverageReviewRating( entityId , entityType );
-            json = new Gson().toJson( averageRating );
-        }
-    return json;
+        response = ssApiIntergrationBuilder.getIntegrationApi().getReportingAverageRating( entityId, entityType );
+        return response;
         
    }
    
    @ResponseBody
    @RequestMapping( value = "/fetchreportingspsstats", method = RequestMethod.GET)
-   public String fetchSpsStats( Model model, HttpServletRequest request ) throws NonFatalException 
+   public Response fetchSpsStats( Model model, HttpServletRequest request ) throws NonFatalException 
    {
         LOG.info( "Fetching Sps Stats Graph" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
-        String json = null;
+        Response response = null;
 
         if ( user == null ) {
             throw new NonFatalException( "NonFatalException while logging in. " );
         }    
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
-            List<List <Object>> spsStats = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
-            json = new Gson().toJson( spsStats );
-        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
-            List<List <Object>> spsStats = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
-            json = new Gson().toJson( spsStats );
-        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
-            List<List <Object>> spsStats = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
-            json = new Gson().toJson( spsStats );
-        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
-            List<List <Object>> spsStats = DashboardGraphManagement.getSpsStatsGraph( entityId , entityType );
-            json = new Gson().toJson( spsStats );
-        }
-    return json;
+        response = ssApiIntergrationBuilder.getIntegrationApi().getReportingSpsStats( entityId, entityType );
+        return response;
         
    }
    
    @ResponseBody
    @RequestMapping( value = "/fetchreportingcompletionrate", method = RequestMethod.GET)
-   public String fetchCompletionRate( Model model, HttpServletRequest request ) throws NonFatalException 
+   public Response fetchCompletionRate( Model model, HttpServletRequest request ) throws NonFatalException 
    {
         LOG.info( "Fetching Completion Rate Graph" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
-        String json = null;
+        Response response = null;
 
         if ( user == null ) {
             throw new NonFatalException( "NonFatalException while logging in. " );
         }    
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
-            List<List <Object>> completionRate = DashboardGraphManagement.getCompletionRate( entityId , entityType );
-            json = new Gson().toJson( completionRate );
-        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
-            List<List <Object>> completionRate = DashboardGraphManagement.getCompletionRate( entityId , entityType );
-            json = new Gson().toJson( completionRate );
-        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
-            List<List <Object>> completionRate = DashboardGraphManagement.getCompletionRate( entityId , entityType );
-            json = new Gson().toJson( completionRate );
-        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
-            List<List <Object>> completionRate = DashboardGraphManagement.getCompletionRate( entityId , entityType );
-            json = new Gson().toJson( completionRate );
-        }
-    return json;
+        response = ssApiIntergrationBuilder.getIntegrationApi().getReportingCompletionRateApi(entityId,entityType);
+        return response;
         
    }
    
    /*
     * Generate Reports For the reporting UI
     */
-   @SuppressWarnings ( "deprecation")
    @ResponseBody
    @RequestMapping( value = "/generatereportingreports", method = RequestMethod.GET)
-   public String generateReportingReports( Model model, HttpServletRequest request, HttpServletResponse response ) throws NonFatalException, ParseException{
+   public String generateReportingReports( Model model, HttpServletRequest request, HttpServletResponse response ) throws NonFatalException, ParseException,FileNotFoundException, IOException{
        LOG.info( "the step to generate reporting reports :generateReportingReports started " );
        HttpSession session = request.getSession( false );
        User user = sessionHelper.getCurrentUser();
@@ -767,21 +656,15 @@ public class ReportingWebController
        if ( user == null ) {
            throw new NonFatalException( "NonFatalException while logging in. " );
        } 
-       Date createdOn = null;
-       String createdOnStr = request.getParameter( "createdOn" );
-       if ( createdOnStr != null && !createdOnStr.isEmpty() ) {
-           createdOn =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse( createdOnStr ) ;
-           //String formattedCurrentDate = new SimpleDateFormat("yyyyMMdd").format(currentDate);
-       }
        Date startDate = null;
        String startDateStr = request.getParameter( "startDate" );
        if ( startDateStr != null && !startDateStr.isEmpty() ) {
-           startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse( startDateStr );
+           startDate = new SimpleDateFormat("MM/dd/yyyy").parse( startDateStr );
        }
        Date endDate = null;
        String endDateStr = request.getParameter( "endDate" );
        if( endDateStr != null && !endDateStr.isEmpty()){
-           endDate =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse( endDateStr ) ;
+           endDate =  new SimpleDateFormat("MM/dd/yyyy").parse( endDateStr ) ;
        }
        //check if only endDate is present
        if(endDate!= null && startDate == null){
@@ -793,12 +676,11 @@ public class ReportingWebController
        }
        String reportIdString = request.getParameter( "reportId" );
        int reportId = Integer.parseInt( reportIdString );
-       Long userId = user.getUserId();
-       String firstName = user.getFirstName();
-       String lastName = user.getLastName();
        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-       ReportingDashboardManagement.generateReports( reportId, startDate, endDate, createdOn, firstName, lastName, entityId, entityType );
+       Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+       Company company = user.getCompany();
+       reportingDashboardManagement.generateReports( reportId, startDate, endDate,entityId, entityType ,company , adminUserid );
        message = "the report is being generated";
        return message;
        

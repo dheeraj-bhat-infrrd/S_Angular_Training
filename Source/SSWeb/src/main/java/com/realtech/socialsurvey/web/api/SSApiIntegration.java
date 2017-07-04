@@ -112,8 +112,20 @@ public interface SSApiIntegration
     
     //reporting: BEGIN
     
-    @GET ( "/v1/createdummyapi" )
-    Response createDummyReporting();
+    @GET ( "/v1/getcompletionrate" )
+    Response getReportingCompletionRateApi(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
     
+    
+    @GET ( "/v1/getspsstats" )
+    Response getReportingSpsStats(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
+    
+    @GET ( "/v1/getaveragerating" )
+    Response getReportingAverageRating(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
+    
+    @GET("/v1/getoverview")
+    Response getReportingOverview(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
+    
+    @GET("/v1/getsurveystatsreport")
+    Response getReportingSurveyStatsReport(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
     //reporting:END
 }

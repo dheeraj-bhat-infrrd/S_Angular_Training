@@ -9,4 +9,8 @@ public interface SurveyStatsReportBranchDao extends GenericReportingDao<SurveySt
 
     List<SurveyStatsReportBranch> fetchBranchSurveyStatsById( Long branchId );
 
+    List<SurveyStatsReportBranch> fetchSurveyStatsByCompanyId( Long companyId );
+
+    List<SurveyStatsReportBranch> fetchSurveyStatsByRegionId( Long regionId );
+
 }
