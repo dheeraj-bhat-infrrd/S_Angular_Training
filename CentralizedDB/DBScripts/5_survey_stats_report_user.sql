@@ -1,3 +1,6 @@
+CREATE DATABASE  IF NOT EXISTS `ss_report_demo` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `ss_report_demo`;
+
 CREATE TABLE `survey_stats_report_user` (
   `survey_stats_report_id` varchar(45) NOT NULL,
   `Id` text,

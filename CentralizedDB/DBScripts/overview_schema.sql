@@ -1,5 +1,5 @@
-CREATE DATABASE  IF NOT EXISTS `ss_centralized_mongodb` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `ss_centralized_mongodb`;
+CREATE DATABASE  IF NOT EXISTS `ss_report_demo` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `ss_report_demo`;
 -- MySQL dump 10.13  Distrib 5.7.12, for Win64 (x86_64)
 --
 -- Host: localhost    Database: ss_centralized_mongodb
