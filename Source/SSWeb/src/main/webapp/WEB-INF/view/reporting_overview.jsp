@@ -124,53 +124,5 @@
 </div>
 
 <script>
-var overviewData = getOverviewData();
-	
-if(overviewData != null){
-		
-	var detractors = overviewData.DetractorPercentage;
-	var passives =   overviewData.PassivesPercentage;
-	var promoters =  overviewData.PromoterPercentage;
-	
-		//spsGauge checks
-		if(detractors == 0 && promoters == 0 && passives == 0){
-			$('#spsGaugeSuccess').hide();
-			$('#spsGaugeFailure').show();
-		}else{
-			$('#spsGaugeFailure').hide();
-			$('#spsGaugeSuccess').show();
-		}
-		
-		//detractors,passives and promoters bar and values assignment
-		$('#detractorsBar').css('width',detractors+'%');
-		$('#detractorsValue').html(detractors+'%');
-		$('#passivesBar').css('width',passives+'%');
-		$('#passivesValue').html(passives+'%');
-		$('#promotersBar').css('width',promoters+'%');
-		$('#promotersValue').html(promoters+'%');
-		
-		//donutChart checks
-		var totalIncompleteTransactions = overviewData.TotalIncompleteTransactions;
-		
-		if(totalIncompleteTransactions > 0){
-			$('#donutChartSuccess').show();
-			$('#donutChartFailure').hide();
-		}else{
-			$('#donutChartSuccess').hide();
-			$('#donutChartFailure').show();
-		}
-		
-		//surveys sent, surveys completed, social posts and zillow reviews values
-		var surveysSent = overviewData.TotalSurveySent;
-		var surveysCompleted = overviewData.TotalSurveyCompleted;
-		var socialPosts = overviewData.TotalSocialPost;
-		var zillowReviews = overviewData.TotalZillowReviews;
-		
-		$('#surveysSentValue').html(surveysSent);
-		$('#surveysCompValue').html(surveysCompleted);
-		$('#socialPostsValue').html(socialPosts);
-		$('#zillowReviewsValue').html(zillowReviews);
-		
-		
-}
+drawOverviewPage();
 </script>

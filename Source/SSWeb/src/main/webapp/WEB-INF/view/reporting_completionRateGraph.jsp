@@ -3,8 +3,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<div id="completion_chart_div" style="width:100%; height:300px; margin-top:20px"></div>
+
 <script type="text/javascript">
 	drawCompletionRateGraph();
 </script>
-
-<div id="completion_chart_div" style="width:100%; height:300px; margin-top:20px"></div>

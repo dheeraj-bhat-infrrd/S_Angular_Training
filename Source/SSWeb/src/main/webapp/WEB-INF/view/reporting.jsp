@@ -55,7 +55,7 @@
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
 				<spring:message code="label.reporting.key" />
 			</div>
-			<div class="header-links-item" onclick="javascript:showMainContent('./showreports.do')"><spring:message code="label.reporting.reports.key" /></div>
+			<div class="header-links-item" onclick="javascript:showMainContent('./showreportspage.do')"><spring:message code="label.reporting.reports.key" /></div>
 			<!-- Add user assignment dropdown -->
 			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
 		</div>
