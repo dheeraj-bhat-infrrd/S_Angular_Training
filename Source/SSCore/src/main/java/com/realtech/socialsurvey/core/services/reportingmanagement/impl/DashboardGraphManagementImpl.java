@@ -43,7 +43,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
 
         LOG.info("getSurveyStatsForCompany has started");
         //List<List<SurveyStatsReportCompany>> SurveyStats = SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(companyId );
-        List<List<Object>> averageRating = new ArrayList<>();;
+        List<List<Object>> averageRating = new ArrayList<>();
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId ) ){
                 List<Object> list = new ArrayList<>();
@@ -85,7 +85,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
     public List<List<Object>> getSpsStatsGraph(Long entityId , String entityType){
         LOG.info("getSpsStatsGraphCompany has started");
         //List<List<SurveyStatsReportCompany>> SurveyStats = SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(companyId );
-        List<List<Object>> spsStats = new ArrayList<>();;
+        List<List<Object>> spsStats = new ArrayList<>();
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId ) ){
                 List<Object> list = new ArrayList<>();
@@ -134,7 +134,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
     public List<List<Object>> getCompletionRate(Long entityId , String entityType){
         LOG.info("getSpsStatsGraphCompany has started");
         //List<List<SurveyStatsReportCompany>> SurveyStats = SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(companyId );
-        List<List<Object>> completionRate = new ArrayList<>();;
+        List<List<Object>> completionRate = new ArrayList<>();
 
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId ) ){

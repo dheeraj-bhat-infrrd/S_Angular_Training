@@ -35,8 +35,42 @@ public class SurveyStatsReportBranchDaoImpl extends GenericReportingDaoImpl<Surv
             throw new DatabaseException( "Exception caught in fetchBranchSurveyStatsById() ", hibernateException );
         }
 
-        LOG.info( "Method to fetch all the users by email id, fetchBranchSurveyStatsById() finished." );
+        LOG.info( "Method to fetch all the users by branch id, fetchBranchSurveyStatsById() finished." );
 
         return (List<SurveyStatsReportBranch>) criteria.list();
+    }
+    
+    @Override
+    public List<SurveyStatsReportBranch> fetchSurveyStatsByCompanyId(Long companyId)
+    {
+        LOG.info( "method to fetch branch based on companyId,fetchBranchSurveyStatsById() started" );
+        Criteria criteria = getSession().createCriteria( SurveyStatsReportBranch.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchSurveyStatsByCompanyId() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchSurveyStatsByCompanyId() ", hibernateException );
+        }
+
+        LOG.info( "method to fetch branch based on companyId, fetchBranchSurveyStatsById() finished." );
+        return (List<SurveyStatsReportBranch>) criteria.list();
+        
+    }
+    
+    @Override
+    public List<SurveyStatsReportBranch> fetchSurveyStatsByRegionId(Long regionId)
+    {
+        LOG.info( "method to fetch branch based on companyId,fetchBranchSurveyStatsById() started" );
+        Criteria criteria = getSession().createCriteria( SurveyStatsReportBranch.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchSurveyStatsByCompanyId() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchSurveyStatsByCompanyId() ", hibernateException );
+        }
+
+        LOG.info( "method to fetch branch based on companyId, fetchBranchSurveyStatsById() finished." );
+        return (List<SurveyStatsReportBranch>) criteria.list();
+        
     }
 }
