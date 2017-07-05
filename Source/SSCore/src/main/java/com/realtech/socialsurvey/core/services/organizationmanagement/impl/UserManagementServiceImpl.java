@@ -2655,6 +2655,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             agentSettings.setSurvey_settings( surveySettings );
         }
 
+        //get company setting
+        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+        if(companySettings != null && companySettings.getCrm_info() != null && companySettings.getCrm_info().isAllowPartnerSurvey() ){
+            agentSettings.setAllowPartnerSurvey(true);
+        }
+        
         MailIdSettings mail_ids = new MailIdSettings();
         mail_ids.setWork( user.getEmailId() );
         contactSettings.setMail_ids( mail_ids );
@@ -4465,7 +4471,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 }
                 
                 
-                
                 //getting minLastReminderTime and maxLastReminderTime
                 long currentTime = System.currentTimeMillis();
                 Map<String , Date> lastReminderTimeCriterias = surveyHandler.getMinMaxLastSurveyReminderTime( currentTime, reminderInterval );
@@ -4511,6 +4516,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     surveyHandler.markSurveyAsSent( survey );
                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
                                 
+
                     } catch ( ProfileNotFoundException | InvalidInputException   e ) {
                         LOG.error(
                             "ProfileNotFoundException / InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",

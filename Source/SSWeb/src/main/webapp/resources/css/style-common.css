@@ -5479,6 +5479,15 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	line-height: 40px;
 }
 
+.bd-check-img-1 {
+	width: 20px;
+	height: 50px;
+	margin-right: 10px;
+	background: url(../images/checks.png) no-repeat;
+	background-position: left center;
+	cursor: pointer;
+}
+
 .bd-check-img {
 	width: 20px;
 	height: 50px;
@@ -9261,3 +9270,5 @@ ul.accordion li>a:before {
 	width: 22px !important; /* Width of new image */
   	height: 22px !important; /* Height of new image */
 }
+
+

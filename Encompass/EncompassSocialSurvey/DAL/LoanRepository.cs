@@ -81,6 +81,7 @@ namespace EncompassSocialSurvey.DAL
 										, COLLECTION_NAME
                                         , STATE
                                         , CITY
+                                        , PARTICIPANT_TYPE
                                           )
                                         VALUES(
                                           ?SURVEY_SOURCE
@@ -102,6 +103,7 @@ namespace EncompassSocialSurvey.DAL
 										, ?COLLECTION_NAME
                                         , ?STATE
                                         , ?CITY
+                                        , ?PARTICIPANT_TYPE
                                         ) ;";
 
         
@@ -258,7 +260,7 @@ namespace EncompassSocialSurvey.DAL
                         commandToInsert.Parameters.Add("?COLLECTION_NAME", MySqlDbType.VarChar, 250).Value = "COMPANY_SETTINGS";
                         commandToInsert.Parameters.Add("?STATE", MySqlDbType.VarChar, 100).Value = loan.State;
                         commandToInsert.Parameters.Add("?CITY", MySqlDbType.VarChar, 100).Value = loan.City;
-
+                        commandToInsert.Parameters.Add("?PARTICIPANT_TYPE", MySqlDbType.Int32).Value = loan.ParticipantType;
                         //
                         commandToInsert.ExecuteNonQuery();
                         noOfRecordsInserted++;

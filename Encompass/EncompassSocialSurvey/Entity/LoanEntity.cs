@@ -26,6 +26,8 @@ namespace EncompassSocialSurvey.Entity
         public int ReminderCounts { get; set; }
         public DateTime LastReminderTime { get; set; }
         public int Status { get; set; }
+        public int ParticipantType { get; set; }
+
 
         //
         public DateTime CreatedOn { get; set; }
