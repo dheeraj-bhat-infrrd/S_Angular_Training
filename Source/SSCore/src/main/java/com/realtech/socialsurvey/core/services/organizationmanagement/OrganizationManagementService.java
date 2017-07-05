@@ -1466,4 +1466,14 @@ public interface OrganizationManagementService
 
     void processDeactivateCompany( Company company, long userId ) throws InvalidInputException, SolrException, NonFatalException;
 
+
+    void updateAllowPartnerSurveyForAllUsers( Set<Long> userIds, boolean allowPartnerSurvey ) throws InvalidInputException;
+
+
+    void updatellowPartnerSurveyForUser( AgentSettings agentSettings, boolean allowPartnerSurvey );
+
+
+    boolean isPartnerSurveyAllowedForComapny( long companyId );
+
+
 }

@@ -109,7 +109,11 @@ public class SurveyPreInitiation implements Serializable
 	@Column ( name = "TRANSACTION_TYPE")
 	private String transactionType;
 
-    @Transient
+	@Column( name = "PARTICIPANT_TYPE")
+	private int participantType;
+	
+        
+	@Transient
     private String errorCodeDescription;
 
 
@@ -434,5 +438,16 @@ public class SurveyPreInitiation implements Serializable
     public void setTransactionType( String transactionType )
     {
         this.transactionType = transactionType;
+    }
+    
+    public int getParticipantType()
+    {
+        return participantType;
+    }
+
+
+    public void setParticipantType( int participantType )
+    {
+        this.participantType = participantType;
     }
 }

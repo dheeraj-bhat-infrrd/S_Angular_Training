@@ -1522,13 +1522,21 @@ public class UserManagementController
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
             User user = null;
+            AgentSettings agentSettings = null;
             try {
                 user = userManagementService.getUserByUserId( userId );
+                agentSettings = userManagementService.getUserSettings( userId );
             } catch ( InvalidInputException e ) {
                 throw new InvalidInputException( "InvalidInputException while getting user.Reason: " + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
+            
+            //partner survey details
+            model.addAttribute( "partnerSurveyAllowedForCompany", organizationManagementService.isPartnerSurveyAllowedForComapny( user.getCompany().getCompanyId() ) );
+            model.addAttribute( "partnerSurveyAllowedForUser", agentSettings.isAllowPartnerSurvey() );
+           
 
+            //user assignments
             UserHierarchyAssignments assignments = (UserHierarchyAssignments) session
                 .getAttribute( CommonConstants.USER_ASSIGNMENTS );
             Map<Long, String> regions = assignments.getRegions();

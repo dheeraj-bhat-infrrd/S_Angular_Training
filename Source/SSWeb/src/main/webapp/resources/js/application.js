@@ -4475,6 +4475,29 @@ function updateVendastaAccessSetting(hasVendastaAcess, disableEle) {
 	
 }
 
+function updateAllowPartnerSurveySettingForCompany(allowPartnerSurvey, disableEle) {
+	var payload = {
+		"allowPartnerSurvey" : allowPartnerSurvey
+	};
+	
+	callAjaxPostWithPayloadData("./updateallowpartnersurveyforcompany.do",function(data) {
+		if (data == "success"){
+			if ($('#alw-ptnr-srvy-chk-box').hasClass('bd-check-img-checked')) {
+				$('#alw-ptnr-srvy-chk-box').removeClass('bd-check-img-checked');
+			}	
+			else{
+				$('#alw-ptnr-srvy-chk-box').addClass('bd-check-img-checked');
+			}
+			$('#overlay-toast').html("Content updated successfully");
+		}else{
+			$('#overlay-toast').html(data);
+		}
+		showToast();
+	}, payload, true, disableEle);
+	
+}
+
+
 function resetTextForMoodFlow(mood, resetId) {
 	var payload = {
 		"mood" : mood
@@ -5163,6 +5186,9 @@ $(document).on('click', '#user-edit-btn', function(e) {
 	$('form input[data-editable="true"]').removeAttr("readonly");
 	$('#btn-save-user-assignment').show();
 
+	//$("#alw-ptnr-srvy-for-usr-chk-box").removeClass('disable-click');
+	//$("#alw-ptnr-srvy-for-usr-chk-box").addClass('enable-click');
+	
 	$("#user-edit-save").off('click');
 	$("#user-edit-save").on('click', function(e) {
 		if (validateUserDetailsUserManagement()) {
@@ -10071,6 +10097,70 @@ $('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
 	}
 });
 
+$('body').on('click', '#alw-ptnr-srvy-chk-box', function() {
+	if ($('#alw-ptnr-srvy-chk-box').hasClass('bd-check-img-checked')) {
+		updateAllowPartnerSurveySettingForCompany(true, '#alw-ptnr-srvy-chk-box');
+	} else {
+		updateAllowPartnerSurveySettingForCompany(false, '#alw-ptnr-srvy-chk-box');
+	}
+});
+
+
+$('body').on('click', '#alw-ptnr-srvy-for-usr-chk-box', function(e) {
+	e.stopPropagation();
+	
+	var isPartnerSurveyAllowed = true;
+	
+	if ($('#alw-ptnr-srvy-for-usr-chk-box').hasClass('bd-check-img-checked')) {		
+		isPartnerSurveyAllowed = true;
+	} else {		
+		isPartnerSurveyAllowed = false;
+	}
+	
+		$('#overlay-main').show();
+		$('#overlay-continue').show();
+		if (isPartnerSurveyAllowed) {
+			$('#overlay-continue').html("Enable");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Allow Partner Survey");
+			$('#overlay-text').html("Are you sure you want to enable partner survey for user ?");
+		} else  {
+			$('#overlay-continue').html("Disable");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Allow Partner Survey");
+			$('#overlay-text').html("Are you sure you want to enable partner survey for user ?");
+		}
+
+		var userId = $('#selected-userid-hidden').val();
+		$('#overlay-continue').attr("onclick", "updateAllowPartnerSurveySettingForUser(" + isPartnerSurveyAllowed + "," + userId + ");");
+	
+	
+});
+
+function updateAllowPartnerSurveySettingForUser(allowPartnerSurvey, userId ) {
+	var disableEle = '#alw-ptnr-srvy-for-usr-chk-box';
+	var payload = {
+		"allowPartnerSurvey" : allowPartnerSurvey,
+		"userId" : userId
+	};
+	
+	callAjaxPostWithPayloadData("./updateallowpartnersurveyforuser.do",function(data) {
+		$('#overlay-main').hide();
+		if (data == "success"){
+			if ($('#alw-ptnr-srvy-for-usr-chk-box').hasClass('bd-check-img-checked')){
+				$('#alw-ptnr-srvy-for-usr-chk-box').removeClass('bd-check-img-checked');
+			}else{
+				$('#alw-ptnr-srvy-for-usr-chk-box').addClass('bd-check-img-checked');
+			}
+			$('#overlay-toast').html("Content updated successfully");
+		}else{
+			$('#overlay-toast').html(data);			
+		}
+		showToast();
+	}, payload, true, disableEle);
+	
+}
+
 $('body').on('click', '#vndsta-access-chk-box', function() {
 	if ($('#vndsta-access-chk-box').hasClass('bd-check-img-checked')) {
 		$('#vndsta-access-chk-box').removeClass('bd-check-img-checked');
@@ -11565,8 +11655,11 @@ function initiateEncompassSaveConnection(warn) {
 		"password" : password,
 		"url" : url
 	};
-	showOverlay();
-	callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/encompass/testcredentials.do", saveEncompassDetailsCallBack, payload, true, '#en-dry-save');
+	//TODO uncomment the test connection after development 
+	// by passed test credentials for develpment
+	//showOverlay();
+	//callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/encompass/testcredentials.do", saveEncompassDetailsCallBack, payload, true, '#en-dry-save');
+	saveEncompassDetails("encompass-form");
 	if (warn) {
 		$('#overlay-cancel').click();
 	}

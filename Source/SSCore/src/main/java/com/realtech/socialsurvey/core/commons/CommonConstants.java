@@ -145,6 +145,14 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_IGNORED_RECORD = 9;
     public static final int STATUS_SURVEYPREINITIATION_DELETED = 0;
     public static final int STATUS_SURVEYPREINITIATION_MISMATCH_RECORD = 10;
+    public static final int STATUS_SURVEYPREINITIATION_SURVEY_NOT_ALLOWED = 11;
+    
+    public static final int SURVEY_PARTICIPANT_TYPE_BORROWER = 1;
+    public static final int SURVEY_PARTICIPANT_TYPE_COBORROWER = 2;
+    public static final int SURVEY_PARTICIPANT_TYPE_BUYER_AGENT = 3;
+    public static final int SURVEY_PARTICIPANT_TYPE_SELLER_AGENT = 4;
+    
+    
 
     /**
      * Hibernate entities and column name constants
