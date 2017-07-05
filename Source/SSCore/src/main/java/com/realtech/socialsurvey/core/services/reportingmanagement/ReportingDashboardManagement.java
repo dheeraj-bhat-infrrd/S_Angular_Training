@@ -15,15 +15,13 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 public interface ReportingDashboardManagement
 {
-    public void generateReports( int reportId, Date startDate, Date endDate, Long entityId, String entityType,Company company,
+    public void createEntryInFileUploadForReporting( int reportId, Date startDate, Date endDate, Long entityId, String entityType,Company company,
         Long adminUserid ) throws InvalidInputException, NoRecordsFetchedException, FileNotFoundException, IOException;
-
-    public void createEntryForReportInFileUpload( int reportId, Date startDate, Date endDate,
-        Long entityId, String entityType , Company company , Long adminUserId);
 
     public List<List<Object>> getSurveyStatsReport( Long entityId, String entityType );
 
+    public List<List<Object>> getRecentActivityList( Long entityId, String entityType , int startIndex, int batchSize  ) throws InvalidInputException;
 
-
+    public Long getRecentActivityCount( Long entityId, String entityType );
 
 }
