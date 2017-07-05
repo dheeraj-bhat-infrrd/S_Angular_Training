@@ -2865,12 +2865,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         
         // add status criteria
-        if ( status.equals( "complete" ) ) {
-            query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ));
-        } else if ( status.equals( "incomplete" ) ) {
-            query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-        } else if ( status.equals( "all" ) ) {
+        if(status != null){
+            if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) ) {
+                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ));
+            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_INCOMPLETE ) ) {
+                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_ALL ) ) {
 
+            }
         }
         
         //add mood criteria
@@ -2923,11 +2925,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         
         // add status criteria
         if(status != null){
-            if ( status.equals( "complete" ) ) {
+            if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) ) {
                 query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ));
-            } else if ( status.equals( "incomplete" ) ) {
+            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_INCOMPLETE ) ) {
                 query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-            } else if ( status.equals( "all" ) ) {
+            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_ALL ) ) {
 
             }
         }
