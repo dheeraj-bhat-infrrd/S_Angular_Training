@@ -31,6 +31,9 @@ public class SurveyStatsReportBranch
     @Column( name = "branch_id")
     private long branchId;
     
+    @Column( name = "region_id")
+    private long regionId;
+    
     @Column( name = "trx_month")
     private String trxMonth;
     
@@ -136,6 +139,16 @@ public class SurveyStatsReportBranch
         this.companyId = companyId;
     }
 
+    public long getRegionId()
+    {
+        return regionId;
+    }
+
+    public void setRegionId( long regionId )
+    {
+        this.regionId = regionId;
+    }
+    
     public long getBranchId()
     {
         return branchId;
