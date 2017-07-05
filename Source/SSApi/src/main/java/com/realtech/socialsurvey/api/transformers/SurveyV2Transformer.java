@@ -102,7 +102,7 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
             boolean isCRMVerified = false;
             if ( d.getSource() != null )
                 if ( d.getSource().equalsIgnoreCase( "encompass" ) || d.getSource().equalsIgnoreCase( "DOTLOOP" )
-                    || d.getSource().equalsIgnoreCase( "FTP" ) || d.getSource().equalsIgnoreCase( "LONEWOLF" ) )
+                		|| d.getSource().equalsIgnoreCase( "API" ) || d.getSource().equalsIgnoreCase( "FTP" ) || d.getSource().equalsIgnoreCase( "LONEWOLF" ) )
                     isCRMVerified = true;
             review.setVerifiedCustomer( isCRMVerified );
 
