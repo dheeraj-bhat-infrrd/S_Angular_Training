@@ -26,7 +26,9 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-
+<div id="toast-container" class="toast-container">
+	<span id="overlay-toast" class="overlay-toast"></span>
+</div>
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
 	<div>
 		<c:choose>
@@ -77,7 +79,7 @@
 						<jsp:include page="reporting_profileimage.jsp"></jsp:include>
 					</div>
 				</div>
-				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper edit-prof-name-wrapper">
+				<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 prof-wrapper pos-relative prof-name-wrapper edit-prof-name-wrapper">
 					<div id="prof-basic-container" class="prof-name-container">
 						<jsp:include page="reporting_basicdetails.jsp"></jsp:include>
 					</div>

@@ -889,7 +889,6 @@ function updateDashboardProfileEvents() {
 	});
 }
 
-
 function paintFixSocialMedia(data){
 	
 	var popup = "";

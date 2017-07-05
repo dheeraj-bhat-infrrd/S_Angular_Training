@@ -3,7 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
- <div id="average_chart_div" style="width:100%; margin-top:20px"></div>
+ <div id="average_chart_div" style="width:100%; "></div>
  
 <script type="text/javascript">
 	drawAvgRatingsGraph();

@@ -9,77 +9,131 @@ function drawSpsStatsGraph(){
 	google.charts.load('current', {	packages : [ 'corechart', 'bar' ]});
 	google.charts.setOnLoadCallback(drawStacked);
 	
+	function drawEmptyChart(){
+		var spsChartData = [
+							[ 'SPS', 'Detractors','Passives','Promoters' ],
+							[ '', 0, 0, 0 ] ];
+
+					var data = google.visualization
+							.arrayToDataTable(spsChartData);
+
+					var options = {
+						title : 'SPS Stats',
+						legend : {
+							position : 'none'
+						},
+						bar : {
+							groupWidth : '40%'
+						},
+						isStacked : true,
+						height : 300,
+						vAxis : {
+							minValue : 0,
+							maxValue : 10,
+							gridlines : {
+								count : 5
+							}
+						},
+						colors : [ '#E8341F',
+								'#999999', '#7ab400' ]
+					};
+
+					var chart = new google.visualization.ColumnChart(
+							document
+									.getElementById('chart_div'));
+					chart.draw(data, options);
+	}
+	
 	function drawStacked() {
-		
 		$.ajax({
-			url : "/fetchreportingspsstats.do",
-			type : "GET",
-			cache : false,
-			dataType : "json",
-			success : function(data) {
-				chartData = data;
-				
-				var spsChartData = new Array(chartData.length+1);
-				for (var k = 0; k <= chartData.length; k++) {
-					  spsChartData[k] = new Array(4);
-				}
-				spsChartData[0] = [ 'SPS', 'Detractors', 'Passives', 'Promoters'];
-				
-				for(var i=1;i<=chartData.length;i++){
-					var monthName = monthNamesList[(chartData[i-1][1])-1];
-					spsChartData[i][0] = monthName + "/" + chartData[i-1][0];
-					spsChartData[i][1] = chartData[i-1][2];	
-					spsChartData[i][2] = chartData[i-1][3];
-					spsChartData[i][3] = chartData[i-1][4];
-				}
-				
-				var data = google.visualization.arrayToDataTable(spsChartData);
+					async : false,
+					url : "/fetchreportingspsstats.do",
+					type : "GET",
+					cache : false,
+					dataType : "json",
+					success : function(data) {
+						if (data.status == 200) {
+							$.ajax({
+										url : data.url,
+										type : "GET",
+										cache : false,
+										dataType : "json",
+										success : function(response) {
+											chartData = JSON.parse(response);
 
-				var options = { title : 'SPS Stats',
-				                legend : {position : 'none'},
-				                bar : {groupWidth : '40%'},
-				                isStacked : true,
-				                height : 300,
-				                vAxis : {
-				                         	gridlines : {
-				                                  			count : 14
-				                                  		}
-				                        },
-				                colors : [ '#E8341F', '#999999', '#7ab400' ]
-				               };
+											if (chartData.length == 0) {
+												drawEmptyChart();
+											} else {
+												var spsChartData = new Array(
+														chartData.length + 1);
+												for (var k = 0; k <= chartData.length; k++) {
+													spsChartData[k] = new Array(
+															4);
+												}
+												spsChartData[0] = [ 'SPS',
+														'Detractors',
+														'Passives', 'Promoters' ];
 
-				var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-				chart.draw(data, options);
-			},
-			error : function(e) {
-				
-				if (e.status == 504) {
-					redirectToLoginPageOnSessionTimeOut(e.status);
-					return;
-				}
-				var spsChartData = [[ 'SPS', 'Detractors', 'Passives', 'Promoters'],['',0,0,0]];
-				
-				var data = google.visualization.arrayToDataTable(spsChartData);
+												for (var i = 1; i <= chartData.length; i++) {
+													var monthName = monthNamesList[(chartData[i - 1][1]) - 1];
+													spsChartData[i][0] = monthName
+															+ "/"
+															+ chartData[i - 1][0];
+													spsChartData[i][1] = chartData[i - 1][2];
+													spsChartData[i][2] = chartData[i - 1][3];
+													spsChartData[i][3] = chartData[i - 1][4];
+												}
 
-				var options = { title : 'SPS Stats',
-				                legend : {position : 'none'},
-				                bar : {groupWidth : '40%'},
-				                isStacked : true,
-				                height : 300,
-				                vAxis : {	
-				                			minValue:0,
-				                			maxValue:10,
-				                         	gridlines : {
-				                                  			count : 5
-				                                  		}
-				                        },
-				                colors : [ '#E8341F', '#999999', '#7ab400' ]
-				               };
+												var data = google.visualization
+														.arrayToDataTable(spsChartData);
 
-				var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-				chart.draw(data, options);
-			}
-		});
+												var options = {
+													title : 'SPS Stats',
+													legend : {
+														position : 'none'
+													},
+													bar : {
+														groupWidth : '40%'
+													},
+													isStacked : true,
+													height : 300,
+													vAxis : {
+														gridlines : {
+															count : 14
+														}
+													},
+													colors : [ '#E8341F',
+															'#999999',
+															'#7ab400' ]
+												};
+
+												var chart = new google.visualization.ColumnChart(
+														document
+																.getElementById('chart_div'));
+												chart.draw(data, options);
+											}
+										},
+										error : function(e) {
+
+											if (e.status == 504) {
+												redirectToLoginPageOnSessionTimeOut(e.status);
+												return;
+											}
+											drawEmptyChart();
+										}
+									});
+						}else{
+							drawEmptyChart();
+						}
+					},
+					error : function(e) {
+						if (e.status == 504) {
+							redirectToLoginPageOnSessionTimeOut(e.status);
+							return;
+						}
+						drawEmptyChart();
+					}
+				});
 	}
 }
 
@@ -87,80 +141,118 @@ function drawAvgRatingsGraph(){
 	
 	google.charts.load("current", {packages:["corechart"]});
 	google.charts.setOnLoadCallback(drawChart);
+	
+	function drawEmptyChart(){
+		var spsChartData = [ [ 'X', 'Y' ],
+								[ '', 0 ] ];
 
+						var data = google.visualization
+								.arrayToDataTable(spsChartData);
+
+						var options = {
+							legend : 'none',
+							height : 300,
+							width : 1000,
+							vAxis : {
+								title : 'Average Rating',
+								minValue : 0,
+								maxValue : 6,
+								gridlines : {
+									count : 7
+								}
+							},
+							colors : [ '009fe0' ],
+							pointSize : 5
+						};
+
+						var chart = new google.visualization.ColumnChart(
+								document
+										.getElementById('average_chart_div'));
+						chart.draw(data, options);
+	}
+	
 	function drawChart() {
-		
 		$.ajax({
-			url : "/fetchaveragereportingrating.do",
-			type : "GET",
-			cache : false,
-			dataType : "json",
-			success : function(data) {
-				chartData = data;
-				
-				var avgRatingChartData = new Array(chartData.length+1);
-				for (var k = 0; k <= chartData.length; k++) {
-					avgRatingChartData[k] = new Array(2);
-				}
-				avgRatingChartData[0] = ['X','Y'];
-				
-				for(var i=1;i<=chartData.length;i++){
-					var monthName = monthNamesList[(chartData[i-1][1])-1];
-					avgRatingChartData[i][0] = monthName + "/" + chartData[i-1][0];
-					avgRatingChartData[i][1] = chartData[i-1][2];	
-				}
-				
-				
-	  		var data = google.visualization.arrayToDataTable(avgRatingChartData);
+					async : false,
+					url : "/fetchaveragereportingrating.do",
+					type : "GET",
+					cache : false,
+					dataType : "json",
+					success : function(data) {
+						if (data.status == 200) {
+							$.ajax({
+										url : data.url,
+										type : "GET",
+										cache : false,
+										dataType : "json",
+										success : function(response) {
+											chartData = JSON.parse(response);
 
-	  		var options = {
-	  			legend: 'none',
-	    		height:300,
-	    		width:1000,
-	    		vAxis: { 
-	    				title:'Average Rating',
-	    				minValue:0, 
-	    				maxValue:6,
-	    				gridlines : {
-	      					count : 7
-	      				}
-	  		   		},
-	    		colors: ['009fe0'],
-	    		pointSize: 5
-	 		};
+											if (chartData.length == 0) {
+												drawEmptyChart();
+											} else {
+												var avgRatingChartData = new Array(
+														chartData.length + 1);
+												for (var k = 0; k <= chartData.length; k++) {
+													avgRatingChartData[k] = new Array(
+															2);
+												}
+												avgRatingChartData[0] = [ 'X',
+														'Y' ];
 
-	  		var chart = new google.visualization.LineChart(document.getElementById('average_chart_div'));
-	  		chart.draw(data, options);
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-	var spsChartData = [['X','Y'],['',0]];
-			
-			var data = google.visualization.arrayToDataTable(spsChartData);
+												for (var i = 1; i <= chartData.length; i++) {
+													var monthName = monthNamesList[(chartData[i - 1][1]) - 1];
+													avgRatingChartData[i][0] = monthName
+															+ "/"
+															+ chartData[i - 1][0];
+													avgRatingChartData[i][1] = chartData[i - 1][2];
+												}
 
-			var options = { 
-							legend: 'none',
-		    				height:300,
-		    				width:1000,
-		    				vAxis: { 
-		        				title:'Average Rating',
-		        				minValue:0, 
-		        				maxValue:6,
-		        				gridlines : {
-		          					count : 7
-		          				}
-		      		   		},
-		        			colors: ['009fe0'],
-		        			pointSize: 5
-			               };
+												var data = google.visualization
+														.arrayToDataTable(avgRatingChartData);
 
-			var chart = new google.visualization.ColumnChart(document.getElementById('average_chart_div'));
-			chart.draw(data, options);
-		}
-		});
+												var options = {
+													legend : 'none',
+													height : 300,
+													width : 1000,
+													vAxis : {
+														title : 'Average Rating',
+														minValue : 0,
+														maxValue : 6,
+														gridlines : {
+															count : 7
+														}
+													},
+													colors : [ '009fe0' ],
+													pointSize : 5
+												};
+
+												var chart = new google.visualization.LineChart(
+														document
+																.getElementById('average_chart_div'));
+												chart.draw(data, options);
+											}
+										},
+										error : function(e) {
+											if (e.status == 504) {
+												redirectToLoginPageOnSessionTimeOut(e.status);
+												return;
+											}
+											drawEmptyChart();
+										}
+									});
+						}else{
+							drawEmptyChart();
+						}
+					},
+					error : function(e) {
+						if (e.status == 504) {
+							redirectToLoginPageOnSessionTimeOut(e.status);
+							return;
+						}
+						drawEmptyChart();
+					}
+				});
 	}
 
 }
@@ -169,85 +261,152 @@ function drawCompletionRateGraph(){
 	google.charts.load('current', {'packages':['corechart']});
 	google.charts.setOnLoadCallback(drawChart);
 
+	function drawEmptyChart(){
+		var spsChartData = [
+							['Month','Completed Transactions ','Incomplete Transactions '],
+							[ '', 0, 0 ] ];
+
+					var data = google.visualization
+							.arrayToDataTable(spsChartData);
+
+					var options = {
+						title : 'Completion Rate',
+						height : 300,
+						width : 1100,
+						chartArea : {
+							width : '78%'
+						},
+						vAxis : {
+							minValue : 0,
+							maxValue : 10,
+							gridlines : {
+								count : 6
+							}
+						},
+						legend : {
+							position : 'right',
+							alignment : 'center',
+							maxLines : 2
+						},
+						pointSize : 5
+					};
+
+					var chart = new google.visualization.ColumnChart(
+							document
+									.getElementById('completion_chart_div'));
+					chart.draw(data, options);
+	}
+	
 	function drawChart() {
-		
 		$.ajax({
-			url : "/fetchreportingcompletionrate.do",
-			type : "GET",
-			cache : false,
-			dataType : "json",
-			success : function(data) {
-				chartData = data;
-				var maxTransactionValue = 0;
-				var compRateChartData = new Array(chartData.length+1);
-				for (var k = 0; k <= chartData.length; k++) {
-					compRateChartData[k] = new Array(3);
-				}
-				compRateChartData[0] = ['Month', 'Completed Transactions ', 'Incomplete Transactions '];
-				
-				for(var i=1;i<=chartData.length;i++){
-					var monthName = monthNamesList[(chartData[i-1][1])-1];
-					compRateChartData[i][0] = monthName + "/" + chartData[i-1][0];
-					compRateChartData[i][1] = chartData[i-1][2];
-					compRateChartData[i][2] = chartData[i-1][3];
-					
-					if(compRateChartData[i][1] > maxTransactionValue){
-						maxTransactionValue =  compRateChartData[i][1];
+					async : false,
+					url : "/fetchreportingcompletionrate.do",
+					type : "GET",
+					cache : false,
+					dataType : "json",
+					success : function(data) {
+						if (data.status == 200) {
+							$.ajax({
+										url : data.url,
+										type : "GET",
+										cache : false,
+										dataType : "json",
+										success : function(response) {
+											chartData = JSON.parse(response);
+
+											if (chartData.length == 0) {
+												drawEmptyChart();
+											} else {
+												var maxTransactionValue = 0;
+												var compRateChartData = new Array(
+														chartData.length + 1);
+												for (var k = 0; k <= chartData.length; k++) {
+													compRateChartData[k] = new Array(
+															3);
+												}
+												compRateChartData[0] = [
+														'Month',
+														'Completed Transactions ',
+														'Incomplete Transactions ' ];
+
+												for (var i = 1; i <= chartData.length; i++) {
+													var monthName = monthNamesList[(chartData[i - 1][1]) - 1];
+													compRateChartData[i][0] = monthName
+															+ "/"
+															+ chartData[i - 1][0];
+													compRateChartData[i][1] = chartData[i - 1][2];
+													compRateChartData[i][2] = chartData[i - 1][3];
+
+													if (compRateChartData[i][1] > maxTransactionValue) {
+														maxTransactionValue = compRateChartData[i][1];
+													}
+
+													if (compRateChartData[i][2] > maxTransactionValue) {
+														maxTransactionValue = compRateChartData[i][2];
+													}
+												}
+
+												var maxVAxisValue = 0;
+
+												if (maxTransactionValue < 10) {
+													maxVAxisValue = maxTransactionValue + 5;
+												} else {
+													maxVAxisValue = maxTransactionValue + 10;
+												}
+
+												var data = google.visualization
+														.arrayToDataTable(compRateChartData);
+
+												var options = {
+													title : 'Completion Rate',
+													height : 300,
+													width : 1100,
+													chartArea : {
+														width : '78%'
+													},
+													vAxis : {
+														minValue : 0,
+														maxValue : maxVAxisValue,
+														gridlines : {
+															count : 6
+														}
+													},
+													legend : {
+														position : 'right',
+														alignment : 'center',
+														maxLines : 2
+													},
+													pointSize : 5
+												};
+
+												var chart = new google.visualization.LineChart(
+														document
+																.getElementById('completion_chart_div'));
+
+												chart.draw(data, options);
+											}
+										},
+										error : function(e) {
+
+											if (e.status == 504) {
+												redirectToLoginPageOnSessionTimeOut(e.status);
+												return;
+											}
+											drawEmptyChart();
+										}
+									});
+						}else{
+							drawEmptyChart();
+						}
+					},
+					error : function(e) {
+						if (e.status == 504) {
+							redirectToLoginPageOnSessionTimeOut(e.status);
+							return;
+						}
+						drawEmptyChart();
 					}
-					
-					if(compRateChartData[i][2] > maxTransactionValue){
-						maxTransactionValue =  compRateChartData[i][2];
-					}
-				}
-			
-				var maxVAxisValue = 0;
-				
-				if(maxTransactionValue<10){
-					maxVAxisValue = maxTransactionValue + 5;
-				}else{
-					maxVAxisValue = maxTransactionValue + 10;
-				}
-				
-	  		var data = google.visualization.arrayToDataTable(compRateChartData);
-
-	  		var options = {
-	    		title: 'Completion Rate',
-	    		height:300,
-	    		width:1100,
-	    		chartArea:{width:'78%'},
-	    		vAxis: { minValue:0, maxValue: maxVAxisValue ,gridlines : {count : 6	}},
-	    		legend: { position: 'right',alignment:'center',maxLines:2},
-	    		pointSize:5
-	  		};
-
-	 		 var chart = new google.visualization.LineChart(document.getElementById('completion_chart_div'));
-
-	  		chart.draw(data, options);
-			},
-		error : function(e) {
-			
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			var spsChartData = [['Month', 'Completed Transactions ', 'Incomplete Transactions '],['',0,0]];
-			
-			var data = google.visualization.arrayToDataTable(spsChartData);
-
-			var options = {
-							title: 'Completion Rate',
-		    				height:300,
-		    				width:1100,
-		    				chartArea:{width:'78%'},
-		    				vAxis: { minValue:0, maxValue: 10 ,gridlines : {count : 6	}},
-		    				legend: { position: 'right',alignment:'center',maxLines:2},
-		    				pointSize:5
-			               };
-
-			var chart = new google.visualization.ColumnChart(document.getElementById('completion_chart_div'));
-			chart.draw(data, options);
-		}
-		});
+				});
 	}
 }
 
@@ -520,21 +679,41 @@ function drawOverviewPage(){
 	}
 }
 
-function getOverviewData(){
-	
-	//var overviewData;
+function getOverviewData() {
+
+	// var overviewData;
 	$.ajax({
-		async:false,
-		url : "/showreportingoverview.do",
+		async : false,
+		url : "/fetchreportingoverview.do",
 		type : "GET",
 		cache : false,
 		dataType : "json",
 		success : function(data) {
-				if(data.length==0){
-					overviewData = null;
-				}else{
-					overviewData = data;
-				}
+			if (data.status == 200) {
+				$.ajax({
+					async : false,
+					url : data.url,
+					type : "GET",
+					cache : false,
+					dataType : "json",
+					success : function(response) {
+						if (response.length == 0) {
+							overviewData = null;
+						} else {
+							overviewData = JSON.parse(response);
+						}
+					},
+					error : function(e) {
+						if (e.status == 504) {
+							redirectToLoginPageOnSessionTimeOut(e.status);
+							return;
+						}
+						overviewData = null;
+					}
+				});
+			}else{
+				overviewData = null;
+			}
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -546,7 +725,7 @@ function getOverviewData(){
 	});
 	
 	return overviewData;
-	
+
 }
 
 //javascript for reporting_reports page
