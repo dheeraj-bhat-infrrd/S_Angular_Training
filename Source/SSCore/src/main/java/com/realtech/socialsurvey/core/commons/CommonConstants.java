@@ -1303,4 +1303,5 @@ public interface CommonConstants
     public static final String SURVEY_API_SURVEY_STATUS_ALL = "all";
 
     
+    public static final String NOT_AVAILABLE = "N/A";
 }
