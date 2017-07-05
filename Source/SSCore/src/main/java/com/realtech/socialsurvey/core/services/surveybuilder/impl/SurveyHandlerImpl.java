@@ -3789,7 +3789,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         //get pre initiated survey from sql
         List<SurveyPreInitiation> preInitiatedSurveys = null;
-        if ( sqlBatch > 0 &&  StringUtils.isEmpty( mood ) && startReviewDate == null ){
+        if ( ! status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) && sqlBatch > 0 &&  StringUtils.isEmpty( mood ) && startReviewDate == null ){
             Timestamp startEngagementClosedTime = null;
             if(startTransactionDate != null)
                 startEngagementClosedTime = new Timestamp( startTransactionDate.getTime() );
