@@ -3,6 +3,9 @@ package com.realtech.socialsurvey.api.controllers;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -14,12 +17,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.realtech.socialsurvey.api.exceptions.BadRequestException;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.exceptions.ValidationException;
+import com.realtech.socialsurvey.api.utils.RestUtils;
 
 
 @ControllerAdvice
 public class GlobalControllerExceptionHandler
 {
     private final static String ERRORS = "errors";
+    
+    @Autowired
+    private RestUtils restUtils;
 
 
     @ExceptionHandler ( ValidationException.class)
@@ -42,17 +49,30 @@ public class GlobalControllerExceptionHandler
 
     @ExceptionHandler ( SSApiException.class)
     @ResponseBody
-    public ResponseEntity<String> handleSSApiException( SSApiException ssapiException )
+    public ResponseEntity<?> handleSSApiException( SSApiException ssapiException, HttpServletRequest request )
     {
-        return new ResponseEntity<String>( ssapiException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR );
+        long companyId = 0;
+		return restUtils.getRestResponseEntity( HttpStatus.INTERNAL_SERVER_ERROR, ssapiException.getMessage(), null, null,
+                request, companyId );
     }
 
 
     @ExceptionHandler ( NumberFormatException.class)
     @ResponseBody
-    public ResponseEntity<String> handleNumberFormatException( NumberFormatException ie )
+    public ResponseEntity<?> handleNumberFormatException( NumberFormatException ie, HttpServletRequest request )
     {
-        return new ResponseEntity<String>( ie.getMessage(), HttpStatus.BAD_REQUEST );
+        long companyId = 0;
+		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, ie.getMessage(), null, null,
+                request, companyId );
+    }
+    
+    @ExceptionHandler ( Throwable.class)
+    @ResponseBody
+    public ResponseEntity<?> handleAnyException( Throwable e , HttpServletRequest request)
+    {
+    	long companyId = 0;
+		return restUtils.getRestResponseEntity( HttpStatus.INTERNAL_SERVER_ERROR, "Could not process request due to server error", null, null,
+                request, companyId );
     }
 
 
