@@ -2,6 +2,16 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<style>
+	.nav-tabs{
+		border-bottom:1px solid #c5c5c5;
+	}
+	
+	.nav>li>a:hover {
+       background-color: #009FE0 !important;
+     }
+</style>
 <c:choose>
 	<c:when test="${columnName == 'companyId'}">
 		<c:set value="1" var="profilemasterid"></c:set>
@@ -16,7 +26,9 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-
+<div id="toast-container" class="toast-container">
+	<span id="overlay-toast" class="overlay-toast"></span>
+</div>
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
 	<div>
 		<c:choose>
@@ -45,6 +57,7 @@
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
 				<spring:message code="label.reporting.key" />
 			</div>
+			<div class="header-links-item" onclick="javascript:showMainContent('./showreportspage.do')"><spring:message code="label.reporting.reports.key" /></div>
 			<!-- Add user assignment dropdown -->
 			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
 		</div>
@@ -66,7 +79,7 @@
 						<jsp:include page="reporting_profileimage.jsp"></jsp:include>
 					</div>
 				</div>
-				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper edit-prof-name-wrapper">
+				<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 prof-wrapper pos-relative prof-name-wrapper edit-prof-name-wrapper">
 					<div id="prof-basic-container" class="prof-name-container">
 						<jsp:include page="reporting_basicdetails.jsp"></jsp:include>
 					</div>
@@ -77,7 +90,7 @@
 					</div>
 				</div>
 			</div>
-			<div id="reportingDashTabs" style="margin-top:10px; display:inline-block">
+			<div id="reportingDashTabs" style="margin-top:40px; display:inline-block">
 				<ul class="nav nav-tabs" role="tablist" style=" margin-bottom:40px;">
 					<li id="overview-btn" class="active"><a href="#overview-tab" data-toggle="tab">Overview</a></li>
 					<li id="leaderboard-btn"><a href="#leaderboard-tab" data-toggle="tab">LeaderBoard</a></li>
@@ -86,9 +99,19 @@
 					<li id="reviews-btn"><a href="#reviews-tab" data-toggle="tab">Reviews</a></li>
 					<li id="incomplete-surveys-btn" ><a href="#incomplete-surveys-tab" data-toggle="tab" style="padding-left:2px; padding-right:2px">Incomplete Surveys</a></li>
 				</ul>
-				<div class="tab-content">
+				<div class="tab-content" style="margin-left:-40px">
 					<div class="tab-pane fade active in" id="overview-tab">
-						<jsp:include page="reporting_overview.jsp"></jsp:include>
+						<div id="overviewSuccess" class="hide">
+							<jsp:include page="reporting_overview.jsp"></jsp:include>
+						</div>
+						<div id="overviewFailure" class="hide">
+							<div style="text-align:center; margin:5% auto">
+								<span class="incomplete-trans-span" style="font-size:large">Sorry!!!</span>
+								<div style="clear: both">
+									<span class="incomplete-trans-span" style="font-size:larger">Incomplete Data Found in Overview</span> 
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class="tab-pane fade" id="leaderboard-tab"></div>
 					<div class="tab-pane fade" id="score-stats-tab"></div>
@@ -168,6 +191,15 @@ $(document).ready(function() {
 	
 	paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
 	
+	var showOverview = getOverviewData();
+	
+	if(showOverview == null){
+		$('#overviewSuccess').hide();
+		$('#overviewFailure').show();
+	}else{
+		$('#overviewSuccess').show();
+		$('#overviewFailure').hide();
+	}
 	
 });
 </script>

@@ -32,14 +32,14 @@
 <div class="float-left dash-main-left col-lg-12 col-md-12 col-sm-12 col-xs-16">
 	<div class="dash-left-txt-wrapper" style="padding: 20px 0; padding-left: 20px;">
 		<c:if test="${hiddenSection && profilemasterid!=4}">
-		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}">
+		<div id="rep-pro-cmplt-stars" class="dsh-star-wrapper clearfix" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}">
 			<div id="dsh-btn0" class="dsh-btn-complete dsh-btn-red float-left <c:if test="${not isSocialMediaExpired}">hide</c:if> ">Reconnect Social Media</div>
 			<div id="dsh-btn2" class="dsh-btn-complete dsh-btn-orange float-left hide"></div>
 			<div id="dsh-btn3" class="dsh-btn-complete dsh-btn-green float-left hide"></div>
 		</div>
 		</c:if>
 		<c:if test="${!hiddenSection}">
-		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}">
+		<div id="rep-pro-cmplt-stars" class="dsh-star-wrapper clearfix" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}">
 			<div id="dsh-btn0" class="dsh-btn-complete dsh-btn-red float-left  <c:if test="${not isSocialMediaExpired}">hide</c:if> ">Reconnect Social Media</div>
 			<div id="dsh-btn2" class="dsh-btn-complete dsh-btn-orange float-left hide"></div>
 			<div id="dsh-btn3" class="dsh-btn-complete dsh-btn-green float-left hide"></div>
@@ -47,3 +47,34 @@
 		</c:if>
 	</div>
 </div>
+
+<script>
+	$(document).ready(function(){
+		$('#rep-pro-cmplt-stars').on('click', '#dsh-btn2', function(e) {
+			e.stopPropagation();
+			var buttonId = 'dsh-btn2';
+			var task = $('#dsh-btn2').data('social');
+			dashboardButtonAction(buttonId, task, colName, colValue);
+		});
+		
+		$('#rep-pro-cmplt-stars').on('click', '#dsh-btn3', function(e) {
+			e.stopPropagation();
+			var buttonId = 'dsh-btn3';
+			var task = $('#dsh-btn3').data('social');
+			dashboardButtonAction(buttonId, task, colName, colValue);
+		});
+		
+		
+		
+		$('#rep-pro-cmplt-stars').on('click', '#dsh-btn0', function(e) {
+			e.stopPropagation();
+			var buttonId = 'dsh-btn0';
+			// getSocialMediaToFix
+			var payload = {
+					"columnName" : colName,
+					"columnValue" : colValue
+				};
+				callAjaxGetWithPayloadData('./socialmediatofix.do', paintFixSocialMedia, payload, true);
+		});
+	});
+</script>
