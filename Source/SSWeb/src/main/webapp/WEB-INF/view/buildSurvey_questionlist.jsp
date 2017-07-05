@@ -65,7 +65,7 @@ $(document).ready(function() {
 	if (status != "") {
 		setTimeout(function() {
 			showError(status);
-		}, 3000);
+		}, 300);
 	} else {
 		hideError();
 	}
