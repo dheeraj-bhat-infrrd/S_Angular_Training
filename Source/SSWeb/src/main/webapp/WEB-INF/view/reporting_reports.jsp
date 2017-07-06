@@ -84,7 +84,11 @@
 				</div>
 			</div>
 			<div class="v-um-tbl-wrapper" id="recent-activity-list">
-			
+				<!-- Fill in the recent activity list jsp -->
+			</div>
+			<div id="paginate-buttons" style="width: 100px; margin: 0 auto;">
+				<div id="page-previous" class="float-left paginate-button"><spring:message code="label.previous.key" /></div>
+				<div id="page-next" class="float-right paginate-button"><spring:message code="label.next.key" /></div>
 			</div>
 			
 </div>
@@ -96,13 +100,7 @@ $(document).ready(function() {
 	bindDatePickerforSurveyDownload();
 	$('#date-pickers').hide();
 	
-	var selectedVal = $('#generate-survey-reports').val();
-	var key = parseInt(selectedValue);
-	if(key == 12 ){
-		$('#date-pickers').hide();
-	}else{
-		$('#date-pickers').show();
-	}
+
 		
 });
 </script>

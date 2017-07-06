@@ -729,3 +729,57 @@ function getOverviewData() {
 }
 
 //javascript for reporting_reports page
+
+//Reports Page Generate report button actions
+$(document).on('change', '#generate-survey-reports', function() {
+	
+	var selectedVal = $('#generate-survey-reports').val();
+	var key = parseInt(selectedVal);
+	if(key == 12 ){
+		$('#date-pickers').hide();
+	}else{
+		$('#date-pickers').show();
+	}
+});
+
+$(document).on('click', '#reports-generate-report-btn', function(e) {
+	var selectedValue = $('#generate-survey-reports').val();
+	var key = parseInt(selectedValue);
+	var startDate = $('#dsh-start-date').val();
+	var endDate = $("#dsh-end-date").val();
+	
+	var success = false;
+	var payload = {
+			"reportId" : key,
+			"startDate" : startDate,
+			"endDate" : endDate
+		};
+	
+		
+		$.ajax({
+			url : "./updateautopostforsurvey.do",
+			type : "POST",
+			data : payload,
+			success : function(data) {
+				$('#message-header').html(data);
+				if ($('#common-message-header').hasClass("success-message")) {
+					success = true;
+				}
+				if ($('#common-message-header').hasClass("error-message")) {
+					createPopupInfo("Error!", $('#message-header p').text());
+				}
+			},
+			complete : function() {
+				if (success) {
+					
+				}
+				hideOverlay();
+			},
+			error : function(e) {
+				if (e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
+			}
+		});
+});

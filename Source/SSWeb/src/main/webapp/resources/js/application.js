@@ -8426,17 +8426,6 @@ $(document).on('change', '#download-survey-reports', function() {
 	// var selectedValue =
 });
 
-$(document).on('change', '#generate-survey-reports', function() {
-	
-	var selectedVal = $('#generate-survey-reports').val();
-	var key = parseInt(selectedVal);
-	if(key == 12 ){
-		$('#date-pickers').hide();
-	}else{
-		$('#date-pickers').show();
-	}
-});
-
 $(document).on('click', '#dsh-dwnld-report-btn', function(e) {
 	var selectedValue = $('#download-survey-reports').val();
 	var startDate = $('#dsh-start-date').val();
@@ -8511,14 +8500,7 @@ $(document).on('click', '#dsh-dwnld-report-btn', function(e) {
 	$('#overlay-main').show();
 });
 
-$(document).on('click', '#reports-generate-report-btn', function(e) {
-	var selectedValue = $('#generate-survey-reports').val();
-	var key = parseInt(selectedValue);
-	var startDate = $('#dsh-start-date').val();
-	var endDate = $("#dsh-end-date").val();
-	
-	console.log(selectedValue,"\n=============\n",key,"\n=============\n",startDate,"\n=============\n",endDate,"\n=============\n");
-});
+
 
 // function to switch to admin
 function userSwitchToAdmin() {
