@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.FileUploadDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
@@ -39,11 +40,13 @@ import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportCompany;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportRegion;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 
@@ -56,7 +59,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     private GenericReportingDao<GenerateReportList, Long> GenerateReportListDao;
     
     @Autowired
-    private GenericDao<FileUpload, Long> fileUploadDao;
+    private FileUploadDao fileUploadDao;
     
     @Autowired
     private SurveyStatsReportBranchDao SurveyStatsReportBranchDao;
@@ -67,30 +70,31 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Autowired
     private FileUploadService fileUploadService;
     
+    @Autowired
+    private UserManagementService userManagementService;
+    
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
     
     @Override
-    public void generateReports(int reportId , Date startDate , Date endDate, Long entityId , String entityType , Company company , Long adminUserid) throws InvalidInputException, NoRecordsFetchedException, FileNotFoundException, IOException{
+    public void createEntryInFileUploadForReporting(int reportId , Date startDate , Date endDate, Long entityId , String entityType , Company company , Long adminUserId) throws InvalidInputException, NoRecordsFetchedException, FileNotFoundException, IOException{
         //adding entry in the feild and set status to pending
-        createEntryForReportInFileUpload(reportId,startDate,endDate,entityId,entityType,company,adminUserid);
-        
-    }
-    
-    @Override
-    @Transactional(value = "transactionManagerForReporting")
-    public void createEntryForReportInFileUpload(int reportId , Date startDate , Date endDate ,Long entityId , String entityType ,Company company , Long adminUserId){
         LOG.info( "method to insert data into the generateReportList and save in aws server" );
         //input value into the generateReportList table 
         FileUpload fileUpload = new FileUpload();
        
         fileUpload.setCompany( company );
-        fileUpload.setAdminUserId( CommonConstants.REALTECH_ADMIN_ID );
-        fileUpload.setFileName( "default" );
+        if(adminUserId != null){
+            fileUpload.setAdminUserId( adminUserId );
+
+        }
+        fileUpload.setFileName( " " );
         fileUpload.setCreatedOn(new Timestamp(System.currentTimeMillis()));
         fileUpload.setModifiedOn(new Timestamp(System.currentTimeMillis()));
         if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT){
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT );
+        }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT){
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT );            
         }
         
         if ( startDate != null ) {
@@ -103,9 +107,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         fileUpload.setProfileLevel( entityType );
         fileUpload.setStatus( CommonConstants.STATUS_ACTIVE );
         fileUploadDao.save(fileUpload);
-        
     }
-    
+ 
     /*
      * Generate report from the surveyStats Table
      * 
@@ -190,6 +193,37 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         
     }
     
+    @Override
+    public List<List<Object>> getRecentActivityList(Long entityId , String entityType , int startIndex , int batchSize) throws InvalidInputException{
+        List<List<Object>> recentActivity = new ArrayList<>();
+        for(FileUpload fileUpload : fileUploadDao.findRecentActivityForReporting(entityId, entityType, startIndex, batchSize)){
+            List<Object> recentActivityList = new ArrayList<>();
+            User user = userManagementService.getUserByUserId( fileUpload.getAdminUserId() );
+            recentActivityList.add( fileUpload.getCreatedOn() );
+            //Set the ReportName according to the upload type 
+            if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT ){
+                recentActivityList.add( CommonConstants.REPORTING_SURVEY_STATS_REPORT );
+            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_USER_ADOPTION_REPORT );
+            }
+            recentActivityList.add( fileUpload.getStartDate() );
+            recentActivityList.add( fileUpload.getEndDate() );
+            recentActivityList.add( user.getFirstName() );
+            recentActivityList.add( user.getLastName() );
+            recentActivityList.add( fileUpload.getStatus());
+            recentActivityList.add( fileUpload.getFileName() );
+            recentActivity.add( recentActivityList );
+        }
+        return recentActivity;
+        
+    }
+    @Override
+    public Long getRecentActivityCount(Long entityId , String entityType){
+        Long Count = null ;
+        Count = fileUploadDao.getRecentActivityCountForReporting(entityId, entityType);
+        return Count;
+   
+    }
     
     
 }

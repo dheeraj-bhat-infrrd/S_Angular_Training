@@ -195,6 +195,8 @@ public interface CommonConstants
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
     public static final String IS_PRIMARY_COLUMN = "isPrimary";
     public static final String SURVEY_LAST_REMINDER_TIME = "lastReminderTime";
+    public static final String PROFILE_VALUE_COLUMN = "profileValue";
+    public static final String PROFILE_LEVEL_COLUMN = "profileLevel";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
@@ -927,6 +929,7 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_INCOMPLETE_SURVEY_REPORT = 10;
     public static final int FILE_UPLOAD_USER_ADOPTION_REPORT = 11;
     public static final int FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT = 12;
+    public static final int FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT = 13;
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
@@ -1297,5 +1300,9 @@ public interface CommonConstants
     public static final String SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION = "Authorization";
     public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
     public static final String SURVEY_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    
+    //Reporting constants
+    public static final String REPORTING_SURVEY_STATS_REPORT = "Survey Stats Report";
+    public static final String REPORTING_USER_ADOPTION_REPORT = "User Adoption Report";
     
 }
