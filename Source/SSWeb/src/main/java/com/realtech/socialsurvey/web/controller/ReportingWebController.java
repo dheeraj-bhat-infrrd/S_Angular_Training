@@ -640,7 +640,7 @@ public class ReportingWebController
     */
    @SuppressWarnings ( "unused")
    @ResponseBody
-   @RequestMapping( value = "/savereportingdata", method = RequestMethod.GET)
+   @RequestMapping( value = "/savereportingdata", method = RequestMethod.POST)
    public String saveReportingData( Model model, HttpServletRequest request, HttpServletResponse response ) throws NonFatalException, ParseException,FileNotFoundException, IOException{
        LOG.info( "the step to generate reporting reports :generateReportingReports started " );
        HttpSession session = request.getSession( false );
@@ -668,7 +668,7 @@ public class ReportingWebController
        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
        Company company = user.getCompany();
        reportingDashboardManagement.createEntryInFileUploadForReporting( reportId, startDate, endDate,entityId, entityType ,company , adminUserid );
-       message = "the report is being generated";
+       message = "The report is being generated";
        return message;
        
    }

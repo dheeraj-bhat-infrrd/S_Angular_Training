@@ -1,24 +1,13 @@
 package com.realtech.socialsurvey.core.services.reportingmanagement.impl;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,34 +18,24 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
-import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
+import com.realtech.socialsurvey.core.dao.UserAdoptionReportDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileUpload;
-import com.realtech.socialsurvey.core.entities.GenerateReportList;
-import com.realtech.socialsurvey.core.entities.HierarchyUpload;
-import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
-import com.realtech.socialsurvey.core.entities.SurveyStatsReportCompany;
-import com.realtech.socialsurvey.core.entities.SurveyStatsReportRegion;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
+import com.realtech.socialsurvey.core.entities.UserAdoptionReport;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
+//import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 
 @Component
 public class ReportingDashboardManagementImpl implements ReportingDashboardManagement
 {
     private static final Logger LOG = LoggerFactory.getLogger( ReportingDashboardManagementImpl.class );
-
-    @Autowired
-    private GenericReportingDao<GenerateReportList, Long> GenerateReportListDao;
     
     @Autowired
     private FileUploadDao fileUploadDao;
@@ -72,6 +51,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Autowired
     private UserManagementService userManagementService;
+    
+    @Autowired
+    private UserAdoptionReportDao userAdoptionReportDao;
+    
+    /*@Autowired
+    private SSApiIntergrationBuilder ssApiIntergrationBuilder;*/
     
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -105,7 +90,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         fileUpload.setProfileValue( entityId );
         fileUpload.setProfileLevel( entityType );
-        fileUpload.setStatus( CommonConstants.STATUS_ACTIVE );
+        fileUpload.setStatus( CommonConstants.STATUS_PENDING );
         fileUploadDao.save(fileUpload);
     }
  
@@ -194,6 +179,34 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
     
     @Override
+    @Transactional(value = "transactionManagerForReporting")
+    public List<List<Object>> getUserAdoptionReport(Long entityId , String entityType){
+        List<List<Object>> userAdoption = new ArrayList<>();
+        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+            for(UserAdoptionReport UserAdoptionReport : userAdoptionReportDao.fetchUserAdoptionByCompanyId(entityId) ){
+                List<Object> userAdoptionReportList = new ArrayList<>();
+                userAdoptionReportList.add( UserAdoptionReport.getCompanyName() );
+                if(UserAdoptionReport.getRegionName() != null && !UserAdoptionReport.getRegionName().isEmpty() ){
+                    userAdoptionReportList.add( UserAdoptionReport.getRegionName() );
+                }else{
+                    userAdoptionReportList.add( "" );
+                }
+                if(UserAdoptionReport.getBranchName() != null && !UserAdoptionReport.getBranchName().isEmpty()){
+                    userAdoptionReportList.add( UserAdoptionReport.getBranchName() );
+                }else{
+                    userAdoptionReportList.add( "" );
+                }
+                userAdoptionReportList.add( UserAdoptionReport.getInvitedUsers() );
+                userAdoptionReportList.add( UserAdoptionReport.getActiveUsers() );
+                userAdoptionReportList.add( UserAdoptionReport.getAdoptionRate() );
+                userAdoption.add( userAdoptionReportList );
+            }
+        }
+        return userAdoption;
+        
+    }
+    
+    @Override
     public List<List<Object>> getRecentActivityList(Long entityId , String entityType , int startIndex , int batchSize) throws InvalidInputException{
         List<List<Object>> recentActivity = new ArrayList<>();
         for(FileUpload fileUpload : fileUploadDao.findRecentActivityForReporting(entityId, entityType, startIndex, batchSize)){
@@ -223,6 +236,21 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         Count = fileUploadDao.getRecentActivityCountForReporting(entityId, entityType);
         return Count;
    
+    }
+    
+    @Override
+    public void generateSurveyStatsForReporting(Long entityId , String entityType , long userId) throws InvalidInputException{
+        User user = userManagementService.getUserByUserId( userId );
+        String fileName = "Survey_Stats_Report-" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+            + ( new Timestamp( new Date().getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadSurveyStatsForReporting( entityId , entityType );
+        
+    }
+    
+    public XSSFWorkbook downloadSurveyStatsForReporting( long entityId , String entityType){
+        //Response response = ssApiIntergrationBuilder.getIntegrationApi().getReportingSurveyStatsReport(entityId,entityType);
+        return null;
+        
     }
     
     
