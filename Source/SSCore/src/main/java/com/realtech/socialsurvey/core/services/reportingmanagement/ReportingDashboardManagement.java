@@ -24,4 +24,9 @@ public interface ReportingDashboardManagement
 
     public Long getRecentActivityCount( Long entityId, String entityType );
 
+    void generateSurveyStatsForReporting( Long entityId, String entityType , long userId ) throws InvalidInputException;
+
+    List<List<Object>> getUserAdoptionReport( Long entityId, String entityType );
+
+
 }

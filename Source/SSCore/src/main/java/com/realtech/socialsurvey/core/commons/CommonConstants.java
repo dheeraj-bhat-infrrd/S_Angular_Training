@@ -129,6 +129,10 @@ public interface CommonConstants
     public static final String YES_STRING = "Y";
     public static final String NO_STRING = "N";
     public static final int DISABLED_ACCOUNT_PROCESSED = 2;
+    //Reporting status in file upload table 
+    public static final int STATUS_PENDING = 0;
+    public static final int STATUS_DONE = 1;
+    public static final int STATUS_FAIL = 2;
 
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
