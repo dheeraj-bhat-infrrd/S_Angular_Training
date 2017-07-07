@@ -749,30 +749,26 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 	var endDate = $("#dsh-end-date").val();
 	
 	var success = false;
+	var messageToDisplay;
 	var payload = {
-			"reportId" : key,
 			"startDate" : startDate,
-			"endDate" : endDate
+			"endDate" : endDate,
+			"reportId" : key
 		};
 	
-		
+	console.log("==============\n\n",payload)
+		showOverlay();
 		$.ajax({
-			url : "./updateautopostforsurvey.do",
+			url : "./savereportingdata.do?startDate="+payload.startDate+"&endDate="+payload.endDate+"&reportId="+payload.reportId,
 			type : "POST",
-			data : payload,
+			dataType:"TEXT",
+			async:false,
 			success : function(data) {
-				$('#message-header').html(data);
-				if ($('#common-message-header').hasClass("success-message")) {
-					success = true;
-				}
-				if ($('#common-message-header').hasClass("error-message")) {
-					createPopupInfo("Error!", $('#message-header p').text());
-				}
+				success=true;
+				messageToDisplay = data;
+				showInfo(messageToDisplay);
 			},
-			complete : function() {
-				if (success) {
-					
-				}
+			complete : function() {	
 				hideOverlay();
 			},
 			error : function(e) {
@@ -783,3 +779,78 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 			}
 		});
 });
+
+$(document).on('click', '.err-new-close', function() {
+	hideError();
+	hideInfo();
+	window.location = window.location;
+});
+
+function getRecentActivityList(startIndex,batchSize){
+	var recentActivityList=null;
+	var payload={
+			"startIndex" : startIndex,
+			"batchSize" : batchSize
+	}
+	$.ajax({
+		async : false,
+		url : "/fetchrecentactivities.do?startIndex="+payload.startIndex+"&batchSize="+payload.batchSize,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			if (data.status == 200) {
+				$.ajax({
+					async : false,
+					url : data.url,
+					type : "GET",
+					cache : false,
+					dataType : "json",
+					success : function(response) {
+						recentActivityList = JSON.parse(response);
+					},
+					error : function(e) {
+						if (e.status == 504) {
+							redirectToLoginPageOnSessionTimeOut(e.status);
+							return;
+						}
+						recentActivityList = null;
+					}
+				});
+			}else{
+				recentActivityList = null;
+			}
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			recentActivityList = null;
+		}
+	});	
+	return recentActivityList;
+}
+
+function getRecentActivityCount(){
+	var recentActivityCount=0;
+	$.ajax({
+		async : false,
+		url : "/fetchrecentactivitiescount.do",
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+			recentActivityCount = parseInt(response);
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			recentActivityCount = 0;
+		}
+	});
+	
+	return recentActivityCount;
+}

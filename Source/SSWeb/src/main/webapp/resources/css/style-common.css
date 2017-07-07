@@ -5999,6 +5999,16 @@ td.v-tbl-spacer {
 	background: url(../images/clear_input.png) no-repeat center;
 }
 
+.v-tbl-recent-activity {
+	width: 18%;
+	padding-left: 10px;
+}
+
+.v-tbl-recent-activity-wide {
+	width: 22%;
+	padding-left: 10px;
+}
+
 .v-tbl-uname {
 	width: 23%;
 	padding-left: 10px;
@@ -9308,4 +9318,22 @@ ul.accordion li>a:before {
 	border-bottom:3px solid white;
 	margin-bottom:0;
 	
+}
+
+.tbl-black-text{
+	color: black;
+    font-size: 12px !important;
+}
+
+.tbl-blue-text{
+	color: #009fe0;
+    font-size: 12px !important;
+}
+
+.recent-act-delete-x, .recent-act-delete-x:active, .recent-act-delete-x:visited{
+	color:#666 !important;
+}
+
+.recent-act-delete-x:hover{
+	color:#a2a0a0 !important;
 }

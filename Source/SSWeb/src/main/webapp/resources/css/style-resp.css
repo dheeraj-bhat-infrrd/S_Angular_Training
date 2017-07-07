@@ -1195,6 +1195,16 @@
 		width: 6.666666%;
 		min-width: 30px;
 	}
+	.v-tbl-recent-activity {
+		width: 30%;
+		padding-left: 10px;
+	}
+
+	.v-tbl-recent-activity-wide {
+		width: 50%;
+		padding-left: 10px;
+	}
+
 	.v-tbl-uname{
     	width: 30%;
     	padding-right: 10px;
