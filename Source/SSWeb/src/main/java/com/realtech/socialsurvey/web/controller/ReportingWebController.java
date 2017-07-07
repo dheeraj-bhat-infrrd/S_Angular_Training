@@ -707,10 +707,10 @@ public class ReportingWebController
         int batchSize = 0;
         String startIndexStr = request.getParameter( "startIndex" );
         String batchSizeStr = request.getParameter( "batchSize" );
-        if(startIndexStr!=null && startIndexStr.isEmpty()){
+        if(startIndexStr!=null && !startIndexStr.isEmpty()){
             startIndex = Integer.parseInt( startIndexStr );
         }
-        if(batchSizeStr != null && batchSizeStr.isEmpty()){
+        if(batchSizeStr != null && !batchSizeStr.isEmpty()){
             batchSize = Integer.parseInt( batchSizeStr );
         }
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
