@@ -193,6 +193,18 @@ public class ReportingController
         return json;
     }
     
+    @RequestMapping( value = "/getuseradoptionreportsforreporting", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch User Adoption Report For Reporting ")
+    public String getUserAdoption( Long entityId, String entityType ) throws NonFatalException 
+    {
+        LOGGER.info( "Fetch User Adoption Report For Reporting" );
+        
+        String json = null;
+        List<List <Object>> userAdoptionList = reportingDashboardManagement.getUserAdoptionReport( entityId, entityType );
+        json = new Gson().toJson( userAdoptionList );
+        return json;
+    }
+    
     
 
 }

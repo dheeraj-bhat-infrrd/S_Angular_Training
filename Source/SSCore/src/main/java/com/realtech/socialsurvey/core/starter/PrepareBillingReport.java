@@ -17,6 +17,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
+import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.reports.BillingReportsService;
 import com.realtech.socialsurvey.core.services.upload.CsvUploadService;
 
@@ -37,6 +38,9 @@ public class PrepareBillingReport implements Runnable
 
     @Autowired
     private BatchTrackerService batchTrackerService;
+    
+    @Autowired
+    private ReportingDashboardManagement reportingDashboardManagement;
 
 
     @Override
@@ -102,6 +106,9 @@ public class PrepareBillingReport implements Runnable
                             dashboardService.generateUserAdoptionReportAndMail( fileUpload.getStartDate(),
                                 fileUpload.getEndDate(), fileUpload.getProfileLevel(), fileUpload.getProfileValue(),
                                 fileUpload.getAdminUserId(), fileUpload.getCompany().getCompanyId(), recipientMailId, null );
+                        } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT ){
+                            reportingDashboardManagement.generateSurveyStatsForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                fileUpload.getAdminUserId() );
                         }
 
                         // update the status to be processed
