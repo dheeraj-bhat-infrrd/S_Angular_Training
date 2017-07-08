@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -38,6 +39,7 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
             if ( batchSize > -1 ) {
                 criteria.setMaxResults( batchSize );
             }
+            criteria.addOrder( Order.desc( CommonConstants.MODIFIED_ON_COLUMN ) );
         } catch ( HibernateException hibernateException ) {
             LOG.error( "HibernateException caught in findRecentActivityForReporting().", hibernateException );
             throw new DatabaseException( "HibernateException caught in findRecentActivityForReporting().", hibernateException );

@@ -1,11 +1,20 @@
 package com.realtech.socialsurvey.core.services.reportingmanagement.impl;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -15,6 +24,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.api.builder.SSApiBatchIntegrationBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
@@ -27,10 +39,18 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserAdoptionReport;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 //import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
+
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
+
 
 @Component
 public class ReportingDashboardManagementImpl implements ReportingDashboardManagement
@@ -55,11 +75,22 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Autowired
     private UserAdoptionReportDao userAdoptionReportDao;
     
-    /*@Autowired
-    private SSApiIntergrationBuilder ssApiIntergrationBuilder;*/
+    @Autowired
+    private SSApiBatchIntegrationBuilder ssApiBatchIntergrationBuilder;
+    
+    @Autowired
+    private WorkbookData workbookData;
+    
+    @Autowired
+    private WorkbookOperations workbookOperations;
+
     
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
+    
+    @Value ( "${CDN_PATH}")
+    private String endpoint;
+
     
     @Override
     public void createEntryInFileUploadForReporting(int reportId , Date startDate , Date endDate, Long entityId , String entityType , Company company , Long adminUserId) throws InvalidInputException, NoRecordsFetchedException, FileNotFoundException, IOException{
@@ -239,18 +270,106 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
     
     @Override
-    public void generateSurveyStatsForReporting(Long entityId , String entityType , long userId) throws InvalidInputException{
+    public String generateSurveyStatsForReporting(Long entityId , String entityType , long userId) throws UnsupportedEncodingException, NonFatalException{
         User user = userManagementService.getUserByUserId( userId );
+        //file is too big for windows hence uncomment the alternative 
         String fileName = "Survey_Stats_Report-" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
-            + ( new Timestamp( new Date().getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+            + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadSurveyStatsForReporting( entityId , entityType );
+        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+        return LocationInS3;
         
     }
     
+    @SuppressWarnings ( "unchecked")
     public XSSFWorkbook downloadSurveyStatsForReporting( long entityId , String entityType){
-        //Response response = ssApiIntergrationBuilder.getIntegrationApi().getReportingSurveyStatsReport(entityId,entityType);
-        return null;
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getReportingSurveyStatsReport(entityId,entityType);
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        //String responseString = "[[\"CompanyOnebranchone2017_06\",\"CompanyOne\",\"branchone\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0],[\"CompanyOnebranchtwo2017_06\",\"CompanyOne\",\"branchtwo\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0]]";
+        //since the string has ""abc"" an extra quote
+        responseString = responseString.substring(1, responseString.length()-1);
+        //and since the string doesnt eliminate the escaped characters
+        responseString = responseString.replace( "\\", "" );
+        List<List<String>> surveyStatsReport = null;
+        Type listType = new TypeToken <List<List<String>>>() {}.getType();
+        surveyStatsReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
+        Map<Integer, List<Object>> data = workbookData.getSurveyStatsReportToBeWrittenInSheet( surveyStatsReport );
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+        return workbook;
         
+    }
+    
+    @Override
+    public String generateUserAdoptionForReporting(Long entityId , String entityType , long userId) throws UnsupportedEncodingException, NonFatalException{
+        User user = userManagementService.getUserByUserId( userId );
+        //file is too big for windows hence uncomment the alternative 
+        String fileName = "User_Adoption_Report-" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+            + (Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadUserAdoptionForReporting( entityId , entityType );
+        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+        return LocationInS3;
+        
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    public XSSFWorkbook downloadUserAdoptionForReporting( long entityId , String entityType){
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getUserAdoption(entityId,entityType);
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        //String responseString = "[[\"CompanyOnebranchone2017_06\",\"CompanyOne\",\"branchone\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0],[\"CompanyOnebranchtwo2017_06\",\"CompanyOne\",\"branchtwo\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0]]";
+        //since the string has ""abc"" an extra quote
+        responseString = responseString.substring(1, responseString.length()-1);
+        //and since the string doesnt eliminate the escaped characters
+        responseString = responseString.replace( "\\", "" );
+        List<List<String>> userAdoptionReport = null;
+        Type listType = new TypeToken <List<List<String>>>() {}.getType();
+        userAdoptionReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
+        Map<Integer, List<Object>> data = workbookData.getUserAdoptionReportToBeWrittenInSheet( userAdoptionReport );
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+        return workbook;
+        
+    }
+    private String createExcelFileAndSaveInAmazonS3( String fileName, XSSFWorkbook workbook ) throws NonFatalException, UnsupportedEncodingException
+    {
+        // Create file and write report into it
+        boolean excelCreated = false;
+        FileOutputStream fileOutput = null;
+        InputStream inputStream = null;
+        File file = null;
+        String filePath = null;
+        String responseString = null;
+        try {
+            file = new File( fileDirectoryLocation + File.separator + fileName );
+            file.createNewFile();
+            fileOutput = new FileOutputStream( file );
+            workbook.write( fileOutput );
+            filePath = file.getPath();
+            excelCreated = true;
+        } catch ( FileNotFoundException fe ) {
+            LOG.error( "Exception caught while generating report " + fileName + ": " + fe.getMessage() );
+            excelCreated = false;
+        } catch ( IOException e ) {
+            LOG.error( "Exception caught while generating report " + fileName + ": " + e.getMessage() );
+            excelCreated = false;
+        } finally {
+            try {
+                if ( fileOutput != null )
+                    fileOutput.close();
+                if ( inputStream != null ) {
+                    inputStream.close();
+                }
+            } catch ( IOException e ) {
+                LOG.error( "Exception caught while generating report " + fileName + ": " + e.getMessage() );
+                excelCreated = false;
+            }
+        }
+
+        // SAVE REPORT IN S3
+        if ( excelCreated ) {
+            fileUploadService.uploadFileAtDefautBucket( file, fileName );
+            String fileNameInS3 = endpoint + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( fileName, "UTF-8" );
+            responseString = fileNameInS3;
+        }
+        return responseString;
     }
     
     

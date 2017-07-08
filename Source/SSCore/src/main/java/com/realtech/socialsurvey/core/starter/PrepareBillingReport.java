@@ -55,6 +55,8 @@ public class PrepareBillingReport implements Runnable
                     FileUpload fileUpload = filesToBeUploadedGenerated.get( 0 );
                     //FileName stores the recipient mail ID
                     String recipientMailId = fileUpload.getFileName();
+                    //Stored Filename in S3
+                    String locationInS3 = null;
 
                     try {
                         // update the status to be processing
@@ -107,17 +109,28 @@ public class PrepareBillingReport implements Runnable
                                 fileUpload.getEndDate(), fileUpload.getProfileLevel(), fileUpload.getProfileValue(),
                                 fileUpload.getAdminUserId(), fileUpload.getCompany().getCompanyId(), recipientMailId, null );
                         } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT ){
-                            reportingDashboardManagement.generateSurveyStatsForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                            locationInS3 = reportingDashboardManagement.generateSurveyStatsForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                fileUpload.getAdminUserId() );
+                        } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT ){
+                            locationInS3 = reportingDashboardManagement.generateUserAdoptionForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                                 fileUpload.getAdminUserId() );
                         }
 
                         // update the status to be processed
-                        fileUpload.setStatus( CommonConstants.STATUS_INACTIVE );
+                        fileUpload.setStatus( CommonConstants.STATUS_DONE );
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                        if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT ){
+                            fileUpload.setFileName( locationInS3 );
+                        }
                         csvUploadService.updateFileUploadRecord( fileUpload );
                     } catch ( Exception e ) {
                         LOG.error( "Error in generating billing report generator ", e );
+                        
                         try {
+                            // update the status to be processed
+                            fileUpload.setStatus( CommonConstants.STATUS_FAIL );
+                            fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                            csvUploadService.updateFileUploadRecord( fileUpload );
                             String reportType = null;
                             if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_BILLING_REPORT ) {
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT;
@@ -138,10 +151,14 @@ public class PrepareBillingReport implements Runnable
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_INCOMPLETE_SURVEY_REPORT;
                             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_USER_ADOPTION_REPORT ) {
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT;
+                            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT ){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_STATS_REPORT;
+                            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT ){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_ADOPTION_REPORT;
                             }
                             String batchName = CommonConstants.BATCH_NAME_FILE_UPLOAD_REPORTS_GENERATOR + " For " + reportType;
-
                             batchTrackerService.sendMailToAdminRegardingBatchError( batchName, System.currentTimeMillis(), e );
+                            
                         } catch ( InvalidInputException | UndeliveredEmailException e1 ) {
                             LOG.error( "error while sende report bug mail to admin ", e1 );
                         }
