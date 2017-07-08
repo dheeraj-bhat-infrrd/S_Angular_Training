@@ -240,6 +240,24 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
         LOG.debug( "Updated the unit setting" );
     }
+    
+    //This method is used to update modified on along with the list 
+    @Override
+    public void updateParticularKeyAndModifiedOnOrganizationUnitSettings( String keyToUpdate, Object updatedRecord,
+        OrganizationUnitSettings unitSettings, String collectionName )
+    {
+        LOG.debug( "Updating unit setting in " + collectionName + " with " + unitSettings + " for key: " + keyToUpdate
+            + " wtih value: " + updatedRecord );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( "_id" ).is( unitSettings.getId() ) );
+        Update update = new Update();
+        update.set( keyToUpdate, updatedRecord );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+        LOG.debug( "Updating the unit settings" );
+        mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
+        LOG.debug( "Updated the unit setting" );
+    }
+    
 
 
     // THIS METHOD TO BE USED WHERE COLLECTION HAS iden FIELD
