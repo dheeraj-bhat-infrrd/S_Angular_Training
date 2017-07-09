@@ -722,9 +722,48 @@ public class ReportingWebController
    
    //TO SHOW REPORTING UI
    @RequestMapping ( value = "/showreportspage", method = RequestMethod.GET)
-   public String showReportsPage( Model model, HttpServletRequest request )
+   public String showReportsPage( Model model, HttpServletRequest request ) throws NonFatalException
    {
        LOG.info( "Showing reports page" );
+       HttpSession session = request.getSession( false );
+       User user = sessionHelper.getCurrentUser();
+       if ( user == null ) {
+           throw new NonFatalException( "NonFatalException while logging in. " );
+       }
+       long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+       String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+       Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+       boolean modelSet = false;
+       if ( user.getCompany() != null && user.getCompany().getLicenseDetails() != null
+           && !user.getCompany().getLicenseDetails().isEmpty()
+           && user.getCompany().getLicenseDetails().get( 0 ).getAccountsMaster() != null ) {
+           if ( user.getCompany().getLicenseDetails().get( 0 ).getAccountsMaster()
+               .getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+               model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
+               model.addAttribute( "columnValue", entityId );
+               modelSet = true;
+           }
+       }
+       String profileName = "";
+       boolean isPasswordSet = true;
+       if ( user.getIsForcePassword() == 1 && user.getLoginPassword() == null ) {
+           isPasswordSet = false;
+       }
+       if ( !modelSet ) {
+           if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+               model.addAttribute( "columnName", entityType );
+               model.addAttribute( "columnValue", entityId );
+           } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+               model.addAttribute( "columnName", entityType );
+               model.addAttribute( "columnValue", entityId );
+           } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+               model.addAttribute( "columnName", entityType );
+               model.addAttribute( "columnValue", entityId );
+           } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+               model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
+               model.addAttribute( "columnValue", entityId );
+           }
+       }
        return JspResolver.REPORTS;
    }
     /**
