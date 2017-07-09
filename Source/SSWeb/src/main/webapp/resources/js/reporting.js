@@ -854,3 +854,86 @@ function getRecentActivityCount(){
 	
 	return recentActivityCount;
 }
+
+function getStatusString(status){
+		var statusString;
+		switch(status){
+		case 1: statusString='Pending';
+			break;
+		case 0: statusString='Download';
+			break;
+		case 2: statusString='Failed';
+			break;
+		default: statusString='Failed'
+		}
+		return statusString;
+	}
+var startIndex=0;
+var batchSize=10
+var tableHeaderData;
+var recentActivityList;
+
+function drawRecentActivity(start,batchSize,tableHeader){
+	
+	tableHeaderData=tableHeader;
+	startIndex=start;
+	recentActivityList = getRecentActivityList(startIndex,batchSize);
+	var tableData=''; 
+	for(var i=0;i<recentActivityList.length;i++){
+		
+		var statusString = getStatusString(recentActivityList[i][6]);
+		tableData += "<tr class=\"u-tbl-row user-row \">"
+			+"<td class=\"v-tbl-recent-activity fetch-name hide\">"+i+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text\" "+(recentActivityList[i][2]==null?("style=\"text-align:center\">"+" "):(">"+recentActivityList[i][2]))+" - "+(recentActivityList[i][3]==null?" ":recentActivityList[i][3])+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
+		
+		if(recentActivityList[i][6]==0){	
+		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"downloadLink"+i+"\"class='txt-bold tbl-blue-text downloadLink' href='#'>"+statusString+"</a></td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row\" class='txt-bold recent-act-delete-x' href='#'>X</td>"
+			+"</tr>";
+		}else if(recentActivityList[i][6]==2){
+			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row\" class='txt-bold recent-act-delete-x' href='#'>X</td>"
+			+"</tr>";
+		}else{
+			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
+				+""
+				+"</tr>";
+		}
+	}
+	
+	$('#recent-activity-list').html(tableHeaderData+tableData+"</table>");
+}
+
+$(document).on('click','.downloadLink',function(e){
+	var clickedID = this.id;
+	var indexRecentActivity = clickedID.match(/\d+$/)[0];
+	var downloadLink=recentActivityList[indexRecentActivity][7];
+	window.open(downloadLink);
+});
+
+function getStartIndex(){
+	return startIndex;
+}
+
+function getTableHeader(){
+	return tableHeaderData;
+}
+
+function showHidePaginateButtons(startIndex,recentActivityCount){
+
+	if(startIndex == 0){
+		$('#rec-act-page-previous').hide();
+	}else{
+		$('#rec-act-page-previous').show();
+	}
+	
+	if((recentActivityCount-startIndex)<=10){
+		$('#rec-act-page-next').hide();
+	}else{
+		$('#rec-act-page-next').show();
+	}
+}
+

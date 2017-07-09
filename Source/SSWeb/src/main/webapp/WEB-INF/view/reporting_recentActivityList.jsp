@@ -15,69 +15,35 @@
 <div id="recent-activity-list" class="hide">
 	
 </div>
-
-
 <script>
 var recentActivityList=null;
 var batchSize = 10;
 var startIndex=0;
 $(document).ready(function(){
 	var recentActivityCount = getRecentActivityCount();
+
+	var tableHeaderData="<table class=\"v-um-tbl\" style=\"margin-bottom:15px\" >"
+		+"<tr id=\"u-tbl-header\" class=\"u-tbl-header\">"
+		+"<td class=\"v-tbl-recent-activity \">${requestedKey}</td>"
+		+"<td class=\"v-tbl-recent-activity\">${reportKey}</td>"
+		+"<td class=\"v-tbl-recent-activity\" \>${dateRangeKey}</td>"
+		+"<td class=\"v-tbl-recent-activity \">${requestedByKey}</td>"
+		+"<td class=\"v-tbl-recent-activity\" style='width:25%'>${statusKey}</td>"
+		+"<td class=\"v-tbl-recent-activity \"></td>"
+		+"</tr>";
 	
-	function getStatusString(status){
-		var statusString;
-		switch(status){
-		case 0: statusString='Pending';
-			break;
-		case 1: statusString='Download';
-			break;
-		case 2: statusString='Failed';
-			break;
-		default: statusString='Failed'
-		}
-		return statusString;
-	}
+	drawRecentActivity(startIndex, batchSize,tableHeaderData);
+	showHidePaginateButtons(startIndex, recentActivityCount);
 	
 	if(recentActivityCount > 0){
 		$('#recent-activity-list').show();
 		$('#empty-list-msg-div').hide();
 		
-		var tableHeaderData="<table class=\"v-um-tbl\" style=\"margin-bottom:15px\" >"
-			+"<tr id=\"u-tbl-header\" class=\"u-tbl-header\">"
-			+"<td class=\"v-tbl-recent-activity \">${requestedKey}</td>"
-			+"<td class=\"v-tbl-recent-activity-wide\">${reportKey}</td>"
-			+"<td class=\"v-tbl-recent-activity-wide\" \>${dateRangeKey}</td>"
-			+"<td class=\"v-tbl-recent-activity \">${requestedByKey}</td>"
-			+"<td class=\"v-tbl-recent-activity\">${statusKey}</td>"
-			+"<td class=\"v-tbl-recent-activity \"></td>"
-			+"</tr>";
-		recentActivityList = getRecentActivityList(startIndex,batchSize);
-		var tableData=''; 
-		for(var i=0;i<recentActivityList.length;i++){
-			
-			var statusString = getStatusString(recentActivityList[i][6]);
-			tableData += "<tr class=\"u-tbl-row user-row \">"
-				+"<td class=\"v-tbl-recent-activity fetch-name hide\">"+i+"</td>"
-				+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
-				+"<td class=\"v-tbl-recent-activity-wide fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>"
-				+"<td class=\"v-tbl-recent-activity-wide fetch-email txt-bold tbl-black-text\" "+(recentActivityList[i][2]==null?("style=\"text-align:center\">"+" "):(">"+recentActivityList[i][2]))+" - "+(recentActivityList[i][3]==null?" ":recentActivityList[i][3])+"</td>"
-				+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
-			
-			if(recentActivityList[i][6]!=1){	
-			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important'>"+statusString+"</td>"
-				+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row\" class='txt-bold recent-act-delete-x' href='#'>X</td>"
-				+"</tr>";
-			}else{
-				tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \"><a id=\"downloadLink\" class='txt-bold tbl-blue-text' href='#'>"+statusString+"</a></td>"
-					+""
-					+"</tr>";
-			}
-		}
-		$('#recent-activity-list').html(tableHeaderData+tableData);
+		
 	}else{
 		$('#recent-activity-list').hide();
 		$('#empty-list-msg-div').show();
-	}
+	}		
 	
 	console.log("==========================\n\n",recentActivityList,"\n\n========================\n\n");
 });
