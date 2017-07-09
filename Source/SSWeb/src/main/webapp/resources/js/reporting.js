@@ -756,8 +756,7 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 			"reportId" : key
 		};
 	
-	console.log("==============\n\n",payload)
-		showOverlay();
+	showOverlay();
 		$.ajax({
 			url : "./savereportingdata.do?startDate="+payload.startDate+"&endDate="+payload.endDate+"&reportId="+payload.reportId,
 			type : "POST",

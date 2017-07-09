@@ -89,8 +89,6 @@ $(document).ready(function() {
 	bindDatePickerforSurveyDownload();
 	$('#date-pickers').hide();
 	
-	console.log('{profilemasterid}');
-	
 	var startIndex=0;
 	var recentActivityCount=getRecentActivityCount();
 	var tableHeaderData= getTableHeader();
@@ -103,7 +101,6 @@ $(document).ready(function() {
 
 	$('#rec-act-page-next').click(function(){
 		startIndex=getStartIndex();
-		console.log(startIndex);
 		startIndex+=10;
 		drawRecentActivity(startIndex, batchSize,tableHeaderData);
 		showHidePaginateButtons(startIndex, recentActivityCount);

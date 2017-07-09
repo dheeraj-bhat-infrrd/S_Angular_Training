@@ -44,8 +44,7 @@ $(document).ready(function(){
 		$('#recent-activity-list').hide();
 		$('#empty-list-msg-div').show();
 	}		
-	
-	console.log("==========================\n\n",recentActivityList,"\n\n========================\n\n");
+
 });
 	
 </script>
