@@ -130,9 +130,10 @@ public interface CommonConstants
     public static final String NO_STRING = "N";
     public static final int DISABLED_ACCOUNT_PROCESSED = 2;
     //Reporting status in file upload table 
-    public static final int STATUS_PENDING = 0;
-    public static final int STATUS_DONE = 1;
+    public static final int STATUS_PENDING = 1;
+    public static final int STATUS_DONE = 0;
     public static final int STATUS_FAIL = 2;
+    public static final int STATUS_DELETE = 3;
 
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
@@ -261,6 +262,8 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_SOCIAL_MONITOR_REPORT = "Social monitor report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_INCOMPLETE_SURVEY_REPORT = "Incomplete survey data report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT = "User adoption report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_STATS_REPORT = "Survey stats report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_ADOPTION_REPORT = "User adoption report for reporting";
 
 
     /**

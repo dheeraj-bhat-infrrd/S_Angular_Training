@@ -44,6 +44,7 @@ import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -659,4 +660,96 @@ public class WorkbookData
         data.put( 1, companyDetailsToPopulate );
         return data;
     }
+    
+    public Map<Integer, List<Object>> getSurveyStatsReportToBeWrittenInSheet( List<List<String>> surveyStats )
+    {
+     // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>> surveyStatsData = new TreeMap<>();
+        
+        Integer surveyStatsCounter = 1;
+        
+        List<Object> surveyStatsReportToPopulate = new ArrayList<>();
+        
+        for(List<String> row : surveyStats ){
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 3 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 4 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 5 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 6 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 7 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 8 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 9 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 10 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 11 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 12 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 13 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 14 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 15 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 16 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 17 ) ));
+            surveyStatsData.put(++surveyStatsCounter ,surveyStatsReportToPopulate );
+            surveyStatsReportToPopulate = new ArrayList<>();
+            
+        }
+        // Setting up user sheet headers
+        surveyStatsReportToPopulate.add( "ID" );
+        surveyStatsReportToPopulate.add( "COMPANY" );
+        surveyStatsReportToPopulate.add( "BRANCH" );
+        surveyStatsReportToPopulate.add( "MONTH" );
+        surveyStatsReportToPopulate.add( "TRX_RCVD" );
+        surveyStatsReportToPopulate.add( "PENDING" );
+        surveyStatsReportToPopulate.add( "DUPLICATES" );
+        surveyStatsReportToPopulate.add( "CORRUPTED" );
+        surveyStatsReportToPopulate.add( "ABUSIVE" );
+        surveyStatsReportToPopulate.add( "OLD RECORDS" );
+        surveyStatsReportToPopulate.add( "IGNORED" );
+        surveyStatsReportToPopulate.add( "MISMATCHED" );
+        surveyStatsReportToPopulate.add( "SURVEYS SENT" );
+        surveyStatsReportToPopulate.add( "SURVEYS CLICKED" );
+        surveyStatsReportToPopulate.add( "SURVEYS COMPLETED" );
+        surveyStatsReportToPopulate.add( "SURVEYS PARTIALLY COMPLETED" );
+        surveyStatsReportToPopulate.add( "COMPLETE PERCENTAGE" );
+        surveyStatsReportToPopulate.add( "DELTA" );
+        surveyStatsData.put( 1, surveyStatsReportToPopulate );
+        
+        return surveyStatsData;
+        
+    }
+    
+    public Map<Integer, List<Object>> getUserAdoptionReportToBeWrittenInSheet( List<List<String>> userAdoption )
+    {
+     // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>>  userAdoptionData = new TreeMap<>();
+        
+        Integer userAdoptionCounter = 1;
+        
+        List<Object> userAdoptionReportToPopulate = new ArrayList<>();
+        
+        for(List<String> row : userAdoption ){
+            userAdoptionReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+            userAdoptionReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+            userAdoptionReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+            userAdoptionReportToPopulate.add(String.valueOf( row.get( 3 ) ));
+            userAdoptionReportToPopulate.add(String.valueOf( row.get( 4 ) ));
+            userAdoptionReportToPopulate.add(String.valueOf( row.get( 5 ) ));
+            userAdoptionData.put(++userAdoptionCounter ,userAdoptionReportToPopulate );
+            userAdoptionReportToPopulate = new ArrayList<>();
+            
+        }
+        // Setting up user sheet headers
+        userAdoptionReportToPopulate.add( "COMPANY" );
+        userAdoptionReportToPopulate.add( "REGIO" );
+        userAdoptionReportToPopulate.add( "BRANCH" );
+        userAdoptionReportToPopulate.add( "INVITED USER" );
+        userAdoptionReportToPopulate.add( "ACTIVE USER" );
+        userAdoptionReportToPopulate.add( "ADOPTION RATE" );
+        userAdoptionData.put( 1, userAdoptionReportToPopulate );
+        
+        return userAdoptionData;
+        
+    }
+    
+    
 }

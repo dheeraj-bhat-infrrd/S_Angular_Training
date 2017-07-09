@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.reportingmanagement;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +13,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 
 public interface ReportingDashboardManagement
 {
@@ -24,9 +26,12 @@ public interface ReportingDashboardManagement
 
     public Long getRecentActivityCount( Long entityId, String entityType );
 
-    void generateSurveyStatsForReporting( Long entityId, String entityType , long userId ) throws InvalidInputException;
+    String generateSurveyStatsForReporting( Long entityId, String entityType , long userId ) throws InvalidInputException, UnsupportedEncodingException, NonFatalException;
 
     List<List<Object>> getUserAdoptionReport( Long entityId, String entityType );
+
+    String generateUserAdoptionForReporting( Long entityId, String entityType, long userId )
+        throws UnsupportedEncodingException, NonFatalException;
 
 
 }
