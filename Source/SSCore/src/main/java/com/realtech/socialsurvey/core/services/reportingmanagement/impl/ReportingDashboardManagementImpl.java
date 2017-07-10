@@ -125,6 +125,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         fileUpload.setProfileValue( entityId );
         fileUpload.setProfileLevel( entityType );
         fileUpload.setStatus( CommonConstants.STATUS_PENDING );
+        fileUpload.setShowOnUI( true );
         fileUploadDao.save(fileUpload);
     }
  
