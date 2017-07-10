@@ -898,12 +898,20 @@ function drawRecentActivity(start,batchSize,tableHeader){
 			+"</tr>";
 		}else{
 			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
-				+""
+				+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" >  </td>"
 				+"</tr>";
 		}
 	}
 	
-	$('#recent-activity-list').html(tableHeaderData+tableData+"</table>");
+	var recentActivityCount = getRecentActivityCount();
+	if(recentActivityCount == 0){
+		tableData='';
+		tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+		$('#recent-activity-list-table').html(tableData);
+	}else{
+		$('#recent-activity-list-table').html(tableHeaderData+tableData+"</table>");
+	}
+	
 }
 
 function deleteRecentActivity(fileUploadId,idIndex){
@@ -922,6 +930,14 @@ function deleteRecentActivity(fileUploadId,idIndex){
 			$('#recent-activity-row'+idIndex).fadeOut(1000,function(){
 				//$('#recent-activity-row'+idIndex).remove();
 			});
+			var recentActivityCount=getRecentActivityCount();
+			showHidePaginateButtons(startIndex, recentActivityCount);
+			
+			if(recentActivityCount == 0){
+				var tableData='';
+				tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+				$('#recent-activity-list-table').html(tableData);
+			}
 		},
 		error : function(e) {
 			if (e.status == 504) {

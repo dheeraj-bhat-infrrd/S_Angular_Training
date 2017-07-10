@@ -9394,3 +9394,8 @@ ul.accordion li>a:before {
 .recent-activity-header{
 	border-top:1px solid #009fe0; width:90%; margin:0 auto;
 }
+
+.incomplete-trans-span{
+	font-size: larger;
+    font-weight: bold !important;	
+}

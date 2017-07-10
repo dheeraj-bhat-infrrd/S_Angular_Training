@@ -76,6 +76,11 @@
 			<div class="v-um-tbl-wrapper" id="recent-activity-list" style="width:90%; margin:30px auto;">
 				<jsp:include page="reporting_recentActivityList.jsp"></jsp:include>
 			</div>
+			<div id="empty-list-msg-div" class="hide">
+				<div style="text-align:center; margin:30% auto">
+					<span class="incomplete-trans-span">There are No Recent Activities</span>
+				</div>
+			</div>
 			<div id="rec-act-paginate-buttons" style="width: 100px; margin: 0 auto; ">
 				<div id="rec-act-page-previous" class="float-left paginate-button"><spring:message code="label.previous.key" /></div>
 				<div id="rec-act-page-next" class="float-right paginate-button"><spring:message code="label.next.key" /></div>
