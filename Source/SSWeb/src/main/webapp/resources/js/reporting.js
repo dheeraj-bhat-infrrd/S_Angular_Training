@@ -910,7 +910,7 @@ $(document).on('click','.downloadLink',function(e){
 	var clickedID = this.id;
 	var indexRecentActivity = clickedID.match(/\d+$/)[0];
 	var downloadLink=recentActivityList[indexRecentActivity][7];
-	window.open(downloadLink);
+	window.location=downloadLink;
 });
 
 function getStartIndex(){

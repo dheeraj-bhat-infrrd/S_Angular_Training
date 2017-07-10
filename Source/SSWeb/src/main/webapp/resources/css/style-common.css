@@ -9361,7 +9361,7 @@ ul.accordion li>a:before {
 }
 
 .generate-report-date-range{
-	display:inline-flex !important; 
+	display:inline-flex; 
 	margin-left:40px;
 }
 

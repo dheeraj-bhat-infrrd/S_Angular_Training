@@ -84,7 +84,7 @@
 
 <script>
 $(document).ready(function() {
-	$(document).attr("title", "Reporting Dashboard");
+	$(document).attr("title", "Reports");
 	updateViewAsScroll();
 	bindDatePickerforSurveyDownload();
 	$('#date-pickers').hide();
