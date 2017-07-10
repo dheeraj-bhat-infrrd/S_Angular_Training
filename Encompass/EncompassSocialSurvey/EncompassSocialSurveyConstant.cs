@@ -54,6 +54,12 @@ namespace EncompassSocialSurvey
         public const int REMINDER_COUNT = 0;
         public const int STATUS = 4;
 
+        public const int PARTICIPANT_TYPE_BORROWER = 1;
+        public const int PARTICIPANT_TYPE_CO_BORROWER = 2;
+        public const int PARTICIPANT_TYPE_LISTING_AGENT = 3;
+        public const int PARTICIPANT_TYPE_BUYER_AGENT = 4;
+
+
         public const int DAYS_BEFORE = 3;
 
         public const string COMPANY_CREDENTIALS_CRM_SOURCE = "encompass";
@@ -76,7 +82,17 @@ namespace EncompassSocialSurvey
         public const string fetchCompaniesUrlParameterVersion = "version";
 
         public const string ENCOMPASS_VERSION = "encompass_version";
- 
+
+        //field list index
+
+        public const int BUYER_AGENT_EMAIL_INDEX = 11;
+
+        public const int BUYER_AGENT_NAME_INDEX = 12;
+
+        public const int SELLER_AGENT_EMAIL_INDEX = 13;
+
+        public const int SELLER_AGENT_NAME_INDEX = 14;
+
 
         public static string GetAppSettingsValue(string key)
         {

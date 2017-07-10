@@ -23,5 +23,7 @@ namespace EncompassSocialSurvey.ViewModel
         public string LoanNumber { get; set; }
         public string City { get; set; }
         public string State { get; set; }
+
+        public int ParticipantType { get; set; }
     }
 }

@@ -12,7 +12,8 @@ public enum SurveyErrorCode
     MISMATCH_RECORD_INCORRECT_COMPANY( "Agent does not belong to correct company." ),
     CORRUPT_RECORD_INCORRECT_REGION_BRANCH( "Agent does not belong to correct region or branch." ),
     NOT_KNOWN( "Reason not found." ),
-    USER_DELETED( "Agent is deleted" );
+    USER_DELETED( "Agent is deleted" ),
+    SURVEY_NOT_ALLOWED( "Survey is not allowed for agent.");
 
     private String value;
 

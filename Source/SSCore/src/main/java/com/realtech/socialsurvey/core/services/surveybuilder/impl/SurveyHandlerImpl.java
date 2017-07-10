@@ -60,6 +60,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
+import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
@@ -671,6 +672,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public List<SurveyPreInitiation> getSurveyListToSendInvitationMail( Company company , Date epochDate)
     {
+
         LOG.debug( "method getSurveyListToSendInvitationMail started." );
 
         List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
@@ -1781,6 +1783,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyPreInitiation> ignoredEmailRecords = new ArrayList<>();
         List<SurveyPreInitiation> oldRecords = new ArrayList<>();
 
+        OrganizationUnitSettings companySettings = null;
+        AgentSettings agentSettings = null;
         Set<Long> companies = new HashSet<>();
         for ( SurveyPreInitiation survey : surveys ) {
             int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
@@ -1795,11 +1799,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         + survey.getCompanyId() );
                 }
 
+                
                 if ( user != null ) {
                     // check if survey has already been sent to the email id
-                    int duplicateSurveyInterval = 0;
-                    OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                    
+                    companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
                         user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                    try {
+                        agentSettings = userManagementService.getUserSettings( user.getUserId() );
+                    } catch ( InvalidInputException e ) {
+                        LOG.error( "No settings found in database for the user id:" + user.getUserId() );
+                    }
+                    
+                    int duplicateSurveyInterval = 0;
                     if ( companySettings != null && companySettings.getSurvey_settings() != null
                         && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 ){
                         duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();                        
@@ -1901,7 +1913,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 errorCode = SurveyErrorCode.MISMATCH_RECORD_INCORRECT_COMPANY.name();
                 invalidAgents.add( survey );
                 companies.add( survey.getCompanyId() );
+            } else if (survey.getParticipantType() == CommonConstants.SURVEY_PARTICIPANT_TYPE_BUYER_AGENT || survey.getParticipantType() == CommonConstants.SURVEY_PARTICIPANT_TYPE_SELLER_AGENT){
+                if( ! isPartnerSurveyAllowed( companySettings, agentSettings )){
+                    status = CommonConstants.STATUS_SURVEYPREINITIATION_SURVEY_NOT_ALLOWED;
+                    errorCode = SurveyErrorCode.SURVEY_NOT_ALLOWED.name();
+                    companies.add( survey.getCompanyId() );
+                }
             }
+            
             if ( status == CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED ) {
                 if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_DOTLOOP ) ) {
                     status = validateUnitsettingsForDotloop( user, survey );
@@ -1929,7 +1948,26 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return corruptRecords;
     }
 
-
+    
+    /**
+     * 
+     * @param companySettings
+     * @param agentSettings
+     * @return
+     */
+    boolean isPartnerSurveyAllowed(OrganizationUnitSettings companySettings , AgentSettings agentSettings){
+        
+        if(companySettings != null && agentSettings != null){
+            CRMInfo crmInfo = companySettings.getCrm_info();
+            if(crmInfo != null && crmInfo.isAllowPartnerSurvey()){
+                //check if agent is allowed for partner survey
+                if(agentSettings.isAllowPartnerSurvey())
+                    return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * 
      * @param emailId
@@ -3789,7 +3827,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         //get pre initiated survey from sql
         List<SurveyPreInitiation> preInitiatedSurveys = null;
-        if ( sqlBatch > 0 &&  StringUtils.isEmpty( mood ) && startReviewDate == null ){
+        if ( ! status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) && sqlBatch > 0 &&  StringUtils.isEmpty( mood ) && startReviewDate == null ){
             Timestamp startEngagementClosedTime = null;
             if(startTransactionDate != null)
                 startEngagementClosedTime = new Timestamp( startTransactionDate.getTime() );

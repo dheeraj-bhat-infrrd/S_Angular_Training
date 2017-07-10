@@ -10,14 +10,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
-import org.jsoup.Connection.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -750,6 +751,14 @@ public class OrganizationManagementController
             model.addAttribute( "autoPostLinkToUserSite", false );
             model.addAttribute( "vendastaAccess", unitSettings.isVendastaAccessible() );
 
+            //set allow parter survey
+            boolean allowPartnerSurvey = false;
+            if(unitSettings.getCrm_info() != null )
+                allowPartnerSurvey = unitSettings.getCrm_info().isAllowPartnerSurvey();
+            
+            model.addAttribute( "allowPartnerSurvey", allowPartnerSurvey );
+            
+            
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
             model.addAttribute( "reviewSortCriteria", profileManagementService.processSortCriteria( companySettings.getIden(),
                 companySettings.getReviewSortCriteria() ) );
@@ -808,6 +817,12 @@ public class OrganizationManagementController
         String encompassUrl = request.getParameter( "encompass-url" );
         String encompassFieldId = request.getParameter( "encompass-fieldId" );
         String state = request.getParameter( "encompass-state" );
+        
+        String buyerAgentEmail = request.getParameter( "buyer-agent-email" );
+        String buyerAgentName = request.getParameter( "buyer-agent-name" );
+        String sellerAgentEmail = request.getParameter( "seller-agnt-email" );
+        String sellerAgentName = request.getParameter( "seller-agnt-name" );
+        
         Map<String, Object> responseMap = new HashMap<String, Object>();
         String message;
         boolean status = true;
@@ -853,6 +868,29 @@ public class OrganizationManagementController
             encompassCrmInfo.setCrm_fieldId( encompassFieldId );
             encompassCrmInfo.setCrm_password( cipherPassword );
             encompassCrmInfo.setUrl( encompassUrl );
+            
+            //check if it's need to update real state agent detail
+            if( !StringUtils.isEmpty( buyerAgentEmail ) ||  !StringUtils.isEmpty( buyerAgentName ) || !StringUtils.isEmpty( sellerAgentEmail ) || !StringUtils.isEmpty( sellerAgentName ))
+            {
+                
+                if (StringUtils.isEmpty( buyerAgentEmail )) {
+                    throw new InvalidInputException( "Buyer agent email can not be empty" );
+                }
+                if (StringUtils.isEmpty( buyerAgentName )) {
+                    throw new InvalidInputException( "Buyer agent name can not be empty" );
+                }
+                if (StringUtils.isEmpty( sellerAgentEmail )) {
+                    throw new InvalidInputException( "Seller agent email can not be empty" );
+                }
+                if (StringUtils.isEmpty( sellerAgentName )) {
+                    throw new InvalidInputException( "Seller agent name can not be empty" );
+                }
+                
+                encompassCrmInfo.setBuyerAgentEmail( buyerAgentEmail );
+                encompassCrmInfo.setBuyerAgentName( buyerAgentName );
+                encompassCrmInfo.setSellerAgentEmail( sellerAgentEmail );
+                encompassCrmInfo.setSellerAgentName( sellerAgentName );
+            }
 
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
@@ -3585,5 +3623,86 @@ public class OrganizationManagementController
         LOG.info( "Method updateSendEmailThrough of OrganizationManagementController finished" );
         return new Gson().toJson( message );
     }
+    
+    
+    @RequestMapping ( value = "/updateallowpartnersurveyforcompany", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateAllowPartnerSurveyForCompany( HttpServletRequest request )
+    {
+        LOG.info( "Method to update AllowPartnerSurvey started" );
+
+        try {
+
+            HttpSession session = request.getSession();
+            long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+            String allowPartnerSurveyString = request.getParameter( "allowPartnerSurvey" );
+
+            boolean allowPartnerSurvey = Boolean.parseBoolean( allowPartnerSurveyString );
+
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            User companyAdmin = userManagementService.getCompanyAdmin( companyId );
+            Set<Long> userIds = userManagementService.getUserIdsUnderAdmin( companyAdmin );
+            organizationManagementService.updateAllowPartnerSurveyForAllUsers( userIds, allowPartnerSurvey );
+
+            if ( companySettings == null )
+                throw new Exception();
+
+            if ( companySettings.getCrm_info() == null ) {
+                return "No crm connected to company";
+            }
+
+            try {
+                EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+                encompassCrmInfo.setAllowPartnerSurvey( allowPartnerSurvey );
+
+                organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
+                    "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            } catch ( ClassCastException e ) {
+                return "Encompass is not connected for company";
+            }
+
+
+        } catch ( Exception error ) {
+            LOG.error( "Exception occured in updateallowpartnersurvey(). Nested exception is ", error );
+            return error.getMessage();
+        }
+
+        LOG.info( "Method to update allow partner survey finished" );
+        return "success";
+    }
+    
+    
+    @RequestMapping ( value = "/updateallowpartnersurveyforuser", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateAllowPartnerSurveyForUser( HttpServletRequest request )
+    {
+        LOG.info( "Method to update updateAllowPartnerSurveyForUser started" );
+        
+        try {
+            String allowPartnerSurveyString = request.getParameter( "allowPartnerSurvey" );
+            String userIdString = request.getParameter( "userId" );
+
+            boolean allowPartnerSurvey = Boolean.parseBoolean( allowPartnerSurveyString );
+            long userId = Long.parseLong( userIdString );
+
+            AgentSettings agentSettings = userManagementService.getUserSettings( userId );
+
+            if ( agentSettings == null )
+                throw new InvalidInputException( "No user found with user id : " + userId );
+
+            agentSettings.setAllowPartnerSurvey( true );
+            organizationManagementService.updatellowPartnerSurveyForUser( agentSettings, allowPartnerSurvey );
+
+
+        } catch ( Exception error ) {
+            LOG.error( "Exception occured in updateallowpartnersurvey(). Nested exception is ", error );
+            return error.getMessage();
+        }
+
+        LOG.info( "Method to update allow partner survey finished" );
+        return "success";
+    }
+
 }
 // JIRA: SS-24 BY RM02 EOC

@@ -453,7 +453,7 @@ public class SurveyBuilderController {
 			if (activeRatingQues < minRatingQuestions) {
 				LOG.info("Marking Survey as inactive");
 				surveyBuilder.changeSurveyStatus(user, CommonConstants.NO);
-				status = "Add " + (minRatingQuestions - activeRatingQues) + " more rating questions to activate the survey";
+				status = "It is recommended to add " + (minRatingQuestions - activeRatingQues) + " more rating question(s)";
 			} else {
 				LOG.info("Marking Survey as active");
 				surveyBuilder.changeSurveyStatus(user, CommonConstants.YES);

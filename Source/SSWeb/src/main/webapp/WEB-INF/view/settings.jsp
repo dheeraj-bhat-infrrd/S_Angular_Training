@@ -89,12 +89,22 @@
 									<input type="hidden" id="at-pst-lnk-usr-ste-cb" name="autopostlinktousersite" value="${autoPostLinkToUserSite}">
 									<div class="float-left customized-settings-child cust-resp-txt">Allow autopost link to the user's website</div>
 								</c:if>
+								
+								<!-- partner survey settings -->
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
+									<div id="alw-ptnr-srvy-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="alw-ptnr-srvy-cb" name="allowpartnersurvey" value="${allowPartnerSurvey}">
+									<div class="float-left customized-settings-child cust-resp-txt">Allow partner survey</div>
+								</c:if>
+								
 								<c:if test="${ columnName != 'agentId' and accountMasterId != 1 }">
 									<div id="vndsta-access-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
 									<div class="float-left listing-access-txt cust-resp-txt">Allow access to Listings Manager</div>
 								</c:if>
+								
 							</c:if>
+							
 							<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 							<div class="send-email-sel-col">
 								<div class="clearfix padding-bottom-twenty">
@@ -275,6 +285,10 @@ $(document).ready(function() {
 		$('#vndsta-access-chk-box').addClass('bd-check-img-checked');
 	}
 
+	if("${allowPartnerSurvey}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
+		$('#alw-ptnr-srvy-chk-box').addClass('bd-check-img-checked');
+	}
+	
 	var accountMasterId = "${accountMasterId}";
 	if (accountMasterId != 5) {
 		

@@ -107,6 +107,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_VENDASTA_RM_SETTINGS = "vendasta_rm_settings";
     public static final String KEY_REVIEW_SORT_CRITERIA = "reviewSortCriteria";
     public static final String KEY_SEND_EMAIL_THROUGH = "sendEmailThrough";
+    public static final String KEY_ALLOW_PARTNER_SURVEY = "allowPartnerSurvey";
 
 
 

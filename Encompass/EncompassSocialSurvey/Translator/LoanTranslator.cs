@@ -66,8 +66,8 @@ namespace EncompassSocialSurvey.Translator
                     Status = loanVM.Status,
                     CreatedOn = DateTime.Now,
                     State = loanVM.State,
-                    City = loanVM.City
-
+                    City = loanVM.City,
+                    ParticipantType = loanVM.ParticipantType
                 };
             }
             catch (Exception ex)

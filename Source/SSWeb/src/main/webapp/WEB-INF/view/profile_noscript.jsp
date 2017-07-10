@@ -858,6 +858,10 @@
 														<div class='verified-badge  verify-image float-right'
 															title='Click here to know more'></div>
 													</c:when>
+													<c:when test="${reviewItem.source =='API'}">
+														<div class='verified-badge  verify-image float-right'
+															title='Click here to know more'></div>
+													</c:when>
 													<c:when test="${reviewItem.source =='Zillow'}">
 														<div class='zillow-badge  verify-image-zillow float-right'></div>
 													</c:when>

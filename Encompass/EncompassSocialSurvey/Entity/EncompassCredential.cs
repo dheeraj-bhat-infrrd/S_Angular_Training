@@ -30,5 +30,30 @@ namespace EncompassSocialSurvey.Entity
 
         [DataMember(Name = "numberOfDays")]
         public int numberOfDays { get; set; }
-    }
+
+
+        [DataMember(Name = "allowPartnerSurvey")]
+        public bool allowPartnerSurvey { get; set; }
+
+
+        [DataMember(Name = "buyerAgentEmail")]
+        public string buyerAgentEmail { get; set; }
+
+
+        [DataMember(Name = "buyerAgentName")]
+        public string buyerAgentName { get; set; }
+
+
+        [DataMember(Name = "sellerAgentEmail")]
+        public string sellerAgentEmail { get; set; }
+
+
+        [DataMember(Name = "sellerAgentName")]
+        public string sellerAgentName { get; set; }
+
+
+
+
+
+    } 
 }

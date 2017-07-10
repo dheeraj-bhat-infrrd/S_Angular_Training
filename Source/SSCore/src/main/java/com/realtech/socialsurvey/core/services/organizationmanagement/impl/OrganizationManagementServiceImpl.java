@@ -8053,4 +8053,47 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
          }
         LOG.info( "processDeactivateCompany company: " + company.getCompanyId() + " finished");
     }
+    
+    
+    @Override
+    public void updateAllowPartnerSurveyForAllUsers( Set<Long> userIds, boolean allowPartnerSurvey )
+        throws InvalidInputException
+    {
+        if ( userIds == null ) {
+            throw new InvalidInputException( "User ids cannot be null." );
+        }
+
+        LOG.info( "Updating AllowPartnerSurvey for users with allowPartnerSurvey value : " + allowPartnerSurvey );
+        List<Object> userIdList = new ArrayList<Object>();
+        userIdList.addAll( userIds );
+        
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY, 
+            allowPartnerSurvey, MongoOrganizationUnitSettingDaoImpl.KEY_IDEN, userIdList, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        LOG.info( "Updated the AllowPartnerSurvey for users successfully" );
+    }
+    
+    
+    @Override
+    public void updatellowPartnerSurveyForUser( AgentSettings agentSettings, boolean allowPartnerSurvey )
+    {
+        LOG.debug( "Inside method updatellowPartnerSurveyForUser for user : " + agentSettings.getIden() );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY,
+            allowPartnerSurvey, agentSettings );
+    }
+    
+    
+    @Override
+    public boolean isPartnerSurveyAllowedForComapny( long companyId )
+    {
+        LOG.debug( "Inside method isPartnerSurveyAllowedForComapny for company : " + companyId );
+        OrganizationUnitSettings companySettings =  organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        if(companySettings != null){
+            if(companySettings.getCrm_info() != null){
+                if(companySettings.getCrm_info().isAllowPartnerSurvey())
+                    return true;
+            }
+        }
+        return false;
+    }
 }
