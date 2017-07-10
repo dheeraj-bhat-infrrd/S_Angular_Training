@@ -2293,6 +2293,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, surveyDetails.getSurveyPreIntitiationId() );
         update.set( CommonConstants.RETAKE_SURVEY_COLUMN, surveyDetails.isRetakeSurvey() );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        update.set( CommonConstants.COMPANY_ID_COLUMN, surveyDetails.getCompanyId() );
+        update.set( CommonConstants.REGION_ID_COLUMN, surveyDetails.getRegionId() );
+        update.set( CommonConstants.BRANCH_ID_COLUMN, surveyDetails.getBranchId() );
+        update.set( CommonConstants.AGENT_ID_COLUMN, surveyDetails.getAgentId() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method insertSurveyDetails() to insert details of survey finished." );
     }
@@ -2396,6 +2400,48 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         List<SurveyDetails> surveys = new ArrayList<SurveyDetails>();
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+
+        surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        return surveys;
+    }
+
+
+    @Override
+    public List<SurveyDetails> getSurveyDetailsForUser( long userId )
+    {
+        LOG.debug( "Method getSurveyDetailsByAgentAndCompany() to insert details of survey started." );
+        List<SurveyDetails> surveys = new ArrayList<SurveyDetails>();
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID ).is( userId ) );
+
+        surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        return surveys;
+    }
+
+
+    @Override
+    public List<SurveyDetails> getSurveyDetailsForRegionOnly( long regionId )
+    {
+        LOG.debug( "Method getSurveyDetailsForRegionOnly() to insert details of survey started." );
+        List<SurveyDetails> surveys = new ArrayList<SurveyDetails>();
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.REGION_ID_COLUMN ).is( regionId )
+            .andOperator( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).lte( 0 ) )
+            .andOperator( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).lte( 0 ) ) );
+
+        surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        return surveys;
+    }
+
+
+    @Override
+    public List<SurveyDetails> getSurveyDetailsForBranchOnly( long branchId )
+    {
+        LOG.debug( "Method getSurveyDetailsForBranchOnly() to insert details of survey started." );
+        List<SurveyDetails> surveys = new ArrayList<SurveyDetails>();
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( branchId )
+            .andOperator( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).lte( 0 ) ) );
 
         surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         return surveys;
@@ -3158,4 +3204,47 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() finished for agentId + " + agentId );
     }
+
+    @Override
+    public void moveSurveysAlongWithUser( long agentId , long branchId, long regionId , long companyId )
+    {
+        LOG.info( "Method moveSurveysAlongWithUser() startedfor user  " + agentId );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
+        Update update = new Update();
+        update.set( CommonConstants.BRANCH_ID_COLUMN, branchId);
+        update.set( CommonConstants.REGION_ID_COLUMN, regionId);
+        update.set( CommonConstants.COMPANY_ID_COLUMN, companyId);
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method moveSurveysAlongWithUser finished." );
+    }
+    
+    
+    @Override
+    public void updateAgentIdInSurveyDetail( SurveyDetails surveyDetails )
+    {
+        LOG.debug( "Method updateAgentIdInSurveyDetail() to update agentId of survey started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyDetails.get_id() ) );
+
+        Update update = new Update();
+        update.set( CommonConstants.AGENT_ID_COLUMN, surveyDetails.getAgentId() );
+
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method updateAgentIdInSurveyDetail() to update agentId of survey finished." );
+    }
+    
+    @Override
+    public void disconnectSurveysFromWithUser( long agentId )
+    {
+        LOG.info( "Method moveSurveysAlongWithUser() startedfor user  " + agentId );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
+        Update update = new Update();
+        update.set( CommonConstants.AGENT_ID_COLUMN, 0l);
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method moveSurveysAlongWithUser finished." );
+    }
+
+    
 }

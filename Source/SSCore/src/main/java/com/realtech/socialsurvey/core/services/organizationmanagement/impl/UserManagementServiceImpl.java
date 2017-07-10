@@ -4109,6 +4109,28 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
     }
+    
+    @Transactional
+    @Override
+    public void updateUserEmailMapping( UserEmailMapping userEmailMapping ) throws InvalidInputException
+    {
+        LOG.debug( "Method to updateUserEmailMapping started." );
+        if ( userEmailMapping == null ) {
+            throw new InvalidInputException( "Passed parameter userEmailMapping is null " );
+        }
+         
+        long userEmailMappingId = userEmailMapping.getUserEmailMappingId();
+        userEmailMapping = userEmailMappingDao.findById( UserEmailMapping.class, userEmailMapping.getUserEmailMappingId() );
+
+
+        if ( userEmailMapping == null ) {
+            throw new InvalidInputException( "No userEmailMapping found for emailMapping id : " + userEmailMappingId );
+        }
+
+        userEmailMappingDao.update( userEmailMapping );
+
+        LOG.debug( "Method to  update UserEmailMapping ended." );
+    }
 
 
     @Transactional
@@ -4724,5 +4746,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         LOG.info( "method temporaryInactiveCompanyAdmin finished for companyId : " + companyId );
 
+    }
+
+
+    @Override
+    @Transactional
+    public void updateUserProfileObject( UserProfile userProfile ) throws InvalidInputException
+    {     
+        LOG.info( "method updateUserProfileObject started" ); 
+        if ( userProfile == null ){
+            throw new InvalidInputException( "Passed parameter userProfile is null" );
+        }
+        userProfileDao.update( userProfile );
+        LOG.info( "method updateUserProfileObject finished for User : " + userProfile.getAgentId() );
     }
 }

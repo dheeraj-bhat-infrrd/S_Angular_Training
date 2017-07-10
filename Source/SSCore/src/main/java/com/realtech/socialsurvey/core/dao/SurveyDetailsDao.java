@@ -339,6 +339,23 @@ public interface SurveyDetailsDao
 
 
     void updateBranchIdRegionIdForAllSurveysOfAgent( long agentId, long branchId, long regionId );
+    
+    
+    public List<SurveyDetails> getSurveyDetailsForUser( long userId );
 
+
+    public List<SurveyDetails> getSurveyDetailsForRegionOnly( long regionId );
+
+
+    public List<SurveyDetails> getSurveyDetailsForBranchOnly( long branchId );
+
+
+    void moveSurveysAlongWithUser( long agentId, long branchId, long regionId, long companyId );
+
+
+    void updateAgentIdInSurveyDetail( SurveyDetails surveyDetails );
+
+
+    void disconnectSurveysFromWithUser( long agentId );
 
 }

@@ -271,4 +271,114 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
             "Method removeSocialPostsForEntityAndSource() for entityType : " + entityType + " ID : " + entityId + " source : "
                 + source + " finished" );
     }
+    
+    @Override
+    public void updateSocialPostAfterHierarchyRelocation( SocialPost socialPost )
+    {
+        LOG.info( "updateSocialPost started for " + socialPost.get_id() );
+        Query updateQuery = new Query();
+        updateQuery.addCriteria( Criteria.where( KEY_MONGO_ID ).is( new ObjectId( socialPost.get_id() ) ) );
+
+        Update update = new Update();
+        update.set( KEY_COMPANY_ID, socialPost.getCompanyId() );
+        update.set( KEY_REGION_ID, socialPost.getRegionId() );
+        update.set( KEY_BRANCH_ID, socialPost.getBranchId() );
+        update.set( KEY_AGENT_ID, socialPost.getAgentId() );
+
+        mongoTemplate.updateFirst( updateQuery, update, CommonConstants.SOCIAL_POST_COLLECTION );
+        LOG.info( "updateSocialPost finished for " + socialPost.get_id() );
+    }
+    
+    @Override
+    public void updateSocialConnectionHistoryAfterHierarchyRelocation( SocialUpdateAction action )
+    {
+        Date date = new Date();
+        action.setUpdateTime( date );
+        LOG.info( "Updating into " + CommonConstants.SOCIAL_HISTORY_COLLECTION + " Object: " + action.toString() );
+        Query updateQuery = new Query();
+        updateQuery.addCriteria( Criteria.where( KEY_MONGO_ID ).is( new ObjectId( action.get_id() ) ) );
+
+        Update update = new Update();
+        update.set( KEY_COMPANY_ID, action.getCompanyId() );
+        update.set( KEY_REGION_ID, action.getRegionId() );
+        update.set( KEY_BRANCH_ID, action.getBranchId() );
+        update.set( KEY_AGENT_ID, action.getAgentId() );
+
+        mongoTemplate.updateFirst( updateQuery, update, CommonConstants.SOCIAL_HISTORY_COLLECTION );
+        LOG.info( "updated into " + CommonConstants.SOCIAL_HISTORY_COLLECTION );
+    }
+    
+    @Override
+    public List<SocialPost> getSocialPostsForRegionOnly( long regionId )
+    {
+        LOG.info( "Fetching Social Posts for region only" );
+        Query query = new Query();
+
+        query.addCriteria( Criteria.where( KEY_REGION_ID ).is( regionId )
+            .andOperator( Criteria.where( KEY_BRANCH_ID ).lte( 0 ) ).andOperator( Criteria.where( KEY_AGENT_ID ).lte( 0 ) ) );
+
+        List<SocialPost> posts = mongoTemplate.find( query, SocialPost.class, CommonConstants.SOCIAL_POST_COLLECTION );
+
+        return posts;
+    }
+    
+
+    @Override
+    public List<SocialPost> getSocialPostsForBranchOnly( long branchId )
+    {
+        LOG.info( "Fetching Social Posts for branch only" );
+        Query query = new Query();
+
+        query.addCriteria(
+            Criteria.where( KEY_BRANCH_ID ).is( branchId ).andOperator( Criteria.where( KEY_AGENT_ID ).lte( 0 ) ) );
+
+        List<SocialPost> posts = mongoTemplate.find( query, SocialPost.class, CommonConstants.SOCIAL_POST_COLLECTION );
+
+        return posts;
+    }
+    
+    @Override
+    public List<SocialPost> getSocialPostsForUser( long agentId )
+    {
+        LOG.info( "Fetching Social Posts for a user" );
+
+
+        List<SocialPost> posts = getSocialPosts( agentId, KEY_AGENT_ID, -1, -1 );
+
+        return posts;
+    }
+    
+    @Override
+    public List<SocialUpdateAction> getSocialConnectionHistoryForRegionOnly( long regionId )
+    {
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_REGION_ID ).is( regionId )
+            .andOperator( Criteria.where( KEY_BRANCH_ID ).lte( 0 ) ).andOperator( Criteria.where( KEY_AGENT_ID ).lte( 0 ) ) );
+        List<SocialUpdateAction> actions = mongoTemplate.find( query, SocialUpdateAction.class,
+            CommonConstants.SOCIAL_HISTORY_COLLECTION );
+        return actions;
+    }
+    
+    @Override
+    public List<SocialUpdateAction> getSocialConnectionHistoryForUser( long agentId )
+    {
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_BRANCH_ID ).is( agentId ) );
+        List<SocialUpdateAction> actions = mongoTemplate.find( query, SocialUpdateAction.class,
+            CommonConstants.SOCIAL_HISTORY_COLLECTION );
+        return actions;
+    }
+
+
+    @Override
+    public List<SocialUpdateAction> getSocialConnectionHistoryForBranchOnly( long branchId )
+    {
+        Query query = new Query();
+        query.addCriteria(
+            Criteria.where( KEY_BRANCH_ID ).is( branchId ).andOperator( Criteria.where( KEY_AGENT_ID ).lte( 0 ) ) );
+        List<SocialUpdateAction> actions = mongoTemplate.find( query, SocialUpdateAction.class,
+            CommonConstants.SOCIAL_HISTORY_COLLECTION );
+        return actions;
+    }
+
 }
