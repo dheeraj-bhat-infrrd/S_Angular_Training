@@ -721,7 +721,7 @@ public class ReportingWebController
    }
    
    @ResponseBody
-   @RequestMapping( value = "/deletefromrecentactivities", method = RequestMethod.GET)
+   @RequestMapping( value = "/deletefromrecentactivities", method = RequestMethod.POST)
    public String deleteFromRecentActivity( HttpServletRequest request ) 
    {
        String message = "The row is deleted from the recentActivity and will not be displayed again";
