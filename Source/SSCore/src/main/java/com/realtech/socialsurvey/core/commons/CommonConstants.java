@@ -429,6 +429,8 @@ public interface CommonConstants
     public static final String ENTITY_TYPE_COLUMN = "entityType";
 
     public static final String FILE_UPLOAD_TYPE_COLUMN = "uploadType";
+    
+    public static final String SHOW_ON_UI_COLUMN = "showOnUI";
 
     /**
      * Batch Constants

@@ -26,12 +26,14 @@ public interface ReportingDashboardManagement
 
     public Long getRecentActivityCount( Long entityId, String entityType );
 
-    String generateSurveyStatsForReporting( Long entityId, String entityType , long userId ) throws InvalidInputException, UnsupportedEncodingException, NonFatalException;
+    String generateSurveyStatsForReporting( Long entityId, String entityType , Long userId ) throws UnsupportedEncodingException, NonFatalException;
 
     List<List<Object>> getUserAdoptionReport( Long entityId, String entityType );
 
-    String generateUserAdoptionForReporting( Long entityId, String entityType, long userId )
+    String generateUserAdoptionForReporting( Long entityId, String entityType, Long userId )
         throws UnsupportedEncodingException, NonFatalException;
+
+    void deleteRecentActivity( Long fileUploadId );
 
 
 }

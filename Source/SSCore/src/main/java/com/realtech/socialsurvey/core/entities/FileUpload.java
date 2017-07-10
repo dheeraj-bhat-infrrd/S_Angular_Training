@@ -47,6 +47,8 @@ public class FileUpload
     @ManyToOne ( fetch = FetchType.LAZY)
     @JoinColumn ( name = "COMPANY_ID")
     private Company company;
+    @Column ( name = "SHOW_ON_UI")
+    private boolean showOnUI;
 
 
     public String getProfileLevel()
@@ -191,5 +193,20 @@ public class FileUpload
     {
         this.company = company;
     }
+
+
+    public boolean isShowOnUI()
+    {
+        return showOnUI;
+    }
+
+
+    public void setShowOnUI( boolean showOnUI )
+    {
+        this.showOnUI = showOnUI;
+    }
+    
+    
+    
 
 }

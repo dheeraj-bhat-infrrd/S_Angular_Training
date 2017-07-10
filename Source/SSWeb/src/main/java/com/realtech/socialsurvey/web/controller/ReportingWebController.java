@@ -720,6 +720,29 @@ public class ReportingWebController
         
    }
    
+   @ResponseBody
+   @RequestMapping( value = "/deletefromrecentactivities", method = RequestMethod.GET)
+   public String deleteFromRecentActivity( HttpServletRequest request ) 
+   {
+       String message = "The row is deleted from the recentActivity and will not be displayed again";
+        try{
+            LOG.info( "Fetching Recent Activity Graph" );
+            long fileUploadId = 0;
+            String fileUploadIdStr = request.getParameter( "fileUploadId" );
+            if(fileUploadIdStr != null && !fileUploadIdStr.isEmpty()){
+                fileUploadId = Integer.parseInt( fileUploadIdStr );
+            }else{
+                message = "The row Id was null or an empty string"; 
+            }
+            reportingDashboardManagement.deleteRecentActivity( fileUploadId );
+            return message;
+        }catch(Exception e){
+            message = "There was an exception :"+e ;
+            return message;
+        }
+        
+   }
+   
    //TO SHOW REPORTING UI
    @RequestMapping ( value = "/showreportspage", method = RequestMethod.GET)
    public String showReportsPage( Model model, HttpServletRequest request ) throws NonFatalException
