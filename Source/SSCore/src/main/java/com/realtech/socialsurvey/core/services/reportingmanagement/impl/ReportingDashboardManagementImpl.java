@@ -83,13 +83,16 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Autowired
     private WorkbookOperations workbookOperations;
-
     
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
     
-    @Value ( "${CDN_PATH}")
+    @Value ( "${CDN_REPORTING_PATH}")
     private String endpoint;
+    
+    @Value ( "${REPORTING_BUCKET}")
+    private String bucketName;
+    
 
     
     @Override
@@ -256,11 +259,13 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             recentActivityList.add( user.getLastName() );
             recentActivityList.add( fileUpload.getStatus());
             recentActivityList.add( fileUpload.getFileName() );
+            recentActivityList.add( fileUpload.getFileUploadId() );
             recentActivity.add( recentActivityList );
         }
         return recentActivity;
         
     }
+    
     @Override
     public Long getRecentActivityCount(Long entityId , String entityType){
         Long Count = null ;
@@ -270,7 +275,16 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
     
     @Override
-    public String generateSurveyStatsForReporting(Long entityId , String entityType , long userId) throws UnsupportedEncodingException, NonFatalException{
+    @Transactional
+    public void deleteRecentActivity( Long fileUploadId ){
+        FileUpload fileUpload = fileUploadDao.findById( FileUpload.class, fileUploadId );
+        fileUpload.setShowOnUI( false );
+        fileUploadDao.changeShowOnUiStatus( fileUpload );
+        
+    }
+    
+    @Override
+    public String generateSurveyStatsForReporting(Long entityId , String entityType , Long userId) throws UnsupportedEncodingException, NonFatalException{
         User user = userManagementService.getUserByUserId( userId );
         //file is too big for windows hence uncomment the alternative 
         String fileName = "Survey_Stats_Report-" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
@@ -300,7 +314,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
     
     @Override
-    public String generateUserAdoptionForReporting(Long entityId , String entityType , long userId) throws UnsupportedEncodingException, NonFatalException{
+    public String generateUserAdoptionForReporting(Long entityId , String entityType , Long userId) throws UnsupportedEncodingException, NonFatalException{
         User user = userManagementService.getUserByUserId( userId );
         //file is too big for windows hence uncomment the alternative 
         String fileName = "User_Adoption_Report-" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
@@ -365,7 +379,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         // SAVE REPORT IN S3
         if ( excelCreated ) {
-            fileUploadService.uploadFileAtDefautBucket( file, fileName );
+            fileUploadService.uploadFileAtSpeicifiedBucket( file, fileName, bucketName, false );;
             String fileNameInS3 = endpoint + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( fileName, "UTF-8" );
             responseString = fileNameInS3;
         }

@@ -11,4 +11,6 @@ public interface FileUploadDao extends GenericDao<FileUpload, Long>
 
     long getRecentActivityCountForReporting( long entityId, String entityType );
 
+    void changeShowOnUiStatus( FileUpload fileUpload );
+
 }

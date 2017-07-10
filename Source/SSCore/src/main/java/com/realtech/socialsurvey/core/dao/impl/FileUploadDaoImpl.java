@@ -12,6 +12,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
@@ -31,6 +32,7 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
         try{
             criteria.add( Restrictions.eq( CommonConstants.PROFILE_VALUE_COLUMN , entityId ) );
             criteria.add( Restrictions.eq( CommonConstants.PROFILE_LEVEL_COLUMN , entityType ) );
+            criteria.add( Restrictions.eq( CommonConstants.SHOW_ON_UI_COLUMN , true ) );
             criteria.add( Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, Arrays.asList(
                 CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT, CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT) ) );
             if ( startIndex > -1 ) {
@@ -65,5 +67,11 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
             LOG.error( "HibernateException caught in findRecentActivityForReporting().", hibernateException );
             throw new DatabaseException( "HibernateException caught in findRecentActivityForReporting().", hibernateException );
         }
+    }
+    
+    @Override
+    @Transactional
+    public void changeShowOnUiStatus( FileUpload fileUpload ){
+        super.update( fileUpload );
     }
 }
