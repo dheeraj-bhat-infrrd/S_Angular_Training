@@ -3145,4 +3145,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method updateTransactionDateInExistingSurveyDetails finished." );
     }
     
+    
+    @Override
+    public void updateBranchIdRegionIdForAllSurveysOfAgent( long agentId , long branchId , long regionId )
+    {
+        LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() started for agentId + " + agentId );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
+        Update update = new Update();
+        update.set( CommonConstants.BRANCH_ID_COLUMN, branchId );
+        update.set( CommonConstants.REGION_ID_COLUMN, regionId );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() finished for agentId + " + agentId );
+    }
 }

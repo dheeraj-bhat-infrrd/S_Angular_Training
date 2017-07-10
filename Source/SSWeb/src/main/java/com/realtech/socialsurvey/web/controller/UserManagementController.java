@@ -1813,7 +1813,7 @@ public class UserManagementController
         LOG.info( "Method deleteUserProfile() called from UserManagementController" );
         try {
             try {
-                User user = sessionHelper.getCurrentUser();
+                User sessionUser = sessionHelper.getCurrentUser();
                 long profileId = Long.parseLong( request.getParameter( "profileId" ) );
                 int status = CommonConstants.STATUS_INACTIVE;
 
@@ -1826,19 +1826,24 @@ public class UserManagementController
                         DisplayMessageType.ERROR_MESSAGE ).getMessage();
                 }
 
-                userManagementService.updateUserProfile( user, profileId, status );
-                userManagementService.updateUserProfilesStatus( user, profileId );
+                userManagementService.updateUserProfile( sessionUser, profileId, status );
+                userManagementService.updateUserProfilesStatus( sessionUser, profileId );
                 userManagementService.removeUserProfile( profileId );
 
                 userManagementService.updatePrimaryProfileOfUser( updatedUser );
                 updatedUser = userManagementService.getUserByUserId( updatedUser.getUserId() );
                 userManagementService.updateUserInSolr( updatedUser );
                 
+                
+                //move surveys if deleted assignment is an agent assignment and user also has another agent assignment
+                organizationManagementService.updateSurveyAssignments( updatedUser,userprofileList ,profileId);
+            
+                
                 userManagementService.updateUserCountModificationNotification( updatedUser.getCompany() );
 
-                if ( user.getUserId() == updatedUser.getUserId() ) {
+                if ( sessionUser.getUserId() == updatedUser.getUserId() ) {
                     try {
-                        sessionHelper.processAssignments( request.getSession( false ), user );
+                        sessionHelper.processAssignments( request.getSession( false ), sessionUser );
                     } catch ( NonFatalException e ) {
                         throw new NonFatalException(
                             "Exception occurred while processing user assignments in. Reason : " + e.getMessage(), e );

@@ -336,4 +336,9 @@ public interface SurveyDetailsDao
 
 
     void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails );
+
+
+    void updateBranchIdRegionIdForAllSurveysOfAgent( long agentId, long branchId, long regionId );
+
+
 }

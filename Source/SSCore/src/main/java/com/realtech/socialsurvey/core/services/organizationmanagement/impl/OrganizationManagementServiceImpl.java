@@ -37,6 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +56,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.RemovedUserDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
@@ -229,6 +233,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private UsercountModificationNotificationDao usercountModificationNotificationDao;
+    
+    @Autowired
+    private SurveyDetailsDao surveyDetailsDao;
 
     @Autowired
     private Utils utils;
@@ -2960,6 +2967,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         //check if new profile will be primary or not
         int isPrimary = checkWillNewProfileBePrimary( userProfileNew, userProfiles );
         userProfileNew.setIsPrimary( isPrimary );
+        
+        //move reviews
+        if(userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId );            
+        }
 
         // Remove if the profile from list
         if ( indexToRemove != -1 ) {
@@ -3128,6 +3140,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         int isPrimary = checkWillNewProfileBePrimary( userProfileNew, userProfiles );
         userProfileNew.setIsPrimary( isPrimary );
 
+        //move reviews
+        if(userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), branchId, regionId );            
+        }
+        
+        
         // Remove if the profile from list
         if ( indexToRemove != -1 ) {
             userProfiles.remove( indexToRemove );
@@ -8095,5 +8113,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         return false;
+    }
+        
+    public void updateSurveyAssignments( User user, List<UserProfile> userProfileList , long oldUserProfileId )
+    {
+        LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() started for agentId + " + user.getUserId() );
+        for(UserProfile profile : userProfileList){
+            if(profile.getUserProfileId() != oldUserProfileId){
+                if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+                    surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( user.getUserId(), profile.getBranchId(), profile.getRegionId() );
+                    break;
+                }
+            }
+        }
+        LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() finished for agentId + " +  user.getUserId() );
     }
 }
