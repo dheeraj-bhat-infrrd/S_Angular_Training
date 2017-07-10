@@ -881,7 +881,7 @@ function drawRecentActivity(start,batchSize,tableHeader){
 	for(var i=0;i<recentActivityList.length;i++){
 		
 		var statusString = getStatusString(recentActivityList[i][6]);
-		tableData += "<tr class=\"u-tbl-row user-row \">"
+		tableData += "<tr id='recent-activity-row"+i+"' class=\"u-tbl-row user-row \">"
 			+"<td class=\"v-tbl-recent-activity fetch-name hide\">"+i+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>"
@@ -889,28 +889,79 @@ function drawRecentActivity(start,batchSize,tableHeader){
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
 		
 		if(recentActivityList[i][6]==0){	
-		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"downloadLink"+i+"\"class='txt-bold tbl-blue-text downloadLink' href='#'>"+statusString+"</a></td>"
-			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row\" class='txt-bold recent-act-delete-x' href='#'>X</td>"
+		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"downloadLink"+i+"\"class='txt-bold tbl-blue-text downloadLink cursor-pointer'>"+statusString+"</a></td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
 			+"</tr>";
 		}else if(recentActivityList[i][6]==2){
 			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
-			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row\" class='txt-bold recent-act-delete-x' href='#'>X</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
 			+"</tr>";
 		}else{
 			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
-				+""
+				+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" >  </td>"
 				+"</tr>";
 		}
 	}
 	
-	$('#recent-activity-list').html(tableHeaderData+tableData+"</table>");
+	var recentActivityCount = getRecentActivityCount();
+	if(recentActivityCount == 0){
+		tableData='';
+		tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+		$('#recent-activity-list-table').html(tableData);
+	}else{
+		$('#recent-activity-list-table').html(tableHeaderData+tableData+"</table>");
+	}
+	
+}
+
+function deleteRecentActivity(fileUploadId,idIndex){
+	showOverlay();
+	$.ajax({
+		url : "./deletefromrecentactivities.do?fileUploadId="+fileUploadId,
+		type : "POST",
+		dataType:"TEXT",
+		async:false,
+		success : function(data) {
+			success=true;
+			messageToDisplay = data;
+		},
+		complete : function() {	
+			hideOverlay();
+			$('#recent-activity-row'+idIndex).fadeOut(1000,function(){
+				//$('#recent-activity-row'+idIndex).remove();
+			});
+			var recentActivityCount=getRecentActivityCount();
+			showHidePaginateButtons(startIndex, recentActivityCount);
+			
+			if(recentActivityCount == 0){
+				var tableData='';
+				tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+				$('#recent-activity-list-table').html(tableData);
+			}
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			messageToDisplay="Sorry! Failed to delete the activity. Please try again later";
+			showError(messageToDisplay);
+		}
+	});
 }
 
 $(document).on('click','.downloadLink',function(e){
 	var clickedID = this.id;
 	var indexRecentActivity = clickedID.match(/\d+$/)[0];
 	var downloadLink=recentActivityList[indexRecentActivity][7];
-	window.open(downloadLink);
+	window.location=downloadLink;
+});
+
+$(document).on('click','.recent-act-delete-x',function(e){
+	var clickedID = this.id;
+	var indexRecentActivity = clickedID.match(/\d+$/)[0];
+	var fileUploadId=recentActivityList[indexRecentActivity][8];
+	deleteRecentActivity(fileUploadId, indexRecentActivity);
 });
 
 function getStartIndex(){
