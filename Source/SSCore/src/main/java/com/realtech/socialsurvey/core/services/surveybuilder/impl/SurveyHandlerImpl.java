@@ -39,6 +39,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,6 +67,7 @@ import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -4058,7 +4062,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
     }
     
-    
+    /**
+     * 
+     */
     @Override
     public Map<String , Date> getMinMaxLastSurveyReminderTime( long systemTime, int reminderInterval )
     {
@@ -4077,4 +4083,161 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return minMaxLastReminderTime;
     }
 
+    
+    /**
+     * @throws InvalidInputException 
+     * 
+     */
+    @Override
+    @Transactional
+    public void moveAllSurveysAlongWithUser( long agentId , long branchId, long regionId , long companyId ) throws InvalidInputException{
+        
+        LOG.info( "Method moveAllSurveysAlongWithUser() started for user  " + agentId );
+        User user = userManagementService.getUserByUserId( agentId );
+        surveyDetailsDao.moveSurveysAlongWithUser( agentId, branchId, regionId, companyId );
+        surveyPreInitiationDao.updateCompanyIdForAllRecordsForAgent( user.getEmailId(), companyId );
+        LOG.info( "Method moveSurveysAlongWithUser finished." );
+        
+    }
+    
+    
+    /**
+     * @throws InvalidInputException 
+     * 
+     */
+    @Override
+    @Transactional
+    public void disconnectAllSurveysFromWithUser( long agentId ) throws InvalidInputException{
+        
+        LOG.info( "Method disconnectAllSurveysFromWithUser() started for user  " + agentId );
+        surveyDetailsDao.disconnectSurveysFromWithUser( agentId );
+        surveyPreInitiationDao.disconnectSurveysFromAgent( agentId);
+        LOG.info( "Method disconnectAllSurveysFromWithUser finished." );
+        
+    }
+    
+    /**
+     * @throws InvalidInputException 
+     * 
+     */
+    @Override
+    @Transactional
+    public void copyAllSurveysAlongWithUser( long agentId , long branchId, long regionId , long companyId ) throws InvalidInputException{
+        
+        LOG.info( "Method copyAllSurveysAlongWithUser() started for user  " + agentId );
+        User user = userManagementService.getUserByUserId( agentId );
+        
+        Map<Long , Long> updatedsurveyPreInitiationIdMap = new HashMap<Long , Long>();
+        
+        //update mysql
+        List<SurveyPreInitiation> existingSurveyPreInitiations = surveyPreInitiationDao.findByColumn( SurveyPreInitiation.class, CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN, user.getLoginName() );
+        for(SurveyPreInitiation surveyPreInitiation : existingSurveyPreInitiations){           
+           //create new survey preinitiation object with updated data
+            if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE){
+                SurveyPreInitiation newSurveyPreInitiation = copySurveyPreinitiationObject( surveyPreInitiation );            
+                newSurveyPreInitiation.setCompanyId( companyId );
+                newSurveyPreInitiation = surveyPreInitiationDao.save( newSurveyPreInitiation );  
+                //add entry in map to update mongo
+                updatedsurveyPreInitiationIdMap.put( surveyPreInitiation.getSurveyPreIntitiationId() , newSurveyPreInitiation.getSurveyPreIntitiationId() );
+            }
+           
+        }
+
+        //update mongo
+        List<SurveyDetails> existingSurveyDetails = surveyDetailsDao.getSurveyDetailsForUser( agentId );
+        for(SurveyDetails surveyDetails : existingSurveyDetails){
+            //create new survey detail object with updated data
+            if(surveyDetails.getStage() == CommonConstants.SURVEY_STAGE_COMPLETE){
+                SurveyDetails newSurveyDetails = copySurveyDetailObject( surveyDetails );
+                newSurveyDetails.setBranchId( branchId );
+                newSurveyDetails.setCompanyId( companyId );
+                newSurveyDetails.setRegionId( regionId );
+                newSurveyDetails.setSurveyPreIntitiationId( updatedsurveyPreInitiationIdMap.get( surveyDetails.getSurveyPreIntitiationId() ) );
+                surveyDetailsDao.insertSurveyDetails( newSurveyDetails );
+            }
+        }
+        
+        LOG.info( "Method copyAllSurveysAlongWithUserk finished." );
+        
+    }
+    
+    private SurveyPreInitiation copySurveyPreinitiationObject(SurveyPreInitiation surveyPreInitiation)
+    {
+        SurveyPreInitiation newSurveyPreInitiation = new SurveyPreInitiation();
+        newSurveyPreInitiation.setAgentEmailId( surveyPreInitiation.getAgentEmailId() );
+        newSurveyPreInitiation.setAgentId( 0l );
+        newSurveyPreInitiation.setAgentName( surveyPreInitiation.getAgentName() );
+        newSurveyPreInitiation.setCity( surveyPreInitiation.getCity() );
+        newSurveyPreInitiation.setCompanyId( surveyPreInitiation.getCompanyId() );
+        newSurveyPreInitiation.setCreatedOn( surveyPreInitiation.getCreatedOn() );
+        newSurveyPreInitiation.setCustomerEmailId( surveyPreInitiation.getCustomerEmailId() );
+        newSurveyPreInitiation.setCustomerFirstName( surveyPreInitiation.getCustomerFirstName() );
+        newSurveyPreInitiation.setCustomerInteractionDetails( surveyPreInitiation.getCustomerInteractionDetails() );
+        newSurveyPreInitiation.setCustomerLastName( surveyPreInitiation.getCustomerLastName() );
+        newSurveyPreInitiation.setEngagementClosedTime( surveyPreInitiation.getEngagementClosedTime() );
+        newSurveyPreInitiation.setIsSurveyRequestSent( surveyPreInitiation.getIsSurveyRequestSent() );
+        newSurveyPreInitiation.setLastReminderTime( surveyPreInitiation.getLastReminderTime() );
+        newSurveyPreInitiation.setModifiedOn( surveyPreInitiation.getModifiedOn() );
+        newSurveyPreInitiation.setReminderCounts( surveyPreInitiation.getReminderCounts() );
+        newSurveyPreInitiation.setState( surveyPreInitiation.getState() );
+        newSurveyPreInitiation.setStatus( surveyPreInitiation.getStatus() );
+        newSurveyPreInitiation.setSurveySource( surveyPreInitiation.getSurveySource() );
+        newSurveyPreInitiation.setSurveySourceId( surveyPreInitiation.getSurveySourceId() );
+        newSurveyPreInitiation.setTransactionType( surveyPreInitiation.getTransactionType() );
+        
+        return newSurveyPreInitiation;
+        
+    }
+    
+    /**
+     * 
+     * @param surveyDetails
+     * @return
+     */
+    private SurveyDetails copySurveyDetailObject(SurveyDetails surveyDetails)
+    {
+        
+        SurveyDetails newSurveyDetails = new SurveyDetails();
+        newSurveyDetails.setAbuseRepByUser( surveyDetails.isAbuseRepByUser() );
+        newSurveyDetails.setAbusive( surveyDetails.isAbusive() );
+        newSurveyDetails.setAgentEmailId( surveyDetails.getAgentEmailId() );
+        newSurveyDetails.setAgentId( 0l );
+        newSurveyDetails.setAgentName( surveyDetails.getAgentName() );
+        newSurveyDetails.setAgreedToShare( surveyDetails.getAgreedToShare() );
+        newSurveyDetails.setBranchId( surveyDetails.getBranchId() );
+        newSurveyDetails.setCity( surveyDetails.getCity() );
+        newSurveyDetails.setCompanyId( surveyDetails.getCompanyId() );
+        newSurveyDetails.setCompleteProfileUrl( surveyDetails.getCompleteProfileUrl() );
+        newSurveyDetails.setCreatedOn( surveyDetails.getCreatedOn() );
+        newSurveyDetails.setCustomerEmail( surveyDetails.getCustomerEmail() );
+        newSurveyDetails.setCustomerFirstName( surveyDetails.getCustomerFirstName() );
+        newSurveyDetails.setCustomerLastName( surveyDetails.getCustomerLastName() );
+        newSurveyDetails.setCustRelationWithAgent( surveyDetails.getCustRelationWithAgent() );
+        newSurveyDetails.setEditable( surveyDetails.getEditable() );
+        newSurveyDetails.setLastReminderForIncompleteSurvey( surveyDetails.getLastReminderForIncompleteSurvey() );
+        newSurveyDetails.setLastReminderForSocialPost( surveyDetails.getLastReminderForSocialPost() );
+        newSurveyDetails.setModifiedOn( surveyDetails.getModifiedOn() );
+        newSurveyDetails.setMood( surveyDetails.getMood() );
+        newSurveyDetails.setRegionId( surveyDetails.getRegionId() );
+        newSurveyDetails.setReminderCount( surveyDetails.getReminderCount() );
+        newSurveyDetails.setRetakeSurvey( surveyDetails.isRetakeSurvey() );
+        newSurveyDetails.setReview( surveyDetails.getReview() );
+        newSurveyDetails.setScore( surveyDetails.getScore() );
+        newSurveyDetails.setShowSurveyOnUI( surveyDetails.isShowSurveyOnUI() );
+        newSurveyDetails.setSource( surveyDetails.getSource() );
+        newSurveyDetails.setSourceId( surveyDetails.getSourceId() );
+        newSurveyDetails.setStage( surveyDetails.getStage() );
+        newSurveyDetails.setState( surveyDetails.getState() );
+        newSurveyDetails.setSummary( surveyDetails.getSummary() );
+        newSurveyDetails.setSurveyCompletedDate( surveyDetails.getSurveyCompletedDate() );
+        newSurveyDetails.setSurveyGeoLocation( surveyDetails.getSurveyGeoLocation() );
+        newSurveyDetails.setSurveyResponse( surveyDetails.getSurveyResponse() );
+        newSurveyDetails.setSurveySentDate( surveyDetails.getSurveySentDate() );
+        newSurveyDetails.setSurveyTransactionDate( surveyDetails.getSurveyTransactionDate() );
+        newSurveyDetails.setSurveyType( surveyDetails.getSurveyType() );
+        newSurveyDetails.setSurveyUpdatedDate( surveyDetails.getSurveyUpdatedDate() );
+        newSurveyDetails.setUrl( surveyDetails.getUrl() );
+        
+        return newSurveyDetails;
+    }
 }

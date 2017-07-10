@@ -2776,9 +2776,27 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             "The zillow review with ID : " + review.get_id() + "does not have any hierarchy ID set" );
                     }
                 } else {
-                    unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getAgentId(),
-                        CommonConstants.AGENT_SETTINGS_COLLECTION );
-                    baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
+                    if ( review.getAgentId() > 0 ) {
+                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getAgentId(),
+                            CommonConstants.AGENT_SETTINGS_COLLECTION );
+                        baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
+                    } else if ( review.getBranchId() > 0 ) {
+                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getBranchId(),
+                            CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                        baseProfileUrl = applicationBaseUrl + CommonConstants.BRANCH_PROFILE_FIXED_URL;
+                    } else if ( review.getRegionId() > 0 ) {
+                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getRegionId(),
+                            CommonConstants.REGION_SETTINGS_COLLECTION );
+                        baseProfileUrl = applicationBaseUrl + CommonConstants.REGION_PROFILE_FIXED_URL;
+                    } else if ( review.getCompanyId() > 0 ) {
+                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getCompanyId(),
+                            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                        baseProfileUrl = applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL;
+                    } else {
+                        throw new InvalidInputException(
+                            "The Review with ID : " + review.get_id() + "does not have any hierarchy ID set" );
+                    }
+                    
                 }
                 if ( unitSetting != null ) {
                     profileUrl = (String) unitSetting.getProfileUrl();

@@ -1475,5 +1475,12 @@ public interface OrganizationManagementService
 
     boolean isPartnerSurveyAllowedForComapny( long companyId );
 
+    void updateSurveyAssignments( User user, List<UserProfile> userProfileList, long oldUserProfileId );
+
+
+    public List<User> getUsersUnderBranch( Branch branch ) throws InvalidInputException;
+
+
+    public void updateCompanyIdInMySQLForUser( User userToBeRelocated, Company targetCompany ) throws InvalidInputException;
 
 }
