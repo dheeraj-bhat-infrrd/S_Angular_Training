@@ -5999,6 +5999,16 @@ td.v-tbl-spacer {
 	background: url(../images/clear_input.png) no-repeat center;
 }
 
+.v-tbl-recent-activity {
+	width: 18%;
+	padding-left: 10px;
+}
+
+.v-tbl-recent-activity-wide {
+	width: 22%;
+	padding-left: 10px;
+}
+
 .v-tbl-uname {
 	width: 23%;
 	padding-left: 10px;
@@ -9308,4 +9318,79 @@ ul.accordion li>a:before {
 	border-bottom:3px solid white;
 	margin-bottom:0;
 	
+}
+
+.tbl-black-text{
+	color: black;
+    font-size: 12px !important;
+}
+
+.tbl-blue-text{
+	color: #009fe0;
+    font-size: 12px !important;
+}
+
+.recent-act-delete-x, .recent-act-delete-x:active, .recent-act-delete-x:visited{
+	color:#666 !important;
+}
+
+.recent-act-delete-x:hover{
+	color:#a2a0a0 !important;
+}
+
+/* reporting styles*/
+.generate-report-div{
+	display:inline-flex; 
+	margin-left:5%;
+}
+
+.generate-report-span-report{
+	height:30px;
+	line-height:30px;
+}
+
+.report-selector{
+	float:left; 
+	margin-left:20px; 
+	width:auto;
+}
+
+.report-selector-choice{
+	width:100%;
+	border-bottom:0 !important;
+}
+
+.generate-report-date-range{
+	display:inline-flex !important; 
+	margin-left:40px;
+}
+
+.generate-report-span-date{
+	height:30px;
+	line-height:30px;
+}
+
+.generate-report-span-dash{
+	height:30px;
+	line-height:30px;
+}
+
+.report-date{
+	float:left; 
+	margin-left:20px; 
+	width:100%;
+}
+
+.generate-report-btn{
+	float:left; 
+	margin-left:40px; 
+	width:120px;
+}
+
+.generate-report-info-text{
+	font-weight: 600 !important; color:#a09d9c; margin: 20px; margin-left: 5%;
+}
+
+.recent-activity-header{
+	border-top:1px solid #009fe0; width:90%; margin:0 auto;
 }
