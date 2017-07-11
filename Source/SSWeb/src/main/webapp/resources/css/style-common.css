@@ -9399,3 +9399,7 @@ ul.accordion li>a:before {
 	font-size: larger;
     font-weight: bold !important;	
 }
+
+.recent-activity-date-range{
+	padding:10px 6%;
+}

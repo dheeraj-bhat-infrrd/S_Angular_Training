@@ -735,7 +735,7 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 12 ){
+	if(key == 12 || key == 13 ){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
@@ -881,11 +881,14 @@ function drawRecentActivity(start,batchSize,tableHeader){
 	for(var i=0;i<recentActivityList.length;i++){
 		
 		var statusString = getStatusString(recentActivityList[i][6]);
+		var startDate = getDateFromDateTime(recentActivityList[i][2]);
+		var endDate =getDateFromDateTime(recentActivityList[i][3]);
+		
 		tableData += "<tr id='recent-activity-row"+i+"' class=\"u-tbl-row user-row \">"
 			+"<td class=\"v-tbl-recent-activity fetch-name hide\">"+i+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>"
-			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text\" "+(recentActivityList[i][2]==null?("style=\"text-align:center\">"+" "):(">"+recentActivityList[i][2]))+" - "+(recentActivityList[i][3]==null?" ":recentActivityList[i][3])+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("recent-activity-date-range\">"+" "):("\">"+startDate))+" - "+(endDate==null?" ":endDate)+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
 		
 		if(recentActivityList[i][6]==0){	
@@ -914,6 +917,14 @@ function drawRecentActivity(start,batchSize,tableHeader){
 	
 }
 
+function getDateFromDateTime(dateTime){
+	if(dateTime != null){
+	return dateTime.match(/[a-zA-z]{3} \d+, \d{4}/)[0];
+	}
+	
+	return null;
+}
+
 function deleteRecentActivity(fileUploadId,idIndex){
 	showOverlay();
 	$.ajax({
@@ -924,21 +935,29 @@ function deleteRecentActivity(fileUploadId,idIndex){
 		success : function(data) {
 			success=true;
 			messageToDisplay = data;
+			
 		},
 		complete : function() {	
 			hideOverlay();
-			$('#recent-activity-row'+idIndex).fadeOut(1000,function(){
-				//$('#recent-activity-row'+idIndex).remove();
-			});
-			var recentActivityCount=getRecentActivityCount();
-			showHidePaginateButtons(startIndex, recentActivityCount);
 			
-			if(recentActivityCount == 0){
-				var tableData='';
-				tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
-				$('#recent-activity-list-table').html(tableData);
-			}
-		},
+			var recentActivityCount=getRecentActivityCount();
+			$('#recent-activity-row'+idIndex).fadeOut(500)
+				.promise()
+				.done(function(){
+					if(recentActivityCount <= startIndex){
+						drawRecentActivity(startIndex-10,batchSize,tableHeaderData);
+					}else if(recentActivityCount>=10){
+						drawRecentActivity(startIndex,batchSize,tableHeaderData);
+					}
+					showHidePaginateButtons(startIndex, recentActivityCount);
+					
+					if(recentActivityCount == 0){
+						var tableData='';
+						tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+						$('#recent-activity-list-table').html(tableData);
+					}
+				});
+			},
 		error : function(e) {
 			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
@@ -984,6 +1003,11 @@ function showHidePaginateButtons(startIndex,recentActivityCount){
 		$('#rec-act-page-next').hide();
 	}else{
 		$('#rec-act-page-next').show();
+	}
+	
+	if(recentActivityCount == 0){
+		$('#rec-act-page-previous').hide();
+		$('#rec-act-page-next').hide();
 	}
 }
 
