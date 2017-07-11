@@ -7,12 +7,8 @@
 <c:set var="dateRangeKey"><spring:message code="label.recent.activity.daterange.key" /></c:set>
 <c:set var="requestedByKey"><spring:message code="label.recent.activity.requestedby.key" /></c:set>
 <c:set var="statusKey"><spring:message code="label.recent.activity.status.key" /></c:set>
-<div id="empty-list-msg-div" class="hide">
-	<div style="text-align:center; margin:30% auto">
-		<span class="incomplete-trans-span">There are No Recent Activities</span>
-	</div>
-</div>
-<div id="recent-activity-list" class="hide">
+
+<div id="recent-activity-list-table">
 	
 </div>
 <script>
@@ -33,17 +29,7 @@ $(document).ready(function(){
 		+"</tr>";
 	
 	drawRecentActivity(startIndex, batchSize,tableHeaderData);
-	showHidePaginateButtons(startIndex, recentActivityCount);
-	
-	if(recentActivityCount > 0){
-		$('#recent-activity-list').show();
-		$('#empty-list-msg-div').hide();
-		
-		
-	}else{
-		$('#recent-activity-list').hide();
-		$('#empty-list-msg-div').show();
-	}		
+	showHidePaginateButtons(startIndex, recentActivityCount);		
 
 });
 	

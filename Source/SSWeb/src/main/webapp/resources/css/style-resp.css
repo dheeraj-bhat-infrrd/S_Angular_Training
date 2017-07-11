@@ -1195,15 +1195,6 @@
 		width: 6.666666%;
 		min-width: 30px;
 	}
-	.v-tbl-recent-activity {
-		width: 30%;
-		padding-left: 10px;
-	}
-
-	.v-tbl-recent-activity-wide {
-		width: 50%;
-		padding-left: 10px;
-	}
 
 	.v-tbl-uname{
     	width: 30%;
@@ -1774,6 +1765,10 @@
 	width:40%
 	}
 	
+	.report-selector-choice{
+		font-size:11px;
+	}
+	
 	.generate-report-date-range{
 		display: inline-grid !important;
 		margin-left: 0;
@@ -1788,6 +1783,7 @@
 		margin-left: 20px;
 		margin-top: 20px;
 		width:120px;
+		font-size:11px;
 	}
 	
 	.generate-report-span-report,.generate-report-span-date{
@@ -1797,6 +1793,18 @@
 	.generate-report-span-dash{
 		padding-left:25%
 	}
+	.v-tbl-recent-activity {
+		width: 30%;
+		padding-left: 10px;
+		font-size:11px !important;
+	}
+
+	.v-tbl-recent-activity-wide {
+		width: 50%;
+		padding-left: 10px;
+		font-size:11px !important;
+	}
+
 }
 
 @media (min-width: 992px){
@@ -2226,6 +2234,10 @@
 	width:40%
 	}
 	
+	.report-selector-choice{
+		font-size:11px;
+	}
+	
 	.generate-report-date-range{
 		display: inline-grid !important;
 		margin-left: 0;
@@ -2240,6 +2252,7 @@
 		margin-left: 20px;
 		margin-top: 20px;
 		width:120px;
+		font-size:11px;
 	}
 	
 	.generate-report-span-report,.generate-report-span-date{
@@ -2248,6 +2261,18 @@
 	
 	.generate-report-span-dash{
 		padding-left:25%
+	}
+	
+	.v-tbl-recent-activity {
+		width: 30%;
+		padding-left: 10px;
+		font-size:11px !important;
+	}
+
+	.v-tbl-recent-activity-wide {
+		width: 50%;
+		padding-left: 10px;
+		font-size:11px !important;
 	}
 
 }

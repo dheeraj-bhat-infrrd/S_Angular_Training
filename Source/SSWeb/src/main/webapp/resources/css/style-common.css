@@ -9361,7 +9361,7 @@ ul.accordion li>a:before {
 }
 
 .generate-report-date-range{
-	display:inline-flex !important; 
+	display:inline-flex; 
 	margin-left:40px;
 }
 
@@ -9393,4 +9393,9 @@ ul.accordion li>a:before {
 
 .recent-activity-header{
 	border-top:1px solid #009fe0; width:90%; margin:0 auto;
+}
+
+.incomplete-trans-span{
+	font-size: larger;
+    font-weight: bold !important;	
 }
