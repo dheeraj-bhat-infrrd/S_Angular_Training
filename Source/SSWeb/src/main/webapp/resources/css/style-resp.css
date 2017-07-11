@@ -1770,7 +1770,7 @@
 	}
 	
 	.generate-report-date-range{
-		display: inline-grid !important;
+		display: inline-grid;
 		margin-left: 0;
 	}
 	
@@ -1803,6 +1803,11 @@
 		width: 50%;
 		padding-left: 10px;
 		font-size:11px !important;
+	}
+	
+	.recent-activity-date-range{
+		position: absolute;
+    	padding: 10px 8%;
 	}
 
 }
@@ -2225,7 +2230,7 @@
 	
 		/* reporting */
 	.generate-report-div{
-		display: inline-grid !important;
+		display: inline-grid ;
 		margin-left:5%;
 		width: 90%;
 	}
@@ -2273,6 +2278,11 @@
 		width: 50%;
 		padding-left: 10px;
 		font-size:11px !important;
+	}
+	
+	.recent-activity-date-range{
+		position: absolute;
+    	padding: 10px 8%;
 	}
 
 }

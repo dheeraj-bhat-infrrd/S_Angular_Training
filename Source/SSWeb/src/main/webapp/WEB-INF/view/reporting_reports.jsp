@@ -35,7 +35,9 @@
 					<span class="generate-report-span-report" >Report</span>
 					<div class="dash-btn-dl-sd-admin report-selector" >
 						<select id="generate-survey-reports" class="float-left dash-download-sel-item report-selector-choice">
-							<option value=12 data-report="survey-stats">Survey Statistics</option>
+							<c:if test="${profilemasterid != 4}">
+								<option value=12 data-report="survey-stats">Survey Statistics</option>
+							</c:if>
 							<c:if test="${profilemasterid == 1}">
 								<option value=13 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option> 
 							</c:if>
@@ -95,11 +97,12 @@ $(document).ready(function() {
 	$('#date-pickers').hide();
 	
 	var startIndex=0;
-	var recentActivityCount=getRecentActivityCount();
+	var recentActivityCount;
 	var tableHeaderData= getTableHeader();
 	$('#rec-act-page-previous').click(function(){
 		startIndex=getStartIndex();	
 		startIndex-=10;
+		recentActivityCount=getRecentActivityCount();
 		drawRecentActivity(startIndex, batchSize,tableHeaderData);
 		showHidePaginateButtons(startIndex, recentActivityCount);
 	});
@@ -107,6 +110,7 @@ $(document).ready(function() {
 	$('#rec-act-page-next').click(function(){
 		startIndex=getStartIndex();
 		startIndex+=10;
+		recentActivityCount=getRecentActivityCount();
 		drawRecentActivity(startIndex, batchSize,tableHeaderData);
 		showHidePaginateButtons(startIndex, recentActivityCount);
 	});
