@@ -53,6 +53,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.ZillowTempPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -67,6 +68,7 @@ import com.realtech.socialsurvey.core.entities.EntityMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
 import com.realtech.socialsurvey.core.entities.FacebookPage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.MediaPostDetails;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -78,12 +80,14 @@ import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.ZillowTempPost;
+import com.realtech.socialsurvey.core.enums.HierarchyType;
 import com.realtech.socialsurvey.core.enums.ProfileStages;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
@@ -3759,6 +3763,253 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
 
         return false;
+    }
 
+    @Override
+    public void updateSocialPostAfterHierarchyRelocation( SocialPost socialPost )
+    {
+        LOG.info( "method updateSocialPostByEntity started " );
+        socialPostDao.updateSocialPostAfterHierarchyRelocation( socialPost );
+        LOG.info( "method updateSocialPostByEntity finished " );
+    }
+
+
+    @Override
+    public void updateSocialConnectionHistoryAfterHierarchyRelocation( SocialUpdateAction socialUpdateAction )
+    {
+        LOG.info( "Method updateSocialConnectionHistoryForUser started" );
+        socialPostDao.updateSocialConnectionHistoryAfterHierarchyRelocation( socialUpdateAction );
+        LOG.info( "Method updateSocialConnectionHistoryForUser finished" );
+    }
+
+
+    /*
+     * updates the Ids for the concerned user in social posts and social connections 
+     */
+    @Override
+    public void processSocialPostsAndSocialConnectionsForUserAfterRelocation( User user,
+        HierarchyRelocationTarget targetLocation ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation started " );
+
+
+        if ( user == null ) {
+            LOG.error( "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: user is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: user is null " );
+        } else if ( targetLocation == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget is null " );
+        } else if ( targetLocation.getTargetCompany() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetCompany is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetCompany is null " );
+        } else if ( targetLocation.getTargetRegion() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetRegion is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetRegion is null " );
+        } else if ( targetLocation.getTargetBranch() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetBranch is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetBranch is null " );
+        }
+
+        if ( targetLocation.getHierarchyType().equals( HierarchyType.USER ) ) {
+            List<SocialPost> postsForUser = socialPostDao.getSocialPosts( user.getUserId(), MongoSocialPostDaoImpl.KEY_AGENT_ID,
+                -1, -1 );
+            List<SocialUpdateAction> actionsForUser = socialPostDao
+                .getSocialConnectionHistoryByEntity( MongoSocialPostDaoImpl.KEY_AGENT_ID, user.getUserId() );
+
+            //update social posts for a user
+            for ( SocialPost post : postsForUser ) {
+                switch ( targetLocation.getHierarchyType() ) {
+                    case USER: {
+                        if ( user.isCompanyAdmin() ) {
+                            LOG.warn( "Cannot relocate social posts of Company Admin to another Company" );
+                            return;
+                        } else {
+                            post.setBranchId( targetLocation.getTargetBranch().getBranchId() );
+                            post.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                            post.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        }
+                    }
+                    case BRANCH: {
+                        if ( !user.isCompanyAdmin() ) {
+                            post.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                            post.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        } else {
+                            post.setBranchId( 0 );
+                        }
+                    }
+                    case REGION: {
+                        if ( !user.isCompanyAdmin() ) {
+                            post.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        } else {
+                            post.setRegionId( 0 );
+                        }
+                        break;
+                    }
+                    default: {
+                        LOG.error( "Invalid Hierarchy Type" );
+                        throw new InvalidInputException(
+                            "Method HierarchyLocationManagementService.updateSocialConnectionHistoryAfterHierarchyRelocation(): Invalid Hierarchy Type" );
+                    }
+                }
+                updateSocialPostAfterHierarchyRelocation( post );
+
+            }
+
+            //update social connections for a user
+            for ( SocialUpdateAction action : actionsForUser ) {
+                switch ( targetLocation.getHierarchyType() ) {
+                    case USER: {
+                        if ( user.isCompanyAdmin() ) {
+                            LOG.warn( "Cannot relocate social connections of Company Admin to another Company" );
+                            return;
+                        } else {
+                            action.setBranchId( targetLocation.getTargetBranch().getBranchId() );
+                            action.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                            action.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        }
+                    }
+                    case BRANCH: {
+                        if ( !user.isCompanyAdmin() ) {
+                            action.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                            action.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        } else {
+                            action.setBranchId( 0 );
+                        }
+                    }
+                    case REGION: {
+                        if ( !user.isCompanyAdmin() ) {
+                            action.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        } else {
+                            action.setRegionId( 0 );
+                        }
+                        break;
+                    }
+                    default: {
+                        LOG.error( "Invalid Hierarchy Type" );
+                        throw new InvalidInputException(
+                            "Method HierarchyLocationManagementService.updateSocialConnectionHistoryAfterHierarchyRelocation(): Invalid Hierarchy Type" );
+                    }
+                }
+                updateSocialConnectionHistoryAfterHierarchyRelocation( action );
+            }
+            
+            //update user in solr
+            if(postsForUser != null && ! postsForUser.isEmpty())
+                solrSearchService.addSocialPostsToSolr( postsForUser );
+        }
+        LOG.info( "Method processSocialPostsForUserAfterRelocation finished " );
+    }
+
+
+    /*
+     * updates the Ids for the concerned branch in social posts and social connections 
+     */
+    @Override
+    public void processSocialPostsAndSocialConnectionsForBranchDuringRelocation( Branch branch,
+        HierarchyRelocationTarget targetLocation ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation started " );
+
+        if ( branch == null ) {
+            LOG.error( "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: branch is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: branch is null " );
+        } else if ( targetLocation == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget is null " );
+        } else if ( targetLocation.getTargetCompany() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget.targetCompany is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget.targetCompany is null " );
+        } else if ( targetLocation.getTargetRegion() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget.targetRegion is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget.targetRegion is null " );
+        }
+
+        List<SocialPost> postsForBranch = socialPostDao.getSocialPostsForBranchOnly( branch.getBranchId() );
+        List<SocialUpdateAction> actionsForBranch = socialPostDao
+            .getSocialConnectionHistoryForBranchOnly( branch.getBranchId() );
+
+        //update social posts for a branch
+        if ( targetLocation.getHierarchyType().equals( HierarchyType.BRANCH ) ) {
+            for ( SocialPost post : postsForBranch ) {
+                post.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                post.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                updateSocialPostAfterHierarchyRelocation( post );
+            }
+
+            //update user in branch
+            solrSearchService.addSocialPostsToSolr( postsForBranch );
+
+            //update social connections for a branch
+            for ( SocialUpdateAction action : actionsForBranch ) {
+                action.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                action.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                updateSocialConnectionHistoryAfterHierarchyRelocation( action );
+            }
+        }
+        LOG.info( "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation finished " );
+    }
+
+
+    /*
+     * updates the Ids for the concerned region in social posts and social connections 
+     */
+    @Override
+    public void processSocialPostsAndSocialConnectionsForRegionDuringRelocation( Region region,
+        HierarchyRelocationTarget targetLocation ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation started " );
+
+        if ( region == null ) {
+            LOG.error( "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: region is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: region is null " );
+        } else if ( targetLocation == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: HierarchyRelocationTarget is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: HierarchyRelocationTarget is null " );
+        } else if ( targetLocation.getTargetCompany() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: HierarchyRelocationTarget.targetCompany is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: HierarchyRelocationTarget.targetCompany is null " );
+        }
+
+
+        List<SocialPost> postsForRegion = socialPostDao.getSocialPostsForRegionOnly( region.getRegionId() );
+        List<SocialUpdateAction> actionsForBranch = socialPostDao
+            .getSocialConnectionHistoryForRegionOnly( region.getRegionId() );
+
+        //update social posts for a region
+        for ( SocialPost post : postsForRegion ) {
+            post.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+            updateSocialPostAfterHierarchyRelocation( post );
+        }
+
+        //update region in solr
+        solrSearchService.addSocialPostsToSolr( postsForRegion );
+
+        //update social connections for a region
+        for ( SocialUpdateAction action : actionsForBranch ) {
+            action.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+            updateSocialConnectionHistoryAfterHierarchyRelocation( action );
+        }
+        LOG.info( "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation finished " );
     }
 }

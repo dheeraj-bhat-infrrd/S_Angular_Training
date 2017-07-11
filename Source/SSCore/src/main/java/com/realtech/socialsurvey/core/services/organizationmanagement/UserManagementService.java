@@ -630,5 +630,11 @@ public interface UserManagementService
 
     void temporaryInactiveCompanyAdmin( long companyId );
 
+
+    public void updateUserEmailMapping( UserEmailMapping userEmailMapping ) throws InvalidInputException;
+
+
+    public void updateUserProfileObject( UserProfile userProfile ) throws InvalidInputException;
+
 }
 // JIRA SS-34 BY RM02 BOC
