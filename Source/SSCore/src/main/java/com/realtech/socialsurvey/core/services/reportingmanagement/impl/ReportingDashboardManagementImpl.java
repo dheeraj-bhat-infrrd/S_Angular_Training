@@ -15,7 +15,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFDataFormat;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -310,6 +317,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         surveyStatsReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
         Map<Integer, List<Object>> data = workbookData.getSurveyStatsReportToBeWrittenInSheet( surveyStatsReport );
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+        XSSFSheet sheet = workbook.getSheetAt(0);
+        this.makeRowBold( workbook, sheet.getRow(0));
         return workbook;
         
     }
@@ -340,6 +349,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         userAdoptionReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
         Map<Integer, List<Object>> data = workbookData.getUserAdoptionReportToBeWrittenInSheet( userAdoptionReport );
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+        XSSFSheet sheet = workbook.getSheetAt(0);
+        this.makeRowBold( workbook, sheet.getRow(0));
         return workbook;
         
     }
@@ -386,6 +397,19 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return responseString;
     }
+    
+    //Make Header Row Bold
+    public static void makeRowBold(XSSFWorkbook wb, Row row){
+        CellStyle style = wb.createCellStyle();//Create style
+        Font font = wb.createFont();//Create font
+        font.setBoldweight(Font.BOLDWEIGHT_BOLD);//Make font bold
+        style.setFont(font);//set it to bold
+
+        for(int i = 0; i < row.getLastCellNum(); i++){//For each cell in the row 
+            row.getCell(i).setCellStyle(style);//Set the sty;e
+        }
+    }
+
     
     
 }

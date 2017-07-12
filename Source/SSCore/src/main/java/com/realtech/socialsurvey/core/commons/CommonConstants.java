@@ -937,8 +937,10 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_SOCIAL_MONITOR_REPORT = 9;
     public static final int FILE_UPLOAD_INCOMPLETE_SURVEY_REPORT = 10;
     public static final int FILE_UPLOAD_USER_ADOPTION_REPORT = 11;
-    public static final int FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT = 12;
-    public static final int FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT = 13;
+    
+    //reporting file upload status 
+    public static final int FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT = 101;
+    public static final int FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT = 102;
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
