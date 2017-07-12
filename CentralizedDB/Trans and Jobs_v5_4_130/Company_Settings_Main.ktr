@@ -113,8 +113,9 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -127,753 +128,50 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
   <hop> <from>Merge Join</from><to>DateConverter </to><enabled>Y</enabled> </hop>
-  <hop> <from>SocialMediaToken</from><to>Sort DB</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort DB</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Mongo</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>MongoDB I - CompanySettings</from><to>CompanySettings</to><enabled>Y</enabled> </hop>
-  <hop> <from>CompanySettings</from><to>Sort Mongo</to><enabled>Y</enabled> </hop>
-  <hop> <from>DateConverter </from><to>Insert &#x2f; Update</to><enabled>N</enabled> </hop>
-  <hop> <from>Insert &#x2f; Update</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>N</enabled> </hop>
-  <hop> <from>DateConverter </from><to>Filter rows</to><enabled>N</enabled> </hop>
-  <hop> <from>Filter rows</from><to>Write to log</to><enabled>N</enabled> </hop>
-  <hop> <from>DateConverter </from><to>Table output</to><enabled>Y</enabled> </hop>
+  <hop> <from>MongoDB I - CompanySettings</from><to>Sort Mongo</to><enabled>Y</enabled> </hop>
+  <hop> <from>SocialMediaToken</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>DateConverter </from><to>Select values</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Table input</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Synchronize after merge Company Settings Main</to><enabled>Y</enabled> </hop>
   </order>
-  <step>
-    <name>CompanySettings</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>      <field>        <name>_class</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>_class_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>_id</name>
-        <rename>COMPANY_SETTINGS_ID</rename>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>_id_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>accessToken</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>accountId</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>address</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>address1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>address2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>agentId</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>allowOverrideForSocialMedia</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>allowZillowAutoPost</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>autoPostEnabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>autoPostLinkToUserSiteEnabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>auto_post_score</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>branchId</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>category</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>city</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>clientCode</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>companyId</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>connection_successful</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>country</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>countryAbbr</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>countryAbbr_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>countryCode</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>countryCode_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>countryCode_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>createdBy</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>createdOn</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>crm_source</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>disclaimer</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>duplicateSurveyInterval</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>enabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>extension</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>facebookAccessToken</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>facebookAccessTokenCreatedOn</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>facebookAccessTokenExpiresOn</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>facebookAccessTokenToPost</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>facebookPageLink</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>formattedPhoneNumber</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>formattedPhoneNumber_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>generateReport</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>googleAccessToken</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>googleAccessTokenCreatedOn</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>googleAccessTokenExpiresIn</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>googleBusinessLink</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>googleRefreshToken</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>happyText</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>happyTextComplete</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>hiddenSection</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>hideSectionsFromProfilePage</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>iden</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isAboutMeLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isAccountDisabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isAddressLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isBlogAddressLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isDefaultBySystem</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isDisplayNameLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isFaxPhoneLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isLocationEnabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isLogoImageProcessed</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isLogoLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isMinScoreLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isPersonalEmailVerified</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isPersonalPhoneLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isProfileImageProcessed</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isReminderDisabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isSeoContentModified</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isSocialPostReminderDisabled</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWebAddressLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWorkEmailLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWorkEmailVerified</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWorkMailVerifiedByAdmin</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>isWorkPhoneLocked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>lendingTreeProfileLink</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>linkedInAccessToken</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>linkedInAccessTokenCreatedOn</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>linkedInAccessTokenExpiresIn</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>linkedInPageLink</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>logo</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>logoThumbnail</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>mailId</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>max_number_of_social_pos_reminders</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>max_number_of_survey_reminders</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>modifiedBy</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>modifiedOn</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>mood</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>name_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>name_1_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>neutralText</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>neutralTextComplete</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>number</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>numberOfDays</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>number_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>order</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>personal</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profileImageUrl</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profileImageUrlThumbnail</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profileLink</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profileName</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profileStageKey</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profileUrl</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profileUrl_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>profile_completion</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>rating</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>realtorProfileLink</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>regionId</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>reviewSortCriteria</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>sadText</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>sadTextComplete</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>sendEmailFromCompany</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>sendEmailThrough</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>show_survey_above_score</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>social_post_reminder_interval_in_days</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>state</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>status</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>survey_reminder_interval_in_days</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>tokenExpiryAlertSent</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>tokenExpiryAlertSent_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>twitterAccessToken</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>twitterAccessTokenCreatedOn</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>twitterAccessTokenSecret</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>twitterPageLink</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>uniqueIdentifier</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>vendastaAccessible</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>vertical</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>work</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>workEmailToVerify</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>work_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>yelpPageLink</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>zillowLenderId</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>zillowProfileLink</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>zillowReviewAverage</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>zillowReviewCount</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>zillowScreenName</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>zipcode</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>allowOverrideForSocialMedia</name>
-        <rename>allowOverrideForSocialMedia</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>allowZillowAutoPost</name>
-        <rename>allowZillowAutoPost</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>hiddenSection</name>
-        <rename>hiddenSection</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isAccountDisabled</name>
-        <rename>isAccountDisabled</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isDefaultBySystem</name>
-        <rename>isDefaultBySystem</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isLocationEnabled</name>
-        <rename>isLocationEnabled</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isLogoImageProcessed</name>
-        <rename>isLogoImageProcessed</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isProfileImageProcessed</name>
-        <rename>isProfileImageProcessed</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isSeoContentModified</name>
-        <rename>isSeoContentModified</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>sendEmailFromCompany</name>
-        <rename>sendEmailFromCompany</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>vendastaAccessible</name>
-        <rename>vendastaAccessible</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>418</xloc>
-      <yloc>109</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step>
     <name>DateConverter </name>
     <type>ScriptValueMod</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -906,237 +204,6 @@
     </step>
 
   <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>296</xloc>
-      <yloc>348</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Insert &#x2f; Update</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>10000</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>company_settings</table>
-      <key>
-        <name>COMPANY_SETTINGS_ID</name>
-        <field>COMPANY_SETTINGS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name> ZILLOW_REVIEW_AVERAGE</name>
-        <rename>zillowReviewAverage</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</name>
-        <rename>allowOverrideForSocialMedia</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>ALLOW_ZILLOW_AUTO_POST</name>
-        <rename>allowZillowAutoPost</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>COMPANY_ID</name>
-        <rename>iden</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>COMPANY_SETTINGS_ID</name>
-        <rename>COMPANY_SETTINGS_ID</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>CREATED_BY</name>
-        <rename>createdBy</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>CREATED_ON</name>
-        <rename>createdOnStr</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>CREATED_ON_MONGO</name>
-        <rename>createdOn</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>DISCLAIMER</name>
-        <rename>disclaimer</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>HIDDEN_SECTION</name>
-        <rename>hiddenSection</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>HIDE_SECTIONS_FROM_PROFILE_PAGE</name>
-        <rename>profileStageKey</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_ACCOUNT_DISABLED</name>
-        <rename>isAccountDisabled</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_DEFAULT_BY_SYSTEM</name>
-        <rename>isDefaultBySystem</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_LOCATION_ENABLED</name>
-        <rename>isLocationEnabled</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_LOGO_IMAGE_PROCESSED</name>
-        <rename>isLogoImageProcessed</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_PROFILE_IMAGE_PROCESSED</name>
-        <rename>isProfileImageProcessed</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_SEO_CONTENT_MODIFIED</name>
-        <rename>isSeoContentModified</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>LOGO</name>
-        <rename>logo</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>LOGO_THUMBNAIL</name>
-        <rename>logoThumbnail</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MODIFIED_BY</name>
-        <rename>modifiedBy</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MODIFIED_ON</name>
-        <rename>modifiedOnStr</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MODIFIED_ON_MONGO</name>
-        <rename>modifiedOn</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>PROFILE_COMPLETION</name>
-        <rename>profile_completion</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>PROFILE_IMAGE_URL</name>
-        <rename>profileImageUrl</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>PROFILE_IMAGE_URL_THUMBNAIL</name>
-        <rename>profileImageUrlThumbnail</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>PROFILE_NAME</name>
-        <rename>profileName</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>PROFILE_URL</name>
-        <rename>profileUrl</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>REVIEW_SORT_CRITERIA</name>
-        <rename>order</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>SEND_EMAIL_FROM_COMPANY</name>
-        <rename>sendEmailFromCompany</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>SEND_EMAIL_THROUGH</name>
-        <rename>sendEmailThrough</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>SOCIAL_MEDIA_TOKENS_ID</name>
-        <rename>SOCIAL_MEDIA_TOKENS_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>STATUS</name>
-        <rename>status</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>UNIQUE_IDENTIFIER</name>
-        <rename>uniqueIdentifier</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>VENDASTA_ACCESSIBLE</name>
-        <rename>vendastaAccessible</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>VERTICAL</name>
-        <rename>vertical</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>ZILLOW_REVIEW_COUNT</name>
-        <rename>zillowReviewCount</rename>
-        <update>Y</update>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>513</xloc>
-      <yloc>339</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Merge Join</name>
     <type>MergeJoin</type>
     <description/>
@@ -1149,7 +216,7 @@
            </partitioning>
 <join_type>LEFT OUTER</join_type>
 <step1>Sort Mongo</step1>
-<step2>Sort DB</step2>
+<step2>SocialMediaToken</step2>
     <keys_1>
       <key>iden</key>
     </keys_1>
@@ -1311,7 +378,7 @@
 
         <field_path>&#x24;.allowOverrideForSocialMedia</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1319,7 +386,7 @@
 
         <field_path>&#x24;.allowZillowAutoPost</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1623,7 +690,7 @@
 
         <field_path>&#x24;.hiddenSection</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1655,7 +722,7 @@
 
         <field_path>&#x24;.isAccountDisabled</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1679,7 +746,7 @@
 
         <field_path>&#x24;.isDefaultBySystem</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1703,7 +770,7 @@
 
         <field_path>&#x24;.isLocationEnabled</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1711,7 +778,7 @@
 
         <field_path>&#x24;.isLogoImageProcessed</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1751,7 +818,7 @@
 
         <field_path>&#x24;.isProfileImageProcessed</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1767,7 +834,7 @@
 
         <field_path>&#x24;.isSeoContentModified</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -2119,7 +1186,7 @@
 
         <field_path>&#x24;.sendEmailFromCompany</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -2231,7 +1298,7 @@
 
         <field_path>&#x24;.vendastaAccessible</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -2342,7 +1409,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, type&#xd;&#xa;, id&#xd;&#xa;FROM social_media_tokens where type &#x3d; 1&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, type&#xd;&#xa;, id&#xd;&#xa;FROM social_media_tokens where type &#x3d; 1 order by id&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2350,41 +1417,7 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>932</xloc>
-      <yloc>109</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort DB</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>id</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>817</xloc>
+      <xloc>933</xloc>
       <yloc>109</yloc>
       <draw>Y</draw>
       </GUI>
@@ -2418,73 +1451,15 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>546</xloc>
-      <yloc>109</yloc>
+      <xloc>464</xloc>
+      <yloc>107</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Filter rows</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Write to log</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>COMPANY_SETTINGS_ID</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>String</type><text>56031d80e4b01ab89e95976c</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>807</xloc>
-      <yloc>224</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Write to log</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>iden</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>809</xloc>
-      <yloc>340</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Table output</name>
-    <type>TableOutput</type>
+    <name>Table input</name>
+    <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -2494,189 +1469,974 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>company_settings</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
+    <sql>SELECT&#xd;&#xa;  COMPANY_SETTINGS_ID&#xd;&#xa;, ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA&#xd;&#xa;, ALLOW_ZILLOW_AUTO_POST&#xd;&#xa;, CREATED_BY&#xd;&#xa;, CREATED_ON_MONGO&#xd;&#xa;, DISCLAIMER&#xd;&#xa;, HIDDEN_SECTION&#xd;&#xa;, HIDE_SECTIONS_FROM_PROFILE_PAGE&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, IS_ACCOUNT_DISABLED&#xd;&#xa;, IS_DEFAULT_BY_SYSTEM&#xd;&#xa;, IS_LOCATION_ENABLED&#xd;&#xa;, IS_LOGO_IMAGE_PROCESSED&#xd;&#xa;, IS_PROFILE_IMAGE_PROCESSED&#xd;&#xa;, IS_SEO_CONTENT_MODIFIED&#xd;&#xa;, LOGO&#xd;&#xa;, LOGO_THUMBNAIL&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, MODIFIED_ON_MONGO&#xd;&#xa;, PROFILE_IMAGE_URL&#xd;&#xa;, PROFILE_IMAGE_URL_THUMBNAIL&#xd;&#xa;, PROFILE_NAME&#xd;&#xa;, PROFILE_URL&#xd;&#xa;, PROFILE_COMPLETION&#xd;&#xa;, REVIEW_SORT_CRITERIA&#xd;&#xa;, SEND_EMAIL_FROM_COMPANY&#xd;&#xa;, SEND_EMAIL_THROUGH&#xd;&#xa;, STATUS&#xd;&#xa;, UNIQUE_IDENTIFIER&#xd;&#xa;, VENDASTA_ACCESSIBLE&#xd;&#xa;, VERTICAL&#xd;&#xa;, ZILLOW_REVIEW_AVERAGE&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;FROM company_settings&#xd;&#xa;order by COMPANY_SETTINGS_ID</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>933</xloc>
+      <yloc>232</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <remove>        <name>Code</name>
+      </remove>      <remove>        <name>Id</name>
+      </remove>      <remove>        <name>LWCompanyCode</name>
+      </remove>      <remove>        <name>Name</name>
+      </remove>      <remove>        <name>_class</name>
+      </remove>      <remove>        <name>_class_1</name>
+      </remove>      <remove>        <name>_id_1</name>
+      </remove>      <remove>        <name>accessToken</name>
+      </remove>      <remove>        <name>accountId</name>
+      </remove>      <remove>        <name>address</name>
+      </remove>      <remove>        <name>address1</name>
+      </remove>      <remove>        <name>address2</name>
+      </remove>      <remove>        <name>agentId</name>
+      </remove>      <remove>        <name>autoPostEnabled</name>
+      </remove>      <remove>        <name>autoPostLinkToUserSiteEnabled</name>
+      </remove>      <remove>        <name>auto_post_score</name>
+      </remove>      <remove>        <name>branchId</name>
+      </remove>      <remove>        <name>category</name>
+      </remove>      <remove>        <name>city</name>
+      </remove>      <remove>        <name>clientCode</name>
+      </remove>      <remove>        <name>companyId</name>
+      </remove>      <remove>        <name>connection_successful</name>
+      </remove>      <remove>        <name>country</name>
+      </remove>      <remove>        <name>countryAbbr</name>
+      </remove>      <remove>        <name>countryAbbr_1</name>
+      </remove>      <remove>        <name>countryCode</name>
+      </remove>      <remove>        <name>countryCode_1</name>
+      </remove>      <remove>        <name>countryCode_2</name>
+      </remove>      <remove>        <name>crm_source</name>
+      </remove>      <remove>        <name>duplicateSurveyInterval</name>
+      </remove>      <remove>        <name>enabled</name>
+      </remove>      <remove>        <name>extension</name>
+      </remove>      <remove>        <name>facebookAccessToken</name>
+      </remove>      <remove>        <name>facebookAccessTokenCreatedOn</name>
+      </remove>      <remove>        <name>facebookAccessTokenExpiresOn</name>
+      </remove>      <remove>        <name>facebookAccessTokenToPost</name>
+      </remove>      <remove>        <name>facebookPageLink</name>
+      </remove>      <remove>        <name>formattedPhoneNumber</name>
+      </remove>      <remove>        <name>formattedPhoneNumber_1</name>
+      </remove>      <remove>        <name>generateReport</name>
+      </remove>      <remove>        <name>googleAccessToken</name>
+      </remove>      <remove>        <name>googleAccessTokenCreatedOn</name>
+      </remove>      <remove>        <name>googleAccessTokenExpiresIn</name>
+      </remove>      <remove>        <name>googleBusinessLink</name>
+      </remove>      <remove>        <name>googleRefreshToken</name>
+      </remove>      <remove>        <name>happyText</name>
+      </remove>      <remove>        <name>happyTextComplete</name>
+      </remove>      <remove>        <name>isAboutMeLocked</name>
+      </remove>      <remove>        <name>isAddressLocked</name>
+      </remove>      <remove>        <name>isBlogAddressLocked</name>
+      </remove>      <remove>        <name>isDisplayNameLocked</name>
+      </remove>      <remove>        <name>isFaxPhoneLocked</name>
+      </remove>      <remove>        <name>isLogoLocked</name>
+      </remove>      <remove>        <name>isMinScoreLocked</name>
+      </remove>      <remove>        <name>isPersonalEmailVerified</name>
+      </remove>      <remove>        <name>isPersonalPhoneLocked</name>
+      </remove>      <remove>        <name>isReminderDisabled</name>
+      </remove>      <remove>        <name>isSocialPostReminderDisabled</name>
+      </remove>      <remove>        <name>isWebAddressLocked</name>
+      </remove>      <remove>        <name>isWorkEmailLocked</name>
+      </remove>      <remove>        <name>isWorkEmailVerified</name>
+      </remove>      <remove>        <name>isWorkMailVerifiedByAdmin</name>
+      </remove>      <remove>        <name>isWorkPhoneLocked</name>
+      </remove>      <remove>        <name>lendingTreeProfileLink</name>
+      </remove>      <remove>        <name>linkedInAccessToken</name>
+      </remove>      <remove>        <name>linkedInAccessTokenCreatedOn</name>
+      </remove>      <remove>        <name>linkedInAccessTokenExpiresIn</name>
+      </remove>      <remove>        <name>linkedInPageLink</name>
+      </remove>      <remove>        <name>loneWolfTransactionParticipantsType</name>
+      </remove>      <remove>        <name>mailId</name>
+      </remove>      <remove>        <name>max_number_of_social_pos_reminders</name>
+      </remove>      <remove>        <name>max_number_of_survey_reminders</name>
+      </remove>      <remove>        <name>mood</name>
+      </remove>      <remove>        <name>name_1</name>
+      </remove>      <remove>        <name>name_1_1</name>
+      </remove>      <remove>        <name>neutralText</name>
+      </remove>      <remove>        <name>neutralTextComplete</name>
+      </remove>      <remove>        <name>number</name>
+      </remove>      <remove>        <name>numberOfDays</name>
+      </remove>      <remove>        <name>number_1</name>
+      </remove>      <remove>        <name>order</name>
+      </remove>      <remove>        <name>personal</name>
+      </remove>      <remove>        <name>profileLink</name>
+      </remove>      <remove>        <name>profileStageKey</name>
+      </remove>      <remove>        <name>profileUrl_1</name>
+      </remove>      <remove>        <name>rating</name>
+      </remove>      <remove>        <name>realtorProfileLink</name>
+      </remove>      <remove>        <name>regionId</name>
+      </remove>      <remove>        <name>sadText</name>
+      </remove>      <remove>        <name>sadTextComplete</name>
+      </remove>      <remove>        <name>show_survey_above_score</name>
+      </remove>      <remove>        <name>social_post_reminder_interval_in_days</name>
+      </remove>      <remove>        <name>state</name>
+      </remove>      <remove>        <name>survey_reminder_interval_in_days</name>
+      </remove>      <remove>        <name>tokenExpiryAlertSent</name>
+      </remove>      <remove>        <name>tokenExpiryAlertSent_1</name>
+      </remove>      <remove>        <name>twitterAccessToken</name>
+      </remove>      <remove>        <name>twitterAccessTokenCreatedOn</name>
+      </remove>      <remove>        <name>twitterAccessTokenSecret</name>
+      </remove>      <remove>        <name>twitterPageLink</name>
+      </remove>      <remove>        <name>work</name>
+      </remove>      <remove>        <name>workEmailToVerify</name>
+      </remove>      <remove>        <name>work_1</name>
+      </remove>      <remove>        <name>yelpPageLink</name>
+      </remove>      <remove>        <name>zillowLenderId</name>
+      </remove>      <remove>        <name>zillowProfileLink</name>
+      </remove>      <remove>        <name>zillowScreenName</name>
+      </remove>      <remove>        <name>zipcode</name>
+      </remove>      <remove>        <name>type</name>
+      </remove>      <remove>        <name>id_1</name>
+      </remove>      <meta>        <name>_id</name>
+        <rename>COMPANY_SETTINGS_ID</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>allowOverrideForSocialMedia</name>
+        <rename>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>allowZillowAutoPost</name>
+        <rename>ALLOW_ZILLOW_AUTO_POST</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>createdBy</name>
+        <rename>CREATED_BY</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>createdOn</name>
+        <rename>CREATED_ON_MONGO</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>disclaimer</name>
+        <rename>DISCLAIMER</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>hiddenSection</name>
+        <rename>HIDDEN_SECTION</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>hideSectionsFromProfilePage</name>
+        <rename>HIDE_SECTIONS_FROM_PROFILE_PAGE</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>iden</name>
+        <rename>COMPANY_ID</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>isAccountDisabled</name>
+        <rename>IS_ACCOUNT_DISABLED</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>isDefaultBySystem</name>
+        <rename>IS_DEFAULT_BY_SYSTEM</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>isLocationEnabled</name>
+        <rename>IS_LOCATION_ENABLED</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>isLogoImageProcessed</name>
+        <rename>IS_LOGO_IMAGE_PROCESSED</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>isProfileImageProcessed</name>
+        <rename>IS_PROFILE_IMAGE_PROCESSED</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>isSeoContentModified</name>
+        <rename>IS_SEO_CONTENT_MODIFIED</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>logo</name>
+        <rename>LOGO</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>logoThumbnail</name>
+        <rename>LOGO_THUMBNAIL</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>modifiedBy</name>
+        <rename>MODIFIED_BY</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>modifiedOn</name>
+        <rename>MODIFIED_ON_MONGO</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>profileImageUrl</name>
+        <rename>PROFILE_IMAGE_URL</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>profileImageUrlThumbnail</name>
+        <rename>PROFILE_IMAGE_URL_THUMBNAIL</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>profileName</name>
+        <rename>PROFILE_NAME</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>profileUrl</name>
+        <rename>PROFILE_URL</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>profile_completion</name>
+        <rename>PROFILE_COMPLETION</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>reviewSortCriteria</name>
+        <rename>REVIEW_SORT_CRITERIA</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>sendEmailFromCompany</name>
+        <rename>SEND_EMAIL_FROM_COMPANY</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>sendEmailThrough</name>
+        <rename>SEND_EMAIL_THROUGH</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>status</name>
+        <rename>STATUS</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>uniqueIdentifier</name>
+        <rename>UNIQUE_IDENTIFIER</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>vendastaAccessible</name>
+        <rename>VENDASTA_ACCESSIBLE</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>vertical</name>
+        <rename>VERTICAL</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>zillowReviewAverage</name>
+        <rename>ZILLOW_REVIEW_AVERAGE</rename>
+        <type>Number</type>
+        <length>-2</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>zillowReviewCount</name>
+        <rename>ZILLOW_REVIEW_COUNT</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>SOCIAL_MEDIA_TOKENS_ID</name>
+        <rename>SOCIAL_MEDIA_TOKENS_ID</rename>
+        <type>String</type>
+        <length>45</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>createdOnStr</name>
+        <rename>CREATED_ON</rename>
+        <type>Timestamp</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>modifiedOnStr</name>
+        <rename>MODIFIED_ON</rename>
+        <type>Timestamp</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>688</xloc>
+      <yloc>354</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
     <fields>
-        <field>
-          <column_name> ZILLOW_REVIEW_AVERAGE</column_name>
-          <stream_name>zillowReviewAverage</stream_name>
-        </field>
-        <field>
-          <column_name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</column_name>
-          <stream_name>allowOverrideForSocialMedia</stream_name>
-        </field>
-        <field>
-          <column_name>ALLOW_ZILLOW_AUTO_POST</column_name>
-          <stream_name>allowZillowAutoPost</stream_name>
-        </field>
-        <field>
-          <column_name>COMPANY_ID</column_name>
-          <stream_name>iden</stream_name>
-        </field>
-        <field>
-          <column_name>COMPANY_SETTINGS_ID</column_name>
-          <stream_name>COMPANY_SETTINGS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>CREATED_BY</column_name>
-          <stream_name>createdBy</stream_name>
-        </field>
-        <field>
-          <column_name>CREATED_ON</column_name>
-          <stream_name>createdOnStr</stream_name>
-        </field>
-        <field>
-          <column_name>CREATED_ON_MONGO</column_name>
-          <stream_name>createdOn</stream_name>
-        </field>
-        <field>
-          <column_name>DISCLAIMER</column_name>
-          <stream_name>disclaimer</stream_name>
-        </field>
-        <field>
-          <column_name>HIDDEN_SECTION</column_name>
-          <stream_name>hiddenSection</stream_name>
-        </field>
-        <field>
-          <column_name>HIDE_SECTIONS_FROM_PROFILE_PAGE</column_name>
-          <stream_name>profileStageKey</stream_name>
-        </field>
-        <field>
-          <column_name>IS_ACCOUNT_DISABLED</column_name>
-          <stream_name>isAccountDisabled</stream_name>
-        </field>
-        <field>
-          <column_name>IS_DEFAULT_BY_SYSTEM</column_name>
-          <stream_name>isDefaultBySystem</stream_name>
-        </field>
-        <field>
-          <column_name>IS_LOCATION_ENABLED</column_name>
-          <stream_name>isLocationEnabled</stream_name>
-        </field>
-        <field>
-          <column_name>IS_LOGO_IMAGE_PROCESSED</column_name>
-          <stream_name>isLogoImageProcessed</stream_name>
-        </field>
-        <field>
-          <column_name>IS_PROFILE_IMAGE_PROCESSED</column_name>
-          <stream_name>isProfileImageProcessed</stream_name>
-        </field>
-        <field>
-          <column_name>IS_SEO_CONTENT_MODIFIED</column_name>
-          <stream_name>isSeoContentModified</stream_name>
-        </field>
-        <field>
-          <column_name>LOGO</column_name>
-          <stream_name>logo</stream_name>
-        </field>
-        <field>
-          <column_name>LOGO_THUMBNAIL</column_name>
-          <stream_name>logoThumbnail</stream_name>
-        </field>
-        <field>
-          <column_name>MODIFIED_BY</column_name>
-          <stream_name>modifiedBy</stream_name>
-        </field>
-        <field>
-          <column_name>MODIFIED_ON</column_name>
-          <stream_name>modifiedOnStr</stream_name>
-        </field>
-        <field>
-          <column_name>MODIFIED_ON_MONGO</column_name>
-          <stream_name>modifiedOn</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_COMPLETION</column_name>
-          <stream_name>profile_completion</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_IMAGE_URL</column_name>
-          <stream_name>profileImageUrl</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_IMAGE_URL_THUMBNAIL</column_name>
-          <stream_name>profileImageUrlThumbnail</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_NAME</column_name>
-          <stream_name>profileName</stream_name>
-        </field>
-        <field>
-          <column_name>PROFILE_URL</column_name>
-          <stream_name>profileUrl</stream_name>
-        </field>
-        <field>
-          <column_name>REVIEW_SORT_CRITERIA</column_name>
-          <stream_name>order</stream_name>
-        </field>
-        <field>
-          <column_name>SEND_EMAIL_FROM_COMPANY</column_name>
-          <stream_name>sendEmailFromCompany</stream_name>
-        </field>
-        <field>
-          <column_name>SEND_EMAIL_THROUGH</column_name>
-          <stream_name>sendEmailThrough</stream_name>
-        </field>
-        <field>
-          <column_name>SOCIAL_MEDIA_TOKENS_ID</column_name>
-          <stream_name>SOCIAL_MEDIA_TOKENS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>STATUS</column_name>
-          <stream_name>status</stream_name>
-        </field>
-        <field>
-          <column_name>UNIQUE_IDENTIFIER</column_name>
-          <stream_name>uniqueIdentifier</stream_name>
-        </field>
-        <field>
-          <column_name>VENDASTA_ACCESSIBLE</column_name>
-          <stream_name>vendastaAccessible</stream_name>
-        </field>
-        <field>
-          <column_name>VERTICAL</column_name>
-          <stream_name>vertical</stream_name>
-        </field>
-        <field>
-          <column_name>ZILLOW_REVIEW_COUNT</column_name>
-          <stream_name>zillowReviewCount</stream_name>
-        </field>
+      <field>
+        <name>COMPANY_SETTINGS_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>666</xloc>
-      <yloc>348</yloc>
+      <xloc>812</xloc>
+      <yloc>354</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Merge Rows &#x28;diff&#x29;</name>
+    <type>MergeRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <keys>
+      <key>COMPANY_SETTINGS_ID</key>
+    </keys>
+    <values>
+      <value>COMPANY_SETTINGS_ID</value>
+    </values>
+<flag_field>flagfield</flag_field>
+<reference>Table input</reference>
+<compare>Sort rows</compare>
+    <compare>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>933</xloc>
+      <yloc>356</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Synchronize after merge Company Settings Main</name>
+    <type>SynchronizeAfterMerge</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <use_batch>Y</use_batch>
+    <perform_lookup>Y</perform_lookup>
+    <operation_order_field>flagfield</operation_order_field>
+    <order_insert>new</order_insert>
+    <order_update>changed</order_update>
+    <order_delete/>
+    <lookup>
+      <schema/>
+      <table>company_settings</table>
+      <key>
+        <name>COMPANY_SETTINGS_ID</name>
+        <field>COMPANY_SETTINGS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>COMPANY_SETTINGS_ID</name>
+        <rename>COMPANY_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</name>
+        <rename>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>ALLOW_ZILLOW_AUTO_POST</name>
+        <rename>ALLOW_ZILLOW_AUTO_POST</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>CREATED_BY</name>
+        <rename>CREATED_BY</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>CREATED_ON_MONGO</name>
+        <rename>CREATED_ON_MONGO</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>DISCLAIMER</name>
+        <rename>DISCLAIMER</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>HIDDEN_SECTION</name>
+        <rename>HIDDEN_SECTION</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>HIDE_SECTIONS_FROM_PROFILE_PAGE</name>
+        <rename>HIDE_SECTIONS_FROM_PROFILE_PAGE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>COMPANY_ID</name>
+        <rename>COMPANY_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_ACCOUNT_DISABLED</name>
+        <rename>IS_ACCOUNT_DISABLED</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_DEFAULT_BY_SYSTEM</name>
+        <rename>IS_DEFAULT_BY_SYSTEM</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_LOCATION_ENABLED</name>
+        <rename>IS_LOCATION_ENABLED</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_LOGO_IMAGE_PROCESSED</name>
+        <rename>IS_LOGO_IMAGE_PROCESSED</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_PROFILE_IMAGE_PROCESSED</name>
+        <rename>IS_PROFILE_IMAGE_PROCESSED</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_SEO_CONTENT_MODIFIED</name>
+        <rename>IS_SEO_CONTENT_MODIFIED</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>LOGO</name>
+        <rename>LOGO</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>LOGO_THUMBNAIL</name>
+        <rename>LOGO_THUMBNAIL</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MODIFIED_BY</name>
+        <rename>MODIFIED_BY</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MODIFIED_ON_MONGO</name>
+        <rename>MODIFIED_ON_MONGO</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>PROFILE_IMAGE_URL</name>
+        <rename>PROFILE_IMAGE_URL</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>PROFILE_IMAGE_URL_THUMBNAIL</name>
+        <rename>PROFILE_IMAGE_URL_THUMBNAIL</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>PROFILE_NAME</name>
+        <rename>PROFILE_NAME</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>PROFILE_URL</name>
+        <rename>PROFILE_URL</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>PROFILE_COMPLETION</name>
+        <rename>PROFILE_COMPLETION</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>REVIEW_SORT_CRITERIA</name>
+        <rename>REVIEW_SORT_CRITERIA</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SEND_EMAIL_FROM_COMPANY</name>
+        <rename>SEND_EMAIL_FROM_COMPANY</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SEND_EMAIL_THROUGH</name>
+        <rename>SEND_EMAIL_THROUGH</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>STATUS</name>
+        <rename>STATUS</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>UNIQUE_IDENTIFIER</name>
+        <rename>UNIQUE_IDENTIFIER</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>VENDASTA_ACCESSIBLE</name>
+        <rename>VENDASTA_ACCESSIBLE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>VERTICAL</name>
+        <rename>VERTICAL</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>ZILLOW_REVIEW_COUNT</name>
+        <rename>ZILLOW_REVIEW_COUNT</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SOCIAL_MEDIA_TOKENS_ID</name>
+        <rename>SOCIAL_MEDIA_TOKENS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>CREATED_ON</name>
+        <rename>CREATED_ON</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MODIFIED_ON</name>
+        <rename>MODIFIED_ON</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>ZILLOW_REVIEW_AVERAGE</name>
+        <rename>ZILLOW_REVIEW_AVERAGE</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>933</xloc>
+      <yloc>508</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
-      <error>
-        <source_step>Insert &#x2f; Update</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
   </step_error_handling>
    <slave-step-copy-partition-distribution>
 </slave-step-copy-partition-distribution>

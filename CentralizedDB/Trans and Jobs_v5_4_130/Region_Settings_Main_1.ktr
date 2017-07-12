@@ -138,6 +138,34 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
   <hop> <from>Sort Mongo BranchSettings</from><to>Merge BranchSettings</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge BranchSettings</from><to>DateConverter </to><enabled>Y</enabled> </hop>
@@ -182,6 +210,25 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>459</xloc>
       <yloc>159</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>654</xloc>
+      <yloc>332</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -283,6 +330,14 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>_class_1</field_name>
+
+        <field_path>&#x24;.crm_info._class</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>_id</field_name>
 
         <field_path>&#x24;._id</field_path>
@@ -299,9 +354,25 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>about_me</field_name>
+
+        <field_path>&#x24;.contact_details.about_me</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>accessToken</field_name>
 
         <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.accessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>accountId</field_name>
+
+        <field_path>&#x24;.vendasta_rm_settings.accountId</field_path>
 
         <field_type>String</field_type>
 
@@ -331,11 +402,19 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>agentId</field_name>
+
+        <field_path>&#x24;.crm_info.agentId</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>allowOverrideForSocialMedia</field_name>
 
         <field_path>&#x24;.allowOverrideForSocialMedia</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -343,7 +422,15 @@
 
         <field_path>&#x24;.allowZillowAutoPost</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>api</field_name>
+
+        <field_path>&#x24;.crm_info.api</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -351,7 +438,7 @@
 
         <field_path>&#x24;.survey_settings.autoPostEnabled</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -359,7 +446,7 @@
 
         <field_path>&#x24;.survey_settings.autoPostLinkToUserSiteEnabled</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -368,6 +455,14 @@
         <field_path>&#x24;.survey_settings.auto_post_score</field_path>
 
         <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>branchId</field_name>
+
+        <field_path>&#x24;.crm_info.branchId</field_path>
+
+        <field_type>Integer</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -387,6 +482,22 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>companyId</field_name>
+
+        <field_path>&#x24;.crm_info.companyId</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>connection_successful</field_name>
+
+        <field_path>&#x24;.crm_info.connection_successful</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>country</field_name>
 
         <field_path>&#x24;.contact_details.country</field_path>
@@ -395,9 +506,25 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>countryAbbr</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryAbbr</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>countryCode</field_name>
 
         <field_path>&#x24;.contact_details.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryCode_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryCode</field_path>
 
         <field_type>String</field_type>
 
@@ -416,6 +543,22 @@
         <field_path>&#x24;.createdOn</field_path>
 
         <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>crm_source</field_name>
+
+        <field_path>&#x24;.crm_info.crm_source</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>disclaimer</field_name>
+
+        <field_path>&#x24;.disclaimer</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -467,9 +610,9 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>firstName</field_name>
+        <field_name>formattedPhoneNumber</field_name>
 
-        <field_path>&#x24;.contact_details.firstName</field_path>
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.formattedPhoneNumber</field_path>
 
         <field_type>String</field_type>
 
@@ -519,7 +662,7 @@
 
         <field_path>&#x24;.hiddenSection</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -531,19 +674,11 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>industry</field_name>
-
-        <field_path>&#x24;.contact_details.industry</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
         <field_name>isAboutMeLocked</field_name>
 
         <field_path>&#x24;.lockSettings.isAboutMeLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -551,7 +686,7 @@
 
         <field_path>&#x24;.isAccountDisabled</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -559,7 +694,7 @@
 
         <field_path>&#x24;.lockSettings.isAddressLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -567,7 +702,7 @@
 
         <field_path>&#x24;.lockSettings.isBlogAddressLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -575,7 +710,7 @@
 
         <field_path>&#x24;.isDefaultBySystem</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -583,7 +718,7 @@
 
         <field_path>&#x24;.lockSettings.isFaxPhoneLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -591,7 +726,7 @@
 
         <field_path>&#x24;.isLocationEnabled</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -599,7 +734,7 @@
 
         <field_path>&#x24;.isLogoImageProcessed</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -607,7 +742,7 @@
 
         <field_path>&#x24;.lockSettings.isLogoLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -615,7 +750,15 @@
 
         <field_path>&#x24;.lockSettings.isMinScoreLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isPersonalEmailVerified</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isPersonalEmailVerified</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -623,7 +766,7 @@
 
         <field_path>&#x24;.lockSettings.isPersonalPhoneLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -631,7 +774,7 @@
 
         <field_path>&#x24;.isProfileImageProcessed</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -639,7 +782,7 @@
 
         <field_path>&#x24;.survey_settings.isReminderDisabled</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -647,7 +790,7 @@
 
         <field_path>&#x24;.isSeoContentModified</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -655,7 +798,7 @@
 
         <field_path>&#x24;.survey_settings.isSocialPostReminderDisabled</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -663,7 +806,7 @@
 
         <field_path>&#x24;.lockSettings.isWebAddressLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -671,21 +814,29 @@
 
         <field_path>&#x24;.lockSettings.isWorkEmailLocked</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkEmailVerified</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isWorkEmailVerified</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkMailVerifiedByAdmin</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isWorkMailVerifiedByAdmin</field_path>
+
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
         <field_name>isWorkPhoneLocked</field_name>
 
         <field_path>&#x24;.lockSettings.isWorkPhoneLocked</field_path>
-
-        <field_type>Boolean</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>lastName</field_name>
-
-        <field_path>&#x24;.contact_details.lastName</field_path>
 
         <field_type>String</field_type>
 
@@ -726,14 +877,6 @@
         <field_name>linkedInPageLink</field_name>
 
         <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInPageLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>location</field_name>
-
-        <field_path>&#x24;.contact_details.location</field_path>
 
         <field_type>String</field_type>
 
@@ -798,6 +941,14 @@
         <field_name>name_1</field_name>
 
         <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>number</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.number</field_path>
 
         <field_type>String</field_type>
 
@@ -883,11 +1034,27 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>recordsBeenFetched</field_name>
+
+        <field_path>&#x24;.crm_info.recordsBeenFetched</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>regionId</field_name>
+
+        <field_path>&#x24;.crm_info.regionId</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>sendEmailFromCompany</field_name>
 
         <field_path>&#x24;.sendEmailFromCompany</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -923,6 +1090,14 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>status_1</field_name>
+
+        <field_path>&#x24;.status</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>survey_reminder_interval_in_days</field_name>
 
         <field_path>&#x24;.survey_settings.survey_reminder_interval_in_days</field_path>
@@ -943,7 +1118,7 @@
 
         <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -957,13 +1132,21 @@
       <mongo_field>
         <field_name>twitterAccessToken</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessToken</field_path>
+        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterAccessToken</field_path>
 
         <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
         <field_name>twitterAccessTokenCreatedOn</field_name>
+
+        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterAccessTokenCreatedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterAccessTokenCreatedOn_1</field_name>
 
         <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessTokenCreatedOn</field_path>
 
@@ -979,9 +1162,33 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>twitterAccessTokenSecret_1</field_name>
+
+        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterAccessTokenSecret</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterAccessToken_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>twitterPageLink</field_name>
 
         <field_path>&#x24;.socialMediaTokens.twitterToken.twitterPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterPageLink_1</field_name>
+
+        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterPageLink</field_path>
 
         <field_type>String</field_type>
 
@@ -991,7 +1198,7 @@
 
         <field_path>&#x24;.vendastaAccessible</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1005,7 +1212,31 @@
       <mongo_field>
         <field_name>work</field_name>
 
+        <field_path>&#x24;.contact_details.mail_ids.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>workEmailToVerify</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.workEmailToVerify</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_1</field_name>
+
         <field_path>&#x24;.contact_details.web_addresses.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_2</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.work</field_path>
 
         <field_type>String</field_type>
 
@@ -1019,17 +1250,17 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>zillowLenderId</field_name>
+        <field_name>zillowProfileLink</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowLenderId</field_path>
+        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowProfileLink</field_path>
 
         <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>zillowProfileLink</field_name>
+        <field_name>zillowProfileLink_1</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowProfileLink</field_path>
+        <field_path>&#x24;.deletedSocialTokens.zillowToken.zillowProfileLink</field_path>
 
         <field_type>String</field_type>
 
@@ -1039,7 +1270,7 @@
 
         <field_path>&#x24;.zillowReviewAverage</field_path>
 
-        <field_type>Integer</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1047,11 +1278,19 @@
 
         <field_path>&#x24;.zillowReviewCount</field_path>
 
-        <field_type>Integer</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
         <field_name>zillowScreenName</field_name>
+
+        <field_path>&#x24;.deletedSocialTokens.zillowToken.zillowScreenName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowScreenName_1</field_name>
 
         <field_path>&#x24;.socialMediaTokens.zillowToken.zillowScreenName</field_path>
 
@@ -1942,25 +2181,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>650</xloc>
       <yloc>435</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>654</xloc>
-      <yloc>332</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
