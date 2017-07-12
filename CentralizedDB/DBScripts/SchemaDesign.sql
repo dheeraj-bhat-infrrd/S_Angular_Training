@@ -1,8 +1,8 @@
 CREATE DATABASE  IF NOT EXISTS `ss_report_demo` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `ss_report_demo`;
--- MySQL dump 10.13  Distrib 5.7.12, for Win32 (AMD64)
+-- MySQL dump 10.13  Distrib 5.7.12, for Win64 (x86_64)
 --
--- Host: localhost    Database: ss_centralized_mongodb
+-- Host: localhost    Database: ss_report_demo
 -- ------------------------------------------------------
 -- Server version	5.7.17-log
 
@@ -83,14 +83,14 @@ CREATE TABLE `agent_settings` (
   `SOCIAL_MEDIA_TOKENS_ID` varchar(45) DEFAULT NULL,
   `STATUS` varchar(45) DEFAULT NULL,
   `CREATED_BY` varchar(45) DEFAULT NULL,
-  `CREATED_ON_MONGO` bigint DEFAULT NULL,
+  `CREATED_ON_MONGO` bigint(20) DEFAULT NULL,
   `CREATED_ON` datetime DEFAULT NULL,
   `MODIFIED_BY` varchar(45) DEFAULT NULL,
-  `MODIFIED_ON_MONGO` bigint DEFAULT NULL,
+  `MODIFIED_ON_MONGO` bigint(20) DEFAULT NULL,
   `MODIFIED_ON` datetime DEFAULT NULL,
   `ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA` tinyint(4) DEFAULT NULL,
   `ALLOW_ZILLOW_AUTO_POST` tinyint(4) DEFAULT NULL,
-  `DISCLAIMER` TEXT DEFAULT NULL,
+  `DISCLAIMER` text,
   `EXPERTISE` text,
   `HIDDEN_AGENT_NAME` tinyint(4) DEFAULT NULL,
   `HIDDEN_SECTION` tinyint(4) DEFAULT NULL,
@@ -101,8 +101,8 @@ CREATE TABLE `agent_settings` (
   `IS_LOGO_IMAGE_PROCESSED` tinyint(4) DEFAULT NULL,
   `IS_PROFILE_IMAGE_PROCESSED` tinyint(4) DEFAULT NULL,
   `IS_SEO_CONTENT_MODIFIED` tinyint(4) DEFAULT NULL,
-  `LOGO` BLOB DEFAULT NULL,
-  `LOGO_THUMBNAIL` TEXT DEFAULT NULL,
+  `LOGO` blob,
+  `LOGO_THUMBNAIL` text,
   `PROFILE_COMPLETION` float DEFAULT NULL,
   `PROFILE_IMAGE_URL` longtext,
   `PROFILE_IMAGE_URL_THUMBNAIL` longtext,
@@ -115,9 +115,9 @@ CREATE TABLE `agent_settings` (
   `VERTICAL` varchar(45) DEFAULT NULL,
   `ZILLOW_REVIEW_AVERAGE` float DEFAULT NULL,
   `ZILLOW_REVIEW_COUNT` int(11) DEFAULT NULL,
-  `ASSOCIATIONS` TEXT DEFAULT NULL,
-  `ACHIEVMENTS` TEXT DEFAULT NULL,
-  `LICENSES` TEXT DEFAULT NULL,
+  `ASSOCIATIONS` text,
+  `ACHIEVMENTS` text,
+  `LICENSES` text,
   PRIMARY KEY (`AGENT_SETTINGS_ID`),
   KEY `AGENT_ID_idx` (`USER_ID`),
   KEY `FK_SOCIAL_MEDIA_TOKEN_ID_idx` (`SOCIAL_MEDIA_TOKENS_ID`),
@@ -194,7 +194,7 @@ CREATE TABLE `batch_tracker` (
   `ERROR` text,
   `DESCRIPTION` text,
   PRIMARY KEY (`BATCH_TRACKER_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -226,7 +226,7 @@ CREATE TABLE `branch` (
   KEY `fk_BRANCH_COMPANY1_idx` (`COMPANY_ID`),
   CONSTRAINT `fk_BRANCH_COMPANY1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_BRANCH_REGION1` FOREIGN KEY (`REGION_ID`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=5674 DEFAULT CHARSET=utf8 COMMENT='Branch details under a region. In case, there are no branches under a region, a default row will be added.';
+) ENGINE=InnoDB AUTO_INCREMENT=5694 DEFAULT CHARSET=utf8 COMMENT='Branch details under a region. In case, there are no branches under a region, a default row will be added.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -258,21 +258,21 @@ CREATE TABLE `branch_settings` (
   `BRANCH_ID` int(10) unsigned DEFAULT NULL,
   `SOCIAL_MEDIA_TOKENS_ID` varchar(45) DEFAULT NULL,
   `CREATED_BY` varchar(45) DEFAULT NULL,
-  `CREATED_ON_MONGO` bigint DEFAULT NULL,
+  `CREATED_ON_MONGO` bigint(20) DEFAULT NULL,
   `CREATED_ON` datetime DEFAULT NULL,
   `MODIFIED_BY` varchar(45) DEFAULT NULL,
-  `MODIFIED_ON_MONGO` bigint DEFAULT NULL,
+  `MODIFIED_ON_MONGO` bigint(20) DEFAULT NULL,
   `MODIFIED_ON` datetime DEFAULT NULL,
   `STATUS` varchar(45) DEFAULT NULL,
-  `ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA` varchar(5) DEFAULT NULL,
-  `ALLOW_ZILLOW_AUTO_POST` varchar(5) DEFAULT NULL,
-  `HIDDEN_SECTION` varchar(5) DEFAULT NULL,
-  `IS_ACCOUNT_DISABLED` varchar(5) DEFAULT NULL,
-  `IS_DEFAULT_BY_SYSTEM` varchar(5) DEFAULT NULL,
-  `IS_LOCATION_ENABLED` varchar(5) DEFAULT NULL,
-  `IS_LOGO_IMAGE_PROCESSED` varchar(5) DEFAULT NULL,
-  `IS_PROFILE_IMAGE_PROCESSED` varchar(5) DEFAULT NULL,
-  `IS_SEO_CONTENT_MODIFIED` varchar(5) DEFAULT NULL,
+  `ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA` tinyint(4) DEFAULT NULL,
+  `ALLOW_ZILLOW_AUTO_POST` tinyint(4) DEFAULT NULL,
+  `HIDDEN_SECTION` tinyint(4) DEFAULT NULL,
+  `IS_ACCOUNT_DISABLED` tinyint(4) DEFAULT NULL,
+  `IS_DEFAULT_BY_SYSTEM` tinyint(4) DEFAULT NULL,
+  `IS_LOCATION_ENABLED` tinyint(4) DEFAULT NULL,
+  `IS_LOGO_IMAGE_PROCESSED` tinyint(4) DEFAULT NULL,
+  `IS_PROFILE_IMAGE_PROCESSED` tinyint(4) DEFAULT NULL,
+  `IS_SEO_CONTENT_MODIFIED` tinyint(4) DEFAULT NULL,
   `LOGO` blob,
   `LOGO_THUMBNAIL` text,
   `PROFILE_COMPLETION` int(11) DEFAULT NULL,
@@ -280,8 +280,8 @@ CREATE TABLE `branch_settings` (
   `PROFILE_IMAGE_URL_THUMBNAIL` text,
   `PROFILE_NAME` varchar(100) DEFAULT NULL,
   `PROFILE_URL` text,
-  `SEND_EMAIL_FROM_COMPANY` varchar(5) DEFAULT NULL,
-  `VENDASTA_ACCESSIBLE` varchar(5) DEFAULT NULL,
+  `SEND_EMAIL_FROM_COMPANY` tinyint(4) DEFAULT NULL,
+  `VENDASTA_ACCESSIBLE` tinyint(4) DEFAULT NULL,
   `VERTICAL` varchar(45) DEFAULT NULL,
   `ZILLOW_REVIEW_AVERAGE` float DEFAULT NULL,
   `ZILLOW_REVIEW_COUNT` int(10) DEFAULT NULL,
@@ -311,6 +311,28 @@ CREATE TABLE `branch_state_history` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `classification_codes`
+--
+
+DROP TABLE IF EXISTS `classification_codes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `classification_codes` (
+  `CLASSIFICATION_CODES_ID` varchar(36) NOT NULL,
+  `CRM_INFO_ID` varchar(36) DEFAULT NULL,
+  `CODE` varchar(45) DEFAULT NULL,
+  `ID` varchar(45) DEFAULT NULL,
+  `LONE_WOLF_TRANSACTION_PARTICIPANTS_TYPE` varchar(45) DEFAULT NULL,
+  `LW_COMPANY_CODE` varchar(45) DEFAULT NULL,
+  `NAME` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`CLASSIFICATION_CODES_ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  KEY `FX_CRM_INFO_ID_idx` (`CRM_INFO_ID`),
+  CONSTRAINT `FX_CRM_INFO_ID` FOREIGN KEY (`CRM_INFO_ID`) REFERENCES `crm_info` (`CRM_INFO_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `collection_dotloop_profilemapping`
 --
 
@@ -332,7 +354,7 @@ CREATE TABLE `collection_dotloop_profilemapping` (
   `MODIFIED_BY` varchar(255) DEFAULT NULL,
   `MODIFIED_ON` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`COLLECTION_PROFILE_MAPPING_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1161 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -362,7 +384,7 @@ CREATE TABLE `company` (
   PRIMARY KEY (`COMPANY_ID`),
   KEY `fk_COMPANY_VERTICALS_MASTER1_idx` (`VERTICAL_ID`),
   CONSTRAINT `fk_COMPANY_VERTICALS_MASTER1` FOREIGN KEY (`VERTICAL_ID`) REFERENCES `verticals_master` (`VERTICALS_MASTER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=904 DEFAULT CHARSET=utf8 COMMENT='Holds the company meta data';
+) ENGINE=InnoDB AUTO_INCREMENT=912 DEFAULT CHARSET=utf8 COMMENT='Holds the company meta data';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -491,13 +513,66 @@ CREATE TABLE `company_settings` (
   `SEND_EMAIL_THROUGH` varchar(45) DEFAULT NULL,
   `VENDASTA_ACCESSIBLE` tinyint(4) DEFAULT NULL,
   `VERTICAL` varchar(45) DEFAULT NULL,
-  ` ZILLOW_REVIEW_AVERAGE` float DEFAULT NULL,
+  `ZILLOW_REVIEW_AVERAGE` float DEFAULT NULL,
   `ZILLOW_REVIEW_COUNT` int(10) DEFAULT NULL,
   PRIMARY KEY (`COMPANY_SETTINGS_ID`),
   KEY `FK_CS_SOCIAL_MEDIA_TOKEN_idx` (`SOCIAL_MEDIA_TOKENS_ID`),
   CONSTRAINT `FK_CS_SOCIAL_MEDIA_TOKEN` FOREIGN KEY (`SOCIAL_MEDIA_TOKENS_ID`) REFERENCES `social_media_tokens` (`SOCIAL_MEDIA_TOKENS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Table structure for table `company_user_report`
+--
+
+DROP TABLE IF EXISTS `company_user_report`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `company_user_report` (
+  `company_user_table_id` varchar(36) NOT NULL,
+  `user_id` int(11) unsigned DEFAULT NULL,
+  `first_name` varchar(250) DEFAULT NULL,
+  `last_name` varchar(45) DEFAULT NULL,
+  `email` varchar(45) DEFAULT NULL,
+  `social_survey_access_level` varchar(45) DEFAULT NULL,
+  `office_branch_assignment` varchar(45) DEFAULT NULL,
+  `region_assignment` varchar(45) DEFAULT NULL,
+  `office_admin` varchar(45) DEFAULT NULL,
+  `region_admin` varchar(45) DEFAULT NULL,
+  `ss_invite_sent_date` datetime DEFAULT NULL,
+  `email_verified` varchar(45) DEFAULT NULL,
+  `last_login_date` datetime DEFAULT NULL,
+  `profile_complete` text,
+  `disclaimer` text,
+  `address` text,
+  `socially_connected` varchar(45) DEFAULT NULL,
+  `fb_data_connection` varchar(45) DEFAULT NULL,
+  `fb_connection_status` varchar(45) DEFAULT NULL,
+  `last_post_date_fb` datetime DEFAULT NULL,
+  `twitter_data_connection` varchar(45) DEFAULT NULL,
+  `twitter_connection_status` varchar(45) DEFAULT NULL,
+  `last_post_date_twitter` datetime DEFAULT NULL,
+  `linkedin_data_connection` varchar(45) DEFAULT NULL,
+  `linkedin_connection_status` varchar(45) DEFAULT NULL,
+  `last_post_date_linkedin` datetime DEFAULT NULL,
+  `google_plus_url` text,
+  `zillow_url` text,
+  `yelp_url` text,
+  `realtor_url` text,
+  `gb_url` text,
+  `lendingtree_url` text,
+  `email_verified_date` datetime DEFAULT NULL,
+  `adoption_completed_date` datetime DEFAULT NULL,
+  `last_survey_sent_date` datetime DEFAULT NULL,
+  `last_survey_posted_date` datetime DEFAULT NULL,
+  `ss_profile` text,
+  `total_reviews` int(11) DEFAULT NULL,
+  `ss_reviews` int(11) DEFAULT NULL,
+  `zillow_reviews` int(11) DEFAULT NULL,
+  `abusive_reviews` int(11) DEFAULT NULL,
+  `3rd_party_reviews` int(11) DEFAULT NULL,
+  PRIMARY KEY (`company_user_table_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -508,7 +583,7 @@ DROP TABLE IF EXISTS `complaint_res_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `complaint_res_settings` (
-  `COMPLAINT_RES_SETTINGS_ID` VARCHAR(36) NOT NULL,
+  `COMPLAINT_RES_SETTINGS_ID` varchar(36) NOT NULL,
   `SURVEY_SETTINGS_ID` varchar(36) DEFAULT NULL,
   `ENABLED` tinyint(4) DEFAULT NULL,
   `MAIL_ID` varchar(45) DEFAULT NULL,
@@ -567,7 +642,6 @@ CREATE TABLE `contact_details` (
   CONSTRAINT `REGION_SETTINGS_ID        ` FOREIGN KEY (`REGION_SETTINGS_ID`) REFERENCES `region_settings` (`REGION_SETTINGS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `SURVEY_DETAILS_ID ` FOREIGN KEY (`SURVEY_DETAILS_ID`) REFERENCES `survey_details` (`SURVEY_DETAILS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -587,7 +661,6 @@ CREATE TABLE `contact_numbers` (
   KEY `CONTACT_DETAILS_ID_idx` (`CONTACT_DETAILS_ID`),
   CONSTRAINT `CONTACT_DETAILS_ID` FOREIGN KEY (`CONTACT_DETAILS_ID`) REFERENCES `contact_details` (`CONTACT_DETAILS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -635,7 +708,7 @@ CREATE TABLE `crm_batch_tracker_history` (
   PRIMARY KEY (`HISTORY_ID`),
   KEY `fk_History_Crm_batch_tracker` (`CRM_BATCH_TRACKER_ID`),
   CONSTRAINT `fk_History_Crm_batch_tracker` FOREIGN KEY (`CRM_BATCH_TRACKER_ID`) REFERENCES `crm_batch_tracker` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1117 DEFAULT CHARSET=utf8 COMMENT='History details of no of records fetched each time when batch runs.';
+) ENGINE=InnoDB AUTO_INCREMENT=1192 DEFAULT CHARSET=utf8 COMMENT='History details of no of records fetched each time when batch runs.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -722,7 +795,7 @@ CREATE TABLE `disabled_accounts` (
   KEY `fk_DISABLED_ACCOUNTS_LICENSE_DETAILS1_idx` (`LICENSE_ID`),
   CONSTRAINT `fk_DISABLED_ACCOUNTS_COMPANY1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_DISABLED_ACCOUNTS_LICENSE_DETAILS1` FOREIGN KEY (`LICENSE_ID`) REFERENCES `license_details` (`LICENSE_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=150 DEFAULT CHARSET=utf8 COMMENT='Holds the disabled account details for a company';
+) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8 COMMENT='Holds the disabled account details for a company';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -745,7 +818,7 @@ CREATE TABLE `dotloop_profile_loop_mapping` (
   `COLLECTION_NAME` varchar(100) DEFAULT NULL,
   `CREATED_ON` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`PROFILE_LOOP_MAPPING_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=102728 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=102862 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -764,7 +837,7 @@ CREATE TABLE `email_entity` (
   `MODIFIED_BY` varchar(255) DEFAULT NULL,
   `MODIFIED_ON` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2862 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3930 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -830,7 +903,7 @@ CREATE TABLE `external_survey_tracker` (
   `MODIFIED_ON` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `MODIFIED_BY` varchar(45) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=753 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=818 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -892,7 +965,7 @@ CREATE TABLE `facebook_token` (
   `TOKEN_EXPIRY_ALERT_TIME` datetime DEFAULT NULL,
   `type` int(11) NOT NULL,
   `id` int(10) NOT NULL,
- `IS_DELETED` tinyint(4) NOT NULL DEFAULT '0',
+  `IS_DELETED` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`type`,`id`),
   UNIQUE KEY `FACEBOOK_TOKEN_ID_UNIQUE` (`FACEBOOK_TOKEN_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -918,7 +991,7 @@ CREATE TABLE `feed_status` (
   `REMINDERS_SENT` int(11) DEFAULT '0',
   `REMINDER_SENT_ON` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`FEED_STATUS_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=274 DEFAULT CHARSET=utf8 COMMENT='Holds the Social Feed Status meta data';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Holds the Social Feed Status meta data';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -944,7 +1017,7 @@ CREATE TABLE `file_upload` (
   PRIMARY KEY (`FILE_UPLOAD_ID`),
   KEY `fk_FILE_UPLOAD_COMPANY1` (`COMPANY_ID`),
   CONSTRAINT `fk_FILE_UPLOAD_COMPANY1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=378 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=397 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1265,6 +1338,28 @@ CREATE TABLE `hierarchy_upload_users_source_mapping` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `job_log_details`
+--
+
+DROP TABLE IF EXISTS `job_log_details`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `job_log_details` (
+  `JOB_LOG_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `JOB_NAME` varchar(45) DEFAULT NULL,
+  `STATUS` varchar(45) DEFAULT NULL,
+  `JOB_START_TIME` timestamp NULL DEFAULT NULL,
+  `JOB_END_TIME` timestamp NULL DEFAULT NULL,
+  `CURRENT_JOB_NAME` varchar(45) DEFAULT NULL,
+  `JOB_UUID` varchar(45) NOT NULL,
+  PRIMARY KEY (`JOB_LOG_ID`),
+  UNIQUE KEY `JOB_UUID_UNIQUE` (`JOB_UUID`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+insert into job_log_details(JOB_NAME,STATUS,JOB_START_TIME,JOB_END_TIME,CURRENT_JOB_NAME,JOB_UUID) 
+values('Dummy Job','Dummy','1980-01-01 00:00:01','1980-01-01 00:00:01','Dummy','xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
+--
 -- Table structure for table `lender_ref`
 --
 
@@ -1332,7 +1427,7 @@ CREATE TABLE `license_details` (
   KEY `fk_LICENCE_DETAILS_COMPANY1_idx` (`COMPANY_ID`),
   CONSTRAINT `fk_LICENCE_DETAILS_ACCOUNTS_MASTER1` FOREIGN KEY (`ACCOUNTS_MASTER_ID`) REFERENCES `accounts_master` (`ACCOUNTS_MASTER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_LICENCE_DETAILS_COMPANY1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=646 DEFAULT CHARSET=utf8 COMMENT='Holds the license details for a company';
+) ENGINE=InnoDB AUTO_INCREMENT=653 DEFAULT CHARSET=utf8 COMMENT='Holds the license details for a company';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1416,13 +1511,13 @@ DROP TABLE IF EXISTS `linked_in_profile_data`;
 CREATE TABLE `linked_in_profile_data` (
   `LINKED_IN_PROFILE_DATA_ID` varchar(45) NOT NULL,
   `AGENT_SETTINGS_ID` varchar(36) NOT NULL,
-  `FIRST_NAME` varchar(45) DEFAULT NULL,
-  `HEADLINE` varchar(45) DEFAULT NULL,
-  `INDUSTRY` varchar(45) DEFAULT NULL,
-  `LAST_NAME` varchar(45) DEFAULT NULL,
+  `FIRST_NAME` varchar(450) DEFAULT NULL,
+  `HEADLINE` varchar(450) DEFAULT NULL,
+  `INDUSTRY` varchar(450) DEFAULT NULL,
+  `LAST_NAME` varchar(450) DEFAULT NULL,
   `PUBLIC_PROFILE_URL` text,
-  `SPECIALTIES` varchar(45) DEFAULT NULL,
-  `SUMMARY` varchar(45) DEFAULT NULL,
+  `SPECIALTIES` varchar(450) DEFAULT NULL,
+  `SUMMARY` text,
   `PICTURE_URL` text,
   `isDeleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`LINKED_IN_PROFILE_DATA_ID`,`AGENT_SETTINGS_ID`),
@@ -1595,7 +1690,6 @@ CREATE TABLE `mail` (
   KEY `CONTACT_DETAILS_ID_idx` (`CONTACT_DETAILS_ID`),
   CONSTRAINT `FX_CONTACT_DETAILS_ID` FOREIGN KEY (`CONTACT_DETAILS_ID`) REFERENCES `contact_details` (`CONTACT_DETAILS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1622,6 +1716,150 @@ CREATE TABLE `organization_level_settings` (
   KEY `fk_ORGANIZATION_PROFILE_COMPANY1_idx` (`COMPANY_ID`),
   CONSTRAINT `fk_ORGANIZATION_PROFILE_COMPANY1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Holds the settings for organisation level. The level could be company, region or branch';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `overview_branch`
+--
+
+DROP TABLE IF EXISTS `overview_branch`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `overview_branch` (
+  `overview_branch_id` varchar(36) NOT NULL,
+  `branch_id` int(10) unsigned DEFAULT NULL,
+  `sps_score` int(11) NOT NULL DEFAULT '0',
+  `total_detractors` int(11) NOT NULL DEFAULT '0',
+  `detractors_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_passives` int(11) NOT NULL DEFAULT '0',
+  `passives_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_promoters` int(11) NOT NULL DEFAULT '0',
+  `promoter_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_corrupted` int(11) NOT NULL DEFAULT '0',
+  `corrupted_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_mismatched` int(11) NOT NULL DEFAULT '0',
+  `mismatched_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_duplicate` int(11) NOT NULL DEFAULT '0',
+  `duplicate_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_archieved` int(11) NOT NULL DEFAULT '0',
+  `archieved_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_incomplete_transactions` int(11) NOT NULL DEFAULT '0',
+  `total_survey_sent` int(11) NOT NULL DEFAULT '0',
+  `total_survey_completed` int(11) NOT NULL DEFAULT '0',
+  `total_social_post` int(11) NOT NULL DEFAULT '0',
+  `total_zillow_reviews` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`overview_branch_id`),
+  KEY `FX_OVERVIEW_BRANCH_idx` (`branch_id`),
+  CONSTRAINT `FX_OVERVIEW_BRANCH` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `overview_company`
+--
+
+DROP TABLE IF EXISTS `overview_company`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `overview_company` (
+  `overview_company_id` varchar(36) NOT NULL,
+  `company_id` int(10) unsigned DEFAULT NULL,
+  `sps_score` int(11) NOT NULL DEFAULT '0',
+  `total_detractors` int(11) NOT NULL DEFAULT '0',
+  `detractors_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_passives` int(11) NOT NULL DEFAULT '0',
+  `passives_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_promoters` int(11) NOT NULL DEFAULT '0',
+  `promoter_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_corrupted` int(11) NOT NULL DEFAULT '0',
+  `corrupted_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_mismatched` int(11) NOT NULL DEFAULT '0',
+  `mismatched_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_duplicate` int(11) NOT NULL DEFAULT '0',
+  `duplicate_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_archieved` int(11) NOT NULL DEFAULT '0',
+  `archieved_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_incomplete_transactions` int(11) NOT NULL DEFAULT '0',
+  `total_survey_sent` int(11) NOT NULL DEFAULT '0',
+  `total_survey_completed` int(11) NOT NULL DEFAULT '0',
+  `total_social_post` int(11) NOT NULL DEFAULT '0',
+  `total_zillow_reviews` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`overview_company_id`),
+  KEY `FX_OVERVIEW_COMPANY_idx` (`company_id`),
+  CONSTRAINT `FX_OVERVIEW_COMPANY` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `overview_region`
+--
+
+DROP TABLE IF EXISTS `overview_region`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `overview_region` (
+  `overview_region_id` varchar(36) NOT NULL,
+  `region_id` int(10) unsigned DEFAULT NULL,
+  `sps_score` int(11) NOT NULL DEFAULT '0',
+  `total_detractors` int(11) NOT NULL DEFAULT '0',
+  `detractors_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_passives` int(11) NOT NULL DEFAULT '0',
+  `passives_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_promoters` int(11) NOT NULL DEFAULT '0',
+  `promoter_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_corrupted` int(11) NOT NULL DEFAULT '0',
+  `corrupted_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_mismatched` int(11) NOT NULL DEFAULT '0',
+  `mismatched_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_duplicate` int(11) NOT NULL DEFAULT '0',
+  `duplicate_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_archieved` int(11) NOT NULL DEFAULT '0',
+  `archieved_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_incomplete_transactions` int(11) NOT NULL DEFAULT '0',
+  `total_survey_sent` int(11) NOT NULL DEFAULT '0',
+  `total_survey_completed` int(11) NOT NULL DEFAULT '0',
+  `total_social_post` int(11) NOT NULL DEFAULT '0',
+  `total_zillow_reviews` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`overview_region_id`),
+  KEY `FX_OVERVIEW_REGION_idx` (`region_id`),
+  CONSTRAINT `FX_OVERVIEW_REGION` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `overview_user`
+--
+
+DROP TABLE IF EXISTS `overview_user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `overview_user` (
+  `overview_user_id` varchar(36) NOT NULL,
+  `user_id` int(10) unsigned DEFAULT NULL,
+  `sps_score` int(11) NOT NULL DEFAULT '0',
+  `total_detractors` int(11) NOT NULL DEFAULT '0',
+  `detractors_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_passives` int(11) NOT NULL DEFAULT '0',
+  `passives_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_promoters` int(11) NOT NULL DEFAULT '0',
+  `promoter_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_corrupted` int(11) NOT NULL DEFAULT '0',
+  `corrupted_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_mismatched` int(11) NOT NULL DEFAULT '0',
+  `mismatched_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_duplicate` int(11) NOT NULL DEFAULT '0',
+  `duplicate_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_archieved` int(11) NOT NULL DEFAULT '0',
+  `archieved_percentage` int(11) NOT NULL DEFAULT '0',
+  `total_incomplete_transactions` int(11) NOT NULL DEFAULT '0',
+  `total_survey_sent` int(11) NOT NULL DEFAULT '0',
+  `total_survey_completed` int(11) NOT NULL DEFAULT '0',
+  `total_social_post` int(11) NOT NULL DEFAULT '0',
+  `total_zillow_reviews` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`overview_user_id`),
+  KEY `FX_OVERVIEW_USER_idx` (`user_id`),
+  CONSTRAINT `FX_OVERVIEW_USER` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1692,7 +1930,6 @@ CREATE TABLE `profile_stages` (
   UNIQUE KEY `PROFILE_STAGES_ID_UNIQUE` (`PROFILE_STAGES_ID`),
   KEY `FX2_AGENT_SETTINGS_ID_idx` (`AGENT_SETTINGS_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1824,7 +2061,7 @@ CREATE TABLE `region` (
   PRIMARY KEY (`REGION_ID`),
   KEY `fk_REGION_COMPANY1_idx` (`COMPANY_ID`),
   CONSTRAINT `fk_REGION_COMPANY1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=1558 DEFAULT CHARSET=utf8 COMMENT='Region details of a company. In case, if the admin decides there is no region for the company, then a default row will be added.';
+) ENGINE=InnoDB AUTO_INCREMENT=1569 DEFAULT CHARSET=utf8 COMMENT='Region details of a company. In case, if the admin decides there is no region for the company, then a default row will be added.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1874,8 +2111,6 @@ CREATE TABLE `region_settings` (
   CONSTRAINT `FK_RS_SOCIAL_MEDIA_TOKEN` FOREIGN KEY (`SOCIAL_MEDIA_TOKENS_ID`) REFERENCES `social_media_tokens` (`SOCIAL_MEDIA_TOKENS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `GX_REGION_ID` FOREIGN KEY (`REGION_ID`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1896,7 +2131,7 @@ CREATE TABLE `removed_user` (
   KEY `fk_REMOVED_USER_2_idx` (`COMPANY_ID`),
   CONSTRAINT `fk_REMOVED_USER_1` FOREIGN KEY (`USER_ID`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_REMOVED_USER_2` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=25369 DEFAULT CHARSET=utf8 COMMENT='Holds the information of users which have been removed from the company.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Holds the information of users which have been removed from the company.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1980,7 +2215,6 @@ CREATE TABLE `social_connection_history` (
   `LINK` text,
   PRIMARY KEY (`SOCIAL_CONNECTION_HISTORY_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2117,7 +2351,7 @@ CREATE TABLE `statelookup` (
   `statecode` varchar(45) DEFAULT NULL,
   `statename` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2137,7 +2371,7 @@ CREATE TABLE `survey` (
   `MODIFIED_ON` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `MODIFIED_BY` varchar(45) NOT NULL,
   PRIMARY KEY (`SURVEY_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=543 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=550 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2161,7 +2395,7 @@ CREATE TABLE `survey_company_mapping` (
   KEY `fk_SURVEY_COMPANY_MAPPING_SURVEY1_idx` (`SURVEY_ID`),
   CONSTRAINT `fk_SURVEY_COMPANY_MAPPING_COMPANY1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_SURVEY_COMPANY_MAPPING_SURVEY1` FOREIGN KEY (`SURVEY_ID`) REFERENCES `survey` (`SURVEY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=1141 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1148 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2174,7 +2408,7 @@ DROP TABLE IF EXISTS `survey_details`;
 CREATE TABLE `survey_details` (
   `SURVEY_DETAILS_ID` varchar(36) NOT NULL,
   `AGENT_ID` int(10) unsigned DEFAULT NULL,
-  `AGENT_NAME` varchar(45) DEFAULT NULL,
+  `AGENT_NAME` varchar(450) DEFAULT NULL,
   `BRANCH_ID` int(10) unsigned DEFAULT NULL,
   `COMPANY_ID` int(10) unsigned DEFAULT NULL,
   `REGION_ID` int(10) unsigned DEFAULT NULL,
@@ -2184,17 +2418,17 @@ CREATE TABLE `survey_details` (
   `CUSTOMER_LAST_NAME` varchar(45) DEFAULT NULL,
   `CREATED_ON` datetime DEFAULT NULL,
   `MODIFIED_ON` datetime DEFAULT NULL,
-  `SOURCE` varchar(45) DEFAULT NULL,
+  `SOURCE` varchar(450) DEFAULT NULL,
   `SOURCE_ID` text,
   `STAGE` int(11) DEFAULT NULL,
-  `STATE` varchar(45) DEFAULT NULL,
-  `MOOD` varchar(45) DEFAULT NULL,
+  `STATE` varchar(450) DEFAULT NULL,
+  `MOOD` varchar(450) DEFAULT NULL,
   `SURVEY_CLICKED` tinyint(4) DEFAULT NULL,
   `SURVEY_COMPLETED_DATE` datetime DEFAULT NULL,
   `SURVEY_TRANSACTION_DATE` datetime DEFAULT NULL,
   `SURVEY_UPDATED_DATE` datetime DEFAULT NULL,
-  `AGREED_TO_SHARE` varchar(45) DEFAULT NULL,
-  `CITY` varchar(45) DEFAULT NULL,
+  `AGREED_TO_SHARE` varchar(450) DEFAULT NULL,
+  `CITY` varchar(450) DEFAULT NULL,
   `COMPLETE_PROFILE_URL` text,
   `EDITABLE` tinyint(4) DEFAULT NULL,
   `IS_ABUSE_REP_BY_USER` tinyint(4) DEFAULT NULL,
@@ -2296,7 +2530,7 @@ CREATE TABLE `survey_pre_initiation` (
   PRIMARY KEY (`SURVEY_PRE_INITIATION_ID`),
   KEY `index_agent_id` (`AGENT_ID`),
   KEY `index_status` (`STATUS`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Holds survey pre-initiation details';
+) ENGINE=InnoDB AUTO_INCREMENT=999999243 DEFAULT CHARSET=latin1 COMMENT='Holds survey pre-initiation details';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2330,7 +2564,7 @@ CREATE TABLE `survey_questions` (
   `MODIFIED_ON` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `MODIFIED_BY` varchar(45) NOT NULL,
   PRIMARY KEY (`SURVEY_QUESTIONS_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Holds the survey questions for a survey';
+) ENGINE=InnoDB AUTO_INCREMENT=1784 DEFAULT CHARSET=utf8 COMMENT='Holds the survey questions for a survey';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2353,7 +2587,7 @@ CREATE TABLE `survey_questions_answer_options` (
   PRIMARY KEY (`SURVEY_QUESTIONS_ANSWER_OPTIONS_ID`),
   KEY `fk_SURVEY_QUESTIONS_ANSWER_OPTIONS_SURVEY_QUESTIONS1_idx` (`SURVEY_QUESTIONS_ID`),
   CONSTRAINT `fk_SURVEY_QUESTIONS_ANSWER_OPTIONS_SURVEY_QUESTIONS1` FOREIGN KEY (`SURVEY_QUESTIONS_ID`) REFERENCES `survey_questions` (`SURVEY_QUESTIONS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2379,12 +2613,13 @@ CREATE TABLE `survey_questions_mapping` (
   KEY `fk_SURVEY_QUESTIONS_MAPPING_SURVEY_QUESTIONS1_idx` (`SURVEY_QUESTIONS_ID`),
   CONSTRAINT `fk_SURVEY_QUESTIONS_MAPPING_SURVEY1` FOREIGN KEY (`SURVEY_ID`) REFERENCES `survey` (`SURVEY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_SURVEY_QUESTIONS_MAPPING_SURVEY_QUESTIONS1` FOREIGN KEY (`SURVEY_QUESTIONS_ID`) REFERENCES `survey_questions` (`SURVEY_QUESTIONS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1784 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `survey_response`
 --
+
 DROP TABLE IF EXISTS `survey_response`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -2400,6 +2635,7 @@ CREATE TABLE `survey_response` (
   KEY `XX5_SURVEY_DETAILS_ID_idx` (`SURVEY_DETAILS_ID`),
   CONSTRAINT `XX5_SURVEY_DETAILS_ID` FOREIGN KEY (`SURVEY_DETAILS_ID`) REFERENCES `survey_details` (`SURVEY_DETAILS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `survey_settings`
@@ -2415,7 +2651,7 @@ CREATE TABLE `survey_settings` (
   `REGION_SETTINGS_ID` varchar(36) DEFAULT NULL,
   `COMPANY_SETTINGS_ID` varchar(36) DEFAULT NULL,
   `SURVEY_DETAILS_ID` varchar(36) DEFAULT NULL,
-  `AUTO_POST_SCORE` int(11) DEFAULT NULL,
+  `AUTO_POST_SCORE` decimal(6,2) DEFAULT NULL,
   `AUTO_POST_ENABLED` tinyint(4) DEFAULT NULL,
   `AUTO_POST_LINK_TO_USER_SITE_ENABLED` tinyint(4) DEFAULT NULL,
   `DUPLICATE_SURVEY_INTERVAL` int(11) DEFAULT NULL,
@@ -2429,7 +2665,7 @@ CREATE TABLE `survey_settings` (
   `NEUTRAL_TEXT_COMPLETE` text,
   `SAD_TEXT` text,
   `SAD_TEXT_COMPLETE` text,
-  `SHOW_SURVEY_ABOVE_SCORE` int(11) DEFAULT NULL,
+  `SHOW_SURVEY_ABOVE_SCORE` decimal(6,2) DEFAULT NULL,
   `SOCIAL_POST_REMINDER_INTERVAL_IN_DAYS` int(11) DEFAULT NULL,
   `SURVEY_REMINDER_INTERVAL_IN_DAYS` int(11) DEFAULT NULL,
   PRIMARY KEY (`SURVEY_SETTINGS_ID`),
@@ -2447,6 +2683,170 @@ CREATE TABLE `survey_settings` (
   CONSTRAINT `FX3_COMPANY_SETTINGS_ID` FOREIGN KEY (`COMPANY_SETTINGS_ID`) REFERENCES `company_settings` (`COMPANY_SETTINGS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FX3_REGION_SETTINGS_ID` FOREIGN KEY (`REGION_SETTINGS_ID`) REFERENCES `region_settings` (`REGION_SETTINGS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FX4_AGENT_SETTINGS_ID` FOREIGN KEY (`AGENT_SETTINGS_ID`) REFERENCES `agent_settings` (`AGENT_SETTINGS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `survey_stats_report`
+--
+
+DROP TABLE IF EXISTS `survey_stats_report`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `survey_stats_report` (
+  `survey_stats_report_id` varchar(45) NOT NULL,
+  `Id` text,
+  `company_id` int(10) unsigned DEFAULT NULL,
+  `region_id` int(11) DEFAULT NULL,
+  `branch_id` int(10) unsigned NOT NULL,
+  `trx_month` varchar(10) DEFAULT NULL,
+  `trx_rcvd` int(11) DEFAULT '0',
+  `pending` int(11) DEFAULT '0',
+  `duplicates` int(11) DEFAULT '0',
+  `corrupted` int(11) DEFAULT '0',
+  `abusive` int(11) DEFAULT '0',
+  `old_records` int(11) DEFAULT '0',
+  `ignored` int(11) DEFAULT '0',
+  `mismatched` int(11) DEFAULT '0',
+  `sent_count` int(11) DEFAULT '0',
+  `clicked_count` int(11) DEFAULT '0',
+  `completed` int(11) DEFAULT '0',
+  `partially_completed` int(11) DEFAULT '0',
+  `complete_percentage` float DEFAULT '0',
+  `delta` int(11) DEFAULT '0',
+  `created_date` datetime DEFAULT NULL,
+  `year` int(11) NOT NULL,
+  `month` int(11) NOT NULL,
+  `avg_rating` float DEFAULT NULL,
+  `detractors` int(11) DEFAULT NULL,
+  `passives` int(11) DEFAULT NULL,
+  `promoters` int(11) DEFAULT NULL,
+  `branch_name` varchar(250) DEFAULT NULL,
+  `company_name` varchar(250) DEFAULT NULL,
+  `incomplete` int(11) DEFAULT NULL,
+  PRIMARY KEY (`branch_id`,`year`,`month`),
+  KEY `FK_BRANCH_idx` (`branch_id`),
+  KEY `FK_COMPANY_idx` (`company_id`),
+  CONSTRAINT `FK_BRANCH` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `survey_stats_report_company`
+--
+
+DROP TABLE IF EXISTS `survey_stats_report_company`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `survey_stats_report_company` (
+  `survey_stats_report_id` varchar(45) NOT NULL,
+  `Id` text,
+  `company_id` int(10) unsigned NOT NULL,
+  `trx_month` varchar(10) DEFAULT NULL,
+  `trx_rcvd` int(11) DEFAULT '0',
+  `pending` int(11) DEFAULT '0',
+  `duplicates` int(11) DEFAULT '0',
+  `corrupted` int(11) DEFAULT '0',
+  `abusive` int(11) DEFAULT '0',
+  `old_records` int(11) DEFAULT '0',
+  `ignored` int(11) DEFAULT '0',
+  `mismatched` int(11) DEFAULT '0',
+  `sent_count` int(11) DEFAULT '0',
+  `clicked_count` int(11) DEFAULT '0',
+  `completed` int(11) DEFAULT '0',
+  `partially_completed` int(11) DEFAULT '0',
+  `complete_percentage` float DEFAULT '0',
+  `delta` int(11) DEFAULT '0',
+  `created_date` datetime DEFAULT NULL,
+  `year` int(11) NOT NULL,
+  `month` int(11) NOT NULL,
+  `avg_rating` float DEFAULT NULL,
+  `detractors` int(11) DEFAULT NULL,
+  `passives` int(11) DEFAULT NULL,
+  `promoters` int(11) DEFAULT NULL,
+  `company_name` varchar(250) DEFAULT NULL,
+  `incomplete` int(11) DEFAULT NULL,
+  PRIMARY KEY (`year`,`month`,`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `survey_stats_report_region`
+--
+
+DROP TABLE IF EXISTS `survey_stats_report_region`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `survey_stats_report_region` (
+  `survey_stats_report_id` varchar(45) NOT NULL,
+  `Id` text,
+  `company_id` int(10) unsigned DEFAULT NULL,
+  `region_id` int(10) unsigned NOT NULL,
+  `trx_month` varchar(10) DEFAULT NULL,
+  `trx_rcvd` int(11) DEFAULT '0',
+  `pending` int(11) DEFAULT '0',
+  `duplicates` int(11) DEFAULT '0',
+  `corrupted` int(11) DEFAULT '0',
+  `abusive` int(11) DEFAULT '0',
+  `old_records` int(11) DEFAULT '0',
+  `ignored` int(11) DEFAULT '0',
+  `mismatched` int(11) DEFAULT '0',
+  `sent_count` int(11) DEFAULT '0',
+  `clicked_count` int(11) DEFAULT '0',
+  `completed` int(11) DEFAULT '0',
+  `partially_completed` int(11) DEFAULT '0',
+  `complete_percentage` float DEFAULT '0',
+  `delta` int(11) DEFAULT '0',
+  `created_date` datetime DEFAULT NULL,
+  `year` int(11) NOT NULL,
+  `month` int(11) NOT NULL,
+  `avg_rating` float DEFAULT NULL,
+  `detractors` int(11) DEFAULT NULL,
+  `passives` int(11) DEFAULT NULL,
+  `promoters` int(11) DEFAULT NULL,
+  `region_name` varchar(250) DEFAULT NULL,
+  `company_name` varchar(250) DEFAULT NULL,
+  `incomplete` int(11) DEFAULT NULL,
+  PRIMARY KEY (`year`,`region_id`,`month`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `survey_stats_report_user`
+--
+
+DROP TABLE IF EXISTS `survey_stats_report_user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `survey_stats_report_user` (
+  `survey_stats_report_id` varchar(45) NOT NULL,
+  `Id` text,
+  `user_id` int(10) unsigned NOT NULL,
+  `user_name` varchar(250) DEFAULT NULL,
+  `trx_month` varchar(10) DEFAULT NULL,
+  `trx_rcvd` int(11) DEFAULT '0',
+  `pending` int(11) DEFAULT '0',
+  `duplicates` int(11) DEFAULT '0',
+  `corrupted` int(11) DEFAULT '0',
+  `abusive` int(11) DEFAULT '0',
+  `old_records` int(11) DEFAULT '0',
+  `ignored` int(11) DEFAULT '0',
+  `mismatched` int(11) DEFAULT '0',
+  `sent_count` int(11) DEFAULT '0',
+  `clicked_count` int(11) DEFAULT '0',
+  `completed` int(11) DEFAULT '0',
+  `partially_completed` int(11) DEFAULT '0',
+  `complete_percentage` float DEFAULT '0',
+  `delta` int(11) DEFAULT '0',
+  `created_date` datetime DEFAULT NULL,
+  `year` int(11) NOT NULL,
+  `month` int(11) NOT NULL,
+  `avg_rating` float DEFAULT NULL,
+  `detractors` int(11) DEFAULT NULL,
+  `passives` int(11) DEFAULT NULL,
+  `promoters` int(11) DEFAULT NULL,
+  `incomplete` int(11) DEFAULT NULL,
+  PRIMARY KEY (`year`,`month`,`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2471,7 +2871,7 @@ CREATE TABLE `survey_vertical_mapping` (
   KEY `fk_SURVEY_VERTICAL_MAPPING_SURVEY1_idx` (`SURVEY_ID`),
   CONSTRAINT `fk_SURVEY_VERTICAL_MAPPING_SURVEY1` FOREIGN KEY (`SURVEY_ID`) REFERENCES `survey` (`SURVEY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_SURVEY_VERTICAL_MAPPING_VERTICAL1` FOREIGN KEY (`VERTICAL_ID`) REFERENCES `verticals_master` (`VERTICALS_MASTER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2509,7 +2909,7 @@ CREATE TABLE `twitter_post_response_list` (
   `ACCESS_TOKEN` text,
   `POST_DATE` datetime DEFAULT NULL,
   `RESPONSE_MESSAGE` text,
-   `SURVEY_DETAILS_ID` varchar(36) DEFAULT NULL,
+  `SURVEY_DETAILS_ID` varchar(36) DEFAULT NULL,
   PRIMARY KEY (`TWITTER_POST_RESPONSE_LIST_ID`),
   UNIQUE KEY `twitter_unique` (`id`,`type`,`SURVEY_DETAILS_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -2811,7 +3211,7 @@ CREATE TABLE `upload_status` (
   PRIMARY KEY (`UPLOAD_STATUS_ID`),
   KEY `fk_UPLOAD_STATUS_COMPANY1` (`COMPANY_ID`),
   CONSTRAINT `fk_UPLOAD_STATUS_COMPANY1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2836,6 +3236,29 @@ CREATE TABLE `url_details` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `user_adoption_report`
+--
+
+DROP TABLE IF EXISTS `user_adoption_report`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user_adoption_report` (
+  `user_adoption_report_id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `company_name` varchar(450) DEFAULT NULL,
+  `region_id` int(10) unsigned NOT NULL,
+  `region_name` varchar(450) DEFAULT NULL,
+  `branch_id` int(10) unsigned NOT NULL,
+  `branch_name` varchar(450) DEFAULT NULL,
+  `invited_users` int(11) DEFAULT NULL,
+  `active_users` int(11) DEFAULT NULL,
+  `adoption_rate` decimal(6,2) DEFAULT NULL,
+  PRIMARY KEY (`branch_id`,`region_id`,`company_id`),
+  UNIQUE KEY `user_adoption_report_id_UNIQUE` (`user_adoption_report_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4448 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `user_api_keys`
 --
 
@@ -2851,7 +3274,7 @@ CREATE TABLE `user_api_keys` (
   `CREATED_ON` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `MODIFIED_ON` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`USER_API_KEY_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Holds user api keys';
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COMMENT='Holds user api keys';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2876,7 +3299,7 @@ CREATE TABLE `user_email_mapping` (
   KEY `fk_USER_EMAIL_MAPPING_1` (`COMPANY_ID`),
   CONSTRAINT `fk_USER_EMAIL_MAPPING_1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_USER_EMAIL_MAPPING_USER1` FOREIGN KEY (`USER_ID`) REFERENCES `users` (`USER_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2906,7 +3329,7 @@ CREATE TABLE `user_invite` (
   KEY `fk_USER_INVITE_PROFILES_MASTER1_idx` (`PROFILE_MASTERS_ID`),
   CONSTRAINT `fk_USER_INVITE_COMPANY1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_USER_INVITE_PROFILES_MASTER1` FOREIGN KEY (`PROFILE_MASTERS_ID`) REFERENCES `profiles_master` (`PROFILE_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Holds the user invitation record';
+) ENGINE=InnoDB AUTO_INCREMENT=910 DEFAULT CHARSET=utf8 COMMENT='Holds the user invitation record';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2941,7 +3364,7 @@ CREATE TABLE `user_profile` (
   CONSTRAINT `fk_USER_PROFILE_COMPANY1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_USER_PROFILE_PROFILES_MASTER1` FOREIGN KEY (`PROFILES_MASTER_ID`) REFERENCES `profiles_master` (`PROFILE_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_USER_PROFILE_USERS1` FOREIGN KEY (`USER_ID`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Holds the details of profile for the company. A row is entered for an association with an organisation level.';
+) ENGINE=InnoDB AUTO_INCREMENT=45016 DEFAULT CHARSET=utf8 COMMENT='Holds the details of profile for the company. A row is entered for an association with an organisation level.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2965,7 +3388,7 @@ CREATE TABLE `user_referral_mapping` (
   KEY `fk_ss_user.USER_REFERRAL_MAPPING_USERS` (`USER_ID`),
   CONSTRAINT `fk_ss_user.USER_REFERRAL_MAPPING_REFERRAL_INVITATION` FOREIGN KEY (`REFERRAL_INVITATION_ID`) REFERENCES `referral_invitation` (`REFERRAL_INVITATION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ss_user.USER_REFERRAL_MAPPING_USERS` FOREIGN KEY (`USER_ID`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2984,7 +3407,7 @@ CREATE TABLE `usercount_modification_notification` (
   PRIMARY KEY (`USERCOUNT_MODIFICATION_NOTIFICATION_ID`),
   KEY `fk_USERCOUNT_MODIFICATION_NOTIFICATION_COMPANY1_idx` (`COMPANY_ID`),
   CONSTRAINT `fk_USERCOUNT_MODIFICATION_NOTIFICATION_COMPANY1` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Holds records if any active user has been added or deleted from a company';
+) ENGINE=InnoDB AUTO_INCREMENT=186 DEFAULT CHARSET=utf8 COMMENT='Holds records if any active user has been added or deleted from a company';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3023,7 +3446,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `LOGIN_NAME_UNIQUE` (`LOGIN_NAME`,`COMPANY_ID`),
   KEY `fk_USERS_COMPANY_idx` (`COMPANY_ID`),
   CONSTRAINT `fk_USERS_COMPANY` FOREIGN KEY (`COMPANY_ID`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=37335 DEFAULT CHARSET=utf8 COMMENT='Holds the user details. A user can have multiple profiles as mapped with user profile table';
+) ENGINE=InnoDB AUTO_INCREMENT=37405 DEFAULT CHARSET=utf8 COMMENT='Holds the user details. A user can have multiple profiles as mapped with user profile table';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3035,10 +3458,10 @@ DROP TABLE IF EXISTS `vendasta_rm_settings`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `vendasta_rm_settings` (
   `VENDASTA_RM_SETTINGS_ID` varchar(36) NOT NULL,
-  `COMPANY_SETTINGS_ID` varchar(36) NOT NULL UNIQUE,
+  `COMPANY_SETTINGS_ID` varchar(36) NOT NULL,
   `ACCOUNT_ID` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`VENDASTA_RM_SETTINGS_ID`),
-  #ADD UNIQUE INDEX `COMPANY_SETTINGS_ID_UNIQUE` (`COMPANY_SETTINGS_ID` ASC),
+  UNIQUE KEY `COMPANY_SETTINGS_ID` (`COMPANY_SETTINGS_ID`),
   KEY `FX5_COMPANY_SETTINGS_ID_idx` (`COMPANY_SETTINGS_ID`),
   CONSTRAINT `FX5_COMPANY_SETTINGS_ID` FOREIGN KEY (`COMPANY_SETTINGS_ID`) REFERENCES `company_settings` (`COMPANY_SETTINGS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -3062,7 +3485,7 @@ CREATE TABLE `vendasta_sso_ticket` (
   `CREATED_BY` varchar(20) NOT NULL,
   `MODIFIED_BY` varchar(20) NOT NULL,
   PRIMARY KEY (`VENDASTA_SSO_TICKET_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='vendasta single use short lived ticket';
+) ENGINE=InnoDB AUTO_INCREMENT=141 DEFAULT CHARSET=utf8 COMMENT='vendasta single use short lived ticket';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3123,10 +3546,8 @@ CREATE TABLE `web_addresses` (
   `WORK` varchar(450) DEFAULT NULL,
   PRIMARY KEY (`WEB_ADDRESSES_ID`),
   UNIQUE KEY `CONTACT_DETAILS_ID_UNIQUE` (`CONTACT_DETAILS_ID`),
-  #KEY `CONTACT_DETAILS_ID_idx` (`CONTACT_DETAILS_ID`),
   CONSTRAINT `CONTACT_DETAILS_ID_WEBAD` FOREIGN KEY (`CONTACT_DETAILS_ID`) REFERENCES `contact_details` (`CONTACT_DETAILS_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3224,56 +3645,8 @@ CREATE TABLE `zipcodelookup` (
   PRIMARY KEY (`id`),
   KEY `fk_state_lookup_idx` (`state_id`),
   CONSTRAINT `fk_state_lookup` FOREIGN KEY (`state_id`) REFERENCES `statelookup` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=42203 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table 'classificationcode'
---
-
-DROP TABLE IF EXISTS `classification_codes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `classification_codes` (
-  `CLASSIFICATION_CODES_ID` varchar(36) NOT NULL,
-  `CRM_INFO_ID` varchar(36) DEFAULT NULL,
-  `CODE` varchar(45) DEFAULT NULL,
-  `ID` varchar(45) DEFAULT NULL,
-  `LONE_WOLF_TRANSACTION_PARTICIPANTS_TYPE` varchar(45) DEFAULT NULL,
-  `LW_COMPANY_CODE` varchar(45) DEFAULT NULL,
-  `NAME` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`CLASSIFICATION_CODES_ID`),
-  UNIQUE KEY `ID_UNIQUE` (`ID`),
-  KEY `FX_CRM_INFO_ID_idx` (`CRM_INFO_ID`),
-  CONSTRAINT `FX_CRM_INFO_ID` FOREIGN KEY (`CRM_INFO_ID`) REFERENCES `crm_info` (`CRM_INFO_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table Structure for table 'job_log_details`
---
-
-DROP TABLE IF EXISTS `job_log_details`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `job_log_details` (
-  `JOB_LOG_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `JOB_NAME` varchar(45) DEFAULT NULL,
-  `STATUS` varchar(45) DEFAULT NULL,
-  `JOB_START_TIME` timestamp NULL DEFAULT NULL,
-  `JOB_END_TIME` timestamp NULL DEFAULT NULL,
-  `CURRENT_JOB_NAME` varchar(45) DEFAULT NULL,
-  `JOB_UUID` varchar(45) NOT NULL,
-  PRIMARY KEY (`JOB_LOG_ID`),
-  UNIQUE KEY `JOB_UUID_UNIQUE` (`JOB_UUID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
-
-insert into job_log_details(JOB_NAME,STATUS,JOB_START_TIME,JOB_END_TIME,CURRENT_JOB_NAME,JOB_UUID) 
-values('Dummy Job','Dummy','1980-01-01 00:00:01','1980-01-01 00:00:01','Dummy','xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
-
---
--- Dumping events for database 'ss_centralized_mongodb'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -3284,4 +3657,4 @@ values('Dummy Job','Dummy','1980-01-01 00:00:01','1980-01-01 00:00:01','Dummy','
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-02 19:59:46
+-- Dump completed on 2017-07-10 16:28:21

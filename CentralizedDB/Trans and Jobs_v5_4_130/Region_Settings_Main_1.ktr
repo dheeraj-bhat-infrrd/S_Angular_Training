@@ -215,25 +215,6 @@
     </step>
 
   <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>654</xloc>
-      <yloc>332</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Merge BranchSettings</name>
     <type>MergeJoin</type>
     <description/>
@@ -322,19 +303,283 @@
 
     <mongo_fields>
       <mongo_field>
-        <field_name>_class</field_name>
+        <field_name>createdOn</field_name>
 
-        <field_path>&#x24;._class</field_path>
+        <field_path>&#x24;.createdOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isSeoContentModified</field_name>
+
+        <field_path>&#x24;.isSeoContentModified</field_path>
 
         <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>_class_1</field_name>
+        <field_name>crm_source</field_name>
 
-        <field_path>&#x24;.crm_info._class</field_path>
+        <field_path>&#x24;.crm_info.crm_source</field_path>
 
         <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>order</field_name>
+
+        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.order</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowProfileLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowProfileLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>city</field_name>
+
+        <field_path>&#x24;.contact_details.city</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>modifiedOn</field_name>
+
+        <field_path>&#x24;.modifiedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>workEmailToVerify</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.workEmailToVerify</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isAboutMeLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isAboutMeLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>connection_successful</field_name>
+
+        <field_path>&#x24;.crm_info.connection_successful</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>survey_reminder_interval_in_days</field_name>
+
+        <field_path>&#x24;.survey_settings.survey_reminder_interval_in_days</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>regionId</field_name>
+
+        <field_path>&#x24;.crm_info.regionId</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profile_completion</field_name>
+
+        <field_path>&#x24;.profile_completion</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>recordsBeenFetched</field_name>
+
+        <field_path>&#x24;.crm_info.recordsBeenFetched</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>facebookAccessToken</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isMinScoreLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isMinScoreLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isDefaultBySystem</field_name>
+
+        <field_path>&#x24;.isDefaultBySystem</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>googleAccessTokenCreatedOn</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessTokenCreatedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>yelpPageLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.yelpToken.yelpPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>facebookAccessTokenCreatedOn</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenCreatedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryAbbr</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryAbbr</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>googleAccessToken</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>state</field_name>
+
+        <field_path>&#x24;.contact_details.state</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>vertical</field_name>
+
+        <field_path>&#x24;.vertical</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>googleAccessTokenExpiresIn</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessTokenExpiresIn</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isLogoLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isLogoLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>max_number_of_survey_reminders</field_name>
+
+        <field_path>&#x24;.survey_settings.max_number_of_survey_reminders</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>allowOverrideForSocialMedia</field_name>
+
+        <field_path>&#x24;.allowOverrideForSocialMedia</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>auto_post_score</field_name>
+
+        <field_path>&#x24;.survey_settings.auto_post_score</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>vendastaAccessible</field_name>
+
+        <field_path>&#x24;.vendastaAccessible</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterAccessToken</field_name>
+
+        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterAccessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isAccountDisabled</field_name>
+
+        <field_path>&#x24;.isAccountDisabled</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileStageKey</field_name>
+
+        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.profileStageKey</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryCode</field_name>
+
+        <field_path>&#x24;.contact_details.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>linkedInAccessTokenCreatedOn</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessTokenCreatedOn</field_path>
+
+        <field_type>Number</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -346,17 +591,81 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>_id_1</field_name>
+        <field_name>sendEmailFromCompany</field_name>
 
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
+        <field_path>&#x24;.sendEmailFromCompany</field_path>
 
         <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
-        <field_name>about_me</field_name>
+        <field_name>facebookAccessTokenExpiresOn</field_name>
 
-        <field_path>&#x24;.contact_details.about_me</field_path>
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenExpiresOn</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterPageLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name</field_name>
+
+        <field_path>&#x24;.contact_details.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isLocationEnabled</field_name>
+
+        <field_path>&#x24;.isLocationEnabled</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>linkedInAccessTokenExpiresIn</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessTokenExpiresIn</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isFaxPhoneLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isFaxPhoneLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>facebookPageLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterAccessToken_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessToken</field_path>
 
         <field_type>String</field_type>
 
@@ -370,6 +679,142 @@
 
       </mongo_field>
       <mongo_field>
+        <field_name>twitterAccessTokenCreatedOn</field_name>
+
+        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterAccessTokenCreatedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkMailVerifiedByAdmin</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isWorkMailVerifiedByAdmin</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>status</field_name>
+
+        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.status</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isSocialPostReminderDisabled</field_name>
+
+        <field_path>&#x24;.survey_settings.isSocialPostReminderDisabled</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileImageUrl</field_name>
+
+        <field_path>&#x24;.profileImageUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isReminderDisabled</field_name>
+
+        <field_path>&#x24;.survey_settings.isReminderDisabled</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>logoThumbnail</field_name>
+
+        <field_path>&#x24;.logoThumbnail</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>linkedInAccessToken</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>tokenExpiryAlertSent</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>duplicateSurveyInterval</field_name>
+
+        <field_path>&#x24;.survey_settings.duplicateSurveyInterval</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkPhoneLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isWorkPhoneLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkEmailVerified</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isWorkEmailVerified</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileUrl</field_name>
+
+        <field_path>&#x24;.profileUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>lendingTreeProfileLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>logo</field_name>
+
+        <field_path>&#x24;.logo</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>category</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.category</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterAccessTokenSecret</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessTokenSecret</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
         <field_name>accountId</field_name>
 
         <field_path>&#x24;.vendasta_rm_settings.accountId</field_path>
@@ -378,9 +823,433 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>address</field_name>
+        <field_name>show_survey_above_score</field_name>
 
-        <field_path>&#x24;.contact_details.address</field_path>
+        <field_path>&#x24;.survey_settings.show_survey_above_score</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isAddressLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isAddressLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>api</field_name>
+
+        <field_path>&#x24;.crm_info.api</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileName</field_name>
+
+        <field_path>&#x24;.profileName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWebAddressLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isWebAddressLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isLogoImageProcessed</field_name>
+
+        <field_path>&#x24;.isLogoImageProcessed</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>createdBy</field_name>
+
+        <field_path>&#x24;.createdBy</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>name_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>realtorProfileLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.realtorToken.realtorProfileLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>title</field_name>
+
+        <field_path>&#x24;.contact_details.title</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowScreenName</field_name>
+
+        <field_path>&#x24;.deletedSocialTokens.zillowToken.zillowScreenName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>about_me</field_name>
+
+        <field_path>&#x24;.contact_details.about_me</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowProfileLink_1</field_name>
+
+        <field_path>&#x24;.deletedSocialTokens.zillowToken.zillowProfileLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>allowZillowAutoPost</field_name>
+
+        <field_path>&#x24;.allowZillowAutoPost</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>agentId</field_name>
+
+        <field_path>&#x24;.crm_info.agentId</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>max_number_of_social_pos_reminders</field_name>
+
+        <field_path>&#x24;.survey_settings.max_number_of_social_pos_reminders</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterPageLink_1</field_name>
+
+        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isBlogAddressLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isBlogAddressLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>linkedInPageLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInPageLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>iden</field_name>
+
+        <field_path>&#x24;.iden</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>autoPostLinkToUserSiteEnabled</field_name>
+
+        <field_path>&#x24;.survey_settings.autoPostLinkToUserSiteEnabled</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>modifiedBy</field_name>
+
+        <field_path>&#x24;.modifiedBy</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_id_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;._id</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_1</field_name>
+
+        <field_path>&#x24;.contact_details.web_addresses.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>googleBusinessLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.googleBusinessToken.googleBusinessLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isWorkEmailLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isWorkEmailLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowScreenName_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowScreenName</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileUrl_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>formattedPhoneNumber</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.formattedPhoneNumber</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileImageUrlThumbnail</field_name>
+
+        <field_path>&#x24;.profileImageUrlThumbnail</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowReviewAverage</field_name>
+
+        <field_path>&#x24;.zillowReviewAverage</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>countryCode_1</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryCode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>number</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.phone1.number</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>hiddenSection</field_name>
+
+        <field_path>&#x24;.hiddenSection</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>country</field_name>
+
+        <field_path>&#x24;.contact_details.country</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isPersonalPhoneLocked</field_name>
+
+        <field_path>&#x24;.lockSettings.isPersonalPhoneLocked</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zipcode</field_name>
+
+        <field_path>&#x24;.contact_details.zipcode</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>zillowReviewCount</field_name>
+
+        <field_path>&#x24;.zillowReviewCount</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterAccessTokenCreatedOn_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessTokenCreatedOn</field_path>
+
+        <field_type>Number</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>facebookAccessTokenToPost</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenToPost</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isProfileImageProcessed</field_name>
+
+        <field_path>&#x24;.isProfileImageProcessed</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>branchId</field_name>
+
+        <field_path>&#x24;.crm_info.branchId</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>companyId</field_name>
+
+        <field_path>&#x24;.crm_info.companyId</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>profileLink</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.googleToken.profileLink</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>twitterAccessTokenSecret_1</field_name>
+
+        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterAccessTokenSecret</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_class</field_name>
+
+        <field_path>&#x24;._class</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>social_post_reminder_interval_in_days</field_name>
+
+        <field_path>&#x24;.survey_settings.social_post_reminder_interval_in_days</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>work_2</field_name>
+
+        <field_path>&#x24;.contact_details.contact_numbers.work</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>tokenExpiryAlertSent_1</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>googleRefreshToken</field_name>
+
+        <field_path>&#x24;.socialMediaTokens.googleToken.googleRefreshToken</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>_class_1</field_name>
+
+        <field_path>&#x24;.crm_info._class</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>isPersonalEmailVerified</field_name>
+
+        <field_path>&#x24;.contact_details.mail_ids.isPersonalEmailVerified</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>disclaimer</field_name>
+
+        <field_path>&#x24;.disclaimer</field_path>
+
+        <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>autoPostEnabled</field_name>
+
+        <field_path>&#x24;.survey_settings.autoPostEnabled</field_path>
 
         <field_type>String</field_type>
 
@@ -402,694 +1271,6 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>agentId</field_name>
-
-        <field_path>&#x24;.crm_info.agentId</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>allowOverrideForSocialMedia</field_name>
-
-        <field_path>&#x24;.allowOverrideForSocialMedia</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>allowZillowAutoPost</field_name>
-
-        <field_path>&#x24;.allowZillowAutoPost</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>api</field_name>
-
-        <field_path>&#x24;.crm_info.api</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>autoPostEnabled</field_name>
-
-        <field_path>&#x24;.survey_settings.autoPostEnabled</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>autoPostLinkToUserSiteEnabled</field_name>
-
-        <field_path>&#x24;.survey_settings.autoPostLinkToUserSiteEnabled</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>auto_post_score</field_name>
-
-        <field_path>&#x24;.survey_settings.auto_post_score</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>branchId</field_name>
-
-        <field_path>&#x24;.crm_info.branchId</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>category</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.category</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>city</field_name>
-
-        <field_path>&#x24;.contact_details.city</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>companyId</field_name>
-
-        <field_path>&#x24;.crm_info.companyId</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>connection_successful</field_name>
-
-        <field_path>&#x24;.crm_info.connection_successful</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>country</field_name>
-
-        <field_path>&#x24;.contact_details.country</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>countryAbbr</field_name>
-
-        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryAbbr</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>countryCode</field_name>
-
-        <field_path>&#x24;.contact_details.countryCode</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>countryCode_1</field_name>
-
-        <field_path>&#x24;.contact_details.contact_numbers.phone1.countryCode</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>createdBy</field_name>
-
-        <field_path>&#x24;.createdBy</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>createdOn</field_name>
-
-        <field_path>&#x24;.createdOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>crm_source</field_name>
-
-        <field_path>&#x24;.crm_info.crm_source</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>disclaimer</field_name>
-
-        <field_path>&#x24;.disclaimer</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>duplicateSurveyInterval</field_name>
-
-        <field_path>&#x24;.survey_settings.duplicateSurveyInterval</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>facebookAccessToken</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>facebookAccessTokenCreatedOn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenCreatedOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>facebookAccessTokenExpiresOn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenExpiresOn</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>facebookAccessTokenToPost</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookAccessTokenToPost</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>facebookPageLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPageLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>formattedPhoneNumber</field_name>
-
-        <field_path>&#x24;.contact_details.contact_numbers.phone1.formattedPhoneNumber</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>googleAccessToken</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>googleAccessTokenCreatedOn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessTokenCreatedOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>googleAccessTokenExpiresIn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleToken.googleAccessTokenExpiresIn</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>googleBusinessLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleBusinessToken.googleBusinessLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>googleRefreshToken</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleToken.googleRefreshToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>hiddenSection</field_name>
-
-        <field_path>&#x24;.hiddenSection</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>iden</field_name>
-
-        <field_path>&#x24;.iden</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isAboutMeLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isAboutMeLocked</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isAccountDisabled</field_name>
-
-        <field_path>&#x24;.isAccountDisabled</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isAddressLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isAddressLocked</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isBlogAddressLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isBlogAddressLocked</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isDefaultBySystem</field_name>
-
-        <field_path>&#x24;.isDefaultBySystem</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isFaxPhoneLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isFaxPhoneLocked</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isLocationEnabled</field_name>
-
-        <field_path>&#x24;.isLocationEnabled</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isLogoImageProcessed</field_name>
-
-        <field_path>&#x24;.isLogoImageProcessed</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isLogoLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isLogoLocked</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isMinScoreLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isMinScoreLocked</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isPersonalEmailVerified</field_name>
-
-        <field_path>&#x24;.contact_details.mail_ids.isPersonalEmailVerified</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isPersonalPhoneLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isPersonalPhoneLocked</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isProfileImageProcessed</field_name>
-
-        <field_path>&#x24;.isProfileImageProcessed</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isReminderDisabled</field_name>
-
-        <field_path>&#x24;.survey_settings.isReminderDisabled</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isSeoContentModified</field_name>
-
-        <field_path>&#x24;.isSeoContentModified</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isSocialPostReminderDisabled</field_name>
-
-        <field_path>&#x24;.survey_settings.isSocialPostReminderDisabled</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isWebAddressLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isWebAddressLocked</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isWorkEmailLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isWorkEmailLocked</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isWorkEmailVerified</field_name>
-
-        <field_path>&#x24;.contact_details.mail_ids.isWorkEmailVerified</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isWorkMailVerifiedByAdmin</field_name>
-
-        <field_path>&#x24;.contact_details.mail_ids.isWorkMailVerifiedByAdmin</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>isWorkPhoneLocked</field_name>
-
-        <field_path>&#x24;.lockSettings.isWorkPhoneLocked</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>lendingTreeProfileLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>linkedInAccessToken</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>linkedInAccessTokenCreatedOn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessTokenCreatedOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>linkedInAccessTokenExpiresIn</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInAccessTokenExpiresIn</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>linkedInPageLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.linkedInPageLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>logo</field_name>
-
-        <field_path>&#x24;.logo</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>logoThumbnail</field_name>
-
-        <field_path>&#x24;.logoThumbnail</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>max_number_of_social_pos_reminders</field_name>
-
-        <field_path>&#x24;.survey_settings.max_number_of_social_pos_reminders</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>max_number_of_survey_reminders</field_name>
-
-        <field_path>&#x24;.survey_settings.max_number_of_survey_reminders</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>modifiedBy</field_name>
-
-        <field_path>&#x24;.modifiedBy</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>modifiedOn</field_name>
-
-        <field_path>&#x24;.modifiedOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>name</field_name>
-
-        <field_path>&#x24;.contact_details.name</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>name_1</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.name</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>number</field_name>
-
-        <field_path>&#x24;.contact_details.contact_numbers.phone1.number</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>order</field_name>
-
-        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.order</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileImageUrl</field_name>
-
-        <field_path>&#x24;.profileImageUrl</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileImageUrlThumbnail</field_name>
-
-        <field_path>&#x24;.profileImageUrlThumbnail</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.googleToken.profileLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileName</field_name>
-
-        <field_path>&#x24;.profileName</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileStageKey</field_name>
-
-        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.profileStageKey</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileUrl</field_name>
-
-        <field_path>&#x24;.profileUrl</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profileUrl_1</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.facebookPages&#x5b;0&#x5d;.profileUrl</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>profile_completion</field_name>
-
-        <field_path>&#x24;.profile_completion</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>realtorProfileLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.realtorToken.realtorProfileLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>recordsBeenFetched</field_name>
-
-        <field_path>&#x24;.crm_info.recordsBeenFetched</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>regionId</field_name>
-
-        <field_path>&#x24;.crm_info.regionId</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>sendEmailFromCompany</field_name>
-
-        <field_path>&#x24;.sendEmailFromCompany</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>show_survey_above_score</field_name>
-
-        <field_path>&#x24;.survey_settings.show_survey_above_score</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>social_post_reminder_interval_in_days</field_name>
-
-        <field_path>&#x24;.survey_settings.social_post_reminder_interval_in_days</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>state</field_name>
-
-        <field_path>&#x24;.contact_details.state</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>status</field_name>
-
-        <field_path>&#x24;.profileStages&#x5b;0&#x5d;.status</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
         <field_name>status_1</field_name>
 
         <field_path>&#x24;.status</field_path>
@@ -1098,209 +1279,9 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>survey_reminder_interval_in_days</field_name>
+        <field_name>address</field_name>
 
-        <field_path>&#x24;.survey_settings.survey_reminder_interval_in_days</field_path>
-
-        <field_type>Integer</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>title</field_name>
-
-        <field_path>&#x24;.contact_details.title</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>tokenExpiryAlertSent</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>tokenExpiryAlertSent_1</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>twitterAccessToken</field_name>
-
-        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterAccessToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>twitterAccessTokenCreatedOn</field_name>
-
-        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterAccessTokenCreatedOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>twitterAccessTokenCreatedOn_1</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessTokenCreatedOn</field_path>
-
-        <field_type>Number</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>twitterAccessTokenSecret</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessTokenSecret</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>twitterAccessTokenSecret_1</field_name>
-
-        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterAccessTokenSecret</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>twitterAccessToken_1</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterAccessToken</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>twitterPageLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.twitterToken.twitterPageLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>twitterPageLink_1</field_name>
-
-        <field_path>&#x24;.deletedSocialTokens.twitterToken.twitterPageLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>vendastaAccessible</field_name>
-
-        <field_path>&#x24;.vendastaAccessible</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>vertical</field_name>
-
-        <field_path>&#x24;.vertical</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>work</field_name>
-
-        <field_path>&#x24;.contact_details.mail_ids.work</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>workEmailToVerify</field_name>
-
-        <field_path>&#x24;.contact_details.mail_ids.workEmailToVerify</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>work_1</field_name>
-
-        <field_path>&#x24;.contact_details.web_addresses.work</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>work_2</field_name>
-
-        <field_path>&#x24;.contact_details.contact_numbers.work</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>yelpPageLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.yelpToken.yelpPageLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>zillowProfileLink</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowProfileLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>zillowProfileLink_1</field_name>
-
-        <field_path>&#x24;.deletedSocialTokens.zillowToken.zillowProfileLink</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>zillowReviewAverage</field_name>
-
-        <field_path>&#x24;.zillowReviewAverage</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>zillowReviewCount</field_name>
-
-        <field_path>&#x24;.zillowReviewCount</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>zillowScreenName</field_name>
-
-        <field_path>&#x24;.deletedSocialTokens.zillowToken.zillowScreenName</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>zillowScreenName_1</field_name>
-
-        <field_path>&#x24;.socialMediaTokens.zillowToken.zillowScreenName</field_path>
-
-        <field_type>String</field_type>
-
-      </mongo_field>
-      <mongo_field>
-        <field_name>zipcode</field_name>
-
-        <field_path>&#x24;.contact_details.zipcode</field_path>
+        <field_path>&#x24;.contact_details.address</field_path>
 
         <field_type>String</field_type>
 
@@ -1325,7 +1306,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  REGION_SETTINGS_ID&#xd;&#xa;, ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA&#xd;&#xa;, ALLOW_ZILLOW_AUTO_POST&#xd;&#xa;, CREATED_BY&#xd;&#xa;, CREATED_ON_MONGO&#xd;&#xa;, HIDDEN_SECTION&#xd;&#xa;, REGION_ID&#xd;&#xa;, IS_ACCOUNT_DISABLED&#xd;&#xa;, IS_DEFAULT_BY_SYSTEM&#xd;&#xa;, IS_LOCATION_ENABLED&#xd;&#xa;, IS_LOGO_IMAGE_PROCESSED&#xd;&#xa;, IS_PROFILE_IMAGE_PROCESSED&#xd;&#xa;, IS_SEO_CONTENT_MODIFIED&#xd;&#xa;, LOGO&#xd;&#xa;, LOGO_THUMBNAIL&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, MODIFIED_ON_MONGO&#xd;&#xa;, PROFILE_IMAGE_URL&#xd;&#xa;, PROFILE_IMAGE_URL_THUMBNAIL&#xd;&#xa;, PROFILE_NAME&#xd;&#xa;, PROFILE_URL&#xd;&#xa;, PROFILE_COMPLETION&#xd;&#xa;, SEND_EMAIL_FROM_COMPANY&#xd;&#xa;, STATUS&#xd;&#xa;, VENDASTA_ACCESSIBLE&#xd;&#xa;, VERTICAL&#xd;&#xa;, ZILLOW_REVIEW_AVERAGE&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;FROM region_settings&#xd;&#xa;order by REGION_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  CREATED_ON_MONGO&#xd;&#xa;, case when IS_SEO_CONTENT_MODIFIED &#x3c;&#x3e; 0 then &#x27;true&#x27; else &#x27;false&#x27; end IS_SEO_CONTENT_MODIFIED&#xd;&#xa;, MODIFIED_ON_MONGO&#xd;&#xa;, PROFILE_COMPLETION&#xd;&#xa;, case when IS_DEFAULT_BY_SYSTEM &#x3c;&#x3e; 0 then &#x27;true&#x27; else &#x27;false&#x27; end IS_DEFAULT_BY_SYSTEM&#xd;&#xa;, VERTICAL&#xd;&#xa;, case when ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA &#x3c;&#x3e; 0 then &#x27;true&#x27; else &#x27;false&#x27; end ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA&#xd;&#xa;, case when VENDASTA_ACCESSIBLE &#x3c;&#x3e; 0 then &#x27;true&#x27; else &#x27;false&#x27; end VENDASTA_ACCESSIBLE&#xd;&#xa;, case when IS_ACCOUNT_DISABLED &#x3c;&#x3e; 0 then &#x27;true&#x27; else &#x27;false&#x27; end IS_ACCOUNT_DISABLED&#xd;&#xa;, REGION_SETTINGS_ID&#xd;&#xa;, case when SEND_EMAIL_FROM_COMPANY &#x3c;&#x3e; 0 then &#x27;true&#x27; else &#x27;false&#x27; end SEND_EMAIL_FROM_COMPANY&#xd;&#xa;, case when IS_LOCATION_ENABLED &#x3c;&#x3e; 0 then &#x27;true&#x27; else &#x27;false&#x27; end IS_LOCATION_ENABLED&#xd;&#xa;, STATUS&#xd;&#xa;, PROFILE_IMAGE_URL&#xd;&#xa;, LOGO_THUMBNAIL&#xd;&#xa;, PROFILE_URL&#xd;&#xa;, LOGO&#xd;&#xa;, PROFILE_NAME&#xd;&#xa;, case when IS_LOGO_IMAGE_PROCESSED &#x3c;&#x3e; 0 then &#x27;true&#x27; else &#x27;false&#x27; end IS_LOGO_IMAGE_PROCESSED&#xd;&#xa;, CREATED_BY&#xd;&#xa;, case when ALLOW_ZILLOW_AUTO_POST &#x3c;&#x3e; 0 then &#x27;true&#x27; else &#x27;false&#x27; end ALLOW_ZILLOW_AUTO_POST &#xd;&#xa;, REGION_ID&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, PROFILE_IMAGE_URL_THUMBNAIL&#xd;&#xa;, ZILLOW_REVIEW_AVERAGE&#xd;&#xa;, case when HIDDEN_SECTION &#x3c;&#x3e; 0 then &#x27;true&#x27; else &#x27;false&#x27; end HIDDEN_SECTION&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, case when IS_PROFILE_IMAGE_PROCESSED &#x3c;&#x3e; 0 then &#x27;true&#x27; else &#x27;false&#x27; end IS_PROFILE_IMAGE_PROCESSED&#xd;&#xa;, SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;FROM region_settings&#xd;&#xa;order by REGION_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1343,89 +1324,700 @@
     <name>Select values</name>
     <type>SelectValues</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>        <select_unspecified>N</select_unspecified>
-      <remove>        <name>_class</name>
-      </remove>      <remove>        <name>_id_1</name>
-      </remove>      <remove>        <name>accessToken</name>
-      </remove>      <remove>        <name>address</name>
-      </remove>      <remove>        <name>address1</name>
-      </remove>      <remove>        <name>address2</name>
-      </remove>      <remove>        <name>autoPostEnabled</name>
-      </remove>      <remove>        <name>autoPostLinkToUserSiteEnabled</name>
-      </remove>      <remove>        <name>auto_post_score</name>
-      </remove>      <remove>        <name>category</name>
-      </remove>      <remove>        <name>city</name>
-      </remove>      <remove>        <name>country</name>
-      </remove>      <remove>        <name>countryCode</name>
-      </remove>      <remove>        <name>duplicateSurveyInterval</name>
-      </remove>      <remove>        <name>facebookAccessToken</name>
-      </remove>      <remove>        <name>facebookAccessTokenCreatedOn</name>
-      </remove>      <remove>        <name>facebookAccessTokenExpiresOn</name>
-      </remove>      <remove>        <name>facebookAccessTokenToPost</name>
-      </remove>      <remove>        <name>facebookPageLink</name>
-      </remove>      <remove>        <name>firstName</name>
-      </remove>      <remove>        <name>googleAccessToken</name>
-      </remove>      <remove>        <name>googleAccessTokenCreatedOn</name>
-      </remove>      <remove>        <name>googleAccessTokenExpiresIn</name>
-      </remove>      <remove>        <name>googleBusinessLink</name>
-      </remove>      <remove>        <name>googleRefreshToken</name>
-      </remove>      <remove>        <name>industry</name>
-      </remove>      <remove>        <name>isAboutMeLocked</name>
-      </remove>      <remove>        <name>isAddressLocked</name>
-      </remove>      <remove>        <name>isBlogAddressLocked</name>
-      </remove>      <remove>        <name>isFaxPhoneLocked</name>
-      </remove>      <remove>        <name>isLogoLocked</name>
-      </remove>      <remove>        <name>isMinScoreLocked</name>
-      </remove>      <remove>        <name>isPersonalPhoneLocked</name>
-      </remove>      <remove>        <name>isReminderDisabled</name>
-      </remove>      <remove>        <name>isSocialPostReminderDisabled</name>
-      </remove>      <remove>        <name>isWebAddressLocked</name>
-      </remove>      <remove>        <name>isWorkEmailLocked</name>
-      </remove>      <remove>        <name>isWorkPhoneLocked</name>
-      </remove>      <remove>        <name>lastName</name>
-      </remove>      <remove>        <name>lendingTreeProfileLink</name>
-      </remove>      <remove>        <name>linkedInAccessToken</name>
-      </remove>      <remove>        <name>linkedInAccessTokenCreatedOn</name>
-      </remove>      <remove>        <name>linkedInAccessTokenExpiresIn</name>
-      </remove>      <remove>        <name>linkedInPageLink</name>
-      </remove>      <remove>        <name>location</name>
-      </remove>      <remove>        <name>max_number_of_social_pos_reminders</name>
-      </remove>      <remove>        <name>max_number_of_survey_reminders</name>
-      </remove>      <remove>        <name>name</name>
-      </remove>      <remove>        <name>name_1</name>
+    <fields>      <field>        <name>createdOn</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isSeoContentModified</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>crm_source</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>order</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>zillowProfileLink</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>city</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>modifiedOn</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>workEmailToVerify</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isAboutMeLocked</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>connection_successful</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>survey_reminder_interval_in_days</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>regionId</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profile_completion</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>recordsBeenFetched</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>facebookAccessToken</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isMinScoreLocked</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isDefaultBySystem</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>googleAccessTokenCreatedOn</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>yelpPageLink</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>facebookAccessTokenCreatedOn</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>countryAbbr</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>googleAccessToken</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>state</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>vertical</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>googleAccessTokenExpiresIn</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isLogoLocked</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>max_number_of_survey_reminders</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>allowOverrideForSocialMedia</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>auto_post_score</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>vendastaAccessible</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>twitterAccessToken</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isAccountDisabled</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profileStageKey</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>countryCode</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>linkedInAccessTokenCreatedOn</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>_id</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>sendEmailFromCompany</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>facebookAccessTokenExpiresOn</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>twitterPageLink</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>work</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>name</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isLocationEnabled</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>linkedInAccessTokenExpiresIn</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isFaxPhoneLocked</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>facebookPageLink</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>twitterAccessToken_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>accessToken</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>twitterAccessTokenCreatedOn</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isWorkMailVerifiedByAdmin</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>status</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isSocialPostReminderDisabled</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profileImageUrl</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isReminderDisabled</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>logoThumbnail</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>linkedInAccessToken</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>tokenExpiryAlertSent</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>duplicateSurveyInterval</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isWorkPhoneLocked</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isWorkEmailVerified</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profileUrl</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>lendingTreeProfileLink</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>logo</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>category</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>twitterAccessTokenSecret</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>accountId</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>show_survey_above_score</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isAddressLocked</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>api</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profileName</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isWebAddressLocked</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isLogoImageProcessed</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>createdBy</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>name_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>realtorProfileLink</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>title</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>zillowScreenName</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>about_me</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>zillowProfileLink_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>allowZillowAutoPost</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>agentId</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>max_number_of_social_pos_reminders</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>twitterPageLink_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isBlogAddressLocked</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>linkedInPageLink</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>iden</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>autoPostLinkToUserSiteEnabled</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>modifiedBy</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>_id_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>work_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>googleBusinessLink</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isWorkEmailLocked</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>zillowScreenName_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profileUrl_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>formattedPhoneNumber</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profileImageUrlThumbnail</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>zillowReviewAverage</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>countryCode_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>number</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>hiddenSection</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>country</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isPersonalPhoneLocked</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>zipcode</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>zillowReviewCount</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>twitterAccessTokenCreatedOn_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>facebookAccessTokenToPost</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isProfileImageProcessed</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>branchId</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>companyId</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>profileLink</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>twitterAccessTokenSecret_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>_class</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>social_post_reminder_interval_in_days</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>work_2</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>tokenExpiryAlertSent_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>googleRefreshToken</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>_class_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>isPersonalEmailVerified</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>disclaimer</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>autoPostEnabled</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>address1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>address2</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>status_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>address</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SOCIAL_MEDIA_TOKENS_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>type</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>id</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>createdOnStr</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>modifiedOnStr</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+      <remove>        <name>crm_source</name>
       </remove>      <remove>        <name>order</name>
-      </remove>      <remove>        <name>profileLink</name>
-      </remove>      <remove>        <name>profileStageKey</name>
-      </remove>      <remove>        <name>profileUrl_1</name>
-      </remove>      <remove>        <name>realtorProfileLink</name>
-      </remove>      <remove>        <name>show_survey_above_score</name>
-      </remove>      <remove>        <name>social_post_reminder_interval_in_days</name>
-      </remove>      <remove>        <name>state</name>
+      </remove>      <remove>        <name>zillowProfileLink</name>
+      </remove>      <remove>        <name>city</name>
+      </remove>      <remove>        <name>workEmailToVerify</name>
+      </remove>      <remove>        <name>isAboutMeLocked</name>
+      </remove>      <remove>        <name>connection_successful</name>
       </remove>      <remove>        <name>survey_reminder_interval_in_days</name>
-      </remove>      <remove>        <name>title</name>
-      </remove>      <remove>        <name>tokenExpiryAlertSent</name>
-      </remove>      <remove>        <name>tokenExpiryAlertSent_1</name>
+      </remove>      <remove>        <name>regionId</name>
+      </remove>      <remove>        <name>recordsBeenFetched</name>
+      </remove>      <remove>        <name>facebookAccessToken</name>
+      </remove>      <remove>        <name>isMinScoreLocked</name>
+      </remove>      <remove>        <name>googleAccessTokenCreatedOn</name>
+      </remove>      <remove>        <name>yelpPageLink</name>
+      </remove>      <remove>        <name>facebookAccessTokenCreatedOn</name>
+      </remove>      <remove>        <name>countryAbbr</name>
+      </remove>      <remove>        <name>googleAccessToken</name>
+      </remove>      <remove>        <name>state</name>
+      </remove>      <remove>        <name>googleAccessTokenExpiresIn</name>
+      </remove>      <remove>        <name>isLogoLocked</name>
+      </remove>      <remove>        <name>max_number_of_survey_reminders</name>
+      </remove>      <remove>        <name>auto_post_score</name>
       </remove>      <remove>        <name>twitterAccessToken</name>
-      </remove>      <remove>        <name>twitterAccessTokenCreatedOn</name>
-      </remove>      <remove>        <name>twitterAccessTokenSecret</name>
+      </remove>      <remove>        <name>profileStageKey</name>
+      </remove>      <remove>        <name>countryCode</name>
+      </remove>      <remove>        <name>linkedInAccessTokenCreatedOn</name>
+      </remove>      <remove>        <name>facebookAccessTokenExpiresOn</name>
       </remove>      <remove>        <name>twitterPageLink</name>
       </remove>      <remove>        <name>work</name>
-      </remove>      <remove>        <name>yelpPageLink</name>
-      </remove>      <remove>        <name>zillowLenderId</name>
-      </remove>      <remove>        <name>zillowProfileLink</name>
+      </remove>      <remove>        <name>name</name>
+      </remove>      <remove>        <name>linkedInAccessTokenExpiresIn</name>
+      </remove>      <remove>        <name>isFaxPhoneLocked</name>
+      </remove>      <remove>        <name>facebookPageLink</name>
+      </remove>      <remove>        <name>twitterAccessToken_1</name>
+      </remove>      <remove>        <name>accessToken</name>
+      </remove>      <remove>        <name>twitterAccessTokenCreatedOn</name>
+      </remove>      <remove>        <name>isWorkMailVerifiedByAdmin</name>
+      </remove>      <remove>        <name>isSocialPostReminderDisabled</name>
+      </remove>      <remove>        <name>isReminderDisabled</name>
+      </remove>      <remove>        <name>linkedInAccessToken</name>
+      </remove>      <remove>        <name>tokenExpiryAlertSent</name>
+      </remove>      <remove>        <name>duplicateSurveyInterval</name>
+      </remove>      <remove>        <name>isWorkPhoneLocked</name>
+      </remove>      <remove>        <name>isWorkEmailVerified</name>
+      </remove>      <remove>        <name>lendingTreeProfileLink</name>
+      </remove>      <remove>        <name>category</name>
+      </remove>      <remove>        <name>twitterAccessTokenSecret</name>
+      </remove>      <remove>        <name>accountId</name>
+      </remove>      <remove>        <name>show_survey_above_score</name>
+      </remove>      <remove>        <name>isAddressLocked</name>
+      </remove>      <remove>        <name>api</name>
+      </remove>      <remove>        <name>isWebAddressLocked</name>
+      </remove>      <remove>        <name>name_1</name>
+      </remove>      <remove>        <name>realtorProfileLink</name>
+      </remove>      <remove>        <name>title</name>
       </remove>      <remove>        <name>zillowScreenName</name>
+      </remove>      <remove>        <name>about_me</name>
+      </remove>      <remove>        <name>zillowProfileLink_1</name>
+      </remove>      <remove>        <name>agentId</name>
+      </remove>      <remove>        <name>max_number_of_social_pos_reminders</name>
+      </remove>      <remove>        <name>twitterPageLink_1</name>
+      </remove>      <remove>        <name>isBlogAddressLocked</name>
+      </remove>      <remove>        <name>linkedInPageLink</name>
+      </remove>      <remove>        <name>autoPostLinkToUserSiteEnabled</name>
+      </remove>      <remove>        <name>_id_1</name>
+      </remove>      <remove>        <name>work_1</name>
+      </remove>      <remove>        <name>googleBusinessLink</name>
+      </remove>      <remove>        <name>isWorkEmailLocked</name>
+      </remove>      <remove>        <name>zillowScreenName_1</name>
+      </remove>      <remove>        <name>profileUrl_1</name>
+      </remove>      <remove>        <name>formattedPhoneNumber</name>
+      </remove>      <remove>        <name>countryCode_1</name>
+      </remove>      <remove>        <name>number</name>
+      </remove>      <remove>        <name>country</name>
+      </remove>      <remove>        <name>isPersonalPhoneLocked</name>
       </remove>      <remove>        <name>zipcode</name>
+      </remove>      <remove>        <name>twitterAccessTokenCreatedOn_1</name>
+      </remove>      <remove>        <name>facebookAccessTokenToPost</name>
+      </remove>      <remove>        <name>branchId</name>
+      </remove>      <remove>        <name>companyId</name>
+      </remove>      <remove>        <name>profileLink</name>
+      </remove>      <remove>        <name>twitterAccessTokenSecret_1</name>
+      </remove>      <remove>        <name>_class</name>
+      </remove>      <remove>        <name>social_post_reminder_interval_in_days</name>
+      </remove>      <remove>        <name>work_2</name>
+      </remove>      <remove>        <name>tokenExpiryAlertSent_1</name>
+      </remove>      <remove>        <name>googleRefreshToken</name>
+      </remove>      <remove>        <name>_class_1</name>
+      </remove>      <remove>        <name>isPersonalEmailVerified</name>
+      </remove>      <remove>        <name>disclaimer</name>
+      </remove>      <remove>        <name>autoPostEnabled</name>
+      </remove>      <remove>        <name>address1</name>
+      </remove>      <remove>        <name>address2</name>
+      </remove>      <remove>        <name>status_1</name>
+      </remove>      <remove>        <name>address</name>
       </remove>      <remove>        <name>type</name>
       </remove>      <remove>        <name>id</name>
-      </remove>      <meta>        <name>SOCIAL_MEDIA_TOKENS_ID</name>
-        <rename>SOCIAL_MEDIA_TOKENS_ID</rename>
+      </remove>      <meta>        <name>createdOn</name>
+        <rename>CREATED_ON_MONGO</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>isSeoContentModified</name>
+        <rename>IS_SEO_CONTENT_MODIFIED</rename>
+        <type>Boolean</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>modifiedOn</name>
+        <rename>MODIFIED_ON_MONGO</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>profile_completion</name>
+        <rename>PROFILE_COMPLETION</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>isDefaultBySystem</name>
+        <rename>IS_DEFAULT_BY_SYSTEM</rename>
+        <type>Boolean</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>vertical</name>
+        <rename>VERTICAL</rename>
         <type>None</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -1441,7 +2033,7 @@
         <storage_type/>
       </meta>      <meta>        <name>allowOverrideForSocialMedia</name>
         <rename>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</rename>
-        <type>Integer</type>
+        <type>Boolean</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1454,69 +2046,9 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>allowZillowAutoPost</name>
-        <rename>ALLOW_ZILLOW_AUTO_POST</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>createdBy</name>
-        <rename>CREATED_BY</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>createdOnStr</name>
-        <rename>CREATED_ON</rename>
-        <type>Timestamp</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>createdOn</name>
-        <rename>CREATED_ON_MONGO</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>hiddenSection</name>
-        <rename>HIDDEN_SECTION</rename>
-        <type>Integer</type>
+      </meta>      <meta>        <name>vendastaAccessible</name>
+        <rename>VENDASTA_ACCESSIBLE</rename>
+        <type>Boolean</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1531,7 +2063,7 @@
         <storage_type/>
       </meta>      <meta>        <name>isAccountDisabled</name>
         <rename>IS_ACCOUNT_DISABLED</rename>
-        <type>Integer</type>
+        <type>Boolean</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1544,9 +2076,24 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>isDefaultBySystem</name>
-        <rename>IS_DEFAULT_BY_SYSTEM</rename>
-        <type>Integer</type>
+      </meta>      <meta>        <name>_id</name>
+        <rename>REGION_SETTINGS_ID</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>sendEmailFromCompany</name>
+        <rename>SEND_EMAIL_FROM_COMPANY</rename>
+        <type>Boolean</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1561,7 +2108,7 @@
         <storage_type/>
       </meta>      <meta>        <name>isLocationEnabled</name>
         <rename>IS_LOCATION_ENABLED</rename>
-        <type>Integer</type>
+        <type>Boolean</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1574,11 +2121,11 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>isLogoImageProcessed</name>
-        <rename>IS_LOGO_IMAGE_PROCESSED</rename>
-        <type>Integer</type>
+      </meta>      <meta>        <name>status</name>
+        <rename>STATUS</rename>
+        <type>None</type>
         <length>-2</length>
-        <precision>-2</precision>
+        <precision>0</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
         <date_format_locale/>
@@ -1589,38 +2136,8 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>isProfileImageProcessed</name>
-        <rename>IS_PROFILE_IMAGE_PROCESSED</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isSeoContentModified</name>
-        <rename>IS_SEO_CONTENT_MODIFIED</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>logo</name>
-        <rename>LOGO</rename>
+      </meta>      <meta>        <name>profileImageUrl</name>
+        <rename>PROFILE_IMAGE_URL</rename>
         <type>None</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -1649,8 +2166,8 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>modifiedBy</name>
-        <rename>MODIFIED_BY</rename>
+      </meta>      <meta>        <name>profileUrl</name>
+        <rename>PROFILE_URL</rename>
         <type>None</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -1664,68 +2181,8 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>modifiedOnStr</name>
-        <rename>MODIFIED_ON</rename>
-        <type>Timestamp</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>modifiedOn</name>
-        <rename>MODIFIED_ON_MONGO</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>profile_completion</name>
-        <rename>PROFILE_COMPLETION</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>profileImageUrl</name>
-        <rename>PROFILE_IMAGE_URL</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>profileImageUrlThumbnail</name>
-        <rename>PROFILE_IMAGE_URL_THUMBNAIL</rename>
+      </meta>      <meta>        <name>logo</name>
+        <rename>LOGO</rename>
         <type>None</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -1754,9 +2211,39 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>profileUrl</name>
-        <rename>PROFILE_URL</rename>
+      </meta>      <meta>        <name>isLogoImageProcessed</name>
+        <rename>IS_LOGO_IMAGE_PROCESSED</rename>
+        <type>Boolean</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>createdBy</name>
+        <rename>CREATED_BY</rename>
         <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>allowZillowAutoPost</name>
+        <rename>ALLOW_ZILLOW_AUTO_POST</rename>
+        <type>Boolean</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1784,8 +2271,8 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>_id</name>
-        <rename>REGION_SETTINGS_ID</rename>
+      </meta>      <meta>        <name>modifiedBy</name>
+        <rename>MODIFIED_BY</rename>
         <type>None</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -1799,53 +2286,8 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>sendEmailFromCompany</name>
-        <rename>SEND_EMAIL_FROM_COMPANY</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>status</name>
-        <rename>STATUS</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>0</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>vendastaAccessible</name>
-        <rename>VENDASTA_ACCESSIBLE</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>vertical</name>
-        <rename>VERTICAL</rename>
+      </meta>      <meta>        <name>profileImageUrlThumbnail</name>
+        <rename>PROFILE_IMAGE_URL_THUMBNAIL</rename>
         <type>None</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -1861,9 +2303,24 @@
         <storage_type/>
       </meta>      <meta>        <name>zillowReviewAverage</name>
         <rename>ZILLOW_REVIEW_AVERAGE</rename>
-        <type>Number</type>
+        <type>None</type>
         <length>-2</length>
-        <precision>0</precision>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>hiddenSection</name>
+        <rename>HIDDEN_SECTION</rename>
+        <type>Boolean</type>
+        <length>-2</length>
+        <precision>-2</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
         <date_format_locale/>
@@ -1876,9 +2333,69 @@
         <storage_type/>
       </meta>      <meta>        <name>zillowReviewCount</name>
         <rename>ZILLOW_REVIEW_COUNT</rename>
-        <type>Integer</type>
+        <type>None</type>
         <length>-2</length>
-        <precision>0</precision>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>isProfileImageProcessed</name>
+        <rename>IS_PROFILE_IMAGE_PROCESSED</rename>
+        <type>Boolean</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>SOCIAL_MEDIA_TOKENS_ID</name>
+        <rename>SOCIAL_MEDIA_TOKENS_ID</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>createdOnStr</name>
+        <rename>CREATED_ON</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>modifiedOnStr</name>
+        <rename>MODIFIED_ON</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
         <date_format_locale/>
@@ -1961,7 +2478,7 @@
     <name>Sort rows</name>
     <type>SortRows</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -2003,7 +2520,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>100</commit>
+    <commit>1000</commit>
     <tablename_in_field>N</tablename_in_field>
     <tablename_field/>
     <use_batch>N</use_batch>
@@ -2022,83 +2539,13 @@
         <name2/>
       </key>
       <value>
-        <name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</name>
-        <rename>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>ALLOW_ZILLOW_AUTO_POST</name>
-        <rename>ALLOW_ZILLOW_AUTO_POST</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>CREATED_BY</name>
-        <rename>CREATED_BY</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>CREATED_ON</name>
-        <rename>CREATED_ON</rename>
-        <update>Y</update>
-      </value>
-      <value>
         <name>CREATED_ON_MONGO</name>
         <rename>CREATED_ON_MONGO</rename>
         <update>Y</update>
       </value>
       <value>
-        <name>HIDDEN_SECTION</name>
-        <rename>HIDDEN_SECTION</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_ACCOUNT_DISABLED</name>
-        <rename>IS_ACCOUNT_DISABLED</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_DEFAULT_BY_SYSTEM</name>
-        <rename>IS_DEFAULT_BY_SYSTEM</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_LOCATION_ENABLED</name>
-        <rename>IS_LOCATION_ENABLED</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_LOGO_IMAGE_PROCESSED</name>
-        <rename>IS_LOGO_IMAGE_PROCESSED</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_PROFILE_IMAGE_PROCESSED</name>
-        <rename>IS_PROFILE_IMAGE_PROCESSED</rename>
-        <update>Y</update>
-      </value>
-      <value>
         <name>IS_SEO_CONTENT_MODIFIED</name>
         <rename>IS_SEO_CONTENT_MODIFIED</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>LOGO</name>
-        <rename>LOGO</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>LOGO_THUMBNAIL</name>
-        <rename>LOGO_THUMBNAIL</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MODIFIED_BY</name>
-        <rename>MODIFIED_BY</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MODIFIED_ON</name>
-        <rename>MODIFIED_ON</rename>
         <update>Y</update>
       </value>
       <value>
@@ -2112,53 +2559,8 @@
         <update>Y</update>
       </value>
       <value>
-        <name>PROFILE_IMAGE_URL</name>
-        <rename>PROFILE_IMAGE_URL</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>PROFILE_IMAGE_URL_THUMBNAIL</name>
-        <rename>PROFILE_IMAGE_URL_THUMBNAIL</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>PROFILE_NAME</name>
-        <rename>PROFILE_NAME</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>PROFILE_URL</name>
-        <rename>PROFILE_URL</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>REGION_ID</name>
-        <rename>REGION_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>REGION_SETTINGS_ID</name>
-        <rename>REGION_SETTINGS_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>SEND_EMAIL_FROM_COMPANY</name>
-        <rename>SEND_EMAIL_FROM_COMPANY</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>SOCIAL_MEDIA_TOKENS_ID</name>
-        <rename>SOCIAL_MEDIA_TOKENS_ID</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>STATUS</name>
-        <rename>STATUS</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>VENDASTA_ACCESSIBLE</name>
-        <rename>VENDASTA_ACCESSIBLE</rename>
+        <name>IS_DEFAULT_BY_SYSTEM</name>
+        <rename>IS_DEFAULT_BY_SYSTEM</rename>
         <update>Y</update>
       </value>
       <value>
@@ -2167,8 +2569,103 @@
         <update>Y</update>
       </value>
       <value>
+        <name>REGION_SETTINGS_ID</name>
+        <rename>REGION_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</name>
+        <rename>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>VENDASTA_ACCESSIBLE</name>
+        <rename>VENDASTA_ACCESSIBLE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_ACCOUNT_DISABLED</name>
+        <rename>IS_ACCOUNT_DISABLED</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SEND_EMAIL_FROM_COMPANY</name>
+        <rename>SEND_EMAIL_FROM_COMPANY</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_LOCATION_ENABLED</name>
+        <rename>IS_LOCATION_ENABLED</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>STATUS</name>
+        <rename>STATUS</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>PROFILE_IMAGE_URL</name>
+        <rename>PROFILE_IMAGE_URL</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>LOGO_THUMBNAIL</name>
+        <rename>LOGO_THUMBNAIL</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>PROFILE_URL</name>
+        <rename>PROFILE_URL</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>LOGO</name>
+        <rename>LOGO</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>PROFILE_NAME</name>
+        <rename>PROFILE_NAME</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_LOGO_IMAGE_PROCESSED</name>
+        <rename>IS_LOGO_IMAGE_PROCESSED</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>CREATED_BY</name>
+        <rename>CREATED_BY</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>ALLOW_ZILLOW_AUTO_POST</name>
+        <rename>ALLOW_ZILLOW_AUTO_POST</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>REGION_ID</name>
+        <rename>REGION_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>MODIFIED_BY</name>
+        <rename>MODIFIED_BY</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>PROFILE_IMAGE_URL_THUMBNAIL</name>
+        <rename>PROFILE_IMAGE_URL_THUMBNAIL</rename>
+        <update>Y</update>
+      </value>
+      <value>
         <name>ZILLOW_REVIEW_AVERAGE</name>
         <rename>ZILLOW_REVIEW_AVERAGE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>HIDDEN_SECTION</name>
+        <rename>HIDDEN_SECTION</rename>
         <update>Y</update>
       </value>
       <value>
@@ -2176,11 +2673,50 @@
         <rename>ZILLOW_REVIEW_COUNT</rename>
         <update>Y</update>
       </value>
+      <value>
+        <name>IS_PROFILE_IMAGE_PROCESSED</name>
+        <rename>IS_PROFILE_IMAGE_PROCESSED</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SOCIAL_MEDIA_TOKENS_ID</name>
+        <rename>SOCIAL_MEDIA_TOKENS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>CREATED_ON</name>
+        <rename>CREATED_ON</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MODIFIED_ON</name>
+        <rename>MODIFIED_ON</rename>
+        <update>Y</update>
+      </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>650</xloc>
       <yloc>435</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>658</xloc>
+      <yloc>317</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
