@@ -735,7 +735,7 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 12 || key == 13 ){
+	if(key == 101 || key == 102 ){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
@@ -782,7 +782,7 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 $(document).on('click', '.err-new-close', function() {
 	hideError();
 	hideInfo();
-	window.location = window.location;
+	location.reload(true);
 });
 
 function getRecentActivityList(startIndex,batchSize){

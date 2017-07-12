@@ -36,10 +36,10 @@
 					<div class="dash-btn-dl-sd-admin report-selector" >
 						<select id="generate-survey-reports" class="float-left dash-download-sel-item report-selector-choice">
 							<c:if test="${profilemasterid != 4}">
-								<option value=12 data-report="survey-stats">Survey Statistics</option>
+								<option value=101 data-report="survey-stats">Survey Statistics</option>
 							</c:if>
 							<c:if test="${profilemasterid == 1}">
-								<option value=13 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option> 
+								<option value=102 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option> 
 							</c:if>
 						</select>	
 					</div>
