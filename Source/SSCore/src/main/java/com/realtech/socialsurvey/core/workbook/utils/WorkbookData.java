@@ -740,11 +740,11 @@ public class WorkbookData
         }
         // Setting up user sheet headers
         userAdoptionReportToPopulate.add( "COMPANY" );
-        userAdoptionReportToPopulate.add( "REGIO" );
+        userAdoptionReportToPopulate.add( "REGION" );
         userAdoptionReportToPopulate.add( "BRANCH" );
         userAdoptionReportToPopulate.add( "INVITED USER" );
         userAdoptionReportToPopulate.add( "ACTIVE USER" );
-        userAdoptionReportToPopulate.add( "ADOPTION RATE" );
+        userAdoptionReportToPopulate.add( "ADOPTION RATES" );
         userAdoptionData.put( 1, userAdoptionReportToPopulate );
         
         return userAdoptionData;
