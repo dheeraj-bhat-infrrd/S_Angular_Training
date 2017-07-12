@@ -204,8 +204,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>476</xloc>
-      <yloc>256</yloc>
+      <xloc>486</xloc>
+      <yloc>259</yloc>
       </entry>
     <entry>
       <name>CreateJobLog</name>
@@ -563,24 +563,6 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>GetJobLogID</from>
-      <to>Mysql MasterTable Updates</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Mysql MasterTable Updates</from>
-      <to>RegionSettings</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>BranchSettings</from>
       <to>SurveyDetails</to>
       <from_nr>0</from_nr>
@@ -592,6 +574,24 @@
     <hop>
       <from>SurveyDetails</from>
       <to>AgentSettings</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>GetJobLogID</from>
+      <to>Mysql MasterTable Updates</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Mysql MasterTable Updates</from>
+      <to>RegionSettings</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

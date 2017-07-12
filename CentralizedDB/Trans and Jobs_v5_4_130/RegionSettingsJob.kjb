@@ -193,8 +193,8 @@
       </parameters>      <parallel>Y</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>220</xloc>
-      <yloc>252</yloc>
+      <xloc>282</xloc>
+      <yloc>255</yloc>
       </entry>
     <entry>
       <name>SocialMediaToken</name>
@@ -226,8 +226,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>328</xloc>
-      <yloc>252</yloc>
+      <xloc>456</xloc>
+      <yloc>255</yloc>
       </entry>
     <entry>
       <name>FacebookPages</name>
@@ -259,8 +259,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>209</xloc>
-      <yloc>139</yloc>
+      <xloc>280</xloc>
+      <yloc>123</yloc>
       </entry>
     <entry>
       <name>RegionSettings_Main_1</name>
@@ -292,8 +292,8 @@
       </parameters>      <parallel>Y</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>460</xloc>
-      <yloc>252</yloc>
+      <xloc>641</xloc>
+      <yloc>254</yloc>
       </entry>
     <entry>
       <name>ContactDetails_Main</name>
@@ -325,8 +325,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>598</xloc>
-      <yloc>252</yloc>
+      <xloc>833</xloc>
+      <yloc>253</yloc>
       </entry>
     <entry>
       <name>ContactDetails</name>
@@ -358,8 +358,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>721</xloc>
-      <yloc>252</yloc>
+      <xloc>1012</xloc>
+      <yloc>249</yloc>
       </entry>
     <entry>
       <name>ContactDetails Phone</name>
@@ -391,8 +391,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>839</xloc>
-      <yloc>252</yloc>
+      <xloc>1179</xloc>
+      <yloc>255</yloc>
       </entry>
     <entry>
       <name>ProfileStages</name>
@@ -424,8 +424,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>460</xloc>
-      <yloc>152</yloc>
+      <xloc>649</xloc>
+      <yloc>145</yloc>
       </entry>
     <entry>
       <name>Crm Info</name>
@@ -457,8 +457,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>460</xloc>
-      <yloc>401</yloc>
+      <xloc>640</xloc>
+      <yloc>386</yloc>
       </entry>
     <entry>
       <name>Error Job Logs</name>
@@ -493,8 +493,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>354</xloc>
-      <yloc>681</yloc>
+      <xloc>482</xloc>
+      <yloc>684</yloc>
       </entry>
     <entry>
       <name>DUMMY</name>
@@ -513,8 +513,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>222</xloc>
-      <yloc>368</yloc>
+      <xloc>284</xloc>
+      <yloc>371</yloc>
       </entry>
     <entry>
       <name>DUMMY 2</name>
@@ -533,8 +533,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>384</xloc>
-      <yloc>356</yloc>
+      <xloc>512</xloc>
+      <yloc>359</yloc>
       </entry>
     <entry>
       <name>Abort job</name>
@@ -544,8 +544,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>490</xloc>
-      <yloc>678</yloc>
+      <xloc>618</xloc>
+      <yloc>681</yloc>
       </entry>
     <entry>
       <name>Update JobLog</name>
