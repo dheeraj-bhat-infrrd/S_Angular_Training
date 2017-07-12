@@ -729,3 +729,285 @@ function getOverviewData() {
 }
 
 //javascript for reporting_reports page
+
+//Reports Page Generate report button actions
+$(document).on('change', '#generate-survey-reports', function() {
+	
+	var selectedVal = $('#generate-survey-reports').val();
+	var key = parseInt(selectedVal);
+	if(key == 12 || key == 13 ){
+		$('#date-pickers').hide();
+	}else{
+		$('#date-pickers').show();
+	}
+});
+
+$(document).on('click', '#reports-generate-report-btn', function(e) {
+	var selectedValue = $('#generate-survey-reports').val();
+	var key = parseInt(selectedValue);
+	var startDate = $('#dsh-start-date').val();
+	var endDate = $("#dsh-end-date").val();
+	
+	var success = false;
+	var messageToDisplay;
+	var payload = {
+			"startDate" : startDate,
+			"endDate" : endDate,
+			"reportId" : key
+		};
+	
+	showOverlay();
+		$.ajax({
+			url : "./savereportingdata.do?startDate="+payload.startDate+"&endDate="+payload.endDate+"&reportId="+payload.reportId,
+			type : "POST",
+			dataType:"TEXT",
+			async:false,
+			success : function(data) {
+				success=true;
+				messageToDisplay = data;
+				showInfo(messageToDisplay);
+			},
+			complete : function() {	
+				hideOverlay();
+			},
+			error : function(e) {
+				if (e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
+			}
+		});
+});
+
+$(document).on('click', '.err-new-close', function() {
+	hideError();
+	hideInfo();
+	window.location = window.location;
+});
+
+function getRecentActivityList(startIndex,batchSize){
+	var recentActivityList=null;
+	var payload={
+			"startIndex" : startIndex,
+			"batchSize" : batchSize
+	}
+	$.ajax({
+		async : false,
+		url : "/fetchrecentactivities.do?startIndex="+payload.startIndex+"&batchSize="+payload.batchSize,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			if (data.status == 200) {
+				$.ajax({
+					async : false,
+					url : data.url,
+					type : "GET",
+					cache : false,
+					dataType : "json",
+					success : function(response) {
+						recentActivityList = JSON.parse(response);
+					},
+					error : function(e) {
+						if (e.status == 504) {
+							redirectToLoginPageOnSessionTimeOut(e.status);
+							return;
+						}
+						recentActivityList = null;
+					}
+				});
+			}else{
+				recentActivityList = null;
+			}
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			recentActivityList = null;
+		}
+	});	
+	return recentActivityList;
+}
+
+function getRecentActivityCount(){
+	var recentActivityCount=0;
+	$.ajax({
+		async : false,
+		url : "/fetchrecentactivitiescount.do",
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+			recentActivityCount = parseInt(response);
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			recentActivityCount = 0;
+		}
+	});
+	
+	return recentActivityCount;
+}
+
+function getStatusString(status){
+		var statusString;
+		switch(status){
+		case 1: statusString='Pending';
+			break;
+		case 0: statusString='Download';
+			break;
+		case 2: statusString='Failed';
+			break;
+		default: statusString='Failed'
+		}
+		return statusString;
+	}
+var startIndex=0;
+var batchSize=10
+var tableHeaderData;
+var recentActivityList;
+
+function drawRecentActivity(start,batchSize,tableHeader){
+	
+	tableHeaderData=tableHeader;
+	startIndex=start;
+	recentActivityList = getRecentActivityList(startIndex,batchSize);
+	var tableData=''; 
+	for(var i=0;i<recentActivityList.length;i++){
+		
+		var statusString = getStatusString(recentActivityList[i][6]);
+		var startDate = getDateFromDateTime(recentActivityList[i][2]);
+		var endDate =getDateFromDateTime(recentActivityList[i][3]);
+		
+		tableData += "<tr id='recent-activity-row"+i+"' class=\"u-tbl-row user-row \">"
+			+"<td class=\"v-tbl-recent-activity fetch-name hide\">"+i+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("recent-activity-date-range\">"+" "):("\">"+startDate))+" - "+(endDate==null?" ":endDate)+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
+		
+		if(recentActivityList[i][6]==0){	
+		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"downloadLink"+i+"\"class='txt-bold tbl-blue-text downloadLink cursor-pointer'>"+statusString+"</a></td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
+			+"</tr>";
+		}else if(recentActivityList[i][6]==2){
+			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
+			+"</tr>";
+		}else{
+			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
+				+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" >  </td>"
+				+"</tr>";
+		}
+	}
+	
+	var recentActivityCount = getRecentActivityCount();
+	if(recentActivityCount == 0){
+		tableData='';
+		tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+		$('#recent-activity-list-table').html(tableData);
+	}else{
+		$('#recent-activity-list-table').html(tableHeaderData+tableData+"</table>");
+	}
+	
+}
+
+function getDateFromDateTime(dateTime){
+	if(dateTime != null){
+	return dateTime.match(/[a-zA-z]{3} \d+, \d{4}/)[0];
+	}
+	
+	return null;
+}
+
+function deleteRecentActivity(fileUploadId,idIndex){
+	showOverlay();
+	$.ajax({
+		url : "./deletefromrecentactivities.do?fileUploadId="+fileUploadId,
+		type : "POST",
+		dataType:"TEXT",
+		async:false,
+		success : function(data) {
+			success=true;
+			messageToDisplay = data;
+			
+		},
+		complete : function() {	
+			hideOverlay();
+			
+			var recentActivityCount=getRecentActivityCount();
+			$('#recent-activity-row'+idIndex).fadeOut(500)
+				.promise()
+				.done(function(){
+					if(recentActivityCount <= startIndex){
+						drawRecentActivity(startIndex-10,batchSize,tableHeaderData);
+					}else if(recentActivityCount>=10){
+						drawRecentActivity(startIndex,batchSize,tableHeaderData);
+					}
+					showHidePaginateButtons(startIndex, recentActivityCount);
+					
+					if(recentActivityCount == 0){
+						var tableData='';
+						tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+						$('#recent-activity-list-table').html(tableData);
+					}
+				});
+			},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			messageToDisplay="Sorry! Failed to delete the activity. Please try again later";
+			showError(messageToDisplay);
+		}
+	});
+}
+
+$(document).on('click','.downloadLink',function(e){
+	var clickedID = this.id;
+	var indexRecentActivity = clickedID.match(/\d+$/)[0];
+	var downloadLink=recentActivityList[indexRecentActivity][7];
+	window.location=downloadLink;
+});
+
+$(document).on('click','.recent-act-delete-x',function(e){
+	var clickedID = this.id;
+	var indexRecentActivity = clickedID.match(/\d+$/)[0];
+	var fileUploadId=recentActivityList[indexRecentActivity][8];
+	deleteRecentActivity(fileUploadId, indexRecentActivity);
+});
+
+function getStartIndex(){
+	return startIndex;
+}
+
+function getTableHeader(){
+	return tableHeaderData;
+}
+
+function showHidePaginateButtons(startIndex,recentActivityCount){
+
+	if(startIndex == 0){
+		$('#rec-act-page-previous').hide();
+	}else{
+		$('#rec-act-page-previous').show();
+	}
+	
+	if((recentActivityCount-startIndex)<=10){
+		$('#rec-act-page-next').hide();
+	}else{
+		$('#rec-act-page-next').show();
+	}
+	
+	if(recentActivityCount == 0){
+		$('#rec-act-page-previous').hide();
+		$('#rec-act-page-next').hide();
+	}
+}
+

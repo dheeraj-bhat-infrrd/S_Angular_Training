@@ -170,7 +170,7 @@ public class ReportingController
     }
     
     @RequestMapping( value = "/getsurveystatsreport", method = RequestMethod.GET)
-    @ApiOperation ( value = "Fetch Data for Overview ")
+    @ApiOperation ( value = "Fetch Data for Survey Stats Reporting ")
     public String getReportingSurveyStatsReport( Long entityId, String entityType ) throws NonFatalException 
     {
         LOGGER.info( "Fetching Survey Stats Graph" );
@@ -180,5 +180,31 @@ public class ReportingController
         json = new Gson().toJson( surveyStatsReport );
         return json;
     }
+    
+    @RequestMapping( value = "/getrecentactivityforreporting", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch Recent Activity Reporting ")
+    public String getRecentActivity( Long entityId, String entityType , int startIndex , int batchSize ) throws NonFatalException 
+    {
+        LOGGER.info( "Fetching Recent Activity Reporting" );
+        
+        String json = null;
+        List<List <Object>> recentActivityList = reportingDashboardManagement.getRecentActivityList( entityId, entityType , startIndex , batchSize);
+        json = new Gson().toJson( recentActivityList );
+        return json;
+    }
+    
+    @RequestMapping( value = "/getuseradoptionreportsforreporting", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch User Adoption Report For Reporting ")
+    public String getUserAdoption( Long entityId, String entityType ) throws NonFatalException 
+    {
+        LOGGER.info( "Fetch User Adoption Report For Reporting" );
+        
+        String json = null;
+        List<List <Object>> userAdoptionList = reportingDashboardManagement.getUserAdoptionReport( entityId, entityType );
+        json = new Gson().toJson( userAdoptionList );
+        return json;
+    }
+    
+    
 
 }

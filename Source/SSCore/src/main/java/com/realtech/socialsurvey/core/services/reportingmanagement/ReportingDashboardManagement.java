@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.reportingmanagement;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -12,18 +13,27 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 
 public interface ReportingDashboardManagement
 {
-    public void generateReports( int reportId, Date startDate, Date endDate, Long entityId, String entityType,Company company,
+    public void createEntryInFileUploadForReporting( int reportId, Date startDate, Date endDate, Long entityId, String entityType,Company company,
         Long adminUserid ) throws InvalidInputException, NoRecordsFetchedException, FileNotFoundException, IOException;
-
-    public void createEntryForReportInFileUpload( int reportId, Date startDate, Date endDate,
-        Long entityId, String entityType , Company company , Long adminUserId);
 
     public List<List<Object>> getSurveyStatsReport( Long entityId, String entityType );
 
+    public List<List<Object>> getRecentActivityList( Long entityId, String entityType , int startIndex, int batchSize  ) throws InvalidInputException;
 
+    public Long getRecentActivityCount( Long entityId, String entityType );
+
+    String generateSurveyStatsForReporting( Long entityId, String entityType , Long userId ) throws UnsupportedEncodingException, NonFatalException;
+
+    List<List<Object>> getUserAdoptionReport( Long entityId, String entityType );
+
+    String generateUserAdoptionForReporting( Long entityId, String entityType, Long userId )
+        throws UnsupportedEncodingException, NonFatalException;
+
+    void deleteRecentActivity( Long fileUploadId );
 
 
 }

@@ -124,8 +124,8 @@ public interface SSApiIntegration
     
     @GET("/v1/getoverview")
     Response getReportingOverview(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
-    
-    @GET("/v1/getsurveystatsreport")
-    Response getReportingSurveyStatsReport(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
+ 
+    @GET("/v1/getrecentactivityforreporting")
+    Response getRecentActivity(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("startIndex") int startIndex , @Query ("batchSize") int batchSize);
     //reporting:END
 }

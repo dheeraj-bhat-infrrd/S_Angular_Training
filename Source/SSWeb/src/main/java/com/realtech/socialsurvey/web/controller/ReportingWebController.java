@@ -577,13 +577,7 @@ public class ReportingWebController
         }
     }
 
-    @RequestMapping ( value = "/fetchreportingprofileimage", method = RequestMethod.GET)
-    public String fetchProfileImage( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Fetching profile image" );
-        return JspResolver.REPORTING_PROFILE_IMAGE;
-    }
-    
+
    @ResponseBody
    @RequestMapping( value = "/fetchaveragereportingrating", method = RequestMethod.GET)
    public Response fetchAverageRating( Model model, HttpServletRequest request ) throws NonFatalException 
@@ -644,12 +638,14 @@ public class ReportingWebController
    /*
     * Generate Reports For the reporting UI
     */
+   @SuppressWarnings ( "unused")
    @ResponseBody
-   @RequestMapping( value = "/generatereportingreports", method = RequestMethod.GET)
-   public String generateReportingReports( Model model, HttpServletRequest request, HttpServletResponse response ) throws NonFatalException, ParseException,FileNotFoundException, IOException{
+   @RequestMapping( value = "/savereportingdata", method = RequestMethod.POST)
+   public String saveReportingData( Model model, HttpServletRequest request, HttpServletResponse response ) throws NonFatalException, ParseException,FileNotFoundException, IOException{
        LOG.info( "the step to generate reporting reports :generateReportingReports started " );
        HttpSession session = request.getSession( false );
        User user = sessionHelper.getCurrentUser();
+       Long adminUserid = user.getUserId();
        String message = "";
        //since we need to store the current time stamp
        
@@ -666,31 +662,131 @@ public class ReportingWebController
        if( endDateStr != null && !endDateStr.isEmpty()){
            endDate =  new SimpleDateFormat("MM/dd/yyyy").parse( endDateStr ) ;
        }
-       //check if only endDate is present
-       if(endDate!= null && startDate == null){
-           message = "The StartDate needs to be present";
-       }
-       //check if enddate is greater the start date 
-       if( endDate != null && startDate != null){
-           message = "The EndDate Should be lesser then the StartDate";
-       }
        String reportIdString = request.getParameter( "reportId" );
        int reportId = Integer.parseInt( reportIdString );
        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-       Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
        Company company = user.getCompany();
-       reportingDashboardManagement.generateReports( reportId, startDate, endDate,entityId, entityType ,company , adminUserid );
-       message = "the report is being generated";
+       reportingDashboardManagement.createEntryInFileUploadForReporting( reportId, startDate, endDate,entityId, entityType ,company , adminUserid );
+       message = "The report is being generated";
        return message;
        
    }
    
+   /*
+    * Method to get count of all the recent activities
+    */
+   @ResponseBody
+   @RequestMapping ( value = "/fetchrecentactivitiescount")
+   public String getIncompleteSurveyCount( Model model, HttpServletRequest request )
+   {
+       LOG.info( "Method to get recent activities of reports" );
+       long count = 0l;
+       HttpSession session = request.getSession( false );
+       long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+       String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+       count = reportingDashboardManagement.getRecentActivityCount( entityId, entityType );
+
+       LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
+       return String.valueOf( count );
+   }
+   
+   @ResponseBody
+   @RequestMapping( value = "/fetchrecentactivities", method = RequestMethod.GET)
+   public Response fetchRecentActivity( Model model, HttpServletRequest request ) throws NonFatalException 
+   {
+        LOG.info( "Fetching Recent Activity Graph" );
+        HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
+        Response response = null;
+
+        if ( user == null ) {
+            throw new NonFatalException( "NonFatalException while logging in. " );
+        }   
+        int startIndex = 0;
+        int batchSize = 0;
+        String startIndexStr = request.getParameter( "startIndex" );
+        String batchSizeStr = request.getParameter( "batchSize" );
+        if(startIndexStr!=null && !startIndexStr.isEmpty()){
+            startIndex = Integer.parseInt( startIndexStr );
+        }
+        if(batchSizeStr != null && !batchSizeStr.isEmpty()){
+            batchSize = Integer.parseInt( batchSizeStr );
+        }
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        response = ssApiIntergrationBuilder.getIntegrationApi().getRecentActivity(entityId,entityType, startIndex, batchSize);
+        return response;
+        
+   }
+   
+   @ResponseBody
+   @RequestMapping( value = "/deletefromrecentactivities", method = RequestMethod.POST)
+   public String deleteFromRecentActivity( HttpServletRequest request ) 
+   {
+       String message = "The row is deleted from the recentActivity and will not be displayed again";
+        try{
+            LOG.info( "Fetching Recent Activity Graph" );
+            long fileUploadId = 0;
+            String fileUploadIdStr = request.getParameter( "fileUploadId" );
+            if(fileUploadIdStr != null && !fileUploadIdStr.isEmpty()){
+                fileUploadId = Integer.parseInt( fileUploadIdStr );
+            }else{
+                message = "The row Id was null or an empty string"; 
+            }
+            reportingDashboardManagement.deleteRecentActivity( fileUploadId );
+            return message;
+        }catch(Exception e){
+            message = "There was an exception :"+e ;
+            return message;
+        }
+        
+   }
+   
    //TO SHOW REPORTING UI
    @RequestMapping ( value = "/showreportspage", method = RequestMethod.GET)
-   public String showReportsPage( Model model, HttpServletRequest request )
+   public String showReportsPage( Model model, HttpServletRequest request ) throws NonFatalException
    {
        LOG.info( "Showing reports page" );
+       HttpSession session = request.getSession( false );
+       User user = sessionHelper.getCurrentUser();
+       if ( user == null ) {
+           throw new NonFatalException( "NonFatalException while logging in. " );
+       }
+       long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+       String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+       Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+       boolean modelSet = false;
+       if ( user.getCompany() != null && user.getCompany().getLicenseDetails() != null
+           && !user.getCompany().getLicenseDetails().isEmpty()
+           && user.getCompany().getLicenseDetails().get( 0 ).getAccountsMaster() != null ) {
+           if ( user.getCompany().getLicenseDetails().get( 0 ).getAccountsMaster()
+               .getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+               model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
+               model.addAttribute( "columnValue", entityId );
+               modelSet = true;
+           }
+       }
+       String profileName = "";
+       boolean isPasswordSet = true;
+       if ( user.getIsForcePassword() == 1 && user.getLoginPassword() == null ) {
+           isPasswordSet = false;
+       }
+       if ( !modelSet ) {
+           if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+               model.addAttribute( "columnName", entityType );
+               model.addAttribute( "columnValue", entityId );
+           } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+               model.addAttribute( "columnName", entityType );
+               model.addAttribute( "columnValue", entityId );
+           } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+               model.addAttribute( "columnName", entityType );
+               model.addAttribute( "columnValue", entityId );
+           } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+               model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
+               model.addAttribute( "columnValue", entityId );
+           }
+       }
        return JspResolver.REPORTS;
    }
     /**

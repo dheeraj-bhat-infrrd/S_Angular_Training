@@ -129,6 +129,11 @@ public interface CommonConstants
     public static final String YES_STRING = "Y";
     public static final String NO_STRING = "N";
     public static final int DISABLED_ACCOUNT_PROCESSED = 2;
+    //Reporting status in file upload table 
+    public static final int STATUS_PENDING = 1;
+    public static final int STATUS_DONE = 0;
+    public static final int STATUS_FAIL = 2;
+    public static final int STATUS_DELETE = 3;
 
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
@@ -195,6 +200,8 @@ public interface CommonConstants
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
     public static final String IS_PRIMARY_COLUMN = "isPrimary";
     public static final String SURVEY_LAST_REMINDER_TIME = "lastReminderTime";
+    public static final String PROFILE_VALUE_COLUMN = "profileValue";
+    public static final String PROFILE_LEVEL_COLUMN = "profileLevel";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
@@ -255,6 +262,8 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_SOCIAL_MONITOR_REPORT = "Social monitor report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_INCOMPLETE_SURVEY_REPORT = "Incomplete survey data report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT = "User adoption report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_STATS_REPORT = "Survey stats report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_ADOPTION_REPORT = "User adoption report for reporting";
 
 
     /**
@@ -420,6 +429,8 @@ public interface CommonConstants
     public static final String ENTITY_TYPE_COLUMN = "entityType";
 
     public static final String FILE_UPLOAD_TYPE_COLUMN = "uploadType";
+    
+    public static final String SHOW_ON_UI_COLUMN = "showOnUI";
 
     /**
      * Batch Constants
@@ -927,6 +938,7 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_INCOMPLETE_SURVEY_REPORT = 10;
     public static final int FILE_UPLOAD_USER_ADOPTION_REPORT = 11;
     public static final int FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT = 12;
+    public static final int FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT = 13;
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
@@ -1297,5 +1309,9 @@ public interface CommonConstants
     public static final String SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION = "Authorization";
     public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
     public static final String SURVEY_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    
+    //Reporting constants
+    public static final String REPORTING_SURVEY_STATS_REPORT = "Survey Stats Report";
+    public static final String REPORTING_USER_ADOPTION_REPORT = "User Adoption Report";
     
 }
