@@ -18,4 +18,6 @@ public interface SSApiBatchIntegration
     @GET("/v1/getuseradoptionreportsforreporting")
     Response getUserAdoption(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
     
+    @GET("/v1/getcompanyuserreportsforreporting")
+    Response getCompanyUserReport(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
 }
