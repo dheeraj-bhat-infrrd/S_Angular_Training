@@ -35,5 +35,10 @@ public interface ReportingDashboardManagement
 
     void deleteRecentActivity( Long fileUploadId );
 
+    List<List<Object>> getCompanyUserReport( Long entityId, String entityType );
+
+    String generateCompanyUserForReporting( Long entityId, String entityType, Long userId )
+        throws UnsupportedEncodingException, NonFatalException;
+
 
 }

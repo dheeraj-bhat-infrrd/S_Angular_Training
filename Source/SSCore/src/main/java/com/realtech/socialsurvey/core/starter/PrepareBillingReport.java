@@ -114,12 +114,16 @@ public class PrepareBillingReport implements Runnable
                         } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT ){
                             locationInS3 = reportingDashboardManagement.generateUserAdoptionForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                                 fileUpload.getAdminUserId() );
+                        } else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
+                            locationInS3 = reportingDashboardManagement.generateCompanyUserForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                fileUpload.getAdminUserId() );
                         }
 
                         // update the status to be processed
                         fileUpload.setStatus( CommonConstants.STATUS_DONE );
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-                        if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT ){
+                        if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT 
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
                             fileUpload.setFileName( locationInS3 );
                         }
                         csvUploadService.updateFileUploadRecord( fileUpload );
@@ -155,6 +159,8 @@ public class PrepareBillingReport implements Runnable
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_STATS_REPORT;
                             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT ){
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_ADOPTION_REPORT;
+                            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT ){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTIND_COMPANY_USER_REPORT;
                             }
                             String batchName = CommonConstants.BATCH_NAME_FILE_UPLOAD_REPORTS_GENERATOR + " For " + reportType;
                             batchTrackerService.sendMailToAdminRegardingBatchError( batchName, System.currentTimeMillis(), e );

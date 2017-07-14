@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -36,10 +37,12 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.api.builder.SSApiBatchIntegrationBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
 import com.realtech.socialsurvey.core.dao.UserAdoptionReportDao;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyUserReport;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.entities.User;
@@ -83,6 +86,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     private UserAdoptionReportDao userAdoptionReportDao;
     
     @Autowired
+    private CompanyUserReportDao companyUserReportDao;
+    
+    @Autowired
     private SSApiBatchIntegrationBuilder ssApiBatchIntergrationBuilder;
     
     @Autowired
@@ -99,6 +105,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Value ( "${REPORTING_BUCKET}")
     private String bucketName;
+    
+    @Value ( "${APPLICATION_BASE_URL}")
+    private String applicationBaseUrl;
     
 
     
@@ -249,6 +258,191 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
     
     @Override
+    @Transactional(value = "transactionManagerForReporting")
+    public List<List<Object>> getCompanyUserReport(Long entityId , String entityType){
+        List<List<Object>> companyUser = new ArrayList<>();
+        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+            for(CompanyUserReport companyUserReport : companyUserReportDao.fetchCompanyUserReportByCompanyId( entityId )){
+                List<Object> companyUserReportList = new ArrayList<>();
+                if(companyUserReport.getFirstName() != null && !companyUserReport.getFirstName().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getFirstName() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getLastName() != null && !companyUserReport.getLastName().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getLastName() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getEmail() != null && !companyUserReport.getEmail().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getEmail() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getSocialSurveyAccessLevel() != null && !companyUserReport.getSocialSurveyAccessLevel().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getSocialSurveyAccessLevel() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getOfficeBranchAssignment() != null && !companyUserReport.getOfficeBranchAssignment().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getOfficeBranchAssignment() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getRegionAssignment() != null && !companyUserReport.getRegionAssignment().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getRegionAssignment() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getOfficeAdmin() != null && !companyUserReport.getOfficeAdmin().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getOfficeAdmin() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getRegionAdmin() != null && !companyUserReport.getRegionAdmin().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getRegionAdmin() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getSsInviteSentDate() != null && !companyUserReport.getSsInviteSentDate().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getSsInviteSentDate() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                companyUserReportList.add( "" );
+                if(companyUserReport.getEmailVerified() != null && !companyUserReport.getEmailVerified().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getEmailVerified() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getLastLoginDate() != null){
+                    companyUserReportList.add( companyUserReport.getLastLoginDate() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getProfileComplete() != null && !companyUserReport.getProfileComplete().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getProfileComplete() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getSociallyConnected() != null && !companyUserReport.getSociallyConnected().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getSociallyConnected() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getFbDataConnection() != null && !companyUserReport.getFbDataConnection().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getFbDataConnection() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getFbConnectionStatus() != null && !companyUserReport.getFbConnectionStatus().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getFbConnectionStatus() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getLastPostDateFb() != null){
+                    companyUserReportList.add( companyUserReport.getLastPostDateFb() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getTwitterDataConnection() != null && !companyUserReport.getTwitterDataConnection().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getTwitterDataConnection() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getTwitterConnectionStatus() != null && !companyUserReport.getTwitterConnectionStatus().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getTwitterConnectionStatus() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getLastPostDateTwitter() != null){
+                    companyUserReportList.add( companyUserReport.getLastPostDateFb() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getLinkedinConnectionStatus() != null && !companyUserReport.getLinkedinConnectionStatus().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getLinkedinConnectionStatus() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getLinkedinConnectionStatus() != null && !companyUserReport.getLinkedinConnectionStatus().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getLinkedinConnectionStatus() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getLastPostDateLinkedin() != null){
+                    companyUserReportList.add( companyUserReport.getLastPostDateLinkedin() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getGooglePlusUrl() != null && !companyUserReport.getGooglePlusUrl().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getGooglePlusUrl() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getZillowUrl() != null && !companyUserReport.getZillowUrl().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getZillowUrl() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getYelpUrl() != null && !companyUserReport.getYelpUrl().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getYelpUrl() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getRealtorUrl() != null && !companyUserReport.getRealtorUrl().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getRealtorUrl() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getGbUrl() != null && !companyUserReport.getGbUrl().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getGbUrl() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getLendingtreeUrl() != null && !companyUserReport.getLendingtreeUrl().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getLendingtreeUrl() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getAdoptionCompletedDate() != null ){
+                    companyUserReportList.add( companyUserReport.getAdoptionCompletedDate() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getLastSurveySentDate() != null ){
+                    companyUserReportList.add( companyUserReport.getLastSurveySentDate() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getLastSurveyPostedDate() != null ){
+                    companyUserReportList.add( companyUserReport.getLastSurveyPostedDate() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getAddress() != null && !companyUserReport.getAddress().isEmpty()){
+                    companyUserReportList.add( companyUserReport.getAddress() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                if(companyUserReport.getSsProfile() != null && !companyUserReport.getSsProfile().isEmpty()){
+                    companyUserReportList.add( applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + companyUserReport.getSsProfile() );
+                }else{
+                    companyUserReportList.add( "" );
+                }
+                companyUserReportList.add( companyUserReport.getTotalReviews() );
+                companyUserReportList.add( companyUserReport.getSsReviews() );
+                companyUserReportList.add( companyUserReport.getZillowReviews() );
+                companyUserReportList.add( companyUserReport.getAbusiveReviews() );
+                companyUserReportList.add( companyUserReport.getThirdPartyReviews() );
+                companyUser.add( companyUserReportList );
+            }
+        }
+        return companyUser;
+        
+    }
+    
+    @Override
     public List<List<Object>> getRecentActivityList(Long entityId , String entityType , int startIndex , int batchSize) throws InvalidInputException{
         List<List<Object>> recentActivity = new ArrayList<>();
         for(FileUpload fileUpload : fileUploadDao.findRecentActivityForReporting(entityId, entityType, startIndex, batchSize)){
@@ -310,8 +504,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         //String responseString = "[[\"CompanyOnebranchone2017_06\",\"CompanyOne\",\"branchone\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0],[\"CompanyOnebranchtwo2017_06\",\"CompanyOne\",\"branchtwo\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0]]";
         //since the string has ""abc"" an extra quote
         responseString = responseString.substring(1, responseString.length()-1);
-        //and since the string doesnt eliminate the escaped characters
-        responseString = responseString.replace( "\\", "" );
+        //Escape characters
+        responseString = StringEscapeUtils.unescapeJava(responseString);
         List<List<String>> surveyStatsReport = null;
         Type listType = new TypeToken <List<List<String>>>() {}.getType();
         surveyStatsReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
@@ -342,18 +536,47 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         //String responseString = "[[\"CompanyOnebranchone2017_06\",\"CompanyOne\",\"branchone\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0],[\"CompanyOnebranchtwo2017_06\",\"CompanyOne\",\"branchtwo\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0]]";
         //since the string has ""abc"" an extra quote
         responseString = responseString.substring(1, responseString.length()-1);
-        //and since the string doesnt eliminate the escaped characters
-        responseString = responseString.replace( "\\", "" );
+        //Escape characters
+        responseString = StringEscapeUtils.unescapeJava(responseString);
         List<List<String>> userAdoptionReport = null;
         Type listType = new TypeToken <List<List<String>>>() {}.getType();
         userAdoptionReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
         Map<Integer, List<Object>> data = workbookData.getUserAdoptionReportToBeWrittenInSheet( userAdoptionReport );
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
-        XSSFSheet sheet = workbook.getSheetAt(0);
-        this.makeRowBold( workbook, sheet.getRow(0));
         return workbook;
         
     }
+    
+    @Override
+    public String generateCompanyUserForReporting(Long entityId , String entityType , Long userId) throws UnsupportedEncodingException, NonFatalException{
+        User user = userManagementService.getUserByUserId( userId );
+        //file is too big for windows hence uncomment the alternative 
+        String fileName = "Company_User_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+            + (Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadCompanyUserForReporting( entityId , entityType );
+        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+        return LocationInS3;
+        
+    }
+    
+    
+    @SuppressWarnings ( "unchecked")
+    public XSSFWorkbook downloadCompanyUserForReporting( long entityId , String entityType){
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyUserReport(entityId,entityType);
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        //since the string has ""abc"" an extra quote
+        responseString = responseString.substring(1, responseString.length()-1);
+        //Escape characters
+        responseString = StringEscapeUtils.unescapeJava(responseString);
+        List<List<String>> companyUserReport = null;
+        Type listType = new TypeToken <List<List<String>>>() {}.getType();
+        companyUserReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
+        Map<Integer, List<Object>> data = workbookData.getCompanyUserReportToBeWrittenInSheet( companyUserReport );
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+        return workbook;
+        
+    }
+    
     private String createExcelFileAndSaveInAmazonS3( String fileName, XSSFWorkbook workbook ) throws NonFatalException, UnsupportedEncodingException
     {
         // Create file and write report into it

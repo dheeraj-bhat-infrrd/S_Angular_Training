@@ -739,15 +739,158 @@ public class WorkbookData
             
         }
         // Setting up user sheet headers
-        userAdoptionReportToPopulate.add( "COMPANY" );
-        userAdoptionReportToPopulate.add( "REGION" );
-        userAdoptionReportToPopulate.add( "BRANCH" );
-        userAdoptionReportToPopulate.add( "INVITED USER" );
-        userAdoptionReportToPopulate.add( "ACTIVE USER" );
-        userAdoptionReportToPopulate.add( "ADOPTION RATES" );
+        userAdoptionReportToPopulate.add( "Company" );
+        userAdoptionReportToPopulate.add( "Region" );
+        userAdoptionReportToPopulate.add( "Branch" );
+        userAdoptionReportToPopulate.add( "Invited Users" );
+        userAdoptionReportToPopulate.add( "Active Users" );
+        userAdoptionReportToPopulate.add( "Adoption Reports" );
         userAdoptionData.put( 1, userAdoptionReportToPopulate );
         
         return userAdoptionData;
+        
+    }
+    
+    public Map<Integer, List<Object>> getCompanyUserReportToBeWrittenInSheet( List<List<String>> companyUser )
+    {
+     // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>>  companyUserData = new TreeMap<>();
+        
+        Integer companyUserCounter = 2;
+        
+        List<Object> companyUserReportToPopulate = new ArrayList<>();
+        
+        for(List<String> row : companyUser ){
+            companyUserReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 3 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 4 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 5 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 6 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 7 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 8 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 9 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 10 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 11 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 12 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 13 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 14 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 15 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 16 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 17 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 18 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 19 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 20 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 21 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 22 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 23 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 24 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 25 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 26 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 27 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 28 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 29 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 30 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 31 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 32 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 33 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 34 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 35 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 36 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 37 ) ));
+            companyUserReportToPopulate.add(String.valueOf( row.get( 38 ) ));
+
+
+            companyUserData.put(++companyUserCounter ,companyUserReportToPopulate );
+            companyUserReportToPopulate = new ArrayList<>();
+            
+        }
+        // Setting up user sheet headers
+        companyUserReportToPopulate.add("First Name");
+        companyUserReportToPopulate.add("Last Name");
+        companyUserReportToPopulate.add("Email");
+        companyUserReportToPopulate.add("SocialSurvey Access Level");
+        companyUserReportToPopulate.add("Office Assignment(s)");
+        companyUserReportToPopulate.add("Region Assignment(s)");
+        companyUserReportToPopulate.add("Office Admin Privilege(s)");
+        companyUserReportToPopulate.add("Region Admin Privilege");
+        companyUserReportToPopulate.add("SocialSurvey Invite sent");
+        companyUserReportToPopulate.add("Date last invite sent");
+        companyUserReportToPopulate.add("Profile Verified");
+        companyUserReportToPopulate.add("Date of last log-in");
+        companyUserReportToPopulate.add("Profile Complete");
+        companyUserReportToPopulate.add("Socially Connected");
+        companyUserReportToPopulate.add("Facebook");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("Twitter");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("Linkedin");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("Google");
+        companyUserReportToPopulate.add("Zillow");
+        companyUserReportToPopulate.add("Yelp");
+        companyUserReportToPopulate.add("Realtor");
+        companyUserReportToPopulate.add("Google Business");
+        companyUserReportToPopulate.add("Lendingtree");
+        companyUserReportToPopulate.add("Date Adoption completed");
+        companyUserReportToPopulate.add("Date last survey sent");
+        companyUserReportToPopulate.add("Date last survey posted");
+        companyUserReportToPopulate.add("User Address");
+        companyUserReportToPopulate.add("SocialSurvey Profile");
+        companyUserReportToPopulate.add("Total Reviews");
+        companyUserReportToPopulate.add("SocialSurvey Reviews");
+        companyUserReportToPopulate.add("Zillow Reviews");
+        companyUserReportToPopulate.add("Abusive Reviews");
+        companyUserReportToPopulate.add("3rd Party Reviews");
+        companyUserData.put( 1, companyUserReportToPopulate );
+        companyUserReportToPopulate = new ArrayList<>();
+        
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("(1=Green, 2=Red)");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("(Photo, Company Logo, Title, Location, Industry, Licenses, Disclaimer, About)");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("Date connection established");
+        companyUserReportToPopulate.add("Connection Status");
+        companyUserReportToPopulate.add("Date of last post");
+        companyUserReportToPopulate.add("Date connection established");
+        companyUserReportToPopulate.add("Connection Status");
+        companyUserReportToPopulate.add("Date of last post");
+        companyUserReportToPopulate.add("Date connection established");
+        companyUserReportToPopulate.add("Connection Status");
+        companyUserReportToPopulate.add("Date of last post");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("(SS + Zillow + 3rd Party Reviews)");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserReportToPopulate.add("");
+        companyUserData.put( 2, companyUserReportToPopulate );
+        
+        return companyUserData;
         
     }
     
