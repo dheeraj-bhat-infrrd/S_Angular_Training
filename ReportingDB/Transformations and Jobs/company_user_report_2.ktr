@@ -6,6 +6,7 @@
     <extended_description/>
     <trans_version/>
     <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
     <directory>&#x2f;</directory>
     <parameters>
     </parameters>
@@ -133,7 +134,6 @@
   <order>
   <hop> <from>AggregateByProfile</from><to>ReplaceIdWithValue</to><enabled>Y</enabled> </hop>
   <hop> <from>User Profile Input</from><to>SortByUserIdAndProfile</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortByUserIdAndProfile</from><to>GroupByUserIdAndProfile</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupByUserIdAndProfile</from><to>AggregateByProfile</to><enabled>Y</enabled> </hop>
   <hop> <from>User Profile Input</from><to>SortUserProfileOnBranch</to><enabled>Y</enabled> </hop>
   <hop> <from>SortBranchOnBranch</from><to>MergeOnBranchId</to><enabled>Y</enabled> </hop>
@@ -187,17 +187,17 @@
   <hop> <from>LastPostScript</from><to>SortRowsOnUserId 8</to><enabled>Y</enabled> </hop>
   <hop> <from>SortRowsOnUserId 8</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>User Input 2</from><to>CheckProfileVerified</to><enabled>Y</enabled> </hop>
-  <hop> <from>User Input</from><to>Database join 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Database join 2</from><to>Sort rows 6</to><enabled>Y</enabled> </hop>
+  <hop> <from>User Input</from><to>DatabaseProfileLink</to><enabled>Y</enabled> </hop>
+  <hop> <from>DatabaseProfileLink</from><to>Sort rows 6</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 6</from><to>Multiway Merge Join 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>User Input</from><to>Database join 2 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>User Input</from><to>Database join 2 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>User Input</from><to>Database join 2 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>User Input</from><to>Database join 2 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>Database join 2 5</from><to>Sort rows 6 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>Database join 2 4</from><to>Sort rows 6 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Database join 2 3</from><to>Sort rows 6 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Database join 2 2</from><to>Sort rows 6 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>User Input</from><to>Database ZilllowLink</to><enabled>Y</enabled> </hop>
+  <hop> <from>User Input</from><to>DatabaseYelpLink</to><enabled>Y</enabled> </hop>
+  <hop> <from>User Input</from><to>DatabaseRealtorLink</to><enabled>Y</enabled> </hop>
+  <hop> <from>User Input</from><to>DatabaseGBLink</to><enabled>Y</enabled> </hop>
+  <hop> <from>DatabaseGBLink</from><to>Sort rows 6 5</to><enabled>Y</enabled> </hop>
+  <hop> <from>DatabaseRealtorLink</from><to>Sort rows 6 4</to><enabled>Y</enabled> </hop>
+  <hop> <from>DatabaseYelpLink</from><to>Sort rows 6 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Database ZilllowLink</from><to>Sort rows 6 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 6 2</from><to>Multiway Merge Join 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 6 3</from><to>Multiway Merge Join 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 6 4</from><to>Multiway Merge Join 2</to><enabled>Y</enabled> </hop>
@@ -227,6 +227,24 @@
   <hop> <from>users</from><to>DatabaseSurveyPostedDate</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 2</from><to>ModifiedMakeNullAsZero</to><enabled>Y</enabled> </hop>
   <hop> <from>ModifiedMakeNullAsZero</from><to>Table output</to><enabled>Y</enabled> </hop>
+  <hop> <from>DatabaseGBLink 2</from><to>Sort rows 6 5 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>User Input</from><to>DatabaseGBLink 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 6 5 2</from><to>Multiway Merge Join 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortByUserIdAndProfile</from><to>FilterBranch</to><enabled>Y</enabled> </hop>
+  <hop> <from>FilterBranch</from><to>DatabaseIsDefault</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortByUserIdAndProfile</from><to>FilterRegion</to><enabled>Y</enabled> </hop>
+  <hop> <from>FilterRegion</from><to>Database join 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>DatabaseIsDefault</from><to>FilterOutdefaultBranch</to><enabled>Y</enabled> </hop>
+  <hop> <from>Database join 3</from><to>FilterOutDefaultRegion</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortByUserIdAndProfile</from><to>FilterUserCompany</to><enabled>Y</enabled> </hop>
+  <hop> <from>FilterOutdefaultBranch</from><to>Sort rows 12</to><enabled>Y</enabled> </hop>
+  <hop> <from>FilterOutDefaultRegion</from><to>Sort rows 13</to><enabled>Y</enabled> </hop>
+  <hop> <from>FilterUserCompany</from><to>Sort rows 14</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 14</from><to>Select values 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 13</from><to>Select values 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 12</from><to>Select values 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values 3</from><to>Sort rows 14 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 14 2</from><to>GroupByUserIdAndProfile</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AggregateByProfile</name>
@@ -262,8 +280,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>535</xloc>
-      <yloc>89</yloc>
+      <xloc>731</xloc>
+      <yloc>243</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -288,8 +306,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>213</xloc>
-      <yloc>403</yloc>
+      <xloc>266</xloc>
+      <yloc>562</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -318,8 +336,38 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>688</xloc>
-      <yloc>797</yloc>
+      <xloc>741</xloc>
+      <yloc>956</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Database ZilllowLink</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>&#xd;&#xa;Select ZILLOW_PROFILE_LINK&#xd;&#xa;from zillow_token&#xd;&#xa;where type &#x3d; 4 and id &#x3d; &#x3f; &#x3b;</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>USER_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>438</xloc>
+      <yloc>1373</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -348,14 +396,14 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>472</xloc>
-      <yloc>712</yloc>
+      <xloc>525</xloc>
+      <yloc>871</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Database join 2</name>
+    <name>Database join 3</name>
     <type>DBJoin</type>
     <description/>
     <distribute>Y</distribute>
@@ -367,139 +415,19 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>Select PROFILE_LINK&#xd;&#xa;from google_token &#xd;&#xa;where type &#x3d; 4 and id &#x3d; &#x3f; &#x3b;</sql>
+    <sql>Select IS_DEFAULT_BY_SYSTEM as default_region from Region where REGION_ID &#x3d; &#x3f; &#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
       <field>
-        <name>USER_ID</name>
+        <name>REGION_ID</name>
         <type>None</type>
       </field>
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>383</xloc>
-      <yloc>1135</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Database join 2 2</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <rowlimit>0</rowlimit>
-    <sql>&#xd;&#xa;Select ZILLOW_PROFILE_LINK&#xd;&#xa;from zillow_token&#xd;&#xa;where type &#x3d; 4 and id &#x3d; &#x3f; &#x3b;</sql>
-    <outer_join>N</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>USER_ID</name>
-        <type>None</type>
-      </field>
-    </parameter>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>385</xloc>
-      <yloc>1214</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Database join 2 3</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <rowlimit>0</rowlimit>
-    <sql>Select YELP_PAGE_LINK&#xd;&#xa;from yelp_token &#xd;&#xa;where type &#x3d; 4 and id &#x3d; &#x3f; &#xd;&#xa;</sql>
-    <outer_join>N</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>USER_ID</name>
-        <type>None</type>
-      </field>
-    </parameter>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>375</xloc>
-      <yloc>1292</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Database join 2 4</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <rowlimit>0</rowlimit>
-    <sql>Select REALTOR_PROFILE_LINK&#xd;&#xa;from  realtor_token &#xd;&#xa;where type &#x3d; 4 and id &#x3d; &#x3f; </sql>
-    <outer_join>N</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>USER_ID</name>
-        <type>None</type>
-      </field>
-    </parameter>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>376</xloc>
-      <yloc>1369</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Database join 2 5</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <rowlimit>0</rowlimit>
-    <sql>Select GOOGLE_BUSINESS_LINK &#xd;&#xa;from google_business_token&#xd;&#xa;where type &#x3d; 4 and id &#x3d; &#x3f;&#x3b;</sql>
-    <outer_join>N</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>USER_ID</name>
-        <type>None</type>
-      </field>
-    </parameter>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>375</xloc>
-      <yloc>1436</yloc>
+      <xloc>252</xloc>
+      <yloc>225</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -528,8 +456,8 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>284</xloc>
-      <yloc>1676</yloc>
+      <xloc>340</xloc>
+      <yloc>2016</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -558,8 +486,98 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>280</xloc>
-      <yloc>1774</yloc>
+      <xloc>336</xloc>
+      <yloc>2114</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>DatabaseGBLink</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>Select GOOGLE_BUSINESS_LINK &#xd;&#xa;from google_business_token&#xd;&#xa;where type &#x3d; 4 and id &#x3d; &#x3f;&#x3b;</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>USER_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>428</xloc>
+      <yloc>1595</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>DatabaseGBLink 2</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>Select LENDING_TREE_PROFILE_LINK&#xd;&#xa;from lending_tree_token&#xd;&#xa;where type &#x3d; 4 and id &#x3d; &#x3f;&#x3b;</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>USER_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>415</xloc>
+      <yloc>1688</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>DatabaseIsDefault</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>Select IS_DEFAULT_BY_SYSTEM as default_branch from Branch where BRANCH_ID &#x3d; &#x3f; &#x3b;</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>BRANCH_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>75</xloc>
+      <yloc>235</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -588,8 +606,68 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>449</xloc>
-      <yloc>188</yloc>
+      <xloc>502</xloc>
+      <yloc>347</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>DatabaseProfileLink</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>Select PROFILE_LINK&#xd;&#xa;from google_token &#xd;&#xa;where type &#x3d; 4 and id &#x3d; &#x3f; &#x3b;</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>USER_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>436</xloc>
+      <yloc>1294</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>DatabaseRealtorLink</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>Select REALTOR_PROFILE_LINK&#xd;&#xa;from  realtor_token &#xd;&#xa;where type &#x3d; 4 and id &#x3d; &#x3f; </sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>USER_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>429</xloc>
+      <yloc>1528</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -618,8 +696,8 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>439</xloc>
-      <yloc>251</yloc>
+      <xloc>437</xloc>
+      <yloc>412</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -648,8 +726,8 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>296</xloc>
-      <yloc>1524</yloc>
+      <xloc>352</xloc>
+      <yloc>1864</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -678,8 +756,8 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>266</xloc>
-      <yloc>1847</yloc>
+      <xloc>322</xloc>
+      <yloc>2187</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -708,8 +786,8 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>266</xloc>
-      <yloc>1953</yloc>
+      <xloc>322</xloc>
+      <yloc>2293</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -742,8 +820,8 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>377</xloc>
-      <yloc>911</yloc>
+      <xloc>430</xloc>
+      <yloc>1070</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -776,8 +854,8 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>379</xloc>
-      <yloc>990</yloc>
+      <xloc>432</xloc>
+      <yloc>1149</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -810,8 +888,38 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>377</xloc>
-      <yloc>1062</yloc>
+      <xloc>430</xloc>
+      <yloc>1221</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>DatabaseYelpLink</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>Select YELP_PAGE_LINK&#xd;&#xa;from yelp_token &#xd;&#xa;where type &#x3d; 4 and id &#x3d; &#x3f; &#xd;&#xa;</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>USER_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>428</xloc>
+      <yloc>1451</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -840,8 +948,42 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>282</xloc>
-      <yloc>1606</yloc>
+      <xloc>338</xloc>
+      <yloc>1946</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>FilterBranch</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>DatabaseIsDefault</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>PROFILES_MASTER_ID</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>3</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>93</xloc>
+      <yloc>303</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -869,8 +1011,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>340</xloc>
-      <yloc>399</yloc>
+      <xloc>393</xloc>
+      <yloc>558</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -898,8 +1040,142 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>226</xloc>
-      <yloc>602</yloc>
+      <xloc>279</xloc>
+      <yloc>761</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>FilterOutDefaultRegion</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows 13</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>default_region</leftvalue>
+ <function>&#x3d;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>256</xloc>
+      <yloc>161</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>FilterOutdefaultBranch</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows 12</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>default_branch</leftvalue>
+ <function>&#x3d;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>75</xloc>
+      <yloc>160</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>FilterRegion</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Database join 3</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>PROFILES_MASTER_ID</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>207</xloc>
+      <yloc>296</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>FilterUserCompany</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows 14</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>PROFILES_MASTER_ID</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>PROFILES_MASTER_ID</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>4</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>316</xloc>
+      <yloc>303</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -923,8 +1199,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1192</xloc>
-      <yloc>471</yloc>
+      <xloc>1245</xloc>
+      <yloc>630</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -963,8 +1239,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>712</xloc>
-      <yloc>254</yloc>
+      <xloc>765</xloc>
+      <yloc>413</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1003,8 +1279,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>715</xloc>
-      <yloc>183</yloc>
+      <xloc>768</xloc>
+      <yloc>342</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1043,8 +1319,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>758</xloc>
-      <yloc>351</yloc>
+      <xloc>811</xloc>
+      <yloc>510</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1083,8 +1359,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>706</xloc>
-      <yloc>508</yloc>
+      <xloc>759</xloc>
+      <yloc>667</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1120,8 +1396,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>353</xloc>
-      <yloc>84</yloc>
+      <xloc>626</xloc>
+      <yloc>267</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1156,8 +1432,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1017</xloc>
-      <yloc>988</yloc>
+      <xloc>1070</xloc>
+      <yloc>1147</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1184,8 +1460,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>516</xloc>
-      <yloc>510</yloc>
+      <xloc>569</xloc>
+      <yloc>669</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1212,8 +1488,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>604</xloc>
-      <yloc>350</yloc>
+      <xloc>657</xloc>
+      <yloc>509</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1242,8 +1518,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>635</xloc>
-      <yloc>690</yloc>
+      <xloc>688</xloc>
+      <yloc>849</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1278,8 +1554,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1184</xloc>
-      <yloc>391</yloc>
+      <xloc>1237</xloc>
+      <yloc>550</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1308,8 +1584,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1060</xloc>
-      <yloc>1126</yloc>
+      <xloc>1113</xloc>
+      <yloc>1285</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1350,8 +1626,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>558</xloc>
-      <yloc>911</yloc>
+      <xloc>611</xloc>
+      <yloc>1070</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1392,8 +1668,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>574</xloc>
-      <yloc>987</yloc>
+      <xloc>627</xloc>
+      <yloc>1146</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1434,8 +1710,62 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>586</xloc>
-      <yloc>1062</yloc>
+      <xloc>639</xloc>
+      <yloc>1221</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>ModifiedMakeNullAsZero</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var total_reviews_correct &#x3d;0 &#x3b;&#xd;&#xa;var ss_reviews_correct &#x3d; 0&#x3b;&#xd;&#xa;var zillow_reviews_correct &#x3d; 0&#x3b;&#xd;&#xa;var abusive_reviews_correct &#x3d; 0&#x3b;&#xd;&#xa;var third_party_reviews_correct &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_reviews &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	total_reviews_correct &#x3d; total_reviews&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;ss_review_count &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	ss_reviews_correct &#x3d;ss_review_count&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;zillow_count &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	zillow_reviews_correct &#x3d; zillow_count&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;abusive_count &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	abusive_reviews_correct &#x3d; abusive_count&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;third_party_count&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	third_party_reviews_correct &#x3d; third_party_count&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>total_reviews_correct</name>
+        <rename>total_reviews_correct</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>ss_reviews_correct</name>
+        <rename>ss_reviews_correct</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>zillow_reviews_correct</name>
+        <rename>zillow_reviews_correct</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>abusive_reviews_correct</name>
+        <rename>abusive_reviews_correct</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>third_party_reviews_correct</name>
+        <rename>third_party_reviews_correct</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1243</xloc>
+      <yloc>803</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1475,8 +1805,8 @@
     </keys>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1057</xloc>
-      <yloc>297</yloc>
+      <xloc>1110</xloc>
+      <yloc>456</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1501,8 +1831,10 @@
     <step5>Sort rows 6 3</step5>
     <step6>Sort rows 6 4</step6>
     <step7>Sort rows 6 5</step7>
-    <number_input>8</number_input>
+    <step8>Sort rows 6 5 2</step8>
+    <number_input>9</number_input>
     <keys>
+      <key>USER_ID</key>
       <key>USER_ID</key>
       <key>USER_ID</key>
       <key>USER_ID</key>
@@ -1514,8 +1846,8 @@
     </keys>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>866</xloc>
-      <yloc>986</yloc>
+      <xloc>919</xloc>
+      <yloc>1145</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1549,8 +1881,8 @@
     </keys>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>606</xloc>
-      <yloc>1671</yloc>
+      <xloc>662</xloc>
+      <yloc>2011</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1575,8 +1907,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>63</xloc>
-      <yloc>602</yloc>
+      <xloc>116</xloc>
+      <yloc>761</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1605,8 +1937,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>692</xloc>
-      <yloc>86</yloc>
+      <xloc>889</xloc>
+      <yloc>244</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2130,11 +2462,15 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>LENDING_TREE_PROFILE_LINK</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1188</xloc>
-      <yloc>274</yloc>
+      <xloc>1241</xloc>
+      <yloc>433</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2670,11 +3006,103 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>LENDING_TREE_PROFILE_LINK</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1193</xloc>
-      <yloc>562</yloc>
+      <xloc>1246</xloc>
+      <yloc>721</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values 3</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>      <field>        <name>USER_PROFILE_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>USER_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>COMPANY_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>EMAIL_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>REGION_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>BRANCH_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>AGENT_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>PROFILES_MASTER_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>USER_PROFILE_TYPE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>PROFILE_COMPLETION_STAGE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>IS_PROFILE_COMPLETE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>IS_PRIMARY</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>STATUS</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CREATED_ON</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CREATED_BY</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MODIFIED_ON</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MODIFIED_BY</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>503</xloc>
+      <yloc>153</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2713,8 +3141,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>562</xloc>
-      <yloc>254</yloc>
+      <xloc>615</xloc>
+      <yloc>413</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2747,8 +3175,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>454</xloc>
-      <yloc>1773</yloc>
+      <xloc>510</xloc>
+      <yloc>2113</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2781,8 +3209,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>435</xloc>
-      <yloc>1836</yloc>
+      <xloc>491</xloc>
+      <yloc>2176</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2806,11 +3234,177 @@
       <compress_variable/>
       <unique_rows>N</unique_rows>
     <fields>
+      <field>
+        <name>USER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>435</xloc>
-      <yloc>1949</yloc>
+      <xloc>491</xloc>
+      <yloc>2289</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 12</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>USER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>PROFILES_MASTER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>244</xloc>
+      <yloc>92</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 13</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>USER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>PROFILES_MASTER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>385</xloc>
+      <yloc>151</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 14</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>USER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>PROFILES_MASTER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>375</xloc>
+      <yloc>227</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 14 2</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>USER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>PROFILES_MASTER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>566</xloc>
+      <yloc>215</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2849,8 +3443,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>565</xloc>
-      <yloc>183</yloc>
+      <xloc>618</xloc>
+      <yloc>342</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2883,8 +3477,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>708</xloc>
-      <yloc>905</yloc>
+      <xloc>761</xloc>
+      <yloc>1064</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2917,8 +3511,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>736</xloc>
-      <yloc>988</yloc>
+      <xloc>789</xloc>
+      <yloc>1147</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2951,8 +3545,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>738</xloc>
-      <yloc>1059</yloc>
+      <xloc>791</xloc>
+      <yloc>1218</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2985,8 +3579,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>587</xloc>
-      <yloc>1137</yloc>
+      <xloc>640</xloc>
+      <yloc>1296</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3019,8 +3613,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>613</xloc>
-      <yloc>1209</yloc>
+      <xloc>666</xloc>
+      <yloc>1368</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3053,8 +3647,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>600</xloc>
-      <yloc>1287</yloc>
+      <xloc>653</xloc>
+      <yloc>1446</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3087,8 +3681,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>603</xloc>
-      <yloc>1363</yloc>
+      <xloc>656</xloc>
+      <yloc>1522</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3121,8 +3715,42 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>607</xloc>
-      <yloc>1435</yloc>
+      <xloc>660</xloc>
+      <yloc>1594</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 6 5 2</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>USER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>647</xloc>
+      <yloc>1687</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3155,8 +3783,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>443</xloc>
-      <yloc>1531</yloc>
+      <xloc>499</xloc>
+      <yloc>1871</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3189,8 +3817,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>443</xloc>
-      <yloc>1609</yloc>
+      <xloc>499</xloc>
+      <yloc>1949</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3223,8 +3851,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>443</xloc>
-      <yloc>1677</yloc>
+      <xloc>499</xloc>
+      <yloc>2017</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3257,8 +3885,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1129</xloc>
-      <yloc>1017</yloc>
+      <xloc>1182</xloc>
+      <yloc>1176</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3297,8 +3925,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>213</xloc>
-      <yloc>510</yloc>
+      <xloc>266</xloc>
+      <yloc>669</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3331,8 +3959,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>386</xloc>
-      <yloc>602</yloc>
+      <xloc>439</xloc>
+      <yloc>761</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3365,8 +3993,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>484</xloc>
-      <yloc>398</yloc>
+      <xloc>537</xloc>
+      <yloc>557</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3405,8 +4033,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>259</xloc>
-      <yloc>176</yloc>
+      <xloc>177</xloc>
+      <yloc>364</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3439,8 +4067,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>826</xloc>
-      <yloc>706</yloc>
+      <xloc>879</xloc>
+      <yloc>865</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3473,8 +4101,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>853</xloc>
-      <yloc>509</yloc>
+      <xloc>906</xloc>
+      <yloc>668</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3507,8 +4135,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>919</xloc>
-      <yloc>348</yloc>
+      <xloc>972</xloc>
+      <yloc>507</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3541,8 +4169,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>872</xloc>
-      <yloc>254</yloc>
+      <xloc>925</xloc>
+      <yloc>413</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3575,8 +4203,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>851</xloc>
-      <yloc>184</yloc>
+      <xloc>904</xloc>
+      <yloc>343</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3609,8 +4237,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>842</xloc>
-      <yloc>72</yloc>
+      <xloc>1039</xloc>
+      <yloc>243</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3643,8 +4271,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>829</xloc>
-      <yloc>818</yloc>
+      <xloc>882</xloc>
+      <yloc>977</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3677,8 +4305,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1027</xloc>
-      <yloc>876</yloc>
+      <xloc>1080</xloc>
+      <yloc>1035</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3717,8 +4345,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>493</xloc>
-      <yloc>307</yloc>
+      <xloc>546</xloc>
+      <yloc>466</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3908,11 +4536,15 @@
           <column_name>company_id</column_name>
           <stream_name>USER_COMPANY_ID</stream_name>
         </field>
+        <field>
+          <column_name>lendingtree_url</column_name>
+          <stream_name>LENDING_TREE_PROFILE_LINK</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1190</xloc>
-      <yloc>722</yloc>
+      <xloc>1243</xloc>
+      <yloc>881</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3937,8 +4569,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>114</xloc>
-      <yloc>1001</yloc>
+      <xloc>167</xloc>
+      <yloc>1160</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3963,8 +4595,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>167</xloc>
-      <yloc>815</yloc>
+      <xloc>220</xloc>
+      <yloc>974</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3989,8 +4621,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>63</xloc>
-      <yloc>316</yloc>
+      <xloc>116</xloc>
+      <yloc>475</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4015,8 +4647,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>326</xloc>
-      <yloc>713</yloc>
+      <xloc>379</xloc>
+      <yloc>872</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4041,62 +4673,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>96</xloc>
-      <yloc>1594</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>ModifiedMakeNullAsZero</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var total_reviews_correct &#x3d;0 &#x3b;&#xd;&#xa;var ss_reviews_correct &#x3d; 0&#x3b;&#xd;&#xa;var zillow_reviews_correct &#x3d; 0&#x3b;&#xd;&#xa;var abusive_reviews_correct &#x3d; 0&#x3b;&#xd;&#xa;var third_party_reviews_correct &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_reviews &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	total_reviews_correct &#x3d; total_reviews&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;ss_review_count &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	ss_reviews_correct &#x3d;ss_review_count&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;zillow_count &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	zillow_reviews_correct &#x3d; zillow_count&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;abusive_count &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	abusive_reviews_correct &#x3d; abusive_count&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;third_party_count&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	third_party_reviews_correct &#x3d; third_party_count&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>total_reviews_correct</name>
-        <rename>total_reviews_correct</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>ss_reviews_correct</name>
-        <rename>ss_reviews_correct</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>zillow_reviews_correct</name>
-        <rename>zillow_reviews_correct</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>abusive_reviews_correct</name>
-        <rename>abusive_reviews_correct</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>third_party_reviews_correct</name>
-        <rename>third_party_reviews_correct</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1190</xloc>
-      <yloc>644</yloc>
+      <xloc>152</xloc>
+      <yloc>1934</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
