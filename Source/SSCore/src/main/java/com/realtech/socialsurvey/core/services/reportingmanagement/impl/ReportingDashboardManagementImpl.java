@@ -130,6 +130,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT );
         }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT){
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT );            
+        }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT );            
         }
         
         if ( startDate != null ) {
@@ -454,6 +456,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_STATS_REPORT );
             }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT){
                 recentActivityList.add( CommonConstants.REPORTING_USER_ADOPTION_REPORT );
+            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_COMPANY_USERS_REPORT );
             }
             recentActivityList.add( fileUpload.getStartDate() );
             recentActivityList.add( fileUpload.getEndDate() );
