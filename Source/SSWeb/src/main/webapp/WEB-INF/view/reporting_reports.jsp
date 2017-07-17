@@ -40,6 +40,7 @@
 							</c:if>
 							<c:if test="${profilemasterid == 1}">
 								<option value=102 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option> 
+								<option value=103 data-report="company-user">Company User Report</option>
 							</c:if>
 						</select>	
 					</div>
