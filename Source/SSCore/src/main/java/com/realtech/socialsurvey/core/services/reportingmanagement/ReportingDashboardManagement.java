@@ -40,5 +40,7 @@ public interface ReportingDashboardManagement
     String generateCompanyUserForReporting( Long entityId, String entityType, Long userId )
         throws UnsupportedEncodingException, NonFatalException;
 
+	List<List<Object>> getSurveyResultsCompanyReport(Long entityId, String EntityType);
+
 
 }

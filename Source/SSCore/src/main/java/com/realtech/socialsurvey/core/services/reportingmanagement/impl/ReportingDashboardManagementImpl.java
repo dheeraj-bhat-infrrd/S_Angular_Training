@@ -39,11 +39,15 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
+import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
+import com.realtech.socialsurvey.core.dao.SurveyResultsCompanyReportDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
 import com.realtech.socialsurvey.core.dao.UserAdoptionReportDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyUserReport;
 import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
+import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserAdoptionReport;
@@ -84,6 +88,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Autowired
     private UserAdoptionReportDao userAdoptionReportDao;
+    
+    @Autowired
+    private SurveyResultsCompanyReportDao surveyResultsCompanyReportDao;
+    
+    @Autowired
+    private SurveyResponseTableDao surveyResponseTableDao;
     
     @Autowired
     private CompanyUserReportDao companyUserReportDao;
@@ -257,6 +267,137 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return userAdoption;
         
+    }
+    
+    @Override
+    @Transactional(value = "transactionManagerForReporting")
+    public List<List<Object>> getSurveyResultsCompanyReport(Long entityId, String entityType){
+    	
+    	List<List<Object>> surveyResultsCompany = new ArrayList<>();
+    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN )){
+    		for(SurveyResultsCompanyReport SurveyResultsCompanyReport: surveyResultsCompanyReportDao.fetchSurveyResultsCompanyReportByCompanyId(entityId)){
+    			List<Object> surveyResultsCompanyReportList = new ArrayList<>();
+    			
+    			if(SurveyResultsCompanyReport.getUserFirstName() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getUserFirstName());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getUserLastName() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getUserLastName());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getCustomerFirstName() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getCustomerFirstName());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getCustomerLastName() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getCustomerLastName());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getSurveySentDate() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveySentDate());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getSurveyCompletedDate() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveyCompletedDate());
+    			}
+    			
+    			surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getTimeInterval());
+    			
+    			if(SurveyResultsCompanyReport.getSurveySource() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveySource());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getSurveySourceId() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveySourceId());
+    			}
+    			
+    			surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveyScore());
+    			
+    			
+    			List<SurveyResponseTable> surveyQuestionAnswers = new ArrayList<>();
+    			String surveyDetailsId = SurveyResultsCompanyReport.getSurveyDetailsId();
+    			int questionCounter = 0;
+    			surveyQuestionAnswers =  surveyResponseTableDao.fetchSurveyResponsesBySurveyDetailsId(surveyDetailsId);
+    			for(SurveyResponseTable surveyResponse: surveyQuestionAnswers){
+    				if(surveyResponse.getAnswer() == null){
+    					surveyResultsCompanyReportList.add("");
+    				}else{
+    					surveyResultsCompanyReportList.add(surveyResponse.getAnswer());
+    				}
+    				questionCounter++;
+    			}
+    			surveyResultsCompanyReportList.add(0, questionCounter);
+    			
+    			if(SurveyResultsCompanyReport.getGateway() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getGateway());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getCustomerComments() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getCustomerComments());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getAgreedToShare() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getAgreedToShare());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getBranchName() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getBranchName());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getClickTroughForCompany() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getClickTroughForCompany());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getClickTroughForAgent() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getClickTroughForAgent());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getClickTroughForRegion() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getClickTroughForRegion());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getClickTroughForBranch() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getClickTroughForBranch());
+    			}
+    			
+    			surveyResultsCompany.add(surveyResultsCompanyReportList);
+    		}
+    	}
+    	
+    	return surveyResultsCompany;
     }
     
     @Override

@@ -1318,5 +1318,6 @@ public interface CommonConstants
     public static final String REPORTING_SURVEY_STATS_REPORT = "Survey Stats Report";
     public static final String REPORTING_USER_ADOPTION_REPORT = "User Adoption Report";
     public static final String REPORTING_COMPANY_USERS_REPORT = "Company User Report";
+    public static final String SURVEY_DETAILS_ID_COLUMN="surveyDetailsId";
     
 }
