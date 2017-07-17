@@ -1,4 +1,4 @@
-CREATE TABLE `survey_transaction_report` (
+CREATE TABLE `survey_transaction_report_region` (
   `survey_transaction_report_id` varchar(36) NOT NULL,
   `month` int(11) DEFAULT NULL,
   `year` int(11) DEFAULT NULL,
@@ -9,6 +9,7 @@ CREATE TABLE `survey_transaction_report` (
   `company_name` varchar(45) DEFAULT NULL,
   `company_id` int(11) DEFAULT NULL,
   `region_name` varchar(45) DEFAULT NULL,
+  `region_id` int(11) DEFAULT NULL,
   `branch_name` varchar(45) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
   `total_zillow_reviews` int(11) DEFAULT NULL,
