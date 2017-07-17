@@ -735,7 +735,7 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 ){
+	if(key == 101 || key == 102 || key == 103){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
