@@ -5,6 +5,7 @@
 .settings
 .project
 .springBeans
+.recommenders
 Source/SSCore/.settings
 Source/SSWeb/.settings
 Source/SSBatch/.settings
