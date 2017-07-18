@@ -39,11 +39,15 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
+import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
+import com.realtech.socialsurvey.core.dao.SurveyResultsCompanyReportDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
 import com.realtech.socialsurvey.core.dao.UserAdoptionReportDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyUserReport;
 import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
+import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserAdoptionReport;
@@ -84,6 +88,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Autowired
     private UserAdoptionReportDao userAdoptionReportDao;
+    
+    @Autowired
+    private SurveyResultsCompanyReportDao surveyResultsCompanyReportDao;
+    
+    @Autowired
+    private SurveyResponseTableDao surveyResponseTableDao;
     
     @Autowired
     private CompanyUserReportDao companyUserReportDao;
@@ -132,6 +142,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT );            
         }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT );            
+        }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT );            
         }
         
         if ( startDate != null ) {
@@ -257,6 +269,152 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return userAdoption;
         
+    }
+    
+    @Override
+    @Transactional(value = "transactionManagerForReporting")
+    public List<String> getSurveyResponseData(String surveyDetailsId){
+    	List<String> surveyResponse =  new ArrayList<>();
+    	for(SurveyResponseTable surveyResponseTable: surveyResponseTableDao.fetchSurveyResponsesBySurveyDetailsId(surveyDetailsId)){
+    		  		
+    		surveyResponse.add(surveyResponseTable.getAnswer());
+    	}
+    	return surveyResponse;
+    }
+    
+    @Override
+    @Transactional(value = "transactionManagerForReporting")
+    public List<List<Object>> getSurveyResultsCompanyReport(Long entityId, String entityType,Date startDate, Date endDate){
+    	
+    	List<List<Object>> surveyResultsCompany = new ArrayList<>();
+    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN )){
+    		for(SurveyResultsCompanyReport SurveyResultsCompanyReport: surveyResultsCompanyReportDao.fetchSurveyResultsCompanyReportByCompanyId(entityId,startDate,endDate)){
+    			List<Object> surveyResultsCompanyReportList = new ArrayList<>();
+    			
+    			if(SurveyResultsCompanyReport.getUserFirstName() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getUserFirstName());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getUserLastName() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getUserLastName());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getCustomerFirstName() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getCustomerFirstName());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getCustomerLastName() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getCustomerLastName());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getSurveySentDate() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveySentDate());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getSurveyCompletedDate() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveyCompletedDate());
+    			}
+    			
+    			surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getTimeInterval());
+    			
+    			if(SurveyResultsCompanyReport.getSurveySource() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveySource());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getSurveySourceId() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveySourceId());
+    			}
+    			
+    			surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveyScore());
+    			
+    			String surveyDetailsId = SurveyResultsCompanyReport.getSurveyDetailsId();
+    			
+    			int questionCounter = 0;
+    			for(SurveyResponseTable surveyResponse: surveyResponseTableDao.fetchSurveyResponsesBySurveyDetailsId(surveyDetailsId)){
+    				questionCounter++;
+    			}
+    			surveyResultsCompanyReportList.add(questionCounter);
+    			
+    			for(SurveyResponseTable surveyResponse: surveyResponseTableDao.fetchSurveyResponsesBySurveyDetailsId(surveyDetailsId)){
+    				if(surveyResponse.getAnswer() == null){
+    					surveyResultsCompanyReportList.add("");
+    				}else{
+    					surveyResultsCompanyReportList.add(surveyResponse.getAnswer());
+    				}
+    			}
+    			if(questionCounter==0){
+    				surveyResultsCompanyReportList.add("");
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getGateway() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getGateway());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getCustomerComments() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getCustomerComments());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getAgreedToShare() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getAgreedToShare());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getBranchName() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getBranchName());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getClickTroughForCompany() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getClickTroughForCompany());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getClickTroughForAgent() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getClickTroughForAgent());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getClickTroughForRegion() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getClickTroughForRegion());
+    			}
+    			
+    			if(SurveyResultsCompanyReport.getClickTroughForBranch() == null){
+    				surveyResultsCompanyReportList.add("");
+    			}else{
+    				surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getClickTroughForBranch());
+    			}
+    			
+    			surveyResultsCompany.add(surveyResultsCompanyReportList);
+    		}
+    	}
+    	
+    	return surveyResultsCompany;
     }
     
     @Override
@@ -458,6 +616,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_USER_ADOPTION_REPORT );
             }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
                 recentActivityList.add( CommonConstants.REPORTING_COMPANY_USERS_REPORT );
+            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_SURVEY_REUSLTS_COMPANY_REPORT );
             }
             recentActivityList.add( fileUpload.getStartDate() );
             recentActivityList.add( fileUpload.getEndDate() );
@@ -579,6 +739,33 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
         return workbook;
         
+    }
+    
+    @Override
+    public String generateSurveyResultsCompanyForReporting(Long entityId , String entityType , Long userId,Date startDate, Date endDate) throws UnsupportedEncodingException, NonFatalException{
+    	User user = userManagementService.getUserByUserId( userId );
+    	String fileName = "Survey_Results_Company_Report"+entityType+"-"+user.getFirstName()+"_"+user.getLastName()+"-"
+    			+ (Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+    	 XSSFWorkbook workbook = this.downloadSurveyResultsCompanyForReporting( entityId , entityType,startDate,endDate );
+         String LocationInS3 = this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+         return LocationInS3;
+    }
+        
+    @SuppressWarnings ( "unchecked")
+    public XSSFWorkbook downloadSurveyResultsCompanyForReporting(long entityId,String entityType,Date startDate, Date endDate){
+    	Response response =  ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany(entityId, entityType,startDate,endDate);
+    	 String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+         //since the string has ""abc"" an extra quote
+         responseString = responseString.substring(1, responseString.length()-1);
+         //Escape characters
+         responseString = StringEscapeUtils.unescapeJava(responseString);
+         List<List<String>> surveyResultsCompanyReport = null;
+         Type listType = new TypeToken <List<List<String>>>() {}.getType();
+         surveyResultsCompanyReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
+         Map<Integer, List<Object>> data = workbookData.getSurveyResultsCompanyReportToBeWrittenInSheet( surveyResultsCompanyReport );
+         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+         return workbook;
+    	
     }
     
     private String createExcelFileAndSaveInAmazonS3( String fileName, XSSFWorkbook workbook ) throws NonFatalException, UnsupportedEncodingException
