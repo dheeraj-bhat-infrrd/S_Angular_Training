@@ -144,6 +144,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT );            
         }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT );            
+        }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT );            
         }
         
         if ( startDate != null ) {
@@ -618,6 +620,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_COMPANY_USERS_REPORT );
             }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_REUSLTS_COMPANY_REPORT );
+            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_SURVEY_TRANSACTION_REPORT );
             }
             recentActivityList.add( fileUpload.getStartDate() );
             recentActivityList.add( fileUpload.getEndDate() );
@@ -766,6 +770,27 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
          XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
          return workbook;
     	
+    }
+    
+    @Override
+    public String generateSurveyTransactionForReporting(Long entityId , String entityType , Long userId) throws UnsupportedEncodingException, NonFatalException{
+        User user = userManagementService.getUserByUserId( userId );
+        //file is too big for windows hence uncomment the alternative 
+        String fileName = "Survey_Transaction_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+            + (Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadSurveyTransactionForReporting( entityId , entityType );
+        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+        return LocationInS3;
+        
+    }
+    
+    
+    @SuppressWarnings ( "unchecked")
+    public XSSFWorkbook downloadSurveyTransactionForReporting( long entityId , String entityType){
+        Map<Integer, List<Object>> data = workbookData.getSurveyTransactionReportToBeWrittenInSheet();
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+        return workbook;
+        
     }
     
     private String createExcelFileAndSaveInAmazonS3( String fileName, XSSFWorkbook workbook ) throws NonFatalException, UnsupportedEncodingException

@@ -1,14 +1,15 @@
-CREATE TABLE `survey_transaction_report` (
-  `survey_transaction_report_id` varchar(36) NOT NULL,
+CREATE TABLE `survey_transaction_report_region` (
+  `survey_transaction_report_region_id` varchar(36) NOT NULL,
   `month` int(11) DEFAULT NULL,
   `year` int(11) DEFAULT NULL,
   `user_name` varchar(45) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `nmls` varchar(45) DEFAULT NULL,
-  `license_id` text,
+  `license_id` varchar(45) DEFAULT NULL,
   `company_name` text,
   `company_id` int(11) DEFAULT NULL,
   `region_name` text,
+  `region_id` int(11) DEFAULT NULL,
   `branch_name` text,
   `total_reviews` int(11) DEFAULT NULL,
   `total_zillow_reviews` int(11) DEFAULT NULL,
@@ -30,5 +31,5 @@ CREATE TABLE `survey_transaction_report` (
   `transaction_mismatched` int(11) DEFAULT NULL,
   `transaction_unassigned` int(11) DEFAULT NULL,
   PRIMARY KEY (`survey_transaction_report_id`),
-  UNIQUE KEY `UserIdYearMonth` (`user_id`,`month`,`year`)
+  UNIQUE KEY `UserIdYearMonthRegion` (`month`,`year`,`user_id`,`region_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

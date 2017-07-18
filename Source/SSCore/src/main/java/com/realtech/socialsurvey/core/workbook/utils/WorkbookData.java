@@ -960,5 +960,50 @@ public class WorkbookData
         
     }
     
+    public Map<Integer, List<Object>> getSurveyTransactionReportToBeWrittenInSheet()
+    {
+     // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>>  surveyTransactionData = new TreeMap<>();
+        
+        Integer surveyTransactionCounter = 1;
+        
+        List<Object> surveyTransactionReportToPopulate = new ArrayList<>();
+        int maxNumberOfQuestions=0;
+       
+        // Setting up user sheet headers
+        surveyTransactionReportToPopulate.add( "Name" );
+        surveyTransactionReportToPopulate.add( "User ID" );
+        surveyTransactionReportToPopulate.add( "NMLS" );
+        surveyTransactionReportToPopulate.add( "License ID" );
+        surveyTransactionReportToPopulate.add( "Company Name" );
+        surveyTransactionReportToPopulate.add( "Region Name" );
+        surveyTransactionReportToPopulate.add( "Branch Name" );
+        surveyTransactionReportToPopulate.add( "Total number of reviews [Zillow + Social Survey]" );
+        surveyTransactionReportToPopulate.add( "Total number of Zillow Reviews" );
+        surveyTransactionReportToPopulate.add( "Total number of 3rd party reviews" );
+        surveyTransactionReportToPopulate.add( "Total number of verified customer reviews");
+        surveyTransactionReportToPopulate.add( "Total number of unverified customer reviews");
+        surveyTransactionReportToPopulate.add( "Total number of Social Survey Reviews");
+        surveyTransactionReportToPopulate.add( "Total number of Abusive Reviews");
+        surveyTransactionReportToPopulate.add( "Total number of Retake Reviews");
+        surveyTransactionReportToPopulate.add( "Total number of Retake Completed");
+        surveyTransactionReportToPopulate.add( "Transaction Received by Source");
+        surveyTransactionReportToPopulate.add( "Transaction Sent (0,1,2,7)");
+        surveyTransactionReportToPopulate.add( "Transaction Unprocessable (3,5,8,9,10)" );
+        surveyTransactionReportToPopulate.add( "Transaction Clicked [2,7]" );
+        surveyTransactionReportToPopulate.add( "Transaction Completed [7]" );
+        surveyTransactionReportToPopulate.add( "Transaction Partially Completed" );
+        surveyTransactionReportToPopulate.add( "Transaction Unopened [1]" );
+        surveyTransactionReportToPopulate.add( "Transaction Duplicates [5]" );
+        surveyTransactionReportToPopulate.add( "Transaction Mismatched [3]" );
+        surveyTransactionReportToPopulate.add( "Transaction Unassigned [10]" );
+
+
+        surveyTransactionData.put( 1, surveyTransactionReportToPopulate );
+        
+        return surveyTransactionData;
+        
+    }
+    
     
 }

@@ -47,4 +47,7 @@ public interface ReportingDashboardManagement
 
 	List<String> getSurveyResponseData(String surveyDetailsId);
 
+    String generateSurveyTransactionForReporting( Long entityId, String entityType, Long userId )
+        throws UnsupportedEncodingException, NonFatalException;
+
 }
