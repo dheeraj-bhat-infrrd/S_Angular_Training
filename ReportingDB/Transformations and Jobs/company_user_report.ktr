@@ -103,6 +103,34 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
   <hop> <from>AggregateByProfile</from><to>ReplaceIdWithValue</to><enabled>Y</enabled> </hop>
   <hop> <from>User Profile Input</from><to>SortByUserIdAndProfile</to><enabled>Y</enabled> </hop>
@@ -357,7 +385,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>Select TITLE,LOCATION,ABOUT_ME,ADDRESS,ADDRESS1,ADDRESS2 from contact_details where AGENT_SETTINGS_ID&#x3d;&#x3f;</sql>
+    <sql>select TITLE,LOCATION,ABOUT_ME,ADDRESS,ADDRESS1,ADDRESS2 from contact_details where AGENT_SETTINGS_ID&#x3d;&#x3f;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -387,7 +415,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>Select IS_DEFAULT_BY_SYSTEM as default_region from Region where REGION_ID &#x3d; &#x3f; &#x3b;</sql>
+    <sql>select IS_DEFAULT_BY_SYSTEM as default_region from region where REGION_ID &#x3d; &#x3f; &#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -537,7 +565,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>Select IS_DEFAULT_BY_SYSTEM as default_branch from Branch where BRANCH_ID &#x3d; &#x3f; &#x3b;</sql>
+    <sql>select IS_DEFAULT_BY_SYSTEM as default_branch from branch where BRANCH_ID &#x3d; &#x3f; &#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -567,7 +595,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>Select branch from branch where branch_id in &#x28;Select BRANCH_ID from user_profile where PROFILES_MASTER_ID &#x3d; 3 and USER_ID &#x3d; &#x3f;&#x29;and IS_DEFAULT_BY_SYSTEM &#x3d; 0&#x3b;</sql>
+    <sql>select branch from branch where branch_id in &#x28;Select BRANCH_ID from user_profile where PROFILES_MASTER_ID &#x3d; 3 and USER_ID &#x3d; &#x3f;&#x29;and IS_DEFAULT_BY_SYSTEM &#x3d; 0&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -657,7 +685,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>&#x2f;&#x2a; Select region from region &#xd;&#xa;where REGION_ID in &#xd;&#xa;	&#x28;Select REGION_ID from user_profile where PROFILES_MASTER_ID &#x3d; 2 and USER_ID &#x3d; &#x3f;&#x29; and IS_DEFAULT_BY_SYSTEM &#x3d; 0&#x3b; &#x2a;&#x2f;&#xd;&#xa;&#xd;&#xa;SELECT distinct T1.region,T2.user_id FROM region T1 join user_profile T2 on&#xd;&#xa;T1.REGION_ID &#x3d; T2.REGION_ID where&#xd;&#xa;T2.PROFILES_MASTER_ID &#x3d; 2 and T2.USER_ID &#x3d; &#x3f;&#xd;&#xa;and T1.IS_DEFAULT_BY_SYSTEM &#x3d; 0</sql>
+    <sql>SELECT distinct T1.region,T2.user_id FROM region T1 join user_profile T2 on T1.REGION_ID &#x3d; T2.REGION_ID where T2.PROFILES_MASTER_ID &#x3d; 2 and T2.USER_ID &#x3d; &#x3f; and T1.IS_DEFAULT_BY_SYSTEM &#x3d; 0&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -777,7 +805,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>Select T1.FACEBOOK_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29; AS FACEBOOK_POST_DATE&#xd;&#xa;FROM facebook_token T1 , facebook_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
+    <sql>select T1.FACEBOOK_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29; AS FACEBOOK_POST_DATE&#xd;&#xa;FROM facebook_token T1 , facebook_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
