@@ -112,15 +112,6 @@
   <hop> <from>Filter Partially Complete</from><to>Sort rows Partially Completed</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Duplicate</from><to>Sort rows Duplicate</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Sent</from><to>Sort Sent</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group Abusive</from><to>Report Id Abusive</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group Clicked</from><to>Report Id Clicked</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group Completed</from><to>Report Id Comp-leted</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group Corrupted</from><to>Report Id Corrupted</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group Duplicate</from><to>Report Id Duplicate</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group Unopened</from><to>Report Id Unopened</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group Mismatched</from><to>Report Id Mismatched</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group Partially Completed</from><to>Report Id Partially Completed</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group Sent</from><to>Report Id Sent</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Completed</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Corrupted</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Unopened</to><enabled>Y</enabled> </hop>
@@ -131,15 +122,6 @@
   <hop> <from>Join User Survey Details</from><to>Filter Abusive</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Clicked</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Partially Complete</to><enabled>Y</enabled> </hop>
-  <hop> <from>Report Id Abusive</from><to>Sort rows 10 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Report Id Clicked</from><to>Sort rows 9</to><enabled>Y</enabled> </hop>
-  <hop> <from>Report Id Comp-leted</from><to>Sort rows 8</to><enabled>Y</enabled> </hop>
-  <hop> <from>Report Id Corrupted</from><to>Sort rows 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Report Id Duplicate</from><to>Sort rows 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Report Id Unopened</from><to>Sort rows Unopened</to><enabled>Y</enabled> </hop>
-  <hop> <from>Report Id Mismatched</from><to>Sort rows 7</to><enabled>Y</enabled> </hop>
-  <hop> <from>Report Id Partially Completed</from><to>Sort rows 10</to><enabled>Y</enabled> </hop>
-  <hop> <from>Report Id Sent</from><to>Sort rows 8 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Completed</from><to>Group Completed</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Corrupted</from><to>Group Corrupted</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Unopened</from><to>Group Unopened</to><enabled>Y</enabled> </hop>
@@ -155,9 +137,41 @@
   <hop> <from>Users</from><to>Join User Survey</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>FilterZillowReviews</to><enabled>Y</enabled> </hop>
   <hop> <from>FilterZillowReviews</from><to>Sort rows zillow</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group Zillow</from><to>Report Id Duplicate 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Report Id Duplicate 2</from><to>Sort rows 3 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows zillow</from><to>Group Zillow</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group Zillow</from><to>Sort rows 3 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group Duplicate</from><to>Sort rows 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group Corrupted</from><to>Sort rows 4</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group Mismatched</from><to>Sort rows 7</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group Completed</from><to>Sort rows 8</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group Sent</from><to>Sort rows 8 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group Clicked</from><to>Sort rows 9</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group Unopened</from><to>Sort rows Unopened</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group Partially Completed</from><to>Sort rows 10</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group Abusive</from><to>Sort rows 10 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter3rdParty</from><to>Sort rows3rdParty</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows3rdParty</from><to>Group 3rd Party</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group 3rd Party</from><to>Sort rows 3rdParty</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey</from><to>Filter3rdParty</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filterverified</from><to>Sort rowsverified</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rowsverified</from><to>Group verified</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group verified</from><to>Sort rowsverified </to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey</from><to>Filterverified</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filterunverified</from><to>Sort rowsunverified</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rowsunverified</from><to>Group unverified</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group unverified</from><to>Sort rows unverified</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey</from><to>Filterunverified</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filterretake</from><to>Sort rows retake</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows retake</from><to>Group retake</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group retake</from><to>Sort rows retake 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey Details</from><to>Filterretake</to><enabled>Y</enabled> </hop>
+  <hop> <from>FilterSocialSurvey</from><to>Sort rows SocialSurvey</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group SocialSurvey</from><to>Sort rowsSocialSurvey</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows SocialSurvey</from><to>Group SocialSurvey</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey</from><to>FilterSocialSurvey</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter Unprocessed</from><to>Sort Unprocessed</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group Unprocessed</from><to>Sort rows Unprocessed  2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort Unprocessed</from><to>Group Unprocessed</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey</from><to>Filter Unprocessed</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Filter Abusive</name>
@@ -199,8 +213,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1876</xloc>
-      <yloc>345</yloc>
+      <xloc>2009</xloc>
+      <yloc>335</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -245,8 +259,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1559</xloc>
-      <yloc>349</yloc>
+      <xloc>1692</xloc>
+      <yloc>339</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -274,8 +288,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>972</xloc>
-      <yloc>347</yloc>
+      <xloc>1091</xloc>
+      <yloc>334</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -303,8 +317,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>608</xloc>
-      <yloc>337</yloc>
+      <xloc>835</xloc>
+      <yloc>334</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -337,8 +351,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1277</xloc>
-      <yloc>356</yloc>
+      <xloc>1396</xloc>
+      <yloc>343</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -366,8 +380,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>776</xloc>
-      <yloc>343</yloc>
+      <xloc>966</xloc>
+      <yloc>335</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -400,8 +414,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1696</xloc>
-      <yloc>346</yloc>
+      <xloc>1829</xloc>
+      <yloc>336</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -429,8 +443,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>477</xloc>
-      <yloc>339</yloc>
+      <xloc>688</xloc>
+      <yloc>331</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -494,8 +508,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1120</xloc>
-      <yloc>351</yloc>
+      <xloc>1239</xloc>
+      <yloc>338</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -561,8 +575,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1876</xloc>
-      <yloc>529</yloc>
+      <xloc>2009</xloc>
+      <yloc>519</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -628,8 +642,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1559</xloc>
-      <yloc>529</yloc>
+      <xloc>1692</xloc>
+      <yloc>519</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -695,8 +709,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>974</xloc>
-      <yloc>531</yloc>
+      <xloc>1093</xloc>
+      <yloc>518</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -762,8 +776,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>608</xloc>
-      <yloc>521</yloc>
+      <xloc>835</xloc>
+      <yloc>518</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -829,8 +843,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>477</xloc>
-      <yloc>523</yloc>
+      <xloc>688</xloc>
+      <yloc>515</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -896,8 +910,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1277</xloc>
-      <yloc>540</yloc>
+      <xloc>1396</xloc>
+      <yloc>527</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -963,8 +977,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>776</xloc>
-      <yloc>527</yloc>
+      <xloc>966</xloc>
+      <yloc>519</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1030,8 +1044,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1696</xloc>
-      <yloc>529</yloc>
+      <xloc>1829</xloc>
+      <yloc>519</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1097,8 +1111,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1120</xloc>
-      <yloc>535</yloc>
+      <xloc>1239</xloc>
+      <yloc>522</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1115,7 +1129,7 @@
            <schema_name/>
            </partitioning>
 <join_type>INNER</join_type>
-<step1>Filter Duplicate 2</step1>
+<step1>Survey Pre Initiation</step1>
 <step2>Users</step2>
     <keys_1>
       <key>AGENT_ID</key>
@@ -1160,276 +1174,6 @@
     </step>
 
   <step>
-    <name>Report Id Abusive</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var report_id &#x3d; first_name &#x2b; &#x22; &#x22; &#x2b; last_name &#x2b; &#x22;_&#x22; &#x2b; TRX_MONTH&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>report_id</name>
-        <rename>report_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1876</xloc>
-      <yloc>643</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Report Id Clicked</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var report_id &#x3d; first_name &#x2b; &#x22; &#x22; &#x2b; last_name &#x2b; &#x22;_&#x22; &#x2b; TRX_MONTH&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>report_id</name>
-        <rename>report_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1559</xloc>
-      <yloc>643</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Report Id Comp-leted</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var report_id &#x3d; first_name &#x2b; &#x22; &#x22; &#x2b; last_name &#x2b; &#x22;_&#x22; &#x2b; TRX_MONTH&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>report_id</name>
-        <rename>report_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>974</xloc>
-      <yloc>635</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Report Id Corrupted</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>first_name&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var report_id &#x3d;  first_name &#x2b; &#x22; &#x22; &#x2b; last_name &#x2b; &#x22;_&#x22; &#x2b; TRX_MONTH&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>report_id</name>
-        <rename>report_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>608</xloc>
-      <yloc>625</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Report Id Duplicate</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var report_id &#x3d; first_name &#x2b; &#x22; &#x22; &#x2b; last_name &#x2b; &#x22;_&#x22; &#x2b; TRX_MONTH&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>report_id</name>
-        <rename>report_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>477</xloc>
-      <yloc>627</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Report Id Unopened</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var report_id &#x3d; first_name &#x2b; &#x22; &#x22; &#x2b; last_name &#x2b; &#x22;_&#x22; &#x2b; TRX_MONTH&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>report_id</name>
-        <rename>report_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1277</xloc>
-      <yloc>640</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Report Id Mismatched</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var report_id &#x3d; first_name &#x2b; &#x22; &#x22; &#x2b; last_name &#x2b; &#x22;_&#x22; &#x2b; TRX_MONTH&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>report_id</name>
-        <rename>report_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>776</xloc>
-      <yloc>631</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Report Id Partially Completed</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var report_id &#x3d; first_name &#x2b; &#x22; &#x22; &#x2b; last_name &#x2b; &#x22;_&#x22; &#x2b; TRX_MONTH&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>report_id</name>
-        <rename>report_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1696</xloc>
-      <yloc>643</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Report Id Sent</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var report_id &#x3d; first_name &#x2b; &#x22; &#x22; &#x2b; last_name &#x2b; &#x22;_&#x22; &#x2b; TRX_MONTH&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>report_id</name>
-        <rename>report_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1120</xloc>
-      <yloc>635</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Sort Completed</name>
     <type>SortRows</type>
     <description/>
@@ -1463,8 +1207,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>974</xloc>
-      <yloc>418</yloc>
+      <xloc>1093</xloc>
+      <yloc>405</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1503,8 +1247,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>608</xloc>
-      <yloc>408</yloc>
+      <xloc>835</xloc>
+      <yloc>405</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1543,8 +1287,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1277</xloc>
-      <yloc>427</yloc>
+      <xloc>1396</xloc>
+      <yloc>414</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1583,8 +1327,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>776</xloc>
-      <yloc>414</yloc>
+      <xloc>966</xloc>
+      <yloc>406</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1623,8 +1367,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1120</xloc>
-      <yloc>422</yloc>
+      <xloc>1239</xloc>
+      <yloc>409</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1691,8 +1435,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1696</xloc>
-      <yloc>765</yloc>
+      <xloc>1829</xloc>
+      <yloc>642</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1725,8 +1469,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1876</xloc>
-      <yloc>765</yloc>
+      <xloc>2008</xloc>
+      <yloc>645</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1759,8 +1503,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>477</xloc>
-      <yloc>745</yloc>
+      <xloc>687</xloc>
+      <yloc>641</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1793,8 +1537,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>608</xloc>
-      <yloc>743</yloc>
+      <xloc>836</xloc>
+      <yloc>648</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1827,8 +1571,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>776</xloc>
-      <yloc>749</yloc>
+      <xloc>969</xloc>
+      <yloc>642</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1861,8 +1605,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>974</xloc>
-      <yloc>753</yloc>
+      <xloc>1087</xloc>
+      <yloc>640</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1895,8 +1639,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1120</xloc>
-      <yloc>757</yloc>
+      <xloc>1236</xloc>
+      <yloc>638</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1929,8 +1673,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1559</xloc>
-      <yloc>765</yloc>
+      <xloc>1693</xloc>
+      <yloc>642</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1969,8 +1713,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1876</xloc>
-      <yloc>416</yloc>
+      <xloc>2009</xloc>
+      <yloc>406</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2009,8 +1753,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1559</xloc>
-      <yloc>416</yloc>
+      <xloc>1692</xloc>
+      <yloc>406</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2049,8 +1793,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>477</xloc>
-      <yloc>410</yloc>
+      <xloc>688</xloc>
+      <yloc>402</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2089,8 +1833,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1696</xloc>
-      <yloc>416</yloc>
+      <xloc>1829</xloc>
+      <yloc>406</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2123,8 +1867,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1277</xloc>
-      <yloc>762</yloc>
+      <xloc>1394</xloc>
+      <yloc>644</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2230,8 +1974,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>166</xloc>
-      <yloc>338</yloc>
+      <xloc>44</xloc>
+      <yloc>323</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2270,8 +2014,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>163</xloc>
-      <yloc>430</yloc>
+      <xloc>44</xloc>
+      <yloc>415</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2306,7 +2050,7 @@
       <fields>
         <field>
           <aggregate>zillow</aggregate>
-          <subject>SURVEY_SOURCE</subject>
+          <subject>SURVEY_PRE_INITIATION_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
         </field>
@@ -2337,38 +2081,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>160</xloc>
-      <yloc>512</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Report Id Duplicate 2</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var report_id &#x3d; first_name &#x2b; &#x22; &#x22; &#x2b; last_name &#x2b; &#x22;_&#x22; &#x2b; TRX_MONTH&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>report_id</name>
-        <rename>report_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>160</xloc>
-      <yloc>616</yloc>
+      <xloc>44</xloc>
+      <yloc>497</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2401,8 +2115,1153 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>160</xloc>
-      <yloc>734</yloc>
+      <xloc>44</xloc>
+      <yloc>632</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter3rdParty</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows3rdParty</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>SURVEY_SOURCE</leftvalue>
+ <function>&#x3d;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>159</xloc>
+      <yloc>326</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows3rdParty</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>TRX_MONTH</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>156</xloc>
+      <yloc>418</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Group 3rd Party</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <all_rows>N</all_rows>
+      <ignore_aggregate>N</ignore_aggregate>
+      <field_ignore/>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>grp</prefix>
+      <add_linenr>N</add_linenr>
+      <linenr_fieldname/>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>AGENT_ID</name>
+        </field>
+        <field>
+          <name>TRX_MONTH</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>ThirdParty</aggregate>
+          <subject>SURVEY_PRE_INITIATION_ID</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>first_name</aggregate>
+          <subject>FIRST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>month_data</aggregate>
+          <subject>MONTH_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>year_data</aggregate>
+          <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>last_name</aggregate>
+          <subject>LAST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>153</xloc>
+      <yloc>500</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 3rdParty</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>157</xloc>
+      <yloc>635</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filterverified</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rowsverified</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>encompass</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>DOTLOOP</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>API</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>FTP</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>LONEWOLF</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>286</xloc>
+      <yloc>327</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rowsverified</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>TRX_MONTH</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>283</xloc>
+      <yloc>419</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Group verified</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <all_rows>N</all_rows>
+      <ignore_aggregate>N</ignore_aggregate>
+      <field_ignore/>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>grp</prefix>
+      <add_linenr>N</add_linenr>
+      <linenr_fieldname/>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>AGENT_ID</name>
+        </field>
+        <field>
+          <name>TRX_MONTH</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>verified</aggregate>
+          <subject>SURVEY_PRE_INITIATION_ID</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>first_name</aggregate>
+          <subject>FIRST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>month_data</aggregate>
+          <subject>MONTH_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>year_data</aggregate>
+          <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>last_name</aggregate>
+          <subject>LAST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>280</xloc>
+      <yloc>501</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rowsverified </name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>284</xloc>
+      <yloc>636</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filterunverified</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rowsunverified</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>Y</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>encompass</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>DOTLOOP</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>API</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>FTP</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>LONEWOLF</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>411</xloc>
+      <yloc>329</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rowsunverified</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>TRX_MONTH</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>408</xloc>
+      <yloc>421</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Group unverified</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <all_rows>N</all_rows>
+      <ignore_aggregate>N</ignore_aggregate>
+      <field_ignore/>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>grp</prefix>
+      <add_linenr>N</add_linenr>
+      <linenr_fieldname/>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>AGENT_ID</name>
+        </field>
+        <field>
+          <name>TRX_MONTH</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>unverified</aggregate>
+          <subject>SURVEY_PRE_INITIATION_ID</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>first_name</aggregate>
+          <subject>FIRST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>month_data</aggregate>
+          <subject>MONTH_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>year_data</aggregate>
+          <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>last_name</aggregate>
+          <subject>LAST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>405</xloc>
+      <yloc>503</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows unverified</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>409</xloc>
+      <yloc>638</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filterretake</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows retake</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>RETAKE_SURVEY</leftvalue>
+ <function>&#x3d;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>1</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2177</xloc>
+      <yloc>312</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows retake</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>TRX_MONTH</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2174</xloc>
+      <yloc>404</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Group retake</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <all_rows>N</all_rows>
+      <ignore_aggregate>N</ignore_aggregate>
+      <field_ignore/>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>grp</prefix>
+      <add_linenr>N</add_linenr>
+      <linenr_fieldname/>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>AGENT_ID</name>
+        </field>
+        <field>
+          <name>TRX_MONTH</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>retake</aggregate>
+          <subject>SURVEY_SOURCE</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>first_name</aggregate>
+          <subject>FIRST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>month_data</aggregate>
+          <subject>MONTH_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>year_data</aggregate>
+          <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>last_name</aggregate>
+          <subject>LAST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2171</xloc>
+      <yloc>486</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows retake 3</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2175</xloc>
+      <yloc>621</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>FilterSocialSurvey</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows SocialSurvey</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>Y</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>557</xloc>
+      <yloc>329</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Group SocialSurvey</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <all_rows>N</all_rows>
+      <ignore_aggregate>N</ignore_aggregate>
+      <field_ignore/>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>grp</prefix>
+      <add_linenr>N</add_linenr>
+      <linenr_fieldname/>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>AGENT_ID</name>
+        </field>
+        <field>
+          <name>TRX_MONTH</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>SocialSurvey</aggregate>
+          <subject>SURVEY_PRE_INITIATION_ID</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>first_name</aggregate>
+          <subject>FIRST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>month_data</aggregate>
+          <subject>MONTH_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>year_data</aggregate>
+          <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>last_name</aggregate>
+          <subject>LAST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>557</xloc>
+      <yloc>513</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rowsSocialSurvey</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>556</xloc>
+      <yloc>639</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows SocialSurvey</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>TRX_MONTH</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>557</xloc>
+      <yloc>400</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter Unprocessed</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort Unprocessed</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>STATUS</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>3</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>STATUS</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>5</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>STATUS</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>8</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>STATUS</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>9</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>STATUS</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>10</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1542</xloc>
+      <yloc>344</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Group Unprocessed</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <all_rows>N</all_rows>
+      <ignore_aggregate>N</ignore_aggregate>
+      <field_ignore/>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>grp</prefix>
+      <add_linenr>N</add_linenr>
+      <linenr_fieldname/>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>AGENT_ID</name>
+        </field>
+        <field>
+          <name>TRX_MONTH</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>unprocessed</aggregate>
+          <subject>SURVEY_PRE_INITIATION_ID</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>first_name</aggregate>
+          <subject>FIRST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>month_data</aggregate>
+          <subject>MONTH_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>year_data</aggregate>
+          <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>last_name</aggregate>
+          <subject>LAST_NAME</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1542</xloc>
+      <yloc>528</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort Unprocessed</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>TRX_MONTH</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1542</xloc>
+      <yloc>415</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows Unprocessed  2</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1540</xloc>
+      <yloc>645</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
