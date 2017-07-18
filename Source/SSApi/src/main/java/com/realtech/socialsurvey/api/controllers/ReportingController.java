@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -205,6 +206,27 @@ public class ReportingController
         return json;
     }
     
+    @RequestMapping( value = "/getsurveyresultscompanyreportsforreporting", method= RequestMethod.GET)
+    @ApiOperation( value = "Fetch Survey Results Company Report For Reporting")
+    public String getSurveyResultsCompany(Long entityId, String entityType, Date startDate, Date endDate) throws NonFatalException
+    {
+    	LOGGER.info( "Fetch Survey Results Company Report For Reporting");
+    	String json = null;
+    	List<List <Object>> surveyResultsCompanyList = reportingDashboardManagement.getSurveyResultsCompanyReport(entityId, entityType,startDate,endDate);
+    	json = new Gson().toJson(surveyResultsCompanyList);
+    	return json;
+    }
+    
+    @RequestMapping( value = "/getsurveyresponseforreporting", method= RequestMethod.GET)
+    @ApiOperation( value = "Fetch Survey Response For Reporting")
+    public String getSurveyResultsCompany(String surveyDetailsId) throws NonFatalException
+    {
+    	LOGGER.info( "Fetch Survey Response For Reporting");
+    	String json = null;
+    	List<String> surveyResponseList = reportingDashboardManagement.getSurveyResponseData(surveyDetailsId);
+    	json = new Gson().toJson(surveyResponseList);
+    	return json;
+    }
     
     @RequestMapping( value = "/getcompanyuserreportsforreporting", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Company User Report For Reporting ")

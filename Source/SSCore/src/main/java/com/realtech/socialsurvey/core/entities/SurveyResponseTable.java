@@ -17,7 +17,7 @@ public class SurveyResponseTable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "SURVEY_RESPONSE_ID")
-	private String surveyStatsReportId;
+	private String surveyResponseId;
 	
 	@Column(name = "SURVEY_DETAILS_ID")
 	private String surveyDetailsId;
@@ -31,12 +31,12 @@ public class SurveyResponseTable {
 	@Column(name = "QUESTION_TYPE")
 	private String questionType;
 
-	public String getSurveyStatsReportId() {
-		return surveyStatsReportId;
+	public String getSurveyResponseId() {
+		return surveyResponseId;
 	}
 
-	public void setSurveyStatsReportId(String surveyStatsReportId) {
-		this.surveyStatsReportId = surveyStatsReportId;
+	public void setSurveyResponseId(String surveyResponseId) {
+		this.surveyResponseId = surveyResponseId;
 	}
 
 	public String getSurveyDetailsId() {
@@ -73,9 +73,9 @@ public class SurveyResponseTable {
 
 	@Override
 	public String toString() {
-		return "SurveyResponseTable [surveyStatsReportId=" + surveyStatsReportId + ", surveyDetailsId="
-				+ surveyDetailsId + ", answer=" + answer + ", question=" + question + ", questionType=" + questionType
-				+ "]";
+		return "SurveyResponseTable [surveyResponseId=" + surveyResponseId + ", surveyDetailsId=" + surveyDetailsId
+				+ ", answer=" + answer + ", question=" + question + ", questionType=" + questionType + "]";
 	}
 
+	
 }

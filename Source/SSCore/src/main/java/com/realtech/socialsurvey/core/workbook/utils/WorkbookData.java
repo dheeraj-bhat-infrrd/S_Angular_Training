@@ -751,6 +751,72 @@ public class WorkbookData
         
     }
     
+    public Map<Integer, List<Object>> getSurveyResultsCompanyReportToBeWrittenInSheet( List<List<String>> surveyResultsCompany )
+    {
+     // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>>  surveyResultsCompanyData = new TreeMap<>();
+        
+        Integer surveyResultCompanyCounter = 1;
+        
+        List<Object> surveyResultsCompanyReportToPopulate = new ArrayList<>();
+        int maxNumberOfQuestions=0;
+        for(List<String> row : surveyResultsCompany ){
+            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 3 ) ));
+            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 4 ) ));
+            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 5 ) ));
+            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 6 ) ));
+            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 7 ) ));
+            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 8 ) ));
+            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 9 ) ));
+            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 10 ) ));
+            if(maxNumberOfQuestions < Integer.valueOf(row.get(11))){
+            	maxNumberOfQuestions =  Integer.valueOf(row.get(11));
+            }
+            for(int questionCounter=12;questionCounter<=Integer.valueOf(row.get(11));questionCounter++){
+            	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( questionCounter ) ));
+            }
+            int nextIndex= Integer.valueOf(row.get(11))+12;
+            for(int nextI=nextIndex;nextI<=row.size();nextI++){
+            	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( nextIndex ) ));
+            }
+            surveyResultsCompanyData.put(++surveyResultCompanyCounter ,surveyResultsCompanyReportToPopulate );
+            surveyResultsCompanyReportToPopulate = new ArrayList<>();
+            
+        }
+        // Setting up user sheet headers
+        surveyResultsCompanyReportToPopulate.add( "User First Name" );
+        surveyResultsCompanyReportToPopulate.add( "User Last Name" );
+        surveyResultsCompanyReportToPopulate.add( "Customer First Name" );
+        surveyResultsCompanyReportToPopulate.add( "Customer Last Name" );
+        surveyResultsCompanyReportToPopulate.add( "Survey Sent Date" );
+        surveyResultsCompanyReportToPopulate.add( "Survey Completed Date" );
+        surveyResultsCompanyReportToPopulate.add( "TimeLine" );
+        surveyResultsCompanyReportToPopulate.add( "Survey Source" );
+        surveyResultsCompanyReportToPopulate.add( "Survey Source ID" );
+        surveyResultsCompanyReportToPopulate.add( "Survey Score" );
+        for(int surveyQuestions=0; surveyQuestions<maxNumberOfQuestions; surveyQuestions++){
+        	surveyResultsCompanyReportToPopulate.add( "Q"+(surveyQuestions+1));
+        }
+        if(maxNumberOfQuestions == 0){
+        	surveyResultsCompanyReportToPopulate.add("Q1");
+        }
+        surveyResultsCompanyReportToPopulate.add( "Gateway");
+        surveyResultsCompanyReportToPopulate.add( "Customer Comments");
+        surveyResultsCompanyReportToPopulate.add( "Agreed To Share");
+        surveyResultsCompanyReportToPopulate.add( "Branch");
+        surveyResultsCompanyReportToPopulate.add( "Click Through for Company");
+        surveyResultsCompanyReportToPopulate.add( "Click Through for Agent");
+        surveyResultsCompanyReportToPopulate.add( "Click Through for Region");
+        surveyResultsCompanyReportToPopulate.add( "Click Through for Branch");
+        surveyResultsCompanyData.put( 1, surveyResultsCompanyReportToPopulate );
+        
+        return surveyResultsCompanyData;
+        
+    }
+    
     public Map<Integer, List<Object>> getCompanyUserReportToBeWrittenInSheet( List<List<String>> companyUser )
     {
      // This data needs to be written (List<Object>)

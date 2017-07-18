@@ -7,6 +7,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
@@ -14,7 +15,8 @@ import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
-public class SurveyResponseTableDaoImpl extends GenericDaoImpl<SurveyResponseTable, String> implements SurveyResponseTableDao{
+@Component
+public class SurveyResponseTableDaoImpl extends GenericReportingDaoImpl<SurveyResponseTable, String> implements SurveyResponseTableDao{
 
 	private static final Logger LOG = LoggerFactory.getLogger( SurveyResponseTableDaoImpl.class );
 	
@@ -29,9 +31,10 @@ public class SurveyResponseTableDaoImpl extends GenericDaoImpl<SurveyResponseTab
             LOG.error( "Exception caught in fetchSurveyResponseBySurveyDetailsId() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchSurveyResponseBySurveyDetailsId() ", hibernateException );
         }
-
+        
+        List<SurveyResponseTable> surveyResponse = criteria.list();
         LOG.info( "method to fetch branch based on companyId, fetchSurveyResponseBySurveyDetailsId() finished." );
-        return (List<SurveyResponseTable>) criteria.list();
+        return (surveyResponse);
 	}
 
 }

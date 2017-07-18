@@ -24,4 +24,7 @@ public class SurveyResponse {
 	public void setAnswer(String answer) {
 		this.answer = answer;
 	}
+	
+	
+	
 }

@@ -40,8 +40,10 @@
 							</c:if>
 							<c:if test="${profilemasterid == 1}">
 								<option value=102 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option> 
-								<option value=103 data-report="company-user">Company User Report</option>
+								<option value=103 data-report="company-user">Company User</option>
+								<option value=104 data-report="survey-results-company">Survey Results Company</option>
 							</c:if>
+								<option value=105 data-report="survey-transaction-summary">Survey Transaction Summary</option>
 						</select>	
 					</div>
 					<div class="generate-report-date-range" id="date-pickers">
@@ -95,7 +97,11 @@ $(document).ready(function() {
 	$(document).attr("title", "Reports");
 	updateViewAsScroll();
 	bindDatePickerforSurveyDownload();
+	var selectedVal = $('#generate-survey-reports').val();
+	var key = parseInt(selectedVal);
+	if(key == 101 || key == 102 || key == 103){
 	$('#date-pickers').hide();
+	}
 	
 	var startIndex=0;
 	var recentActivityCount;

@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.api;
 
+import java.util.Date;
+
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
@@ -20,4 +22,10 @@ public interface SSApiBatchIntegration
     
     @GET("/v1/getcompanyuserreportsforreporting")
     Response getCompanyUserReport(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
+    
+    @GET("/v1/getsurveyresultscompanyreportsforreporting")
+    Response getSurveyResultsCompany(@Query ("entityId") Long entityId , @Query ("entityType") String entityType, @Query ("startDate") Date startDate, @Query ("endDate") Date endDate);
+
+    @GET("/v1/getsurveyresponseforreporting")
+    Response getsurveyresponseforreporting(@Query ("surveyDetailsId") String surveyDetailsId);
 }

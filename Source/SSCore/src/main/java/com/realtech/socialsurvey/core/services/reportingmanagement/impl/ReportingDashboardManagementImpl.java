@@ -142,6 +142,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT );            
         }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT );            
+        }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT );            
         }
         
         if ( startDate != null ) {
@@ -271,11 +273,22 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Override
     @Transactional(value = "transactionManagerForReporting")
-    public List<List<Object>> getSurveyResultsCompanyReport(Long entityId, String entityType){
+    public List<String> getSurveyResponseData(String surveyDetailsId){
+    	List<String> surveyResponse =  new ArrayList<>();
+    	for(SurveyResponseTable surveyResponseTable: surveyResponseTableDao.fetchSurveyResponsesBySurveyDetailsId(surveyDetailsId)){
+    		  		
+    		surveyResponse.add(surveyResponseTable.getAnswer());
+    	}
+    	return surveyResponse;
+    }
+    
+    @Override
+    @Transactional(value = "transactionManagerForReporting")
+    public List<List<Object>> getSurveyResultsCompanyReport(Long entityId, String entityType,Date startDate, Date endDate){
     	
     	List<List<Object>> surveyResultsCompany = new ArrayList<>();
     	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN )){
-    		for(SurveyResultsCompanyReport SurveyResultsCompanyReport: surveyResultsCompanyReportDao.fetchSurveyResultsCompanyReportByCompanyId(entityId)){
+    		for(SurveyResultsCompanyReport SurveyResultsCompanyReport: surveyResultsCompanyReportDao.fetchSurveyResultsCompanyReportByCompanyId(entityId,startDate,endDate)){
     			List<Object> surveyResultsCompanyReportList = new ArrayList<>();
     			
     			if(SurveyResultsCompanyReport.getUserFirstName() == null){
@@ -330,20 +343,24 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     			
     			surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveyScore());
     			
-    			
-    			List<SurveyResponseTable> surveyQuestionAnswers = new ArrayList<>();
     			String surveyDetailsId = SurveyResultsCompanyReport.getSurveyDetailsId();
+    			
     			int questionCounter = 0;
-    			surveyQuestionAnswers =  surveyResponseTableDao.fetchSurveyResponsesBySurveyDetailsId(surveyDetailsId);
-    			for(SurveyResponseTable surveyResponse: surveyQuestionAnswers){
+    			for(SurveyResponseTable surveyResponse: surveyResponseTableDao.fetchSurveyResponsesBySurveyDetailsId(surveyDetailsId)){
+    				questionCounter++;
+    			}
+    			surveyResultsCompanyReportList.add(questionCounter);
+    			
+    			for(SurveyResponseTable surveyResponse: surveyResponseTableDao.fetchSurveyResponsesBySurveyDetailsId(surveyDetailsId)){
     				if(surveyResponse.getAnswer() == null){
     					surveyResultsCompanyReportList.add("");
     				}else{
     					surveyResultsCompanyReportList.add(surveyResponse.getAnswer());
     				}
-    				questionCounter++;
     			}
-    			surveyResultsCompanyReportList.add(0, questionCounter);
+    			if(questionCounter==0){
+    				surveyResultsCompanyReportList.add("");
+    			}
     			
     			if(SurveyResultsCompanyReport.getGateway() == null){
     				surveyResultsCompanyReportList.add("");
@@ -599,6 +616,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_USER_ADOPTION_REPORT );
             }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
                 recentActivityList.add( CommonConstants.REPORTING_COMPANY_USERS_REPORT );
+            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_SURVEY_REUSLTS_COMPANY_REPORT );
             }
             recentActivityList.add( fileUpload.getStartDate() );
             recentActivityList.add( fileUpload.getEndDate() );
@@ -720,6 +739,33 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
         return workbook;
         
+    }
+    
+    @Override
+    public String generateSurveyResultsCompanyForReporting(Long entityId , String entityType , Long userId,Date startDate, Date endDate) throws UnsupportedEncodingException, NonFatalException{
+    	User user = userManagementService.getUserByUserId( userId );
+    	String fileName = "Survey_Results_Company_Report"+entityType+"-"+user.getFirstName()+"_"+user.getLastName()+"-"
+    			+ (Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+    	 XSSFWorkbook workbook = this.downloadSurveyResultsCompanyForReporting( entityId , entityType,startDate,endDate );
+         String LocationInS3 = this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+         return LocationInS3;
+    }
+        
+    @SuppressWarnings ( "unchecked")
+    public XSSFWorkbook downloadSurveyResultsCompanyForReporting(long entityId,String entityType,Date startDate, Date endDate){
+    	Response response =  ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany(entityId, entityType,startDate,endDate);
+    	 String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+         //since the string has ""abc"" an extra quote
+         responseString = responseString.substring(1, responseString.length()-1);
+         //Escape characters
+         responseString = StringEscapeUtils.unescapeJava(responseString);
+         List<List<String>> surveyResultsCompanyReport = null;
+         Type listType = new TypeToken <List<List<String>>>() {}.getType();
+         surveyResultsCompanyReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
+         Map<Integer, List<Object>> data = workbookData.getSurveyResultsCompanyReportToBeWrittenInSheet( surveyResultsCompanyReport );
+         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+         return workbook;
+    	
     }
     
     private String createExcelFileAndSaveInAmazonS3( String fileName, XSSFWorkbook workbook ) throws NonFatalException, UnsupportedEncodingException
