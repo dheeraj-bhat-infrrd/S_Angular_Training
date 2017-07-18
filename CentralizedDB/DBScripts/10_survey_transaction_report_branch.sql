@@ -1,5 +1,5 @@
 CREATE TABLE `survey_transaction_report_branch` (
-  `survey_transaction_report_id` varchar(36) NOT NULL,
+  `survey_transaction_report_branch_id` varchar(36) NOT NULL,
   `month` int(11) DEFAULT NULL,
   `year` int(11) DEFAULT NULL,
   `user_name` varchar(45) DEFAULT NULL,
@@ -30,5 +30,6 @@ CREATE TABLE `survey_transaction_report_branch` (
   `transaction_duplicates` int(11) DEFAULT NULL,
   `transaction_mismatched` int(11) DEFAULT NULL,
   `transaction_unassigned` int(11) DEFAULT NULL,
-  PRIMARY KEY (`survey_transaction_report_id`)
+  PRIMARY KEY (`survey_transaction_report_id`),
+  UNIQUE KEY `userIdMonthYearBranch` (`month`,`year`,`user_id`,`branch_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
