@@ -243,13 +243,13 @@ public class ReportingController
     
     @RequestMapping( value = "/getsurveytransactionreportforreporting", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Survey Transaction Report For Reporting ")
-    public String getSurveyTransactionReport( Long entityId, String entityType  ) throws NonFatalException 
+    public String getSurveyTransactionReport( Long entityId, String entityType , Timestamp startDate, Timestamp endDate ) throws NonFatalException 
     {
-        LOGGER.info( "Fetch User Adoption Report For Reporting" );
+        LOGGER.info( "Fetch Survey Transaction Report For Reporting" );
         
         String json = null;
-        List<List <Object>> userAdoptionList = reportingDashboardManagement.getCompanyUserReport( entityId, entityType );
-        json = new Gson().toJson( userAdoptionList );
+        List<List <Object>> surveyTransactionList = reportingDashboardManagement.getSurveyTransactionReport( entityId, entityType ,startDate ,endDate );
+        json = new Gson().toJson( surveyTransactionList );
         return json;
     }
     

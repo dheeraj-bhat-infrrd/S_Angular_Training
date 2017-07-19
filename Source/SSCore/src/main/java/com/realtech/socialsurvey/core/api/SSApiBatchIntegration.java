@@ -29,4 +29,8 @@ public interface SSApiBatchIntegration
 
     @GET("/v1/getsurveyresponseforreporting")
     Response getsurveyresponseforreporting(@Query ("surveyDetailsId") String surveyDetailsId);
+    
+    @GET("/v1/getsurveytransactionreportforreporting")
+    Response getSurveyTransactionReport(@Query ("entityId") Long entityId , @Query ("entityType") String entityType, @Query ("startDate") Timestamp startDate, @Query ("endDate") Timestamp endDate);
+
 }

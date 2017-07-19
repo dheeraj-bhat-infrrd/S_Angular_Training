@@ -42,6 +42,9 @@ import com.realtech.socialsurvey.core.dao.FileUploadDao;
 import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
 import com.realtech.socialsurvey.core.dao.SurveyResultsCompanyReportDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
+import com.realtech.socialsurvey.core.dao.SurveyTransactionReportBranchDao;
+import com.realtech.socialsurvey.core.dao.SurveyTransactionReportDao;
+import com.realtech.socialsurvey.core.dao.SurveyTransactionReportRegionDao;
 import com.realtech.socialsurvey.core.dao.UserAdoptionReportDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyUserReport;
@@ -49,6 +52,9 @@ import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
+import com.realtech.socialsurvey.core.entities.SurveyTransactionReport;
+import com.realtech.socialsurvey.core.entities.SurveyTransactionReportBranch;
+import com.realtech.socialsurvey.core.entities.SurveyTransactionReportRegion;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserAdoptionReport;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -88,6 +94,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Autowired
     private UserAdoptionReportDao userAdoptionReportDao;
+    
+    @Autowired
+    private SurveyTransactionReportDao surveyTransactionReportDao;
+    
+    @Autowired
+    private SurveyTransactionReportRegionDao surveyTransactionReportRegionDao;  
+    
+    @Autowired
+    private SurveyTransactionReportBranchDao surveyTransactionReportBranchDao;
     
     @Autowired
     private SurveyResultsCompanyReportDao surveyResultsCompanyReportDao;
@@ -605,6 +620,261 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
     
     @Override
+    @Transactional(value = "transactionManagerForReporting")
+    public List<List<Object>> getSurveyTransactionReport(Long entityId , String entityType ,Timestamp startDate, Timestamp endDate){
+        List<List<Object>> surveyTransaction = new ArrayList<>();
+        Calendar calender = Calendar.getInstance();
+        int startYear = 0;
+        int startMonth = 0;
+        int endYear = 0;
+        int endMonth = 0;
+        if( startDate != null){
+            calender.setTime(startDate);
+            startYear = calender.get(Calendar.YEAR);
+            startMonth = calender.get(Calendar.MONTH);
+        }
+        if( endDate != null){
+
+            calender.setTime(endDate);
+            endYear = calender.get(Calendar.YEAR);
+            endMonth = calender.get(Calendar.MONTH);
+      }
+        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+            for(SurveyTransactionReport surveyTransactionReport : surveyTransactionReportDao.fetchSurveyTransactionByCompanyId( entityId, startYear, startMonth, endYear, endMonth )){
+                List<Object> surveyTransactionReportList = new ArrayList<>();
+                if(surveyTransactionReport.getUserName() != null && !surveyTransactionReport.getUserName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getUserName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                
+                surveyTransactionReportList.add( surveyTransactionReport.getUserId() );
+                
+                if(surveyTransactionReport.getNmls() != null && !surveyTransactionReport.getNmls().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getNmls() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReport.getLicenseId() != null && !surveyTransactionReport.getLicenseId().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getLicenseId() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReport.getCompanyName() != null && !surveyTransactionReport.getCompanyName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getCompanyName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReport.getRegionName() != null && !surveyTransactionReport.getRegionName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getRegionName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReport.getBranchName() != null && !surveyTransactionReport.getBranchName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getBranchName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalZillowReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotal_3rdPartyReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalVerifiedCustomerReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalUnverifiedCustomerReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalSocialSurveyReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalAbusiveReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalRetakeReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalRetakeCompleted() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionReceivedBySource() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionSent() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionUnprocessable() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionClicked() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionCompleted_() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionPartiallyCompleted() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionUnopened() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionDuplicates() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionMismatched() );     
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionUnassigned() );
+                surveyTransaction.add( surveyTransactionReportList );
+            }
+        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
+            for(SurveyTransactionReportRegion surveyTransactionReportRegion : surveyTransactionReportRegionDao.fetchSurveyTransactionByRegionId( entityId, startYear, startMonth, endYear, endMonth )){
+                List<Object> surveyTransactionReportList = new ArrayList<>();
+                if(surveyTransactionReportRegion.getUserName() != null && !surveyTransactionReportRegion.getUserName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportRegion.getUserName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getUserId() );
+                
+                if(surveyTransactionReportRegion.getNmls() != null && !surveyTransactionReportRegion.getNmls().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportRegion.getNmls() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReportRegion.getLicenseId() != null && !surveyTransactionReportRegion.getLicenseId().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportRegion.getLicenseId() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReportRegion.getCompanyName() != null && !surveyTransactionReportRegion.getCompanyName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportRegion.getCompanyName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReportRegion.getRegionName() != null && !surveyTransactionReportRegion.getRegionName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportRegion.getRegionName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReportRegion.getBranchName() != null && !surveyTransactionReportRegion.getBranchName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportRegion.getBranchName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTotalReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTotalZillowReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTotal_3rdPartyReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTotalVerifiedCustomerReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTotalUnverifiedCustomerReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTotalSocialSurveyReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTotalAbusiveReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTotalRetakeReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTotalRetakeCompleted() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTransactionReceivedBySource() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTransactionSent() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTransactionUnprocessable() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTransactionClicked() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTransactionCompleted_() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTransactionPartiallyCompleted() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTransactionUnopened() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTransactionDuplicates() );
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTransactionMismatched() );     
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getTransactionUnassigned() );
+                surveyTransaction.add( surveyTransactionReportList );
+            }
+        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
+            for(SurveyTransactionReportBranch surveyTransactionReportBranch : surveyTransactionReportBranchDao.fetchSurveyTransactionByBranchId( entityId, startYear, startMonth, endYear, endMonth )){
+                List<Object> surveyTransactionReportList = new ArrayList<>();
+                if(surveyTransactionReportBranch.getUserName() != null && !surveyTransactionReportBranch.getUserName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportBranch.getUserName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getUserId() );
+                
+                if(surveyTransactionReportBranch.getNmls() != null && !surveyTransactionReportBranch.getNmls().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportBranch.getNmls() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReportBranch.getLicenseId() != null && !surveyTransactionReportBranch.getLicenseId().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportBranch.getLicenseId() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReportBranch.getCompanyName() != null && !surveyTransactionReportBranch.getCompanyName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportBranch.getCompanyName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReportBranch.getRegionName() != null && !surveyTransactionReportBranch.getRegionName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportBranch.getRegionName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReportBranch.getBranchName() != null && !surveyTransactionReportBranch.getBranchName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReportBranch.getBranchName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTotalReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTotalZillowReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTotal_3rdPartyReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTotalVerifiedCustomerReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTotalUnverifiedCustomerReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTotalSocialSurveyReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTotalAbusiveReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTotalRetakeReviews() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTotalRetakeCompleted() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTransactionReceivedBySource() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTransactionSent() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTransactionUnprocessable() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTransactionClicked() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTransactionCompleted_() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTransactionPartiallyCompleted() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTransactionUnopened() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTransactionDuplicates() );
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTransactionMismatched() );     
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getTransactionUnassigned() );
+                surveyTransaction.add( surveyTransactionReportList );
+            }
+            
+        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
+            for(SurveyTransactionReport surveyTransactionReport : surveyTransactionReportDao.fetchSurveyTransactionByAgentId( entityId, startYear, startMonth, endYear, endMonth )){
+                List<Object> surveyTransactionReportList = new ArrayList<>();
+                if(surveyTransactionReport.getUserName() != null && !surveyTransactionReport.getUserName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getUserName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                
+                surveyTransactionReportList.add( surveyTransactionReport.getUserId() );
+                
+                if(surveyTransactionReport.getNmls() != null && !surveyTransactionReport.getNmls().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getNmls() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReport.getLicenseId() != null && !surveyTransactionReport.getLicenseId().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getLicenseId() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReport.getCompanyName() != null && !surveyTransactionReport.getCompanyName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getCompanyName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReport.getRegionName() != null && !surveyTransactionReport.getRegionName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getRegionName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                if(surveyTransactionReport.getBranchName() != null && !surveyTransactionReport.getBranchName().isEmpty()){
+                    surveyTransactionReportList.add( surveyTransactionReport.getBranchName() );
+                }else{
+                    surveyTransactionReportList.add( "" );
+                }
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalZillowReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotal_3rdPartyReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalVerifiedCustomerReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalUnverifiedCustomerReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalSocialSurveyReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalAbusiveReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalRetakeReviews() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTotalRetakeCompleted() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionReceivedBySource() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionSent() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionUnprocessable() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionClicked() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionCompleted_() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionPartiallyCompleted() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionUnopened() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionDuplicates() );
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionMismatched() );     
+                surveyTransactionReportList.add( surveyTransactionReport.getTransactionUnassigned() );
+                surveyTransaction.add( surveyTransactionReportList );
+            }
+            
+        }
+        return surveyTransaction;
+        
+    }
+    
+    @Override
     public List<List<Object>> getRecentActivityList(Long entityId , String entityType , int startIndex , int batchSize) throws InvalidInputException{
         List<List<Object>> recentActivity = new ArrayList<>();
         for(FileUpload fileUpload : fileUploadDao.findRecentActivityForReporting(entityId, entityType, startIndex, batchSize)){
@@ -773,12 +1043,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
     
     @Override
-    public String generateSurveyTransactionForReporting(Long entityId , String entityType , Long userId) throws UnsupportedEncodingException, NonFatalException{
+    public String generateSurveyTransactionForReporting(Long entityId , String entityType , Long userId ,Timestamp startDate, Timestamp endDate) throws UnsupportedEncodingException, NonFatalException{
         User user = userManagementService.getUserByUserId( userId );
         //file is too big for windows hence uncomment the alternative 
         String fileName = "Survey_Transaction_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + (Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
-        XSSFWorkbook workbook = this.downloadSurveyTransactionForReporting( entityId , entityType );
+        XSSFWorkbook workbook = this.downloadSurveyTransactionForReporting( entityId , entityType, startDate, endDate );
         String LocationInS3 = this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
         return LocationInS3;
         
@@ -786,8 +1056,17 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     
     @SuppressWarnings ( "unchecked")
-    public XSSFWorkbook downloadSurveyTransactionForReporting( long entityId , String entityType){
-        Map<Integer, List<Object>> data = workbookData.getSurveyTransactionReportToBeWrittenInSheet();
+    public XSSFWorkbook downloadSurveyTransactionForReporting( long entityId , String entityType ,Timestamp startDate, Timestamp endDate){
+        Response response =  ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyTransactionReport(entityId, entityType,startDate,endDate);
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        //since the string has ""abc"" an extra quote
+        responseString = responseString.substring(1, responseString.length()-1);
+        //Escape characters
+        responseString = StringEscapeUtils.unescapeJava(responseString);
+        List<List<String>> surveyTransactionReport = null;
+        Type listType = new TypeToken <List<List<String>>>() {}.getType();
+        surveyTransactionReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
+        Map<Integer, List<Object>> data = workbookData.getSurveyTransactionReportToBeWrittenInSheet(surveyTransactionReport);
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
         return workbook;
         
