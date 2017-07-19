@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.api;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import retrofit.client.Response;
@@ -24,7 +25,7 @@ public interface SSApiBatchIntegration
     Response getCompanyUserReport(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
     
     @GET("/v1/getsurveyresultscompanyreportsforreporting")
-    Response getSurveyResultsCompany(@Query ("entityId") Long entityId , @Query ("entityType") String entityType, @Query ("startDate") Date startDate, @Query ("endDate") Date endDate);
+    Response getSurveyResultsCompany(@Query ("entityId") Long entityId , @Query ("entityType") String entityType, @Query ("startDate") Timestamp startDate, @Query ("endDate") Timestamp endDate);
 
     @GET("/v1/getsurveyresponseforreporting")
     Response getsurveyresponseforreporting(@Query ("surveyDetailsId") String surveyDetailsId);

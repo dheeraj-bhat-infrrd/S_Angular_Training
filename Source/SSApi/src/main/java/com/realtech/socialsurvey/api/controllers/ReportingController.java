@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.api.controllers;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -208,7 +209,7 @@ public class ReportingController
     
     @RequestMapping( value = "/getsurveyresultscompanyreportsforreporting", method= RequestMethod.GET)
     @ApiOperation( value = "Fetch Survey Results Company Report For Reporting")
-    public String getSurveyResultsCompany(Long entityId, String entityType, Date startDate, Date endDate) throws NonFatalException
+    public String getSurveyResultsCompany(Long entityId, String entityType, Timestamp startDate, Timestamp endDate) throws NonFatalException
     {
     	LOGGER.info( "Fetch Survey Results Company Report For Reporting");
     	String json = null;

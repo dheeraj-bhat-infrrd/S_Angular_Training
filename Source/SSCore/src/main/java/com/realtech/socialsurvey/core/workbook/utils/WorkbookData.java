@@ -760,8 +760,9 @@ public class WorkbookData
         
         List<Object> surveyResultsCompanyReportToPopulate = new ArrayList<>();
         int maxNumberOfQuestions=0;
+        int count=0;
         for(List<String> row : surveyResultsCompany ){
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+        	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 0 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 1 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 2 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 3 ) ));
@@ -771,16 +772,15 @@ public class WorkbookData
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 7 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 8 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 9 ) ));
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 10 ) ));
-            if(maxNumberOfQuestions < Integer.valueOf(row.get(11))){
-            	maxNumberOfQuestions =  Integer.valueOf(row.get(11));
+            if(maxNumberOfQuestions < Integer.valueOf(row.get(10))){
+            	maxNumberOfQuestions =  Integer.valueOf(row.get(10));
             }
-            for(int questionCounter=12;questionCounter<=Integer.valueOf(row.get(11));questionCounter++){
+            for(int questionCounter=11;questionCounter<11+Integer.valueOf(row.get(10));questionCounter++){
             	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( questionCounter ) ));
             }
-            int nextIndex= Integer.valueOf(row.get(11))+12;
-            for(int nextI=nextIndex;nextI<=row.size();nextI++){
-            	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( nextIndex ) ));
+            int nextIndex= Integer.valueOf(row.get(10))+11;
+            for(int nextI=nextIndex;nextI<row.size();nextI++){
+            	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( nextI ) ));
             }
             surveyResultsCompanyData.put(++surveyResultCompanyCounter ,surveyResultsCompanyReportToPopulate );
             surveyResultsCompanyReportToPopulate = new ArrayList<>();
