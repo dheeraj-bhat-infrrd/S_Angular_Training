@@ -765,7 +765,7 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 			success : function(data) {
 				success=true;
 				messageToDisplay = data;
-				showInfo(messageToDisplay);
+				showInfoForReporting(messageToDisplay);
 			},
 			complete : function() {	
 				hideOverlay();
@@ -779,7 +779,7 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 		});
 });
 
-$(document).on('click', '.err-new-close', function() {
+$(document).on('click', '.err-close-rep', function() {
 	hideError();
 	hideInfo();
 	location.reload(true);
