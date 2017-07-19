@@ -762,12 +762,7 @@ public class WorkbookData
         int maxNumberOfQuestions=0;
         int count=0;
         for(List<String> row : surveyResultsCompany ){
-        	if(count++==0){
-        		LOG.info("\n\n=======================\n\n");
-        		LOG.info(""+row);
-        		LOG.info("\n\n=======================\n\n");
-        	}
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+        	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 0 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 1 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 2 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 3 ) ));
@@ -818,12 +813,6 @@ public class WorkbookData
         surveyResultsCompanyReportToPopulate.add( "Click Through for Branch");
         surveyResultsCompanyData.put( 1, surveyResultsCompanyReportToPopulate );
         
-        LOG.info("\n\n=======================\n\n");
-		LOG.info(""+surveyResultsCompanyData.get(1));
-		LOG.info("\n\n=======================\n\n");
-		LOG.info("\n\n=======================\n\n");
-		LOG.info(""+surveyResultsCompanyData.get(2));
-		LOG.info("\n\n=======================\n\n");
         return surveyResultsCompanyData;
         
     }
