@@ -275,10 +275,41 @@
            <schema_name/>
            </partitioning>
     <keys>
-      <key>REGION_ID</key>
+      <key>REGION_SETTINGS_ID</key>
     </keys>
     <values>
+      <value>REGION_SETTINGS_ID</value>
+      <value>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</value>
+      <value>ALLOW_ZILLOW_AUTO_POST</value>
+      <value>CREATED_BY</value>
+      <value>CREATED_ON_MONGO</value>
+      <value>DISCLAIMER</value>
+      <value>HIDDEN_SECTION</value>
       <value>REGION_ID</value>
+      <value>IS_ACCOUNT_DISABLED</value>
+      <value>IS_DEFAULT_BY_SYSTEM</value>
+      <value>IS_LOCATION_ENABLED</value>
+      <value>IS_LOGO_IMAGE_PROCESSED</value>
+      <value>IS_PROFILE_IMAGE_PROCESSED</value>
+      <value>IS_SEO_CONTENT_MODIFIED</value>
+      <value>LOGO</value>
+      <value>LOGO_THUMBNAIL</value>
+      <value>MODIFIED_BY</value>
+      <value>MODIFIED_ON_MONGO</value>
+      <value>PROFILE_IMAGE_URL</value>
+      <value>PROFILE_IMAGE_URL_THUMBNAIL</value>
+      <value>PROFILE_NAME</value>
+      <value>PROFILE_URL</value>
+      <value>PROFILE_COMPLETION</value>
+      <value>SEND_EMAIL_FROM_COMPANY</value>
+      <value>STATUS</value>
+      <value>VENDASTA_ACCESSIBLE</value>
+      <value>VERTICAL</value>
+      <value>ZILLOW_REVIEW_AVERAGE</value>
+      <value>ZILLOW_REVIEW_COUNT</value>
+      <value>SOCIAL_MEDIA_TOKENS_ID</value>
+      <value>CREATED_ON</value>
+      <value>MODIFIED_ON</value>
     </values>
 <flag_field>flagfield</flag_field>
 <reference>Region Settings Input</reference>
@@ -521,6 +552,96 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>737</xloc>
       <yloc>552</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Modified Java Script Value</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;allowOverrideForSocialMedia &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; allowOverrideForSocialMedia &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var allowOverrideForSocialMedia &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var allowOverrideForSocialMedia &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;allowZillowAutoPost &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; allowZillowAutoPost &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var allowZillowAutoPost &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var allowZillowAutoPost &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;hiddenSection &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; hiddenSection &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var hiddenSection &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var hiddenSection &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isAccountDisabled &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isAccountDisabled &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isAccountDisabled &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isAccountDisabled &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isDefaultBySystem &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isDefaultBySystem &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isDefaultBySystem &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isDefaultBySystem &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isLocationEnabled &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isLocationEnabled &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isLocationEnabled &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isLocationEnabled &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isLogoImageProcessed &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isLogoImageProcessed &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isLogoImageProcessed &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isLogoImageProcessed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isProfileImageProcessed &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isProfileImageProcessed &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isProfileImageProcessed &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isProfileImageProcessed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isSeoContentModified &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isSeoContentModified &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isSeoContentModified &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isSeoContentModified &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sendEmailFromCompany &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; sendEmailFromCompany &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var sendEmailFromCompany &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var sendEmailFromCompany &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;vendastaAccessible &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; vendastaAccessible &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var vendastaAccessible &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var vendastaAccessible &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>allowOverrideForSocialMedia</name>
+        <rename>allowOverrideForSocialMedia</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>allowZillowAutoPost</name>
+        <rename>allowZillowAutoPost</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>hiddenSection</name>
+        <rename>hiddenSection</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>isAccountDisabled</name>
+        <rename>isAccountDisabled</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>isDefaultBySystem</name>
+        <rename>isDefaultBySystem</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>isLocationEnabled</name>
+        <rename>isLocationEnabled</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>isLogoImageProcessed</name>
+        <rename>isLogoImageProcessed</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>isProfileImageProcessed</name>
+        <rename>isProfileImageProcessed</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>isSeoContentModified</name>
+        <rename>isSeoContentModified</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>sendEmailFromCompany</name>
+        <rename>sendEmailFromCompany</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>vendastaAccessible</name>
+        <rename>vendastaAccessible</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>582</xloc>
+      <yloc>247</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1559,7 +1680,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  REGION_SETTINGS_ID&#xd;&#xa;, case when ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA &#x3c;&#x3e; 0 then true else false end ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA&#xd;&#xa;, case when ALLOW_ZILLOW_AUTO_POST &#x3c;&#x3e; 0 then true else false end ALLOW_ZILLOW_AUTO_POST&#xd;&#xa;, CREATED_BY&#xd;&#xa;, CREATED_ON_MONGO&#xd;&#xa;, DISCLAIMER&#xd;&#xa;, case when HIDDEN_SECTION &#x3c;&#x3e; 0 then true else false end HIDDEN_SECTION&#xd;&#xa;, REGION_ID&#xd;&#xa;, case when IS_ACCOUNT_DISABLED &#x3c;&#x3e; 0 then true else false end IS_ACCOUNT_DISABLED&#xd;&#xa;, case when IS_DEFAULT_BY_SYSTEM &#x3c;&#x3e; 0 then true else false end IS_DEFAULT_BY_SYSTEM&#xd;&#xa;, case when IS_LOCATION_ENABLED &#x3c;&#x3e; 0 then true else false end IS_LOCATION_ENABLED&#xd;&#xa;, case when IS_LOGO_IMAGE_PROCESSED &#x3c;&#x3e; 0 then true else false end IS_LOGO_IMAGE_PROCESSED&#xd;&#xa;, case when IS_PROFILE_IMAGE_PROCESSED &#x3c;&#x3e; 0 then true else false end IS_PROFILE_IMAGE_PROCESSED&#xd;&#xa;, case when IS_SEO_CONTENT_MODIFIED &#x3c;&#x3e; 0 then true else false end IS_SEO_CONTENT_MODIFIED&#xd;&#xa;, LOGO&#xd;&#xa;, LOGO_THUMBNAIL&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, MODIFIED_ON_MONGO&#xd;&#xa;, PROFILE_IMAGE_URL&#xd;&#xa;, PROFILE_IMAGE_URL_THUMBNAIL&#xd;&#xa;, PROFILE_NAME&#xd;&#xa;, PROFILE_URL&#xd;&#xa;, PROFILE_COMPLETION&#xd;&#xa;, case when SEND_EMAIL_FROM_COMPANY &#x3c;&#x3e; 0 then true else false end SEND_EMAIL_FROM_COMPANY&#xd;&#xa;, STATUS&#xd;&#xa;, case when VENDASTA_ACCESSIBLE &#x3c;&#x3e; 0 then true else false end VENDASTA_ACCESSIBLE&#xd;&#xa;, VERTICAL&#xd;&#xa;, ZILLOW_REVIEW_AVERAGE&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;FROM region_settings&#xd;&#xa;order by REGION_ID</sql>
+    <sql>SELECT&#xd;&#xa;  REGION_SETTINGS_ID&#xd;&#xa;, case when ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA &#x3c;&#x3e; 0 then true else false end ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA&#xd;&#xa;, case when ALLOW_ZILLOW_AUTO_POST &#x3c;&#x3e; 0 then true else false end ALLOW_ZILLOW_AUTO_POST&#xd;&#xa;, CREATED_BY&#xd;&#xa;, CREATED_ON_MONGO&#xd;&#xa;, DISCLAIMER&#xd;&#xa;, case when HIDDEN_SECTION &#x3c;&#x3e; 0 then true else false end HIDDEN_SECTION&#xd;&#xa;, REGION_ID&#xd;&#xa;, case when IS_ACCOUNT_DISABLED &#x3c;&#x3e; 0 then true else false end IS_ACCOUNT_DISABLED&#xd;&#xa;, case when IS_DEFAULT_BY_SYSTEM &#x3c;&#x3e; 0 then true else false end IS_DEFAULT_BY_SYSTEM&#xd;&#xa;, case when IS_LOCATION_ENABLED &#x3c;&#x3e; 0 then true else false end IS_LOCATION_ENABLED&#xd;&#xa;, case when IS_LOGO_IMAGE_PROCESSED &#x3c;&#x3e; 0 then true else false end IS_LOGO_IMAGE_PROCESSED&#xd;&#xa;, case when IS_PROFILE_IMAGE_PROCESSED &#x3c;&#x3e; 0 then true else false end IS_PROFILE_IMAGE_PROCESSED&#xd;&#xa;, case when IS_SEO_CONTENT_MODIFIED &#x3c;&#x3e; 0 then true else false end IS_SEO_CONTENT_MODIFIED&#xd;&#xa;, LOGO&#xd;&#xa;, LOGO_THUMBNAIL&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, MODIFIED_ON_MONGO&#xd;&#xa;, PROFILE_IMAGE_URL&#xd;&#xa;, PROFILE_IMAGE_URL_THUMBNAIL&#xd;&#xa;, PROFILE_NAME&#xd;&#xa;, PROFILE_URL&#xd;&#xa;, PROFILE_COMPLETION&#xd;&#xa;, case when SEND_EMAIL_FROM_COMPANY &#x3c;&#x3e; 0 then true else false end SEND_EMAIL_FROM_COMPANY&#xd;&#xa;, STATUS&#xd;&#xa;, case when VENDASTA_ACCESSIBLE &#x3c;&#x3e; 0 then true else false end VENDASTA_ACCESSIBLE&#xd;&#xa;, VERTICAL&#xd;&#xa;, ZILLOW_REVIEW_AVERAGE&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;FROM region_settings&#xd;&#xa;order by REGION_SETTINGS_ID</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2249,7 +2370,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>REGION_ID</name>
+        <name>REGION_SETTINGS_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2458,96 +2579,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>699</xloc>
       <yloc>394</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Modified Java Script Value</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;allowOverrideForSocialMedia &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; allowOverrideForSocialMedia &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var allowOverrideForSocialMedia &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var allowOverrideForSocialMedia &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;allowZillowAutoPost &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; allowZillowAutoPost &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var allowZillowAutoPost &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var allowZillowAutoPost &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;hiddenSection &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; hiddenSection &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var hiddenSection &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var hiddenSection &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isAccountDisabled &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isAccountDisabled &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isAccountDisabled &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isAccountDisabled &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isDefaultBySystem &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isDefaultBySystem &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isDefaultBySystem &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isDefaultBySystem &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isLocationEnabled &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isLocationEnabled &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isLocationEnabled &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isLocationEnabled &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isLogoImageProcessed &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isLogoImageProcessed &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isLogoImageProcessed &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isLogoImageProcessed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isProfileImageProcessed &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isProfileImageProcessed &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isProfileImageProcessed &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isProfileImageProcessed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isSeoContentModified &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isSeoContentModified &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isSeoContentModified &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var isSeoContentModified &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sendEmailFromCompany &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; sendEmailFromCompany &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var sendEmailFromCompany &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var sendEmailFromCompany &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;vendastaAccessible &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; vendastaAccessible &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var vendastaAccessible &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var vendastaAccessible &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>allowOverrideForSocialMedia</name>
-        <rename>allowOverrideForSocialMedia</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>allowZillowAutoPost</name>
-        <rename>allowZillowAutoPost</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>hiddenSection</name>
-        <rename>hiddenSection</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>isAccountDisabled</name>
-        <rename>isAccountDisabled</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>isDefaultBySystem</name>
-        <rename>isDefaultBySystem</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>isLocationEnabled</name>
-        <rename>isLocationEnabled</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>isLogoImageProcessed</name>
-        <rename>isLogoImageProcessed</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>isProfileImageProcessed</name>
-        <rename>isProfileImageProcessed</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>isSeoContentModified</name>
-        <rename>isSeoContentModified</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>sendEmailFromCompany</name>
-        <rename>sendEmailFromCompany</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>vendastaAccessible</name>
-        <rename>vendastaAccessible</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>582</xloc>
-      <yloc>247</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
