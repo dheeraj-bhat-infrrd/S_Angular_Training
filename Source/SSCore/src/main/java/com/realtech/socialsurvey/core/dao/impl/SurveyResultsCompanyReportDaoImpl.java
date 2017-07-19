@@ -28,6 +28,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
         Criteria criteria = getSession().createCriteria( SurveyResultsCompanyReport.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+            criteria.add( Restrictions.eq( CommonConstants.SURVEY_RESULTS_IS_DELETED, false ) );
             Criterion criterion = Restrictions.and(
                     Restrictions.gt( CommonConstants.SURVEY_RESULTS_REPORT_MODIFIED_ON, startDate),
                     Restrictions.lt( CommonConstants.SURVEY_RESULTS_REPORT_MODIFIED_ON, endDate) );
