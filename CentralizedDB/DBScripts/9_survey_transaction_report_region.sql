@@ -30,6 +30,6 @@ CREATE TABLE `survey_transaction_report_region` (
   `transaction_duplicates` int(11) DEFAULT NULL,
   `transaction_mismatched` int(11) DEFAULT NULL,
   `transaction_unassigned` int(11) DEFAULT NULL,
-  PRIMARY KEY (`survey_transaction_report_id`),
+  PRIMARY KEY (`survey_transaction_report_region_id`),
   UNIQUE KEY `UserIdYearMonthRegion` (`month`,`year`,`user_id`,`region_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

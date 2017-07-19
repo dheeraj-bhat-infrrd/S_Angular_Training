@@ -8,8 +8,8 @@ CREATE TABLE `survey_transaction_report_branch` (
   `license_id` varchar(45) DEFAULT NULL,
   `company_name` varchar(45) DEFAULT NULL,
   `company_id` int(11) DEFAULT NULL,
-  `region_name` varchar(45) DEFAULT NULL,
-  `branch_name` varchar(45) DEFAULT NULL,
+  `region_name` text,
+  `branch_name` text,
   `branch_id` int(11) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
   `total_zillow_reviews` int(11) DEFAULT NULL,
@@ -30,6 +30,6 @@ CREATE TABLE `survey_transaction_report_branch` (
   `transaction_duplicates` int(11) DEFAULT NULL,
   `transaction_mismatched` int(11) DEFAULT NULL,
   `transaction_unassigned` int(11) DEFAULT NULL,
-  PRIMARY KEY (`survey_transaction_report_id`),
+  PRIMARY KEY (`survey_transaction_report_branch_id`),
   UNIQUE KEY `userIdMonthYearBranch` (`month`,`year`,`user_id`,`branch_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
