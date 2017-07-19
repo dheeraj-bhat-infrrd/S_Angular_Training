@@ -72,6 +72,17 @@ function buildMessageDiv() {
 	}
 }
 
+function buildMessageDivForReporting() {
+	if ($('.err-nw-wrapper').length == 0) {
+		var errorDiv = $("<div id='err-nw-wrapper' class='err-nw-wrapper'>");
+		var closeSpan = $('<span class="err-new-close err-close-rep">');
+		var textSpan = $('<span id="err-nw-txt">');
+		errorDiv.append(closeSpan);
+		errorDiv.append(textSpan);
+		$('.hm-header-main-wrapper').after(errorDiv);
+	}
+}
+
 function buildMessageInvalidDiv() {
 	if ($('.err-nw-wrapper-invalid').length == 0) {
 		var errorDiv = $("<div id='err-nw-wrapper-invalid' class='err-nw-wrapper-invalid'>");
@@ -132,6 +143,15 @@ function showInfo(msg) {
 	$(window).scrollTop($('#err-nw-wrapper').offset().top);
 	$('#err-nw-wrapper').addClass('bg-black-success');
 }
+
+function showInfoForReporting(msg) {
+	buildMessageDivForReporting();
+	$('#err-nw-txt').html(msg);
+	$('#err-nw-wrapper').slideDown(200);
+	$(window).scrollTop($('#err-nw-wrapper').offset().top);
+	$('#err-nw-wrapper').addClass('bg-black-success');
+}
+
 function showInfoSuccess(msg) {
 	buildMessageSuccessDiv();
 	$('#err-nw-txt-success').html(msg);

@@ -126,6 +126,9 @@ public class PrepareBillingReport implements Runnable
                         	locationInS3 = reportingDashboardManagement.generateSurveyResultsCompanyForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                                     fileUpload.getAdminUserId(),fileUpload.getStartDate(),
                                     fileUpload.getEndDate() );
+                         }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
+                             locationInS3 = reportingDashboardManagement.generateSurveyTransactionForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                 fileUpload.getAdminUserId() );
                          }
                         
 
@@ -133,7 +136,7 @@ public class PrepareBillingReport implements Runnable
                         fileUpload.setStatus( CommonConstants.STATUS_DONE );
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT 
-                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
                             fileUpload.setFileName( locationInS3 );
                         }
                         csvUploadService.updateFileUploadRecord( fileUpload );
