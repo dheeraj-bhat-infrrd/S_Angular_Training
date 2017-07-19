@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -120,18 +121,17 @@ public class PrepareBillingReport implements Runnable
                             locationInS3 = reportingDashboardManagement.generateCompanyUserForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                                 fileUpload.getAdminUserId() );
                         } else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
-                        	Date startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(fileUpload.getStartDate()));
-                        	Date endDate =  new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(fileUpload.getEndDate()));
-                        	LOG.info("\n\n=======================\n\n"+startDate+"\n\n===============\n\n"+endDate+"\n\n=============\n\n");
                         	locationInS3 = reportingDashboardManagement.generateSurveyResultsCompanyForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
-                                    fileUpload.getAdminUserId(),fileUpload.getStartDate(),
-                                    fileUpload.getEndDate() );
-                         }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
+                                    fileUpload.getAdminUserId(),fileUpload.getStartDate(),fileUpload.getEndDate());
+                         
+                        }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
                              locationInS3 = reportingDashboardManagement.generateSurveyTransactionForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                                  fileUpload.getAdminUserId() );
+
+                                    fileUpload.getAdminUserId();
+
                          }
                         
-
                         // update the status to be processed
                         fileUpload.setStatus( CommonConstants.STATUS_DONE );
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );

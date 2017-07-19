@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -84,10 +85,22 @@ public class SurveyResultsCompanyReport {
 	private String clickTroughForBranch;
 	
 	@Column(name = "REPORT_MODIFIED_ON")
-	private Date reportModifiedOn;
+	private Timestamp reportModifiedOn;
 	
-	@Column(name = "IS_DELETED")
-	private boolean isDeleted;
+	@Override
+	public String toString() {
+		return "SurveyResultsCompanyReport [surveyStatsReportId=" + surveyStatsReportId + ", surveyDetailsId="
+				+ surveyDetailsId + ", companyId=" + companyId + ", agentId=" + agentId + ", userFirstName="
+				+ userFirstName + ", userLastName=" + userLastName + ", customerFirstName=" + customerFirstName
+				+ ", customerLastName=" + customerLastName + ", surveySentDate=" + surveySentDate
+				+ ", surveyCompletedDate=" + surveyCompletedDate + ", timeInterval=" + timeInterval + ", surveySource="
+				+ surveySource + ", surveySourceId=" + surveySourceId + ", surveyScore=" + surveyScore + ", gateway="
+				+ gateway + ", customerComments=" + customerComments + ", agreedToShare=" + agreedToShare
+				+ ", branchName=" + branchName + ", clickTroughForCompany=" + clickTroughForCompany
+				+ ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
+				+ ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn
+				+ ", isDeleted=" + isDeleted + "]";
+	}
 
 	public String getSurveyStatsReportId() {
 		return surveyStatsReportId;
@@ -265,11 +278,11 @@ public class SurveyResultsCompanyReport {
 		this.clickTroughForBranch = clickTroughForBranch;
 	}
 
-	public Date getReportModifiedOn() {
+	public Timestamp getReportModifiedOn() {
 		return reportModifiedOn;
 	}
 
-	public void setReportModifiedOn(Date reportModifiedOn) {
+	public void setReportModifiedOn(Timestamp reportModifiedOn) {
 		this.reportModifiedOn = reportModifiedOn;
 	}
 
@@ -281,26 +294,8 @@ public class SurveyResultsCompanyReport {
 		this.isDeleted = isDeleted;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
-	@Override
-	public String toString() {
-		return "SurveyResultsCompanyReport [surveyStatsReportId=" + surveyStatsReportId + ", surveyDetailsId="
-				+ surveyDetailsId + ", companyId=" + companyId + ", agentId=" + agentId + ", userFirstName="
-				+ userFirstName + ", userLastName=" + userLastName + ", customerFirstName=" + customerFirstName
-				+ ", customerLastName=" + customerLastName + ", surveySentDate=" + surveySentDate
-				+ ", surveyCompletedDate=" + surveyCompletedDate + ", timeInterval=" + timeInterval + ", surveySource="
-				+ surveySource + ", surveySourceId=" + surveySourceId + ", surveyScore=" + surveyScore + ", gateway="
-				+ gateway + ", customerComments=" + customerComments + ", agreedToShare=" + agreedToShare
-				+ ", branchName=" + branchName + ", clickTroughForCompany=" + clickTroughForCompany
-				+ ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
-				+ ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn
-				+ ", isDeleted=" + isDeleted + "]";
-	}
-
-	
+	@Column(name = "IS_DELETED")
+	private boolean isDeleted;
 	
 	
 }

@@ -40,9 +40,9 @@ public interface ReportingDashboardManagement
     String generateCompanyUserForReporting( Long entityId, String entityType, Long userId )
         throws UnsupportedEncodingException, NonFatalException;
 
-	List<List<Object>> getSurveyResultsCompanyReport(Long entityId, String EntityType,Date startDate, Date endDate);
+	List<List<Object>> getSurveyResultsCompanyReport(Long entityId, String EntityType,Timestamp startDate, Timestamp endDate);
 	
-	String generateSurveyResultsCompanyForReporting( Long entityId, String entityType, Long userId, Date startDate, Date endDate )
+	String generateSurveyResultsCompanyForReporting( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
 		        throws UnsupportedEncodingException, NonFatalException;
 
 	List<String> getSurveyResponseData(String surveyDetailsId);

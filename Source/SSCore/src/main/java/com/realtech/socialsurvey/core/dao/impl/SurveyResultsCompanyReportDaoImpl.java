@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 	private static final Logger LOG = LoggerFactory.getLogger( SurveyResultsCompanyReportDaoImpl.class );
 	
 	@Override
-	public List<SurveyResultsCompanyReport> fetchSurveyResultsCompanyReportByCompanyId(Long companyId,Date startDate, Date endDate) {
+	public List<SurveyResultsCompanyReport> fetchSurveyResultsCompanyReportByCompanyId(Long companyId,Timestamp startDate, Timestamp endDate) {
 		LOG.info( "method to fetch survey results company report based on companyId,fetchSurveyResultsCompanyReportByCompanyId() started" );
         Criteria criteria = getSession().createCriteria( SurveyResultsCompanyReport.class );
         try {

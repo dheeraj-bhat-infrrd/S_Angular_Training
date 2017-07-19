@@ -286,7 +286,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Override
     @Transactional(value = "transactionManagerForReporting")
-    public List<List<Object>> getSurveyResultsCompanyReport(Long entityId, String entityType,Date startDate, Date endDate){
+    public List<List<Object>> getSurveyResultsCompanyReport(Long entityId, String entityType,Timestamp startDate, Timestamp endDate){
     	
     	List<List<Object>> surveyResultsCompany = new ArrayList<>();
     	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN )){
@@ -746,7 +746,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
     
     @Override
-    public String generateSurveyResultsCompanyForReporting(Long entityId , String entityType , Long userId,Date startDate, Date endDate) throws UnsupportedEncodingException, NonFatalException{
+    public String generateSurveyResultsCompanyForReporting(Long entityId , String entityType , Long userId,Timestamp startDate, Timestamp endDate) throws UnsupportedEncodingException, NonFatalException{
     	User user = userManagementService.getUserByUserId( userId );
     	String fileName = "Survey_Results_Company_Report"+entityType+"-"+user.getFirstName()+"_"+user.getLastName()+"-"
     			+ (Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
@@ -756,7 +756,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
         
     @SuppressWarnings ( "unchecked")
-    public XSSFWorkbook downloadSurveyResultsCompanyForReporting(long entityId,String entityType,Date startDate, Date endDate){
+    public XSSFWorkbook downloadSurveyResultsCompanyForReporting(long entityId,String entityType,Timestamp startDate, Timestamp endDate){
     	Response response =  ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany(entityId, entityType,startDate,endDate);
     	 String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
          //since the string has ""abc"" an extra quote
