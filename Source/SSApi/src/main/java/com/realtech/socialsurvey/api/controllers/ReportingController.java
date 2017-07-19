@@ -218,6 +218,7 @@ public class ReportingController
     	return json;
     }
     
+    //Survey Response api for testing. Not being used anywhere else
     @RequestMapping( value = "/getsurveyresponseforreporting", method= RequestMethod.GET)
     @ApiOperation( value = "Fetch Survey Response For Reporting")
     public String getSurveyResultsCompany(String surveyDetailsId) throws NonFatalException

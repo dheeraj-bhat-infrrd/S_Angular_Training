@@ -1328,4 +1328,5 @@ public interface CommonConstants
     
     public static final String SURVEY_DETAILS_ID_COLUMN="surveyDetailsId";
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
+    public static final String SURVEY_RESULTS_IS_DELETED = "isDeleted";
 }
