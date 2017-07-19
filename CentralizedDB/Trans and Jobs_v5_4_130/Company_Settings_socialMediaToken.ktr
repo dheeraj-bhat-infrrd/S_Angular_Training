@@ -167,8 +167,9 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -194,8 +195,9 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -788,10 +790,6 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>Id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
       </field>      <field>        <name>isDeleted</name>
         <rename/>
         <length>-2</length>
@@ -1224,37 +1222,37 @@
       <value>
         <name>FACEBOOK_ACCESS_TOKEN</name>
         <rename>facebookAccessToken</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>FACEBOOK_ACCESS_TOKEN_EXPIRES_ON</name>
         <rename>facebookAccessTokenExpiresOn</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>FACEBOOK_ACCESS_TOKEN_TO_POST</name>
         <rename>facebookAccessTokenToPost</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>FACEBOOK_PAGE_LINK</name>
         <rename>facebookPageLink</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>TOKEN_EXPIRY_ALERT_SENT</name>
         <rename>tokenExpiryAlertSent</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>FACEBOOK_ACCESS_TOKEN_CREATED_ON</name>
         <rename>createdOnStr</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>IS_DELETED</name>
         <rename>isDeleted</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -1312,12 +1310,12 @@
       <value>
         <name>GOOGLE_BUSINESS_LINK</name>
         <rename>googleBusinessLink</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>IS_DELETED</name>
         <rename>isDeleted</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -1370,27 +1368,27 @@
       <value>
         <name>GOOGLE_ACCESS_TOKEN</name>
         <rename>googleAccessToken</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>GOOGLE_ACCESS_TOKEN_CREATED_ON</name>
         <rename>createdOnStr</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>GOOGLE_ACCESS_TOKEN_EXPIRES_IN</name>
         <rename>googleAccessTokenExpiresIn</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>GOOGLE_REFRESH_TOKEN</name>
         <rename>googleRefreshToken</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>PROFILE_LINK</name>
         <rename>profileLink</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>id</name>
@@ -1400,7 +1398,7 @@
       <value>
         <name>IS_DELETED</name>
         <rename>isDeleted</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -1453,7 +1451,7 @@
       <value>
         <name>LENDING_TREE_PROFILE_LINK</name>
         <rename>lendingTreeProfileLink</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>id</name>
@@ -1463,7 +1461,7 @@
       <value>
         <name>IS_DELETED</name>
         <rename>isDeleted</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -1521,32 +1519,32 @@
       <value>
         <name>LINKED_IN_ACCESS_TOKEN</name>
         <rename>linkedInAccessToken</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>LINKED_IN_ACCESS_TOKEN_CREATED_ON</name>
         <rename>createdOnStr</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>LINKED_IN_ACCESS_TOKEN_EXPIRES_IN</name>
         <rename>linkedInAccessTokenExpiresIn</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>LINKED_IN_PAGE_LINK</name>
         <rename>linkedInPageLink</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>TOKEN_EXPIRY_ALERT_SENT</name>
         <rename>tokenExpiryAlertSent</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>IS_DELETED</name>
         <rename>isDeleted</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -1599,7 +1597,7 @@
       <value>
         <name>REALTOR_PROFILE_LINK</name>
         <rename>realtorProfileLink</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>id</name>
@@ -1609,7 +1607,7 @@
       <value>
         <name>IS_DELETED</name>
         <rename>isDeleted</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -1632,7 +1630,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>100</commit>
+    <commit>10000</commit>
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
@@ -1662,22 +1660,22 @@
       <value>
         <name>TWITTER_ACCESS_TOKEN</name>
         <rename>twitterAccessToken</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>TWITTER_ACCESS_TOKEN_CREATED_ON</name>
         <rename>createdOnStr</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>TWITTER_ACCESS_TOKEN_SECRET</name>
         <rename>twitterAccessTokenSecret</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>TWITTER_PAGE_LINK</name>
         <rename>twitterPageLink</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>id</name>
@@ -1687,7 +1685,7 @@
       <value>
         <name>IS_DELETED</name>
         <rename>isDeleted</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -1740,12 +1738,12 @@
       <value>
         <name>IS_DELETED</name>
         <rename>isDeleted</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>YELP_PAGE_LINK</name>
         <rename>yelpPageLink</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>YELP_TOKEN_ID</name>
@@ -1803,17 +1801,17 @@
       <value>
         <name>ZILLOW_LENDER_ID</name>
         <rename>zillowLenderId</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>ZILLOW_PROFILE_LINK</name>
         <rename>zillowProfileLink</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>ZILLOW_SCREEN_NAME</name>
         <rename>zillowScreenName</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>id</name>
@@ -1823,7 +1821,7 @@
       <value>
         <name>IS_DELETED</name>
         <rename>isDeleted</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -3361,7 +3359,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
+    <commit>1000</commit>
     <use_batch>N</use_batch>
     <error_ignored>N</error_ignored>
     <ignore_flag_field/>
