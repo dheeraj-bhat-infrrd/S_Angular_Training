@@ -793,7 +793,7 @@ public class WorkbookData
         surveyResultsCompanyReportToPopulate.add( "Customer Last Name" );
         surveyResultsCompanyReportToPopulate.add( "Survey Sent Date" );
         surveyResultsCompanyReportToPopulate.add( "Survey Completed Date" );
-        surveyResultsCompanyReportToPopulate.add( "TimeLine" );
+        surveyResultsCompanyReportToPopulate.add( "Time Interval" );
         surveyResultsCompanyReportToPopulate.add( "Survey Source" );
         surveyResultsCompanyReportToPopulate.add( "Survey Source ID" );
         surveyResultsCompanyReportToPopulate.add( "Survey Score" );
