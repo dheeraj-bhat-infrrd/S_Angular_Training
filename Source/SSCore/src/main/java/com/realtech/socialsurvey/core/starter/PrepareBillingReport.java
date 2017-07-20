@@ -126,7 +126,7 @@ public class PrepareBillingReport implements Runnable
                          
                         }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
                              locationInS3 = reportingDashboardManagement.generateSurveyTransactionForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
-                                 fileUpload.getAdminUserId() );
+                                 fileUpload.getAdminUserId(),fileUpload.getStartDate(),fileUpload.getEndDate() );
 
                                     fileUpload.getAdminUserId();
 

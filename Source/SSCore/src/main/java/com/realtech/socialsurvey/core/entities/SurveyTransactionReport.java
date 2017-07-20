@@ -19,10 +19,10 @@ public class SurveyTransactionReport
     private String surveyTransactionReportId;
     
     @Column ( name = "month")
-    private Long month;
+    private int month;
     
     @Column ( name = "year")
-    private Long year;
+    private int year;
     
     @Column ( name = "user_name")
     private String userName;
@@ -115,22 +115,22 @@ public class SurveyTransactionReport
         this.surveyTransactionReportId = surveyTransactionReportId;
     }
 
-    public Long getMonth()
+    public int getMonth()
     {
         return month;
     }
 
-    public void setMonth( Long month )
+    public void setMonth( int month )
     {
         this.month = month;
     }
 
-    public Long getYear()
+    public int getYear()
     {
         return year;
     }
 
-    public void setYear( Long year )
+    public void setYear( int year )
     {
         this.year = year;
     }

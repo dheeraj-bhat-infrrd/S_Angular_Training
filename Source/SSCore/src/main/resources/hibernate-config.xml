@@ -123,6 +123,10 @@
 				<value>com.realtech.socialsurvey.core.entities.SurveyStatsReportCompany</value>
 				<value>com.realtech.socialsurvey.core.entities.UserAdoptionReport</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyUserReport</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyTransactionReport</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyTransactionReportRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyTransactionReportBranch</value>
+	
 			</list>
 		</property>
 	</bean>
