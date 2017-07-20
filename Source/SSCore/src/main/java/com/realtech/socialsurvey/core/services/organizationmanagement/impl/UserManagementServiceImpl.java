@@ -24,6 +24,8 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -1160,7 +1162,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.setTitle( agentSettings.getContact_details().getTitle() );
             user.setLocation( agentSettings.getContact_details().getLocation() );
             user.setIndustry( agentSettings.getContact_details().getIndustry() );
-            user.setAboutMe( agentSettings.getContact_details().getAbout_me() );
+            if( agentSettings.getContact_details().getAbout_me() != null ){
+            user.setAboutMe( Jsoup.clean( agentSettings.getContact_details().getAbout_me(), Whitelist.none() ) );
+            }
             //JIRA SS-1104 search results not updated with correct number of reviews
             long reviewCount = profileManagementService.getReviewsCount( agentSettings.getIden(), 0, 5,
                 CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
