@@ -2357,97 +2357,108 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * @throws ProfileNotFoundException 
      */
     @Override
-    public void findProfileMailIdAndSendMail( String profileName, String message, String senderName, String senderMailId,
+    public void findProfileMailIdAndSendMail( String companyProfileName, String profileName, String message, String senderName, String senderMailId,
         String profileType )
         throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
+        if ( companyProfileName == null || companyProfileName.isEmpty() ) {
+            LOG.error( "Contact Us : companyProfileName parameter is empty or null!" );
+            throw new InvalidInputException( "Contact Us : companyProfileName parameter is empty or null!" );
+        }
         if ( profileName == null || profileName.isEmpty() ) {
-            LOG.error( "contactAgent : profileName parameter is empty or null!" );
-            throw new InvalidInputException( "contactAgent : profileName parameter is empty or null!" );
+            LOG.error( "Contact Us : profileName parameter is empty or null!" );
+            throw new InvalidInputException( "Contact Us : profileName parameter is empty or null!" );
         }
         if ( message == null || message.isEmpty() ) {
-            LOG.error( "contactAgent : message parameter is empty or null!" );
-            throw new InvalidInputException( "contactAgent : message parameter is empty or null!" );
+            LOG.error( "Contact Us : message parameter is empty or null!" );
+            throw new InvalidInputException( "Contact Us : message parameter is empty or null!" );
         }
         if ( senderName == null || senderName.isEmpty() ) {
-            LOG.error( "contactAgent : senderName parameter is empty or null!" );
-            throw new InvalidInputException( "contactAgent : senderName parameter is empty or null!" );
+            LOG.error( "Contact Us : senderName parameter is empty or null!" );
+            throw new InvalidInputException( "Contact Us : senderName parameter is empty or null!" );
         }
         if ( senderMailId == null || senderMailId.isEmpty() ) {
-            LOG.error( "contactAgent : senderMailId parameter is empty or null!" );
-            throw new InvalidInputException( "contactAgent : senderMailId parameter is empty or null!" );
+            LOG.error( "Contact Us : senderMailId parameter is empty or null!" );
+            throw new InvalidInputException( "Contact Us : senderMailId parameter is empty or null!" );
         }
         if ( profileType == null || profileType.isEmpty() ) {
-            LOG.error( "contactAgent : profileType parameter is empty or null!" );
-            throw new InvalidInputException( "contactAgent : profileType parameter is empty or null!" );
+            LOG.error( "Contact Us : profileType parameter is empty or null!" );
+            throw new InvalidInputException( "Contact Us : profileType parameter is empty or null!" );
         }
-
         OrganizationUnitSettings settings = null;
-        if ( profileType.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
-            LOG.debug( "Fetching the agent settings from mongo for the agent with profile name : " + profileName );
-            settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( profileName,
-                CommonConstants.AGENT_SETTINGS_COLLECTION );
-            if ( settings != null
-                && ( settings.getContact_details() == null || settings.getContact_details().getMail_ids() == null
-                    || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) ) {
-                Map<String, Long> hierarchyDetails = getHierarchyDetailsByEntity( CommonConstants.AGENT_ID,
-                    settings.getIden() );
-                long companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
-                long regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
-                long branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
-                settings = organizationManagementService.getBranchSettingsDefault( branchId );
-                if ( settings == null || settings.getContact_details() == null
-                    || settings.getContact_details().getMail_ids() == null
-                    || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) {
+        
+        //Fetch the companysettings to first check if we have route all Contact Us emails to the Company Admin only
+        LOG.debug( "Fetching the company settings from mongo for the company with profile name : " + companyProfileName );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( companyProfileName,
+                CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Settings fetched from mongo!" );
+        
+        if(companySettings.isContactUsEmailsRoutedToCompanyAdmin()){
+        	settings = companySettings;
+        }
+        else{
+        	if ( profileType.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+                LOG.debug( "Fetching the agent settings from mongo for the agent with profile name : " + profileName );
+                settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( profileName,
+                    CommonConstants.AGENT_SETTINGS_COLLECTION );
+                if ( settings != null
+                    && ( settings.getContact_details() == null || settings.getContact_details().getMail_ids() == null
+                        || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) ) {
+                    Map<String, Long> hierarchyDetails = getHierarchyDetailsByEntity( CommonConstants.AGENT_ID,
+                        settings.getIden() );
+                    long regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+                    long branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+                    settings = organizationManagementService.getBranchSettingsDefault( branchId );
+                    if ( settings == null || settings.getContact_details() == null
+                        || settings.getContact_details().getMail_ids() == null
+                        || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) {
+                        settings = organizationManagementService.getRegionSettings( regionId );
+                        if ( settings == null || settings.getContact_details() == null
+                            || settings.getContact_details().getMail_ids() == null
+                            || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) {
+                        	//Company settings are already fetched, re-use that
+                        	settings = companySettings;
+                        }
+                    }
+                }
+                LOG.debug( "Settings fetched from mongo!" );
+            } else if ( profileType.equals( CommonConstants.PROFILE_LEVEL_BRANCH ) ) {
+                LOG.debug( "Fetching the branch settings from mongo for the branch with profile name : " + profileName );
+                settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( profileName,
+                    CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                if ( settings != null
+                    && ( settings.getContact_details() == null || settings.getContact_details().getMail_ids() == null
+                        || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) ) {
+                    Map<String, Long> hierarchyDetails = getHierarchyDetailsByEntity( CommonConstants.BRANCH_ID,
+                        settings.getIden() );
+                    long regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
                     settings = organizationManagementService.getRegionSettings( regionId );
                     if ( settings == null || settings.getContact_details() == null
                         || settings.getContact_details().getMail_ids() == null
                         || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) {
-                        settings = organizationManagementService.getCompanySettings( companyId );
+                    	//Company settings are already fetched, re-use that
+                    	settings = companySettings;
                     }
                 }
-            }
-            LOG.debug( "Settings fetched from mongo!" );
-        } else if ( profileType.equals( CommonConstants.PROFILE_LEVEL_BRANCH ) ) {
-            LOG.debug( "Fetching the branch settings from mongo for the branch with profile name : " + profileName );
-            settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( profileName,
-                CommonConstants.BRANCH_SETTINGS_COLLECTION );
-            if ( settings != null
-                && ( settings.getContact_details() == null || settings.getContact_details().getMail_ids() == null
-                    || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) ) {
-                Map<String, Long> hierarchyDetails = getHierarchyDetailsByEntity( CommonConstants.BRANCH_ID,
-                    settings.getIden() );
-                long companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
-                long regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
-                settings = organizationManagementService.getRegionSettings( regionId );
-                if ( settings == null || settings.getContact_details() == null
-                    || settings.getContact_details().getMail_ids() == null
-                    || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) {
-                    settings = organizationManagementService.getCompanySettings( companyId );
+                LOG.debug( "Settings fetched from mongo!" );
+            } else if ( profileType.equals( CommonConstants.PROFILE_LEVEL_REGION ) ) {
+                LOG.debug( "Fetching the region settings from mongo for the region with profile name : " + profileName );
+                settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( profileName,
+                    CommonConstants.REGION_SETTINGS_COLLECTION );
+                if ( settings != null
+                    && ( settings.getContact_details() == null || settings.getContact_details().getMail_ids() == null
+                        || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) ) {
+                	//Company settings are already fetched, re-use that
+                	settings = companySettings;
                 }
+                LOG.debug( "Settings fetched from mongo!" );
+            } else if ( profileType.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            	//Company settings are already fetched, re-use that
+                settings = companySettings;
+            } else {
+                LOG.error( "Profile level not known:{}", profileType );
+                throw new InvalidInputException( "Profile level not known:" + profileType );
             }
-            LOG.debug( "Settings fetched from mongo!" );
-        } else if ( profileType.equals( CommonConstants.PROFILE_LEVEL_REGION ) ) {
-            LOG.debug( "Fetching the region settings from mongo for the region with profile name : " + profileName );
-            settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( profileName,
-                CommonConstants.REGION_SETTINGS_COLLECTION );
-            if ( settings != null
-                && ( settings.getContact_details() == null || settings.getContact_details().getMail_ids() == null
-                    || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) ) {
-                Map<String, Long> hierarchyDetails = getHierarchyDetailsByEntity( CommonConstants.REGION_ID,
-                    settings.getIden() );
-                long companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
-                settings = organizationManagementService.getCompanySettings( companyId );
-            }
-            LOG.debug( "Settings fetched from mongo!" );
-        } else if ( profileType.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
-            LOG.debug( "Fetching the company settings from mongo for the company with profile name : " + profileName );
-            settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( profileName,
-                CommonConstants.COMPANY_SETTINGS_COLLECTION );
-            LOG.debug( "Settings fetched from mongo!" );
-        } else {
-            LOG.error( "Profile level not known!" );
-            throw new InvalidInputException( "Profile level not known!" );
         }
 
         if ( settings != null ) {
@@ -2456,9 +2467,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 settings.getContact_details().getName(), senderName, senderMailId, message );
             LOG.debug( "Contact us mail sent!" );
         } else {
-            LOG.error( "No records found for agent settings of profile name : " + profileName + " in mongo" );
+            LOG.error( "No records found for profile settings of profile name: {}, profile type: {} in mongo",profileName,profileType );
             throw new NoRecordsFetchedException(
-                "No records found for agent settings of profile name : " + profileName + " in mongo" );
+            		"No records found for profile settings of profile name: " + profileName + ", profile type: " + profileType + " in mongo");
         }
     }
 

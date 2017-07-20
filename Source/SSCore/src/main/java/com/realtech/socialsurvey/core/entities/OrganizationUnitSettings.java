@@ -63,6 +63,9 @@ public class OrganizationUnitSettings
     
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
+    
+    //are the 'Contact Us' emails routed to the company admin always?
+    private boolean contactUsEmailsRoutedToCompanyAdmin;
 
 
     public boolean isSendEmailFromCompany()
@@ -619,7 +622,17 @@ public class OrganizationUnitSettings
         this.sendEmailThrough = sendEmailThrough;
     }
 
-    @Override
+    public boolean isContactUsEmailsRoutedToCompanyAdmin() {
+		return contactUsEmailsRoutedToCompanyAdmin;
+	}
+
+
+	public void setContactUsEmailsRoutedToCompanyAdmin( boolean contactUsEmailsRoutedToCompanyAdmin ) {
+		this.contactUsEmailsRoutedToCompanyAdmin = contactUsEmailsRoutedToCompanyAdmin;
+	}
+
+
+	@Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", profile_completion=" + profile_completion
