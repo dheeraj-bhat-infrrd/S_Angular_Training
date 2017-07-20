@@ -29,10 +29,13 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.eq( CommonConstants.SURVEY_RESULTS_IS_DELETED, false ) );
+            
+            if(startDate != null && endDate != null){
             Criterion criterion = Restrictions.and(
-                    Restrictions.gt( CommonConstants.SURVEY_RESULTS_REPORT_MODIFIED_ON, startDate),
-                    Restrictions.lt( CommonConstants.SURVEY_RESULTS_REPORT_MODIFIED_ON, endDate) );
+                    Restrictions.ge( CommonConstants.SURVEY_RESULTS_REPORT_MODIFIED_ON, startDate),
+                    Restrictions.le( CommonConstants.SURVEY_RESULTS_REPORT_MODIFIED_ON, endDate) );
                 criteria.add( criterion );
+            }
         } catch ( HibernateException hibernateException ) {
             LOG.error( "Exception caught in fetchSurveyResultsCompanyReportByCompanyId() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchSurveyResultsCompanyReportByCompanyId() ", hibernateException );

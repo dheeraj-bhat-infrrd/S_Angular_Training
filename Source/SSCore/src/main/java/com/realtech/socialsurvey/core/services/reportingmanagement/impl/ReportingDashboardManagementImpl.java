@@ -768,6 +768,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
          surveyResultsCompanyReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
          Map<Integer, List<Object>> data = workbookData.getSurveyResultsCompanyReportToBeWrittenInSheet( surveyResultsCompanyReport );
          XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+         XSSFSheet sheet = workbook.getSheetAt(0);
+         this.makeRowBold( workbook, sheet.getRow(0));
          return workbook;
     	
     }
