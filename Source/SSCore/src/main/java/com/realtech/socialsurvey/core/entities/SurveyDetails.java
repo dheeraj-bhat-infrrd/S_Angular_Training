@@ -48,6 +48,7 @@ public class SurveyDetails
     private SocialMediaPostDetails socialMediaPostDetails;
     private boolean underResolution;
     private boolean isAbuseRepByUser;
+    private Date lastAbuseReportedDate;
     private SocialMediaPostResponseDetails socialMediaPostResponseDetails;
     private boolean showSurveyOnUI;
     private String summary;
@@ -732,6 +733,18 @@ public class SurveyDetails
     public void setSurveyUpdatedDate( Date surveyUpdatedDate )
     {
         this.surveyUpdatedDate = surveyUpdatedDate;
+    }
+
+
+    public Date getLastAbuseReportedDate()
+    {
+        return lastAbuseReportedDate;
+    }
+
+
+    public void setLastAbuseReportedDate( Date lastAbuseReportedDate )
+    {
+        this.lastAbuseReportedDate = lastAbuseReportedDate;
     }
 	
 }

@@ -290,6 +290,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, true );
         update.set( CommonConstants.IS_ABUSIVE_REPORTED_BY_USER_COLUMN, true );
+        update.set( CommonConstants.SURVEY_LAST_ABUSE_REPORTED_DATE, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         query = new Query();
@@ -2170,7 +2171,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     {
         LOG.debug( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive started." );
         Query query = new Query( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( true ) );
-        query.with( new Sort( Sort.Direction.ASC, CommonConstants.DEFAULT_MONGO_ID_COLUMN ) );
+        query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_LAST_ABUSE_REPORTED_DATE ) );
         if ( start > -1 ) {
             query.skip( start );
         }
@@ -2196,8 +2197,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         //create AbuseReporterDetails object for the surveys reported abusive by application
         AbuseReporterDetails absReporterDetailForApp = new AbuseReporterDetails();
         Set<ReporterDetail> abuseReportersForApp = new HashSet<ReporterDetail>();
-        abuseReportersForApp.add( new ReporterDetail( CommonConstants.REPORT_ABUSE_BY_APPLICSTION_NAME,
-            CommonConstants.REPORT_ABUSE_BY_APPLICSTION_EMAIL ) );
+        abuseReportersForApp.add( new ReporterDetail( CommonConstants.REPORT_ABUSE_BY_APPLICATION_NAME,
+            CommonConstants.REPORT_ABUSE_BY_APPLICATION_EMAIL ) );
         absReporterDetailForApp.setAbuseReporters( abuseReportersForApp );
 
         List<AbusiveSurveyReportWrapper> abusiveSurveyReports = new ArrayList<AbusiveSurveyReportWrapper>();

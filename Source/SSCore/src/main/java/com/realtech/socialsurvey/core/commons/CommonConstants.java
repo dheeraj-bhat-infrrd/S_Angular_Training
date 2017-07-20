@@ -320,6 +320,8 @@ public interface CommonConstants
     public static final String SURVEY_TRANSACTION_DATE_COLUMN = "surveyTransactionDate";
     public static final String ACCOUNT_DISABLE_DATE_COLUMN = "disableDate";
     public static final String IS_FORCE_DELETE_COLUMN = "isForceDelete";
+    public static final String SURVEY_LAST_ABUSE_REPORTED_DATE = "lastAbuseReportedDate";
+    
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -997,8 +999,8 @@ public interface CommonConstants
     public static final String URL_COLUMN = "url";
 
     //mark abusive by application constant
-    public static final String REPORT_ABUSE_BY_APPLICSTION_NAME = "Application";
-    public static final String REPORT_ABUSE_BY_APPLICSTION_EMAIL = "Reported By Application";
+    public static final String REPORT_ABUSE_BY_APPLICATION_NAME = "Application";
+    public static final String REPORT_ABUSE_BY_APPLICATION_EMAIL = "Reported By Application";
 
     // sendgrid inbound mail status
     public static final String SENDGRID_OK_STATUS = "OK";
