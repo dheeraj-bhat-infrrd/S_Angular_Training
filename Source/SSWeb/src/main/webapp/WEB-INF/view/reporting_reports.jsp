@@ -37,9 +37,9 @@
 						<select id="generate-survey-reports" class="float-left dash-download-sel-item report-selector-choice">
 							<c:if test="${profilemasterid != 4}">
 								<option value=101 data-report="survey-stats">Survey Statistics</option>
+								<option value=102 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option>
 							</c:if>
-							<c:if test="${profilemasterid == 1}">
-								<option value=102 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option> 
+							<c:if test="${profilemasterid == 1}"> 
 								<option value=103 data-report="company-user">Company User</option>
 								<option value=104 data-report="survey-results-company">Survey Results Company</option>
 							</c:if>

@@ -7,6 +7,6 @@ import com.realtech.socialsurvey.core.entities.UserAdoptionReport;
 public interface UserAdoptionReportDao extends GenericReportingDao<UserAdoptionReport, String>
 {
 
-    List<UserAdoptionReport> fetchUserAdoptionByCompanyId( Long companyId );
+    List<UserAdoptionReport> fetchUserAdoptionById( Long entityId, String entityType );
 
 }

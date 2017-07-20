@@ -20,20 +20,28 @@ public class UserAdoptionReportDaoImpl extends GenericReportingDaoImpl<UserAdopt
     private static final Logger LOG = LoggerFactory.getLogger( UserAdoptionReportDaoImpl.class );
 
 
+    @SuppressWarnings ( "unchecked")
     @Override
-    public List<UserAdoptionReport> fetchUserAdoptionByCompanyId(Long companyId)
+    public List<UserAdoptionReport> fetchUserAdoptionById(Long entityId  , String entityType)
     {
-        LOG.info( "method to fetch user adoption report based on companyId,fetchUserAdoptionByCompanyId() started" );
+        LOG.info( "method to fetch user adoption report based on Id and type,fetchUserAdoptionById() started" );
         Criteria criteria = getSession().createCriteria( UserAdoptionReport.class );
         try {
-            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+            if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+                criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, entityId ) );
+            }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
+                criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, entityId ) );
+            }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
+                criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, entityId ) );
+            }
         } catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserAdoptionByCompanyId() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserAdoptionByCompanyId() ", hibernateException );
+            LOG.error( "Exception caught in fetchUserAdoptionById() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserAdoptionById() ", hibernateException );
         }
 
-        LOG.info( "method to fetch branch based on companyId, fetchUserAdoptionByCompanyId() finished." );
+        LOG.info( "method to fetch user adoption report based on Id and type, fetchUserAdoptionById() finished." );
         return (List<UserAdoptionReport>) criteria.list();
         
     }
+    
 }
