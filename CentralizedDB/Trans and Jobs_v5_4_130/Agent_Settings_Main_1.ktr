@@ -1499,7 +1499,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
@@ -1513,17 +1513,17 @@
       <value>
         <name>PROFILE_COMPLETION</name>
         <rename>profile_completion</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>STATUS</name>
         <rename>status</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>VERTICAL</name>
         <rename>vertical</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>AGENT_SETTINGS_ID</name>
@@ -1533,27 +1533,27 @@
       <value>
         <name>SOCIAL_MEDIA_TOKENS_ID</name>
         <rename>SOCIAL_MEDIA_TOKENS_ID</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</name>
         <rename>allowOverrideForSocialMedia</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>ALLOW_ZILLOW_AUTO_POST</name>
         <rename>allowZillowAutoPost</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>CREATED_BY</name>
         <rename>createdBy</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>CREATED_ON_MONGO</name>
         <rename>createdOn</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>USER_ID</name>
@@ -1563,152 +1563,152 @@
       <value>
         <name>HIDDEN_SECTION</name>
         <rename>hiddenSection</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>IS_ACCOUNT_DISABLED</name>
         <rename>isAccountDisabled</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>IS_DEFAULT_BY_SYSTEM</name>
         <rename>isDefaultBySystem</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>IS_LOCATION_ENABLED</name>
         <rename>isLocationEnabled</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>IS_LOGO_IMAGE_PROCESSED</name>
         <rename>isLogoImageProcessed</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>IS_PROFILE_IMAGE_PROCESSED</name>
         <rename>isProfileImageProcessed</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>IS_SEO_CONTENT_MODIFIED</name>
         <rename>isSeoContentModified</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>MODIFIED_BY</name>
         <rename>modifiedBy</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>MODIFIED_ON_MONGO</name>
         <rename>modifiedOn</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>PROFILE_IMAGE_URL</name>
         <rename>profileImageUrl</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>PROFILE_IMAGE_URL_THUMBNAIL</name>
         <rename>profileImageUrlThumbnail</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>PROFILE_NAME</name>
         <rename>profileName</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>PROFILE_URL</name>
         <rename>profileUrl</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>REVIEW_COUNT</name>
         <rename>reviewCount</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SEND_EMAIL_FROM_COMPANY</name>
         <rename>sendEmailFromCompany</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>USER_ENCRYPTED_ID</name>
         <rename>userEncryptedId</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>VENDASTA_ACCESSIBLE</name>
         <rename>vendastaAccessible</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>CREATED_ON</name>
         <rename>createdOnStr</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>MODIFIED_ON</name>
         <rename>modifiedOnStr</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>DISCLAIMER</name>
         <rename>disclaimer</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>ASSOCIATIONS</name>
         <rename>associations</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>EXPERTISE</name>
         <rename>experties</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>HOBBIES</name>
         <rename>hobies</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>ACHIEVMENTS</name>
         <rename>achievements</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>LOGO</name>
         <rename>logo</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>LOGO_THUMBNAIL</name>
         <rename>logoThumbnail</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>ZILLOW_REVIEW_AVERAGE</name>
         <rename>zillowReviewAverage</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>ZILLOW_REVIEW_COUNT</name>
         <rename>zillowReviewCount</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>HIDDEN_AGENT_NAME</name>
         <rename>hiddenAgentName</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>LICENSES</name>
         <rename>licenses</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>

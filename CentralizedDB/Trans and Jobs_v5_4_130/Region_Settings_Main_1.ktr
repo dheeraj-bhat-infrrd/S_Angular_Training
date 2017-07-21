@@ -175,7 +175,6 @@
   <hop> <from>Sort rows</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Synchronize after merge</to><enabled>Y</enabled> </hop>
   <hop> <from>Synchronize after merge</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Microsoft Excel Output</to><enabled>Y</enabled> </hop>
   <hop> <from>DateConverter </from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>Sort rows</to><enabled>Y</enabled> </hop>
@@ -267,7 +266,7 @@
     <name>Merge Rows &#x28;diff&#x29;</name>
     <type>MergeRows</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -320,238 +319,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>472</xloc>
       <yloc>394</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Microsoft Excel Output</name>
-    <type>ExcelOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <header>Y</header>
-    <footer>N</footer>
-    <encoding/>
-    <append>N</append>
-    <add_to_result_filenames>Y</add_to_result_filenames>
-    <file>
-      <name>C&#x3a;&#x5c;Users&#x5c;admin&#x5c;Desktop&#x5c;file</name>
-      <extention>xls</extention>
-      <do_not_open_newfile_init>N</do_not_open_newfile_init>
-      <create_parent_folder>N</create_parent_folder>
-      <split>N</split>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <sheetname>Sheet1</sheetname>
-      <autosizecolums>N</autosizecolums>
-      <nullisblank>N</nullisblank>
-      <protect_sheet>N</protect_sheet>
-      <password>Encrypted </password>
-      <splitevery>0</splitevery>
-      <usetempfiles>N</usetempfiles>
-      <tempdirectory/>
-      </file>
-    <template>
-      <enabled>N</enabled>
-      <append>N</append>
-      <filename>template.xls</filename>
-    </template>
-    <fields>
-      <field>
-        <name>REGION_SETTINGS_ID</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>ALLOW_ZILLOW_AUTO_POST</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>CREATED_BY</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>CREATED_ON_MONGO</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>DISCLAIMER</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>HIDDEN_SECTION</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>REGION_ID</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>IS_ACCOUNT_DISABLED</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>IS_DEFAULT_BY_SYSTEM</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>IS_LOCATION_ENABLED</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>IS_LOGO_IMAGE_PROCESSED</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>IS_PROFILE_IMAGE_PROCESSED</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>IS_SEO_CONTENT_MODIFIED</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>LOGO</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>LOGO_THUMBNAIL</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>MODIFIED_BY</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>MODIFIED_ON_MONGO</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>PROFILE_IMAGE_URL</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>PROFILE_IMAGE_URL_THUMBNAIL</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>PROFILE_NAME</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>PROFILE_URL</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>PROFILE_COMPLETION</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>SEND_EMAIL_FROM_COMPANY</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>STATUS</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>VENDASTA_ACCESSIBLE</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>VERTICAL</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>ZILLOW_REVIEW_AVERAGE</name>
-        <type>Number</type>
-        <format/>
-      </field>
-      <field>
-        <name>ZILLOW_REVIEW_COUNT</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>SOCIAL_MEDIA_TOKENS_ID</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>CREATED_ON</name>
-        <type>Timestamp</type>
-        <format/>
-      </field>
-      <field>
-        <name>MODIFIED_ON</name>
-        <type>Timestamp</type>
-        <format/>
-      </field>
-      <field>
-        <name>flagfield</name>
-        <type>String</type>
-        <format/>
-      </field>
-    </fields>
-    <custom>
-    <header_font_name>arial</header_font_name>
-    <header_font_size>10</header_font_size>
-    <header_font_bold>N</header_font_bold>
-    <header_font_italic>N</header_font_italic>
-    <header_font_underline>no</header_font_underline>
-    <header_font_orientation>horizontal</header_font_orientation>
-    <header_font_color>black</header_font_color>
-    <header_background_color>none</header_background_color>
-    <header_row_height>255</header_row_height>
-    <header_alignment>left</header_alignment>
-    <header_image/>
-    <row_font_name>arial</row_font_name>
-    <row_font_size>10</row_font_size>
-    <row_font_color>black</row_font_color>
-    <row_background_color>none</row_background_color>
-      </custom>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>737</xloc>
-      <yloc>552</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2354,7 +2121,7 @@
     <name>Sort rows</name>
     <type>SortRows</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>

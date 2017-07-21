@@ -103,8 +103,8 @@
       <note>Tables Handled&#xd;&#xa;1&#x29;LockSettings&#xd;&#xa;2&#x29;SurveySettings i&#x29;complaintRes&#xd;&#xa;3&#x29;vendestaRm&#xd;&#xa;4&#x29;ContactDetails &#xd;&#xa;  i&#x29;ContactNumbers&#xd;&#xa;  ii&#x29;Mail&#xd;&#xa;  iii&#x29;WebAddress</note>
       <xloc>34</xloc>
       <yloc>781</yloc>
-      <width>226</width>
-      <heigth>194</heigth>
+      <width>336</width>
+      <heigth>290</heigth>
       <fontname>Segoe Print</fontname>
       <fontsize>10</fontsize>
       <fontbold>N</fontbold>
@@ -188,8 +188,9 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -215,8 +216,9 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -277,8 +279,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1012</xloc>
-      <yloc>28</yloc>
+      <xloc>1226</xloc>
+      <yloc>25</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -303,8 +305,27 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>800</xloc>
-      <yloc>470</yloc>
+      <xloc>872</xloc>
+      <yloc>471</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>608</xloc>
+      <yloc>874</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -332,8 +353,435 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1145</xloc>
+      <xloc>1151</xloc>
       <yloc>238</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Contact Numbers</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>contact_numbers</table>
+      <key>
+        <name>CONTACT_DETAILS_ID</name>
+        <field>CONTACT_DETAILS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>CONTACT_DETAILS_ID</name>
+        <rename>CONTACT_DETAILS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>CONTACT_NUMBERS_ID</name>
+        <rename>CONTACT_NUMBERS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>WORK</name>
+        <rename>work</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>131</xloc>
+      <yloc>476</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Lock Settings</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>lock_settings</table>
+      <key>
+        <name>COMPANY_SETTINGS_ID</name>
+        <field>COMPANY_SETTINGS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>COMPANY_SETTINGS_ID</name>
+        <rename>COMPANY_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>LOCK_SETTINGS_ID</name>
+        <rename>LOCK_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_ABOUT_ME_LOCKED</name>
+        <rename>isAboutMeLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_ADDRESS_LOCKED</name>
+        <rename>isAddressLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_BLOG_ADDRESS_LOCKED</name>
+        <rename>isBlogAddressLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_FAX_PHONE_LOCKED</name>
+        <rename>isFaxPhoneLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_LOGO_LOCKED</name>
+        <rename>isLogoLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_MIN_SCORE_LOCKED</name>
+        <rename>isMinScoreLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_PERSONAL_PHONE_LOCKED</name>
+        <rename>isPersonalPhoneLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_WEB_ADDRESS_LOCKED</name>
+        <rename>isWebAddressLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_WORK_EMAIL_LOCKED</name>
+        <rename>isWorkEmailLocked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_WORK_PHONE_LOCKED</name>
+        <rename>isWorkPhoneLocked</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>187</xloc>
+      <yloc>141</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Mail</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>mail</table>
+      <key>
+        <name>CONTACT_DETAILS_ID</name>
+        <field>CONTACT_DETAILS _ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>MAIL_IDS</name>
+        <rename>MAIL_IDS</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>CONTACT_DETAILS _ID</name>
+        <rename>CONTACT_DETAILS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>IS_PERSONAL_EMAIL_VERIFIED</name>
+        <rename>isPersonalEmailVerified</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_WORK_EMAIL_VERIFIED</name>
+        <rename>isWorkEmailVerified</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_WORK_MAIL_VERIFIED_BY_ADMIN</name>
+        <rename>isWorkMailVerifiedByAdmin</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>WORK_EMAIL_TO_VERIFY</name>
+        <rename>workEmailToVerify</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>WORK</name>
+        <rename>work</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>446</xloc>
+      <yloc>678</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Survey Settings</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>survey_settings</table>
+      <key>
+        <name>COMPANY_SETTINGS_ID</name>
+        <field>COMPANY_SETTINGS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>AUTO_POST_ENABLED</name>
+        <rename>autoPostEnabled</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>AUTO_POST_LINK_TO_USER_SITE_ENABLED</name>
+        <rename>autoPostLinkToUserSiteEnabled</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>AUTO_POST_SCORE</name>
+        <rename>auto_post_score</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>COMPANY_SETTINGS_ID</name>
+        <rename>COMPANY_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>DUPLICATE_SURVEY_INTERVAL</name>
+        <rename>duplicateSurveyInterval</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>HAPPY_TEXT</name>
+        <rename>happyText</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>HAPPY_TEXT_COMPLETE</name>
+        <rename>happyTextComplete</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_REMINDER_DISABLED</name>
+        <rename>isReminderDisabled</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_SOCIAL_POST_REMINDER_DISABLED</name>
+        <rename>isSocialPostReminderDisabled</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MAX_NUMBER_OF_SOCIAL_POS_REMINDERS</name>
+        <rename>max_number_of_social_pos_reminders</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MAX_NUMBER_OF_SURVEY_REMINDERS</name>
+        <rename>max_number_of_survey_reminders</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>NEUTRAL_TEXT</name>
+        <rename>neutralText</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>NEUTRAL_TEXT_COMPLETE</name>
+        <rename>neutralTextComplete</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SAD_TEXT</name>
+        <rename>sadText</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SAD_TEXT_COMPLETE</name>
+        <rename>sadTextComplete</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SHOW_SURVEY_ABOVE_SCORE</name>
+        <rename>show_survey_above_score</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SOCIAL_POST_REMINDER_INTERVAL_IN_DAYS</name>
+        <rename>social_post_reminder_interval_in_days</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SURVEY_REMINDER_INTERVAL_IN_DAYS</name>
+        <rename>survey_reminder_interval_in_days</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SURVEY_SETTINGS_ID</name>
+        <rename>SURVEY_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>804</xloc>
+      <yloc>295</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Vendesta</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>vendasta_rm_settings</table>
+      <key>
+        <name>COMPANY_SETTINGS_ID</name>
+        <field>COMPANY_SETTINGS_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>VENDASTA_RM_SETTINGS_ID</name>
+        <rename>VENDASTA_RM_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>ACCOUNT_ID</name>
+        <rename>accountId</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>COMPANY_SETTINGS_ID</name>
+        <rename>COMPANY_SETTINGS_ID</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1151</xloc>
+      <yloc>398</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update Web Address</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>web_addresses</table>
+      <key>
+        <name>CONTACT_DETAILS_ID</name>
+        <field>CONTACT_DETAILS _ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>WEB_ADDRESSES_ID</name>
+        <rename>WEB_ADDRESSES_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>CONTACT_DETAILS _ID</name>
+        <rename>CONTACT_DETAILS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>WORK</name>
+        <rename>work_1</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>812</xloc>
+      <yloc>654</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -360,8 +808,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>587</xloc>
-      <yloc>471</yloc>
+      <xloc>588</xloc>
+      <yloc>483</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -388,8 +836,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>587</xloc>
-      <yloc>28</yloc>
+      <xloc>676</xloc>
+      <yloc>25</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1474,8 +1922,8 @@
       </mongo_field>
     </mongo_fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>165</xloc>
-      <yloc>28</yloc>
+      <xloc>128</xloc>
+      <yloc>25</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1509,7 +1957,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>408</xloc>
-      <yloc>28</yloc>
+      <yloc>25</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1542,8 +1990,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>804</xloc>
-      <yloc>28</yloc>
+      <xloc>986</xloc>
+      <yloc>25</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1601,7 +2049,7 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1144</xloc>
+      <xloc>1151</xloc>
       <yloc>132</yloc>
       <draw>Y</draw>
       </GUI>
@@ -1732,453 +2180,19 @@
       </GUI>
     </step>
 
-  <step>
-    <name>Insert &#x2f; Update Lock Settings</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>100</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>lock_settings</table>
-      <key>
-        <name>COMPANY_SETTINGS_ID</name>
-        <field>COMPANY_SETTINGS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>COMPANY_SETTINGS_ID</name>
-        <rename>COMPANY_SETTINGS_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>LOCK_SETTINGS_ID</name>
-        <rename>LOCK_SETTINGS_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>IS_ABOUT_ME_LOCKED</name>
-        <rename>isAboutMeLocked</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_ADDRESS_LOCKED</name>
-        <rename>isAddressLocked</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_BLOG_ADDRESS_LOCKED</name>
-        <rename>isBlogAddressLocked</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_FAX_PHONE_LOCKED</name>
-        <rename>isFaxPhoneLocked</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_LOGO_LOCKED</name>
-        <rename>isLogoLocked</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_MIN_SCORE_LOCKED</name>
-        <rename>isMinScoreLocked</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_PERSONAL_PHONE_LOCKED</name>
-        <rename>isPersonalPhoneLocked</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_WEB_ADDRESS_LOCKED</name>
-        <rename>isWebAddressLocked</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_WORK_EMAIL_LOCKED</name>
-        <rename>isWorkEmailLocked</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_WORK_PHONE_LOCKED</name>
-        <rename>isWorkPhoneLocked</rename>
-        <update>Y</update>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>259</xloc>
-      <yloc>143</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Insert &#x2f; Update Mail</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>10000</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>mail</table>
-      <key>
-        <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS _ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>MAIL_IDS</name>
-        <rename>MAIL_IDS</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>CONTACT_DETAILS _ID</name>
-        <rename>CONTACT_DETAILS_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>IS_PERSONAL_EMAIL_VERIFIED</name>
-        <rename>isPersonalEmailVerified</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_WORK_EMAIL_VERIFIED</name>
-        <rename>isWorkEmailVerified</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_WORK_MAIL_VERIFIED_BY_ADMIN</name>
-        <rename>isWorkMailVerifiedByAdmin</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>WORK_EMAIL_TO_VERIFY</name>
-        <rename>workEmailToVerify</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>WORK</name>
-        <rename>work</rename>
-        <update>Y</update>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>446</xloc>
-      <yloc>678</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Insert &#x2f; Update Web Address</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>100</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>web_addresses</table>
-      <key>
-        <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS _ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>WEB_ADDRESSES_ID</name>
-        <rename>WEB_ADDRESSES_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>CONTACT_DETAILS _ID</name>
-        <rename>CONTACT_DETAILS_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>WORK</name>
-        <rename>work_1</rename>
-        <update>Y</update>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>805</xloc>
-      <yloc>678</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Insert &#x2f; Update Contact Numbers</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>100</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>contact_numbers</table>
-      <key>
-        <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>CONTACT_DETAILS_ID</name>
-        <rename>CONTACT_DETAILS_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>CONTACT_NUMBERS_ID</name>
-        <rename>CONTACT_NUMBERS_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>WORK</name>
-        <rename>work</rename>
-        <update>Y</update>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>151</xloc>
-      <yloc>472</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Insert &#x2f; Update Survey Settings</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>10000</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>survey_settings</table>
-      <key>
-        <name>COMPANY_SETTINGS_ID</name>
-        <field>COMPANY_SETTINGS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>AUTO_POST_ENABLED</name>
-        <rename>autoPostEnabled</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>AUTO_POST_LINK_TO_USER_SITE_ENABLED</name>
-        <rename>autoPostLinkToUserSiteEnabled</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>AUTO_POST_SCORE</name>
-        <rename>auto_post_score</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>COMPANY_SETTINGS_ID</name>
-        <rename>COMPANY_SETTINGS_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>DUPLICATE_SURVEY_INTERVAL</name>
-        <rename>duplicateSurveyInterval</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>HAPPY_TEXT</name>
-        <rename>happyText</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>HAPPY_TEXT_COMPLETE</name>
-        <rename>happyTextComplete</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_REMINDER_DISABLED</name>
-        <rename>isReminderDisabled</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>IS_SOCIAL_POST_REMINDER_DISABLED</name>
-        <rename>isSocialPostReminderDisabled</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MAX_NUMBER_OF_SOCIAL_POS_REMINDERS</name>
-        <rename>max_number_of_social_pos_reminders</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MAX_NUMBER_OF_SURVEY_REMINDERS</name>
-        <rename>max_number_of_survey_reminders</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>NEUTRAL_TEXT</name>
-        <rename>neutralText</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>NEUTRAL_TEXT_COMPLETE</name>
-        <rename>neutralTextComplete</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>SAD_TEXT</name>
-        <rename>sadText</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>SAD_TEXT_COMPLETE</name>
-        <rename>sadTextComplete</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>SHOW_SURVEY_ABOVE_SCORE</name>
-        <rename>show_survey_above_score</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>SOCIAL_POST_REMINDER_INTERVAL_IN_DAYS</name>
-        <rename>social_post_reminder_interval_in_days</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>SURVEY_REMINDER_INTERVAL_IN_DAYS</name>
-        <rename>survey_reminder_interval_in_days</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>SURVEY_SETTINGS_ID</name>
-        <rename>SURVEY_SETTINGS_ID</rename>
-        <update>N</update>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>809</xloc>
-      <yloc>250</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Insert &#x2f; Update Vendesta</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>100</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>vendasta_rm_settings</table>
-      <key>
-        <name>COMPANY_SETTINGS_ID</name>
-        <field>COMPANY_SETTINGS_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>VENDASTA_RM_SETTINGS_ID</name>
-        <rename>VENDASTA_RM_SETTINGS_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>ACCOUNT_ID</name>
-        <rename>accountId</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>COMPANY_SETTINGS_ID</name>
-        <rename>COMPANY_SETTINGS_ID</rename>
-        <update>N</update>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1151</xloc>
-      <yloc>398</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>608</xloc>
-      <yloc>874</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step_error_handling>
+      <error>
+        <source_step>Insert &#x2f; Update Contact Numbers</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
       <error>
         <source_step>Insert &#x2f; Update Lock Settings</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
@@ -2204,30 +2218,6 @@
         <min_pct_rows/>
       </error>
       <error>
-        <source_step>Insert &#x2f; Update Web Address</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
-        <source_step>Insert &#x2f; Update Contact Numbers</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
-      <error>
         <source_step>Insert &#x2f; Update Survey Settings</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
@@ -2241,6 +2231,18 @@
       </error>
       <error>
         <source_step>Insert &#x2f; Update Vendesta</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Insert &#x2f; Update Web Address</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
