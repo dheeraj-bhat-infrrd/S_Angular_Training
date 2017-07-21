@@ -12,6 +12,62 @@
   <modified_date>2017&#x2f;06&#x2f;06 23&#x3a;40&#x3a;25.156</modified_date>
     <parameters>
     </parameters>
+  <connection>
+    <name>SS_Centralized_Mysql_Conn</name>
+    <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;CENTRALIZED_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;CENTRALIZED_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;CENTRALIZED_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;CENTRALIZED_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;CENTRALIZED_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
     <slaveservers>
     </slaveservers>
 <job-log-table><connection/>
@@ -84,8 +140,8 @@
       </parameters>      <parallel>Y</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>249</xloc>
-      <yloc>194</yloc>
+      <xloc>285</xloc>
+      <yloc>197</yloc>
       </entry>
     <entry>
       <name>SocialMedia</name>
@@ -117,8 +173,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>380</xloc>
-      <yloc>194</yloc>
+      <xloc>509</xloc>
+      <yloc>204</yloc>
       </entry>
     <entry>
       <name>CompanySettingsMain</name>
@@ -150,8 +206,8 @@
       </parameters>      <parallel>Y</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>513</xloc>
-      <yloc>194</yloc>
+      <xloc>672</xloc>
+      <yloc>205</yloc>
       </entry>
     <entry>
       <name>ContactDetailsMain</name>
@@ -183,8 +239,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>661</xloc>
-      <yloc>194</yloc>
+      <xloc>888</xloc>
+      <yloc>208</yloc>
       </entry>
     <entry>
       <name>ContachDetails</name>
@@ -216,8 +272,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>801</xloc>
-      <yloc>194</yloc>
+      <xloc>1065</xloc>
+      <yloc>209</yloc>
       </entry>
     <entry>
       <name>ProfileStages</name>
@@ -249,8 +305,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>529</xloc>
-      <yloc>86</yloc>
+      <xloc>724</xloc>
+      <yloc>19</yloc>
       </entry>
     <entry>
       <name>crm_info</name>
@@ -282,8 +338,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>516</xloc>
-      <yloc>322</yloc>
+      <xloc>675</xloc>
+      <yloc>333</yloc>
       </entry>
     <entry>
       <name>Company_Settings_FacebookPages</name>
@@ -315,8 +371,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>252</xloc>
-      <yloc>294</yloc>
+      <xloc>288</xloc>
+      <yloc>297</yloc>
       </entry>
     <entry>
       <name>Update JobLogs</name>
@@ -387,8 +443,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>589</xloc>
-      <yloc>505</yloc>
+      <xloc>748</xloc>
+      <yloc>516</yloc>
       </entry>
     <entry>
       <name>DUMMY</name>
@@ -407,8 +463,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>349</xloc>
-      <yloc>286</yloc>
+      <xloc>478</xloc>
+      <yloc>296</yloc>
       </entry>
     <entry>
       <name>DUMMY 2</name>
@@ -427,8 +483,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>592</xloc>
-      <yloc>280</yloc>
+      <xloc>773</xloc>
+      <yloc>319</yloc>
       </entry>
     <entry>
       <name>Abort job</name>
@@ -438,8 +494,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>722</xloc>
-      <yloc>504</yloc>
+      <xloc>949</xloc>
+      <yloc>518</yloc>
       </entry>
     <entry>
       <name>ContactDetails_Phone</name>
@@ -471,8 +527,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>929</xloc>
-      <yloc>194</yloc>
+      <xloc>1228</xloc>
+      <yloc>211</yloc>
       </entry>
   </entries>
   <hops>
