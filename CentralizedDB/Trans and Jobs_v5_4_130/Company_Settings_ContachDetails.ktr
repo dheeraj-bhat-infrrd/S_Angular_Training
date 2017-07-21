@@ -252,12 +252,12 @@
   <hop> <from>UUID_SurveySettings</from><to>Insert &#x2f; Update Survey Settings</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID-vendestaRmSettings</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>Insert &#x2f; Update Vendesta</to><enabled>Y</enabled> </hop>
-  <hop> <from>Insert &#x2f; Update Mail</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Insert &#x2f; Update Web Address</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Lock Settings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Insert &#x2f; Update Contact Numbers</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Insert &#x2f; Update Vendesta</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Web Address</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Insert &#x2f; Update Survey Settings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Insert &#x2f; Update Lock Settings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Insert &#x2f; Update Mail</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>CompanySettings Input</name>
@@ -371,7 +371,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>100</commit>
+    <commit>1000</commit>
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
@@ -517,7 +517,7 @@
       <table>mail</table>
       <key>
         <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS _ID</field>
+        <field>CONTACT_DETAILS_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
       </key>
@@ -527,7 +527,7 @@
         <update>N</update>
       </value>
       <value>
-        <name>CONTACT_DETAILS _ID</name>
+        <name>CONTACT_DETAILS_ID</name>
         <rename>CONTACT_DETAILS_ID</rename>
         <update>N</update>
       </value>
@@ -758,7 +758,7 @@
       <table>web_addresses</table>
       <key>
         <name>CONTACT_DETAILS_ID</name>
-        <field>CONTACT_DETAILS _ID</field>
+        <field>CONTACT_DETAILS_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
       </key>
@@ -768,14 +768,14 @@
         <update>N</update>
       </value>
       <value>
-        <name>CONTACT_DETAILS _ID</name>
-        <rename>CONTACT_DETAILS_ID</rename>
-        <update>N</update>
-      </value>
-      <value>
         <name>WORK</name>
         <rename>work_1</rename>
         <update>Y</update>
+      </value>
+      <value>
+        <name>CONTACT_DETAILS_ID</name>
+        <rename>CONTACT_DETAILS_ID</rename>
+        <update>N</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -860,7 +860,7 @@
     <fields_name/>
     <collection>COMPANY_SETTINGS</collection>
     <json_field_name>json</json_field_name>
-    <json_query>&#x7b;&#x24;query&#x3a;&#x7b;&#x22;modifiedOn&#x22; &#x3a;&#x7b;&#x24;gte&#x3a;&#x24;&#x7b;modifiedOnSettings&#x7d;&#x7d;&#x7d;&#x7d;</json_query>
+    <json_query/>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -997,7 +997,7 @@
 
         <field_path>&#x24;.contact_details.mail_ids.isPersonalEmailVerified</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1005,7 +1005,7 @@
 
         <field_path>&#x24;.contact_details.mail_ids.isWorkEmailVerified</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1013,7 +1013,7 @@
 
         <field_path>&#x24;.contact_details.mail_ids.isWorkMailVerifiedByAdmin</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1285,7 +1285,7 @@
 
         <field_path>&#x24;.lockSettings.isAboutMeLocked</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1293,7 +1293,7 @@
 
         <field_path>&#x24;.lockSettings.isAddressLocked</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1301,7 +1301,7 @@
 
         <field_path>&#x24;.lockSettings.isBlogAddressLocked</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1309,7 +1309,7 @@
 
         <field_path>&#x24;.lockSettings.isDisplayNameLocked</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1317,7 +1317,7 @@
 
         <field_path>&#x24;.lockSettings.isFaxPhoneLocked</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1325,7 +1325,7 @@
 
         <field_path>&#x24;.lockSettings.isLogoLocked</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1333,7 +1333,7 @@
 
         <field_path>&#x24;.lockSettings.isMinScoreLocked</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1341,7 +1341,7 @@
 
         <field_path>&#x24;.lockSettings.isPersonalPhoneLocked</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1349,7 +1349,7 @@
 
         <field_path>&#x24;.lockSettings.isWebAddressLocked</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1357,7 +1357,7 @@
 
         <field_path>&#x24;.lockSettings.isWorkEmailLocked</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1365,7 +1365,7 @@
 
         <field_path>&#x24;.lockSettings.isWorkPhoneLocked</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1709,7 +1709,7 @@
 
         <field_path>&#x24;.survey_settings.autoPostEnabled</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1717,7 +1717,7 @@
 
         <field_path>&#x24;.survey_settings.autoPostLinkToUserSiteEnabled</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1789,7 +1789,7 @@
 
         <field_path>&#x24;.survey_settings.isReminderDisabled</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -1797,7 +1797,7 @@
 
         <field_path>&#x24;.survey_settings.isSocialPostReminderDisabled</field_path>
 
-        <field_type>String</field_type>
+        <field_type>Boolean</field_type>
 
       </mongo_field>
       <mongo_field>
