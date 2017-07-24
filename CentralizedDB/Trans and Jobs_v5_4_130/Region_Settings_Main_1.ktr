@@ -138,34 +138,6 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
-  <connection>
-    <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
-    <type>MYSQL</type>
-    <access>Native</access>
-    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
-    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
-    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
-    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
-      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
   <order>
   <hop> <from>Sort Region Settings Mongo</from><to>Merge BranchSettings</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge BranchSettings</from><to>DateConverter </to><enabled>Y</enabled> </hop>
@@ -338,72 +310,72 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;allowOverrideForSocialMedia &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; allowOverrideForSocialMedia &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var allowOverrideForSocialMedia &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;allowOverrideForSocialMedia &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; allowOverrideForSocialMedia &#x3d;&#x3d; &#x22;false&#x22;&#x29;&#x7b;&#xd;&#xa;	var allowOverrideForSocialMedia &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;allowZillowAutoPost &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; allowZillowAutoPost &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var allowZillowAutoPost &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;allowZillowAutoPost &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; allowZillowAutoPost &#x3d;&#x3d; &#x22;false&#x22;&#x29;&#x7b;&#xd;&#xa;	var allowZillowAutoPost &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;hiddenSection &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; hiddenSection &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var hiddenSection &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;hiddenSection &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; hiddenSection &#x3d;&#x3d; &#x22;false&#x22;&#x29;&#x7b;&#xd;&#xa;	var hiddenSection &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isAccountDisabled &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isAccountDisabled &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isAccountDisabled &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isAccountDisabled &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isAccountDisabled &#x3d;&#x3d; &#x22;false&#x22;&#x29;&#x7b;&#xd;&#xa;	var isAccountDisabled &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isDefaultBySystem &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isDefaultBySystem &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isDefaultBySystem &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isDefaultBySystem &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isDefaultBySystem &#x3d;&#x3d; &#x22;false&#x22;&#x29;&#x7b;&#xd;&#xa;	var isDefaultBySystem &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isLocationEnabled &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isLocationEnabled &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isLocationEnabled &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isLocationEnabled &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isLocationEnabled &#x3d;&#x3d; &#x22;false&#x22;&#x29;&#x7b;&#xd;&#xa;	var isLocationEnabled &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isLogoImageProcessed &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isLogoImageProcessed &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isLogoImageProcessed &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isLogoImageProcessed &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isLogoImageProcessed &#x3d;&#x3d; &#x22;false&#x22;&#x29;&#x7b;&#xd;&#xa;	var isLogoImageProcessed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isProfileImageProcessed &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isProfileImageProcessed &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isProfileImageProcessed &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isProfileImageProcessed &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isProfileImageProcessed &#x3d;&#x3d; &#x22;false&#x22;&#x29;&#x7b;&#xd;&#xa;	var isProfileImageProcessed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isSeoContentModified &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isSeoContentModified &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var isSeoContentModified &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isSeoContentModified &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isSeoContentModified &#x3d;&#x3d; &#x22;false&#x22;&#x29;&#x7b;&#xd;&#xa;	var isSeoContentModified &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sendEmailFromCompany &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; sendEmailFromCompany &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var sendEmailFromCompany &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;sendEmailFromCompany &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; sendEmailFromCompany &#x3d;&#x3d; &#x22;false&#x22;&#x29;&#x7b;&#xd;&#xa;	var sendEmailFromCompany &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;vendastaAccessible &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; vendastaAccessible &#x3d;&#x3d; &#x22;true&#x22;&#x29;&#x7b;&#xd;&#xa;	var vendastaAccessible &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;vendastaAccessible &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; vendastaAccessible &#x3d;&#x3d; &#x22;false&#x22;&#x29;&#x7b;&#xd;&#xa;	var vendastaAccessible &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;allowOverrideForSocialMedia &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; allowOverrideForSocialMedia &#x3d;&#x3d; true&#x29;&#x7b;&#xd;&#xa;	var allowOverrideForSocialMedia &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;allowOverrideForSocialMedia &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; allowOverrideForSocialMedia &#x3d;&#x3d; false&#x29;&#x7b;&#xd;&#xa;	var allowOverrideForSocialMedia &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;allowZillowAutoPost &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; allowZillowAutoPost &#x3d;&#x3d; true&#x29;&#x7b;&#xd;&#xa;	var allowZillowAutoPost &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;allowZillowAutoPost &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; allowZillowAutoPost &#x3d;&#x3d; false&#x29;&#x7b;&#xd;&#xa;	var allowZillowAutoPost &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;hiddenSection &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; hiddenSection &#x3d;&#x3d; true&#x29;&#x7b;&#xd;&#xa;	var hiddenSection &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;hiddenSection &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; hiddenSection &#x3d;&#x3d; false&#x29;&#x7b;&#xd;&#xa;	var hiddenSection &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isAccountDisabled &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isAccountDisabled &#x3d;&#x3d; true&#x29;&#x7b;&#xd;&#xa;	var isAccountDisabled &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isAccountDisabled &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isAccountDisabled &#x3d;&#x3d; false&#x29;&#x7b;&#xd;&#xa;	var isAccountDisabled &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isDefaultBySystem &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isDefaultBySystem &#x3d;&#x3d; true&#x29;&#x7b;&#xd;&#xa;	var isDefaultBySystem &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isDefaultBySystem &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isDefaultBySystem &#x3d;&#x3d; false&#x29;&#x7b;&#xd;&#xa;	var isDefaultBySystem &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isLocationEnabled &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isLocationEnabled &#x3d;&#x3d; true&#x29;&#x7b;&#xd;&#xa;	var isLocationEnabled &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isLocationEnabled &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isLocationEnabled &#x3d;&#x3d; false&#x29;&#x7b;&#xd;&#xa;	var isLocationEnabled &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isLogoImageProcessed &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isLogoImageProcessed &#x3d;&#x3d; true&#x29;&#x7b;&#xd;&#xa;	var isLogoImageProcessed &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isLogoImageProcessed &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isLogoImageProcessed &#x3d;&#x3d; false&#x29;&#x7b;&#xd;&#xa;	var isLogoImageProcessed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isProfileImageProcessed &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isProfileImageProcessed &#x3d;&#x3d; true&#x29;&#x7b;&#xd;&#xa;	var isProfileImageProcessed &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isProfileImageProcessed &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isProfileImageProcessed &#x3d;&#x3d; false&#x29;&#x7b;&#xd;&#xa;	var isProfileImageProcessed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;isSeoContentModified &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; isSeoContentModified &#x3d;&#x3d; true&#x29;&#x7b;&#xd;&#xa;	var isSeoContentModified &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;isSeoContentModified &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; isSeoContentModified &#x3d;&#x3d; false&#x29;&#x7b;&#xd;&#xa;	var isSeoContentModified &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sendEmailFromCompany &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; sendEmailFromCompany &#x3d;&#x3d; true&#x29;&#x7b;&#xd;&#xa;	var sendEmailFromCompany &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;sendEmailFromCompany &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; sendEmailFromCompany &#x3d;&#x3d; false&#x29;&#x7b;&#xd;&#xa;	var sendEmailFromCompany &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;vendastaAccessible &#x3d;&#x3d; &#x22;Y&#x22; &#x7c;&#x7c; vendastaAccessible &#x3d;&#x3d; true&#x29;&#x7b;&#xd;&#xa;	var vendastaAccessible &#x3d; 1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;vendastaAccessible &#x3d;&#x3d; &#x22;N&#x22; &#x7c;&#x7c; vendastaAccessible &#x3d;&#x3d; false&#x29;&#x7b;&#xd;&#xa;	var vendastaAccessible &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>allowOverrideForSocialMedia</name>
         <rename>allowOverrideForSocialMedia</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>allowZillowAutoPost</name>
         <rename>allowZillowAutoPost</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>hiddenSection</name>
         <rename>hiddenSection</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>isAccountDisabled</name>
         <rename>isAccountDisabled</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>isDefaultBySystem</name>
         <rename>isDefaultBySystem</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>isLocationEnabled</name>
         <rename>isLocationEnabled</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>isLogoImageProcessed</name>
         <rename>isLogoImageProcessed</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>isProfileImageProcessed</name>
         <rename>isProfileImageProcessed</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>isSeoContentModified</name>
         <rename>isSeoContentModified</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>sendEmailFromCompany</name>
         <rename>sendEmailFromCompany</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>vendastaAccessible</name>
         <rename>vendastaAccessible</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
