@@ -29,8 +29,8 @@ CREATE TABLE `overview_branch_month` (
   `month` int(11),
   `year` int(11),
   PRIMARY KEY (`overview_branch_id`),
-  KEY `FX_OVERVIEW_BRANCH_idx` (`branch_id`),
-  CONSTRAINT `FX_OVERVIEW_BRANCH` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `FX_OVERVIEW_BRANCH_MONTH_idx` (`branch_id`),
+  CONSTRAINT `FX_OVERVIEW_BRANCH_MONTH` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -62,8 +62,8 @@ CREATE TABLE `overview_company_month` (
   `month` int(11),
   `year` int(11),
   PRIMARY KEY (`overview_company_id`),
-  KEY `FX_OVERVIEW_COMPANY_idx` (`company_id`),
-  CONSTRAINT `FX_OVERVIEW_COMPANY` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `FX_OVERVIEW_COMPANY_MONTH_idx` (`company_id`),
+  CONSTRAINT `FX_OVERVIEW_COMPANY_MONTH` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -95,8 +95,8 @@ CREATE TABLE `overview_region_month` (
   `month` int(11),
   `year` int(11),
   PRIMARY KEY (`overview_region_id`),
-  KEY `FX_OVERVIEW_REGION_idx` (`region_id`),
-  CONSTRAINT `FX_OVERVIEW_REGION` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `FX_OVERVIEW_REGION_MONTH_idx` (`region_id`),
+  CONSTRAINT `FX_OVERVIEW_REGION_MONTH` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -125,9 +125,9 @@ CREATE TABLE `overview_user_month` (
   `total_survey_completed` int(11) NOT NULL DEFAULT '0',
   `total_social_post` int(11) NOT NULL DEFAULT '0',
   `total_zillow_reviews` int(11) NOT NULL DEFAULT '0',
-  `month` int(11),
-  `year` int(11),
+  `month` INT(11),
+  `year` INT(11),
   PRIMARY KEY (`overview_user_id`),
-  KEY `FX_OVERVIEW_USER_idx` (`user_id`),
-  CONSTRAINT `FX_OVERVIEW_USER` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `FX_OVERVIEW_USER_MONTH_idx` (`user_id`),
+  CONSTRAINT `FX_OVERVIEW_USER_MONTH` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
