@@ -293,12 +293,30 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.SURVEY_LAST_ABUSE_REPORTED_DATE, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
+        // check if the reporter already exists in DB
         query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).is( surveyMongoId ) );
-        update = new Update();
-        update.set( CommonConstants.SURVEY_ID_COLUMN, surveyMongoId );
-        update.push( CommonConstants.ABUSE_REPORTERS_COLUMN, new ReporterDetail( reporterName, reporterEmail ) );
-        mongoTemplate.upsert( query, update, ABS_REPORTER_DETAILS_COLLECTION );
+        
+        AbuseReporterDetails previousReporterDetails = mongoTemplate.findOne( query, AbuseReporterDetails.class,
+            ABS_REPORTER_DETAILS_COLLECTION );
+
+        boolean doesReporterExistInDB = false;
+        if ( previousReporterDetails != null && !previousReporterDetails.getAbuseReporters().isEmpty() ) {
+            for ( ReporterDetail previousReporter : previousReporterDetails.getAbuseReporters() ) {
+                if ( StringUtils.equals( previousReporter.getReporterEmail(), reporterEmail ) ) {
+                    doesReporterExistInDB = true;
+                    break;
+                }
+            }
+        }
+
+        if ( !doesReporterExistInDB && StringUtils.isNotEmpty( reporterEmail ) ) {
+            update = new Update();
+            update.set( CommonConstants.SURVEY_ID_COLUMN, surveyMongoId );
+            update.push( CommonConstants.ABUSE_REPORTERS_COLUMN, new ReporterDetail( reporterName, reporterEmail ) );
+            mongoTemplate.upsert( query, update, ABS_REPORTER_DETAILS_COLLECTION );
+        }
+
         LOG.debug( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
     }
 
