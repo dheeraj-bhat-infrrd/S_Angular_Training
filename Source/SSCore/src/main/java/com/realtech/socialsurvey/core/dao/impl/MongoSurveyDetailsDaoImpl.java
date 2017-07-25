@@ -290,6 +290,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, true );
         update.set( CommonConstants.IS_ABUSIVE_REPORTED_BY_USER_COLUMN, true );
+        update.set( CommonConstants.SURVEY_LAST_ABUSE_REPORTED_DATE, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         query = new Query();
