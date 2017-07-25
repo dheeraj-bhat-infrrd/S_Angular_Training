@@ -4839,6 +4839,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 //Update user profiles here.
                 userProfileDao.updateRegionIdForBranch( branchId, region.getRegionId() );
 
+                //update survey details
+                surveyDetailsDao.updateRegionIdForAllSurveysOfBranch( branchId, region.getRegionId() );
+                
                 //Get and update user
                 SolrDocumentList users = null;
                 int pageNo = 1;
