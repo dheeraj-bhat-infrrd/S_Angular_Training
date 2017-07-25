@@ -296,6 +296,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         // check if the reporter already exists in DB
         query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).is( surveyMongoId ) );
+        
         AbuseReporterDetails previousReporterDetails = mongoTemplate.findOne( query, AbuseReporterDetails.class,
             ABS_REPORTER_DETAILS_COLLECTION );
 
@@ -309,7 +310,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             }
         }
 
-        if ( doesReporterExistInDB && StringUtils.isNotEmpty( reporterEmail ) ) {
+        if ( !doesReporterExistInDB && StringUtils.isNotEmpty( reporterEmail ) ) {
             update = new Update();
             update.set( CommonConstants.SURVEY_ID_COLUMN, surveyMongoId );
             update.push( CommonConstants.ABUSE_REPORTERS_COLUMN, new ReporterDetail( reporterName, reporterEmail ) );
