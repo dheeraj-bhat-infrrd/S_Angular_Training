@@ -358,4 +358,7 @@ public interface SurveyDetailsDao
 
     void disconnectSurveysFromWithUser( long agentId );
 
+
+    void updateRegionIdForAllSurveysOfBranch( long branchId, long regionId );
+
 }

@@ -157,21 +157,19 @@ $(document).on('click', '.lp-button', function(event){
 		data = "";
 		if($("#agent-profile-name").val() != ""){
 			data += "profilename=" + $("#agent-profile-name").val();
-			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
 		}
 		else if($("#region-profile-name").val() != ""){
 			data += "profilename=" + $("#region-profile-name").val();
-			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
 		}
 		else if($("#branch-profile-name").val() != ""){
 			data += "profilename=" + $("#branch-profile-name").val();
-			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
 		}
 		else if($("#company-profile-name").val() != ""){
 			data += "profilename=" + $("#company-profile-name").val();
-			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
 		}
 		
+		data += "&companyprofilename=" + $("#company-profile-name").val();
+		data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
 		data += "&name=" + $('#lp-input-name').val();
 		data += "&email=" + $('#lp-input-email').val();
 		data += "&message=" + $('#lp-input-message').val();

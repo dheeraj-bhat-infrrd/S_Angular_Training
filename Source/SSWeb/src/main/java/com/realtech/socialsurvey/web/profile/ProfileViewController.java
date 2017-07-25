@@ -707,6 +707,7 @@ public class ProfileViewController
             return JspResolver.MESSAGE_HEADER;
         }
 
+        model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
         model.addAttribute( "agentProfileName", agentProfileName );
         model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_INDIVIDUAL );
 
@@ -757,6 +758,7 @@ public class ProfileViewController
                 throw new InvalidInputException( "Profile type not mentioned!" );
             }
 
+            String companyProfileName = request.getParameter( "companyprofilename" );
             String profileName = request.getParameter( "profilename" );
             String senderName = request.getParameter( "name" );
             String senderMailId = request.getParameter( "email" );
@@ -782,7 +784,7 @@ public class ProfileViewController
 
             LOG.debug( "Sending mail to :  " + profileName + " from : " + senderMailId );
 
-            profileManagementService.findProfileMailIdAndSendMail( profileName, message, senderName, senderMailId,
+            profileManagementService.findProfileMailIdAndSendMail( companyProfileName, profileName, message, senderName, senderMailId,
                 profileType );
             LOG.debug( "Mail sent!" );
             returnMessage = messageUtils
