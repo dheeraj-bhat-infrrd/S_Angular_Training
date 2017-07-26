@@ -126,6 +126,14 @@
 				<value>com.realtech.socialsurvey.core.entities.SurveyTransactionReport</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyTransactionReportRegion</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyTransactionReportBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewUserMonth</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewBranchMonth</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewRegionMonth</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewCompanyMonth</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewUserYear</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewBranchYear</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewRegionYear</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewCompanyYear</value>
 	
 			</list>
 		</property>

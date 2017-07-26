@@ -47,6 +47,8 @@ CREATE TABLE `overview_branch` (
   `total_survey_completed` int(11) NOT NULL DEFAULT '0',
   `total_social_post` int(11) NOT NULL DEFAULT '0',
   `total_zillow_reviews` int(11) NOT NULL DEFAULT '0',
+  `total_reviews` int(11) DEFAULT '0',
+  `rating` decimal(10,2) DEFAULT '0.00',
   PRIMARY KEY (`overview_branch_id`),
   KEY `FX_OVERVIEW_BRANCH_idx` (`branch_id`),
   CONSTRAINT `FX_OVERVIEW_BRANCH` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -92,6 +94,8 @@ CREATE TABLE `overview_company` (
   `total_survey_completed` int(11) NOT NULL DEFAULT '0',
   `total_social_post` int(11) NOT NULL DEFAULT '0',
   `total_zillow_reviews` int(11) NOT NULL DEFAULT '0',
+  `total_reviews` int(11) DEFAULT '0',
+  `rating` decimal(10,2) DEFAULT '0.00',
   PRIMARY KEY (`overview_company_id`),
   KEY `FX_OVERVIEW_COMPANY_idx` (`company_id`),
   CONSTRAINT `FX_OVERVIEW_COMPANY` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -137,6 +141,8 @@ CREATE TABLE `overview_region` (
   `total_survey_completed` int(11) NOT NULL DEFAULT '0',
   `total_social_post` int(11) NOT NULL DEFAULT '0',
   `total_zillow_reviews` int(11) NOT NULL DEFAULT '0',
+  `total_reviews` int(11) DEFAULT '0',
+  `rating` decimal(10,2) DEFAULT '0.00',
   PRIMARY KEY (`overview_region_id`),
   KEY `FX_OVERVIEW_REGION_idx` (`region_id`),
   CONSTRAINT `FX_OVERVIEW_REGION` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -160,7 +166,7 @@ DROP TABLE IF EXISTS `overview_user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `overview_user` (
- `overview_user_id` varchar(36) NOT NULL,
+  `overview_user_id` varchar(36) NOT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
   `sps_score` int(11) NOT NULL DEFAULT '0',
   `total_detractors` int(11) NOT NULL DEFAULT '0',
@@ -182,6 +188,8 @@ CREATE TABLE `overview_user` (
   `total_survey_completed` int(11) NOT NULL DEFAULT '0',
   `total_social_post` int(11) NOT NULL DEFAULT '0',
   `total_zillow_reviews` int(11) NOT NULL DEFAULT '0',
+  `total_reviews` int(11) DEFAULT '0',
+  `rating` decimal(10,2) DEFAULT '0.00',
   PRIMARY KEY (`overview_user_id`),
   KEY `FX_OVERVIEW_USER_idx` (`user_id`),
   CONSTRAINT `FX_OVERVIEW_USER` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION

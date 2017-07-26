@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.OverviewBranch;
 import com.realtech.socialsurvey.core.entities.OverviewCompany;
 import com.realtech.socialsurvey.core.entities.OverviewRegion;
 import com.realtech.socialsurvey.core.entities.OverviewUser;
+import com.realtech.socialsurvey.core.entities.OverviewUserMonth;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
@@ -118,6 +119,8 @@ public class ReportingController
             overview_map.put( "TotalSurveyCompleted",overviewUser.getTotalSurveyCompleted() );
             overview_map.put( "TotalSocialPost", overviewUser.getTotalSocialPost() );
             overview_map.put( "TotalZillowReviews", overviewUser.getTotalZillowReviews() );
+            overview_map.put( "Rating",overviewUser.getRating() );
+            overview_map.put( "TotalReview",overviewUser.getTotalReviews() );
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
             OverviewBranch overviewBranch = overviewManagement.fetchOverviewBranchDetails( entityId, entityType );
             overview_map.put( "SpsScore", overviewBranch.getSpsScore() );
@@ -133,6 +136,8 @@ public class ReportingController
             overview_map.put( "TotalSurveyCompleted",overviewBranch.getTotalSurveyCompleted() );
             overview_map.put( "TotalSocialPost", overviewBranch.getTotalSocialPost() );
             overview_map.put( "TotalZillowReviews", overviewBranch.getTotalZillowReviews() );
+            overview_map.put( "Rating",overviewBranch.getRating() );
+            overview_map.put( "TotalReview",overviewBranch.getTotalReviews() );
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
            OverviewRegion overviewRegion = overviewManagement.fetchOverviewRegionDetails( entityId, entityType );
            overview_map.put( "SpsScore", overviewRegion.getSpsScore() );
@@ -148,6 +153,8 @@ public class ReportingController
            overview_map.put( "TotalSurveyCompleted",overviewRegion.getTotalSurveyCompleted() );
            overview_map.put( "TotalSocialPost", overviewRegion.getTotalSocialPost() );
            overview_map.put( "TotalZillowReviews", overviewRegion.getTotalZillowReviews() );
+           overview_map.put( "Rating",overviewRegion.getRating() );
+           overview_map.put( "TotalReview",overviewRegion.getTotalReviews() );
         }else if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             OverviewCompany overviewCompany = overviewManagement.fetchOverviewCompanyDetails( entityId, entityType );
             overview_map.put( "SpsScore", overviewCompany.getSpsScore() );
@@ -163,6 +170,8 @@ public class ReportingController
             overview_map.put( "TotalSurveyCompleted",overviewCompany.getTotalSurveyCompleted() );
             overview_map.put( "TotalSocialPost", overviewCompany.getTotalSocialPost() );
             overview_map.put( "TotalZillowReviews", overviewCompany.getTotalZillowReviews() );
+            overview_map.put( "Rating",overviewCompany.getRating() );
+            overview_map.put( "TotalReview",overviewCompany.getTotalReviews() );
         }
         json = new Gson().toJson( overview_map );
         if(json == null && json.length() <= 0){
@@ -254,6 +263,31 @@ public class ReportingController
         return json;
     }
     
+    @RequestMapping( value = "/getmonthdataoverviewfordashboard", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch Month Data For Overview ")
+    public String getMonthDataOverviewForDashboard( Long entityId, String entityType , int month , int year ) throws NonFatalException 
+    {
+        LOGGER.info( "Fetch Month Data For Overview " );
+        
+        String json = null;
+        
+        Map<String,Object> overview_map = overviewManagement.fetchOverviewDetailsBasedOnMonth( entityId , entityType , month , year);
+        json = new Gson().toJson( overview_map );
+        return json;
+    }
+    
+    @RequestMapping( value = "/getyeardataoverviewfordashboard", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetching Year Data For Overview")
+    public String getYearDataOverviewForDashboard( Long entityId, String entityType, int year ) throws NonFatalException 
+    {
+        LOGGER.info( "Fetching Year Data For Overview" );
+        
+        String json = null;
+        
+        Map<String,Object> overview_map = overviewManagement.fetchOverviewDetailsBasedOnYear( entityId , entityType , year);
+        json = new Gson().toJson( overview_map );
+        return json;
+    }
     
 
 }
