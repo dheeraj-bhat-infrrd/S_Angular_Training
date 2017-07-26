@@ -86,6 +86,12 @@ public class OverviewBranch implements Serializable
 
     @Column ( name = "total_zillow_reviews")
     private int totalZillowReviews;
+    
+    @Column ( name = "total_reviews")
+    private int totalReviews;
+    
+    @Column ( name = "rating")
+    private float rating;
 
 
     public String getOverviewBranchId()
@@ -358,13 +364,44 @@ public class OverviewBranch implements Serializable
     }
 
 
-    @Override
-    public String toString() {
-        return "OverviewBranch [overviewBranchId=" + overviewBranchId + ", branchId=" + branchId + ", spsScore=" + spsScore + ", totalDetractors=" + totalDetractors
-                + ", detractorPercentage=" + detractorPercentage + ", totalPassives=" + totalPassives + ", passivesPercentage=" + passivesPercentage 
-                + ", totalPromoters=" + totalPromoters + ", promoterPercentage=" + ", promoterPercentage=" + totalCorrupted + ", totalCorrupted=" +", "
-                + "corruptedPercentage=" + corruptedPercentage + ", totalMismatched=" + totalMismatched + ", mismatchedPercentage=" + mismatchedPercentage + ", totalDuplicate=" +
-                totalDuplicate + ", duplicatePercentage=" +duplicatePercentage + ", totalArchieved=" +totalArchieved + ", archievedPercentage=" +archievedPercentage + ", totalIncompleteTransactions=" +
-                totalIncompleteTransactions +", totalSurveySent=" +totalSurveySent +", totalSurveyCompleted=" +totalSurveyCompleted +", totalSocialPost=" +totalSocialPost +", totalZillowReviews=" +totalZillowReviews+ "]";
+    public int getTotalReviews()
+    {
+        return totalReviews;
     }
+
+
+    public void setTotalReviews( int totalReviews )
+    {
+        this.totalReviews = totalReviews;
+    }
+
+
+    public float getRating()
+    {
+        return rating;
+    }
+
+
+    public void setRating( float rating )
+    {
+        this.rating = rating;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "OverviewBranch [overviewBranchId=" + overviewBranchId + ", branchId=" + branchId + ", spsScore=" + spsScore
+            + ", totalDetractors=" + totalDetractors + ", detractorPercentage=" + detractorPercentage + ", totalPassives="
+            + totalPassives + ", passivesPercentage=" + passivesPercentage + ", totalPromoters=" + totalPromoters
+            + ", promoterPercentage=" + promoterPercentage + ", totalCorrupted=" + totalCorrupted + ", corruptedPercentage="
+            + corruptedPercentage + ", totalMismatched=" + totalMismatched + ", mismatchedPercentage=" + mismatchedPercentage
+            + ", totalDuplicate=" + totalDuplicate + ", duplicatePercentage=" + duplicatePercentage + ", totalArchieved="
+            + totalArchieved + ", archievedPercentage=" + archievedPercentage + ", totalIncompleteTransactions="
+            + totalIncompleteTransactions + ", totalSurveySent=" + totalSurveySent + ", totalSurveyCompleted="
+            + totalSurveyCompleted + ", totalSocialPost=" + totalSocialPost + ", totalZillowReviews=" + totalZillowReviews
+            + ", totalReviews=" + totalReviews + ", rating=" + rating + "]";
+    }
+
+    
 }

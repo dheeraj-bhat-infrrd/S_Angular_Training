@@ -127,5 +127,11 @@ public interface SSApiIntegration
  
     @GET("/v1/getrecentactivityforreporting")
     Response getRecentActivity(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("startIndex") int startIndex , @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getmonthdataoverviewfordashboard")
+    Response getMonthDataOverviewForDashboard(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("month") int month , @Query ("year") int year);
+    
+    @GET("/v1/getyeardataoverviewfordashboard")
+    Response getYearDataOverviewForDashboard(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("year") int year);
     //reporting:END
 }

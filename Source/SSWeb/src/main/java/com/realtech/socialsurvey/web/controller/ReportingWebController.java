@@ -635,6 +635,67 @@ public class ReportingWebController
         
    }
    
+   @ResponseBody
+   @RequestMapping( value = "/fetchmonthdataforoverview", method = RequestMethod.GET)
+   public Response fetchMonthDataForOverview( Model model, HttpServletRequest request ) throws NonFatalException 
+   {
+        LOG.info( "Fetching Overview Based On Month" );
+        HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
+        Response response = null;
+        int month = 0;
+        int year = 0;
+
+        if ( user == null ) {
+            throw new NonFatalException( "NonFatalException while logging in. " );
+        }    
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        String month_string = request.getParameter( "month" );
+        if(month_string != null && !month_string.isEmpty()){
+           month = Integer.valueOf(month_string);
+        }
+        String year_string = request.getParameter( "year");
+        if(year_string != null && !year_string.isEmpty()){
+            year = Integer.valueOf(year_string);
+        }
+        if ( month == 0 || year == 0 ) {
+            throw new NonFatalException( "NonFatalException while logging in. " );
+        }else {
+            response = ssApiIntergrationBuilder.getIntegrationApi().getMonthDataOverviewForDashboard(entityId,entityType, month, year);
+        }
+        return response;
+        
+   }
+   
+   @ResponseBody
+   @RequestMapping( value = "/fetchyeardataforoverview", method = RequestMethod.GET)
+   public Response fetchYearDataForOverview( Model model, HttpServletRequest request ) throws NonFatalException 
+   {
+        LOG.info( "Fetching Overview Based On Year" );
+        HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
+        Response response = null;
+        int year = 0;
+
+        if ( user == null ) {
+            throw new NonFatalException( "NonFatalException while logging in. " );
+        }    
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        String year_string = request.getParameter( "year");
+        if(year_string != null && !year_string.isEmpty()){
+            year = Integer.valueOf(year_string);
+        }
+        if ( year == 0 ) {
+            throw new NonFatalException( "NonFatalException while logging in. " );
+        }else {
+            response = ssApiIntergrationBuilder.getIntegrationApi().getYearDataOverviewForDashboard(entityId,entityType,year);
+        }
+        return response;
+        
+   }
+   
    /*
     * Generate Reports For the reporting UI
     */
