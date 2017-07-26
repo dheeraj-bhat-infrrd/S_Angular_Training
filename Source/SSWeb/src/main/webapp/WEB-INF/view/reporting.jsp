@@ -57,6 +57,7 @@
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
 				<spring:message code="label.reporting.key" />
 			</div>
+			<jsp:include page="timeFrame_dropdown.jsp"></jsp:include>
 			<!-- Add user assignment dropdown -->
 			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
 		</div>
@@ -94,7 +95,6 @@
 					<li id="overview-btn" class="active"><a href="#overview-tab" data-toggle="tab">Overview</a></li>
 					<li id="leaderboard-btn"><a href="#leaderboard-tab" data-toggle="tab">LeaderBoard</a></li>
 					<li id="score-stats-btn"><a href="#score-stats-tab" data-toggle="tab">Score Stats</a></li>
-					<li id="activity-btn"><a href="#activity-tab" data-toggle="tab">Activity</a></li>
 					<li id="reviews-btn"><a href="#reviews-tab" data-toggle="tab">Reviews</a></li>
 					<li id="incomplete-surveys-btn" ><a href="#incomplete-surveys-tab" data-toggle="tab" style="padding-left:2px; padding-right:2px">Incomplete Surveys</a></li>
 				</ul>
