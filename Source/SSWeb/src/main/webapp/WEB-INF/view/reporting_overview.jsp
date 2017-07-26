@@ -21,9 +21,21 @@
 	.nav>li>a:hover{
        background-color: #009FE0 !important;
      }
+     
+     .rep-sps-lbl{
+     	font-size: 20px;
+    	position: absolute;
+    	left: 0;
+    	z-index: 1000;
+    	float: left;
+    	margin-top: -20px;
+   		margin-left: 50px;
+    	
+     }
 </style>
-<script src="${initParam.resourcesPath}/resources/js/googleloader.js"></script>
-<div class="col-lg-3 col-md-3 col-sm-3" style="padding-left:50px">
+<span class="rep-sps-lbl">Social Promoter Score (SPS)</span>
+<div class="col-lg-3 col-md-3 col-sm-3" style="padding-left:50px; padding-top:10px;">
+	
 	<div id="spsGaugeSuccess" class="hide">
 		<jsp:include page="reporting_spsGauge.jsp"></jsp:include>
 	</div>
@@ -40,7 +52,7 @@
 	</div>
 </div>
 <div class="col-lg-3 col-md-3 col-sm-3"
-	style="display: grid; margin-top: 20px;">
+	style="display: grid; margin-top: 40px;">
 	<div style="display: inline-flex; margin-top: 10px">
 		<div class="float-left dash-sel-lbl" style="padding-left:12px; font-weight:600 !important">Detractors</div>
 		<div id="detractorsBar" class="float-left dash-sel-lbl"
@@ -65,7 +77,8 @@
 	<jsp:include page="reporting_spsStatsGraph.jsp"></jsp:include>
 </div>
 
-<div id="graphTabs" style="margin-top: 10px; display: inline-block; float:left; width:100%;height:420px">
+<div id="graphTabs" style="margin-top: 10px; display: inline-block; float:left; width:100%;height:360px; border-top:1px solid #d2cdcd;margin-left:15px">
+	<span class="rep-sps-lbl" style="margin-top: 13px;">Completion Rate</span>
 	<jsp:include page="reporting_completionRateGraph.jsp"></jsp:include>
 </div>
 

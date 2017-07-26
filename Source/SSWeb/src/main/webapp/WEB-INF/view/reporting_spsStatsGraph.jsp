@@ -3,7 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
- <div id="chart_div" style="width:100%; margin-top:20px"></div>
+ <div id="chart_div" style="width:100%; margin-top:-30px"></div>
  
  <script>
 	drawSpsStatsGraph();

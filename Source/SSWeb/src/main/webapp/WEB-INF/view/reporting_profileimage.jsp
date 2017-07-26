@@ -22,7 +22,7 @@
 
 <c:choose>
 	<c:when test="${not empty profileimage}">
-		<img id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" src="${profileimage}"></img>
+		<img id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer rep-prof-pic" src="${profileimage}"></img>
 	</c:when>
 	<c:otherwise>
 		<c:choose>
@@ -39,6 +39,6 @@
 				<c:set value="pers-default-big" var="defaultprofimageclass"></c:set>
 			</c:when>
 		</c:choose>
-		<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer"></div>
+		<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer rep-prof-pic"></div>
 	</c:otherwise>
 </c:choose>
