@@ -23,8 +23,8 @@
 <div id="wrapper" onload="">
 <img id="metre-needle" src="${initParam.resourcesPath}/resources/images/svg-meter-gauge-needle.svg" style="
     margin-left: 155px;
-    margin-top: 70px;
-    height: 100px;
+    margin-top: 80px;
+    height: 80px;
     position:absolute;
     z-index:1000">
 <div style="margin-left: 165px;
@@ -43,12 +43,12 @@
 
     
   <svg id="meter">
-<path id="arc1" fill="none" stroke="#E8341F" stroke-width="40" />
-<path id="arc2" fill="none" stroke="#999999" stroke-width="40" />
-<path id="arc3" fill="none" stroke="#7ab400" stroke-width="40" />
-<path id="arc4" fill="none" stroke="#E8341F" stroke-width="40" />
-<path id="arc5" fill="none" stroke="#999999" stroke-width="40" />
-<path id="arc6" fill="none" stroke="#7ab400" stroke-width="40" />
+		<path id="arc1" fill="none" stroke="#E8341F" stroke-width="32" />
+		<path id="arc2" fill="none" stroke="#999999" stroke-width="32" />
+		<path id="arc3" fill="none" stroke="#7ab400" stroke-width="32" />
+		<path id="arc4" fill="none" stroke="#E8341F" stroke-width="32" />
+		<path id="arc5" fill="none" stroke="#999999" stroke-width="32" />
+		<path id="arc6" fill="none" stroke="#7ab400" stroke-width="32" />
   </svg>
 
 </div>

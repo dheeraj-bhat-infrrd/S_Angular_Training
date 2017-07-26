@@ -88,7 +88,6 @@ function drawSpsStatsGraph(){
 														.arrayToDataTable(spsChartData);
 
 												var options = {
-													title : 'SPS Stats',
 													legend : {
 														position : 'none'
 													},
@@ -96,7 +95,9 @@ function drawSpsStatsGraph(){
 														groupWidth : '40%'
 													},
 													isStacked : true,
-													height : 300,
+													width: 600,
+													height: 300,
+													chartArea: {width:500,height:200},
 													vAxis : {
 														gridlines : {
 															count : 14
@@ -358,11 +359,10 @@ function drawCompletionRateGraph(){
 														.arrayToDataTable(compRateChartData);
 
 												var options = {
-													title : 'Completion Rate',
 													height : 300,
 													width : 1100,
 													chartArea : {
-														width : '78%'
+														width : '85%'
 													},
 													vAxis : {
 														minValue : 0,
@@ -372,9 +372,8 @@ function drawCompletionRateGraph(){
 														}
 													},
 													legend : {
-														position : 'right',
-														alignment : 'center',
-														maxLines : 2
+														position : 'bottom',
+														alignment : 'center'
 													},
 													pointSize : 5
 												};
@@ -408,6 +407,144 @@ function drawCompletionRateGraph(){
 					}
 				});
 	}
+}
+function drawUnclickedDonutChart(){
+	 google.charts.load("current", {packages:["corechart"]});
+     google.charts.setOnLoadCallback(drawChart);
+     
+     var processed = 68993;
+     var unprocessed = 9337;
+     
+     function drawChart() {
+    	 
+	        var data = google.visualization.arrayToDataTable([
+	          ['Transaction', 'Number#'],
+	          ['Processed', processed],
+	          ['Unprocessed', unprocessed]
+	        ]);
+
+	        var options = {
+	          pieStartAngle: 130,
+	          backgroundColor: '#f9f9fb',
+	          pieHole: 0.5,
+	          legend: { 
+	      	    position : 'none'
+	      	  },
+	      	  pieSliceText:'none',
+	      	  chartArea:{
+	      		  width:'100%',
+	      		  height:'65%'
+	      	  },
+	      	slices: [{color : '#0072c2'},{color: '#fa5b00'}],
+	      	 legend: {
+	             position: 'labeled',
+	             labeledValueText: 'none',
+	             textStyle: {
+	                 color: 'black', 
+	                 fontSize: 15,
+	                 bold: true
+	             }
+	      	 },
+	      	tooltip: { trigger: 'none' }
+	        };
+
+	        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+	        chart.draw(data, options);
+	      }
+}
+
+function drawProcessedDonutChart(){
+	 google.charts.load("current", {packages:["corechart"]});
+     google.charts.setOnLoadCallback(drawChart);
+     
+     var incomplete = 62080;
+     var completed = 6913;
+     
+     function drawChart() {
+    	 
+	        var data = google.visualization.arrayToDataTable([
+	          ['Transaction', 'Number#'],
+	          ['Incomplete', incomplete],
+	          ['Completed', completed]
+	        ]);
+
+	        var options = {
+	          pieStartAngle: 130,
+	          backgroundColor: '#f9f9fb',
+	          pieHole: 0.5,
+	          legend: { 
+	      	    position : 'none'
+	      	  },
+	      	  pieSliceText:'none',
+	      	  chartArea:{
+	      		  width:'100%',
+	      		  height:'65%'
+	      	  },
+	      	slices: [{color : '#f5c70a'},{color: '#79b600'}],
+	      	 legend: {
+	             position: 'labeled',
+	             labeledValueText: 'none',
+	             textStyle: {
+	                 color: 'black', 
+	                 fontSize: 15,
+	                 bold: true
+	             }
+	      	 },
+	      	tooltip: { trigger: 'none' }
+	        };
+
+	        var chart = new google.visualization.PieChart(document.getElementById('processedDonutchart'));
+	        chart.draw(data, options);
+	      }
+}
+
+function drawUnprocessedDonutChart(){
+	 google.charts.load("current", {packages:["corechart"]});
+    google.charts.setOnLoadCallback(drawChart);
+    
+    var unassigned = 127;
+    var duplicate = 7745;
+    var corrupted = 1465;
+    var other=26;
+    
+    function drawChart() {
+   	 
+	        var data = google.visualization.arrayToDataTable([
+	          ['Transaction', 'Number#'],
+	          ['Unassigned', unassigned],
+	          ['duplicate', duplicate],
+	          ['corrupted', corrupted],
+	          ['other',other]
+	        ]);
+
+	        var options = {
+	          pieStartAngle: 90,
+	          backgroundColor: '#f9f9fb',
+	          pieHole: 0.5,
+	          legend: { 
+	      	    position : 'none'
+	      	  },
+	      	  pieSliceText:'none',
+	      	  chartArea:{
+	      		  width:'100%',
+	      		  height:'65%'
+	      	  },
+	      	slices: [{color : '#f5c70a'},{color: '#7e36c2'},{color:'#ea310b'},{color:'#000000'}],
+	      	 legend: {
+	             position: 'labeled',
+	             labeledValueText: 'none',
+	             textStyle: {
+	                 color: 'black', 
+	                 fontSize: 15,
+	                 bold: true
+	             }
+	      	 },
+	      	tooltip: { trigger: 'none' }
+	        };
+
+	        var chart = new google.visualization.PieChart(document.getElementById('unprocessedDonutchart'));
+	        chart.draw(data, options);
+	      }
 }
 
 function drawDonutChart(){
@@ -522,10 +659,10 @@ function drawSpsGauge(){
 				}
 				
 				if(detractors > 50){
-					document.getElementById("arc1").setAttribute("d", describeArc(150, 150, 70, detractorStartAngle, 0));
-					document.getElementById("arc4").setAttribute("d", describeArc(150, 150, 70, 0, detractorEndAngle));
+					document.getElementById("arc1").setAttribute("d", describeArc(150, 150, 55, detractorStartAngle, 0));
+					document.getElementById("arc4").setAttribute("d", describeArc(150, 150, 55, 0, detractorEndAngle));
 				}else{
-					document.getElementById("arc1").setAttribute("d", describeArc(150, 150, 70, detractorStartAngle, detractorEndAngle));
+					document.getElementById("arc1").setAttribute("d", describeArc(150, 150, 55, detractorStartAngle, detractorEndAngle));
 				}
 				
 				//Passives Start and End Angles
@@ -544,13 +681,13 @@ function drawSpsGauge(){
 				
 				if(passivesStartAngle >= gaugeStartAngle){
 					if(passivesEndAngle >= gaugeStartAngle){
-						document.getElementById("arc2").setAttribute("d", describeArc(150, 150, 70, passivesStartAngle, passivesEndAngle));
+						document.getElementById("arc2").setAttribute("d", describeArc(150, 150, 55, passivesStartAngle, passivesEndAngle));
 					}else{
-						document.getElementById("arc2").setAttribute("d", describeArc(150, 150, 70, passivesStartAngle, 0));
-						document.getElementById("arc5").setAttribute("d", describeArc(150, 150, 70, 0, passivesEndAngle));
+						document.getElementById("arc2").setAttribute("d", describeArc(150, 150, 55, passivesStartAngle, 0));
+						document.getElementById("arc5").setAttribute("d", describeArc(150, 150, 55, 0, passivesEndAngle));
 					}
 				}else{
-					document.getElementById("arc5").setAttribute("d", describeArc(150, 150, 70, passivesStartAngle, passivesEndAngle));
+					document.getElementById("arc5").setAttribute("d", describeArc(150, 150, 55, passivesStartAngle, passivesEndAngle));
 				}
 				
 				//Promoters Start and End Angles
@@ -566,13 +703,13 @@ function drawSpsGauge(){
 				
 				if(promotersStartAngle >= gaugeStartAngle){
 					if(promotersEndAngle >= gaugeStartAngle){
-						document.getElementById("arc3").setAttribute("d", describeArc(150, 150, 70, promotersStartAngle, promotersEndAngle));
+						document.getElementById("arc3").setAttribute("d", describeArc(150, 150, 55, promotersStartAngle, promotersEndAngle));
 					}else{
-						document.getElementById("arc3").setAttribute("d", describeArc(150, 150, 70, promotersStartAngle, 0));
-						document.getElementById("arc6").setAttribute("d", describeArc(150, 150, 70, 0, promotersEndAngle));
+						document.getElementById("arc3").setAttribute("d", describeArc(150, 150, 55, promotersStartAngle, 0));
+						document.getElementById("arc6").setAttribute("d", describeArc(150, 150, 55, 0, promotersEndAngle));
 					}
 				}else{
-					document.getElementById("arc6").setAttribute("d", describeArc(150, 150, 70, promotersStartAngle, promotersEndAngle));
+					document.getElementById("arc6").setAttribute("d", describeArc(150, 150, 55, promotersStartAngle, promotersEndAngle));
 				}
 			}
 		}
@@ -592,7 +729,7 @@ function drawSpsGauge(){
 					
 						needleDegree = 360-(Math.abs(spsScore)*1.1);
 						if(spsScore < -87){
-							$("#metre-needle").css("margin-left",marginLeft-marginNeedle+5+'px');
+							$("#metre-needle").css("margin-left",marginLeft-marginNeedle+12+'px');
 						}else{
 							$("#metre-needle").css("margin-left",marginLeft-marginNeedle-5+'px');
 						}
@@ -602,7 +739,7 @@ function drawSpsGauge(){
 					
 					needleDegree = Math.abs(spsScore)*1.1;
 					if(spsScore > 87){
-						$("#metre-needle").css("margin-left",marginLeft+marginNeedle-10+'px');
+						$("#metre-needle").css("margin-left",marginLeft+marginNeedle-20+'px');
 					}else{
 						$("#metre-needle").css("margin-left",marginLeft+marginNeedle+'px');
 					}
@@ -615,7 +752,7 @@ function drawSpsGauge(){
 					
 				}else if(spsScore == 0 || (spsScore > 0 && spsScore <= 7)){
 					needleDegree = Math.abs(spsScore)*1.1;
-					$("#metre-needle").css("margin-left",marginLeft-13+'px');
+					$("#metre-needle").css("margin-left",marginLeft-8+'px');
 				}
 				
 				$('#metre-needle').css({'transform':'rotate(' + needleDegree + 'deg)'});
@@ -1010,4 +1147,8 @@ function showHidePaginateButtons(startIndex,recentActivityCount){
 		$('#rec-act-page-next').hide();
 	}
 }
+
+function activaTab(tab){
+    $('.nav-tabs a[href="#' + tab + '"]').tab('show');
+};
 

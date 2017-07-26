@@ -37,8 +37,9 @@
 	}
 </style>
 <div id="time-frame-wrapper" class="float-left clearfix hr-dsh-adj-lft hdr-prof-sel time-frame-prof-sel">
-	<div id="time-frame-sel" class="float-left hr-txt2 cursor-pointer" style="height:90%; line-height:40px !important;">This Month</div>	
+	<div id="time-frame-sel" class="float-left hr-txt2 cursor-pointer" style="height:90%; line-height:40px !important;">All Time</div>	
 	<div id="time-frame-options" class="time-frame-wrapper hide">
+		<div class="time-frame-item" data-column-value="100">All Time</div>
 		<div class="time-frame-item" data-column-value="101">This Month</div>
 		<div class="time-frame-item" data-column-value="102">Last Month</div>
 		<div class="time-frame-item" data-column-value="103">This Year</div>
@@ -67,11 +68,12 @@
 		monthStr[11] = "Dec";
 		
 		var monthJspStr='';
+		var count=4;
 		
 		if(currentMonth > 1){
 			var month = currentMonth - 2;
 			
-			while(month >= 0){
+			while(month >= 0 && count-- > 0){
 				monthJspStr += '<div class="time-frame-item" data-column-value="' + month + '">' + monthStr[month] + ' ' + currentYear + '</div>' ;
 				month--;
 			}
@@ -82,6 +84,17 @@
 		$(document).on('click', '#time-frame-sel', function(e) {
 			e.stopPropagation();
 			$('#time-frame-options').slideToggle(200);
+		});
+		
+		$(document).on('click', '.time-frame-item', function(e) {
+			showOverlay();
+			$('#time-frame-sel').html($(this).html());
+			$('#time-frame-options').slideToggle(200);
+			
+			var timeFrame = $(this).attr('data-column-value');
+			console.log(timeFrame);
+			
+			hideOverlay();
 		});
 	});
 </script>
