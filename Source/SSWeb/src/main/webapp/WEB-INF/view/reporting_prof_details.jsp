@@ -91,7 +91,7 @@
 	<c:set value="${cannonicalusersettings.companySettings.vertical}" var="verticalVal"></c:set>
 </c:if>
 
-
+<c:if test="${(highestrole != 1 && highestrole != 2 && highestrole != 3)}">
 <div id="rep-user-details" class="col-sm-6 col-lg-6 col-md-6 col-xs-6">
 	<div id="rep-rank-prof-pic" class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="height: 150px;">
 		<div class="rep-rank-rect" style="display:inline-grid;">
@@ -123,6 +123,31 @@
 		</div>
 	</div>
 </div>
+</c:if>
+
+<c:if test="${(highestrole == 1 || highestrole == 2 || highestrole == 3)}">
+<div id="rep-user-details" class="col-sm-6 col-lg-6 col-md-6 col-xs-6" style="margin-left:-75px">
+	<div id="rep-rank-prof-pic" class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="height: 150px;">
+		<div class="rep-prof-pic-circle">
+			<jsp:include page="reporting_profileimage.jsp"></jsp:include>
+		</div>
+	</div>
+	<div id="rep-user-info" class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 15px;">
+		<div id="prof-name-container" class="lp-edit-wrapper clearfix prof-edditable-cont">
+			<div id="name" class="prof-name prof-name-txt rep-dsh-large-text dsh-txt-1">${contactdetail.name}</div>
+		</div>
+		<div id="prof-name-container" class="lp-edit-wrapper clearfix prof-edditable-cont">
+			<div id="designation-nmls" class="prof-addline2 prof-name-txt rep-dsh-medium-text dsh-txt-2" >${contactdetail.title}
+					| ${verticalVal}
+			</div>
+		</div>
+		<div id="prof-rating-review-count" class="prof-rating clearfix" style="margin-top:30px">
+			<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp"></div>
+			<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>
+		</div>
+	</div>
+</div>
+</c:if>
 
 <div id="rep-dash-btns" class="col-sm-6 col-lg-6 col-md-6 col-xs-6">
 	<div id="rep-send-survey" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rep-send-survey-div" >
@@ -167,6 +192,11 @@
 					"columnValue" : colValue
 				};
 				callAjaxGetWithPayloadData('./socialmediatofix.do', paintFixSocialMedia, payload, true);
+		});
+		
+		$(document).on('click','#prof-company-review-count',function(e){
+			e.stopPropagation();
+			activaTab('reviews-tab');
 		});
 	});
 </script>
