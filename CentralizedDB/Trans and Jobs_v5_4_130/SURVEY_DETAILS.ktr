@@ -162,8 +162,8 @@
   <hop> <from>DateConverter</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 2</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Survey Details Input</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Synchronize after merge Survey Details</to><enabled>Y</enabled> </hop>
+  <hop> <from>Survey Details Input</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>DateConverter</name>
@@ -2999,7 +2999,7 @@
         <storage_type/>
       </meta>      <meta>        <name>score</name>
         <rename>SCORE</rename>
-        <type>Integer</type>
+        <type>Number</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
