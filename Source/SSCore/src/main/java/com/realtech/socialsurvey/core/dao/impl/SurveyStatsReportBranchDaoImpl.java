@@ -24,12 +24,14 @@ public class SurveyStatsReportBranchDaoImpl extends GenericReportingDaoImpl<Surv
    
 
     @Override
-    public List<SurveyStatsReportBranch> fetchBranchSurveyStatsById( Long branchId )
+    public List<SurveyStatsReportBranch> fetchBranchSurveyStatsById( Long branchId , String startTrxMonth , String endTrxMonth  )
     {
         LOG.info( "Method to fetch all the survey stats,fetchBranchSurveyStatsById() started." );
         Criteria criteria = getSession().createCriteria( SurveyStatsReportBranch.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
+            criteria.add( Restrictions.gt( CommonConstants.TRX_MONTH, startTrxMonth ) );
+            criteria.add( Restrictions.le( CommonConstants.TRX_MONTH, endTrxMonth ) );
         } catch ( HibernateException hibernateException ) {
             LOG.error( "Exception caught in fetchBranchSurveyStatsById() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchBranchSurveyStatsById() ", hibernateException );

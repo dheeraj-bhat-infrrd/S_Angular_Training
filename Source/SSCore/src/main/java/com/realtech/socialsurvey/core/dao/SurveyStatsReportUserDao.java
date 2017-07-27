@@ -8,5 +8,5 @@ import com.realtech.socialsurvey.core.entities.SurveyStatsReportUser;
 public interface SurveyStatsReportUserDao extends GenericReportingDao<SurveyStatsReportUser, String>
 {
 
-    public List<SurveyStatsReportUser> fetchUserSurveyStatsById( Long userId );
+    List<SurveyStatsReportUser> fetchUserSurveyStatsById( Long userId, String startTrxMonth, String endTrxMonth );
 }
