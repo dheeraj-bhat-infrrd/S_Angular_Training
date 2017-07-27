@@ -454,8 +454,8 @@ public class ReportingWebController
     }
     
     @ResponseBody
-    @RequestMapping ( value = "/fetchreportingoverview", method = RequestMethod.GET)
-    public Response reportingOverviewStats(Model model, HttpServletRequest request) throws NonFatalException
+    @RequestMapping ( value = "/fetchspsfromreportingoverview", method = RequestMethod.GET)
+    public Response reportingOverviewSpsStats(Model model, HttpServletRequest request) throws NonFatalException
     {
         LOG.info( "Reporting Dashboard Page started" );
         HttpSession session = request.getSession( false );
@@ -467,7 +467,26 @@ public class ReportingWebController
         }    
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        response = ssApiIntergrationBuilder.getIntegrationApi().getReportingOverview( entityId, entityType );
+        response = ssApiIntergrationBuilder.getIntegrationApi().getSpsStatsFromOverview( entityId, entityType );
+        return response;
+        
+    }   
+    
+    @ResponseBody
+    @RequestMapping ( value = "/fetchalltimefromreportingoverview", method = RequestMethod.GET)
+    public Response reportingOverviewAllTimeStats(Model model, HttpServletRequest request) throws NonFatalException
+    {
+        LOG.info( "Reporting Dashboard Page started" );
+        HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
+
+        Response response = null;
+        if ( user == null ) {
+            throw new NonFatalException( "NonFatalException while logging in. " );
+        }    
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        response = ssApiIntergrationBuilder.getIntegrationApi().getAllTimeDataOverview( entityId, entityType );
         return response;
         
     }   
