@@ -22,12 +22,14 @@ public class SurveyStatsReportRegionDaoImpl extends GenericReportingDaoImpl<Surv
 
 
     @Override
-    public List<SurveyStatsReportRegion> fetchRegionSurveyStatsById( Long regionId )
+    public List<SurveyStatsReportRegion> fetchRegionSurveyStatsById( Long regionId , String startTrxMonth , String endTrxMonth )
     {
         LOG.info( "Method to fetch all the survey stats,fetchRegionSurveyStatsById() started." );
         Criteria criteria = getSession().createCriteria( SurveyStatsReportRegion.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
+            criteria.add( Restrictions.gt( CommonConstants.TRX_MONTH, startTrxMonth ) );
+            criteria.add( Restrictions.le( CommonConstants.TRX_MONTH, endTrxMonth ) );
         } catch ( HibernateException hibernateException ) {
             LOG.error( "Exception caught in fetchRegionSurveyStatsById() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchRegionSurveyStatsById() ", hibernateException );
