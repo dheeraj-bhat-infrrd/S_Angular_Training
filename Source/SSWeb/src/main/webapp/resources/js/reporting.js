@@ -517,14 +517,68 @@ return overviewYearData;
 
 }
 
-var overviewYearData = getoverviewYearData(2017);
+function getoverviewAllTimeData() {
+
+	// var overviewData;
+	$.ajax({
+		async : false,
+		url : "/fetchalltimefromreportingoverview.do",
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			if (data.status == 200) {
+				$.ajax({
+					async : false,
+					url : data.url,
+					type : "GET",
+					cache : false,
+					dataType : "json",
+					success : function(response) {
+						if (response.length == 0) {
+							overviewAllTimeData = null;
+						} else {
+							if(response == "{}"){
+								overviewAllTimeData = null;
+							}else{
+								overviewAllTimeData = JSON.parse(response);
+							}
+							
+						}
+					},
+					error : function(e) {
+						if (e.status == 504) {
+							redirectToLoginPageOnSessionTimeOut(e.status);
+							return;
+						}
+						overviewAllTimeData = null;
+					}
+				});
+			}else{
+				overviewAllTimeData = null;
+			}
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			overviewAllTimeData = null;
+		}
+	});
+
+	return overviewAllTimeData;
+
+	}
 
 function drawUnclickedDonutChart(){
 	 
 	var monthYear = getTimeFrameValue();
 	var overviewYearData;
 	
-    if(monthYear.month == 13){
+	if(monthYear.month == 14){
+		overviewYearData = getoverviewAllTimeData();
+	}else if(monthYear.month == 13){
     	overviewYearData =  getoverviewYearData(monthYear.year);
     }else{
     	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
@@ -586,7 +640,9 @@ function drawProcessedDonutChart(){
 	var monthYear = getTimeFrameValue();
 	var overviewYearData;
 	
-    if(monthYear.month == 13){
+	if(monthYear.month == 14){
+		overviewYearData = getoverviewAllTimeData();
+	}else if(monthYear.month == 13){
     	overviewYearData =  getoverviewYearData(monthYear.year);
     }else{
     	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
@@ -655,7 +711,7 @@ function getTimeFrameValue(){
 	};
 	var timeFrame = parseInt($('#time-frame-sel').attr('data-column-value'));
 	switch(timeFrame){
-		case 100: monthYear.month=13;
+		case 100: monthYear.month=14;
 				  monthYear.year=currentYear;
 				  return monthYear;
 		
@@ -732,7 +788,9 @@ function drawUnprocessedDonutChart(){
     var monthYear = getTimeFrameValue();
     var overviewYearData;
     
-    if(monthYear.month == 13){
+    if(monthYear.month == 14){
+		overviewYearData = getoverviewAllTimeData();
+	}else if(monthYear.month == 13){
     	overviewYearData =  getoverviewYearData(monthYear.year);
     }else{
     	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
@@ -1044,10 +1102,10 @@ function drawOverviewPage(){
 
 function getOverviewData() {
 
-	// var overviewData;
+	// get sps from overview data
 	$.ajax({
 		async : false,
-		url : "/fetchreportingoverview.do",
+		url : "/fetchspsfromreportingoverview.do",
 		type : "GET",
 		cache : false,
 		dataType : "json",
@@ -1387,7 +1445,9 @@ function updateReportingDashboard(){
 	var monthYear = getTimeFrameValue();
 	var overviewYearData;
 	
-    if(monthYear.month == 13){
+	if(monthYear.month == 14){
+		overviewYearData = getoverviewAllTimeData();
+	}else if(monthYear.month == 13){
     	overviewYearData =  getoverviewYearData(monthYear.year);
     }else{
     	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);

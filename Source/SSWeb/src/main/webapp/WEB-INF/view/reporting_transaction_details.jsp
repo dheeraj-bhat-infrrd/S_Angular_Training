@@ -343,7 +343,9 @@ $(document).ready(function(){
 	var monthYear = getTimeFrameValue();
 	var overviewYearData;
 	
-    if(monthYear.month == 13){
+	if(monthYear.month == 14){
+		overviewYearData = getoverviewAllTimeData();
+	}else if(monthYear.month == 13){
     	overviewYearData =  getoverviewYearData(monthYear.year);
     }else{
     	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
@@ -384,11 +386,7 @@ $(document).ready(function(){
 		$('#processed-trans-graph').addClass('hide');
 		$('#unprocessed-trans-graph').addClass('hide');
 		$('#empty-rep-chart-div').removeClass('hide');
-	}
-	
-	
-	console.log(overviewYearData);	
-	
+	}	
 	
 });
 </script>
