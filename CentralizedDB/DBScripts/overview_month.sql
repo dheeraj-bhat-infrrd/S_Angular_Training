@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `overview_user_month`;
 CREATE TABLE `overview_user_month` (
   `overview_user_month_id` varchar(45) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
@@ -20,6 +21,7 @@ CREATE TABLE `overview_user_month` (
   PRIMARY KEY (`overview_user_month_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `overview_branch_month`;
 CREATE TABLE `overview_branch_month` (
   `overview_branch_month_id` varchar(45) NOT NULL,
   `branch_id` int(11) DEFAULT NULL,
@@ -42,6 +44,7 @@ CREATE TABLE `overview_branch_month` (
   PRIMARY KEY (`overview_branch_month_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `overview_region_month`;
 CREATE TABLE `overview_region_month` (
   `overview_region_month_id` varchar(45) NOT NULL,
   `region_id` int(11) DEFAULT NULL,
@@ -64,6 +67,7 @@ CREATE TABLE `overview_region_month` (
   PRIMARY KEY (`overview_region_month_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `overview_company_month`;
 CREATE TABLE `overview_company_month` (
   `overview_company_month_id` varchar(45) NOT NULL,
   `company_id` int(11) DEFAULT NULL,
