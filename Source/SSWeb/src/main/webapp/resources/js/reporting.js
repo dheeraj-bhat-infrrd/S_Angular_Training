@@ -719,7 +719,7 @@ function getTimeFrameValue(){
 		  		monthYear.year=currentYear;
 		  		return monthYear;
 		
-		case 102: monthYear.month=currentMonth+2;
+		case 102: monthYear.month=currentMonth;
   				monthYear.year=currentYear;
   				return monthYear;
   		
