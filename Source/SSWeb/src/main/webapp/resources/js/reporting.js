@@ -18,7 +18,6 @@ function drawSpsStatsGraph(){
 							.arrayToDataTable(spsChartData);
 
 					var options = {
-						title : 'SPS Stats',
 						legend : {
 							position : 'none'
 						},
@@ -27,6 +26,8 @@ function drawSpsStatsGraph(){
 						},
 						isStacked : true,
 						height : 300,
+						width:600,
+						chartArea: {width:500,height:200},
 						vAxis : {
 							minValue : 0,
 							maxValue : 10,
@@ -271,11 +272,10 @@ function drawCompletionRateGraph(){
 							.arrayToDataTable(spsChartData);
 
 					var options = {
-						title : 'Completion Rate',
 						height : 300,
 						width : 1100,
 						chartArea : {
-							width : '78%'
+							width : '85%'
 						},
 						vAxis : {
 							minValue : 0,
@@ -285,9 +285,8 @@ function drawCompletionRateGraph(){
 							}
 						},
 						legend : {
-							position : 'right',
-							alignment : 'center',
-							maxLines : 2
+							position : 'bottom',
+							alignment : 'center'
 						},
 						pointSize : 5
 					};
@@ -719,7 +718,7 @@ function getTimeFrameValue(){
 		  		monthYear.year=currentYear;
 		  		return monthYear;
 		
-		case 102: monthYear.month=currentMonth+2;
+		case 102: monthYear.month=currentMonth;
   				monthYear.year=currentYear;
   				return monthYear;
   		
