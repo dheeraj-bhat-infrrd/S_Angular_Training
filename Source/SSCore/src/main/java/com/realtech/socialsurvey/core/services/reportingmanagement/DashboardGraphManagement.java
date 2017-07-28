@@ -10,7 +10,5 @@ public interface DashboardGraphManagement
     public List<List<Object>> getSpsStatsGraph(Long entityId , String entityType);
 
     public List<List<Object>> getCompletionRate( Long entityId , String entityType);
-
-    public List<List<Object>> getAverageReviewRating( Long entityId, String entityType );
     
 }

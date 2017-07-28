@@ -37,7 +37,7 @@
 	}
 </style>
 <div id="time-frame-wrapper" class="float-left clearfix hr-dsh-adj-lft hdr-prof-sel time-frame-prof-sel">
-	<div id="time-frame-sel" class="float-left hr-txt2 cursor-pointer" style="height:90%; line-height:40px !important;">All Time</div>	
+	<div id="time-frame-sel" data-column-value="100" class="float-left hr-txt2 cursor-pointer" style="height:90%; line-height:40px !important;">All Time</div>	
 	<div id="time-frame-options" class="time-frame-wrapper hide">
 		<div class="time-frame-item" data-column-value="100">All Time</div>
 		<div class="time-frame-item" data-column-value="101">This Month</div>
@@ -74,27 +74,32 @@
 			var month = currentMonth - 2;
 			
 			while(month >= 0 && count-- > 0){
-				monthJspStr += '<div class="time-frame-item" data-column-value="' + month + '">' + monthStr[month] + ' ' + currentYear + '</div>' ;
+				monthJspStr += '<div class="time-frame-item" data-column-value="' + (month+1) + '">' + monthStr[month] + ' ' + currentYear + '</div>' ;
 				month--;
 			}
 			
 			$('#time-frame-options').append(monthJspStr);
 		}
 		
-		$(document).on('click', '#time-frame-sel', function(e) {
+		$('#timeFrame_container').unbind('click').on('click', '#time-frame-sel', function(e) {
 			e.stopPropagation();
 			$('#time-frame-options').slideToggle(200);
 		});
 		
-		$(document).on('click', '.time-frame-item', function(e) {
+		$('#timeFrame_container').on('click', '.time-frame-item', function(e) {
 			showOverlay();
+			var time=$(this).html();
 			$('#time-frame-sel').html($(this).html());
 			$('#time-frame-options').slideToggle(200);
 			
 			var timeFrame = $(this).attr('data-column-value');
-			console.log(timeFrame);
-			
+			$('#time-frame-sel').attr('data-column-value',timeFrame);
+
+			$('#reporting-trans-details').fadeOut(500);
+			$('#reporting-trans-details').fadeIn(500);
+			updateReportingDashboard();
 			hideOverlay();
+			
 		});
 	});
 </script>

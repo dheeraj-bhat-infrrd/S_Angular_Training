@@ -27,12 +27,14 @@ public class SurveyStatsReportCompanyDaoImpl extends GenericReportingDaoImpl<Sur
 
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<SurveyStatsReportCompany> fetchCompanySurveyStatsById( Long companyId )
+    public List<SurveyStatsReportCompany> fetchCompanySurveyStatsById( Long companyId , String startTrxMonth , String endTrxMonth )
     {
         LOG.info( "Method to fetch all the survey stats,fetchCompanySurveyStatsById() started." );
         Criteria criteria = getSession().createCriteria( SurveyStatsReportCompany.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+            criteria.add( Restrictions.gt( CommonConstants.TRX_MONTH, startTrxMonth ) );
+            criteria.add( Restrictions.le( CommonConstants.TRX_MONTH, endTrxMonth ) );
         } catch ( HibernateException hibernateException ) {
             LOG.error( "Exception caught in fetchCompanySurveyStatsById() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchCompanySurveyStatsById() ", hibernateException );

@@ -24,10 +24,12 @@ public class SurveyStatsReportUserDaoImpl extends GenericReportingDaoImpl<Survey
 
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<SurveyStatsReportUser> fetchUserSurveyStatsById( Long userId )
+    public List<SurveyStatsReportUser> fetchUserSurveyStatsById( Long userId , String startTrxMonth , String endTrxMonth  )
     {
         LOG.info( "Method to fetch all the survey stats,fetchUserSurveyStatsById() started." );
         Criteria criteria = getSession().createCriteria( SurveyStatsReportUser.class );
+        criteria.add( Restrictions.gt( CommonConstants.TRX_MONTH, startTrxMonth ) );
+        criteria.add( Restrictions.le( CommonConstants.TRX_MONTH, endTrxMonth ) );
         try {
             criteria.add( Restrictions.eq( "userId" , userId ) );
         } catch ( HibernateException hibernateException ) {

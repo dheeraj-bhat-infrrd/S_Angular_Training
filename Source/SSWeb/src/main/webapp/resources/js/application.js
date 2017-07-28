@@ -7811,8 +7811,18 @@ function paintForReportingDash() {
 	$('#prof-review-item').html('');
 	
 	// Common call for all cases
-	fetchAvgRating(attrName, attrVal);
-	fetchReviewCount(attrName, attrVal, minScore);
+	overviewYearData = getoverviewYearData(2017);
+	if(overviewYearData != null){
+		var avgRating = overviewYearData.Rating;
+		var reviewCount=  overviewYearData.TotalReview;
+		paintAvgRating(avgRating);
+		paintReviewCount(reviewCount);
+	}else{
+		var avgRating = 0;
+		var reviewCount=  0;
+		paintAvgRating(avgRating);
+		paintReviewCount(reviewCount);
+	}
 	fetchReviewsOnEditProfile(attrName, attrVal, false);
 }
 

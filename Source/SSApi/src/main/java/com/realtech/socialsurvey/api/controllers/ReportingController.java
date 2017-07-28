@@ -81,19 +81,7 @@ public class ReportingController
         return json;
 
     }
-    
-    @RequestMapping( value = "/getaveragerating", method = RequestMethod.GET)
-    @ApiOperation ( value = "Fetch Data for Average Rating Graph")
-    public String getReportingAverageRating( Long entityId, String entityType ) throws NonFatalException 
-    {
-        LOGGER.info( "Fetching Survey Stats Graph" );
-        
-        String json = null;
-        List<List <Object>> averageRating = dashboardGraphManagement.getAverageReviewRating( entityId , entityType );
-        json = new Gson().toJson( averageRating );
-        return json;
-    }
-    
+
     @RequestMapping( value = "/getspsfromoverview", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Data for Overview ")
     public String getSpsStatsFromOverview( Long entityId, String entityType ) throws NonFatalException 
