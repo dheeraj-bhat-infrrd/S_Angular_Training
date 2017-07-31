@@ -169,30 +169,15 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Sort rows</from><to>Group by agentId</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 2</from><to>Group by STATUS</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_pre_initiation input</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_pre_initiation input</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForStatus</from><to>Select values</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select values</from><to>Group byAgentId</to><enabled>Y</enabled> </hop>
   <hop> <from>social_post</from><to>jsToCountPost</to><enabled>Y</enabled> </hop>
   <hop> <from>jsToCountPost</from><to>SortByEntityId</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortByEntityId</from><to>GroupByAgentId2</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_details</from><to>SortMood</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortMood</from><to>GroupByMood</to><enabled>Y</enabled> </hop>
-  <hop> <from>GroupByMood</from><to>jsForMood</to><enabled>Y</enabled> </hop>
-  <hop> <from>jsForMood</from><to>GroupByAgentId</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_details</from><to>zillow_sort</to><enabled>Y</enabled> </hop>
   <hop> <from>zillow_sort</from><to>FilterForZillow</to><enabled>Y</enabled> </hop>
-  <hop> <from>FilterForZillow</from><to>GroupByZillow</to><enabled>Y</enabled> </hop>
   <hop> <from>SortSentCount</from><to>SortAgent1</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group byAgentId</from><to>SortAgent 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortAgent1</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortAgent 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortAgent3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortAgent 4</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortAgent 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Multiway Merge Join</from><to>Select All Values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select All Values</from><to>jsForMainAgent</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForMainAgent</from><to>UUID_overview_user</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_overview_user</from><to>Select values 2</to><enabled>Y</enabled> </hop>
@@ -200,18 +185,34 @@
   <hop> <from>jsForIncompleteSurveys</from><to>Write to log</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 2</from><to>jsForPercentage</to><enabled>Y</enabled> </hop>
   <hop> <from>Write to log</from><to>jsToConvertNullToZero</to><enabled>Y</enabled> </hop>
-  <hop> <from>GroupByAgentId</from><to>SortAgent 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>GroupByZillow</from><to>SortAgent 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>GroupByAgentId2</from><to>SortAgent3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by STATUS</from><to>jsForStatus</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by agentId</from><to>SortSentCount</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by</from><to>CalculateRating</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortAgent</from><to>Group by</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_details</from><to>SortAgent</to><enabled>Y</enabled> </hop>
   <hop> <from>CalculateRating</from><to>SortAgent 5 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortAgent 5 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>jsToConvertNullToZero</from><to>FilterUserZero</to><enabled>Y</enabled> </hop>
   <hop> <from>FilterUserZero</from><to>overview_user_output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows</from><to>Memory Group by agentId </to><enabled>Y</enabled> </hop>
+  <hop> <from>Memory Group by agentId </from><to>SortSentCount</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 2</from><to>Group by STATUS</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group by STATUS</from><to>jsForStatus</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values</from><to>Memory Group by</to><enabled>Y</enabled> </hop>
+  <hop> <from>Memory Group by</from><to>SortAgent 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>GroupByAgentId2</from><to>SortAgent3</to><enabled>Y</enabled> </hop>
+  <hop> <from>GroupByMood</from><to>jsForMood</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortMood</from><to>GroupByMood</to><enabled>Y</enabled> </hop>
+  <hop> <from>GroupByAgentId</from><to>SortAgent 4</to><enabled>Y</enabled> </hop>
+  <hop> <from>jsForMood</from><to>GroupByAgentId</to><enabled>Y</enabled> </hop>
+  <hop> <from>GroupByZillow</from><to>SortAgent 5</to><enabled>Y</enabled> </hop>
+  <hop> <from>FilterForZillow</from><to>GroupByZillow</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group by</from><to>CalculateRating</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortAgent</from><to>Group by</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortByEntityId</from><to>Select values 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values 3</from><to>GroupByAgentId2</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortAgent1</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortAgent 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortAgent3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortAgent 4</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortAgent 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortAgent 5 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Multiway Merge Join</from><to>Select All Values</to><enabled>Y</enabled> </hop>
   <hop> <from>overview_user_output</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
@@ -238,8 +239,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>527</xloc>
-      <yloc>615</yloc>
+      <xloc>706</xloc>
+      <yloc>605</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -293,8 +294,8 @@
     </step>
 
   <step>
-    <name>Group by</name>
-    <type>GroupBy</type>
+    <name>FilterUserZero</name>
+    <type>FilterRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -303,13 +304,35 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
+<send_true_to>overview_user_output</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>Y</negated>
+ <leftvalue>main_AgentId</leftvalue>
+ <function>&#x3d;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>429</xloc>
+      <yloc>680</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Group by</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
       <give_back_row>N</give_back_row>
       <group>
         <field>
@@ -332,15 +355,15 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>348</xloc>
-      <yloc>615</yloc>
+      <xloc>473</xloc>
+      <yloc>612</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
     <name>Group by STATUS</name>
-    <type>GroupBy</type>
+    <type>MemoryGroupBy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -349,13 +372,6 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
       <give_back_row>N</give_back_row>
       <group>
         <field>
@@ -375,15 +391,15 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>460</xloc>
-      <yloc>133</yloc>
+      <xloc>429</xloc>
+      <yloc>144</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Group by agentId</name>
-    <type>GroupBy</type>
+    <name>GroupByAgentId</name>
+    <type>MemoryGroupBy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -392,13 +408,6 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
       <give_back_row>N</give_back_row>
       <group>
         <field>
@@ -407,23 +416,35 @@
       </group>
       <fields>
         <field>
-          <aggregate>sent_count</aggregate>
-          <subject>AGENT_ID</subject>
-          <type>COUNT_ANY</type>
+          <aggregate>total_detractors</aggregate>
+          <subject>detractors</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>total_passives</aggregate>
+          <subject>passives</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>total_promoters</aggregate>
+          <subject>promoters</subject>
+          <type>SUM</type>
           <valuefield/>
         </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>431</xloc>
-      <yloc>37</yloc>
+      <xloc>716</xloc>
+      <yloc>432</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Group byAgentId</name>
-    <type>GroupBy</type>
+    <name>GroupByAgentId2</name>
+    <type>MemoryGroupBy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -432,13 +453,108 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>AGENT_ID</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>total_shared_by</aggregate>
+          <subject>total_shared_on</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>621</xloc>
+      <yloc>335</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>GroupByMood</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>AGENT_ID</name>
+        </field>
+        <field>
+          <name>MOOD</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>mood_count</aggregate>
+          <subject>MOOD</subject>
+          <type>COUNT_ANY</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>387</xloc>
+      <yloc>437</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>GroupByZillow</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>AGENT_ID</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>zillow_count</aggregate>
+          <subject>SOURCE</subject>
+          <type>COUNT_ANY</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>523</xloc>
+      <yloc>532</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Memory Group by</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
       <give_back_row>N</give_back_row>
       <group>
         <field>
@@ -491,15 +607,15 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>735</xloc>
-      <yloc>242</yloc>
+      <xloc>732</xloc>
+      <yloc>226</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>GroupByAgentId</name>
-    <type>GroupBy</type>
+    <name>Memory Group by agentId </name>
+    <type>MemoryGroupBy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -508,13 +624,6 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
       <give_back_row>N</give_back_row>
       <group>
         <field>
@@ -523,186 +632,16 @@
       </group>
       <fields>
         <field>
-          <aggregate>total_detractors</aggregate>
-          <subject>detractors</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>total_passives</aggregate>
-          <subject>passives</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>total_promoters</aggregate>
-          <subject>promoters</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>686</xloc>
-      <yloc>432</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>GroupByAgentId2</name>
-    <type>GroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>ENTITY_ID</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>total_shared_by</aggregate>
-          <subject>total_shared_on</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>496</xloc>
-      <yloc>338</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>GroupByMood</name>
-    <type>GroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>AGENT_ID</name>
-        </field>
-        <field>
-          <name>MOOD</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>mood_count</aggregate>
-          <subject>MOOD</subject>
+          <aggregate>sent_count</aggregate>
+          <subject>AGENT_ID</subject>
           <type>COUNT_ANY</type>
           <valuefield/>
         </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>377</xloc>
-      <yloc>438</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>GroupByZillow</name>
-    <type>GroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>AGENT_ID</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>zillow_count</aggregate>
-          <subject>SOURCE</subject>
-          <type>COUNT_ANY</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>524</xloc>
-      <yloc>542</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <join_type>FULL OUTER</join_type>
-    <step0>SortAgent1</step0>
-    <step1>SortAgent 2</step1>
-    <step2>SortAgent3</step2>
-    <step3>SortAgent 4</step3>
-    <step4>SortAgent 5</step4>
-    <step5>SortAgent 5 2</step5>
-    <number_input>6</number_input>
-    <keys>
-      <key>AGENT_ID</key>
-      <key>AGENT_ID</key>
-      <key>ENTITY_ID</key>
-      <key>AGENT_ID</key>
-      <key>AGENT_ID</key>
-      <key>AGENT_ID</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1030</xloc>
-      <yloc>319</yloc>
+      <xloc>422</xloc>
+      <yloc>47</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -758,7 +697,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>ENTITY_ID</name>
+      </field>      <field>        <name>AGENT_ID_2</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -766,7 +705,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_2</name>
+      </field>      <field>        <name>AGENT_ID_3</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -782,7 +721,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_3</name>
+      </field>      <field>        <name>AGENT_ID_4</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -790,7 +729,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_4</name>
+      </field>      <field>        <name>AGENT_ID_5</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1061,8 +1000,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>222</xloc>
-      <yloc>612</yloc>
+      <xloc>254</xloc>
+      <yloc>608</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1257,7 +1196,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>ENTITY_ID</name>
+        <name>AGENT_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1448,27 +1387,33 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var corrupted_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var mismatched_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var duplicate_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var archieved_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;total_incomplete_transactions_var &#x21;&#x3d; 0&#x29;&#x7b;&#xd;&#xa;		corrupted_percentage_var &#x3d; &#x28;total_corrupted&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;		mismatched_percentage_var &#x3d; &#x28;total_mismatched&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;		duplicate_percentage_var &#x3d; &#x28;total_duplicate&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;		archieved_percentage_var &#x3d; &#x28;total_archieved&#x2f;total_incomplete_transactions_var&#x29;&#x2a;100&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>corrupted_percentage_var</name>
-        <rename>corrupted_percentage_var</rename>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; total_initiate&#x2b; total_pre&#x3b;&#xd;&#xa;var total_processed &#x3d; total_initiate &#x2b; total_pre &#x2b; total_completed&#x3b;&#xd;&#xa;var total_unprocessed &#x3d; total_corrupted &#x2b; total_mismatched &#x2b; total_duplicate&#x3b;&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_processed &#x21;&#x3d; 0 &#x7c;&#x7c; total_processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;total_completed&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;total_incomplete_transactions_var&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>total_incomplete_transactions_var</name>
+        <rename>total_incomplete_transactions_var</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_processed</name>
+        <rename>total_processed</rename>
         <type>Number</type>
         <length>16</length>
         <precision>2</precision>
         <replace>N</replace>
-      </field>      <field>        <name>mismatched_percentage_var</name>
-        <rename>mismatched_percentage_var</rename>
+      </field>      <field>        <name>total_unprocessed</name>
+        <rename>total_unprocessed</rename>
         <type>Number</type>
         <length>16</length>
         <precision>2</precision>
         <replace>N</replace>
-      </field>      <field>        <name>duplicate_percentage_var</name>
-        <rename>duplicate_percentage_var</rename>
+      </field>      <field>        <name>complete_percentage</name>
+        <rename>complete_percentage</rename>
         <type>Number</type>
         <length>16</length>
         <precision>2</precision>
         <replace>N</replace>
-      </field>      <field>        <name>archieved_percentage_var</name>
-        <rename>archieved_percentage_var</rename>
+      </field>      <field>        <name>incomplete_percentage</name>
+        <rename>incomplete_percentage</rename>
         <type>Number</type>
         <length>16</length>
         <precision>2</precision>
@@ -1496,7 +1441,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var main_AgentId &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;ENTITY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;ENTITY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_3&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var main_AgentId &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_5&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_3&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>main_AgentId</name>
         <rename>main_AgentId</rename>
         <type>String</type>
@@ -1568,7 +1513,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var sps_score_var &#x3d; 0&#x3b;&#xd;&#xa;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var passives_percentage_var &#x3d;0&#x3b;&#xd;&#xa;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;total_completed &#x21;&#x3d; 0 &#x26;&#x26; total_completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	sps_score_var&#x3d;&#x28; &#x28;total_promoters-total_detractors&#x29;&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	detractors_percentage_var &#x3d; &#x28;total_detractors&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	passives_percentage_var &#x3d; &#x28;total_passives&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	promoter_percentage_var &#x3d; &#x28;total_promoters&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	total_incomplete_transactions_var &#x3d; sent_count- total_completed&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var sps_score_var &#x3d; 0&#x3b;&#xd;&#xa;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var passives_percentage_var &#x3d;0&#x3b;&#xd;&#xa;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;total_completed &#x21;&#x3d; 0 &#x26;&#x26; total_completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	sps_score_var&#x3d;&#x28; &#x28;total_promoters-total_detractors&#x29;&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	detractors_percentage_var &#x3d; &#x28;total_detractors&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	passives_percentage_var &#x3d; &#x28;total_passives&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;	promoter_percentage_var &#x3d; &#x28;total_promoters&#x2f;total_completed&#x29;&#x2a;100&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>sps_score_var</name>
         <rename>sps_score_var</rename>
         <type>Number</type>
@@ -1667,8 +1612,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>419</xloc>
-      <yloc>247</yloc>
+      <xloc>441</xloc>
+      <yloc>234</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1688,7 +1633,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;sent_count &#x3d;&#x3d; null&#x29;var  sent_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_archieved &#x3d;&#x3d; null&#x29;var total_archieved &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_completed &#x3d;&#x3d; null&#x29;var total_completed &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_corrupted &#x3d;&#x3d; null&#x29;var total_corrupted &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_duplicate &#x3d;&#x3d; null&#x29;var total_duplicate &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_initiate &#x3d;&#x3d; null&#x29;var total_initiate &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_mismatched &#x3d;&#x3d; null&#x29;var total_mismatched&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_pre&#x3d;&#x3d; null&#x29;var total_pre &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_shared_by&#x3d;&#x3d; null&#x29;var total_shared_by &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_detractors &#x3d;&#x3d; null&#x29;var total_detractors&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_passives &#x3d;&#x3d; null&#x29;var total_passives &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_promoters &#x3d;&#x3d; null&#x29;var total_promoters &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;zillow_count &#x3d;&#x3d; null&#x29;var zillow_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_reviews &#x3d;&#x3d; null&#x29;var total_reviews &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;average_score &#x3d;&#x3d; null&#x29;var average_score&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;rating &#x3d;&#x3d; null&#x29;var rating &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;sps_score_var &#x3d;&#x3d; null&#x29;var sps_score_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;detractors_percentage_var &#x3d;&#x3d; null&#x29;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;passives_percentage_var &#x3d;&#x3d; null&#x29;var passives_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;promoter_percentage_var &#x3d;&#x3d; null&#x29;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_incomplete_transactions_var&#x3d;&#x3d; null&#x29;var total_incomplete_transactions_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;corrupted_percentage_var &#x3d;&#x3d; null&#x29;var corrupted_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;mismatched_percentage_var &#x3d;&#x3d; null&#x29;var mismatched_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;duplicate_percentage_var &#x3d;&#x3d; null&#x29;var duplicate_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;archieved_percentage_var &#x3d;&#x3d; null&#x29;var archieved_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;sent_count &#x3d;&#x3d; null&#x29;var  sent_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_archieved &#x3d;&#x3d; null&#x29;var total_archieved &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_completed &#x3d;&#x3d; null&#x29;var total_completed &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_corrupted &#x3d;&#x3d; null&#x29;var total_corrupted &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_duplicate &#x3d;&#x3d; null&#x29;var total_duplicate &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_initiate &#x3d;&#x3d; null&#x29;var total_initiate &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_mismatched &#x3d;&#x3d; null&#x29;var total_mismatched&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_pre&#x3d;&#x3d; null&#x29;var total_pre &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_shared_by&#x3d;&#x3d; null&#x29;var total_shared_by &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_detractors &#x3d;&#x3d; null&#x29;var total_detractors&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_passives &#x3d;&#x3d; null&#x29;var total_passives &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_promoters &#x3d;&#x3d; null&#x29;var total_promoters &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;zillow_count &#x3d;&#x3d; null&#x29;var zillow_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_reviews &#x3d;&#x3d; null&#x29;var total_reviews &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;average_score &#x3d;&#x3d; null&#x29;var average_score&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;rating &#x3d;&#x3d; null&#x29;var rating &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;sps_score_var &#x3d;&#x3d; null&#x29;var sps_score_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;detractors_percentage_var &#x3d;&#x3d; null&#x29;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;passives_percentage_var &#x3d;&#x3d; null&#x29;var passives_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;promoter_percentage_var &#x3d;&#x3d; null&#x29;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_incomplete_transactions_var&#x3d;&#x3d; null&#x29;var total_incomplete_transactions_var &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>sent_count</name>
         <rename>sent_count</rename>
         <type>String</type>
@@ -1815,30 +1760,6 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
-      </field>      <field>        <name>corrupted_percentage_var</name>
-        <rename>corrupted_percentage_var</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>mismatched_percentage_var</name>
-        <rename>mismatched_percentage_var</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>duplicate_percentage_var</name>
-        <rename>duplicate_percentage_var</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>archieved_percentage_var</name>
-        <rename>archieved_percentage_var</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>590</xloc>
@@ -1923,28 +1844,8 @@
           <stream_name>promoter_percentage_var</stream_name>
         </field>
         <field>
-          <column_name>total_incomplete_transactions</column_name>
-          <stream_name>total_incomplete_transactions_var</stream_name>
-        </field>
-        <field>
           <column_name>overview_user_id</column_name>
           <stream_name>overview_user_id</stream_name>
-        </field>
-        <field>
-          <column_name>corrupted_percentage</column_name>
-          <stream_name>corrupted_percentage_var</stream_name>
-        </field>
-        <field>
-          <column_name>mismatched_percentage</column_name>
-          <stream_name>mismatched_percentage_var</stream_name>
-        </field>
-        <field>
-          <column_name>duplicate_percentage</column_name>
-          <stream_name>duplicate_percentage_var</stream_name>
-        </field>
-        <field>
-          <column_name>archieved_percentage</column_name>
-          <stream_name>archieved_percentage_var</stream_name>
         </field>
         <field>
           <column_name>user_id</column_name>
@@ -1959,28 +1860,12 @@
           <stream_name>sent_count</stream_name>
         </field>
         <field>
-          <column_name>total_survey_completed</column_name>
-          <stream_name>total_completed</stream_name>
-        </field>
-        <field>
           <column_name>total_corrupted</column_name>
           <stream_name>total_corrupted</stream_name>
         </field>
         <field>
-          <column_name>total_mismatched</column_name>
-          <stream_name>total_mismatched</stream_name>
-        </field>
-        <field>
           <column_name>total_duplicate</column_name>
           <stream_name>total_duplicate</stream_name>
-        </field>
-        <field>
-          <column_name>total_social_post</column_name>
-          <stream_name>total_shared_by</stream_name>
-        </field>
-        <field>
-          <column_name>total_zillow_reviews</column_name>
-          <stream_name>zillow_count</stream_name>
         </field>
         <field>
           <column_name>total_promoters</column_name>
@@ -2001,6 +1886,42 @@
         <field>
           <column_name>rating</column_name>
           <stream_name>rating</stream_name>
+        </field>
+        <field>
+          <column_name>unassigned</column_name>
+          <stream_name>total_mismatched</stream_name>
+        </field>
+        <field>
+          <column_name>incomplete</column_name>
+          <stream_name>total_incomplete_transactions_var</stream_name>
+        </field>
+        <field>
+          <column_name>completed</column_name>
+          <stream_name>total_completed</stream_name>
+        </field>
+        <field>
+          <column_name>zillow_reviews</column_name>
+          <stream_name>zillow_count</stream_name>
+        </field>
+        <field>
+          <column_name>completed_percentage</column_name>
+          <stream_name>complete_percentage</stream_name>
+        </field>
+        <field>
+          <column_name>processed</column_name>
+          <stream_name>total_processed</stream_name>
+        </field>
+        <field>
+          <column_name>unprocessed</column_name>
+          <stream_name>total_unprocessed</stream_name>
+        </field>
+        <field>
+          <column_name>social_posts</column_name>
+          <stream_name>total_shared_by</stream_name>
+        </field>
+        <field>
+          <column_name>incomplete_percentage</column_name>
+          <stream_name>incomplete_percentage</stream_name>
         </field>
     </fields>
      <cluster_schema/>
@@ -2130,8 +2051,8 @@
     </step>
 
   <step>
-    <name>FilterUserZero</name>
-    <type>FilterRows</type>
+    <name>Select values 3</name>
+    <type>SelectValues</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -2140,20 +2061,97 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to/>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>Y</negated>
- <leftvalue>main_AgentId</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>String</type><text>0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
-    </compare>
+    <fields>      <field>        <name>SOCIAL_MEDIA_POST_DETAILS_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_DETAILS_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>ENTITY_TYPE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>ENTITY_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SHARED_ON_FACEBOOK</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SHARED_ON_LINKEDIN</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SHARED_ON_TWITTER</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SHARED_ON_SOCIAL_SURVEY</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>total_shared_on</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>ENTITY_ID</name>
+        <rename>AGENT_ID</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>487</xloc>
+      <yloc>334</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Multiway Merge Join</name>
+    <type>MultiwayMergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <join_type>FULL OUTER</join_type>
+    <step0>SortAgent1</step0>
+    <step1>SortAgent 2</step1>
+    <step2>SortAgent3</step2>
+    <step3>SortAgent 4</step3>
+    <step4>SortAgent 5</step4>
+    <step5>SortAgent 5 2</step5>
+    <number_input>6</number_input>
+    <keys>
+      <key>AGENT_ID</key>
+      <key>AGENT_ID</key>
+      <key>AGENT_ID</key>
+      <key>AGENT_ID</key>
+      <key>AGENT_ID</key>
+      <key>AGENT_ID</key>
+    </keys>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>429</xloc>
-      <yloc>680</yloc>
+      <xloc>1028</xloc>
+      <yloc>340</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
