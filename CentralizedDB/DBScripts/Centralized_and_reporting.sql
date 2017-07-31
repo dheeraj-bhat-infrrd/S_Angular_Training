@@ -919,7 +919,7 @@ CREATE TABLE `facebook_pages` (
   `FACEBOOK_TOKEN_ID` varchar(45) NOT NULL,
   `ACCESS_TOKEN` text,
   `CATEGORY` varchar(45) DEFAULT NULL,
-  `NAME` varchar(45) DEFAULT NULL,
+  `NAME` varchar(450) DEFAULT NULL,
   `PROFILE_URL` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`FACEBOOK_PAGES_ID`,`FACEBOOK_TOKEN_ID`),
   KEY `FK_FACEBOOK_TOKEN_ID_idx` (`FACEBOOK_TOKEN_ID`),
@@ -2015,10 +2015,10 @@ CREATE TABLE `overview_region_year` (
 DROP TABLE IF EXISTS `overview_user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `overview_branch` (
-  `overview_branch_id` varchar(36) NOT NULL,
-  `branch_id` int(10) unsigned DEFAULT NULL,
- `sps_score` decimal(10,2) NOT NULL DEFAULT '0.00',
+CREATE TABLE `overview_user` (
+  `overview_user_id` varchar(36) NOT NULL,
+  `user_id` int(10) unsigned DEFAULT NULL,
+  `sps_score` decimal(10,2) NOT NULL DEFAULT '0.00',
   `total_detractors` int(11) NOT NULL DEFAULT '0',
   `detractors_percentage` decimal(10,2) NOT NULL DEFAULT '0.00',
   `total_passives` int(11) NOT NULL DEFAULT '0',
@@ -2040,9 +2040,9 @@ CREATE TABLE `overview_branch` (
   `incomplete_percentage` decimal(10,2) NOT NULL DEFAULT '0.00',
   `processed` int(11) NOT NULL DEFAULT '0',
   `unprocessed` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`overview_branch_id`),
-  KEY `FX_OVERVIEW_BRANCH_idx` (`branch_id`),
-  CONSTRAINT `FX_OVERVIEW_BRANCH` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`overview_user_id`),
+  KEY `FX_OVERVIEW_USER_idx` (`user_id`),
+  CONSTRAINT `FX_OVERVIEW_USER` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET character_set_client = @saved_cs_client */;
