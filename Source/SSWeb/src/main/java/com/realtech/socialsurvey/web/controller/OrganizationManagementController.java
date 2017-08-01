@@ -3,10 +3,12 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -777,9 +779,16 @@ public class OrganizationManagementController
                 model.addAttribute( "autoPostLinkToUserSite", surveySettings.isAutoPostLinkToUserSiteEnabled() );
             }
 
-            surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
-            model.addAttribute( "defaultSurveyProperties", surveySettings );
+            //enocode before sending to UI
+            encodeSurveySettings( surveySettings );
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
+            
+            //get default setting and store in model
+            SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
+          //enocode before sending to UI
+            encodeSurveySettings( defaultSurveySettings );
+            model.addAttribute( "defaultSurveyProperties", defaultSurveySettings );
+            
             if(companySettings.getSendEmailThrough()== null){
                 model.addAttribute("sendEmailThrough",CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME);
             }else{
@@ -796,6 +805,7 @@ public class OrganizationManagementController
         return JspResolver.EDIT_SETTINGS;
     }
 
+   
 
     /**
      * Method to save encompass details / CRM info
@@ -3704,5 +3714,25 @@ public class OrganizationManagementController
         return "success";
     }
 
+    /**
+     * 
+     * @param surveySettings
+     */
+    private void encodeSurveySettings( SurveySettings surveySettings){
+        if(surveySettings.getHappyText() != null)
+            surveySettings.setHappyText(new String(Base64.getEncoder().encode(surveySettings.getHappyText().getBytes())));
+        if(surveySettings.getSadText() != null)
+            surveySettings.setSadText(new String(Base64.getEncoder().encode(surveySettings.getSadText().getBytes())));
+        if(surveySettings.getNeutralText() != null)
+            surveySettings.setNeutralText(new String(Base64.getEncoder().encode(surveySettings.getNeutralText().getBytes())));
+
+        if(surveySettings.getHappyTextComplete() != null)
+            surveySettings.setHappyTextComplete(new String(Base64.getEncoder().encode(surveySettings.getHappyTextComplete().getBytes())));
+        if(surveySettings.getSadTextComplete() != null)
+            surveySettings.setSadTextComplete(new String(Base64.getEncoder().encode(surveySettings.getSadTextComplete().getBytes())));
+        if(surveySettings.getNeutralTextComplete() != null)
+            surveySettings.setNeutralTextComplete(new String(Base64.getEncoder().encode(surveySettings.getNeutralTextComplete().getBytes())));
+        
+    }
 }
 // JIRA: SS-24 BY RM02 EOC
