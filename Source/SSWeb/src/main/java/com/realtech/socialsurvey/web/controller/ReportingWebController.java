@@ -596,25 +596,6 @@ public class ReportingWebController
         }
     }
 
-
-   @ResponseBody
-   @RequestMapping( value = "/fetchaveragereportingrating", method = RequestMethod.GET)
-   public Response fetchAverageRating( Model model, HttpServletRequest request ) throws NonFatalException 
-   {
-        LOG.info( "Fetching Average Rating Graph" );
-        HttpSession session = request.getSession( false );
-        User user = sessionHelper.getCurrentUser();
-        Response response = null;
-
-        if ( user == null ) {
-            throw new NonFatalException( "NonFatalException while logging in. " );
-        }    
-        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        response = ssApiIntergrationBuilder.getIntegrationApi().getReportingAverageRating( entityId, entityType );
-        return response;
-        
-   }
    
    @ResponseBody
    @RequestMapping( value = "/fetchreportingspsstats", method = RequestMethod.GET)

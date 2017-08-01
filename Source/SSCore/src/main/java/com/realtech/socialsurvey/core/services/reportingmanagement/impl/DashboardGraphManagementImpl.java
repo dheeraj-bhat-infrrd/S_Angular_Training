@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.core.services.reportingmanagement.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -38,56 +40,19 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
     private SurveyStatsReportUserDao SurveyStatsReportUserDao;
 
 
-    @Override
-    public List<List<Object>> getAverageReviewRating(Long entityId , String entityType){
-
-        LOG.info("getSurveyStatsForCompany has started");
-        //List<List<SurveyStatsReportCompany>> SurveyStats = SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(companyId );
-        List<List<Object>> averageRating = new ArrayList<>();
-        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
-            for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId ) ){
-                List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportCompany.getYear() );
-                list.add( SurveyStatsReportCompany.getMonth() );
-                list.add( SurveyStatsReportCompany.getAvgRating() );
-                averageRating.add( list );
-            }
-        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
-            for(SurveyStatsReportRegion SurveyStatsReportRegion : SurveyStatsReportRegionDao.fetchRegionSurveyStatsById(entityId) ){
-                List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportRegion.getYear() );
-                list.add( SurveyStatsReportRegion.getMonth() );
-                list.add( SurveyStatsReportRegion.getAvgRating() );
-                averageRating.add( list );
-            }
-        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
-            for(SurveyStatsReportBranch SurveyStatsReportBranch : SurveyStatsReportBranchDao.fetchBranchSurveyStatsById(entityId ) ){
-                List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportBranch.getYear() );
-                list.add( SurveyStatsReportBranch.getMonth() );
-                list.add( SurveyStatsReportBranch.getAvgRating() );
-                averageRating.add( list );
-            }
-        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
-            for(SurveyStatsReportUser SurveyStatsReportUser : SurveyStatsReportUserDao.fetchUserSurveyStatsById( entityId ) ){
-                List<Object> list = new ArrayList<>();
-                list.add( SurveyStatsReportUser.getYear() );
-                list.add( SurveyStatsReportUser.getMonth() );
-                list.add( SurveyStatsReportUser.getAvgRating() );
-                averageRating.add( list );
-            }
-        }
-        
-        return averageRating;
-    }
-    
+  
     @Override
     public List<List<Object>> getSpsStatsGraph(Long entityId , String entityType){
         LOG.info("getSpsStatsGraphCompany has started");
         //List<List<SurveyStatsReportCompany>> SurveyStats = SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(companyId );
         List<List<Object>> spsStats = new ArrayList<>();
+        Calendar calender = Calendar.getInstance();
+        calender.getTime();
+        String endTrxMonth = new SimpleDateFormat("yyyy_MM").format(calender.getTime()); //example passes 2016_07
+        calender.add(Calendar.MONTH, -6); 
+        String startTrxMonth = new SimpleDateFormat("yyyy_MM").format(calender.getTime()); //example passes 2016_01
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
-            for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId ) ){
+            for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportCompany.getYear() );
                 list.add( SurveyStatsReportCompany.getMonth() );
@@ -97,7 +62,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 spsStats.add( list );
             }
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
-            for(SurveyStatsReportRegion SurveyStatsReportRegion : SurveyStatsReportRegionDao.fetchRegionSurveyStatsById(entityId) ){
+            for(SurveyStatsReportRegion SurveyStatsReportRegion : SurveyStatsReportRegionDao.fetchRegionSurveyStatsById(entityId, startTrxMonth, endTrxMonth) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportRegion.getYear() );
                 list.add( SurveyStatsReportRegion.getMonth() );
@@ -107,7 +72,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 spsStats.add( list );
             }
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
-            for(SurveyStatsReportBranch SurveyStatsReportBranch : SurveyStatsReportBranchDao.fetchBranchSurveyStatsById(entityId ) ){
+            for(SurveyStatsReportBranch SurveyStatsReportBranch : SurveyStatsReportBranchDao.fetchBranchSurveyStatsById(entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportBranch.getYear() );
                 list.add( SurveyStatsReportBranch.getMonth() );
@@ -117,7 +82,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 spsStats.add( list );
             }
         }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
-            for(SurveyStatsReportUser SurveyStatsReportUser : SurveyStatsReportUserDao.fetchUserSurveyStatsById( entityId ) ){
+            for(SurveyStatsReportUser SurveyStatsReportUser : SurveyStatsReportUserDao.fetchUserSurveyStatsById( entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportUser.getYear() );
                 list.add( SurveyStatsReportUser.getMonth() );
@@ -135,9 +100,14 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
         LOG.info("getSpsStatsGraphCompany has started");
         //List<List<SurveyStatsReportCompany>> SurveyStats = SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(companyId );
         List<List<Object>> completionRate = new ArrayList<>();
+        Calendar calender = Calendar.getInstance();
+        calender.getTime();
+        String endTrxMonth = new SimpleDateFormat("yyyy_MM").format(calender.getTime()); //example passes 2016_07
+        calender.add(Calendar.MONTH, -6); 
+        String startTrxMonth = new SimpleDateFormat("yyyy_MM").format(calender.getTime()); //example passes 2016_01
 
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
-            for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId ) ){
+            for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportCompany.getYear() );
                 list.add( SurveyStatsReportCompany.getMonth() );
@@ -146,7 +116,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 completionRate.add( list );
             }
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
-            for(SurveyStatsReportRegion SurveyStatsReportRegion : SurveyStatsReportRegionDao.fetchRegionSurveyStatsById(entityId) ){
+            for(SurveyStatsReportRegion SurveyStatsReportRegion : SurveyStatsReportRegionDao.fetchRegionSurveyStatsById(entityId, startTrxMonth, endTrxMonth) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportRegion.getYear() );
                 list.add( SurveyStatsReportRegion.getMonth() );
@@ -155,7 +125,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 completionRate.add( list );
             }
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
-            for(SurveyStatsReportBranch SurveyStatsReportBranch : SurveyStatsReportBranchDao.fetchBranchSurveyStatsById(entityId ) ){
+            for(SurveyStatsReportBranch SurveyStatsReportBranch : SurveyStatsReportBranchDao.fetchBranchSurveyStatsById(entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportBranch.getYear() );
                 list.add( SurveyStatsReportBranch.getMonth() );
@@ -164,7 +134,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 completionRate.add( list );
             }
         }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
-            for(SurveyStatsReportUser SurveyStatsReportUser : SurveyStatsReportUserDao.fetchUserSurveyStatsById( entityId ) ){
+            for(SurveyStatsReportUser SurveyStatsReportUser : SurveyStatsReportUserDao.fetchUserSurveyStatsById( entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportUser.getYear() );
                 list.add( SurveyStatsReportUser.getMonth() );

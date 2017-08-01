@@ -119,9 +119,6 @@ public interface SSApiIntegration
     @GET ( "/v1/getspsstats" )
     Response getReportingSpsStats(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
     
-    @GET ( "/v1/getaveragerating" )
-    Response getReportingAverageRating(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
-    
     @GET("/v1/getspsfromoverview")
     Response getSpsStatsFromOverview(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
  

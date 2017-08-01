@@ -9,6 +9,6 @@ public interface SurveyStatsReportBranchDao extends GenericReportingDao<SurveySt
 
     List<SurveyStatsReportBranch> fetchSurveyStatsById( Long entityId, String entityType );
 
-    List<SurveyStatsReportBranch> fetchBranchSurveyStatsById( Long branchId );
+    List<SurveyStatsReportBranch> fetchBranchSurveyStatsById( Long branchId, String startTrxMonth, String endTrxMonth );
 
 }

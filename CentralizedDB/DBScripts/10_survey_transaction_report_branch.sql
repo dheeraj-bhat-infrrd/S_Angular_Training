@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `survey_transaction_report_branch`;
 CREATE TABLE `survey_transaction_report_branch` (
   `survey_transaction_report_branch_id` varchar(36) NOT NULL,
   `month` int(11) DEFAULT NULL,

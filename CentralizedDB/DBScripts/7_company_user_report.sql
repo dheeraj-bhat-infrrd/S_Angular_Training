@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `company_user_report`;
 CREATE TABLE `company_user_report` (
   `company_user_table_id` varchar(36) NOT NULL,
   `company_id` int(10) DEFAULT NULL,

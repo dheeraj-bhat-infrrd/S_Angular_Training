@@ -30,71 +30,70 @@ public class OverviewUser implements Serializable {
     private long userId;
 
     @Column ( name = "sps_score")
-    private int spsScore;
+    private float spsScore;
 
     @Column ( name = "total_detractors")
     private int totalDetractors;
 
     @Column ( name = "detractors_percentage")
-    private int detractorPercentage;
+    private float detractorPercentage;
 
     @Column ( name = "total_passives")
     private int totalPassives;
 
     @Column ( name = "passives_percentage")
-    private int passivesPercentage;
+    private float passivesPercentage;
 
     @Column ( name = "total_promoters")
     private int totalPromoters;
 
     @Column ( name = "promoter_percentage")
-    private int promoterPercentage;
+    private float promoterPercentage;
 
     @Column ( name = "total_corrupted")
     private int totalCorrupted;
 
-    @Column ( name = "corrupted_percentage")
-    private int corruptedPercentage;
-
-    @Column ( name = "total_mismatched")
-    private int totalMismatched;
-
-    @Column ( name = "mismatched_percentage")
-    private int mismatchedPercentage;
+    @Column ( name = "unassigned")
+    private int unassigned;
 
     @Column ( name = "total_duplicate")
     private int totalDuplicate;
 
-    @Column ( name = "duplicate_percentage")
-    private int duplicatePercentage;
-
     @Column ( name = "total_archieved")
     private int totalArchieved;
 
-    @Column ( name = "archieved_percentage")
-    private int archievedPercentage;
-
-    @Column ( name = "total_incomplete_transactions")
-    private int totalIncompleteTransactions;
+    @Column ( name = "incomplete")
+    private int incomplete;
 
     @Column ( name = "total_survey_sent")
     private int totalSurveySent;
 
-    @Column ( name = "total_survey_completed")
-    private int totalSurveyCompleted;
+    @Column ( name = "completed")
+    private int completed;
 
-    @Column ( name = "total_social_post")
-    private int totalSocialPost;
+    @Column ( name = "social_posts")
+    private int socialPosts;
 
-    @Column ( name = "total_zillow_reviews")
-    private int totalZillowReviews;
+    @Column ( name = "zillow_reviews")
+    private int zillowReviews;
     
     @Column ( name = "total_reviews")
     private int totalReviews;
     
     @Column ( name = "rating")
     private float rating;
-
+    
+    @Column ( name = "completed_percentage")
+    private float completedPercentage;
+    
+    @Column ( name = "incomplete_percentage")
+    private float incompletePercentage;
+    
+    @Column ( name = "processed")
+    private int processed;
+    
+    @Column ( name = "unprocessed")
+    private int unprocessed;
 
     public String getOverviewUserId()
     {
@@ -116,12 +115,12 @@ public class OverviewUser implements Serializable {
         this.userId = userId;
     }
 
-    public int getSpsScore()
+    public float getSpsScore()
     {
         return spsScore;
     }
 
-    public void setSpsScore( int spsScore )
+    public void setSpsScore( float spsScore )
     {
         this.spsScore = spsScore;
     }
@@ -136,12 +135,12 @@ public class OverviewUser implements Serializable {
         this.totalDetractors = totalDetractors;
     }
 
-    public int getDetractorPercentage()
+    public float getDetractorPercentage()
     {
         return detractorPercentage;
     }
 
-    public void setDetractorPercentage( int detractorPercentage )
+    public void setDetractorPercentage( float detractorPercentage )
     {
         this.detractorPercentage = detractorPercentage;
     }
@@ -156,12 +155,12 @@ public class OverviewUser implements Serializable {
         this.totalPassives = totalPassives;
     }
 
-    public int getPassivesPercentage()
+    public float getPassivesPercentage()
     {
         return passivesPercentage;
     }
 
-    public void setPassivesPercentage( int passivesPercentage )
+    public void setPassivesPercentage( float passivesPercentage )
     {
         this.passivesPercentage = passivesPercentage;
     }
@@ -176,12 +175,12 @@ public class OverviewUser implements Serializable {
         this.totalPromoters = totalPromoters;
     }
 
-    public int getPromoterPercentage()
+    public float getPromoterPercentage()
     {
         return promoterPercentage;
     }
 
-    public void setPromoterPercentage( int promoterPercentage )
+    public void setPromoterPercentage( float promoterPercentage )
     {
         this.promoterPercentage = promoterPercentage;
     }
@@ -196,34 +195,14 @@ public class OverviewUser implements Serializable {
         this.totalCorrupted = totalCorrupted;
     }
 
-    public int getCorruptedPercentage()
+    public int getUnassigned()
     {
-        return corruptedPercentage;
+        return unassigned;
     }
 
-    public void setCorruptedPercentage( int corruptedPercentage )
+    public void setUnassigned( int unassigned )
     {
-        this.corruptedPercentage = corruptedPercentage;
-    }
-
-    public int getTotalMismatched()
-    {
-        return totalMismatched;
-    }
-
-    public void setTotalMismatched( int totalMismatched )
-    {
-        this.totalMismatched = totalMismatched;
-    }
-
-    public int getMismatchedPercentage()
-    {
-        return mismatchedPercentage;
-    }
-
-    public void setMismatchedPercentage( int mismatchedPercentage )
-    {
-        this.mismatchedPercentage = mismatchedPercentage;
+        this.unassigned = unassigned;
     }
 
     public int getTotalDuplicate()
@@ -236,16 +215,6 @@ public class OverviewUser implements Serializable {
         this.totalDuplicate = totalDuplicate;
     }
 
-    public int getDuplicatePercentage()
-    {
-        return duplicatePercentage;
-    }
-
-    public void setDuplicatePercentage( int duplicatePercentage )
-    {
-        this.duplicatePercentage = duplicatePercentage;
-    }
-
     public int getTotalArchieved()
     {
         return totalArchieved;
@@ -256,24 +225,14 @@ public class OverviewUser implements Serializable {
         this.totalArchieved = totalArchieved;
     }
 
-    public int getArchievedPercentage()
+    public int getIncomplete()
     {
-        return archievedPercentage;
+        return incomplete;
     }
 
-    public void setArchievedPercentage( int archievedPercentage )
+    public void setIncomplete( int incomplete )
     {
-        this.archievedPercentage = archievedPercentage;
-    }
-
-    public int getTotalIncompleteTransactions()
-    {
-        return totalIncompleteTransactions;
-    }
-
-    public void setTotalIncompleteTransactions( int totalIncompleteTransactions )
-    {
-        this.totalIncompleteTransactions = totalIncompleteTransactions;
+        this.incomplete = incomplete;
     }
 
     public int getTotalSurveySent()
@@ -286,39 +245,34 @@ public class OverviewUser implements Serializable {
         this.totalSurveySent = totalSurveySent;
     }
 
-    public int getTotalSurveyCompleted()
+    public int getCompleted()
     {
-        return totalSurveyCompleted;
+        return completed;
     }
 
-    public void setTotalSurveyCompleted( int totalSurveyCompleted )
+    public void setCompleted( int completed )
     {
-        this.totalSurveyCompleted = totalSurveyCompleted;
+        this.completed = completed;
     }
 
-    public int getTotalSocialPost()
+    public int getSocialPosts()
     {
-        return totalSocialPost;
+        return socialPosts;
     }
 
-    public void setTotalSocialPost( int totalSocialPost )
+    public void setSocialPosts( int socialPosts )
     {
-        this.totalSocialPost = totalSocialPost;
+        this.socialPosts = socialPosts;
     }
 
-    public int getTotalZillowReviews()
+    public int getZillowReviews()
     {
-        return totalZillowReviews;
+        return zillowReviews;
     }
 
-    public void setTotalZillowReviews( int totalZillowReviews )
+    public void setZillowReviews( int zillowReviews )
     {
-        this.totalZillowReviews = totalZillowReviews;
-    }
-
-    public static long getSerialversionuid()
-    {
-        return serialVersionUID;
+        this.zillowReviews = zillowReviews;
     }
 
     public int getTotalReviews()
@@ -341,21 +295,66 @@ public class OverviewUser implements Serializable {
         this.rating = rating;
     }
 
+    public float getCompletedPercentage()
+    {
+        return completedPercentage;
+    }
+
+    public void setCompletedPercentage( float completedPercentage )
+    {
+        this.completedPercentage = completedPercentage;
+    }
+
+    public float getIncompletePercentage()
+    {
+        return incompletePercentage;
+    }
+
+    public void setIncompletePercentage( float incompletePercentage )
+    {
+        this.incompletePercentage = incompletePercentage;
+    }
+
+    public int getProcessed()
+    {
+        return processed;
+    }
+
+    public void setProcessed( int processed )
+    {
+        this.processed = processed;
+    }
+
+    public int getUnprocessed()
+    {
+        return unprocessed;
+    }
+
+    public void setUnprocessed( int unprocessed )
+    {
+        this.unprocessed = unprocessed;
+    }
+
+    public static long getSerialversionuid()
+    {
+        return serialVersionUID;
+    }
+
     @Override
     public String toString()
     {
         return "OverviewUser [overviewUserId=" + overviewUserId + ", userId=" + userId + ", spsScore=" + spsScore
             + ", totalDetractors=" + totalDetractors + ", detractorPercentage=" + detractorPercentage + ", totalPassives="
             + totalPassives + ", passivesPercentage=" + passivesPercentage + ", totalPromoters=" + totalPromoters
-            + ", promoterPercentage=" + promoterPercentage + ", totalCorrupted=" + totalCorrupted + ", corruptedPercentage="
-            + corruptedPercentage + ", totalMismatched=" + totalMismatched + ", mismatchedPercentage=" + mismatchedPercentage
-            + ", totalDuplicate=" + totalDuplicate + ", duplicatePercentage=" + duplicatePercentage + ", totalArchieved="
-            + totalArchieved + ", archievedPercentage=" + archievedPercentage + ", totalIncompleteTransactions="
-            + totalIncompleteTransactions + ", totalSurveySent=" + totalSurveySent + ", totalSurveyCompleted="
-            + totalSurveyCompleted + ", totalSocialPost=" + totalSocialPost + ", totalZillowReviews=" + totalZillowReviews
-            + ", totalReviews=" + totalReviews + ", rating=" + rating + "]";
+            + ", promoterPercentage=" + promoterPercentage + ", totalCorrupted=" + totalCorrupted + ", unassigned=" + unassigned
+            + ", totalDuplicate=" + totalDuplicate + ", totalArchieved=" + totalArchieved + ", incomplete=" + incomplete
+            + ", totalSurveySent=" + totalSurveySent + ", completed=" + completed + ", socialPosts=" + socialPosts
+            + ", zillowReviews=" + zillowReviews + ", totalReviews=" + totalReviews + ", rating=" + rating
+            + ", completedPercentage=" + completedPercentage + ", incompletePercentage=" + incompletePercentage + ", processed="
+            + processed + ", unprocessed=" + unprocessed + "]";
     }
-    
+
+
    
 
     

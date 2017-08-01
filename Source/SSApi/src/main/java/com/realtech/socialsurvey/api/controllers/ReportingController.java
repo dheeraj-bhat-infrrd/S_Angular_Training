@@ -42,7 +42,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @RequestMapping ( "/v1")
 public class ReportingController
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( SurveyApiController.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( ReportingController.class );
 
     @Autowired
     private RestUtils restUtils;
@@ -81,19 +81,7 @@ public class ReportingController
         return json;
 
     }
-    
-    @RequestMapping( value = "/getaveragerating", method = RequestMethod.GET)
-    @ApiOperation ( value = "Fetch Data for Average Rating Graph")
-    public String getReportingAverageRating( Long entityId, String entityType ) throws NonFatalException 
-    {
-        LOGGER.info( "Fetching Survey Stats Graph" );
-        
-        String json = null;
-        List<List <Object>> averageRating = dashboardGraphManagement.getAverageReviewRating( entityId , entityType );
-        json = new Gson().toJson( averageRating );
-        return json;
-    }
-    
+
     @RequestMapping( value = "/getspsfromoverview", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Data for Overview ")
     public String getSpsStatsFromOverview( Long entityId, String entityType ) throws NonFatalException 
@@ -152,15 +140,15 @@ public class ReportingController
         Map<String,Object> overview_map = new HashMap<String,Object>();
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
             OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType); 
-            overview_map.put( "Processed", 0 );
-            overview_map.put( "Completed", overviewUser.getTotalSurveyCompleted() );
-            overview_map.put( "CompletePercentage", 0 );
-            overview_map.put( "Incomplete", overviewUser.getTotalIncompleteTransactions() );
-            overview_map.put( "IncompletePercentage", 0 );
-            overview_map.put( "SocialPosts", overviewUser.getTotalSocialPost());
-            overview_map.put( "ZillowReviews", overviewUser.getTotalZillowReviews() );
-            overview_map.put( "Unprocessed", 0 );
-            overview_map.put( "Unassigned", overviewUser.getTotalMismatched() );
+            overview_map.put( "Processed", overviewUser.getProcessed() );
+            overview_map.put( "Completed", overviewUser.getCompleted() );
+            overview_map.put( "CompletePercentage", overviewUser.getCompletedPercentage() );
+            overview_map.put( "Incomplete", overviewUser.getIncomplete() );
+            overview_map.put( "IncompletePercentage", overviewUser.getIncompletePercentage() );
+            overview_map.put( "SocialPosts", overviewUser.getSocialPosts());
+            overview_map.put( "ZillowReviews", overviewUser.getZillowReviews() );
+            overview_map.put( "Unprocessed", overviewUser.getUnprocessed() );
+            overview_map.put( "Unassigned", overviewUser.getUnassigned() );
             overview_map.put( "Duplicate", overviewUser.getTotalDuplicate() );
             overview_map.put( "Corrupted", overviewUser.getTotalCorrupted() );
             overview_map.put( "Rating",overviewUser.getRating() );
@@ -168,15 +156,15 @@ public class ReportingController
           
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
             OverviewBranch overviewBranch = overviewManagement.fetchOverviewBranchDetails( entityId, entityType );
-            overview_map.put( "Processed", 0 );
-            overview_map.put( "Completed", overviewBranch.getTotalSurveyCompleted() );
-            overview_map.put( "CompletePercentage", 0 );
-            overview_map.put( "Incomplete", overviewBranch.getTotalIncompleteTransactions() );
-            overview_map.put( "IncompletePercentage", 0 );
-            overview_map.put( "SocialPosts", overviewBranch.getTotalSocialPost());
-            overview_map.put( "ZillowReviews", overviewBranch.getTotalZillowReviews() );
-            overview_map.put( "Unprocessed", 0 );
-            overview_map.put( "Unassigned", overviewBranch.getTotalMismatched() );
+            overview_map.put( "Processed", overviewBranch.getProcessed() );
+            overview_map.put( "Completed", overviewBranch.getCompleted() );
+            overview_map.put( "CompletePercentage", overviewBranch.getCompletedPercentage() );
+            overview_map.put( "Incomplete", overviewBranch.getIncomplete() );
+            overview_map.put( "IncompletePercentage", overviewBranch.getIncompletePercentage() );
+            overview_map.put( "SocialPosts", overviewBranch.getSocialPosts());
+            overview_map.put( "ZillowReviews", overviewBranch.getZillowReviews() );
+            overview_map.put( "Unprocessed", overviewBranch.getUnprocessed() );
+            overview_map.put( "Unassigned", overviewBranch.getUnassigned() );
             overview_map.put( "Duplicate", overviewBranch.getTotalDuplicate() );
             overview_map.put( "Corrupted", overviewBranch.getTotalCorrupted() );
             overview_map.put( "Rating",overviewBranch.getRating() );
@@ -184,15 +172,15 @@ public class ReportingController
             
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
            OverviewRegion overviewRegion = overviewManagement.fetchOverviewRegionDetails( entityId, entityType );
-           overview_map.put( "Processed", 0 );
-           overview_map.put( "Completed", overviewRegion.getTotalSurveyCompleted() );
-           overview_map.put( "CompletePercentage", 0 );
-           overview_map.put( "Incomplete", overviewRegion.getTotalIncompleteTransactions() );
-           overview_map.put( "IncompletePercentage", 0 );
-           overview_map.put( "SocialPosts", overviewRegion.getTotalSocialPost());
-           overview_map.put( "ZillowReviews", overviewRegion.getTotalZillowReviews() );
-           overview_map.put( "Unprocessed", 0 );
-           overview_map.put( "Unassigned", overviewRegion.getTotalMismatched() );
+           overview_map.put( "Processed", overviewRegion.getProcessed() );
+           overview_map.put( "Completed", overviewRegion.getCompleted() );
+           overview_map.put( "CompletePercentage", overviewRegion.getCompletedPercentage() );
+           overview_map.put( "Incomplete", overviewRegion.getIncomplete() );
+           overview_map.put( "IncompletePercentage", overviewRegion.getIncompletePercentage() );
+           overview_map.put( "SocialPosts", overviewRegion.getSocialPosts());
+           overview_map.put( "ZillowReviews", overviewRegion.getZillowReviews() );
+           overview_map.put( "Unprocessed", overviewRegion.getUnprocessed() );
+           overview_map.put( "Unassigned", overviewRegion.getUnassigned() );
            overview_map.put( "Duplicate", overviewRegion.getTotalDuplicate() );
            overview_map.put( "Corrupted", overviewRegion.getTotalCorrupted() );
            overview_map.put( "Rating",overviewRegion.getRating() );
@@ -200,15 +188,15 @@ public class ReportingController
          
         }else if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             OverviewCompany overviewCompany = overviewManagement.fetchOverviewCompanyDetails( entityId, entityType );
-            overview_map.put( "Processed", 0 );
-            overview_map.put( "Completed", overviewCompany.getTotalSurveyCompleted() );
-            overview_map.put( "CompletePercentage", 0 );
-            overview_map.put( "Incomplete", overviewCompany.getTotalIncompleteTransactions() );
-            overview_map.put( "IncompletePercentage", 0 );
-            overview_map.put( "SocialPosts", overviewCompany.getTotalSocialPost());
-            overview_map.put( "ZillowReviews", overviewCompany.getTotalZillowReviews() );
-            overview_map.put( "Unprocessed", 0 );
-            overview_map.put( "Unassigned", overviewCompany.getTotalMismatched() );
+            overview_map.put( "Processed", overviewCompany.getProcessed() );
+            overview_map.put( "Completed", overviewCompany.getCompleted() );
+            overview_map.put( "CompletePercentage", overviewCompany.getCompletedPercentage() );
+            overview_map.put( "Incomplete", overviewCompany.getIncomplete() );
+            overview_map.put( "IncompletePercentage", overviewCompany.getIncompletePercentage() );
+            overview_map.put( "SocialPosts", overviewCompany.getSocialPosts());
+            overview_map.put( "ZillowReviews", overviewCompany.getZillowReviews() );
+            overview_map.put( "Unprocessed", overviewCompany.getUnprocessed() );
+            overview_map.put( "Unassigned", overviewCompany.getUnassigned() );
             overview_map.put( "Duplicate", overviewCompany.getTotalDuplicate() );
             overview_map.put( "Corrupted", overviewCompany.getTotalCorrupted() );
             overview_map.put( "Rating",overviewCompany.getRating() );
