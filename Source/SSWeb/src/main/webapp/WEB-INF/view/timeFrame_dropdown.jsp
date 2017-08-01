@@ -1,43 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<style>
-	.time-frame-item{
-		cursor: pointer;
-		font-size: 12px;
-		line-height: 15px;
-		padding: 7px 5px;
-		border-bottom: 1px solid #eee;
-	}
-	
-	.time-frame-wrapper{
-		z-index: 999;
-   		border: 1px solid #dcdcdc;
-    	position: absolute;
-    	background-color: #fff;
-    	border-radius: 3px;
-    	width: 129px;
-    	color: #666;
-    	text-align: left;
-    	top: 110px;
-    	left: 234px;
-    	max-height: 400px;
-    	box-shadow: 3px 3px 30px #444;
-	}
-	
-	.time-frame-prof-sel{
-		border: 1px solid #d2cdcd;
-   		background: #ffffff;
-    	height: 40px;
-    	border-radius: 3px;
-	}
-	
-	.time-frame-item:hover{
-		color: #fff;
-		background-color: #5cc7ef;
-	}
-</style>
+
 <div id="time-frame-wrapper" class="float-left clearfix hr-dsh-adj-lft hdr-prof-sel time-frame-prof-sel">
-	<div id="time-frame-sel" data-column-value="100" class="float-left hr-txt2 cursor-pointer" style="height:90%; line-height:40px !important;">All Time</div>	
+	<div id="time-frame-sel" data-column-value="100" class="float-left hr-txt2 cursor-pointer time-frame-sel" >All Time</div>	
 	<div id="time-frame-options" class="time-frame-wrapper hide">
 		<div class="time-frame-item" data-column-value="100">All Time</div>
 		<div class="time-frame-item" data-column-value="101">This Month</div>

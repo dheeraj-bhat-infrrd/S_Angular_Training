@@ -6,11 +6,8 @@
 <style>
 	.incomplete-trans-span{
 		text-align:center;
-		font-family: cursive;
 		font-size: small;
-		font-style: italic;
 		font-variant: small-caps;
-		font-weight: bold !important;
 		line-height: 15px;
 	}
 	
@@ -34,7 +31,7 @@
      }
 </style>
 <span class="rep-sps-lbl">Social Promoter Score (SPS)</span>
-<div class="col-lg-3 col-md-3 col-sm-3" style="padding-left:50px; padding-top:10px;">
+<div class="col-lg-3 col-md-3 col-sm-3 rep-sps-div">
 	
 	<div id="spsGaugeSuccess" class="hide">
 		<jsp:include page="reporting_spsGauge.jsp"></jsp:include>
@@ -51,22 +48,21 @@
 		</div>
 	</div>
 </div>
-<div class="col-lg-3 col-md-3 col-sm-3"
-	style="display: grid; margin-top: 40px;">
-	<div style="display: inline-flex; margin-top: 10px">
-		<div class="float-left dash-sel-lbl" style="padding-left:12px; font-weight:600 !important">Detractors</div>
+<div class="col-lg-3 col-md-3 col-sm-3 rep-sps-scores">
+	<div class="rep-det-div">
+		<div class="float-left dash-sel-lbl rep-dash-sel-lbl-det">Detractors</div>
 		<div id="detractorsBar" class="float-left dash-sel-lbl"
 			style=" height:65%; background:#E8341F; margin:auto 2px;"></div>
 		<div id="detractorsValue" class="float-left dash-sel-lbl" style="color: #E8341F; text-align:left; margin-left:5px"></div>
 	</div>
-	<div style="display: inline-flex; margin-top: 10px">
-		<div class="float-left dash-sel-lbl" style="padding-left:25px; font-weight:600 !important">Passives</div>
+	<div class="rep-det-div">
+		<div class="float-left dash-sel-lbl rep-dash-sel-lbl-pas">Passives</div>
 		<div id="passivesBar" class="float-left dash-sel-lbl"
 			style=" height:65%; background:#999999; margin:auto 2px"></div>
 		<div id="passivesValue" class="float-left dash-sel-lbl" style="color: #999999; text-align:left; margin-left:5px"></div>
 	</div>
-	<div style="display: inline-flex; margin-top: 10px">
-		<div class="float-left dash-sel-lbl" style="padding-left:12px; font-weight:600 !important">Promotors</div>
+	<div class="rep-det-div">
+		<div class="float-left dash-sel-lbl rep-dash-lbl-sel-prom">Promotors</div>
 		<div id="promotersBar" class="float-left dash-sel-lbl"
 			style=" height:65%; background:#7ab400; margin:auto 2px"></div>
 		<div id="promotersValue" class="float-left dash-sel-lbl" style="color: #7ab400; text-align:left; margin-left:5px"></div>
@@ -77,7 +73,7 @@
 	<jsp:include page="reporting_spsStatsGraph.jsp"></jsp:include>
 </div>
 
-<div id="graphTabs" style="margin-top: 10px; display: inline-block; float:left; width:100%;height:360px; border-top:1px solid #d2cdcd;margin-left:15px">
+<div id="graphTabs" class="col-md-12 col-lg-12 col-sm-12 col-xs-12" style="margin-top: 10px; display: inline-block; float:left; width:100%;height:360px; border-top:1px solid #d2cdcd;margin-left:15px">
 	<span class="rep-sps-lbl" style="margin-top: 13px;">Completion Rate</span>
 	<jsp:include page="reporting_completionRateGraph.jsp"></jsp:include>
 </div>

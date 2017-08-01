@@ -3,75 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <style>
-.inline-flex-class{
-	display:inline-flex;
-	 width: 72%;
-	 margin-bottom:15px;
-}
 
-.processed-lbl-rect-div{
-	width: 15px;
-    height: 15px;
-    background: #0072c2;
-    border-radius: 3px;
-    margin: auto 0;
-}
-
-.completed-lbl-rect-div{
-	width: 15px;
-    height: 15px;
-    background: #79b600;
-    border-radius: 3px;
-    margin: auto 0;
-}
-
-.incomplete-lbl-rect-div{
-	width: 15px;
-    height: 15px;
-    background: #f5c70a;
-    border-radius: 3px;
-    margin: auto 0;
-}
-
-.unprocessed-lbl-rect-div{
-	width: 15px;
-    height: 15px;
-    background: #fa5b00;
-    border-radius: 3px;
-    margin: auto 0;
-}
-
-.unassigned-lbl-rect-div{
-	width: 15px;
-    height: 15px;
-    background: #f5c70a;
-    border-radius: 3px;
-    margin: auto 0;
-}
-
-.duplicate-lbl-rect-div{
-	width: 15px;
-    height: 15px;
-    background: #8445d1;
-    border-radius: 3px;
-    margin: auto 0;
-}
-
-.corrupted-lbl-rect-div{
-	width: 15px;
-    height: 15px;
-    background: #ea310b;
-    border-radius: 3px;
-    margin: auto 0;
-}
-
-.other-lbl-rect-div{
-	width: 15px;
-    height: 15px;
-    background: #000000;
-    border-radius: 3px;
-    margin: auto 0;
-}
 
 hr{
 	width: 265px;
@@ -84,76 +16,8 @@ hr{
     margin-left: 25px;
 }
 
-#processed-lbl,#unprocessed-lbl{
-	margin-left: 15px;
-    margin-right: 90px;
-}
-
-#completed-lbl{
-	margin-left: 15px;
-    margin-right: 86px;
-}
-
-#incompleted-lbl{
-	margin-left: 15px;
-    margin-right: 84px;
-}
-
-#social-posts-lbl{
-	margin-left: 15px;
-    margin-right: 81px;
-}
-
-#zillow-lbl{
-	margin-left: 15px;
-    margin-right: 65px;
-}
-
-#unassigned-lbl{
-	margin-left: 15px;
-    margin-right: 99px;
-}
-
-#duplicate-lbl{
-	margin-left: 15px;
-    margin-right: 114px;
-}
-
-#corrupted-lbl{
-	margin-left: 15px;
-    margin-right: 110px;
-}
-
-#other-lbl{
-	margin-left: 15px;
-    margin-right: 141px;
-}
-
-.trans-font-style{
-	font-weight: 600 !important;
-    font-size: 14px;
-}
-
-.social-posts-lbl-rect-div{
-	width: 15px;
-    height: 15px;
-    background: #D2DEDF;
-    border-radius: 3px;
-    margin: auto 0;
-}
-.background-rect,.processed-background-rect,.unprocessed-background-rect{
-	width: 15px;
-    height: 15px;
-    background: #f9f9fb;
-    border-radius: 3px;
-    margin: auto 0;
-}
-
-#incompleted-lbl-sel-span:hover,#unassigned-lbl-sel-span:hover{
-	background:#bab8b8;
-}
 </style>
-<div id="processed-trans-div" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 cursor-pointer">
+<div id="processed-trans-div" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 cursor-pointer processed-trans-div">
 	<div id="processed-div" style="display:inline-grid; padding-left: 45px;">
 		<div id="processed-details" class="inline-flex-class" style="margin-bottom: 0px; margin-top: 45px;">
 			<div id="processed-background-rect" class="background-rect hide"></div>
@@ -196,7 +60,7 @@ hr{
 			
 	</div>
 </div>
-<div id="rep-trans-graphs" class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+<div id="rep-trans-graphs" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 rep-trans-graphs">
 	<div id="unclicked-trans-graph" style="margin-top:35px" >
 		<div id="unclicked-graph-div" style="position:relative">
 			<div id="donutchart" style="width: 100%; height: 90%;"></div>
@@ -216,12 +80,12 @@ hr{
 		<div style="text-align:center; margin:5% auto">
 			<span class="incomplete-trans-span" style="font-size:large">You have no</span>
 			<div style="clear: both">
-				<span class="incomplete-trans-span" style="font-size:larger">Transactions for your account</span> 
+				<span class="incomplete-trans-span" style="font-size:large">Transactions for your account</span> 
 			</div>
 		</div>
 	</div>
 </div>
-<div id="unprocessed-trans-div" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 cursor-pointer">
+<div id="unprocessed-trans-div" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 cursor-pointer unprocessed-trans-div">
 	<div id="unprocessed-div" style="display:inline-grid; padding-left: 45px; width: 100%;">
 		<div id="unprocessed-details" class="inline-flex-class" style="margin-bottom: 0px; margin-top: 45px;">
 			<div id="unprocessed-background-rect" class="background-rect hide"></div>
@@ -273,9 +137,9 @@ $(document).ready(function(){
 		activaTab('incomplete-surveys-tab');
 	});
 	
-	$(document).on('click','#unassigned-lbl-sel',function(e){
+	$(document).on('click','#unassigned-lbl-sel-span',function(e){
 		e.stopPropagation();
-		activaTab('incomplete-surveys-tab');
+		showMainContent('./showapps.do');
 	});
 	
 	$(document).on('click','#unprocessed-trans-div',function(e){
@@ -335,6 +199,15 @@ $(document).ready(function(){
 	drawUnclickedDonutChart();
 	drawProcessedDonutChart();
 	drawUnprocessedDonutChart();
+	
+	 $(window).resize(function(){
+		 $('#unclicked-trans-graph').removeClass('hide');
+		 	drawUnclickedDonutChart();
+			drawProcessedDonutChart();
+			drawUnprocessedDonutChart();
+			$('#unprocessed-trans-graph').addClass('hide');
+			$('#processed-trans-graph').addClass('hide');
+	 });
 	
 	var currentDate =  new Date();
 	var currentMonth = currentDate.getMonth();
