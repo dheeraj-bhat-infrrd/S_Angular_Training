@@ -591,10 +591,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                         String imageUrl = applicationLogoUrlForLinkedin;
 
-                        if ( agentSettings.getProfileImageUrl() != null && !agentSettings.getProfileImageUrl().isEmpty() ) {
-                            imageUrl = agentSettings.getProfileImageUrl();
-                        } else if ( companySettings.getLogo() != null && !companySettings.getLogo().isEmpty() ) {
-                            imageUrl = companySettings.getLogo();
+                        if ( agentSettings.getProfileImageUrlThumbnail() != null && !agentSettings.getProfileImageUrlThumbnail().isEmpty() ) {
+                            imageUrl = agentSettings.getProfileImageUrlThumbnail();
+                        } else if ( companySettings.getLogoThumbnail() != null && !companySettings.getLogoThumbnail().isEmpty() ) {
+                            imageUrl = companySettings.getLogoThumbnail();
                         }
                         String profileUrl = "";
                         if ( surveyId != null && !surveyId.isEmpty() ) {
