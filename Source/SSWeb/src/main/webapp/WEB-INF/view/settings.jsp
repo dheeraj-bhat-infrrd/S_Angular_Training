@@ -34,10 +34,7 @@
 </div>
 
 <div id="temp-div"></div>
-<div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25"
-	data-hpy="${surveysettings.happyText}" data-hpy-compl="${surveysettings.happyTextComplete}" 
-	data-nutl="${surveysettings.neutralText}" data-nutl-compl="${surveysettings.neutralTextComplete}" 
-	data-sad="${surveysettings.sadText}" data-sad-compl="${surveysettings.sadTextComplete}">
+<div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
 	
 	<div class="container">
 
@@ -303,28 +300,28 @@ $(document).ready(function() {
 		autoSetCheckboxStatus('#st-settings-account-on', '#st-settings-account-off', '#other-account');
 		autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
 		autoSetReminderIntervalStatus();
-		var happyTxt=$('#hm-main-content-wrapper').attr("data-hpy");
+		var happyTxt="${surveysettings.happyText}";
 		if(happyTxt == ""){
-			happyTxt = "${defaultSurveyProperties.happyText}";
+			happyTxt = '${defaultSurveyProperties.happyText}';
 		}
-		var nuTxt=$('#hm-main-content-wrapper').attr("data-nutl");
+		var nuTxt="${surveysettings.neutralText}";
 		if(nuTxt == ""){
 			nuTxt = "${defaultSurveyProperties.neutralText}";
 		}
 		
-		var sadTxt=$('#hm-main-content-wrapper').attr("data-sad");
+		var sadTxt="${surveysettings.sadText}";
 		if(sadTxt == ""){
 			sadTxt = "${defaultSurveyProperties.sadText}";
 		}
-		var happyTxtComplete=$('#hm-main-content-wrapper').attr("data-hpy-compl");
+		var happyTxtComplete="${surveysettings.happyTextComplete}";
 		if(happyTxtComplete == ""){
 			happyTxtComplete = "${defaultSurveyProperties.happyTextComplete}";
 		}
-		var nuTxtComplete=$('#hm-main-content-wrapper').attr("data-nutl-compl");
+		var nuTxtComplete="${surveysettings.neutralTextComplete}";
 		if(nuTxtComplete == ""){
 			nuTxtComplete = "${defaultSurveyProperties.neutralTextComplete}";
 		}
-		var sadTxtComplete=$('#hm-main-content-wrapper').attr("data-sad-compl");
+		var sadTxtComplete="${surveysettings.sadTextComplete}";
 		if(sadTxtComplete == ""){
 			sadTxtComplete = "${defaultSurveyProperties.sadTextComplete}";
 		}
