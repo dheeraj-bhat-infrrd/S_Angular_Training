@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -3720,18 +3720,18 @@ public class OrganizationManagementController
      */
     private void encodeSurveySettings( SurveySettings surveySettings){
         if(surveySettings.getHappyText() != null)
-            surveySettings.setHappyText(new String(Base64.getEncoder().encode(surveySettings.getHappyText().getBytes())));
+            surveySettings.setHappyText(DatatypeConverter.printBase64Binary(surveySettings.getHappyText().getBytes()));
         if(surveySettings.getSadText() != null)
-            surveySettings.setSadText(new String(Base64.getEncoder().encode(surveySettings.getSadText().getBytes())));
+            surveySettings.setSadText(DatatypeConverter.printBase64Binary(surveySettings.getSadText().getBytes()));
         if(surveySettings.getNeutralText() != null)
-            surveySettings.setNeutralText(new String(Base64.getEncoder().encode(surveySettings.getNeutralText().getBytes())));
+            surveySettings.setNeutralText(DatatypeConverter.printBase64Binary(surveySettings.getNeutralText().getBytes()));
 
         if(surveySettings.getHappyTextComplete() != null)
-            surveySettings.setHappyTextComplete(new String(Base64.getEncoder().encode(surveySettings.getHappyTextComplete().getBytes())));
+            surveySettings.setHappyTextComplete(DatatypeConverter.printBase64Binary(surveySettings.getHappyTextComplete().getBytes()));
         if(surveySettings.getSadTextComplete() != null)
-            surveySettings.setSadTextComplete(new String(Base64.getEncoder().encode(surveySettings.getSadTextComplete().getBytes())));
+            surveySettings.setSadTextComplete(DatatypeConverter.printBase64Binary(surveySettings.getSadTextComplete().getBytes()));
         if(surveySettings.getNeutralTextComplete() != null)
-            surveySettings.setNeutralTextComplete(new String(Base64.getEncoder().encode(surveySettings.getNeutralTextComplete().getBytes())));
+            surveySettings.setNeutralTextComplete(DatatypeConverter.printBase64Binary(surveySettings.getNeutralTextComplete().getBytes()));
         
     }
 }
