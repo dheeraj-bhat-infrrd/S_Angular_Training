@@ -1923,6 +1923,11 @@ $(document).click(function(e) {
 	if ($('#srch-crtria-list').css('display') == "block") {
 		$('#srch-crtria-list').toggle();
 	}
+	
+	if ($('#time-frame-options').css('display') == "block") {
+		$('#time-frame-options').toggle();
+	}
+	
 
 	/*
 	 * if($('.v-tbl-icn-wraper').is(':visible')) { $('.v-tbl-icn-wraper').hide(); }

@@ -62,7 +62,7 @@
 				<spring:message code="label.reporting.key" />
 			</div>
 			<div id="timeFrame_container">
-			<jsp:include page="timeFrame_dropdown.jsp"></jsp:include>
+			<jsp:include page="reporting_timeFrame_dropdown.jsp"></jsp:include>
 			</div>
 			<!-- Add user assignment dropdown -->
 			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>

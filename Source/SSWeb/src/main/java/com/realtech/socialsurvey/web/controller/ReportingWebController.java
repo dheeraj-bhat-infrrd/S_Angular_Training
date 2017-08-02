@@ -850,6 +850,13 @@ public class ReportingWebController
        }
        return JspResolver.REPORTS;
    }
+   
+   //Ranking Settings Page
+   @RequestMapping ( value = "/showrankingsettings", method = RequestMethod.GET)
+   public String showRankingPage( Model model, HttpServletRequest request ) throws NonFatalException
+   {
+       return JspResolver.RANKING_SETTINGS;
+   }
     /**
     *
     * @param model

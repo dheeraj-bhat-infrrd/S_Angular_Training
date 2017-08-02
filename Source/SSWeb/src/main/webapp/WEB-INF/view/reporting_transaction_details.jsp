@@ -142,59 +142,7 @@ $(document).ready(function(){
 		showMainContent('./showapps.do');
 	});
 	
-	$(document).on('click','#unprocessed-trans-div',function(e){
-		e.stopPropagation();
-		$(this).css('opacity','1.0');
-		$('#incompleted-details-selectable').hide();
-		$('#incompleted-details').removeClass('hide');
-		$('#incompleted-details').addClass('inline-flex-class');
-		$('#unassigned-details-selectable').hide();
-		$('#unassigned-details').removeClass('hide');
-		$('#unassigned-details').addClass('inline-flex-class');
-		$('.processed-background-rect').show();
-		$('#processed-background-rect').show();
-		$('#processed-lbl-rect').hide();
-		$('#completed-lbl-rect').hide();
-		$('#incompleted-lbl-rect').hide();
-		$('#social-posts-lbl-rect').hide();
-		$('#zillow-lbl-rect').hide();
-		$('#unassigned-lbl-rect').show();
-		$('#duplicate-lbl-rect').show();
-		$('#corrupted-lbl-rect').show();
-		$('#other-lbl-rect').show();
-		$('#processed-trans-div').fadeTo('fast','0.2');
-		$('#unclicked-trans-graph').addClass('hide');
-		$('#processed-trans-graph').addClass('hide');
-		$('#unprocessed-trans-graph').removeClass('hide');
-		
-	});
 	
-	$(document).on('click','#processed-trans-div',function(e){
-		e.stopPropagation();
-		$(this).css('opacity','1.0');
-		$('#incompleted-details-selectable').hide();
-		$('#incompleted-details').removeClass('hide');
-		$('#incompleted-details').addClass('inline-flex-class');
-		$('#unassigned-details-selectable').hide();
-		$('#unassigned-details').removeClass('hide');
-		$('#unassigned-details').addClass('inline-flex-class');
-		$('.unprocessed-background-rect').show();
-		$('#unprocessed-background-rect').show();
-		$('#unprocessed-lbl-rect').hide();
-		$('#completed-lbl-rect').show();
-		$('#incompleted-lbl-rect').show();
-		$('#social-posts-lbl-rect').show();
-		$('#zillow-lbl-rect').show();
-		$('#unassigned-lbl-rect').hide();
-		$('#duplicate-lbl-rect').hide();
-		$('#corrupted-lbl-rect').hide();
-		$('#other-lbl-rect').hide();
-		$('#unprocessed-trans-div').fadeTo('fast','0.2');
-		$('#unclicked-trans-graph').addClass('hide');
-		$('#unprocessed-trans-graph').addClass('hide');
-		$('#processed-trans-graph').removeClass('hide');
-		
-	});
 	
 	drawUnclickedDonutChart();
 	drawProcessedDonutChart();
@@ -261,5 +209,75 @@ $(document).ready(function(){
 		$('#empty-rep-chart-div').removeClass('hide');
 	}	
 	
+	$(document).on('click','#unprocessed-trans-div',function(e){
+		
+		e.stopPropagation();
+		$(this).css('opacity','1.0');
+		$('#incompleted-details-selectable').hide();
+		$('#incompleted-details').removeClass('hide');
+		$('#incompleted-details').addClass('inline-flex-class');
+		$('#unassigned-details-selectable').hide();
+		$('#unassigned-details').removeClass('hide');
+		$('#unassigned-details').addClass('inline-flex-class');
+		$('.processed-background-rect').show();
+		$('#processed-background-rect').show();
+		$('#processed-lbl-rect').hide();
+		$('#completed-lbl-rect').hide();
+		$('#incompleted-lbl-rect').hide();
+		$('#social-posts-lbl-rect').hide();
+		$('#zillow-lbl-rect').hide();
+		$('#unassigned-lbl-rect').show();
+		$('#duplicate-lbl-rect').show();
+		$('#corrupted-lbl-rect').show();
+		$('#other-lbl-rect').show();
+		$('#processed-trans-div').fadeTo('fast','0.2');
+		
+		var unprocessed=parseInt($('#unprocessed-lbl-span').html());
+		if(unprocessed != 0){
+			$('#unclicked-trans-graph').addClass('hide');
+			$('#processed-trans-graph').addClass('hide');
+			$('#unprocessed-trans-graph').removeClass('hide');
+			$('#empty-rep-chart-div').addClass('hide');
+		}else{
+			$('#unclicked-trans-graph').addClass('hide');
+			$('#unprocessed-trans-graph').addClass('hide');
+			$('#processed-trans-graph').addClass('hide');
+		}
+	});
+	
+	$(document).on('click','#processed-trans-div',function(e){
+		e.stopPropagation();
+		$(this).css('opacity','1.0');
+		$('#incompleted-details-selectable').hide();
+		$('#incompleted-details').removeClass('hide');
+		$('#incompleted-details').addClass('inline-flex-class');
+		$('#unassigned-details-selectable').hide();
+		$('#unassigned-details').removeClass('hide');
+		$('#unassigned-details').addClass('inline-flex-class');
+		$('.unprocessed-background-rect').show();
+		$('#unprocessed-background-rect').show();
+		$('#unprocessed-lbl-rect').hide();
+		$('#completed-lbl-rect').show();
+		$('#incompleted-lbl-rect').show();
+		$('#social-posts-lbl-rect').show();
+		$('#zillow-lbl-rect').show();
+		$('#unassigned-lbl-rect').hide();
+		$('#duplicate-lbl-rect').hide();
+		$('#corrupted-lbl-rect').hide();
+		$('#other-lbl-rect').hide();
+		$('#unprocessed-trans-div').fadeTo('fast','0.2');
+		
+		var processed=parseInt($('#processed-lbl-span').html());
+		if(processed != 0){
+			$('#unclicked-trans-graph').addClass('hide');
+			$('#unprocessed-trans-graph').addClass('hide');
+			$('#processed-trans-graph').removeClass('hide');
+			$('#empty-rep-chart-div').addClass('hide');
+		}else{
+			$('#unclicked-trans-graph').addClass('hide');
+			$('#unprocessed-trans-graph').addClass('hide');
+			$('#processed-trans-graph').addClass('hide');
+		}
+	});
 });
 </script>
