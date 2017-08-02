@@ -161,11 +161,12 @@
   <hop> <from>Sort Mongo</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB I - CompanySettings</from><to>Sort Mongo</to><enabled>Y</enabled> </hop>
   <hop> <from>SocialMediaToken</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>DateConverter </from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Table input</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Synchronize after merge Company Settings Main</to><enabled>Y</enabled> </hop>
+  <hop> <from>DateConverter </from><to>Convert to EST</to><enabled>Y</enabled> </hop>
+  <hop> <from>Convert to EST</from><to>Select values</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>DateConverter </name>
@@ -282,6 +283,8 @@
       <value>SOCIAL_MEDIA_TOKENS_ID</value>
       <value>CREATED_ON</value>
       <value>MODIFIED_ON</value>
+      <value>CREATED_ON_EST</value>
+      <value>MODIFIED_ON_EST</value>
     </values>
 <flag_field>flagfield</flag_field>
 <reference>Table input</reference>
@@ -290,8 +293,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>933</xloc>
-      <yloc>356</yloc>
+      <xloc>934</xloc>
+      <yloc>424</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2124,10 +2127,40 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
+      </meta>      <meta>        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
       </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>688</xloc>
-      <yloc>354</yloc>
+      <xloc>689</xloc>
+      <yloc>422</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2220,8 +2253,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>812</xloc>
-      <yloc>354</yloc>
+      <xloc>813</xloc>
+      <yloc>422</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2436,11 +2469,21 @@
         <rename>ZILLOW_REVIEW_AVERAGE</rename>
         <update>Y</update>
       </value>
+      <value>
+        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        <update>Y</update>
+      </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>933</xloc>
-      <yloc>508</yloc>
+      <xloc>934</xloc>
+      <yloc>576</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2457,7 +2500,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  COMPANY_SETTINGS_ID&#xd;&#xa;, ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA&#xd;&#xa;, ALLOW_ZILLOW_AUTO_POST&#xd;&#xa;, CREATED_BY&#xd;&#xa;, CREATED_ON_MONGO&#xd;&#xa;, DISCLAIMER&#xd;&#xa;, HIDDEN_SECTION&#xd;&#xa;, HIDE_SECTIONS_FROM_PROFILE_PAGE&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, IS_ACCOUNT_DISABLED&#xd;&#xa;, IS_DEFAULT_BY_SYSTEM&#xd;&#xa;, IS_LOCATION_ENABLED&#xd;&#xa;, IS_LOGO_IMAGE_PROCESSED&#xd;&#xa;, IS_PROFILE_IMAGE_PROCESSED&#xd;&#xa;, IS_SEO_CONTENT_MODIFIED&#xd;&#xa;, LOGO&#xd;&#xa;, LOGO_THUMBNAIL&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, MODIFIED_ON_MONGO&#xd;&#xa;, PROFILE_IMAGE_URL&#xd;&#xa;, PROFILE_IMAGE_URL_THUMBNAIL&#xd;&#xa;, PROFILE_NAME&#xd;&#xa;, PROFILE_URL&#xd;&#xa;, PROFILE_COMPLETION&#xd;&#xa;, REVIEW_SORT_CRITERIA&#xd;&#xa;, SEND_EMAIL_FROM_COMPANY&#xd;&#xa;, SEND_EMAIL_THROUGH&#xd;&#xa;, STATUS&#xd;&#xa;, UNIQUE_IDENTIFIER&#xd;&#xa;, VENDASTA_ACCESSIBLE&#xd;&#xa;, VERTICAL&#xd;&#xa;, ZILLOW_REVIEW_AVERAGE&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;FROM company_settings&#xd;&#xa;order by COMPANY_SETTINGS_ID</sql>
+    <sql>SELECT&#xd;&#xa;  COMPANY_SETTINGS_ID&#xd;&#xa;, ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA&#xd;&#xa;, ALLOW_ZILLOW_AUTO_POST&#xd;&#xa;, CREATED_BY&#xd;&#xa;, CREATED_ON_MONGO&#xd;&#xa;, DISCLAIMER&#xd;&#xa;, HIDDEN_SECTION&#xd;&#xa;, HIDE_SECTIONS_FROM_PROFILE_PAGE&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, IS_ACCOUNT_DISABLED&#xd;&#xa;, IS_DEFAULT_BY_SYSTEM&#xd;&#xa;, IS_LOCATION_ENABLED&#xd;&#xa;, IS_LOGO_IMAGE_PROCESSED&#xd;&#xa;, IS_PROFILE_IMAGE_PROCESSED&#xd;&#xa;, IS_SEO_CONTENT_MODIFIED&#xd;&#xa;, LOGO&#xd;&#xa;, LOGO_THUMBNAIL&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, MODIFIED_ON_MONGO&#xd;&#xa;, PROFILE_IMAGE_URL&#xd;&#xa;, PROFILE_IMAGE_URL_THUMBNAIL&#xd;&#xa;, PROFILE_NAME&#xd;&#xa;, PROFILE_URL&#xd;&#xa;, PROFILE_COMPLETION&#xd;&#xa;, REVIEW_SORT_CRITERIA&#xd;&#xa;, SEND_EMAIL_FROM_COMPANY&#xd;&#xa;, SEND_EMAIL_THROUGH&#xd;&#xa;, STATUS&#xd;&#xa;, UNIQUE_IDENTIFIER&#xd;&#xa;, VENDASTA_ACCESSIBLE&#xd;&#xa;, VERTICAL&#xd;&#xa;, ZILLOW_REVIEW_AVERAGE&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, MODIFIED_ON_EST&#xd;&#xa;FROM company_settings&#xd;&#xa;order by COMPANY_SETTINGS_ID</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2467,6 +2510,42 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>933</xloc>
       <yloc>232</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Convert to EST</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var createdOnDate &#x3d; new Date&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnDate &#x3d; new Date&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; sdf.format&#x28;createdOnDate&#x29;&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; sdf.format&#x28;modifiedOnDate&#x29;&#x3b;&#xd;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>687</xloc>
+      <yloc>334</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

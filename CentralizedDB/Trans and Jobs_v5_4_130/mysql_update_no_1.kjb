@@ -84,8 +84,9 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -111,8 +112,9 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -177,8 +179,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>367</xloc>
-      <yloc>35</yloc>
+      <xloc>649</xloc>
+      <yloc>19</yloc>
       </entry>
     <entry>
       <name>batch_tracker Transformation</name>
@@ -210,8 +212,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>502</xloc>
-      <yloc>17</yloc>
+      <xloc>955</xloc>
+      <yloc>6</yloc>
       </entry>
     <entry>
       <name>crm_batch_tracker Transformation</name>
@@ -243,8 +245,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>690</xloc>
-      <yloc>132</yloc>
+      <xloc>1283</xloc>
+      <yloc>32</yloc>
       </entry>
     <entry>
       <name>crm_master Transformation</name>
@@ -276,8 +278,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>718</xloc>
-      <yloc>187</yloc>
+      <xloc>1283</xloc>
+      <yloc>111</yloc>
       </entry>
     <entry>
       <name>email_entity Transformation</name>
@@ -309,8 +311,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>766</xloc>
-      <yloc>307</yloc>
+      <xloc>875</xloc>
+      <yloc>253</yloc>
       </entry>
     <entry>
       <name>event Transformation</name>
@@ -342,8 +344,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>754</xloc>
-      <yloc>367</yloc>
+      <xloc>1373</xloc>
+      <yloc>648</yloc>
       </entry>
     <entry>
       <name>external_survey_tracker Transformation</name>
@@ -375,8 +377,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>729</xloc>
-      <yloc>421</yloc>
+      <xloc>1233</xloc>
+      <yloc>681</yloc>
       </entry>
     <entry>
       <name>referral_invitation Transformation</name>
@@ -408,8 +410,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>608</xloc>
-      <yloc>534</yloc>
+      <xloc>806</xloc>
+      <yloc>674</yloc>
       </entry>
     <entry>
       <name>statelookup Transformation</name>
@@ -441,8 +443,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>499</xloc>
-      <yloc>547</yloc>
+      <xloc>590</xloc>
+      <yloc>717</yloc>
       </entry>
     <entry>
       <name>survey Transformation</name>
@@ -474,8 +476,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>408</xloc>
-      <yloc>537</yloc>
+      <xloc>419</xloc>
+      <yloc>680</yloc>
       </entry>
     <entry>
       <name>survey_pre_initiation Transformation</name>
@@ -507,8 +509,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>269</xloc>
-      <yloc>521</yloc>
+      <xloc>271</xloc>
+      <yloc>704</yloc>
       </entry>
     <entry>
       <name>survey_pre_initiation_status_lookup Transformation</name>
@@ -540,8 +542,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>167</xloc>
-      <yloc>463</yloc>
+      <xloc>189</xloc>
+      <yloc>628</yloc>
       </entry>
     <entry>
       <name>survey_questions Transformation</name>
@@ -573,8 +575,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>99</xloc>
-      <yloc>391</yloc>
+      <xloc>127</xloc>
+      <yloc>553</yloc>
       </entry>
     <entry>
       <name>user_api_keys Transformation</name>
@@ -606,8 +608,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>67</xloc>
-      <yloc>294</yloc>
+      <xloc>114</xloc>
+      <yloc>466</yloc>
       </entry>
     <entry>
       <name>vendasta_sso_ticket  Transformation</name>
@@ -639,8 +641,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>86</xloc>
-      <yloc>222</yloc>
+      <xloc>140</xloc>
+      <yloc>380</yloc>
       </entry>
     <entry>
       <name>verticals_master Transformation</name>
@@ -672,8 +674,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>112</xloc>
-      <yloc>158</yloc>
+      <xloc>113</xloc>
+      <yloc>245</yloc>
       </entry>
     <entry>
       <name>zillow_temp_post Transformation</name>
@@ -738,8 +740,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>253</xloc>
-      <yloc>55</yloc>
+      <xloc>386</xloc>
+      <yloc>35</yloc>
       </entry>
     <entry>
       <name>Update JobLogs</name>
@@ -874,8 +876,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>769</xloc>
-      <yloc>555</yloc>
+      <xloc>1026</xloc>
+      <yloc>712</yloc>
       </entry>
   </entries>
   <hops>

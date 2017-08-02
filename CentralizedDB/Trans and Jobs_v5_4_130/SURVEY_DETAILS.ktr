@@ -159,12 +159,73 @@
   <order>
   <hop> <from>MongoDB Input</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>DateConverter</to><enabled>Y</enabled> </hop>
-  <hop> <from>DateConverter</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 2</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Synchronize after merge Survey Details</to><enabled>Y</enabled> </hop>
   <hop> <from>Survey Details Input</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>DateConverter</from><to>Convert to EST</to><enabled>Y</enabled> </hop>
+  <hop> <from>Convert to EST</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   </order>
+  <step>
+    <name>Convert to EST</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var createdOnDate &#x3d; new Date&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnDate &#x3d; new Date&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;var surveyCompletedDateVal &#x3d; new Date&#x28;surveyCompletedDate&#x29;&#x3b;&#xd;&#xa;var surveyTranscationDateVal &#x3d; new Date&#x28;surveyTransactionDate&#x29;&#x3b;&#xd;&#xa;var surveyUpdatedDateVal &#x3d; new Date&#x28;surveyUpdatedDate&#x29;&#x3b;&#xd;&#xa;var lastReminderForSocialPostDate &#x3d; new Date&#x28;lastReminderForSocialPost&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; null&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_COMPLETED_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_TRANSACTION_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_UPDATED_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var LAST_REMINDER_FOR_SOCIAL_POST_EST &#x3d; null&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;createdOn &#x21;&#x3d; null&#x29;&#x7b; CREATED_ON_EST &#x3d; sdf.format&#x28;createdOn&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;modifiedOn &#x21;&#x3d; null&#x29;&#x7b; MODIFIED_ON_EST &#x3d; sdf.format&#x28;modifiedOn&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyCompletedDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_COMPLETED_DATE_EST &#x3d; sdf.format&#x28;surveyCompletedDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyTransactionDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_TRANSACTION_DATE_EST &#x3d; sdf.format&#x28;surveyTransactionDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyUpdatedDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_UPDATED_DATE_EST &#x3d; sdf.format&#x28;surveyUpdatedDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;lastReminderForSocialPost &#x21;&#x3d; null&#x29;&#x7b; LAST_REMINDER_FOR_SOCIAL_POST_EST &#x3d; sdf.format&#x28;lastReminderForSocialPost&#x29;&#x3b;&#x7d;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>SURVEY_COMPLETED_DATE_EST</name>
+        <rename>SURVEY_COMPLETED_DATE_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>SURVEY_TRANSACTION_DATE_EST</name>
+        <rename>SURVEY_TRANSACTION_DATE_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>SURVEY_UPDATED_DATE_EST</name>
+        <rename>SURVEY_UPDATED_DATE_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>LAST_REMINDER_FOR_SOCIAL_POST_EST</name>
+        <rename>LAST_REMINDER_FOR_SOCIAL_POST_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>490</xloc>
+      <yloc>124</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step>
     <name>DateConverter</name>
     <type>ScriptValueMod</type>
@@ -272,6 +333,12 @@
       <value>SURVEY_COMPLETED_DATE</value>
       <value>SURVEY_TRANSACTION_DATE</value>
       <value>SURVEY_UPDATED_DATE</value>
+      <value>CREATED_ON_EST</value>
+      <value>MODIFIED_ON_EST</value>
+      <value>SURVEY_COMPLETED_DATE_EST</value>
+      <value>SURVEY_TRANSACTION_DATE_EST</value>
+      <value>SURVEY_UPDATED_DATE_EST</value>
+      <value>LAST_REMINDER_FOR_SOCIAL_POST_EST</value>
     </values>
 <flag_field>flagfield</flag_field>
 <reference>Survey Details Input</reference>
@@ -280,8 +347,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>763</xloc>
-      <yloc>191</yloc>
+      <xloc>900</xloc>
+      <yloc>193</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2616,6 +2683,30 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>CREATED_ON_EST</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MODIFIED_ON_EST</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_COMPLETED_DATE_EST</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_TRANSACTION_DATE_EST</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_UPDATED_DATE_EST</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>LAST_REMINDER_FOR_SOCIAL_POST_EST</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
       <remove>        <name>_class</name>
       </remove>      <remove>        <name>accessToken</name>
@@ -3237,10 +3328,100 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
+      </meta>      <meta>        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>SURVEY_COMPLETED_DATE_EST</name>
+        <rename>SURVEY_COMPLETED_DATE_EST</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>SURVEY_TRANSACTION_DATE_EST</name>
+        <rename>SURVEY_TRANSACTION_DATE_EST</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>SURVEY_UPDATED_DATE_EST</name>
+        <rename>SURVEY_UPDATED_DATE_EST</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>LAST_REMINDER_FOR_SOCIAL_POST_EST</name>
+        <rename>LAST_REMINDER_FOR_SOCIAL_POST_EST</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
       </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>496</xloc>
-      <yloc>121</yloc>
+      <xloc>633</xloc>
+      <yloc>123</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3273,8 +3454,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>621</xloc>
-      <yloc>121</yloc>
+      <xloc>758</xloc>
+      <yloc>123</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3291,7 +3472,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, CITY&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, COMPLETE_PROFILE_URL&#xd;&#xa;, CUSTOMER_EMAIL&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, EDITABLE&#xd;&#xa;, IS_ABUSE_REP_BY_USER&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST&#xd;&#xa;, MOOD&#xd;&#xa;, REGION_ID&#xd;&#xa;, REMINDER_COUNT&#xd;&#xa;, REMINDERS_FOR_SOCIAL_POSTS&#xd;&#xa;, RETAKE_SURVEY&#xd;&#xa;, REVIEW&#xd;&#xa;, SCORE&#xd;&#xa;, SHOW_SURVEY_ON_UI&#xd;&#xa;, SOCIAL_POSTS_REMINDER&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, STAGE&#xd;&#xa;, STATE&#xd;&#xa;, SUMMARY&#xd;&#xa;, SURVEY_CLICKED&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, UNDER_RESOLUTION&#xd;&#xa;, URL&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, SURVEY_COMPLETED_DATE&#xd;&#xa;, SURVEY_TRANSACTION_DATE&#xd;&#xa;, SURVEY_UPDATED_DATE&#xd;&#xa;FROM survey_details&#xd;&#xa;order by SURVEY_DETAILS_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, CITY&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, COMPLETE_PROFILE_URL&#xd;&#xa;, CUSTOMER_EMAIL&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, EDITABLE&#xd;&#xa;, IS_ABUSE_REP_BY_USER&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST&#xd;&#xa;, MOOD&#xd;&#xa;, REGION_ID&#xd;&#xa;, REMINDER_COUNT&#xd;&#xa;, REMINDERS_FOR_SOCIAL_POSTS&#xd;&#xa;, RETAKE_SURVEY&#xd;&#xa;, REVIEW&#xd;&#xa;, SCORE&#xd;&#xa;, SHOW_SURVEY_ON_UI&#xd;&#xa;, SOCIAL_POSTS_REMINDER&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, STAGE&#xd;&#xa;, STATE&#xd;&#xa;, SUMMARY&#xd;&#xa;, SURVEY_CLICKED&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, UNDER_RESOLUTION&#xd;&#xa;, URL&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, SURVEY_COMPLETED_DATE&#xd;&#xa;, SURVEY_TRANSACTION_DATE&#xd;&#xa;, SURVEY_UPDATED_DATE&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, MODIFIED_ON_EST&#xd;&#xa;, SURVEY_COMPLETED_DATE_EST&#xd;&#xa;, SURVEY_TRANSACTION_DATE_EST&#xd;&#xa;, SURVEY_UPDATED_DATE_EST&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST_EST&#xd;&#xa;FROM survey_details&#xd;&#xa;order by SURVEY_DETAILS_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -3299,8 +3480,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>620</xloc>
-      <yloc>235</yloc>
+      <xloc>757</xloc>
+      <yloc>237</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3320,7 +3501,7 @@
     <commit>10000</commit>
     <tablename_in_field>N</tablename_in_field>
     <tablename_field/>
-    <use_batch>Y</use_batch>
+    <use_batch>N</use_batch>
     <perform_lookup>Y</perform_lookup>
     <operation_order_field>flagfield</operation_order_field>
     <order_insert>new</order_insert>
@@ -3525,11 +3706,41 @@
         <rename>SURVEY_UPDATED_DATE</rename>
         <update>Y</update>
       </value>
+      <value>
+        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SURVEY_COMPLETED_DATE_EST</name>
+        <rename>SURVEY_COMPLETED_DATE_EST</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SURVEY_TRANSACTION_DATE_EST</name>
+        <rename>SURVEY_TRANSACTION_DATE_EST</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SURVEY_UPDATED_DATE_EST</name>
+        <rename>SURVEY_UPDATED_DATE_EST</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>LAST_REMINDER_FOR_SOCIAL_POST_EST</name>
+        <rename>LAST_REMINDER_FOR_SOCIAL_POST_EST</rename>
+        <update>Y</update>
+      </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1031</xloc>
-      <yloc>191</yloc>
+      <xloc>1168</xloc>
+      <yloc>193</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
