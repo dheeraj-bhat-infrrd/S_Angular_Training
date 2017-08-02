@@ -74,11 +74,11 @@
 	<div>
 		<div class="container pos-relative">
 			<div id="logo-dash" class="hide"></div>
-			<div id="reporting-prof-details" class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper" style="border-bottom:1px solid #d2cdcd">
+			<div id="reporting-prof-details" class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper rep-prof-details" style="border-bottom:1px solid #d2cdcd">
 				<jsp:include page="reporting_prof_details.jsp"></jsp:include>
 			</div>
 			
-			<div id="reporting-trans-details" class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper" style="background:#f9f9fb; border-bottom:1px solid #d2cdcd">
+			<div id="reporting-trans-details" class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper reporting-trans-details">
 				<jsp:include page="reporting_transaction_details.jsp"></jsp:include>
 			</div>
 			
@@ -90,7 +90,7 @@
 					<li id="reviews-btn"><a href="#reviews-tab" data-toggle="tab">Reviews</a></li>
 					<li id="incomplete-surveys-btn" ><a href="#incomplete-surveys-tab" data-toggle="tab" style="padding-left:2px; padding-right:2px">Incomplete Surveys</a></li>
 				</ul>
-				<div class="tab-content" style="margin-left:-40px">
+				<div class="tab-content rep-tab-content">
 					<div class="tab-pane fade active in" id="overview-tab">
 						<div id="overviewSuccess" class="hide">
 							<jsp:include page="reporting_overview.jsp"></jsp:include>
@@ -99,7 +99,7 @@
 							<div style="text-align:center; margin:5% auto">
 								<span class="incomplete-trans-span" style="font-size:large">Sorry!!!</span>
 								<div style="clear: both">
-									<span class="incomplete-trans-span" style="font-size:larger">Incomplete Data Found in Overview</span> 
+									<span class="incomplete-trans-span" style="font-size:large">Incomplete Data Found in Overview</span> 
 								</div>
 							</div>
 						</div>
@@ -148,14 +148,17 @@
 	paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
 	
 	var showOverview = getOverviewData();
-
+	
 		if (showOverview == null) {
 			$('#overviewSuccess').hide();
 			$('#overviewFailure').show();
 		} else {
 			$('#overviewSuccess').show();
+			drawCompletionRateGraph();
+			drawSpsStatsGraph();
+			$(window).resize();
 			$('#overviewFailure').hide();
 		}
-
+		
 	});
 </script>

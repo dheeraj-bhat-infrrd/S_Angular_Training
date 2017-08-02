@@ -21,13 +21,7 @@ function drawSpsStatsGraph(){
 						legend : {
 							position : 'none'
 						},
-						bar : {
-							groupWidth : '40%'
-						},
 						isStacked : true,
-						height : 300,
-						width:600,
-						chartArea: {width:500,height:200},
 						vAxis : {
 							minValue : 0,
 							maxValue : 10,
@@ -92,13 +86,8 @@ function drawSpsStatsGraph(){
 													legend : {
 														position : 'none'
 													},
-													bar : {
-														groupWidth : '40%'
-													},
 													isStacked : true,
-													width: 600,
-													height: 300,
-													chartArea: {width:500,height:200},
+													chartArea:{width:'85%'},
 													vAxis : {
 														gridlines : {
 															count : 14
@@ -272,8 +261,6 @@ function drawCompletionRateGraph(){
 							.arrayToDataTable(spsChartData);
 
 					var options = {
-						height : 300,
-						width : 1100,
 						chartArea : {
 							width : '85%'
 						},
@@ -358,8 +345,6 @@ function drawCompletionRateGraph(){
 														.arrayToDataTable(compRateChartData);
 
 												var options = {
-													height : 300,
-													width : 1100,
 													chartArea : {
 														width : '85%'
 													},
@@ -677,6 +662,7 @@ function drawProcessedDonutChart(){
 	      	    position : 'none'
 	      	  },
 	      	  pieSliceText:'none',
+	      	  width:360,
 	      	  chartArea:{
 	      		  width:'100%',
 	      		  height:'65%'
@@ -831,6 +817,7 @@ function drawUnprocessedDonutChart(){
 	      	    position : 'none'
 	      	  },
 	      	  pieSliceText:'none',
+	      	  width:360,
 	      	  chartArea:{
 	      		  width:'100%',
 	      		  height:'65%'

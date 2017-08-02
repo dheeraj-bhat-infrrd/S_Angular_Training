@@ -2,9 +2,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-
-<div id="completion_chart_div" style="width:100%; height:350px; margin-top:20px; margin-left:30px"></div>
-
+<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12"> 
+	<div id="completion_chart_div" style="width:100%; height:300px; margin-top:20px; "></div>
+</div>
 <script type="text/javascript">
-	drawCompletionRateGraph();
+	$(window).resize(function(){
+		drawCompletionRateGraph();
+	 });
 </script>
