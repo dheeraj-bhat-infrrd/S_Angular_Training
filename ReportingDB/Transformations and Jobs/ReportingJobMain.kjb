@@ -205,8 +205,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>689</xloc>
-      <yloc>91</yloc>
+      <xloc>721</xloc>
+      <yloc>90</yloc>
       </entry>
     <entry>
       <name>overview_company</name>
@@ -238,7 +238,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>904</xloc>
+      <xloc>946</xloc>
       <yloc>91</yloc>
       </entry>
     <entry>
@@ -337,8 +337,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>689</xloc>
-      <yloc>377</yloc>
+      <xloc>721</xloc>
+      <yloc>376</yloc>
       </entry>
     <entry>
       <name>survey_stats_report_company</name>
@@ -370,8 +370,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>904</xloc>
-      <yloc>377</yloc>
+      <xloc>946</xloc>
+      <yloc>376</yloc>
       </entry>
     <entry>
       <name>User Adoption</name>
@@ -436,7 +436,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>904</xloc>
+      <xloc>946</xloc>
       <yloc>555</yloc>
       </entry>
     <entry>
@@ -469,7 +469,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>689</xloc>
+      <xloc>721</xloc>
       <yloc>555</yloc>
       </entry>
     <entry>
@@ -601,8 +601,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>904</xloc>
-      <yloc>217</yloc>
+      <xloc>946</xloc>
+      <yloc>219</yloc>
       </entry>
     <entry>
       <name>Overview_Branch_month</name>
@@ -634,8 +634,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>689</xloc>
-      <yloc>217</yloc>
+      <xloc>721</xloc>
+      <yloc>216</yloc>
       </entry>
     <entry>
       <name>Overview_region_month</name>

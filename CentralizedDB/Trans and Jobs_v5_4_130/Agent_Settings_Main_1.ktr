@@ -111,33 +111,6 @@
   <notepads>
   </notepads>
   <connection>
-    <name>MySql_Con</name>
-    <server>localhost</server>
-    <type>MYSQL</type>
-    <access>Native</access>
-    <database>sakila</database>
-    <port>3306</port>
-    <username>&#x24;&#x7b;db_user_name&#x7d;</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
-      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
-  <connection>
     <name>SS_Centralized_Mysql_Conn</name>
     <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
@@ -209,17 +182,13 @@
   <hop> <from>Sort rows 2 2 2</from><to>Group Experties</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Experties</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Multiway Merge Join</from><to>DateConverter </to><enabled>Y</enabled> </hop>
-  <hop> <from>Json Licenses 1</from><to>Json Licenses 2</to><enabled>N</enabled> </hop>
-  <hop> <from>Json Licenses 2</from><to>Filter rows 2 2 2 2</to><enabled>N</enabled> </hop>
   <hop> <from>Sort rows 2 2 2 2</from><to>Group Licenses</to><enabled>Y</enabled> </hop>
-  <hop> <from>MongoDB I - AgentSettings 2</from><to>Json Licenses 1</to><enabled>N</enabled> </hop>
   <hop> <from>Group Licenses</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 2</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 2 2</from><to>Sort rows 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 2 2 2</from><to>Sort rows 2 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 2 2 2 2</from><to>Sort rows 2 2 2 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>DateConverter </from><to>Insert &#x2f; Update AgentSettings</to><enabled>Y</enabled> </hop>
   <hop> <from>Insert &#x2f; Update AgentSettings</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>MongoDB I - AgentSettings 2</from><to>Fast JSON Input</to><enabled>Y</enabled> </hop>
   <hop> <from>Fast JSON Input</from><to>Fast JSON Input 2</to><enabled>Y</enabled> </hop>
@@ -241,6 +210,8 @@
   <hop> <from>Fast JSON Input 4 3</from><to>Fast JSON Input 5 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Fast JSON Input 5 2</from><to>Filter rows 2 2 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 2 2 2 2</from><to>Dummy &#x28;do nothing&#x29; 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>DateConverter </from><to>Convert to EST</to><enabled>Y</enabled> </hop>
+  <hop> <from>Convert to EST</from><to>Insert &#x2f; Update AgentSettings</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AgentSettings</name>
@@ -391,6 +362,42 @@
     </step>
 
   <step>
+    <name>Convert to EST</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var createdOnDate &#x3d; new Date&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnDate &#x3d; new Date&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; sdf.format&#x28;createdOnDate&#x29;&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; sdf.format&#x28;modifiedOnDate&#x29;&#x3b;&#xd;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1405</xloc>
+      <yloc>412</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>DateConverter </name>
     <type>ScriptValueMod</type>
     <description/>
@@ -458,8 +465,8 @@
            </partitioning>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1403</xloc>
-      <yloc>539</yloc>
+      <xloc>1404</xloc>
+      <yloc>646</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -944,8 +951,8 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>413</xloc>
-      <yloc>674</yloc>
+      <xloc>289</xloc>
+      <yloc>781</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1072,8 +1079,8 @@
     <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>550</xloc>
-      <yloc>693</yloc>
+      <xloc>484</xloc>
+      <yloc>781</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1282,7 +1289,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>638</xloc>
-      <yloc>777</yloc>
+      <yloc>781</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1710,135 +1717,21 @@
         <rename>licenses</rename>
         <update>Y</update>
       </value>
+      <value>
+        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        <update>Y</update>
+      </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1403</xloc>
-      <yloc>400</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Json Licenses 1</name>
-    <type>JsonInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <include>N</include>
-    <include_field/>
-    <rownum>N</rownum>
-    <addresultfile>N</addresultfile>
-    <readurl>N</readurl>
-    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
-    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>Y</ignoreMissingPath>
-    <rownum_field/>
-    <file>
-      <name/>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
-    <fields>
-      <field>
-        <name>iden</name>
-        <path>&#x24;.iden</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-    </fields>
-    <limit>0</limit>
-    <IsInFields>Y</IsInFields>
-    <IsAFile>N</IsAFile>
-    <valueField>json</valueField>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>388</xloc>
-      <yloc>776</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Json Licenses 2</name>
-    <type>JsonInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <include>N</include>
-    <include_field/>
-    <rownum>N</rownum>
-    <addresultfile>N</addresultfile>
-    <readurl>N</readurl>
-    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
-    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>Y</ignoreMissingPath>
-    <rownum_field/>
-    <file>
-      <name/>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
-    <fields>
-      <field>
-        <name>licenses</name>
-        <path>&#x24;.licenses.authorized_in&#x5b;&#x2a;&#x5d;</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-    </fields>
-    <limit>0</limit>
-    <IsInFields>Y</IsInFields>
-    <IsAFile>N</IsAFile>
-    <valueField>json</valueField>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>512</xloc>
-      <yloc>776</yloc>
+      <xloc>1404</xloc>
+      <yloc>507</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1889,7 +1782,7 @@
     <fields_name/>
     <collection>AGENT_SETTINGS</collection>
     <json_field_name>json</json_field_name>
-    <json_query>&#x7b;&#x24;query&#x3a;&#x7b;&#x22;modifiedOn&#x22; &#x3a;&#x7b;&#x24;gte&#x3a;&#x24;&#x7b;modifiedOnSettings&#x7d;&#x7d;&#x7d;&#x7d;</json_query>
+    <json_query/>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -3191,7 +3084,7 @@
     <fields_name/>
     <collection>AGENT_SETTINGS</collection>
     <json_field_name>json</json_field_name>
-    <json_query>&#x7b;&#x24;query&#x3a;&#x7b;&#x22;modifiedOn&#x22; &#x3a;&#x7b;&#x24;gte&#x3a;&#x24;&#x7b;modifiedOnSettings&#x7d;&#x7d;&#x7d;&#x7d;</json_query>
+    <json_query/>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -4464,8 +4357,8 @@
     </keys>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1188</xloc>
-      <yloc>353</yloc>
+      <xloc>1142</xloc>
+      <yloc>286</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4729,7 +4622,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>767</xloc>
-      <yloc>776</yloc>
+      <yloc>781</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

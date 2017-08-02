@@ -57,8 +57,9 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -84,8 +85,9 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -150,8 +152,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>619</xloc>
-      <yloc>236</yloc>
+      <xloc>913</xloc>
+      <yloc>155</yloc>
       </entry>
     <entry>
       <name>company_ignored_email_mapping Transformation</name>
@@ -183,8 +185,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>853</xloc>
-      <yloc>225</yloc>
+      <xloc>1290</xloc>
+      <yloc>123</yloc>
       </entry>
     <entry>
       <name>license_details Transformation</name>
@@ -216,8 +218,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>850</xloc>
-      <yloc>365</yloc>
+      <xloc>1251</xloc>
+      <yloc>459</yloc>
       </entry>
     <entry>
       <name>file_upload Transformation</name>
@@ -249,8 +251,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>723</xloc>
-      <yloc>349</yloc>
+      <xloc>953</xloc>
+      <yloc>430</yloc>
       </entry>
     <entry>
       <name>organization_level_settings Transformation</name>
@@ -282,8 +284,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>545</xloc>
-      <yloc>308</yloc>
+      <xloc>802</xloc>
+      <yloc>614</yloc>
       </entry>
     <entry>
       <name>region Transformation</name>
@@ -315,8 +317,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>400</xloc>
-      <yloc>336</yloc>
+      <xloc>570</xloc>
+      <yloc>396</yloc>
       </entry>
     <entry>
       <name>users Transformation</name>
@@ -348,8 +350,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>273</xloc>
-      <yloc>366</yloc>
+      <xloc>111</xloc>
+      <yloc>412</yloc>
       </entry>
     <entry>
       <name>survey_company_mapping Transformation</name>
@@ -381,8 +383,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>116</xloc>
-      <yloc>336</yloc>
+      <xloc>155</xloc>
+      <yloc>574</yloc>
       </entry>
     <entry>
       <name>upload_status Transformation</name>
@@ -414,8 +416,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>116</xloc>
-      <yloc>219</yloc>
+      <xloc>135</xloc>
+      <yloc>55</yloc>
       </entry>
     <entry>
       <name>user_invite Transformation</name>
@@ -447,8 +449,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>260</xloc>
-      <yloc>233</yloc>
+      <xloc>123</xloc>
+      <yloc>202</yloc>
       </entry>
     <entry>
       <name>usercount_modification_notification Transformation</name>
@@ -480,8 +482,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>433</xloc>
-      <yloc>217</yloc>
+      <xloc>443</xloc>
+      <yloc>269</yloc>
       </entry>
     <entry>
       <name>START</name>
@@ -572,8 +574,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>419</xloc>
-      <yloc>548</yloc>
+      <xloc>434</xloc>
+      <yloc>637</yloc>
       </entry>
     <entry>
       <name>Abort job</name>
@@ -583,8 +585,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>418</xloc>
-      <yloc>650</yloc>
+      <xloc>433</xloc>
+      <yloc>739</yloc>
       </entry>
   </entries>
   <hops>
