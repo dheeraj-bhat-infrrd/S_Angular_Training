@@ -1847,44 +1847,84 @@ $(document).on('click', '.da-dd-item', function(e) {
 });
 
 function setUpListenerForSortCriteriaDropdown(){
-	$("#sort-criteria-sel").on('change',function(event){
+	$('.sort-option-item').on('click',function(event){
+		$('#sort-criteria-sel').val($(this).html());
+		$('#sort-options').slideToggle(200);
+		
+		var sortCr;
+		if( $('#sort-criteria-sel').val() == "Sort responses by Featured Reviews" ){
+			sortCr = "feature";
+		} else {
+			sortCr = "date";
+		}
+		
 		var payload = {
-			"sortCriteria" : $("#sort-criteria-sel").val()
+			"sortCriteria" : sortCr
 		};
 		
 		callAjaxPostWithPayloadData( "./updatesortcriteria.do", function(data){
 				var message = JSON.parse(data);
-				if (message.type != "ERROR_MESSAGE") {
-					$('#overlay-toast').html(message.message + ' to ' + $("#sort-criteria-sel").find(":selected").attr('data-sort'));
-					showToast();
-				}
-				else {
-					$('#overlay-toast').html(message.message);
-					showToast();
-				}
+				$('#overlay-toast').html(message.message);
+				showToast();
 			}, payload, false);
 	});
 }
 
 function setUpListenerForEmailOptionDropdown(){
-	$("#email-sel").on('change',function(event){
+	$('.email-option-item').on('click',function(event){
+		$('#email-sel').val($(this).html());
+		$('#email-options').slideToggle(200);
 		var payload = {
 			"sendEmailThrough" : $("#email-sel").val()
 		};
 		
 		callAjaxPostWithPayloadData( "./updatesendemailthrough.do", function(data){
 				var message = JSON.parse(data);
-				if (message.type != "ERROR_MESSAGE") {
-					$('#overlay-toast').html(message.message + ' to ' + $("#email-sel").find(":selected").attr('data-email-option'));
-					showToast();
-				}
-				else {
-					$('#overlay-toast').html(message.message);
-					showToast();
-				}
+				$('#overlay-toast').html(message.message);
+				showToast();
 			}, payload, false);
 	});
 }
+
+function autoAppendSortOrderDropdown(sortOrderId, classes) {
+	autoAppendTextDropdown(sortOrderId, classes, ["Sort responses by Date", "Sort responses by Featured Reviews"]);
+}
+
+function autoAppendEmailCriteriaDropdown(emailCriteriaId, classes) {
+	autoAppendTextDropdown(emailCriteriaId, classes, ["socialsurvey.me" , "socialsurvey.us"]);
+}
+
+
+//Generic functions
+function autoAppendTextDropdown(elementId, classes, listOfValues) {
+	listOfValues.map(function( item ){
+		$(elementId).append($('<div/>').addClass(classes).text(item));
+	});
+}
+
+var ratingMouseUp = function (e){
+	var container = $('#st-dd-wrapper-min-post');
+	if (!container.is(e.target) && container.has(e.target).length == 0){
+		container.slideToggle(200);
+	}
+	$(document).unbind("mouseup",ratingMouseUp);
+};
+
+var sortCriteriaMouseUp = function (e){
+	var container = $('#sort-options');
+	if (!container.is(e.target) && container.has(e.target).length == 0){
+		container.slideToggle(200);
+	}
+	$(document).unbind("mouseup",sortCriteriaMouseUp);
+};
+
+var emailCriteriaMouseUp = function (e){
+	var container = $('#email-options');
+	if (!container.is(e.target) && container.has(e.target).length == 0){
+		container.slideToggle(200);
+	}
+	$(document).unbind("mouseup",emailCriteriaMouseUp);
+};
 
 $(document).click(function(e) {
 	e.stopPropagation();
