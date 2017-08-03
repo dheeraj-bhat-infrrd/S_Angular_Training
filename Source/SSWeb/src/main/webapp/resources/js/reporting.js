@@ -128,126 +128,6 @@ function drawSpsStatsGraph(){
 	}
 }
 
-function drawAvgRatingsGraph(){
-	
-	google.charts.load("current", {packages:["corechart"]});
-	google.charts.setOnLoadCallback(drawChart);
-	
-	function drawEmptyChart(){
-		var spsChartData = [ [ 'X', 'Y' ],
-								[ '', 0 ] ];
-
-						var data = google.visualization
-								.arrayToDataTable(spsChartData);
-
-						var options = {
-							legend : 'none',
-							height : 300,
-							width : 1000,
-							vAxis : {
-								title : 'Average Rating',
-								minValue : 0,
-								maxValue : 6,
-								gridlines : {
-									count : 7
-								}
-							},
-							colors : [ '009fe0' ],
-							pointSize : 5
-						};
-
-						var chart = new google.visualization.ColumnChart(
-								document
-										.getElementById('average_chart_div'));
-						chart.draw(data, options);
-	}
-	
-	function drawChart() {
-		$.ajax({
-					async : false,
-					url : "/fetchaveragereportingrating.do",
-					type : "GET",
-					cache : false,
-					dataType : "json",
-					success : function(data) {
-						if (data.status == 200) {
-							$.ajax({
-										url : data.url,
-										type : "GET",
-										cache : false,
-										dataType : "json",
-										success : function(response) {
-											chartData = JSON.parse(response);
-
-											if (chartData.length == 0) {
-												drawEmptyChart();
-											} else {
-												var avgRatingChartData = new Array(
-														chartData.length + 1);
-												for (var k = 0; k <= chartData.length; k++) {
-													avgRatingChartData[k] = new Array(
-															2);
-												}
-												avgRatingChartData[0] = [ 'X',
-														'Y' ];
-
-												for (var i = 1; i <= chartData.length; i++) {
-													var monthName = monthNamesList[(chartData[i - 1][1]) - 1];
-													avgRatingChartData[i][0] = monthName
-															+ "/"
-															+ chartData[i - 1][0];
-													avgRatingChartData[i][1] = chartData[i - 1][2];
-												}
-
-												var data = google.visualization
-														.arrayToDataTable(avgRatingChartData);
-
-												var options = {
-													legend : 'none',
-													height : 300,
-													width : 1000,
-													vAxis : {
-														title : 'Average Rating',
-														minValue : 0,
-														maxValue : 6,
-														gridlines : {
-															count : 7
-														}
-													},
-													colors : [ '009fe0' ],
-													pointSize : 5
-												};
-
-												var chart = new google.visualization.LineChart(
-														document
-																.getElementById('average_chart_div'));
-												chart.draw(data, options);
-											}
-										},
-										error : function(e) {
-											if (e.status == 504) {
-												redirectToLoginPageOnSessionTimeOut(e.status);
-												return;
-											}
-											drawEmptyChart();
-										}
-									});
-						}else{
-							drawEmptyChart();
-						}
-					},
-					error : function(e) {
-						if (e.status == 504) {
-							redirectToLoginPageOnSessionTimeOut(e.status);
-							return;
-						}
-						drawEmptyChart();
-					}
-				});
-	}
-
-}
-
 function drawCompletionRateGraph(){
 	google.charts.load('current', {'packages':['corechart']});
 	google.charts.setOnLoadCallback(drawChart);
@@ -685,6 +565,80 @@ function drawProcessedDonutChart(){
 	      }
 }
 
+function drawUnprocessedDonutChart(){
+	 google.charts.load("current", {packages:["corechart"]});
+    google.charts.setOnLoadCallback(drawChart);
+    
+    var monthYear = getTimeFrameValue();
+    var overviewYearData;
+    
+    if(monthYear.month == 14){
+		overviewYearData = getoverviewAllTimeData();
+	}else if(monthYear.month == 13){
+    	overviewYearData =  getoverviewYearData(monthYear.year);
+    }else{
+    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
+    }
+    
+    
+    var unassigned;
+    var duplicate;
+    var corrupted;
+    var other;
+    
+    if(overviewYearData != null){
+    	unassigned = overviewYearData.Unassigned;
+        duplicate = overviewYearData.Duplicate;
+        corrupted = overviewYearData.Corrupted;
+        other= overviewYearData.Unprocessed - (overviewYearData.Unassigned + overviewYearData.Duplicate + overviewYearData.Corrupted);
+    }else{
+    	unassigned = 0;
+        duplicate = 0;
+        corrupted = 0;
+        other=0;
+    }
+    
+    function drawChart() {
+   	 
+	        var data = google.visualization.arrayToDataTable([
+	          ['Transaction', 'Number#'],
+	          ['Unassigned', unassigned],
+	          ['duplicate', duplicate],
+	          ['corrupted', corrupted],
+	          ['other',other]
+	        ]);
+
+	        var options = {
+	          pieStartAngle: 90,
+	          backgroundColor: '#f9f9fb',
+	          pieHole: 0.5,
+	          legend: { 
+	      	    position : 'none'
+	      	  },
+	      	  pieSliceText:'none',
+	      	  width:360,
+	      	  chartArea:{
+	      		  width:'100%',
+	      		  height:'65%'
+	      	  },
+	      	slices: [{color : '#f5c70a'},{color: '#7e36c2'},{color:'#ea310b'},{color:'#000000'}],
+	      	 legend: {
+	             position: 'labeled',
+	             labeledValueText: 'none',
+	             textStyle: {
+	                 color: 'black', 
+	                 fontSize: 15,
+	                 bold: true
+	             }
+	      	 },
+	      	tooltip: { trigger: 'none' }
+	        };
+
+	        var chart = new google.visualization.PieChart(document.getElementById('unprocessedDonutchart'));
+	        chart.draw(data, options);
+	      }
+}
+
 function getTimeFrameValue(){
 	var currentDate =  new Date();
 	var currentMonth = currentDate.getMonth();
@@ -763,133 +717,6 @@ function getTimeFrameValue(){
 		case 12: monthYear.month=12;
 			monthYear.year=currentYear;
 			return monthYear;
-	}
-}
-
-function drawUnprocessedDonutChart(){
-	 google.charts.load("current", {packages:["corechart"]});
-    google.charts.setOnLoadCallback(drawChart);
-    
-    var monthYear = getTimeFrameValue();
-    var overviewYearData;
-    
-    if(monthYear.month == 14){
-		overviewYearData = getoverviewAllTimeData();
-	}else if(monthYear.month == 13){
-    	overviewYearData =  getoverviewYearData(monthYear.year);
-    }else{
-    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
-    }
-    
-    
-    var unassigned;
-    var duplicate;
-    var corrupted;
-    var other;
-    
-    if(overviewYearData != null){
-    	unassigned = overviewYearData.Unassigned;
-        duplicate = overviewYearData.Duplicate;
-        corrupted = overviewYearData.Corrupted;
-        other= overviewYearData.Unprocessed - (overviewYearData.Unassigned + overviewYearData.Duplicate + overviewYearData.Corrupted);
-    }else{
-    	unassigned = 0;
-        duplicate = 0;
-        corrupted = 0;
-        other=0;
-    }
-    
-    function drawChart() {
-   	 
-	        var data = google.visualization.arrayToDataTable([
-	          ['Transaction', 'Number#'],
-	          ['Unassigned', unassigned],
-	          ['duplicate', duplicate],
-	          ['corrupted', corrupted],
-	          ['other',other]
-	        ]);
-
-	        var options = {
-	          pieStartAngle: 90,
-	          backgroundColor: '#f9f9fb',
-	          pieHole: 0.5,
-	          legend: { 
-	      	    position : 'none'
-	      	  },
-	      	  pieSliceText:'none',
-	      	  width:360,
-	      	  chartArea:{
-	      		  width:'100%',
-	      		  height:'65%'
-	      	  },
-	      	slices: [{color : '#f5c70a'},{color: '#7e36c2'},{color:'#ea310b'},{color:'#000000'}],
-	      	 legend: {
-	             position: 'labeled',
-	             labeledValueText: 'none',
-	             textStyle: {
-	                 color: 'black', 
-	                 fontSize: 15,
-	                 bold: true
-	             }
-	      	 },
-	      	tooltip: { trigger: 'none' }
-	        };
-
-	        var chart = new google.visualization.PieChart(document.getElementById('unprocessedDonutchart'));
-	        chart.draw(data, options);
-	      }
-}
-
-function drawDonutChart(){
-	
-	//var overviewData = getOverviewData();
-	
-	if(overviewData != null){
-	      google.charts.load("current", {packages:["corechart"]});
-	      google.charts.setOnLoadCallback(drawChart);
-	      
-	      var totalIncompleteTransactions = overviewData.TotalIncompleteTransactions;
-	      $('#incompleteTransValue').html(totalIncompleteTransactions);
-	      
-	      var corruptedTrans = overviewData.CorruptedPercentage;
-	      var duplicateTrans = overviewData.DuplicatePercentage;
-	      var archivedTrans = overviewData.ArchievedPercentage;
-	      var mismatchedTrans = overviewData.MismatchedPercentage;
-	      
-	      var corrupted= (corruptedTrans/100) * totalIncompleteTransactions;
-	      var duplicate= (duplicateTrans/100) * totalIncompleteTransactions;
-	      var archived= (archivedTrans/100) * totalIncompleteTransactions;
-	      var mismatched= (mismatchedTrans/100) * totalIncompleteTransactions;
-	      var totalOfCorDupArcMis = corrupted + duplicate + archived + mismatched;
-	      var other = totalIncompleteTransactions - totalOfCorDupArcMis;
-	      
-	      function drawChart() {
-	    	 
-	        var data = google.visualization.arrayToDataTable([
-	          ['Task', 'Hours per Day'],
-	          ['Mismatched', mismatched],
-	          ['Corrupted', corrupted],
-	          ['Duplicate', duplicate],
-	          ['Archived', archived],
-	          ['Other', other]
-	        ]);
-
-	        var options = {
-	          pieHole: 0.5,
-	          legend: { 
-	      	    position : 'none'
-	      	  },
-	      	  pieSliceText:'none',
-	      	  chartArea:{
-	      		  width:'95%',
-	      		  height:'97%'
-	      	  },
-	      	slices: [{color : '#009fe0'},{color: '#E8341F'}, {color: '#985698'}, {color: '#7ab400'}, {color: '#f4ad42'}]
-	        };
-
-	        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
-	        chart.draw(data, options);
-	      }
 	}
 }
 
