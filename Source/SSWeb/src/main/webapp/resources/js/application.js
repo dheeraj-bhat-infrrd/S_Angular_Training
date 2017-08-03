@@ -7816,7 +7816,16 @@ function paintForReportingDash() {
 	$('#prof-review-item').html('');
 	
 	// Common call for all cases
-	overviewYearData = getoverviewYearData(2017);
+	var monthYear = getTimeFrameValue();
+	var overviewYearData;
+	
+	if(monthYear.month == 14){
+		overviewYearData = getoverviewAllTimeData();
+	}else if(monthYear.month == 13){
+    	overviewYearData =  getoverviewYearData(monthYear.year);
+    }else{
+    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
+    }
 	if(overviewYearData != null){
 		var avgRating = overviewYearData.Rating;
 		var reviewCount=  overviewYearData.TotalReview;
