@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>user_ranking_this_year_main_2</name>
+    <name>user_ranking_past_month_main_2</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -66,10 +66,10 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;08&#x2f;05 14&#x3a;51&#x3a;03.383</created_date>
+  <created_date>2017&#x2f;08&#x2f;06 20&#x3a;57&#x3a;20.382</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;08&#x2f;05 14&#x3a;51&#x3a;03.383</modified_date>
-    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+  <modified_date>2017&#x2f;08&#x2f;06 20&#x3a;57&#x3a;20.382</modified_date>
+    <key_for_session_key/>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -125,11 +125,14 @@
       <field>
         <name>company_id</name>
         </field>
+      <field>
+        <name>month_year</name>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>531</xloc>
-      <yloc>132</yloc>
+      <xloc>483</xloc>
+      <yloc>112</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -146,7 +149,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  user_ranking_this_year_main_id&#xd;&#xa;, user_id&#xd;&#xa;, company_id&#xd;&#xa;, this_year&#xd;&#xa;, first_name&#xd;&#xa;, last_name&#xd;&#xa;, ranking_score&#xd;&#xa;, rank&#xd;&#xa;, sps&#xd;&#xa;, days_of_registration&#xd;&#xa;, completed&#xd;&#xa;, sent&#xd;&#xa;, completed_percentage&#xd;&#xa;, total_reviews&#xd;&#xa;, is_eligible&#xd;&#xa;FROM user_ranking_this_year_main&#xd;&#xa;where is_eligible &#x3d; 1&#xd;&#xa;order by company_id , ranking_score DESC ,total_reviews DESC ,first_name ASC,last_name ASC&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  user_ranking_past_month_main_id&#xd;&#xa;, user_id&#xd;&#xa;, company_id&#xd;&#xa;, month&#xd;&#xa;, year&#xd;&#xa;, first_name&#xd;&#xa;, last_name&#xd;&#xa;, ranking_score&#xd;&#xa;, rank&#xd;&#xa;, sps&#xd;&#xa;, days_of_registration&#xd;&#xa;, completed&#xd;&#xa;, sent&#xd;&#xa;, completed_percentage&#xd;&#xa;, total_reviews&#xd;&#xa;, is_eligible&#xd;&#xa;, month_year&#xd;&#xa;FROM user_ranking_past_month_main&#xd;&#xa;where is_eligible &#x3d; 1&#xd;&#xa;order by company_id , ranking_score DESC ,total_reviews DESC ,first_name ASC,last_name ASC&#xd;&#xa;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -154,8 +157,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>246</xloc>
-      <yloc>120</yloc>
+      <xloc>198</xloc>
+      <yloc>100</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -179,10 +182,10 @@
     <ignore_flag_field/>
     <lookup>
       <schema/>
-      <table>user_ranking_this_year_main</table>
+      <table>user_ranking_past_month_main</table>
       <key>
-        <name>user_ranking_this_year_main_id</name>
-        <field>user_ranking_this_year_main_id</field>
+        <name>user_ranking_past_month_main_id</name>
+        <field>user_ranking_past_month_main_id</field>
         <condition>&#x3d;</condition>
         <name2/>
         </key>
@@ -193,8 +196,8 @@
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>751</xloc>
-      <yloc>137</yloc>
+      <xloc>703</xloc>
+      <yloc>117</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -224,11 +227,17 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>month_year</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>384</xloc>
-      <yloc>130</yloc>
+      <xloc>311</xloc>
+      <yloc>106</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
