@@ -172,12 +172,14 @@ CREATE TABLE `user_ranking_past_month_main` (
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
   `is_eligible` tinyint(4) DEFAULT NULL,
+  `month_year` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_month_main_id`),
   KEY `UR6_COMPANY_ID_idx` (`company_id`),
   KEY `UR6_USER_ID_idx` (`user_id`),
   CONSTRAINT `UR6_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `UR6_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 CREATE TABLE `user_ranking_past_month_branch` (
@@ -198,6 +200,7 @@ CREATE TABLE `user_ranking_past_month_branch` (
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
   `is_eligible` tinyint(4) DEFAULT NULL,
+  `month_year` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_month_branch_id`),
   KEY `UR61_COMPANY_ID_idx` (`company_id`),
   KEY `UR61_USER_ID_idx` (`user_id`),
@@ -225,6 +228,7 @@ CREATE TABLE `user_ranking_past_month_region` (
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
   `is_eligible` tinyint(4) DEFAULT NULL,
+  `month_year` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_month_region_id`),
   KEY `UR62_COMPANY_ID_idx` (`company_id`),
   KEY `UR62_USER_ID_idx` (`user_id`),
