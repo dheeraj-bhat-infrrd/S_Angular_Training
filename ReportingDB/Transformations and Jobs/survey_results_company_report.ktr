@@ -680,7 +680,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, CREATED_ON&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;WHERE SURVEY_PRE_INITIATION_ID&#x3d;&#x3f;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, CREATED_ON_EST AS CREATED_ON&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;WHERE SURVEY_PRE_INITIATION_ID&#x3d;&#x3f;</sql>
     <outer_join>N</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
@@ -2487,7 +2487,7 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1005</xloc>
+      <xloc>913</xloc>
       <yloc>543</yloc>
       <draw>Y</draw>
       </GUI>
