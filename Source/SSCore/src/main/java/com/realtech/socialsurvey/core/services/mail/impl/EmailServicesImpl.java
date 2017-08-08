@@ -74,6 +74,9 @@ public class EmailServicesImpl implements EmailServices
     @Value ( "${APPLICATION_BASE_URL}")
     private String appBaseUrl;
 
+    @Value ( "${APPLICATION_SUPPORT_EMAIL}")
+    private String applicationSupportEmail;
+
     @Value ( "${APPLICATION_LOGO_URL}")
     private String appLogoUrl;
 
@@ -649,13 +652,13 @@ public class EmailServicesImpl implements EmailServices
         if ( hiddenSection ) {
             messageBodyReplacements.setFileName(
                 EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_BODY_CUSTOM );
-            messageBodyReplacements
-                .setReplacementArgs( Arrays.asList( appLogoUrl, name, url, url, url, loginName, appBaseUrl, appBaseUrl ) );
+            messageBodyReplacements.setReplacementArgs(
+                Arrays.asList( appLogoUrl, name, url, url, url, loginName, applicationSupportEmail, appBaseUrl, appBaseUrl ) );
         } else {
             messageBodyReplacements.setFileName(
                 EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_BODY );
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, name, url, url, url, appBaseUrl, profileName,
-                appBaseUrl, profileName, loginName, appBaseUrl, appBaseUrl ) );
+            messageBodyReplacements.setReplacementArgs(
+                Arrays.asList( appLogoUrl, name, url, url, url, loginName, applicationSupportEmail, appBaseUrl, appBaseUrl ) );
         }
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false,
