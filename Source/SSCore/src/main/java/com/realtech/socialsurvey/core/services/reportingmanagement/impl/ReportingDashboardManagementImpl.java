@@ -1085,244 +1085,205 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
     }
 
-	@Override
-	public List<List<Object>> getUserRankingThisYearRegion(Long regionId, int year) {
-		
+    @Override
+	public List<List<Object>> getUserRankingThisYear(String entityType, Long entityId, int year,int startIndex,int batchSize) {
 		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingThisYearRegion userRankingThisYearRegion : userRankingThisYearRegionDao.fetchUserRankingForThisYearRegion(regionId, year)){
-			List<Object> userRankingThisYearRegionList = new ArrayList<>();
-			userRankingThisYearRegionList.add(userRankingThisYearRegion.getRank());
-			userRankingThisYearRegionList.add(userRankingThisYearRegion.getFirstName());
-			userRankingThisYearRegionList.add(userRankingThisYearRegion.getLastName());
-			userRankingThisYearRegionList.add(userRankingThisYearRegion.getRankingScore());
-			userRankingThisYearRegionList.add(userRankingThisYearRegion.getTotalReviews());
-			userRankingThisYearRegionList.add(userRankingThisYearRegion.getAverageRating());
-			userRankingThisYearRegionList.add(userRankingThisYearRegion.getSps());
-			userRankingThisYearRegionList.add(userRankingThisYearRegion.getCompleted());
-			userRankingThisYearRegionList.add(userRankingThisYearRegion.isEligible());
-			userRanking.add(userRankingThisYearRegionList);
-		}
 		
+		if(entityType == CommonConstants.COMPANY_ID_COLUMN){
+			for(UserRankingThisYearMain userRankingThisYearMain : userRankingThisYearMainDao.fetchUserRankingForThisYearMain(entityId, year,startIndex,batchSize)){
+				List<Object> userRankingThisYearMainList = new ArrayList<>();
+				userRankingThisYearMainList.add(userRankingThisYearMain.getRank());
+				userRankingThisYearMainList.add(userRankingThisYearMain.getFirstName());
+				userRankingThisYearMainList.add(userRankingThisYearMain.getLastName());
+				userRankingThisYearMainList.add(userRankingThisYearMain.getRankingScore());
+				userRankingThisYearMainList.add(userRankingThisYearMain.getTotalReviews());
+				userRankingThisYearMainList.add(userRankingThisYearMain.getAverageRating());
+				userRankingThisYearMainList.add(userRankingThisYearMain.getSps());
+				userRankingThisYearMainList.add(userRankingThisYearMain.getCompleted());
+				userRankingThisYearMainList.add(userRankingThisYearMain.isEligible());
+				userRanking.add(userRankingThisYearMainList);
+			}
+		}else if(entityType ==  CommonConstants.REGION_ID_COLUMN){
+			for(UserRankingThisYearRegion userRankingThisYearRegion : userRankingThisYearRegionDao.fetchUserRankingForThisYearRegion(entityId, year,startIndex,batchSize)){
+				List<Object> userRankingThisYearRegionList = new ArrayList<>();
+				userRankingThisYearRegionList.add(userRankingThisYearRegion.getRank());
+				userRankingThisYearRegionList.add(userRankingThisYearRegion.getFirstName());
+				userRankingThisYearRegionList.add(userRankingThisYearRegion.getLastName());
+				userRankingThisYearRegionList.add(userRankingThisYearRegion.getRankingScore());
+				userRankingThisYearRegionList.add(userRankingThisYearRegion.getTotalReviews());
+				userRankingThisYearRegionList.add(userRankingThisYearRegion.getAverageRating());
+				userRankingThisYearRegionList.add(userRankingThisYearRegion.getSps());
+				userRankingThisYearRegionList.add(userRankingThisYearRegion.getCompleted());
+				userRankingThisYearRegionList.add(userRankingThisYearRegion.isEligible());
+				userRanking.add(userRankingThisYearRegionList);
+			}
+		}else if(entityType == CommonConstants.BRANCH_ID_COLUMN){
+			for(UserRankingThisYearBranch userRankingThisYearBranch : userRankingThisYearBranchDao.fetchUserRankingForThisYearBranch(entityId, year,startIndex,batchSize)){
+				List<Object> userRankingThisYearBranchList = new ArrayList<>();
+				userRankingThisYearBranchList.add(userRankingThisYearBranch.getRank());
+				userRankingThisYearBranchList.add(userRankingThisYearBranch.getFirstName());
+				userRankingThisYearBranchList.add(userRankingThisYearBranch.getLastName());
+				userRankingThisYearBranchList.add(userRankingThisYearBranch.getRankingScore());
+				userRankingThisYearBranchList.add(userRankingThisYearBranch.getTotalReviews());
+				userRankingThisYearBranchList.add(userRankingThisYearBranch.getAverageRating());
+				userRankingThisYearBranchList.add(userRankingThisYearBranch.getSps());
+				userRankingThisYearBranchList.add(userRankingThisYearBranch.getCompleted());
+				userRankingThisYearBranchList.add(userRankingThisYearBranch.isEligible());
+				userRanking.add(userRankingThisYearBranchList);
+			}
+		}
 		return userRanking;
+	}
+    
+    @Override
+	public List<List<Object>> getUserRankingThisMonth(String entityType, Long entityId, int month, int year,int startIndex,int batchSize) 
+	{
+			List<List<Object>> userRanking = new ArrayList<>();
+			
+			if(entityType == CommonConstants.COMPANY_ID_COLUMN){
+				for(UserRankingThisMonthMain userRankingThisMonthMain : userRankingThisMonthMainDao.fetchUserRankingForThisMonthMain(entityId,month,year,startIndex,batchSize)){
+					List<Object> userRankingThisMonthMainList = new ArrayList<>();
+					userRankingThisMonthMainList.add(userRankingThisMonthMain.getRank());
+					userRankingThisMonthMainList.add(userRankingThisMonthMain.getFirstName());
+					userRankingThisMonthMainList.add(userRankingThisMonthMain.getLastName());
+					userRankingThisMonthMainList.add(userRankingThisMonthMain.getRankingScore());
+					userRankingThisMonthMainList.add(userRankingThisMonthMain.getTotalReviews());
+					userRankingThisMonthMainList.add(userRankingThisMonthMain.getAverageRating());
+					userRankingThisMonthMainList.add(userRankingThisMonthMain.getSps());
+					userRankingThisMonthMainList.add(userRankingThisMonthMain.getCompleted());
+					userRankingThisMonthMainList.add(userRankingThisMonthMain.isEligible());
+					userRanking.add(userRankingThisMonthMainList);
+				}
+			}else if(entityType ==  CommonConstants.REGION_ID_COLUMN){
+				for(UserRankingThisMonthRegion userRankingThisMonthRegion : userRankingThisMonthRegionDao.fetchUserRankingForThisMonthRegion(entityId,month,year,startIndex,batchSize)){
+					List<Object> userRankingThisMonthRegionList = new ArrayList<>();
+					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getRank());
+					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getFirstName());
+					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getLastName());
+					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getRankingScore());
+					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getTotalReviews());
+					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getAverageRating());
+					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getSps());
+					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getCompleted());
+					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.isEligible());
+					userRanking.add(userRankingThisMonthRegionList);
+				}
+			}else if(entityType == CommonConstants.BRANCH_ID_COLUMN){
+				for(UserRankingThisMonthBranch userRankingThisMonthBranch : userRankingThisMonthBranchDao.fetchUserRankingForThisMonthBranch(entityId,month,year,startIndex,batchSize)){
+					List<Object> userRankingThisMonthBranchList = new ArrayList<>();
+					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getRank());
+					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getFirstName());
+					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getLastName());
+					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getRankingScore());
+					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getTotalReviews());
+					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getAverageRating());
+					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getSps());
+					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getCompleted());
+					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.isEligible());
+					userRanking.add(userRankingThisMonthBranchList);
+				}
+			}
+			return userRanking;
+	}
+    
+    @Override
+	public List<List<Object>> getUserRankingPastMonth(String entityType, Long entityId, int month, int year,int startIndex,int batchSize) {
+    	
+    	List<List<Object>> userRanking = new ArrayList<>();
+    	
+    	if(entityType == CommonConstants.COMPANY_ID_COLUMN){
+    		for(UserRankingPastMonthRegion userRankingPastMonthRegion : userRankingPastMonthRegionDao.fetchUserRankingForPastMonthRegion(entityId,month,year,startIndex,batchSize)){
+    			List<Object> userRankingPastMonthRegionList = new ArrayList<>();
+    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getRank());
+    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getFirstName());
+    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getLastName());
+    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getRankingScore());
+    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getTotalReviews());
+    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getAverageRating());
+    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getSps());
+    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getCompleted());
+    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.isEligible());
+    			userRanking.add(userRankingPastMonthRegionList);
+    		}
+    	}else if(entityType ==  CommonConstants.REGION_ID_COLUMN){
+    		for(UserRankingPastMonthMain userRankingPastMonthMain : userRankingPastMonthMainDao.fetchUserRankingForPastMonthMain(entityId,month,year,startIndex,batchSize)){
+    			List<Object> userRankingPastMonthMainList = new ArrayList<>();
+    			userRankingPastMonthMainList.add(userRankingPastMonthMain.getRank());
+    			userRankingPastMonthMainList.add(userRankingPastMonthMain.getFirstName());
+    			userRankingPastMonthMainList.add(userRankingPastMonthMain.getLastName());
+    			userRankingPastMonthMainList.add(userRankingPastMonthMain.getRankingScore());
+    			userRankingPastMonthMainList.add(userRankingPastMonthMain.getTotalReviews());
+    			userRankingPastMonthMainList.add(userRankingPastMonthMain.getAverageRating());
+    			userRankingPastMonthMainList.add(userRankingPastMonthMain.getSps());
+    			userRankingPastMonthMainList.add(userRankingPastMonthMain.getCompleted());
+    			userRankingPastMonthMainList.add(userRankingPastMonthMain.isEligible());
+    			userRanking.add(userRankingPastMonthMainList);
+    		}
+    	}else if(entityType == CommonConstants.BRANCH_ID_COLUMN){
+    		for(UserRankingPastMonthBranch userRankingPastMonthBranch : userRankingPastMonthBranchDao.fetchUserRankingForPastMonthBranch(entityId,month,year,startIndex,batchSize)){
+    			List<Object> userRankingPastMonthBranchList = new ArrayList<>();
+    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getRank());
+    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getFirstName());
+    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getLastName());
+    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getRankingScore());
+    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getTotalReviews());
+    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getAverageRating());
+    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getSps());
+    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getCompleted());
+    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.isEligible());
+    			userRanking.add(userRankingPastMonthBranchList);
+    		}
+    	}
+    	return userRanking;
 	}
 
 	@Override
-	public List<List<Object>> getUserRankingThisYearMain(Long companyId, int year) {
+	public List<List<Object>> getUserRankingPastYear(String entityType, Long entityId, int year,int startIndex,int batchSize) {
 		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingThisYearMain userRankingThisYearMain : userRankingThisYearMainDao.fetchUserRankingForThisYearMain(companyId, year)){
-			List<Object> userRankingThisYearMainList = new ArrayList<>();
-			userRankingThisYearMainList.add(userRankingThisYearMain.getRank());
-			userRankingThisYearMainList.add(userRankingThisYearMain.getFirstName());
-			userRankingThisYearMainList.add(userRankingThisYearMain.getLastName());
-			userRankingThisYearMainList.add(userRankingThisYearMain.getRankingScore());
-			userRankingThisYearMainList.add(userRankingThisYearMain.getTotalReviews());
-			userRankingThisYearMainList.add(userRankingThisYearMain.getAverageRating());
-			userRankingThisYearMainList.add(userRankingThisYearMain.getSps());
-			userRankingThisYearMainList.add(userRankingThisYearMain.getCompleted());
-			userRankingThisYearMainList.add(userRankingThisYearMain.isEligible());
-			userRanking.add(userRankingThisYearMainList);
-		}
-		
-		return userRanking;
-	}
-
-	@Override
-	public List<List<Object>> getUserRankingThisYearBranch(Long branchId, int year) {
-		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingThisYearBranch userRankingThisYearBranch : userRankingThisYearBranchDao.fetchUserRankingForThisYearBranch(branchId, year)){
-			List<Object> userRankingThisYearBranchList = new ArrayList<>();
-			userRankingThisYearBranchList.add(userRankingThisYearBranch.getRank());
-			userRankingThisYearBranchList.add(userRankingThisYearBranch.getFirstName());
-			userRankingThisYearBranchList.add(userRankingThisYearBranch.getLastName());
-			userRankingThisYearBranchList.add(userRankingThisYearBranch.getRankingScore());
-			userRankingThisYearBranchList.add(userRankingThisYearBranch.getTotalReviews());
-			userRankingThisYearBranchList.add(userRankingThisYearBranch.getAverageRating());
-			userRankingThisYearBranchList.add(userRankingThisYearBranch.getSps());
-			userRankingThisYearBranchList.add(userRankingThisYearBranch.getCompleted());
-			userRankingThisYearBranchList.add(userRankingThisYearBranch.isEligible());
-			userRanking.add(userRankingThisYearBranchList);
-		}
-		
-		return userRanking;
-	}
-
-	@Override
-	public List<List<Object>> getUserRankingThisMonthRegion(Long regionId, int month, int year) {
-		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingThisMonthRegion userRankingThisMonthRegion : userRankingThisMonthRegionDao.fetchUserRankingForThisMonthRegion(regionId,month,year)){
-			List<Object> userRankingThisMonthRegionList = new ArrayList<>();
-			userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getRank());
-			userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getFirstName());
-			userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getLastName());
-			userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getRankingScore());
-			userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getTotalReviews());
-			userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getAverageRating());
-			userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getSps());
-			userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getCompleted());
-			userRankingThisMonthRegionList.add(userRankingThisMonthRegion.isEligible());
-			userRanking.add(userRankingThisMonthRegionList);
-		}
-		
-		return userRanking;
-	}
-
-	@Override
-	public List<List<Object>> getUserRankingThisMonthMain(Long companyId, int month, int year) {
-		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingThisMonthMain userRankingThisMonthMain : userRankingThisMonthMainDao.fetchUserRankingForThisMonthMain(companyId,month,year)){
-			List<Object> userRankingThisMonthMainList = new ArrayList<>();
-			userRankingThisMonthMainList.add(userRankingThisMonthMain.getRank());
-			userRankingThisMonthMainList.add(userRankingThisMonthMain.getFirstName());
-			userRankingThisMonthMainList.add(userRankingThisMonthMain.getLastName());
-			userRankingThisMonthMainList.add(userRankingThisMonthMain.getRankingScore());
-			userRankingThisMonthMainList.add(userRankingThisMonthMain.getTotalReviews());
-			userRankingThisMonthMainList.add(userRankingThisMonthMain.getAverageRating());
-			userRankingThisMonthMainList.add(userRankingThisMonthMain.getSps());
-			userRankingThisMonthMainList.add(userRankingThisMonthMain.getCompleted());
-			userRankingThisMonthMainList.add(userRankingThisMonthMain.isEligible());
-			userRanking.add(userRankingThisMonthMainList);
-		}
-		
-		return userRanking;
-	}
-
-	@Override
-	public List<List<Object>> getUserRankingThisMonthBranch(Long branchId, int month, int year) {
-		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingThisMonthBranch userRankingThisMonthBranch : userRankingThisMonthBranchDao.fetchUserRankingForThisMonthBranch(branchId,month,year)){
-			List<Object> userRankingThisMonthBranchList = new ArrayList<>();
-			userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getRank());
-			userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getFirstName());
-			userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getLastName());
-			userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getRankingScore());
-			userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getTotalReviews());
-			userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getAverageRating());
-			userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getSps());
-			userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getCompleted());
-			userRankingThisMonthBranchList.add(userRankingThisMonthBranch.isEligible());
-			userRanking.add(userRankingThisMonthBranchList);
-		}
-		
-		return userRanking;
-	}
-
-	@Override
-	public List<List<Object>> getUserRankingPastMonthRegion(Long regionId, int month, int year) {
-		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingPastMonthRegion userRankingPastMonthRegion : userRankingPastMonthRegionDao.fetchUserRankingForPastMonthRegion(regionId,month,year)){
-			List<Object> userRankingPastMonthRegionList = new ArrayList<>();
-			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getRank());
-			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getFirstName());
-			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getLastName());
-			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getRankingScore());
-			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getTotalReviews());
-			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getAverageRating());
-			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getSps());
-			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getCompleted());
-			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.isEligible());
-			userRanking.add(userRankingPastMonthRegionList);
-		}
-		
-		return userRanking;
-	}
-
-	@Override
-	public List<List<Object>> getUserRankingPastMonthMain(Long companyId, int month, int year) {
-		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingPastMonthMain userRankingPastMonthMain : userRankingPastMonthMainDao.fetchUserRankingForPastMonthMain(companyId,month,year)){
-			List<Object> userRankingPastMonthMainList = new ArrayList<>();
-			userRankingPastMonthMainList.add(userRankingPastMonthMain.getRank());
-			userRankingPastMonthMainList.add(userRankingPastMonthMain.getFirstName());
-			userRankingPastMonthMainList.add(userRankingPastMonthMain.getLastName());
-			userRankingPastMonthMainList.add(userRankingPastMonthMain.getRankingScore());
-			userRankingPastMonthMainList.add(userRankingPastMonthMain.getTotalReviews());
-			userRankingPastMonthMainList.add(userRankingPastMonthMain.getAverageRating());
-			userRankingPastMonthMainList.add(userRankingPastMonthMain.getSps());
-			userRankingPastMonthMainList.add(userRankingPastMonthMain.getCompleted());
-			userRankingPastMonthMainList.add(userRankingPastMonthMain.isEligible());
-			userRanking.add(userRankingPastMonthMainList);
-		}
-		
-		return userRanking;
-	}
-
-	@Override
-	public List<List<Object>> getUserRankingPastMonthBranch(Long branchId, int month, int year) {
-		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingPastMonthBranch userRankingPastMonthBranch : userRankingPastMonthBranchDao.fetchUserRankingForPastMonthBranch(branchId,month,year)){
-			List<Object> userRankingPastMonthBranchList = new ArrayList<>();
-			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getRank());
-			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getFirstName());
-			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getLastName());
-			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getRankingScore());
-			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getTotalReviews());
-			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getAverageRating());
-			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getSps());
-			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getCompleted());
-			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.isEligible());
-			userRanking.add(userRankingPastMonthBranchList);
-		}
-		
-		return userRanking;
-	}
-
-	@Override
-	public List<List<Object>> getUserRankingPastYearRegion(Long regionId, int year) {
-		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingPastYearRegion userRankingPastYearRegion : userRankingPastYearRegionDao.fetchUserRankingForPastYearRegion(regionId, year)){
-			List<Object> userRankingPastYearRegionList = new ArrayList<>();
-			userRankingPastYearRegionList.add(userRankingPastYearRegion.getRank());
-			userRankingPastYearRegionList.add(userRankingPastYearRegion.getFirstName());
-			userRankingPastYearRegionList.add(userRankingPastYearRegion.getLastName());
-			userRankingPastYearRegionList.add(userRankingPastYearRegion.getRankingScore());
-			userRankingPastYearRegionList.add(userRankingPastYearRegion.getTotalReviews());
-			userRankingPastYearRegionList.add(userRankingPastYearRegion.getAverageRating());
-			userRankingPastYearRegionList.add(userRankingPastYearRegion.getSps());
-			userRankingPastYearRegionList.add(userRankingPastYearRegion.getCompleted());
-			userRankingPastYearRegionList.add(userRankingPastYearRegion.isEligible());
-			userRanking.add(userRankingPastYearRegionList);
-		}
-		
-		return userRanking;
-	}
-
-	@Override
-	public List<List<Object>> getUserRankingPastYearMain(Long companyId, int year) {
-		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingPastYearMain userRankingPastYearMain : userRankingPastYearMainDao.fetchUserRankingForPastYearMain(companyId, year)){
-			List<Object> userRankingPastYearMainList = new ArrayList<>();
-			userRankingPastYearMainList.add(userRankingPastYearMain.getRank());
-			userRankingPastYearMainList.add(userRankingPastYearMain.getFirstName());
-			userRankingPastYearMainList.add(userRankingPastYearMain.getLastName());
-			userRankingPastYearMainList.add(userRankingPastYearMain.getRankingScore());
-			userRankingPastYearMainList.add(userRankingPastYearMain.getTotalReviews());
-			userRankingPastYearMainList.add(userRankingPastYearMain.getAverageRating());
-			userRankingPastYearMainList.add(userRankingPastYearMain.getSps());
-			userRankingPastYearMainList.add(userRankingPastYearMain.getCompleted());
-			userRankingPastYearMainList.add(userRankingPastYearMain.isEligible());
-			userRanking.add(userRankingPastYearMainList);
-		}
-		
-		return userRanking;
-	}
-
-	@Override
-	public List<List<Object>> getUserRankingPastYearBranch(Long branchId, int year) {
-		List<List<Object>> userRanking = new ArrayList<>();
-		for(UserRankingPastYearBranch userRankingPastYearBranch : userRankingPastYearBranchDao.fetchUserRankingForPastYearBranch(branchId, year)){
-			List<Object> userRankingPastYearBranchList = new ArrayList<>();
-			userRankingPastYearBranchList.add(userRankingPastYearBranch.getRank());
-			userRankingPastYearBranchList.add(userRankingPastYearBranch.getFirstName());
-			userRankingPastYearBranchList.add(userRankingPastYearBranch.getLastName());
-			userRankingPastYearBranchList.add(userRankingPastYearBranch.getRankingScore());
-			userRankingPastYearBranchList.add(userRankingPastYearBranch.getTotalReviews());
-			userRankingPastYearBranchList.add(userRankingPastYearBranch.getAverageRating());
-			userRankingPastYearBranchList.add(userRankingPastYearBranch.getSps());
-			userRankingPastYearBranchList.add(userRankingPastYearBranch.getCompleted());
-			userRankingPastYearBranchList.add(userRankingPastYearBranch.isEligible());
-			userRanking.add(userRankingPastYearBranchList);
-		}
-		
-		return userRanking;
+    	
+    	if(entityType == CommonConstants.COMPANY_ID_COLUMN){
+    		for(UserRankingPastYearRegion userRankingPastYearRegion : userRankingPastYearRegionDao.fetchUserRankingForPastYearRegion(entityId, year,startIndex,batchSize)){
+    			List<Object> userRankingPastYearRegionList = new ArrayList<>();
+    			userRankingPastYearRegionList.add(userRankingPastYearRegion.getRank());
+    			userRankingPastYearRegionList.add(userRankingPastYearRegion.getFirstName());
+    			userRankingPastYearRegionList.add(userRankingPastYearRegion.getLastName());
+    			userRankingPastYearRegionList.add(userRankingPastYearRegion.getRankingScore());
+    			userRankingPastYearRegionList.add(userRankingPastYearRegion.getTotalReviews());
+    			userRankingPastYearRegionList.add(userRankingPastYearRegion.getAverageRating());
+    			userRankingPastYearRegionList.add(userRankingPastYearRegion.getSps());
+    			userRankingPastYearRegionList.add(userRankingPastYearRegion.getCompleted());
+    			userRankingPastYearRegionList.add(userRankingPastYearRegion.isEligible());
+    			userRanking.add(userRankingPastYearRegionList);
+    		}
+    	}else if(entityType ==  CommonConstants.REGION_ID_COLUMN){
+    		for(UserRankingPastYearMain userRankingPastYearMain : userRankingPastYearMainDao.fetchUserRankingForPastYearMain(entityId, year,startIndex,batchSize)){
+    			List<Object> userRankingPastYearMainList = new ArrayList<>();
+    			userRankingPastYearMainList.add(userRankingPastYearMain.getRank());
+    			userRankingPastYearMainList.add(userRankingPastYearMain.getFirstName());
+    			userRankingPastYearMainList.add(userRankingPastYearMain.getLastName());
+    			userRankingPastYearMainList.add(userRankingPastYearMain.getRankingScore());
+    			userRankingPastYearMainList.add(userRankingPastYearMain.getTotalReviews());
+    			userRankingPastYearMainList.add(userRankingPastYearMain.getAverageRating());
+    			userRankingPastYearMainList.add(userRankingPastYearMain.getSps());
+    			userRankingPastYearMainList.add(userRankingPastYearMain.getCompleted());
+    			userRankingPastYearMainList.add(userRankingPastYearMain.isEligible());
+    			userRanking.add(userRankingPastYearMainList);
+    		}
+    	}else if(entityType == CommonConstants.BRANCH_ID_COLUMN){
+    		for(UserRankingPastYearBranch userRankingPastYearBranch : userRankingPastYearBranchDao.fetchUserRankingForPastYearBranch(entityId, year,startIndex,batchSize)){
+    			List<Object> userRankingPastYearBranchList = new ArrayList<>();
+    			userRankingPastYearBranchList.add(userRankingPastYearBranch.getRank());
+    			userRankingPastYearBranchList.add(userRankingPastYearBranch.getFirstName());
+    			userRankingPastYearBranchList.add(userRankingPastYearBranch.getLastName());
+    			userRankingPastYearBranchList.add(userRankingPastYearBranch.getRankingScore());
+    			userRankingPastYearBranchList.add(userRankingPastYearBranch.getTotalReviews());
+    			userRankingPastYearBranchList.add(userRankingPastYearBranch.getAverageRating());
+    			userRankingPastYearBranchList.add(userRankingPastYearBranch.getSps());
+    			userRankingPastYearBranchList.add(userRankingPastYearBranch.getCompleted());
+    			userRankingPastYearBranchList.add(userRankingPastYearBranch.isEligible());
+    			userRanking.add(userRankingPastYearBranchList);
+    		}
+    	}
+    	return userRanking;
 	}   
 }
