@@ -134,7 +134,18 @@
 				<value>com.realtech.socialsurvey.core.entities.OverviewBranchYear</value>
 				<value>com.realtech.socialsurvey.core.entities.OverviewRegionYear</value>
 				<value>com.realtech.socialsurvey.core.entities.OverviewCompanyYear</value>
-	
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisMonthBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisMonthMain</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisMonthRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisYearBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisYearMain</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisYearRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearMain</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastMonthBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastMonthMain</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastMonthRegion</value>
 			</list>
 		</property>
 	</bean>

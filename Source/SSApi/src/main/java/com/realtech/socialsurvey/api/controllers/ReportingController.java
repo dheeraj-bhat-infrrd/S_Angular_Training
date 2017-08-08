@@ -319,5 +319,98 @@ public class ReportingController
         return json;
     }
     
+    @RequestMapping( value = "/getuserrankingforthisyear")
+    @ApiOperation( value = "Fetch User Ranking for this year")
+    public String getUserRankingForThisYear(Long entityId, String entityType,int year) throws NonFatalException
+    {
+    	LOGGER.info( "Fetching User Ranking for this year");
+    	
+    	String json = null;
+    	
+    	List<List<Object>> userRankingList =  new ArrayList<>();
+    	
+    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingThisYearMain(entityId, year);
+    	}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingThisYearRegion(entityId, year);
+    	}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingThisYearBranch(entityId, year);
+    	}  
+    	
+    	json = new Gson().toJson(userRankingList);
+    	
+    	return json;
+    }
+    
+    @RequestMapping( value = "/getuserrankingforthismonth")
+    @ApiOperation( value = "Fetch User Ranking for this year")
+    public String getUserRankingForThisMonth(Long entityId, String entityType,int month,int year) throws NonFatalException
+    {
+    	LOGGER.info( "Fetching User Ranking for this month");
+    	
+    	String json = null;
+    	
+    	List<List<Object>> userRankingList =  new ArrayList<>();
+    	
+    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingThisMonthMain(entityId,month,year);
+    	}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingThisMonthRegion(entityId,month,year);
+    	}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingThisMonthBranch(entityId,month,year);
+    	}  
+    	
+    	
+    	json = new Gson().toJson(userRankingList);
+    	
+    	return json;
+    }
+    
+    @RequestMapping( value = "/getuserrankingforpastyear")
+    @ApiOperation( value = "Fetch User Ranking for this year")
+    public String getUserRankingForPastYear(Long entityId, String entityType,int year) throws NonFatalException
+    {
+    	LOGGER.info( "Fetching User Ranking for past year");
+    	
+    	String json = null;
+    	
+    	List<List<Object>> userRankingList =  new ArrayList<>();
+    	
+    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingPastYearMain(entityId, year);
+    	}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingPastYearRegion(entityId, year);
+    	}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingPastYearBranch(entityId, year);
+    	}  
+    	
+    	json = new Gson().toJson(userRankingList);
+    	
+    	return json;
+    }
+    
+    @RequestMapping( value = "/getuserrankingforpastmonth")
+    @ApiOperation( value = "Fetch User Ranking for this year")
+    public String getUserRankingForPastMonth(Long entityId, String entityType,int month,int year) throws NonFatalException
+    {
+    	LOGGER.info( "Fetching User Ranking for past month");
+    	
+    	String json = null;
+    	
+    	List<List<Object>> userRankingList =  new ArrayList<>();
+    	
+    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingPastMonthMain(entityId,month,year);
+    	}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingPastMonthRegion(entityId,month,year);
+    	}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){	
+    		userRankingList = reportingDashboardManagement.getUserRankingPastMonthBranch(entityId,month,year);
+    	}  
+    	
+    	json = new Gson().toJson(userRankingList);
+    	
+    	return json;
+    }
+    
 
 }

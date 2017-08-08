@@ -51,5 +51,29 @@ public interface ReportingDashboardManagement
 
     String generateSurveyTransactionForReporting( Long entityId, String entityType, Long userId, Timestamp startDate,
         Timestamp endDate ) throws UnsupportedEncodingException, NonFatalException;
+    
+    List<List<Object>> getUserRankingThisYearRegion(Long regionId,int year);
+    
+    List<List<Object>> getUserRankingThisYearMain(Long companyId,int year);
+    
+    List<List<Object>> getUserRankingThisYearBranch(Long branchId,int year);
+    
+    List<List<Object>> getUserRankingThisMonthRegion(Long regionId,int month,int year);
+    
+    List<List<Object>> getUserRankingThisMonthMain(Long companyId,int month,int year);
+    
+    List<List<Object>> getUserRankingThisMonthBranch(Long branchId,int month,int year);
+    
+    List<List<Object>> getUserRankingPastMonthRegion(Long regionId,int month,int year);
+    
+    List<List<Object>> getUserRankingPastMonthMain(Long companyId,int month,int year);
+    
+    List<List<Object>> getUserRankingPastMonthBranch(Long branchId,int month,int year);
+    
+    List<List<Object>> getUserRankingPastYearRegion(Long regionId,int year);
+    
+    List<List<Object>> getUserRankingPastYearMain(Long companyId,int year);
+    
+    List<List<Object>> getUserRankingPastYearBranch(Long branchId,int year);
 
 }

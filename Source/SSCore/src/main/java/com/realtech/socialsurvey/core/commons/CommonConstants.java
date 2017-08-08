@@ -1330,4 +1330,10 @@ public interface CommonConstants
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
     public static final String SURVEY_RESULTS_IS_DELETED = "isDeleted";
     public static final String TRX_MONTH = "trxMonth";
+    
+    public static final String THIS_MONTH="thisMonth";
+    public static final String THIS_YEAR="thisYear";
+    public static final String LEADERBOARD_YEAR="year";
+    public static final String LEADERBOARD_MONTH="month";
+    
 }
