@@ -133,5 +133,17 @@ public interface SSApiIntegration
     
     @GET("/v1/getyeardataoverviewfordashboard")
     Response getYearDataOverviewForDashboard(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("year") int year);
+    
+    @GET("/v1/getuserrankingforthisyear")
+    Response getUserRankingForThisYear(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("year") int year);
+    
+    @GET("/v1/getuserrankingforpastyear")
+    Response getUserRankingForPastYear(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("year") int year);
+    
+    @GET("/v1/getuserrankingforthismonth")
+    Response getUserRankingForThisMonth(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("month") int month, @Query ("year") int year);
+    
+    @GET("/v1/getuserrankingforpastmonth")
+    Response getUserRankingForPastMonth(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("month") int month, @Query ("year") int year);
     //reporting:END
 }

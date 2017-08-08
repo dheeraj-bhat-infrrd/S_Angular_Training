@@ -82,7 +82,7 @@
 				<jsp:include page="reporting_transaction_details.jsp"></jsp:include>
 			</div>
 			
-			<div id="reportingDashTabs" style="margin-top:-40px; display:inline-block">
+			<div id="reportingDashTabs" class=" col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:-40px; display:inline-block">
 				<ul class="nav nav-tabs" role="tablist" style=" margin-bottom:40px;">
 					<li id="overview-btn" class="active"><a href="#overview-tab" data-toggle="tab">Overview</a></li>
 					<li id="leaderboard-btn"><a href="#leaderboard-tab" data-toggle="tab">LeaderBoard</a></li>
@@ -104,7 +104,9 @@
 							</div>
 						</div>
 					</div>
-					<div class="tab-pane fade" id="leaderboard-tab"></div>
+					<div class="tab-pane fade col-lg-12 col-md-12 col-sm-12 col-xs-12" id="leaderboard-tab">
+						<jsp:include page="reporting_leaderboard.jsp"></jsp:include>
+					</div>
 					<div class="tab-pane fade" id="score-stats-tab"></div>
 					<div class="tab-pane fade" id="activity-tab"></div>
 					<div class="tab-pane fade" id="reviews-tab">

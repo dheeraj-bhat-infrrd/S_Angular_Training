@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +25,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -53,6 +57,7 @@ import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 import retrofit.client.Response;
+import scala.Console;
 
 @Controller
 public class ReportingWebController
@@ -856,6 +861,84 @@ public class ReportingWebController
    public String showRankingPage( Model model, HttpServletRequest request ) throws NonFatalException
    {
        return JspResolver.RANKING_SETTINGS;
+   }
+   
+   @ResponseBody
+   @RequestMapping ( value = "/getUserRanking", method = RequestMethod.GET)
+   public String getUserRankingForThisYear(Model model, HttpServletRequest request) throws NonFatalException
+   {     
+	   LOG.info( "Get User Ranking for this year" );
+       
+	   LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
+       List<List<Object>> userRankingList = new ArrayList<>();
+       User user = sessionHelper.getCurrentUser();
+       
+       try{
+    	   userRankingList= fetchUserRanking(request);
+       } catch ( NonFatalException e ) {
+           LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
+           model.addAttribute( "message", e.getMessage() );
+       }
+   }
+   
+   private List<List<Object>> fetchUserRanking( HttpServletRequest request) throws InvalidInputException {
+	   
+	   LOG.debug( "Method fetchUserRanking() started" );
+	   List<List<Object>> userRankingList =  new ArrayList<>();
+	   String startIndexStr = request.getParameter( "startIndex" );
+       String batchSizeStr = request.getParameter( "batchSize" );
+       String entityIdStr = request.getParameter("entityId");
+       String entityTypeStr = request.getParameter("entityType");
+       String rankingTypeStr = request.getParameter("rankingType");
+       String monthStr = request.getParameter("month");
+       String yearStr = request.getParameter("year");
+       
+       Long entityId;
+       int month;
+       int year;
+       
+       int startIndex = -1;
+       int batchSize = -1;
+       
+       if ( startIndexStr != null && !startIndexStr.isEmpty() ) {
+           try {
+               startIndex = Integer.parseInt( startIndexStr );
+           } catch ( NumberFormatException e ) {
+               throw new InvalidInputException( "Invalid start index passed" );
+           }
+       }
+
+       if ( batchSizeStr != null && !batchSizeStr.isEmpty() ) {
+           try {
+               batchSize = Integer.parseInt( batchSizeStr );
+           } catch ( NumberFormatException e ) {
+               throw new InvalidInputException( "Invalid batch size passed" );
+           }
+       }
+       
+       if ( ( entityTypeStr == null || entityTypeStr.isEmpty() ) ) {
+           LOG.error( "Invalid value (null/empty) passed for profile level." );
+           throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+       }
+       
+       if ( entityIdStr != null && !entityIdStr.isEmpty() ) {
+           try {
+               entityId = Long.parseLong( entityIdStr );
+           } catch ( NumberFormatException e ) {
+               LOG.error( "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
+                   e );
+               throw e;
+           }
+       }
+       
+       try{
+    	   userRankingList = reportingDashboardManagement.getUserRanking
+       }catch ( InvalidInputException e ) {
+           LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
+           throw e;
+       }
+       
+	   return userRankingList;
    }
     /**
     *
