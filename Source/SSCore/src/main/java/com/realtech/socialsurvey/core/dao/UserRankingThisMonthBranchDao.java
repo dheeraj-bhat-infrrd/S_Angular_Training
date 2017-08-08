@@ -5,6 +5,8 @@ import java.util.List;
 import com.realtech.socialsurvey.core.entities.UserRankingThisMonthBranch;
 
 public interface UserRankingThisMonthBranchDao extends GenericReportingDao<UserRankingThisMonthBranch, String>{
-	List<UserRankingThisMonthBranch> fetchUserRankingForThisMonthBranch(Long branchId, int month, int year);
+
+    List<UserRankingThisMonthBranch> fetchUserRankingForThisMonthBranch( Long branchId, int month, int year, int startIndex,
+        int batchSize );
 
 }

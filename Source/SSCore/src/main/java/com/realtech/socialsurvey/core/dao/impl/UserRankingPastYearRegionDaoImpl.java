@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +21,19 @@ public class UserRankingPastYearRegionDaoImpl extends GenericReportingDaoImpl< U
 	private static final Logger LOG = LoggerFactory.getLogger( UserRankingPastYearRegionDaoImpl.class );
 
 	@Override
-	public List<UserRankingPastYearRegion> fetchUserRankingForPastYearRegion(Long regionId, int year) {
+	public List<UserRankingPastYearRegion> fetchUserRankingForPastYearRegion(Long regionId, int year , int startIndex , int batchSize) {
 		LOG.info( "method to fetch user ranking region list for past year, fetchUserRankingForPastYearRegion() started" );
         Criteria criteria = getSession().createCriteria( UserRankingPastYearRegion.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
-            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) );            
+            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) );  
+            if ( startIndex > -1 ) {
+                criteria.setFirstResult( startIndex );
+            }
+            if ( batchSize > -1 ) {
+                criteria.setMaxResults( batchSize );
+            }
+            criteria.addOrder( Order.asc( CommonConstants.RANK ) );
             }
         catch ( HibernateException hibernateException ) {
             LOG.error( "Exception caught in fetchUserRankingForPastYearRegion() ", hibernateException );
