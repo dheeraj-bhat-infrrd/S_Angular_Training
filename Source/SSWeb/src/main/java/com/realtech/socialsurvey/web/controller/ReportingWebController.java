@@ -58,6 +58,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 
 import retrofit.client.Response;
 import scala.Console;
+import scala.collection.generic.BitOperations.Int;
 
 @Controller
 public class ReportingWebController
@@ -864,8 +865,8 @@ public class ReportingWebController
    }
    
    @ResponseBody
-   @RequestMapping ( value = "/getUserRanking", method = RequestMethod.GET)
-   public String getUserRankingForThisYear(Model model, HttpServletRequest request) throws NonFatalException
+   @RequestMapping ( value = "/getuserranking", method = RequestMethod.GET)
+   public Response getUserRankingForThisYear(Model model, HttpServletRequest request) throws NonFatalException
    {     
 	   LOG.info( "Get User Ranking for this year" );
        
@@ -873,73 +874,60 @@ public class ReportingWebController
        List<List<Object>> userRankingList = new ArrayList<>();
        User user = sessionHelper.getCurrentUser();
        
-       try{
-    	   userRankingList= fetchUserRanking(request);
-       } catch ( NonFatalException e ) {
-           LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
-           model.addAttribute( "message", e.getMessage() );
+       String entityType= request.getParameter(CommonConstants.ENTITY_TYPE_COLUMN);
+       String entityIdStr= request.getParameter(CommonConstants.ENTITY_ID_COLUMN);
+       String timeFrameStr = request.getParameter("timeFrame");
+       String startIndexStr = request.getParameter("startIndex");
+       String batchSizeStr = request.getParameter("batchSize");
+       String yearStr= request.getParameter("year");
+       String monthStr="";
+       int startIndex = 0;
+       int batchSize = 11;
+       int timeFrame = 1;
+       long entityId = 0;
+       
+       @SuppressWarnings("deprecation")
+       int year= (new Date()).getYear();
+       @SuppressWarnings("deprecation")
+       int month = (new Date()).getMonth()+1;
+       Response response =null;
+       
+       if(startIndexStr!=null && !startIndexStr.isEmpty()){
+           startIndex = Integer.parseInt( startIndexStr );
        }
+       if(batchSizeStr != null && !batchSizeStr.isEmpty()){
+           batchSize = Integer.parseInt( batchSizeStr );
+       }
+       if(timeFrameStr!=null && !timeFrameStr.isEmpty()){
+    	   timeFrame = Integer.parseInt(timeFrameStr);
+       }
+       if(entityIdStr!=null && !entityIdStr.isEmpty()){
+    	   entityId = Long.parseLong(entityIdStr);
+       }
+       if(yearStr!=null && !yearStr.isEmpty()){
+    	   year = Integer.parseInt(yearStr);
+       }
+       
+       switch(timeFrame){
+       		case 1: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForThisYear(entityId, entityType, year,startIndex,batchSize);
+       			break;
+       		case 2: 
+       			monthStr = request.getParameter("month");
+       			month = Integer.parseInt(monthStr);
+       			response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForThisMonth(entityId, entityType, month,year,startIndex,batchSize);
+       			break;
+       		case 3:  response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForPastYear(entityId, entityType, year,startIndex,batchSize);
+       			break;
+       		case 4: monthStr = request.getParameter("month");
+   					month = Integer.parseInt(monthStr);
+   					response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForPastMonth(entityId, entityType, month,year,startIndex,batchSize);
+   	       			break;
+   	       	default: throw new NonFatalException( "NonFatalException while choosing time frame for leaderboard" );
+       }
+       
+       return response;
    }
    
-   private List<List<Object>> fetchUserRanking( HttpServletRequest request) throws InvalidInputException {
-	   
-	   LOG.debug( "Method fetchUserRanking() started" );
-	   List<List<Object>> userRankingList =  new ArrayList<>();
-	   String startIndexStr = request.getParameter( "startIndex" );
-       String batchSizeStr = request.getParameter( "batchSize" );
-       String entityIdStr = request.getParameter("entityId");
-       String entityTypeStr = request.getParameter("entityType");
-       String rankingTypeStr = request.getParameter("rankingType");
-       String monthStr = request.getParameter("month");
-       String yearStr = request.getParameter("year");
-       
-       Long entityId;
-       int month;
-       int year;
-       
-       int startIndex = -1;
-       int batchSize = -1;
-       
-       if ( startIndexStr != null && !startIndexStr.isEmpty() ) {
-           try {
-               startIndex = Integer.parseInt( startIndexStr );
-           } catch ( NumberFormatException e ) {
-               throw new InvalidInputException( "Invalid start index passed" );
-           }
-       }
-
-       if ( batchSizeStr != null && !batchSizeStr.isEmpty() ) {
-           try {
-               batchSize = Integer.parseInt( batchSizeStr );
-           } catch ( NumberFormatException e ) {
-               throw new InvalidInputException( "Invalid batch size passed" );
-           }
-       }
-       
-       if ( ( entityTypeStr == null || entityTypeStr.isEmpty() ) ) {
-           LOG.error( "Invalid value (null/empty) passed for profile level." );
-           throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
-       }
-       
-       if ( entityIdStr != null && !entityIdStr.isEmpty() ) {
-           try {
-               entityId = Long.parseLong( entityIdStr );
-           } catch ( NumberFormatException e ) {
-               LOG.error( "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
-                   e );
-               throw e;
-           }
-       }
-       
-       try{
-    	   userRankingList = reportingDashboardManagement.getUserRanking
-       }catch ( InvalidInputException e ) {
-           LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
-           throw e;
-       }
-       
-	   return userRankingList;
-   }
     /**
     *
     * @param model
