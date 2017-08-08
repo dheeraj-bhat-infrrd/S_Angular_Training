@@ -321,7 +321,7 @@ public class ReportingController
     
     @RequestMapping( value = "/getuserrankingforthisyear")
     @ApiOperation( value = "Fetch User Ranking for this year")
-    public String getUserRankingForThisYear(Long entityId, String entityType,int year) throws NonFatalException
+    public String getUserRankingForThisYear(Long entityId, String entityType,int year,int startIndex,int batchSize) throws NonFatalException
     {
     	LOGGER.info( "Fetching User Ranking for this year");
     	
@@ -329,13 +329,7 @@ public class ReportingController
     	
     	List<List<Object>> userRankingList =  new ArrayList<>();
     	
-    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingThisYearMain(entityId, year);
-    	}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingThisYearRegion(entityId, year);
-    	}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingThisYearBranch(entityId, year);
-    	}  
+    	userRankingList = reportingDashboardManagement.getUserRankingThisYear(entityType,entityId, year,startIndex,batchSize);
     	
     	json = new Gson().toJson(userRankingList);
     	
@@ -344,23 +338,16 @@ public class ReportingController
     
     @RequestMapping( value = "/getuserrankingforthismonth")
     @ApiOperation( value = "Fetch User Ranking for this year")
-    public String getUserRankingForThisMonth(Long entityId, String entityType,int month,int year) throws NonFatalException
+    public String getUserRankingForThisMonth(Long entityId, String entityType,int month,int year,int startIndex,int batchSize) throws NonFatalException
     {
     	LOGGER.info( "Fetching User Ranking for this month");
     	
     	String json = null;
     	
     	List<List<Object>> userRankingList =  new ArrayList<>();
-    	
-    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingThisMonthMain(entityId,month,year);
-    	}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingThisMonthRegion(entityId,month,year);
-    	}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingThisMonthBranch(entityId,month,year);
-    	}  
-    	
-    	
+    	    	
+    	userRankingList = reportingDashboardManagement.getUserRankingThisMonth(entityType,entityId,month,year,startIndex,batchSize);
+  
     	json = new Gson().toJson(userRankingList);
     	
     	return json;
@@ -368,7 +355,7 @@ public class ReportingController
     
     @RequestMapping( value = "/getuserrankingforpastyear")
     @ApiOperation( value = "Fetch User Ranking for this year")
-    public String getUserRankingForPastYear(Long entityId, String entityType,int year) throws NonFatalException
+    public String getUserRankingForPastYear(Long entityId, String entityType,int year,int startIndex,int batchSize) throws NonFatalException
     {
     	LOGGER.info( "Fetching User Ranking for past year");
     	
@@ -376,13 +363,7 @@ public class ReportingController
     	
     	List<List<Object>> userRankingList =  new ArrayList<>();
     	
-    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingPastYearMain(entityId, year);
-    	}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingPastYearRegion(entityId, year);
-    	}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingPastYearBranch(entityId, year);
-    	}  
+    	userRankingList = reportingDashboardManagement.getUserRankingPastYear(entityType,entityId, year,startIndex,batchSize);
     	
     	json = new Gson().toJson(userRankingList);
     	
@@ -391,7 +372,7 @@ public class ReportingController
     
     @RequestMapping( value = "/getuserrankingforpastmonth")
     @ApiOperation( value = "Fetch User Ranking for this year")
-    public String getUserRankingForPastMonth(Long entityId, String entityType,int month,int year) throws NonFatalException
+    public String getUserRankingForPastMonth(Long entityId, String entityType,int month,int year,int startIndex,int batchSize) throws NonFatalException
     {
     	LOGGER.info( "Fetching User Ranking for past month");
     	
@@ -399,13 +380,7 @@ public class ReportingController
     	
     	List<List<Object>> userRankingList =  new ArrayList<>();
     	
-    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingPastMonthMain(entityId,month,year);
-    	}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingPastMonthRegion(entityId,month,year);
-    	}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){	
-    		userRankingList = reportingDashboardManagement.getUserRankingPastMonthBranch(entityId,month,year);
-    	}  
+    	userRankingList = reportingDashboardManagement.getUserRankingPastMonth(entityType,entityId,month,year,startIndex,batchSize);
     	
     	json = new Gson().toJson(userRankingList);
     	
