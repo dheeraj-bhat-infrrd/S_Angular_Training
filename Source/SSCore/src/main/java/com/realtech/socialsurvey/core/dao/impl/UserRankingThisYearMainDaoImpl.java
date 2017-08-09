@@ -58,7 +58,7 @@ public class UserRankingThisYearMainDaoImpl extends GenericReportingDaoImpl<User
     }
 	
 	@Override
-    public long fetchUserRankingCountForThisYearMain(Long companyId, int year , Long userId ) {
+    public long fetchUserRankingCountForThisYearMain(Long companyId, int year) {
         LOG.info( "method to fetch user ranking Main count for this year, fetchUserRankingCountForThisYearMain() started" );
         Criteria criteria = getSession().createCriteria( UserRankingThisYearMain.class );
         try {

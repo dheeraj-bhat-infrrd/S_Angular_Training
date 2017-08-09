@@ -865,10 +865,10 @@ public class ReportingWebController
    }
    
    @ResponseBody
-   @RequestMapping ( value = "/getuserrankingcount", method = RequestMethod.GET)
-   public Response getUserRankingCount(Model model, HttpServletRequest request) throws NonFatalException
+   @RequestMapping ( value = "/getuserrankingrankandcount", method = RequestMethod.GET)
+   public Response getUserRankingRankAndCount(Model model, HttpServletRequest request) throws NonFatalException
    {     
-       LOG.info( "Get User Ranking Count" );
+       LOG.info( "Get User Ranking Rank And Count" );
        
        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
        List<List<Object>> userRankingList = new ArrayList<>();
@@ -912,13 +912,72 @@ public class ReportingWebController
            month = Integer.parseInt( monthStr );
        }
        switch(timeFrame){
-           case 1: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForThisYear(userId , entityId, entityType, year,batchSize);
+           case 1: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingRankCountForThisYear(userId , entityId, entityType, year,batchSize);
                break;
-           case 2: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForThisMonth(userId , entityId, entityType, month,year,batchSize);
+           case 2: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingRankCountForThisMonth(userId , entityId, entityType, month,year,batchSize);
                break;
-           case 3:  response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForPastYear(userId , entityId, entityType, year,batchSize);
+           case 3:  response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingRankCountForPastYear(userId , entityId, entityType, year,batchSize);
                break;
-           case 4: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForPastMonth(userId ,entityId, entityType, month,year,batchSize);
+           case 4: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingRankCountForPastMonth(userId ,entityId, entityType, month,year,batchSize);
+                   break;
+           default: throw new NonFatalException( "NonFatalException while getting User Ranking Count" );
+      }
+      
+    return response;
+   }
+   
+   @ResponseBody
+   @RequestMapping ( value = "/getuserrankingcount", method = RequestMethod.GET)
+   public Response getUserRankingCount(Model model, HttpServletRequest request) throws NonFatalException
+   {     
+       LOG.info( "Get User Ranking Rank " );
+       
+       LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
+       Integer batchSize = 0;
+       int timeFrame = 1;
+       Long entityId = (long) 0;
+       int year = 0;
+       int month = 0;
+       String batchSizeStr = request.getParameter( "batchSize" );
+       String entityIdStr = request.getParameter("entityId");
+       String entityType = request.getParameter("entityType");
+       String timeFrameStr = request.getParameter("timeFrame");
+       String yearStr = request.getParameter("year");
+       String monthStr = request.getParameter("month");
+       Response response = null;
+       if(batchSizeStr != null && !batchSizeStr.isEmpty()){
+           batchSize = Integer.parseInt( batchSizeStr );
+       }
+       if ( ( entityType == null || entityType.isEmpty() ) ) {
+           LOG.error( "Invalid value (null/empty) passed for profile level." );
+           throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+       }
+       if(timeFrameStr!=null && !timeFrameStr.isEmpty()){
+           timeFrame = Integer.parseInt(timeFrameStr);
+       }
+       if ( entityIdStr != null && !entityIdStr.isEmpty() ) {
+           try {
+               entityId = Long.parseLong( entityIdStr );
+           } catch ( NumberFormatException e ) {
+               LOG.error( "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
+                   e );
+               throw e;
+           }
+       }
+       if(yearStr != null && !yearStr.isEmpty()){
+           year = Integer.parseInt( yearStr );
+       }
+       if(monthStr != null && !monthStr.isEmpty()){
+           month = Integer.parseInt( monthStr );
+       }
+       switch(timeFrame){
+           case 1: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForThisYear(entityId, entityType, year,batchSize);
+               break;
+           case 2: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForThisMonth(entityId, entityType, month,year,batchSize);
+               break;
+           case 3:  response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForPastYear(entityId, entityType, year,batchSize);
+               break;
+           case 4: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForPastMonth(entityId, entityType, month,year,batchSize);
                    break;
            default: throw new NonFatalException( "NonFatalException while getting User Ranking Count" );
       }

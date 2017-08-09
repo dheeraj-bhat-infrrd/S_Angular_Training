@@ -61,16 +61,29 @@ public interface ReportingDashboardManagement
     
     List<List<Object>> getUserRankingPastYear(String entityType, Long entityId,int year,int startIndex,int batchSize);
 
-    Map<String, Object> fetchRankingCountThisYear( long userId, long entityId, String entityType, int year, int BatchSize )
+    Map<String, Object> fetchRankingCountThisYear(long entityId, String entityType, int year, int BatchSize )
         throws NonFatalException;
 
-    Map<String, Object> fetchRankingCountThisMonth( long userId, long entityId, String entityType, int year, int month,
+    Map<String, Object> fetchRankingCountThisMonth(long entityId, String entityType, int year, int month,
         int BatchSize ) throws NonFatalException;
 
-    Map<String, Object> fetchRankingCountPastYear( long userId, long entityId, String entityType, int year, int BatchSize )
+    Map<String, Object> fetchRankingCountPastYear( long entityId, String entityType, int year, int BatchSize )
         throws NonFatalException;
 
-    Map<String, Object> fetchRankingCountPastMonth( long userId, long entityId, String entityType, int year, int month,
+    Map<String, Object> fetchRankingCountPastMonth( long entityId, String entityType, int year, int month,
         int BatchSize ) throws NonFatalException;
+
+    Map<String, Object> fetchRankingRankCountThisYear( long userId, long entityId, String entityType, int year, int BatchSize )
+        throws NonFatalException;
+
+    Map<String, Object> fetchRankingRankCountThisMonth( long userId, long entityId, String entityType, int year, int month,
+        int BatchSize ) throws NonFatalException;
+
+    Map<String, Object> fetchRankingRankCountPastYear( long userId, long entityId, String entityType, int year, int BatchSize )
+        throws NonFatalException;
+
+    Map<String, Object> fetchRankingRankCountPastMonth( long userId, long entityId, String entityType, int year, int month,
+        int BatchSize ) throws NonFatalException;
+
     
 }
