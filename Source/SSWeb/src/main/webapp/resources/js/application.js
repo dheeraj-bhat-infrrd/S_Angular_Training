@@ -1990,7 +1990,8 @@ function bindEditSurveyEvents() {
 		var questionId = $(this).parent().parent().data('questionid');
 		
 		if( ratingQuestionCount <= 1 && $(this).parent().parent().data('rating-question') == true ){
-			showToast( "Cannot remove the question, there must be a minimum of 1 ranking type question." );
+			$('#overlay-toast').html( "Cannot remove the question, there must be a minimum of 1 ranking type question." );
+			showToast();
 			return;
 		} else {
 			ratingQuestionCount--;
