@@ -450,6 +450,7 @@ public class SurveyBuilderController {
 
 			// Fetch count of active Rating questions
 			int activeRatingQues = (int) surveyBuilder.countActiveRatingQuestionsInSurvey(user);
+			surveyDetail.setCountOfRatingQuestions( activeRatingQues );
 			if (activeRatingQues < minRatingQuestions) {
 				LOG.info("Marking Survey as inactive");
 				surveyBuilder.changeSurveyStatus(user, CommonConstants.NO);
