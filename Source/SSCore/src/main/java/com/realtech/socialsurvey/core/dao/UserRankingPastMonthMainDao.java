@@ -9,6 +9,6 @@ public interface UserRankingPastMonthMainDao extends GenericReportingDao<UserRan
 
     int fetchUserRankingRankForPastMonthMain( Long userId, Long companyId, int year );
 
-    long fetchUserRankingCountForPastMonthMain( Long companyId, int year, int month, Long userId );
+    long fetchUserRankingCountForPastMonthMain( Long companyId, int year, int month );
 
 }
