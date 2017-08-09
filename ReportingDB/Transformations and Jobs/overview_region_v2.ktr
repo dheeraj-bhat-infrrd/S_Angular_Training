@@ -969,7 +969,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  USER_PROFILE_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;FROM user_profile order by USER_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  distinct USER_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;FROM user_profile order by USER_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
