@@ -636,5 +636,8 @@ public interface UserManagementService
 
     public void updateUserProfileObject( UserProfile userProfile ) throws InvalidInputException;
 
+
+    public void updateLastInviteSentDateIfUserExistsInDB( String emailId );
+
 }
 // JIRA SS-34 BY RM02 BOC
