@@ -638,6 +638,9 @@ public class OrganizationManagementController
                 unitSettings = userManagementService.getUserSettings( user.getUserId() );
             }
             model.addAttribute( CommonConstants.USER_APP_SETTINGS, unitSettings );
+            
+            
+            model.addAttribute( CommonConstants.ENCOMPASS_VERSION_LIST, organizationManagementService.getActiveEncompassSdkVersions() );
 
             //REALTECH_USER_ID is set only for real tech and SS admin
             boolean isRealTechOrSSAdmin = false;
@@ -832,6 +835,8 @@ public class OrganizationManagementController
         String sellerAgentEmail = request.getParameter( "seller-agnt-email" );
         String sellerAgentName = request.getParameter( "seller-agnt-name" );
         
+        String version = request.getParameter( "sdk-version-selection-list" );
+        
         Map<String, Object> responseMap = new HashMap<String, Object>();
         String message;
         boolean status = true;
@@ -851,6 +856,11 @@ public class OrganizationManagementController
                 LOG.info( "Field Id is empty" );
                 encompassFieldId = CommonConstants.ENCOMPASS_DEFAULT_FEILD_ID;
             }
+            
+            if ( version == null || version.isEmpty() ) {
+                throw new InvalidInputException( "version can not be empty" );
+            }
+            
             if ( state == null || state.isEmpty() || state.equals( CommonConstants.CRM_INFO_DRY_RUN_STATE ) ) {
                 state = CommonConstants.CRM_INFO_DRY_RUN_STATE;
             } else {
@@ -877,6 +887,7 @@ public class OrganizationManagementController
             encompassCrmInfo.setCrm_fieldId( encompassFieldId );
             encompassCrmInfo.setCrm_password( cipherPassword );
             encompassCrmInfo.setUrl( encompassUrl );
+            encompassCrmInfo.setVersion( version );
             
             //check if it's need to update real state agent detail
             if( !StringUtils.isEmpty( buyerAgentEmail ) ||  !StringUtils.isEmpty( buyerAgentName ) || !StringUtils.isEmpty( sellerAgentEmail ) || !StringUtils.isEmpty( sellerAgentName ))

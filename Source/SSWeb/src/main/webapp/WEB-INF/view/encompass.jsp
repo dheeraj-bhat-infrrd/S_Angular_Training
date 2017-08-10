@@ -12,6 +12,7 @@
 					<c:set var="encompassurl" value="${appSettings.crm_info.url}" />
 					<c:set var="encompassfieldid" value="${appSettings.crm_info.crm_fieldId}" />
 					<c:set var="encompassstate" value="${ appSettings.crm_info.state }" />
+					<c:set var="encompassversion" value="${ appSettings.crm_info.version }" />
 					
 					<c:set var="buyerAgentEmail" value="${ appSettings.crm_info.buyerAgentEmail }" />
 					<c:set var="buyerAgentName" value="${ appSettings.crm_info.buyerAgentName }" />
@@ -131,7 +132,7 @@
 					
 					<!-- Seller agent details -->
 					
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding">
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
 								<spring:message code="label.crm.sellerAgentEmail.key" />
@@ -143,7 +144,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden en-botttom-padding" >
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden" >
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
 								<spring:message code="label.crm.sellerAgentName.key" />
@@ -160,7 +161,23 @@
 						</div>
 					</div>
 					
-					<div class="encompass-btn">
+					<!-- ENCOMPASS SDK VERSION -->
+					
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding overflow-hidden">
+							<div class="um-item-row-left text-right">SDK Version</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<select id="sdk-version-selection-list" name="sdk-version-selection-list" class="float-left app-stng-sel-item">
+								<c:forEach items="${encompassVersionList}" var="version">
+    								<option value="${version.sdkVersion}" <c:if test ="${version.sdkVersion == encompassversion}">selected</c:if>>${version.sdkVersion}</option>
+       							</c:forEach>
+								</select>
+								<div id="encompass-version-error" class="hm-item-err-2" style="display: none;"></div>
+							</div>
+					</div>
+					
+					
+					
+					<div class="encompass-btn clearfix">
 						<div>
 							<div id="en-dry-save" class="float-left enc-state-icon cursor-pointer">Save</div>
 							<div id="en-dry-enable" class="float-left enc-state-icon cursor-pointer hide" style="display: none;">Enable</div>

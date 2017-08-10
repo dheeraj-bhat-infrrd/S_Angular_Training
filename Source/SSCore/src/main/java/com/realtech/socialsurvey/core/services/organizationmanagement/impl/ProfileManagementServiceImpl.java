@@ -39,6 +39,9 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -134,9 +137,6 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
 
 
 @DependsOn ( "generic")
@@ -3154,9 +3154,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     void updateCrumbListWithCompanyName( List<BreadCrumb> breadCrumbList, Company company ) throws InvalidInputException
     {
         BreadCrumb breadCrumb = new BreadCrumb();
+
+        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( company.getCompanyId() ); 
         breadCrumb.setBreadCrumbProfile( company.getCompany() );
-        breadCrumb.setBreadCrumbUrl(
-            organizationManagementService.getCompanySettings( company.getCompanyId() ).getCompleteProfileUrl() );
+        breadCrumb.setBreadCrumbUrl(companySettings.getCompleteProfileUrl());
+        breadCrumb.setHideFromBreadCrumb( companySettings.getHideFromBreadCrumb() );
         breadCrumbList.add( breadCrumb );
     }
 
@@ -3165,10 +3167,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         throws InvalidInputException, NoRecordsFetchedException
     {
         if ( branch.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+            OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettings( branch.getBranchId() ).getOrganizationUnitSettings(); 
             BreadCrumb breadCrumb = new BreadCrumb();
             breadCrumb.setBreadCrumbProfile( branch.getBranch() );
-            breadCrumb.setBreadCrumbUrl( organizationManagementService.getBranchSettings( branch.getBranchId() )
-                .getOrganizationUnitSettings().getCompleteProfileUrl() );
+            breadCrumb.setBreadCrumbUrl( branchSettings.getCompleteProfileUrl() );
+            breadCrumb.setHideFromBreadCrumb( branchSettings.getHideFromBreadCrumb() );
             breadCrumbList.add( breadCrumb );
         }
     }
@@ -3177,10 +3180,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     void updateCrumbListWithRegionName( List<BreadCrumb> breadCrumbList, Region region ) throws InvalidInputException
     {
         if ( region.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( region.getRegionId() ); 
             BreadCrumb breadCrumb = new BreadCrumb();
             breadCrumb.setBreadCrumbProfile( region.getRegion() );
-            breadCrumb.setBreadCrumbUrl(
-                organizationManagementService.getRegionSettings( region.getRegionId() ).getCompleteProfileUrl() );
+            breadCrumb.setBreadCrumbUrl( regionSettings.getCompleteProfileUrl() );
+            breadCrumb.setHideFromBreadCrumb( regionSettings.getHideFromBreadCrumb() );
             breadCrumbList.add( breadCrumb );
         }
     }
