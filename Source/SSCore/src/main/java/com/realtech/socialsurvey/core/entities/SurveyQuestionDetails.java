@@ -12,6 +12,7 @@ public class SurveyQuestionDetails {
 	private List<SurveyAnswerOptions> answers;
 	private String questionType;
 	private int isRatingQuestion;
+	private int isUserRankingQuestion;
 	private int questionOrder;
 	private String customerResponse;
 
@@ -55,7 +56,17 @@ public class SurveyQuestionDetails {
 		this.isRatingQuestion = isRatingQuestion;
 	}
 
-	public int getQuestionOrder() {
+	public int getIsUserRankingQuestion()
+    {
+        return isUserRankingQuestion;
+    }
+
+    public void setIsUserRankingQuestion( int isUserRankingQuestion )
+    {
+        this.isUserRankingQuestion = isUserRankingQuestion;
+    }
+
+    public int getQuestionOrder() {
 		return questionOrder;
 	}
 
