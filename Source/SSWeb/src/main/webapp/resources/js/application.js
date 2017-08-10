@@ -122,6 +122,8 @@ var zillowCallBreak = false;
 var existingCall;
 var classificationsList = [];
 
+var ratingQuestionCount= 0;
+
 /**
  * js functions for landing page
  */
@@ -1986,6 +1988,15 @@ function bindEditSurveyEvents() {
 	$('.srv-tbl-rem').on('click', function(e) {
 		e.stopPropagation();
 		var questionId = $(this).parent().parent().data('questionid');
+		
+		if( ratingQuestionCount <= 1 && $(this).parent().parent().data('rating-question') == true ){
+			$('#overlay-toast').html( "Cannot remove the question, there must be a minimum of 1 ranking type question." );
+			showToast();
+			return;
+		} else {
+			ratingQuestionCount--;
+		}
+		
 		var url = "./removequestionfromsurvey.do?questionId=" + questionId;
 
 		createPopupConfirm("Delete Question", "Do you want to delete the question ?", "Delete", "Cancel");
@@ -5688,6 +5699,11 @@ function initSurveyWithUrl(q) {
 				}else{
 					$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
 				}
+			} 
+			else {
+				$('.sq-ques-wrapper').addClass( 'sq-main-txt' );
+				$('.sq-ques-wrapper').empty();
+				$('.sq-ques-wrapper').html("Sorry, It looks like there are no questions associated with this survey.");
 			}
 		},
 		error : function(e) {
