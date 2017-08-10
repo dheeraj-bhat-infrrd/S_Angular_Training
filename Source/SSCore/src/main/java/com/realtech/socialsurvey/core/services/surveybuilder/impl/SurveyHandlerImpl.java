@@ -378,13 +378,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @throws Exception
      */
     @Override
-    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage )
+    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage , boolean isUserRankingQuestion )
     {
         LOG.debug( "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
         SurveyResponse surveyResponse = new SurveyResponse();
         surveyResponse.setAnswer( answer );
         surveyResponse.setQuestion( question );
         surveyResponse.setQuestionType( questionType );
+        surveyResponse.setIsUserRankingQuestion( isUserRankingQuestion );
         surveyDetailsDao.updateCustomerResponse( surveyId, surveyResponse, stage );
         LOG.debug(
             "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );

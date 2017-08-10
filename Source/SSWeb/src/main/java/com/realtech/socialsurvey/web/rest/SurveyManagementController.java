@@ -181,9 +181,15 @@ public class SurveyManagementController
 		String question = request.getParameter("question");
 		String questionType = request.getParameter("questionType");
 		int stage = Integer.parseInt(request.getParameter("stage"));
+		int isUserRankingQuestionInt = Integer.parseInt(request.getParameter("isUserRankingQuestion"));
 		String surveyId = request.getParameter("surveyId");
 
-		surveyHandler.updateCustomerAnswersInSurvey(surveyId, question, questionType, answer, stage);
+		//get boolean value for isUserRankingQues
+		boolean isUserRankingQuestion = false;
+		if(isUserRankingQuestionInt == CommonConstants.QUESTION_RATING_VALUE_TRUE){
+		    isUserRankingQuestion = true;
+		}
+		surveyHandler.updateCustomerAnswersInSurvey(surveyId, question, questionType, answer, stage, isUserRankingQuestion);
 		LOG.info("Method storeSurveyAnswer() finished to store response of customer.");
 		return surveyHandler.getSwearWords();
 	}
