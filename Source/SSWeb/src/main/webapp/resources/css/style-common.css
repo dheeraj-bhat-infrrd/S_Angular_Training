@@ -4430,6 +4430,17 @@ img.prof-image {
 	outline: none;
 }
 
+.app-stng-sel-item {
+	background-color: #fff;
+	height: 40px;
+	width: 300px;
+	margin-left: 30px;
+	border: 1px solid #dcdcdc;
+	border-radius: 3px;
+	padding-left: 5px;
+	outline: none;
+}
+
 .review-sort-sel-item{
     border: 1px solid #e3e3e3;
     border-radius: 3px;

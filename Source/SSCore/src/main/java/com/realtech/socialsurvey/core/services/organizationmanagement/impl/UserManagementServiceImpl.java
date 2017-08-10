@@ -3712,6 +3712,38 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+ // Method to return active agent with provided email and company
+    @Transactional
+    @Override
+    public User getActiveAgentByEmailAndCompany( long companyId, String emailId )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "Method getActiveAgentByEmailAndCompany() called from UserManagementService" );
+
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id is null or empty in getUserByEmailAndCompany()" );
+        }
+
+        Company company = companyDao.findById( Company.class, companyId );
+        if ( company == null ) {
+            throw new NoRecordsFetchedException( "No company found with the id " + companyId );
+        }
+
+        User user = getUserByEmailAddress( emailId );
+        if ( user.getCompany().getCompanyId() != companyId ) {
+            throw new InvalidInputException( "The user is not part of the specified company" );
+        }
+        
+        List<UserProfile> userProfiles = user.getUserProfiles();
+        for(UserProfile profile : userProfiles){
+            if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID)
+                return user;
+        }
+        //if no agent profile found throw an exception
+        throw new NoRecordsFetchedException( "No agent found" );
+
+    }
+    
     /**
      *  Method to get a map of userId - review count given a list of userIds
      * @param userIds
@@ -4238,6 +4270,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+    @SuppressWarnings ( "unchecked")
     private void sendCorruptDataFromCrmNotificationMail( Map<String, Object> corruptRecords )
     {
         List<SurveyPreInitiation> unavailableAgents = (List<SurveyPreInitiation>) corruptRecords.get( "unavailableAgents" );
