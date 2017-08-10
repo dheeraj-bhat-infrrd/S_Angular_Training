@@ -189,4 +189,5 @@ public interface JspResolver
     public static final String REPORTS = "reporting_reports";
     public static final String RANKING_SETTINGS = "ranking_settings";
     public static final String LEADERBOARD_LIST= "leaderboard_list";
+    public static final String LEADERBOARD_PROFILE_IMAGE = "leaderboard_profile_image";
 }

@@ -1092,6 +1092,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
 			for(UserRankingThisYearMain userRankingThisYearMain : userRankingThisYearMainDao.fetchUserRankingForThisYearMain(entityId, year,startIndex,batchSize)){
 				List<Object> userRankingThisYearMainList = new ArrayList<>();
+				userRankingThisYearMainList.add(userRankingThisYearMain.getUserId());
 				userRankingThisYearMainList.add(userRankingThisYearMain.getRank());
 				userRankingThisYearMainList.add(userRankingThisYearMain.getFirstName());
 				userRankingThisYearMainList.add(userRankingThisYearMain.getLastName());
@@ -1106,6 +1107,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
 			for(UserRankingThisYearRegion userRankingThisYearRegion : userRankingThisYearRegionDao.fetchUserRankingForThisYearRegion(entityId, year,startIndex,batchSize)){
 				List<Object> userRankingThisYearRegionList = new ArrayList<>();
+				userRankingThisYearRegionList.add(userRankingThisYearRegion.getUserId());
 				userRankingThisYearRegionList.add(userRankingThisYearRegion.getRank());
 				userRankingThisYearRegionList.add(userRankingThisYearRegion.getFirstName());
 				userRankingThisYearRegionList.add(userRankingThisYearRegion.getLastName());
@@ -1120,6 +1122,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
 			for(UserRankingThisYearBranch userRankingThisYearBranch : userRankingThisYearBranchDao.fetchUserRankingForThisYearBranch(entityId, year,startIndex,batchSize)){
 				List<Object> userRankingThisYearBranchList = new ArrayList<>();
+				userRankingThisYearBranchList.add(userRankingThisYearBranch.getUserId());
 				userRankingThisYearBranchList.add(userRankingThisYearBranch.getRank());
 				userRankingThisYearBranchList.add(userRankingThisYearBranch.getFirstName());
 				userRankingThisYearBranchList.add(userRankingThisYearBranch.getLastName());
@@ -1143,6 +1146,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
 				for(UserRankingThisMonthMain userRankingThisMonthMain : userRankingThisMonthMainDao.fetchUserRankingForThisMonthMain(entityId,month,year,startIndex,batchSize)){
 					List<Object> userRankingThisMonthMainList = new ArrayList<>();
+					userRankingThisMonthMainList.add(userRankingThisMonthMain.getUserId());
 					userRankingThisMonthMainList.add(userRankingThisMonthMain.getRank());
 					userRankingThisMonthMainList.add(userRankingThisMonthMain.getFirstName());
 					userRankingThisMonthMainList.add(userRankingThisMonthMain.getLastName());
@@ -1157,6 +1161,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
 				for(UserRankingThisMonthRegion userRankingThisMonthRegion : userRankingThisMonthRegionDao.fetchUserRankingForThisMonthRegion(entityId,month,year,startIndex,batchSize)){
 					List<Object> userRankingThisMonthRegionList = new ArrayList<>();
+					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getUserId());
 					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getRank());
 					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getFirstName());
 					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getLastName());
@@ -1171,6 +1176,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
 				for(UserRankingThisMonthBranch userRankingThisMonthBranch : userRankingThisMonthBranchDao.fetchUserRankingForThisMonthBranch(entityId,month,year,startIndex,batchSize)){
 					List<Object> userRankingThisMonthBranchList = new ArrayList<>();
+					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getUserId());
 					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getRank());
 					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getFirstName());
 					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getLastName());
@@ -1191,9 +1197,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     	
     	List<List<Object>> userRanking = new ArrayList<>();
     	
-    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
+    	if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
     		for(UserRankingPastMonthRegion userRankingPastMonthRegion : userRankingPastMonthRegionDao.fetchUserRankingForPastMonthRegion(entityId,month,year,startIndex,batchSize)){
     			List<Object> userRankingPastMonthRegionList = new ArrayList<>();
+    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getUserId());
     			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getRank());
     			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getFirstName());
     			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getLastName());
@@ -1205,9 +1212,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.isEligible());
     			userRanking.add(userRankingPastMonthRegionList);
     		}
-    	}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
+    	}else if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
     		for(UserRankingPastMonthMain userRankingPastMonthMain : userRankingPastMonthMainDao.fetchUserRankingForPastMonthMain(entityId,month,year,startIndex,batchSize)){
     			List<Object> userRankingPastMonthMainList = new ArrayList<>();
+    			userRankingPastMonthMainList.add(userRankingPastMonthMain.getUserId());
     			userRankingPastMonthMainList.add(userRankingPastMonthMain.getRank());
     			userRankingPastMonthMainList.add(userRankingPastMonthMain.getFirstName());
     			userRankingPastMonthMainList.add(userRankingPastMonthMain.getLastName());
@@ -1222,6 +1230,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     	}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
     		for(UserRankingPastMonthBranch userRankingPastMonthBranch : userRankingPastMonthBranchDao.fetchUserRankingForPastMonthBranch(entityId,month,year,startIndex,batchSize)){
     			List<Object> userRankingPastMonthBranchList = new ArrayList<>();
+    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getUserId());
     			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getRank());
     			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getFirstName());
     			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getLastName());
@@ -1241,9 +1250,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	public List<List<Object>> getUserRankingPastYear(String entityType, Long entityId, int year,int startIndex,int batchSize) {
 		List<List<Object>> userRanking = new ArrayList<>();
     	
-    	if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
+    	if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
     		for(UserRankingPastYearRegion userRankingPastYearRegion : userRankingPastYearRegionDao.fetchUserRankingForPastYearRegion(entityId, year,startIndex,batchSize)){
     			List<Object> userRankingPastYearRegionList = new ArrayList<>();
+    			userRankingPastYearRegionList.add(userRankingPastYearRegion.getUserId());
     			userRankingPastYearRegionList.add(userRankingPastYearRegion.getRank());
     			userRankingPastYearRegionList.add(userRankingPastYearRegion.getFirstName());
     			userRankingPastYearRegionList.add(userRankingPastYearRegion.getLastName());
@@ -1255,9 +1265,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     			userRankingPastYearRegionList.add(userRankingPastYearRegion.isEligible());
     			userRanking.add(userRankingPastYearRegionList);
     		}
-    	}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
+    	}else if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
     		for(UserRankingPastYearMain userRankingPastYearMain : userRankingPastYearMainDao.fetchUserRankingForPastYearMain(entityId, year,startIndex,batchSize)){
     			List<Object> userRankingPastYearMainList = new ArrayList<>();
+    			userRankingPastYearMainList.add(userRankingPastYearMain.getUserId());
     			userRankingPastYearMainList.add(userRankingPastYearMain.getRank());
     			userRankingPastYearMainList.add(userRankingPastYearMain.getFirstName());
     			userRankingPastYearMainList.add(userRankingPastYearMain.getLastName());
@@ -1272,6 +1283,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     	}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
     		for(UserRankingPastYearBranch userRankingPastYearBranch : userRankingPastYearBranchDao.fetchUserRankingForPastYearBranch(entityId, year,startIndex,batchSize)){
     			List<Object> userRankingPastYearBranchList = new ArrayList<>();
+    			userRankingPastYearBranchList.add(userRankingPastYearBranch.getUserId());
     			userRankingPastYearBranchList.add(userRankingPastYearBranch.getRank());
     			userRankingPastYearBranchList.add(userRankingPastYearBranch.getFirstName());
     			userRankingPastYearBranchList.add(userRankingPastYearBranch.getLastName());

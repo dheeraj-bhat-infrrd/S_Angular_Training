@@ -1049,6 +1049,34 @@ public class ReportingWebController
        return response;
    }
    
+   @ResponseBody
+   @RequestMapping ( value = "/getuserprofimageforleaderboard", method = RequestMethod.GET)
+   public String getUserProfileImageForLeaderboard(Model model, HttpServletRequest request) throws NonFatalException
+   {
+	   String json=null;
+	   
+	   Map<String,String> profileImageMap = null;
+	   String userIdStr = request.getParameter("userId");
+	   String profileImageUrl = "";
+	   long userId=01;
+	   if(userIdStr!=null && !userIdStr.isEmpty()){
+		   userId = Long.parseLong(userIdStr);
+		   try {
+				// get details from mongo
+				AgentSettings agentSettings = userManagementService.getUserSettings(userId);
+				if (agentSettings != null) {
+					profileImageUrl = (agentSettings.getProfileImageUrlThumbnail() != null ? agentSettings.getProfileImageUrlThumbnail()
+							: agentSettings.getProfileImageUrl());
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Error occurred while fetching details of agent. Error is : " + e);
+				return json;
+			}
+	   }
+	   json= new Gson().toJson(profileImageUrl);
+	   return json;
+   }
     /**
     *
     * @param model
