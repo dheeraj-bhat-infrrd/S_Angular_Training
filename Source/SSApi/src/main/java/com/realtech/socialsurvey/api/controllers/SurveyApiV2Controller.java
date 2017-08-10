@@ -100,6 +100,14 @@ public class SurveyApiV2Controller
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request, companyId );
         }
 
+        
+        try {
+        	surveyPreInitiations = surveyHandler.validatePreinitiatedRecord( surveyPreInitiations );
+		} catch (InvalidInputException e) {
+            return restUtils.getRestResponseEntity( HttpStatus.NOT_ACCEPTABLE, e.getMessage(), null, null, request, companyId );
+            }
+
+        
         //save the object to database
         Map<String, Long> surveyIds = new HashMap<String, Long>();
         try {

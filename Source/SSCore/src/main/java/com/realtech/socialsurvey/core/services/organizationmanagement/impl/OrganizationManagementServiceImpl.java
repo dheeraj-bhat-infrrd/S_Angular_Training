@@ -76,6 +76,7 @@ import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.Event;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
@@ -202,6 +203,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private GenericDao<ZipCodeLookup, Integer> zipCodeLookupDao;
 
+    @Autowired
+    private GenericDao<EncompassSdkVersion, Long> encompassSdkVersionDao;
+    
     @Autowired
     private DisabledAccountDao disabledAccountDao;
 
@@ -8181,5 +8185,34 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         LOG.info( "Method updateCompanyIdInMySQLForUser finished" );
+    }
+    
+    
+    @Override
+    public List<EncompassSdkVersion> getActiveEncompassSdkVersions()
+    {
+        LOG.info( "Method getActiveEncompassSdkVersions started" );
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<EncompassSdkVersion> encompassSdkVersions =  encompassSdkVersionDao.findByKeyValue( EncompassSdkVersion.class, queries );
+        LOG.info( "Method getActiveEncompassSdkVersions finisshed" );
+        return encompassSdkVersions;
+
+    }
+    
+    @Override
+    public String getEncompassHostByVersion(String sdkVersion) throws InvalidInputException
+    {
+        LOG.info( "Method getActiveEncompassSdkVersions started" );
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        queries.put( CommonConstants.ENCOMPASS_SDK_VERSION_COLUMN, sdkVersion );
+        List<EncompassSdkVersion> encompassSdkVersions =  encompassSdkVersionDao.findByKeyValue( EncompassSdkVersion.class, queries );
+        if(encompassSdkVersions == null || encompassSdkVersions.size() == 0){
+            throw new InvalidInputException("Unsupported Encompass Version");
+        }
+        LOG.info( "Method getActiveEncompassSdkVersions finisshed" );
+        return encompassSdkVersions.get(CommonConstants.INITIAL_INDEX).getHostName();
+
     }
 }

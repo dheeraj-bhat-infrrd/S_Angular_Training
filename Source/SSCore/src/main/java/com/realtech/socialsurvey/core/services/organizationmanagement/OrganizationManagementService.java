@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
+import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
@@ -1482,5 +1483,11 @@ public interface OrganizationManagementService
 
 
     public void updateCompanyIdInMySQLForUser( User userToBeRelocated, Company targetCompany ) throws InvalidInputException;
+
+
+    public List<EncompassSdkVersion> getActiveEncompassSdkVersions();
+
+
+    String getEncompassHostByVersion( String sdkVersion ) throws InvalidInputException;
 
 }

@@ -60,7 +60,9 @@ public class OrganizationUnitSettings
     private boolean sendEmailFromCompany;
     private String reviewSortCriteria;
     private String sendEmailThrough;
-    
+    public boolean hideFromBreadCrumb;
+
+
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
     
@@ -630,6 +632,17 @@ public class OrganizationUnitSettings
 	public void setContactUsEmailsRoutedToCompanyAdmin( boolean contactUsEmailsRoutedToCompanyAdmin ) {
 		this.contactUsEmailsRoutedToCompanyAdmin = contactUsEmailsRoutedToCompanyAdmin;
 	}
+    
+    public boolean getHideFromBreadCrumb()
+    {
+        return hideFromBreadCrumb;
+    }
+
+
+    public void setHideFromBreadCrumb( boolean hideFromBreadCrumb )
+    {
+        this.hideFromBreadCrumb = hideFromBreadCrumb;
+    }
 
 
 	@Override
