@@ -6,6 +6,22 @@
 <c:set value="${cannonicalusersettings.companySettings.iden}" var="companyId"></c:set>
 <c:set value="${userId}" var="userId"></c:set>
 
+<c:choose>
+	<c:when test="${columnName == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+</c:choose>
+
+
 <style>
 .block-display{
  display:block !important;
@@ -104,10 +120,22 @@ img.lead-img {
     width: 10%;
 }
 
+.top-ten-ranks{
+	width: 100px;
+    margin: 0;
+    margin-left: 75%;
+}
+
 .lead-ranks-above{
 	width: 100px;
     margin: 0;
     margin-left: 89%;
+}
+
+.top-ten-ranks-btn{
+	font-size: 14px;
+    font-weight: bold !important;
+    margin-bottom: -25px;
 }
 
 .lead-ranks-above-btn{
@@ -143,21 +171,24 @@ img.lead-img {
 	<span class="board-div-span">Board</span>
 	<div class="dash-btn-dl-sd-admin board-selector" >
 		<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
-			<option value=1 data-report="company">Company</option>
-			<option value=2 data-report="region">Region</option>
-			<option value=3 data-report="branch">Branch</option>
+			<option value=1 data-report="company">My Company</option>
+			<option value=2 data-report="region">My Region</option>
+			<option value=3 data-report="branch">My Branch</option>
 		</select>	
 	</div>
 </div>
-	
+
+<div id="top-ten-ranks" class="top-ten-ranks">
+	<div id="top-ten-ranks-btn" class="float-right paginate-button top-ten-ranks-btn">Top Ten Ranks</div>
+</div>
 <div id="lead-ranks-above" class="lead-ranks-above">
-	<div id="lead-ranks-above-btn" class="float-right paginate-button lead-ranks-above-btn">Ranks above</div>
+	<div id="lead-ranks-above-btn" class="float-right paginate-button lead-ranks-above-btn">Load More</div>
 </div>
 <div class="v-um-tbl-wrapper" id="leaderboard-list" style="width:100%;">
 	<jsp:include page="leaderboard_list.jsp"></jsp:include>
 </div>
 <div id="lead-ranks-below" class="lead-ranks-below">
-	<div id="lead-ranks-below-btn" class="float-right paginate-button lead-ranks-below-btn">Ranks below</div>
+	<div id="lead-ranks-below-btn" class="float-right paginate-button lead-ranks-below-btn">Load More</div>
 </div>
 
 <div id="leaderboard-empty-list-msg-div" class="hide">
@@ -173,10 +204,11 @@ $(document).ready(function(){
 	
 	var currentDate = new Date();
 	var currentYear = currentDate.getFullYear();
-	var currentMonth = currentDate.getMonth();
+	var currentMonth = currentDate.getMonth()+1;
 	
 	var companyId = "${companyId}";
 	var userId = "${userId}";
+	var profileMasterId = "${profilemasterid}";
 	
 	var timeFrameStr = $('#time-selector').val();
 	var timeFrame = parseInt(timeFrameStr);
@@ -198,10 +230,20 @@ $(document).ready(function(){
 		break;
 	}
 	
-	var userRankingCount = getUserRankingCount("companyId", companyId, year, month, batchSize, timeFrame);
-	if(userRankingCount != null){
-		startIndex= userRankingCount.startIndex;
-		count=userRankingCount.Count;
+	var userRankingCount =null;
+	
+	if(profileMasterId != 4){
+		userRankingCount = getUserRankingCountForAdmins("companyId", companyId, year, month, batchSize, timeFrame)
+		if(userRankingCount != null){
+			startIndex= 0;
+			count=userRankingCount.Count;
+		}
+	}else{
+		userRankingCount = getUserRankingCount("companyId", companyId, year, month, batchSize, timeFrame);
+		if(userRankingCount != null){
+			startIndex= userRankingCount.startIndex;
+			count=userRankingCount.Count;
+		}
 	}
 	
 showHideRankPaginateBtns(startIndex, count);
@@ -295,6 +337,7 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 $(document).on('change', '#time-selector', function() {
 	timeFrameStr = $('#time-selector').val();
 	timeFrame = parseInt(timeFrameStr);
+	startIndex = 0;
 	
 	switch(timeFrame){
 	case 1: year = currentYear;
@@ -309,10 +352,19 @@ $(document).on('change', '#time-selector', function() {
 		break;
 	case 5: year = currentYear - 1
 	}
-	userRankingCount = getUserRankingCount("companyId", companyId, year, month, batchSize, timeFrame);
-	if(userRankingCount != null){
-		startIndex= userRankingCount.startIndex;
-		count=userRankingCount.Count;
+	
+	if(profileMasterId != 4){
+		userRankingCount = getUserRankingCountForAdmins("companyId", companyId, year, month, batchSize, timeFrame)
+		if(userRankingCount != null){
+			startIndex= 0;
+			count=userRankingCount.Count;
+		}
+	}else{
+		userRankingCount = getUserRankingCount("companyId", companyId, year, month, batchSize, timeFrame);
+		if(userRankingCount != null){
+			startIndex= userRankingCount.startIndex;
+			count=userRankingCount.Count;
+		}
 	}
 	
 	var userRankingList = getUserRankingList("companyId",companyId, year, month, startIndex, batchSize, timeFrame);
@@ -335,5 +387,46 @@ $(document).on('change', '#time-selector', function() {
 	 
 	hideOverlay();
 });
+
+$(document).on('click','#top-ten-ranks-btn',function(){
+	showOverlay();
+	startIndex=0;
+	
+	timeFrameStr = $('#time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	
+	switch(timeFrame){
+	case 1: year = currentYear;
+		break;
+	case 2: year = currentYear;
+		month = currentMonth;
+		break;
+	case 3: year = currentYear - 1;
+		break;
+	case 4: year = currentYear;
+		month=currentMonth -1;
+		break;
+	}
+	
+	var userRankingList = getUserRankingList("companyId",companyId, year, month, startIndex, batchSize, timeFrame);
+	
+	if(userRankingList != null && userRankingList.length != 0){
+		tableData=drawLeaderboardTableStructure(userRankingList, userId)
+		$('#leaderboard-list').removeClass('hide');
+		$('#leaderboard-tbl').html(tableData);
+		$('#leaderboard-empty-list-msg-div').addClass('hide');
+	}else{
+		$('#leaderboard-list').addClass('hide');
+		$('#leaderboard-empty-list-msg-div').removeClass('hide');
+	}
+	
+	showHideRankPaginateBtns(startIndex, count);
+	$('html, body').animate({
+        scrollTop: $('#leaderboard-tbl').offset().top - 20
+    }, 'slow');
+	hideOverlay();
+	
+});
+
 });
 </script>
