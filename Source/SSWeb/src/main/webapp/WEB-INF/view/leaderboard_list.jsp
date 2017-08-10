@@ -6,6 +6,21 @@
 <c:set value="${cannonicalusersettings.companySettings.iden}" var="companyId"></c:set>
 <c:set value="${userId}" var="userId"></c:set>
 
+<c:choose>
+	<c:when test="${columnName == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+</c:choose>
+
 <style>
 .leaderboard-table{
 	margin-bottom: -10px;
@@ -28,17 +43,29 @@
 	
 	var currentDate = new Date();
 	var currentYear = currentDate.getFullYear();
-	var currentMonth = currentDate.getMonth();
+	var currentMonth = currentDate.getMonth()+1;
 	
 	$(document).ready(function(){
 		var companyId = "${companyId}";
 		var userId = "${userId}";
+		var profileMasterId = "${profilemasterid}";
+		var userRankingCount =null;
 		
-		var userRankingCount = getUserRankingCount("companyId", companyId, currentYear, currentMonth, batchSize, 1);
-		if(userRankingCount != null){
-			startIndex= userRankingCount.startIndex;
-			count=userRankingCount.Count;
+		if(profileMasterId != 4){
+			userRankingCount = getUserRankingCountForAdmins("companyId", companyId, currentYear, currentMonth, batchSize, 1)
+			if(userRankingCount != null){
+				startIndex= 0;
+				count=userRankingCount.Count;
+			}
+		}else{
+			userRankingCount = getUserRankingCount("companyId", companyId, currentYear, currentMonth, batchSize, 1);
+			if(userRankingCount != null){
+				startIndex= userRankingCount.startIndex;
+				count=userRankingCount.Count;
+			}
 		}
+		
+		$('#rank-count').html('/'+count);
 		
 		var userRankingList = getUserRankingList("companyId",companyId, currentYear, currentMonth, startIndex, batchSize, 1);
 		

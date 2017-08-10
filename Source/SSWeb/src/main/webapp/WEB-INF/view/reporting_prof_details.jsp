@@ -34,7 +34,7 @@
 		<div class="rep-rank-rect" style="display:inline-grid;">
 			<div id="rep-rank" style="display:inline-flex; margin-top: 5px;">
 				<span>Rank#</span>
-				<span style="font-size: 23px;font-weight: bold !important;margin-left: 8px;line-height: 15px;">7</span><span>/20</span>
+				<span id="rank-span" style="font-size: 23px;font-weight: bold !important;margin-left: 8px;line-height: 15px;">NA</span><span id="rank-count"></span>
 			</div>
 			<div id="rep-user-score" style="display:inline-flex;">
 				<span>Userscore</span>
