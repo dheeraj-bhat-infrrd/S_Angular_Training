@@ -5,7 +5,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Survey;
@@ -23,6 +27,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetail;
 import com.realtech.socialsurvey.core.entities.SurveyQuestion;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption;
+import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyTemplate;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -114,6 +119,14 @@ public class SurveyBuilderController {
 		String statusJson = "";
 
 		try {
+		    
+		    Boolean isUserRankingQuestion = false;
+	        String isUserRankingStr = request.getParameter( "user-ranking-ques" );
+	        if(! StringUtils.isEmpty( isUserRankingStr )){
+	            isUserRankingQuestion = Boolean.parseBoolean( isUserRankingStr );
+
+	        }
+		    
 			// Check if survey is default one and clone it
 			surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
 			
@@ -125,6 +138,7 @@ public class SurveyBuilderController {
 			
 			// Order of question 
 			String order = request.getParameter("order");
+			
 
 			// Creating new SurveyQuestionDetails from form
 			String questionType = request.getParameter("sb-question-type-" + order);
@@ -137,11 +151,19 @@ public class SurveyBuilderController {
 
 			if (questionType.indexOf(CommonConstants.QUESTION_RATING) != -1) {
 				questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
+				//will be user ranking ques only if it is a rating ques
+				if(isUserRankingQuestion){
+	                 questionDetails.setIsUserRankingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
+
+	            }else{
+	                  questionDetails.setIsUserRankingQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
+	            }
 			}
 			else {
 				questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
 			}
 
+			
 			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				List<SurveyAnswerOptions> answers = new ArrayList<SurveyAnswerOptions>();
 				List<String> strAnswers = Arrays.asList(request.getParameterValues("sb-answers-" + order + "[]"));
@@ -209,6 +231,14 @@ public class SurveyBuilderController {
 		String statusJson = "";
 
 		try {
+		    
+		    Boolean isUserRankingQuestion = false;
+            String isUserRankingStr = request.getParameter( "user-ranking-ques" );
+            if(! StringUtils.isEmpty( isUserRankingStr )){
+                isUserRankingQuestion = Boolean.parseBoolean( isUserRankingStr );
+
+            }
+		    
 			// Check if survey is default one and clone it
 			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
 
@@ -232,11 +262,20 @@ public class SurveyBuilderController {
 
 			if (questionType.indexOf(CommonConstants.QUESTION_RATING) != -1) {
 				questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
+				//will be ranking ques only if it is a rating ques
+				if(isUserRankingQuestion){
+	                questionDetails.setIsUserRankingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
+
+	            }else{
+	                 questionDetails.setIsUserRankingQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
+	            }
 			}
 			else {
 				questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
 			}
-
+			
+			
+			
 			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				List<SurveyAnswerOptions> answers = new ArrayList<SurveyAnswerOptions>();
 				List<String> strAnswerTexts = Arrays.asList(request.getParameterValues("sb-answers-" + order + "[]"));
@@ -477,12 +516,15 @@ public class SurveyBuilderController {
 		SurveyQuestionDetails surveyQuestion = new SurveyQuestionDetails();
 		try {
 			long questionMappingId = Long.parseLong(request.getParameter("questionId"));
-			SurveyQuestion question = surveyBuilder.getSurveyQuestionFromMapping(questionMappingId);
-
+			SurveyQuestionsMapping questionsMapping = surveyBuilder.getSurveyQuestionFromMapping(questionMappingId);
+			SurveyQuestion question = questionsMapping.getSurveyQuestion();
+			
 			surveyQuestion.setQuestionId(questionMappingId);
 			surveyQuestion.setQuestion(question.getSurveyQuestion());
 			surveyQuestion.setQuestionType(question.getSurveyQuestionsCode());
-
+			surveyQuestion.setIsUserRankingQuestion( questionsMapping.getIsUserRankingQuestion() );
+            surveyQuestion.setIsRatingQuestion( questionsMapping.getIsRatingQuestion() );
+			
 			// For each answer
 			SurveyAnswerOptions surveyAnswerOptions = null;
 			List<SurveyAnswerOptions> answerOptionsToQuestion = new ArrayList<SurveyAnswerOptions>();
