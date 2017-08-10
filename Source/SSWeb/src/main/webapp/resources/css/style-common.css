@@ -2300,6 +2300,26 @@ button.paypal.is-active {
 	z-index: 2;
 }
 
+.sort-option-wrapper {
+	position: absolute;
+	width: 255px;
+	background-color: #fff;
+	padding: 0;
+	border-radius: 0 0 3px 3px;
+	border: 1px solid #dcdcdc;
+	z-index: 2;
+}
+
+.email-option-wrapper {
+	position: absolute;
+	width: 150px;
+	background-color: #fff;
+	padding: 0;
+	border-radius: 0 0 3px 3px;
+	border: 1px solid #dcdcdc;
+	z-index: 2;
+}
+
 .st-dd-item {
 	border-bottom: 1px solid #dcdcdc;
 	line-height: 28px;
@@ -2307,7 +2327,29 @@ button.paypal.is-active {
 	padding: 0 10px;
 }
 
+.sort-option-item {
+	border-bottom: 1px solid #dcdcdc;
+	line-height: 28px;
+	cursor: pointer;
+	padding: 0 10px;
+}
+
+.email-option-item {
+	border-bottom: 1px solid #dcdcdc;
+	line-height: 28px;
+	cursor: pointer;
+	padding: 0 10px;
+}
+
 .st-dd-item:last-child {
+	border-bottom: 0;
+}
+
+.sort-option-item:last-child {
+	border-bottom: 0;
+}
+
+.email-option-item:last-child {
 	border-bottom: 0;
 }
 
@@ -4419,7 +4461,7 @@ img.prof-image {
 	margin-bottom: 20px;
 }
 
-.dash-sel-item,.admin-sel-item,.review-sort-sel-item {
+.dash-sel-item,.admin-sel-item {
 	background-color: #fff;
 	height: 36px;
 	width: 215px;
@@ -4442,27 +4484,42 @@ img.prof-image {
 }
 
 .review-sort-sel-item{
+	background-color: #fff;
     border: 1px solid #e3e3e3;
     border-radius: 3px;
     box-shadow: 0px 2px 2px 0px #e3e3e3;
     width: 255px;
     height: 50px;
     margin-left: 0px;
+    border-radius: 3px;
+	padding-left: 7px;
+	outline: none;
+}
+
+.email-sel-wrapper {
+	float: left;
+    margin-left: 20px;
+}
+
+.email-item-wrapper {
+	background-color: #fff;
+    height: 50px;
+    width: 150px;
+    padding-left: 5px;
+    outline: none;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+}
+
+.sort-sel-wrapper {
+    width: 255px;
+    height: 50px;
 }
 
 .email-sel-item{
-	background-color: #fff;
 	height: 50px;
 	width: 150px;
-	margin-left: 20px;
-	border: 1px solid #dcdcdc;
-	border-radius: 3px;
-	padding-left: 5px;
-	outline: none;
-	border: 1px solid #e3e3e3;
-    border-radius: 3px;
-    box-shadow: 0px 2px 2px 0px #e3e3e3;
-	
 }
 
 .dash-sel-item-sm {
