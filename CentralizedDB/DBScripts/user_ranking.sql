@@ -326,3 +326,79 @@ CREATE TABLE `user_ranking_past_year_region` (
   CONSTRAINT `UR65_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `UR65_REGION_ID` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `user_ranking_past_years_main` (
+  `user_ranking_past_years_main_id` varchar(36) NOT NULL,
+  `user_id` int(11) unsigned DEFAULT NULL,
+  `company_id` int(11) unsigned DEFAULT NULL,
+  `first_name` varchar(45) DEFAULT NULL,
+  `last_name` varchar(45) DEFAULT NULL,
+  `ranking_score` decimal(10,2) DEFAULT NULL,
+  `rank` int(11) DEFAULT NULL,
+  `sps` decimal(10,2) DEFAULT NULL,
+  `days_of_registration` int(11) DEFAULT NULL,
+  `completed` int(11) DEFAULT NULL,
+  `sent` int(11) DEFAULT NULL,
+  `completed_percentage` decimal(10,2) DEFAULT NULL,
+  `total_reviews` int(11) DEFAULT NULL,
+  `is_eligible` tinyint(4) DEFAULT NULL,
+  `average_rating` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`user_ranking_past_years_main_id`),
+  KEY `UR67_COMPANY_ID_idx` (`company_id`),
+  KEY `UR67_USER_ID_idx` (`user_id`),
+  CONSTRAINT `UR67_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `UR67_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `user_ranking_past_years_branch` (
+  `user_ranking_past_years_branch_id` varchar(36) NOT NULL,
+  `user_id` int(11) unsigned DEFAULT NULL,
+  `company_id` int(11) unsigned DEFAULT NULL,
+  `branch_id` int(11) unsigned DEFAULT NULL,
+  `first_name` varchar(45) DEFAULT NULL,
+  `last_name` varchar(45) DEFAULT NULL,
+  `ranking_score` decimal(10,2) DEFAULT NULL,
+  `rank` int(11) DEFAULT NULL,
+  `sps` decimal(10,2) DEFAULT NULL,
+  `days_of_registration` int(11) DEFAULT NULL,
+  `completed` int(11) DEFAULT NULL,
+  `sent` int(11) DEFAULT NULL,
+  `completed_percentage` decimal(10,2) DEFAULT NULL,
+  `total_reviews` int(11) DEFAULT NULL,
+  `is_eligible` tinyint(4) DEFAULT NULL,
+  `average_rating` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`user_ranking_past_years_branch_id`),
+  KEY `UR68_COMPANY_ID_idx` (`company_id`),
+  KEY `UR68_USER_ID_idx` (`user_id`),
+  KEY `UR68_BRANCH_ID_idx` (`branch_id`),
+  CONSTRAINT `UR68_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `UR68_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+   CONSTRAINT `UR68_BRANCH_ID` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `user_ranking_past_years_region` (
+  `user_ranking_past_years_region_id` varchar(36) NOT NULL,
+  `user_id` int(11) unsigned DEFAULT NULL,
+  `company_id` int(11) unsigned DEFAULT NULL,
+  `region_id` int(11) unsigned DEFAULT NULL,
+  `first_name` varchar(45) DEFAULT NULL,
+  `last_name` varchar(45) DEFAULT NULL,
+  `ranking_score` decimal(10,2) DEFAULT NULL,
+  `rank` int(11) DEFAULT NULL,
+  `sps` decimal(10,2) DEFAULT NULL,
+  `days_of_registration` int(11) DEFAULT NULL,
+  `completed` int(11) DEFAULT NULL,
+  `sent` int(11) DEFAULT NULL,
+  `completed_percentage` decimal(10,2) DEFAULT NULL,
+  `total_reviews` int(11) DEFAULT NULL,
+  `is_eligible` tinyint(4) DEFAULT NULL,
+  `average_rating` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`user_ranking_past_years_region_id`),
+  KEY `UR69_COMPANY_ID_idx` (`company_id`),
+  KEY `UR69_USER_ID_idx` (`user_id`),
+  KEY `UR69_REGION_ID_idx` (`region_id`),
+  CONSTRAINT `UR69_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `UR69_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `UR69_REGION_ID` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

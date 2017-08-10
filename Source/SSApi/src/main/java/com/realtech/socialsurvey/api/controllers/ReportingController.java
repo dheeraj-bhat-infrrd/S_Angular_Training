@@ -387,6 +387,22 @@ public class ReportingController
         return json;
     }
 
+    @RequestMapping( value = "/getuserrankingforpastyears")
+    @ApiOperation( value = "Fetch User Ranking for past years")
+    public String getUserRankingForPastYears(Long entityId, String entityType,int startIndex,int batchSize) throws NonFatalException
+    {
+        LOGGER.info( "Fetching User Ranking for past years");
+        
+        String json = null;
+        
+        List<List<Object>> userRankingList =  new ArrayList<>();
+        
+        userRankingList = reportingDashboardManagement.getUserRankingPastYears(entityType,entityId,startIndex,batchSize);
+        
+        json = new Gson().toJson(userRankingList);
+        
+        return json;
+    }
  
     @RequestMapping( value = "/getuserrankingrankcountthisyear" , method = RequestMethod.GET)
     @ApiOperation( value = "Fetch User Ranking Rank Count for this year")
@@ -442,6 +458,21 @@ public class ReportingController
         String json = null;
         Map<String, Object> RankingCountStartIndex = new HashMap<String,Object>();
         RankingCountStartIndex = reportingDashboardManagement.fetchRankingRankCountPastMonth(userId, entityId, entityType, year, month, batchSize );
+        json = new Gson().toJson(RankingCountStartIndex);
+        
+        return json;
+        
+    }
+    
+    @RequestMapping( value = "/getuserrankingrankcountpastyears" , method = RequestMethod.GET)
+    @ApiOperation( value = "Fetch User Ranking Rank Count for past years")
+    public String getUserRankingRankCountForPastYears(Long userId , Long entityId, String entityType, int batchSize) throws NonFatalException
+    {
+        LOGGER.info( "Fetching User Ranking Count For past year");
+        
+        String json = null;
+        Map<String, Object> RankingCountStartIndex = new HashMap<String,Object>();
+        RankingCountStartIndex = reportingDashboardManagement.fetchRankingRankCountPastYears(userId, entityId, entityType, batchSize );
         json = new Gson().toJson(RankingCountStartIndex);
         
         return json;
@@ -508,5 +539,19 @@ public class ReportingController
         
     }
     
+    @RequestMapping( value = "/getuserrankingcountpastyears" , method = RequestMethod.GET)
+    @ApiOperation( value = "Fetch User Ranking Count for past years")
+    public String getUserRankingCountForPastYears(Long entityId, String entityType, int batchSize) throws NonFatalException
+    {
+        LOGGER.info( "Fetching User Ranking Count For past years");
+        
+        String json = null;
+        Map<String, Object> RankingCountStartIndex = new HashMap<String,Object>();
+        RankingCountStartIndex = reportingDashboardManagement.fetchRankingCountPastYears( entityId, entityType, batchSize );
+        json = new Gson().toJson(RankingCountStartIndex);
+        
+        return json;
+        
+    }
 
 }

@@ -85,5 +85,12 @@ public interface ReportingDashboardManagement
     Map<String, Object> fetchRankingRankCountPastMonth( long userId, long entityId, String entityType, int year, int month,
         int BatchSize ) throws NonFatalException;
 
+    Map<String, Object> fetchRankingRankCountPastYears( long userId, long entityId, String entityType, int BatchSize )
+        throws NonFatalException;
+
+    Map<String, Object> fetchRankingCountPastYears( long entityId, String entityType, int BatchSize ) throws NonFatalException;
+
+    List<List<Object>> getUserRankingPastYears( String entityType, Long entityId, int startIndex, int batchSize );
+
     
 }
