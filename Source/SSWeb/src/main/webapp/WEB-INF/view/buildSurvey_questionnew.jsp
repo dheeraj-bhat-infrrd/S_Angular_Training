@@ -45,6 +45,15 @@
 							</div>
 						</div> --%>
 					</div>
+					
+					<div class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
+						<div id="user-ranking-chkbox-wrapper-new" class="clearfix" style="width: 200px;">
+							<div id="user-ranking-chkbox-new" class="float-left user-ranking-chkbox bd-check-img"></div>
+							<input type="hidden" id="user-ranking-ques-new" name="user-ranking-ques" value=true>
+							<div class="float-left  listing-access-txt cursor-pointer">Consider for User Ranking</div>
+							</div>
+  					</div>
+					
 				</div>
 				<div id="" class="bd-ans-type-mcq bd-ans-type-item hide">
 					<div class="bd-and-tier2"><spring:message code="label.customer.answerfrom.key" /></div>

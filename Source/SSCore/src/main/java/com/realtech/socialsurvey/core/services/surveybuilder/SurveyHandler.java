@@ -59,7 +59,7 @@ public interface SurveyHandler
      * @param stage
      * @throws Exception
      */
-    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage );
+    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage, boolean isUserRankingQuestion );
 
 
     /*
@@ -380,4 +380,7 @@ public interface SurveyHandler
 
 
     void disconnectAllSurveysFromWithUser( long agentId ) throws InvalidInputException;
+
+
+    List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations ) throws InvalidInputException;
 }
