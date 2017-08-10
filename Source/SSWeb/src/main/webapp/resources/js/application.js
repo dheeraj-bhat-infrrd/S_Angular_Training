@@ -11692,10 +11692,12 @@ function initiateEncompassSaveConnection(warn) {
 	var username = document.getElementById('encompass-username').value;
 	var password = document.getElementById('encompass-password').value;
 	var url = document.getElementById('encompass-url').value;
+	var version = $( "#sdk-version-selection-list option:selected" ).text();
 	var payload = {
 		"username" : username,
 		"password" : password,
-		"url" : url
+		"url" : url,
+		"version"  : version
 	};
 	//TODO uncomment the test connection after development 
 	// by passed test credentials for develpment
@@ -11896,10 +11898,12 @@ function encompassCretentials() {
 	var username = document.getElementById('encompass-username').value;
 	var password = document.getElementById('encompass-password').value;
 	var url = document.getElementById('encompass-url').value;
+	var version = $( "#sdk-version-selection-list option:selected" ).text();
 	var payload = {
 		"username" : username,
 		"password" : password,
-		"url" : url
+		"url" : url,
+		"version" : version
 	};
 
 	if (validateEncompassTestInput('encompass-form-div')) {

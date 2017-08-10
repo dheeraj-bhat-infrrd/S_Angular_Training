@@ -203,6 +203,7 @@ public interface CommonConstants
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
     public static final String IS_PRIMARY_COLUMN = "isPrimary";
     public static final String SURVEY_LAST_REMINDER_TIME = "lastReminderTime";
+    public static final String ENCOMPASS_SDK_VERSION_COLUMN = "sdkVersion";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
@@ -421,6 +422,7 @@ public interface CommonConstants
     public static final String POPUP_FLAG_IN_SESSION = "popupStatus";
     public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
     public static final String NO_GOOGLE_PLUS_FOUND = "nogoogleplusfound";
+    public static final String ENCOMPASS_VERSION_LIST = "encompassVersionList";
 
     public static final String BILLING_MODE_ATTRIBUTE_IN_SESSION = "billingMode";
 
@@ -1314,4 +1316,7 @@ public interface CommonConstants
 
     
     public static final String NOT_AVAILABLE = "N/A";
+    
+    //Encompass test connection htt prequest initial
+    public static final String HTTP_REQUEST_URL_INITIAL = "http://";
 }
