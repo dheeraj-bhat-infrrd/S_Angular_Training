@@ -4532,13 +4532,13 @@ function saveTextForMoodFlow(content, mood) {
 }
 
 function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete) {
-	$('#happy-text').html(happyText);
-	$('#neutral-text').html(neutralText);
-	$('#sad-text').html(sadText);
+	$('#happy-text').val(atob(happyText));
+	$('#neutral-text').val(atob(neutralText));
+	$('#sad-text').val(atob(sadText));
 
-	$('#happy-text-complete').html(happyTextComplete);
-	$('#neutral-text-complete').html(neutralTextComplete);
-	$('#sad-text-complete').html(sadTextComplete);
+	$('#happy-text-complete').val(atob(happyTextComplete));
+	$('#neutral-text-complete').val(atob(neutralTextComplete));
+	$('#sad-text-complete').val(atob(sadTextComplete));
 }
 
 // User management

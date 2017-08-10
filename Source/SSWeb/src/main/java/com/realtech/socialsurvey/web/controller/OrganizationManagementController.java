@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -777,9 +778,16 @@ public class OrganizationManagementController
                 model.addAttribute( "autoPostLinkToUserSite", surveySettings.isAutoPostLinkToUserSiteEnabled() );
             }
 
-            surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
-            model.addAttribute( "defaultSurveyProperties", surveySettings );
+            //enocode before sending to UI
+            encodeSurveySettings( surveySettings );
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
+            
+            //get default setting and store in model
+            SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
+          //enocode before sending to UI
+            encodeSurveySettings( defaultSurveySettings );
+            model.addAttribute( "defaultSurveyProperties", defaultSurveySettings );
+            
             if(companySettings.getSendEmailThrough()== null){
                 model.addAttribute("sendEmailThrough",CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME);
             }else{
@@ -796,6 +804,7 @@ public class OrganizationManagementController
         return JspResolver.EDIT_SETTINGS;
     }
 
+   
 
     /**
      * Method to save encompass details / CRM info
@@ -3704,5 +3713,25 @@ public class OrganizationManagementController
         return "success";
     }
 
+    /**
+     * 
+     * @param surveySettings
+     */
+    private void encodeSurveySettings( SurveySettings surveySettings){
+        if(surveySettings.getHappyText() != null)
+            surveySettings.setHappyText(DatatypeConverter.printBase64Binary(surveySettings.getHappyText().getBytes()));
+        if(surveySettings.getSadText() != null)
+            surveySettings.setSadText(DatatypeConverter.printBase64Binary(surveySettings.getSadText().getBytes()));
+        if(surveySettings.getNeutralText() != null)
+            surveySettings.setNeutralText(DatatypeConverter.printBase64Binary(surveySettings.getNeutralText().getBytes()));
+
+        if(surveySettings.getHappyTextComplete() != null)
+            surveySettings.setHappyTextComplete(DatatypeConverter.printBase64Binary(surveySettings.getHappyTextComplete().getBytes()));
+        if(surveySettings.getSadTextComplete() != null)
+            surveySettings.setSadTextComplete(DatatypeConverter.printBase64Binary(surveySettings.getSadTextComplete().getBytes()));
+        if(surveySettings.getNeutralTextComplete() != null)
+            surveySettings.setNeutralTextComplete(DatatypeConverter.printBase64Binary(surveySettings.getNeutralTextComplete().getBytes()));
+        
+    }
 }
 // JIRA: SS-24 BY RM02 EOC
