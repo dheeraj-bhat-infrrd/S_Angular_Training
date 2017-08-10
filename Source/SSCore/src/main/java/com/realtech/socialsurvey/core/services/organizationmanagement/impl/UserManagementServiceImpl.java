@@ -1797,6 +1797,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         // Send reset password link to the user email ID
         emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName, holdSendingMail,
             hiddenSection );
+        
+        // if the email is supposed to be either sent immediately or by batch without holding it, then update the invite sent date for the user 
+        if( !holdSendingMail ){
+        updateLastInviteSentDateIfUserExistsInDB( emailId );
+        }
     }
 
 
@@ -1951,6 +1956,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Calling email services to send registration invitation mail" );
         emailServices.sendRegistrationInviteMail( url, emailId, firstName, lastName );
+        
+        updateLastInviteSentDateIfUserExistsInDB( emailId );
 
         LOG.debug( "Method inviteUser finished successfully" );
     }
@@ -4796,5 +4803,30 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         userProfileDao.update( userProfile );
         LOG.info( "method updateUserProfileObject finished for User : " + userProfile.getAgentId() );
+    }
+    
+    /**
+     * method to update the last invitation sent date in users table in MySQL if the user entry exists.
+     *
+     * @param emailId
+     * @return
+     */
+    @Override
+    public void updateLastInviteSentDateIfUserExistsInDB( String emailId )
+    {
+        LOG.debug( "Method updateLastInviteSentDateIfUserExists started." );
+        try {
+            Map<String, Object> columns = new HashMap<>();
+            columns.put( "emailId", emailId );
+            List<User> usersWithTheGivenEmailId = userDao.findByKeyValue( User.class, columns );
+            if ( usersWithTheGivenEmailId != null && !usersWithTheGivenEmailId.isEmpty() ) {
+                usersWithTheGivenEmailId.get( CommonConstants.INITIAL_INDEX )
+                    .setLastInvitationSentDate( new Timestamp( System.currentTimeMillis() ) );
+                userDao.update( usersWithTheGivenEmailId.get( CommonConstants.INITIAL_INDEX ) );
+            }
+            LOG.debug( "Method updateLastInviteSentDateIfUserExists finished." );
+        } catch ( Exception databaseException ) {
+            LOG.error( "Exception caught while checking for email id in USERS table." );
+        }
     }
 }
