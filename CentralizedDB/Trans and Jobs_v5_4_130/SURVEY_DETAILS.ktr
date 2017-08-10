@@ -181,7 +181,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var createdOnDate &#x3d; new Date&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnDate &#x3d; new Date&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;var surveyCompletedDateVal &#x3d; new Date&#x28;surveyCompletedDate&#x29;&#x3b;&#xd;&#xa;var surveyTranscationDateVal &#x3d; new Date&#x28;surveyTransactionDate&#x29;&#x3b;&#xd;&#xa;var surveyUpdatedDateVal &#x3d; new Date&#x28;surveyUpdatedDate&#x29;&#x3b;&#xd;&#xa;var lastReminderForSocialPostDate &#x3d; new Date&#x28;lastReminderForSocialPost&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; null&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_COMPLETED_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_TRANSACTION_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_UPDATED_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var LAST_REMINDER_FOR_SOCIAL_POST_EST &#x3d; null&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;createdOn &#x21;&#x3d; null&#x29;&#x7b; CREATED_ON_EST &#x3d; sdf.format&#x28;createdOn&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;modifiedOn &#x21;&#x3d; null&#x29;&#x7b; MODIFIED_ON_EST &#x3d; sdf.format&#x28;modifiedOn&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyCompletedDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_COMPLETED_DATE_EST &#x3d; sdf.format&#x28;surveyCompletedDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyTransactionDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_TRANSACTION_DATE_EST &#x3d; sdf.format&#x28;surveyTransactionDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyUpdatedDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_UPDATED_DATE_EST &#x3d; sdf.format&#x28;surveyUpdatedDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;lastReminderForSocialPost &#x21;&#x3d; null&#x29;&#x7b; LAST_REMINDER_FOR_SOCIAL_POST_EST &#x3d; sdf.format&#x28;lastReminderForSocialPost&#x29;&#x3b;&#x7d;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var createdOnDate &#x3d; new Date&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnDate &#x3d; new Date&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;var surveyCompletedDateVal &#x3d; new Date&#x28;surveyCompletedDate&#x29;&#x3b;&#xd;&#xa;var surveyTranscationDateVal &#x3d; new Date&#x28;surveyTransactionDate&#x29;&#x3b;&#xd;&#xa;var surveyUpdatedDateVal &#x3d; new Date&#x28;surveyUpdatedDate&#x29;&#x3b;&#xd;&#xa;var lastReminderForSocialPostDate &#x3d; new Date&#x28;lastReminderForSocialPost&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST5EDT&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; null&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_COMPLETED_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_TRANSACTION_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_UPDATED_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var LAST_REMINDER_FOR_SOCIAL_POST_EST &#x3d; null&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;createdOn &#x21;&#x3d; null&#x29;&#x7b; CREATED_ON_EST &#x3d; sdf.format&#x28;createdOn&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;modifiedOn &#x21;&#x3d; null&#x29;&#x7b; MODIFIED_ON_EST &#x3d; sdf.format&#x28;modifiedOn&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyCompletedDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_COMPLETED_DATE_EST &#x3d; sdf.format&#x28;surveyCompletedDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyTransactionDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_TRANSACTION_DATE_EST &#x3d; sdf.format&#x28;surveyTransactionDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyUpdatedDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_UPDATED_DATE_EST &#x3d; sdf.format&#x28;surveyUpdatedDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;lastReminderForSocialPost &#x21;&#x3d; null&#x29;&#x7b; LAST_REMINDER_FOR_SOCIAL_POST_EST &#x3d; sdf.format&#x28;lastReminderForSocialPost&#x29;&#x3b;&#x7d;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>CREATED_ON_EST</name>
         <rename>CREATED_ON_EST</rename>
         <type>String</type>
@@ -3746,6 +3746,18 @@
     </step>
 
   <step_error_handling>
+      <error>
+        <source_step>Synchronize after merge Survey Details</source_step>
+        <target_step>Survey Details Error</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
   </step_error_handling>
    <slave-step-copy-partition-distribution>
 </slave-step-copy-partition-distribution>
