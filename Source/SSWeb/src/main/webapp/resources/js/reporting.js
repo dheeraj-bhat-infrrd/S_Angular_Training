@@ -1370,13 +1370,48 @@ function getUserRankingList(entityType,entityId,year,month,startIndex,batchSize,
 	return userRankingList;
 }
 
-function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame){
+function getUserRankingCountForAdmins(entityType,entityId,year,month,batchSize,timeFrame){
 	
 	var userRankingCount=null;
 	
 	$.ajax({
 		async : false,
 		url : "/getuserrankingcount.do?entityId="+entityId+"&entityType="+entityType+"&month="+month+"&year="+year+"&batchSize="+batchSize+"&timeFrame="+timeFrame,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			if (data.status == 200) {
+				$.ajax({
+							async:false,
+							url : data.url,
+							type : "GET",
+							cache : false,
+							dataType : "json",
+							success : function(response) {
+								userRankingCount = JSON.parse(response);
+							}
+						});
+			}
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+	return userRankingCount;
+	
+}
+
+function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame){
+	
+	var userRankingCount=null;
+	
+	$.ajax({
+		async : false,
+		url : "/getuserrankingrankandcount.do?entityId="+entityId+"&entityType="+entityType+"&month="+month+"&year="+year+"&batchSize="+batchSize+"&timeFrame="+timeFrame,
 		type : "GET",
 		cache : false,
 		dataType : "json",
@@ -1436,6 +1471,7 @@ function drawLeaderboardTableStructure(userRankingList,userId){
 				}
 				if(userRankingList[i][0] == userId){
 					tableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
+					$('#rank-span').html(userRankingList[i][1]);
 				}else{
 					tableData+='<tr class="u-tbl-row leaderboard-row">';
 				}
@@ -1453,6 +1489,7 @@ function drawLeaderboardTableStructure(userRankingList,userId){
 			}else{
 				if(userRankingList[i][0] == "${userId}"){
 					nonRankedTableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
+					$('#rank-span').html('NA');
 				}else{
 					nonRankedTableData+='<tr class="u-tbl-row leaderboard-row">';
 				}
@@ -1478,11 +1515,11 @@ function showHideRankPaginateBtns(startIndex,count){
 	if(startIndex == 0 || count<11){
 		if(!($('#lead-ranks-above').hasClass('hide'))){
 			$('#lead-ranks-above').addClass('hide');
-			$('#lead-ranks-below').removeClass('block-display');
+			$('#lead-ranks-above').removeClass('block-display');
 		}		
 	}else{
 		$('#lead-ranks-above').removeClass('hide');
-		$('#lead-ranks-below').addClass('block-display');
+		$('#lead-ranks-above').addClass('block-display');
 		
 	}
 	

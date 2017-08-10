@@ -1320,9 +1320,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public List<List<Object>> getUserRankingPastYears(String entityType, Long entityId,int startIndex,int batchSize) {
         List<List<Object>> userRanking = new ArrayList<>();
         
-        if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
+        if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
             for(UserRankingPastYearsRegion userRankingPastYearsRegion : userRankingPastYearsRegionDao.fetchUserRankingForPastYearsRegion(entityId,startIndex,batchSize)){
                 List<Object> userRankingPastYearsRegionList = new ArrayList<>();
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getUserId());
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getRank());
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getFirstName());
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getLastName());
@@ -1334,9 +1335,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.isEligible());
                 userRanking.add(userRankingPastYearsRegionList);
             }
-        }else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
+        }else if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
             for(UserRankingPastYearsMain userRankingPastYearsMain : userRankingPastYearsMainDao.fetchUserRankingForPastYearsMain(entityId, startIndex,batchSize)){
                 List<Object> userRankingPastYearsMainList = new ArrayList<>();
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.getUserId());
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getRank());
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getFirstName());
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getLastName());
@@ -1351,6 +1353,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
             for(UserRankingPastYearsBranch userRankingPastYearsBranch : userRankingPastYearsBranchDao.fetchUserRankingForPastYearsBranch(entityId, startIndex,batchSize)){
                 List<Object> userRankingPastYearsBranchList = new ArrayList<>();
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getUserId());
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getRank());
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getFirstName());
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getLastName());
@@ -1374,8 +1377,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	        RankingCountStartIndex.put( "Count",userRankingThisYearMainDao.fetchUserRankingCountForThisYearMain( entityId, year) );
 	        int Rank = userRankingThisYearMainDao.fetchUserRankingRankForThisYearMain( userId, entityId, year );
 	        //get the mod to determine startIndex
-	        int mod = (Rank % BatchSize);
-	        int startIndex = Rank - mod;
+	        int startIndex=0;
+            int mod = (Rank % BatchSize);
+            int diff = (BatchSize/2);
+            
+            if(Rank >=(BatchSize/2)){
+            	startIndex = Rank - diff;
+            }else{
+            	startIndex = Rank - mod;
+            }
             RankingCountStartIndex.put( "startIndex",startIndex);
 
 	    }
@@ -1390,8 +1400,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             RankingCountStartIndex.put( "Count",userRankingThisMonthMainDao.fetchUserRankingCountForThisMonthMain( entityId, year, month) );
             int Rank = userRankingThisMonthMainDao.fetchUserRankingRankForThisMonthMain( userId, entityId, year );
             //get the mod to determine startIndex
+            int startIndex=0;
             int mod = (Rank % BatchSize);
-            int startIndex = Rank - mod;
+            int diff = (BatchSize/2);
+            
+            if(Rank >=(BatchSize/2)){
+            	startIndex = Rank - diff;
+            }else{
+            	startIndex = Rank - mod;
+            }
             RankingCountStartIndex.put( "startIndex",startIndex);
 
         }
@@ -1406,8 +1423,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             RankingCountStartIndex.put( "Count",userRankingPastYearMainDao.fetchUserRankingCountForPastYearMain( entityId, year) );
             int Rank = userRankingPastYearMainDao.fetchUserRankingRankForPastYearMain( userId, entityId, year );
             //get the mod to determine startIndex
+            int startIndex=0;
             int mod = (Rank % BatchSize);
-            int startIndex = Rank - mod;
+            int diff = (BatchSize/2);
+            
+            if(Rank >=(BatchSize/2)){
+            	startIndex = Rank - diff;
+            }else{
+            	startIndex = Rank - mod;
+            }
             RankingCountStartIndex.put( "startIndex",startIndex);
 
         }
@@ -1438,8 +1462,16 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             RankingCountStartIndex.put( "Count",userRankingPastMonthMainDao.fetchUserRankingCountForPastMonthMain( entityId, year, month) );
             int Rank = userRankingPastMonthMainDao.fetchUserRankingRankForPastMonthMain( userId, entityId, year );
             //get the mod to determine startIndex
+            int startIndex=0;
             int mod = (Rank % BatchSize);
-            int startIndex = Rank - mod;
+            int diff = (BatchSize/2);
+            
+            if(Rank >=(BatchSize/2)){
+            	startIndex = Rank - diff;
+            }else{
+            	startIndex = Rank - mod;
+            }
+           
             RankingCountStartIndex.put( "startIndex",startIndex);
 
         }
