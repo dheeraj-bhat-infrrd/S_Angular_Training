@@ -1336,3 +1336,186 @@ function updateReportingDashboard(){
 	drawProcessedDonutChart();
 	drawUnprocessedDonutChart();
 }
+
+function getUserRankingList(entityType,entityId,year,month,startIndex,batchSize,timeFrame){
+	var userRankingList =null;	
+	
+	$.ajax({
+		async : false,
+		url : "/getuserranking.do?entityId="+entityId+"&entityType="+entityType+"&month="+month+"&year="+year+"&startIndex="+startIndex+"&batchSize="+batchSize+"&timeFrame="+timeFrame,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			if (data.status == 200) {
+				$.ajax({	
+							async : false,
+							url : data.url,
+							type : "GET",
+							cache : false,
+							dataType : "json",
+							success : function(response) {
+								userRankingList = JSON.parse(response);		
+							}
+				});
+			}
+		},	
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+	return userRankingList;
+}
+
+function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame){
+	
+	var userRankingCount=null;
+	
+	$.ajax({
+		async : false,
+		url : "/getuserrankingcount.do?entityId="+entityId+"&entityType="+entityType+"&month="+month+"&year="+year+"&batchSize="+batchSize+"&timeFrame="+timeFrame,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			if (data.status == 200) {
+				$.ajax({
+							async:false,
+							url : data.url,
+							type : "GET",
+							cache : false,
+							dataType : "json",
+							success : function(response) {
+								userRankingCount = JSON.parse(response);
+							}
+						});
+			}
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+	return userRankingCount;
+}
+
+function drawLeaderboardTableStructure(userRankingList,userId){
+	
+	var tableHeaderData='<table id="leaderboard-table" class="v-um-tbl leaderboard-table">'
+		+'<tr id="u-tbl-header" class="u-tbl-header">'
+		+'<td class="lead-tbl-ln-of text-center">Rank</td>'
+		+'<td class="v-tbl-uname lead-name-alignment">Name</td>'
+		+'<td class="lead-tbl-ln-of text-center">Reviews</td>'
+		+'<td class="lead-tbl-ln-of text-center">Average Score</td>'
+		+'<td class="lead-tbl-ln-of text-center">SPS</td>'
+		+'<td class="lead-tbl-ln-of text-center">Completion %</td>'
+		+'</tr>';
+	
+	var tableData = '';
+	var nonRankedTableData = '';
+	var profileImageUrl="";
+	var imageDiv="";
+	
+	if(userRankingList.length>0 && userRankingList != null){
+		for(var i=0;i<userRankingList.length;i++){
+			var rank='#';
+			
+			if(userRankingList[i][1]!=0){
+				rank='#' + userRankingList[i][1];
+				
+				profileImageUrl = getProfileImageByUserId(userRankingList[i][0]);
+				if(profileImageUrl != null && profileImageUrl!=""){
+					imageDiv='<img id="lead-prof-image-edit" class="prof-image prof-image-edit pos-relative leaderboard-pic-circle" src="'+profileImageUrl+'"></img>';
+				}else{
+					imageDiv='<div id="lead-prof-image-edit" class="prof-image prof-image-edit pers-default-big pos-relative leaderboard-pic-circle"></div>';
+				}
+				if(userRankingList[i][0] == userId){
+					tableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
+				}else{
+					tableData+='<tr class="u-tbl-row leaderboard-row">';
+				}
+				
+				tableData+= '<td class="lead-tbl-ln-of">'+rank+'</td>'
+				+'<td class="v-tbl-uname fetch-name">'+'<div class="leaderboard-name-div">'
+				+'<div class="lead-img-div">'+imageDiv+'</div>'
+				+'<span class="lead-name-span" >'+userRankingList[i][2]+' '+userRankingList[i][3]+'</span></div>'
+				+'</td>'
+				+'<td class="lead-tbl-ln-of">'+userRankingList[i][5]+'</td>'
+				+'<td class="lead-tbl-ln-of">'+userRankingList[i][6]+'</td>'
+				+'<td class="lead-tbl-ln-of">'+userRankingList[i][7]+'</td>'
+				+'<td class="lead-tbl-ln-of">'+userRankingList[i][8]+'</td>'
+				+'</tr>'
+			}else{
+				if(userRankingList[i][0] == "${userId}"){
+					nonRankedTableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
+				}else{
+					nonRankedTableData+='<tr class="u-tbl-row leaderboard-row">';
+				}
+				nonRankedTableData+= '<td class="lead-tbl-ln-of">'+rank+'</td>'
+				+'<td class="v-tbl-uname fetch-name">'+'<div class="leaderboard-name-div">'
+				+'<div class="lead-img-div"><img id="prof-image-edit" class="lead-img prof-image-edit pos-relative leaderboard-pic-circle" src="${initParam.resourcesPath}/resources/images/bg.jpg"></img></div>'
+				+'<span class="lead-name-span" >'+userRankingList[i][2]+' '+userRankingList[i][3]+'</span></div>'
+				+'</td>'
+				+'<td class="lead-tbl-ln-of">'+userRankingList[i][5]+'</td>'
+				+'<td class="lead-tbl-ln-of">'+userRankingList[i][6]+'</td>'
+				+'<td class="lead-tbl-ln-of">'+userRankingList[i][7]+'</td>'
+				+'<td class="lead-tbl-ln-of">'+userRankingList[i][8]+'</td>'
+				+'</tr>'
+			}
+			
+		}
+	}
+	
+	return (tableHeaderData+tableData+nonRankedTableData+'</table>');
+}
+
+function showHideRankPaginateBtns(startIndex,count){
+	if(startIndex == 0 || count<11){
+		if(!($('#lead-ranks-above').hasClass('hide'))){
+			$('#lead-ranks-above').addClass('hide');
+			$('#lead-ranks-below').removeClass('block-display');
+		}		
+	}else{
+		$('#lead-ranks-above').removeClass('hide');
+		$('#lead-ranks-below').addClass('block-display');
+		
+	}
+	
+	if(count<11 || startIndex>count-10){
+		if(!($('#lead-ranks-below').hasClass('hide'))){
+			$('#lead-ranks-below').addClass('hide');
+			$('#lead-ranks-below').removeClass('block-display');
+		}
+	}else{
+		$('#lead-ranks-below').removeClass('hide');
+		$('#lead-ranks-below').addClass('block-display');
+	}
+	
+}
+
+function getProfileImageByUserId(userId){
+	var profileImageUrlData=null;
+	$.ajax({
+		async : false,
+		url : "/getuserprofimageforleaderboard.do?userId="+userId,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			profileImageUrlData = data;						
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+	
+	return profileImageUrlData;
+}

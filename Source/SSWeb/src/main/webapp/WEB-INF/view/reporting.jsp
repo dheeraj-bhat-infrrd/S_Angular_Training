@@ -112,7 +112,7 @@
 					<div class="tab-pane fade" id="reviews-tab">
 						<jsp:include page="reporting_reviews.jsp"></jsp:include>
 					</div>
-					<div class="tab-pane fade" id="incomplete-surveys-tab">
+					<div class="tab-pane fade" id="incomplete-surveys-tab" style="max-height:600px">
 						<jsp:include page="reporting_incomplete_surveys.jsp"></jsp:include>
 					</div>
 				</div>
