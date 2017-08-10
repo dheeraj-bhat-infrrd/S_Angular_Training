@@ -380,4 +380,7 @@ public interface SurveyHandler
 
 
     void disconnectAllSurveysFromWithUser( long agentId ) throws InvalidInputException;
+
+
+    List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations ) throws InvalidInputException;
 }

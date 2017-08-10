@@ -4240,4 +4240,110 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         
         return newSurveyDetails;
     }
+    
+ 
+    /**
+     * 
+     * @param surveyPreInitiations
+     * @return
+     * @throws InvalidInputException 
+     */
+    // Method to update agentId in SurveyPreInitiation 
+    @Override
+    @Transactional
+    public List<SurveyPreInitiation> validatePreinitiatedRecord(List<SurveyPreInitiation> surveyPreInitiations) throws InvalidInputException
+    {
+
+        LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord started " );
+
+
+        for ( SurveyPreInitiation survey : surveyPreInitiations ) {
+
+            User user = null;
+            try {
+                user = userManagementService.getActiveAgentByEmailAndCompany( survey.getCompanyId(), survey.getAgentEmailId() );
+                survey.setAgentId( user.getUserId() );
+            } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                LOG.error( "No user found in database for the email id: " + survey.getAgentEmailId() + " and company id : "
+                    + survey.getCompanyId() );
+                throw new InvalidInputException("Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId());
+            }
+
+            // check if survey has already been sent to the email id
+            int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany( user.getCompany().getCompanyId() );
+            List<SurveyPreInitiation> incompleteSurveyCustomers = null;
+            if ( duplicateSurveyInterval > 0 ) {
+                incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays(
+                    user.getUserId(), survey.getCustomerEmailId(), duplicateSurveyInterval );
+            } else {
+                incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( user.getUserId(),
+                    survey.getCustomerEmailId() );
+            }
+            
+            //get valid survey intervals
+            Timestamp engagementClosedTime = survey.getEngagementClosedTime();
+            Calendar calendar = Calendar.getInstance();
+            calendar.add( Calendar.DATE, -validSurveyInterval );
+            Date date = calendar.getTime();
+            
+            if(StringUtils.isEmpty( survey.getCustomerEmailId() ) || ! organizationManagementService.validateEmail(  survey.getCustomerEmailId() ) ){
+                LOG.warn( "Invalid Customer Email Id " );
+                throw new InvalidInputException("Can not process the record. Invalid Customer email id : " + survey.getCustomerEmailId() + "");
+            }else if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
+                LOG.warn( "Survey request already sent" );
+                throw new InvalidInputException("Can not process the record. A survey request for customer " + survey.getCustomerFirstName() + " has already received.");
+            }else if ( engagementClosedTime.before( date ) ) {
+                LOG.debug( "An old record found : " + survey.getSurveyPreIntitiationId() );
+                throw new InvalidInputException("Can not process the record. Request for customer " + survey.getCustomerFirstName() + " is older than " + validSurveyInterval + " days.");
+            } else if (  isEmailIsIgnoredEmail( survey.getAgentEmailId(), survey.getCompanyId() ) ) {
+                LOG.error( "no agent found with this email id and its an ignored record" );
+                throw new InvalidInputException("Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId());
+            } else if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
+                LOG.error( "Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId() );
+                throw new InvalidInputException("Can not process the record.  service provider email id is missing");
+            } else if ( ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() )
+                && ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() ) ) {
+                LOG.error( "No Name found for customer, hence this is an invalid survey " + survey.getSurveyPreIntitiationId() );
+                throw new InvalidInputException("Can not process the record. Customer Name is missing");
+            } else if ( survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty() ) {
+                LOG.error( "No customer email id found, invalid survey " + survey.getSurveyPreIntitiationId() );
+                throw new InvalidInputException("Can not process the record. Customer Email id is missing");
+            }else if ( user.getCompany() == null ) {
+                LOG.error( "Agent doesnt have an company associated with it " );
+                throw new InvalidInputException("Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId());
+            } else if ( user.getCompany().getCompanyId() != survey.getCompanyId() ) {
+                throw new InvalidInputException("Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId());
+            } 
+
+            survey.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
+        }
+
+        LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord finished " );
+        return surveyPreInitiations;
+    }
+    
+    /**
+     * 
+     * @param companyId
+     * @return
+     */
+    private int getDuplicateSurveyIntervalForCompany(long companyId){
+        
+        LOG.debug( "Method getDuplicateSurveyIntervalForCompany started for company " + companyId );
+        
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        int duplicateSurveyInterval = 0;
+        if ( companySettings != null && companySettings.getSurvey_settings() != null
+            && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 ) {
+            duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
+        } else {
+            duplicateSurveyInterval = defaultSurveyRetakeInterval;
+        }
+        LOG.debug( "Method getDuplicateSurveyIntervalForCompany finished for company " + companyId );
+        return duplicateSurveyInterval;
+
+    }
+    
 }
