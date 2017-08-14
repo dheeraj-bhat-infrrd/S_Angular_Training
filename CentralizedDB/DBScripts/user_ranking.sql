@@ -15,13 +15,11 @@ CREATE TABLE `user_ranking_this_month_main` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `max_eligible_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_this_month_main_id`),
-  KEY `UR_COMPANY_ID_idx` (`company_id`),
-  KEY `UR_USER_ID_idx` (`user_id`),
-  CONSTRAINT `UR_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f11` (`user_id`,`this_month`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -42,15 +40,11 @@ CREATE TABLE `user_ranking_this_month_branch` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `internal_branch_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_this_month_branch_id`),
-  KEY `UR1_COMPANY_ID_idx` (`company_id`),
-  KEY `UR1_USER_ID_idx` (`user_id`),
-  KEY `UR1_BRANCH_ID_idx` (`branch_id`),
-  CONSTRAINT `UR1_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR1_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-   CONSTRAINT `UR1_BRANCH_ID` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f10` (`user_id`,`branch_id`,`this_month`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `user_ranking_this_month_region` (
@@ -70,15 +64,11 @@ CREATE TABLE `user_ranking_this_month_region` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `internal_region_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_this_month_region_id`),
-  KEY `UR2_COMPANY_ID_idx` (`company_id`),
-  KEY `UR2_USER_ID_idx` (`user_id`),
-  KEY `UR2_REGION_ID_idx` (`region_id`),
-  CONSTRAINT `UR2_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR2_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR2_REGION_ID` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f12` (`user_id`,`region_id`,`this_month`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -97,13 +87,11 @@ CREATE TABLE `user_ranking_this_year_main` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `max_eligible_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_this_year_main_id`),
-  KEY `UR3_COMPANY_ID_idx` (`company_id`),
-  KEY `UR3_USER_ID_idx` (`user_id`),
-  CONSTRAINT `UR3_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR3_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f14` (`user_id`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -123,16 +111,13 @@ CREATE TABLE `user_ranking_this_year_branch` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `internal_branch_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_this_year_branch_id`),
-  KEY `UR4_COMPANY_ID_idx` (`company_id`),
-  KEY `UR4_USER_ID_idx` (`user_id`),
-  KEY `UR4_BRANCH_ID_idx` (`branch_id`),
-  CONSTRAINT `UR4_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR4_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-   CONSTRAINT `UR4_BRANCH_ID` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f13` (`user_id`,`branch_id`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `user_ranking_this_year_region` (
   `user_ranking_this_year_region_id` varchar(36) NOT NULL,
@@ -150,16 +135,13 @@ CREATE TABLE `user_ranking_this_year_region` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `internal_region_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_this_year_region_id`),
-  KEY `UR5_COMPANY_ID_idx` (`company_id`),
-  KEY `UR5_USER_ID_idx` (`user_id`),
-  KEY `UR5_REGION_ID_idx` (`region_id`),
-  CONSTRAINT `UR5_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR5_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR5_REGION_ID` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f15` (`user_id`,`region_id`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `user_ranking_past_month_main` (
   `user_ranking_past_month_main_id` varchar(36) NOT NULL,
@@ -177,15 +159,14 @@ CREATE TABLE `user_ranking_past_month_main` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `month_year` varchar(45) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `max_eligible_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_month_main_id`),
-  KEY `UR6_COMPANY_ID_idx` (`company_id`),
-  KEY `UR6_USER_ID_idx` (`user_id`),
-  CONSTRAINT `UR6_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR6_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_key_f1` (`user_id`,`month_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 
@@ -206,17 +187,14 @@ CREATE TABLE `user_ranking_past_month_branch` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `month_year` varchar(45) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `internal_branch_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_month_branch_id`),
-  KEY `UR61_COMPANY_ID_idx` (`company_id`),
-  KEY `UR61_USER_ID_idx` (`user_id`),
-  KEY `UR61_BRANCH_ID_idx` (`branch_id`),
-  CONSTRAINT `UR61_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR61_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-   CONSTRAINT `UR61_BRANCH_ID` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_key_f2` (`user_id`,`branch_id`,`month_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `user_ranking_past_month_region` (
   `user_ranking_past_month_region_id` varchar(36) NOT NULL,
@@ -235,17 +213,14 @@ CREATE TABLE `user_ranking_past_month_region` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `month_year` varchar(45) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `internal_region_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_month_region_id`),
-  KEY `UR62_COMPANY_ID_idx` (`company_id`),
-  KEY `UR62_USER_ID_idx` (`user_id`),
-  KEY `UR62_REGION_ID_idx` (`region_id`),
-  CONSTRAINT `UR62_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR62_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR62_REGION_ID` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f3` (`user_id`,`region_id`,`month_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 CREATE TABLE `user_ranking_past_year_main` (
@@ -263,14 +238,13 @@ CREATE TABLE `user_ranking_past_year_main` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `max_eligible_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_year_main_id`),
-  KEY `UR63_COMPANY_ID_idx` (`company_id`),
-  KEY `UR63_USER_ID_idx` (`user_id`),
-  CONSTRAINT `UR63_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR63_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f5` (`user_id`,`year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 CREATE TABLE `user_ranking_past_year_branch` (
@@ -289,16 +263,13 @@ CREATE TABLE `user_ranking_past_year_branch` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `internal_branch_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_year_branch_id`),
-  KEY `UR64_COMPANY_ID_idx` (`company_id`),
-  KEY `UR64_USER_ID_idx` (`user_id`),
-  KEY `UR64_BRANCH_ID_idx` (`branch_id`),
-  CONSTRAINT `UR64_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR64_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-   CONSTRAINT `UR64_BRANCH_ID` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f4` (`user_id`,`branch_id`,`year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `user_ranking_past_year_region` (
   `user_ranking_past_year_region_id` varchar(36) NOT NULL,
@@ -316,16 +287,13 @@ CREATE TABLE `user_ranking_past_year_region` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `internal_region_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_year_region_id`),
-  KEY `UR65_COMPANY_ID_idx` (`company_id`),
-  KEY `UR65_USER_ID_idx` (`user_id`),
-  KEY `UR65_REGION_ID_idx` (`region_id`),
-  CONSTRAINT `UR65_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR65_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR65_REGION_ID` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f6` (`user_id`,`region_id`,`year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `user_ranking_past_years_main` (
   `user_ranking_past_years_main_id` varchar(36) NOT NULL,
@@ -341,13 +309,11 @@ CREATE TABLE `user_ranking_past_years_main` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `max_eligible_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_years_main_id`),
-  KEY `UR67_COMPANY_ID_idx` (`company_id`),
-  KEY `UR67_USER_ID_idx` (`user_id`),
-  CONSTRAINT `UR67_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR67_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f8` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -366,16 +332,13 @@ CREATE TABLE `user_ranking_past_years_branch` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `internal_branch_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_years_branch_id`),
-  KEY `UR68_COMPANY_ID_idx` (`company_id`),
-  KEY `UR68_USER_ID_idx` (`user_id`),
-  KEY `UR68_BRANCH_ID_idx` (`branch_id`),
-  CONSTRAINT `UR68_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR68_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-   CONSTRAINT `UR68_BRANCH_ID` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f7` (`user_id`,`branch_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `user_ranking_past_years_region` (
   `user_ranking_past_years_region_id` varchar(36) NOT NULL,
@@ -392,13 +355,9 @@ CREATE TABLE `user_ranking_past_years_region` (
   `sent` int(11) DEFAULT NULL,
   `completed_percentage` decimal(10,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT NULL,
-  `is_eligible` tinyint(4) DEFAULT NULL,
+  `is_eligible` int(2) DEFAULT NULL,
   `average_rating` tinyint(4) DEFAULT NULL,
+  `internal_region_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_ranking_past_years_region_id`),
-  KEY `UR69_COMPANY_ID_idx` (`company_id`),
-  KEY `UR69_USER_ID_idx` (`user_id`),
-  KEY `UR69_REGION_ID_idx` (`region_id`),
-  CONSTRAINT `UR69_COMPANY_ID` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR69_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `UR69_REGION_ID` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `unique_keys_f9` (`user_id`,`region_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
