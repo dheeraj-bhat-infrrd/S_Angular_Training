@@ -212,6 +212,21 @@ $(document).ready(function(){
 	
 	var timeFrameStr = $('#time-selector').val();
 	var timeFrame = parseInt(timeFrameStr);
+	
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
 	var year = currentYear;
 	var month = currentMonth;
 	
@@ -233,13 +248,13 @@ $(document).ready(function(){
 	var userRankingCount =null;
 	
 	if(profileMasterId != 4){
-		userRankingCount = getUserRankingCountForAdmins("companyId", companyId, year, month, batchSize, timeFrame)
+		userRankingCount = getUserRankingCountForAdmins(entityType, companyId, year, month, batchSize, timeFrame)
 		if(userRankingCount != null){
 			startIndex= 0;
 			count=userRankingCount.Count;
 		}
 	}else{
-		userRankingCount = getUserRankingCount("companyId", companyId, year, month, batchSize, timeFrame);
+		userRankingCount = getUserRankingCount(entityType, companyId, year, month, batchSize, timeFrame);
 		if(userRankingCount != null){
 			startIndex= userRankingCount.startIndex;
 			count=userRankingCount.Count;
@@ -271,7 +286,21 @@ $(document).on('click','#lead-ranks-above-btn',function(){
 		break;
 	}
 	
-	var userRankingList = getUserRankingList("companyId",companyId, year, month, startIndex, batchSize, timeFrame);
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
+	var userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	
 	if(userRankingList != null && userRankingList.length != 0){
 		tableData=drawLeaderboardTableStructure(userRankingList, userId)
@@ -315,7 +344,21 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 		break;
 	}
 	
-	var userRankingList = getUserRankingList("companyId",companyId, year, month, startIndex, batchSize, timeFrame);
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
+	var userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	
 	if(userRankingList != null && userRankingList.length != 0){
 		tableData=drawLeaderboardTableStructure(userRankingList, userId)
@@ -353,21 +396,103 @@ $(document).on('change', '#time-selector', function() {
 	case 5: year = currentYear - 1
 	}
 	
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
 	if(profileMasterId != 4){
-		userRankingCount = getUserRankingCountForAdmins("companyId", companyId, year, month, batchSize, timeFrame)
+		userRankingCount = getUserRankingCountForAdmins(entityType, companyId, year, month, batchSize, timeFrame)
 		if(userRankingCount != null){
 			startIndex= 0;
 			count=userRankingCount.Count;
 		}
 	}else{
-		userRankingCount = getUserRankingCount("companyId", companyId, year, month, batchSize, timeFrame);
+		userRankingCount = getUserRankingCount(entityType, companyId, year, month, batchSize, timeFrame);
 		if(userRankingCount != null){
 			startIndex= userRankingCount.startIndex;
 			count=userRankingCount.Count;
 		}
 	}
 	
-	var userRankingList = getUserRankingList("companyId",companyId, year, month, startIndex, batchSize, timeFrame);
+	var userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	
+	if(userRankingList != null && userRankingList.length != 0){
+		tableData=drawLeaderboardTableStructure(userRankingList, userId)
+		$('#leaderboard-list').removeClass('hide');
+		$('#leaderboard-tbl').html(tableData);
+		$('#leaderboard-empty-list-msg-div').addClass('hide');
+	}else{
+		$('#leaderboard-list').addClass('hide');
+		$('#leaderboard-empty-list-msg-div').removeClass('hide');
+	}
+	
+	showHideRankPaginateBtns(startIndex, count);
+	
+	 $('html, body').animate({
+	        scrollTop: $('#leaderboard-tbl').offset().top - 20
+	    }, 'slow');
+	 
+	hideOverlay();
+});
+
+$(document).on('change', '#board-selector', function() {
+	timeFrameStr = $('#time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	startIndex = 0;
+	
+	switch(timeFrame){
+	case 1: year = currentYear;
+		break;
+	case 2: year = currentYear;
+		month = currentMonth;
+		break;
+	case 3: year = currentYear - 1;
+		break;
+	case 4: year = currentYear;
+		month=currentMonth -1;
+		break;
+	case 5: year = currentYear - 1
+	}
+	
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
+	if(profileMasterId != 4){
+		userRankingCount = getUserRankingCountForAdmins(entityType, companyId, year, month, batchSize, timeFrame)
+		if(userRankingCount != null){
+			startIndex= 0;
+			count=userRankingCount.Count;
+		}
+	}else{
+		userRankingCount = getUserRankingCount(entityType, companyId, year, month, batchSize, timeFrame);
+		if(userRankingCount != null){
+			startIndex= userRankingCount.startIndex;
+			count=userRankingCount.Count;
+		}
+	}
+	
+	var userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	
 	if(userRankingList != null && userRankingList.length != 0){
 		tableData=drawLeaderboardTableStructure(userRankingList, userId)
@@ -408,7 +533,21 @@ $(document).on('click','#top-ten-ranks-btn',function(){
 		break;
 	}
 	
-	var userRankingList = getUserRankingList("companyId",companyId, year, month, startIndex, batchSize, timeFrame);
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
+	var userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	
 	if(userRankingList != null && userRankingList.length != 0){
 		tableData=drawLeaderboardTableStructure(userRankingList, userId)
