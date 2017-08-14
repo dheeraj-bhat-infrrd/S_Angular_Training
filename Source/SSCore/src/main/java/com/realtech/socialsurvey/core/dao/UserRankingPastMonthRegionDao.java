@@ -8,4 +8,8 @@ public interface UserRankingPastMonthRegionDao extends GenericReportingDao<UserR
 
     List<UserRankingPastMonthRegion> fetchUserRankingForPastMonthRegion( Long regionId, int month, int year, int startIndex,
         int batchSize );
+    
+    int fetchUserRankingRankForPastMonthRegion( Long userId, Long regionId, int year );
+
+    long fetchUserRankingCountForPastMonthRegion( Long regionId, int year, int month );
 }

@@ -64,7 +64,10 @@ public class UserRankingThisYearRegion
     private int averageRating;
     
     @Column(name = "is_eligible")
-    private	boolean isEligible;
+    private	int isEligible;
+    
+    @Column(name = "internal_region_rank")
+    int internalRegionRank;
     
 	public int getAverageRating() {
 		return averageRating;
@@ -194,12 +197,20 @@ public class UserRankingThisYearRegion
 		this.totalReviews = totalReviews;
 	}
 
-	public boolean isEligible() {
+	public int getIsEligible() {
 		return isEligible;
 	}
 
-	public void setEligible(boolean isEligible) {
+	public void setIsEligible(int isEligible) {
 		this.isEligible = isEligible;
+	}
+
+	public int getInternalRegionRank() {
+		return internalRegionRank;
+	}
+
+	public void setInternalRegionRank(int internalRegionRank) {
+		this.internalRegionRank = internalRegionRank;
 	}
 
 	@Override
@@ -209,10 +220,8 @@ public class UserRankingThisYearRegion
 				+ ", firstName=" + firstName + ", lastName=" + lastName + ", rankingScore=" + rankingScore + ", rank="
 				+ rank + ", sps=" + sps + ", daysOfRegistration=" + daysOfRegistration + ", completed=" + completed
 				+ ", sent=" + sent + ", completedPercentage=" + completedPercentage + ", totalReviews=" + totalReviews
-				+ ", averageRating=" + averageRating + ", isEligible=" + isEligible + "]";
+				+ ", averageRating=" + averageRating + ", isEligible=" + isEligible + ", internalRegionRank="
+				+ internalRegionRank + "]";
 	}
 
-	
-    
-    
 }

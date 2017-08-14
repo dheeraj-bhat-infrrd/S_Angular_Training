@@ -1337,5 +1337,7 @@ public interface CommonConstants
     public static final String LEADERBOARD_MONTH="month";
     
     public static final String RANK = "rank";
+    public static final String INTERNAL_BRANCH_RANK = "internalBranchRank";
+    public static final String INTERNAL_REGION_RANK = "internalRegionRank";
     
 }

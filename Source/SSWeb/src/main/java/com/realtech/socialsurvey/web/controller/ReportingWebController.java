@@ -911,6 +911,18 @@ public class ReportingWebController
        if(monthStr != null && !monthStr.isEmpty()){
            month = Integer.parseInt( monthStr );
        }
+       
+       AgentSettings agentSettings = userManagementService.getUserSettings( userId );
+       Map<String, Long> hierarchyMap = null;
+       hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+       long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+       long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+       if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
+    	   entityId = regionId;
+       }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
+    	   entityId = branchId;
+       }
+       
        switch(timeFrame){
            case 1: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingRankCountForThisYear(userId , entityId, entityType, year,batchSize);
                break;
@@ -972,6 +984,20 @@ public class ReportingWebController
        if(monthStr != null && !monthStr.isEmpty()){
            month = Integer.parseInt( monthStr );
        }
+       
+       User user = sessionHelper.getCurrentUser();
+       Long userId = user.getUserId();
+       AgentSettings agentSettings = userManagementService.getUserSettings( userId );
+       Map<String, Long> hierarchyMap = null;
+       hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+       long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+       long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+       if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
+    	   entityId = regionId;
+       }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
+    	   entityId = branchId;
+       }
+       
        switch(timeFrame){
            case 1: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForThisYear(entityId, entityType, year,batchSize);
                    break;
@@ -997,8 +1023,7 @@ public class ReportingWebController
        
        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
        List<List<Object>> userRankingList = new ArrayList<>();
-       User user = sessionHelper.getCurrentUser();
-       
+              
        String entityType= request.getParameter(CommonConstants.ENTITY_TYPE_COLUMN);
        String entityIdStr= request.getParameter(CommonConstants.ENTITY_ID_COLUMN);
        String timeFrameStr = request.getParameter("timeFrame");
@@ -1031,6 +1056,19 @@ public class ReportingWebController
        }
        if(yearStr!=null && !yearStr.isEmpty()){
            year = Integer.parseInt(yearStr);
+       }
+       
+       User user = sessionHelper.getCurrentUser();
+       Long userId = user.getUserId();
+       AgentSettings agentSettings = userManagementService.getUserSettings( userId );
+       Map<String, Long> hierarchyMap = null;
+       hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+       long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+       long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+       if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
+    	   entityId = regionId;
+       }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
+    	   entityId = branchId;
        }
        
        switch(timeFrame){
