@@ -62,7 +62,10 @@ public class UserRankingPastYearsRegion
     private int averageRating;
     
     @Column(name = "is_eligible")
-    private boolean isEligible;
+    private	int isEligible;
+    
+    @Column(name = "internal_region_rank")
+    int internalRegionRank;
 
     public String getUserRankingPastYearsRegionId()
     {
@@ -214,31 +217,30 @@ public class UserRankingPastYearsRegion
         this.averageRating = averageRating;
     }
 
-    public boolean isEligible()
-    {
-        return isEligible;
-    }
+	public int getIsEligible() {
+		return isEligible;
+	}
 
-    public void setEligible( boolean isEligible )
-    {
-        this.isEligible = isEligible;
-    }
+	public void setIsEligible(int isEligible) {
+		this.isEligible = isEligible;
+	}
 
-    public static long getSerialversionuid()
-    {
-        return serialVersionUID;
-    }
+	public int getInternalRegionRank() {
+		return internalRegionRank;
+	}
 
-    @Override
-    public String toString()
-    {
-        return "UserRankingPastYearsRegion [userRankingPastYearsRegionId=" + userRankingPastYearsRegionId + ", userId=" + userId
-            + ", companyId=" + companyId + ", regionId=" + regionId + ", firstName=" + firstName + ", lastName=" + lastName
-            + ", rankingScore=" + rankingScore + ", rank=" + rank + ", sps=" + sps + ", daysOfRegistration="
-            + daysOfRegistration + ", completed=" + completed + ", sent=" + sent + ", completedPercentage="
-            + completedPercentage + ", totalReviews=" + totalReviews + ", averageRating=" + averageRating + ", isEligible="
-            + isEligible + "]";
-    }
-    
-    
+	public void setInternalRegionRank(int internalRegionRank) {
+		this.internalRegionRank = internalRegionRank;
+	}
+
+	@Override
+	public String toString() {
+		return "UserRankingPastYearsRegion [userRankingPastYearsRegionId=" + userRankingPastYearsRegionId + ", userId="
+				+ userId + ", companyId=" + companyId + ", regionId=" + regionId + ", firstName=" + firstName
+				+ ", lastName=" + lastName + ", rankingScore=" + rankingScore + ", rank=" + rank + ", sps=" + sps
+				+ ", daysOfRegistration=" + daysOfRegistration + ", completed=" + completed + ", sent=" + sent
+				+ ", completedPercentage=" + completedPercentage + ", totalReviews=" + totalReviews + ", averageRating="
+				+ averageRating + ", isEligible=" + isEligible + ", internalRegionRank=" + internalRegionRank + "]";
+	}
+
 }

@@ -65,8 +65,7 @@ public class UserRankingPastMonthMain
     private int averageRating;
     
     @Column(name = "is_eligible")
-    private	boolean isEligible;
-    
+    private	int isEligible;
     
 	public int getAverageRating() {
 		return averageRating;
@@ -227,16 +226,13 @@ public class UserRankingPastMonthMain
 		this.totalReviews = totalReviews;
 	}
 
-
-	public boolean isEligible() {
+	public int getIsEligible() {
 		return isEligible;
 	}
 
-
-	public void setEligible(boolean isEligible) {
+	public void setIsEligible(int isEligible) {
 		this.isEligible = isEligible;
 	}
-
 
 	@Override
 	public String toString() {

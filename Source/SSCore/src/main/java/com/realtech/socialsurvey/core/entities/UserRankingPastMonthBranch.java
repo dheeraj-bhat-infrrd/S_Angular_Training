@@ -68,7 +68,10 @@ public class UserRankingPastMonthBranch
     private int averageRating;
     
     @Column(name = "is_eligible")
-    private	boolean isEligible;
+    private	int isEligible;
+    
+    @Column(name = "internal_branch_rank")
+    int internalBranchRank;
 
 	public String getUserRankingPastMonthBranchId() {
 		return userRankingPastMonthBranchId;
@@ -206,12 +209,20 @@ public class UserRankingPastMonthBranch
 		this.averageRating = averageRating;
 	}
 
-	public boolean isEligible() {
+	public int getIsEligible() {
 		return isEligible;
 	}
 
-	public void setEligible(boolean isEligible) {
+	public void setIsEligible(int isEligible) {
 		this.isEligible = isEligible;
+	}
+
+	public int getInternalBranchRank() {
+		return internalBranchRank;
+	}
+
+	public void setInternalBranchRank(int internalBranchRank) {
+		this.internalBranchRank = internalBranchRank;
 	}
 
 	@Override
@@ -221,7 +232,8 @@ public class UserRankingPastMonthBranch
 				+ ", firstName=" + firstName + ", lastName=" + lastName + ", rankingScore=" + rankingScore + ", rank="
 				+ rank + ", sps=" + sps + ", daysOfRegistration=" + daysOfRegistration + ", completed=" + completed
 				+ ", sent=" + sent + ", completedPercentage=" + completedPercentage + ", totalReviews=" + totalReviews
-				+ ", averageRating=" + averageRating + ", isEligible=" + isEligible + "]";
-	} 
-    
+				+ ", averageRating=" + averageRating + ", isEligible=" + isEligible + ", internalBranchRank="
+				+ internalBranchRank + "]";
+	}
+
 }

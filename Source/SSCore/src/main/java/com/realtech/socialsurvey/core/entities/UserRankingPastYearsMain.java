@@ -58,7 +58,7 @@ public class UserRankingPastYearsMain
     private int averageRating;
     
     @Column(name = "is_eligible")
-    private boolean isEligible;
+    private	int isEligible;
 
     public String getUserRankingPastYearsMainId()
     {
@@ -200,22 +200,15 @@ public class UserRankingPastYearsMain
         this.averageRating = averageRating;
     }
 
-    public boolean isEligible()
-    {
-        return isEligible;
-    }
+    public int getIsEligible() {
+		return isEligible;
+	}
 
-    public void setEligible( boolean isEligible )
-    {
-        this.isEligible = isEligible;
-    }
+	public void setIsEligible(int isEligible) {
+		this.isEligible = isEligible;
+	}
 
-    public static long getSerialversionuid()
-    {
-        return serialVersionUID;
-    }
-
-    @Override
+	@Override
     public String toString()
     {
         return "UserRankingPastYearsMain [userRankingPastYearsMainId=" + userRankingPastYearsMainId + ", userId=" + userId
