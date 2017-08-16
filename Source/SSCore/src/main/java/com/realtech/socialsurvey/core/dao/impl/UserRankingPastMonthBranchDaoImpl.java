@@ -49,17 +49,18 @@ public class UserRankingPastMonthBranchDaoImpl extends GenericReportingDaoImpl<U
 	}
 
 	@Override
-	public int fetchUserRankingRankForPastMonthBranch(Long userId, Long branchId, int year) {
+	public int fetchUserRankingRankForPastMonthBranch(Long userId, Long branchId, int year, int month) {
 		LOG.info( "method to fetch user ranking Branch Rank for past month, fetchUserRankingRankFoPastMonthBranch() started" );
-        Query query = getSession().createSQLQuery( "SELECT internal_branch_rank FROM user_ranking_past_month_branch WHERE user_id = :userId " );
+        Query query = getSession().createSQLQuery( "SELECT internal_branch_rank FROM user_ranking_past_month_branch WHERE user_id = :userId AND month = :month" );
         query.setParameter( "userId", userId  );
+        query.setParameter( "month", month  );
         int UserRank = (int) query.uniqueResult();
         LOG.info( "method to fetch user ranking Branch Rank for this month, fetchUserRankingRankFoPastMonthBranch() finished." );
         return UserRank;
 	}
 
 	@Override
-	public long fetchUserRankingCountForPastMonthBranch(Long branchId, int year, int month) {
+	public long fetchUserRankingCountForPastMonthBranch(Long branchId, int month, int year) {
 		LOG.info( "method to fetch user ranking Branch count for past month, fetchUserRankingCountForPastMonthBranch() started" );
         Criteria criteria = getSession().createCriteria( UserRankingPastMonthBranch.class );
         try {

@@ -49,10 +49,11 @@ public class UserRankingPastMonthMainDaoImpl extends GenericReportingDaoImpl<Use
 	}
 	
 	@Override
-    public int fetchUserRankingRankForPastMonthMain(Long userId , Long companyId, int year) {
+    public int fetchUserRankingRankForPastMonthMain(Long userId , Long companyId, int year,int month) {
         LOG.info( "method to fetch user ranking Main Rank for past month, fetchUserRankingRankFoPastMonthMain() started" );
-        Query query = getSession().createSQLQuery( "SELECT rank FROM user_ranking_past_month_main WHERE user_id = :userId " );
+        Query query = getSession().createSQLQuery( "SELECT rank FROM user_ranking_past_month_main WHERE user_id = :userId AND month = :month" );
         query.setParameter( "userId", userId  );
+        query.setParameter( "month", month  );
         int UserRank = (int) query.uniqueResult();
         LOG.info( "method to fetch user ranking Main Rank for this month, fetchUserRankingRankFoPastMonthMain() finished." );
         return UserRank;

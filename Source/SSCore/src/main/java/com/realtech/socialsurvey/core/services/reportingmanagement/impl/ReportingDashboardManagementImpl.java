@@ -1587,7 +1587,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         Map<String, Object> RankingCountStartIndex = new HashMap<String,Object>();
         if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
             RankingCountStartIndex.put( "Count",userRankingPastMonthMainDao.fetchUserRankingCountForPastMonthMain( entityId, year, month) );
-            int Rank = userRankingPastMonthMainDao.fetchUserRankingRankForPastMonthMain( userId, entityId, year );
+            int Rank = userRankingPastMonthMainDao.fetchUserRankingRankForPastMonthMain( userId, entityId, year,month );
             //get the mod to determine startIndex
             int startIndex=0;
             int mod = (Rank % BatchSize);
@@ -1603,7 +1603,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
 	    	RankingCountStartIndex.put( "Count",userRankingPastMonthBranchDao.fetchUserRankingCountForPastMonthBranch( entityId,month, year) );
-	        int Rank = userRankingPastMonthBranchDao.fetchUserRankingRankForPastMonthBranch( userId, entityId, year );
+	        int Rank = userRankingPastMonthBranchDao.fetchUserRankingRankForPastMonthBranch( userId, entityId, year,month );
 	        //get the mod to determine startIndex
 	        int startIndex=0;
             int mod = (Rank % BatchSize);
@@ -1618,7 +1618,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         
         }else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
 	    	RankingCountStartIndex.put( "Count",userRankingPastMonthRegionDao.fetchUserRankingCountForPastMonthRegion( entityId,month, year) );
-	        int Rank = userRankingPastMonthRegionDao.fetchUserRankingRankForPastMonthRegion( userId, entityId, year );
+	        int Rank = userRankingPastMonthRegionDao.fetchUserRankingRankForPastMonthRegion( userId, entityId, year ,month);
 	        //get the mod to determine startIndex
 	        int startIndex=0;
             int mod = (Rank % BatchSize);

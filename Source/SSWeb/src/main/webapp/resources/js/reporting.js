@@ -1458,9 +1458,9 @@ function drawLeaderboardTableStructure(userRankingList,userId){
 	
 	if(userRankingList.length>0 && userRankingList != null){
 		for(var i=0;i<userRankingList.length;i++){
-			var rank='#';
+			var rank='NR';
 			
-			if(userRankingList[i][1]!=0){
+			if(userRankingList[i][9] == 1){
 				rank='#' + userRankingList[i][1];
 				
 				profileImageUrl = getProfileImageByUserId(userRankingList[i][0]);
@@ -1487,6 +1487,14 @@ function drawLeaderboardTableStructure(userRankingList,userId){
 				+'<td class="lead-tbl-ln-of">'+userRankingList[i][8]+'</td>'
 				+'</tr>'
 			}else{
+				
+				profileImageUrl = getProfileImageByUserId(userRankingList[i][0]);
+				if(profileImageUrl != null && profileImageUrl!=""){
+					imageDiv='<img id="lead-prof-image-edit" class="prof-image prof-image-edit pos-relative leaderboard-pic-circle" src="'+profileImageUrl+'"></img>';
+				}else{
+					imageDiv='<div id="lead-prof-image-edit" class="prof-image prof-image-edit pers-default-big pos-relative leaderboard-pic-circle"></div>';
+				}
+				
 				if(userRankingList[i][0] == "${userId}"){
 					nonRankedTableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
 					$('#rank-span').html('NA');
@@ -1495,7 +1503,7 @@ function drawLeaderboardTableStructure(userRankingList,userId){
 				}
 				nonRankedTableData+= '<td class="lead-tbl-ln-of">'+rank+'</td>'
 				+'<td class="v-tbl-uname fetch-name">'+'<div class="leaderboard-name-div">'
-				+'<div class="lead-img-div"><img id="prof-image-edit" class="lead-img prof-image-edit pos-relative leaderboard-pic-circle" src="${initParam.resourcesPath}/resources/images/bg.jpg"></img></div>'
+				+'<div class="lead-img-div">'+imageDiv+'</div>'
 				+'<span class="lead-name-span" >'+userRankingList[i][2]+' '+userRankingList[i][3]+'</span></div>'
 				+'</td>'
 				+'<td class="lead-tbl-ln-of">'+userRankingList[i][5]+'</td>'

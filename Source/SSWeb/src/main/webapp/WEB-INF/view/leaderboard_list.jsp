@@ -20,6 +20,8 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
+<c:set value="${columnName}" var="columnName"></c:set>
+<c:set value="${columnValue}" var="columnId"></c:set>
 
 <style>
 .leaderboard-table{
@@ -50,9 +52,12 @@
 		var userId = "${userId}";
 		var profileMasterId = "${profilemasterid}";
 		var userRankingCount =null;
+		var columnName = "${columnName}";
+		var columnId = "${columnId}";
 		
+		console.log(columnName,columnId);
 		if(profileMasterId != 4){
-			userRankingCount = getUserRankingCountForAdmins("companyId", companyId, currentYear, currentMonth, batchSize, 1)
+			userRankingCount = getUserRankingCountForAdmins(columnName, columnId, currentYear, currentMonth, batchSize, 1)
 			if(userRankingCount != null){
 				startIndex= 0;
 				count=userRankingCount.Count;
@@ -67,7 +72,12 @@
 		
 		$('#rank-count').html('/'+count);
 		
-		var userRankingList = getUserRankingList("companyId",companyId, currentYear, currentMonth, startIndex, batchSize, 1);
+		var userRankingList = null;
+		if(profileMasterId != 4){
+			userRankingList = getUserRankingList(columnName,columnId, currentYear, currentMonth, startIndex, batchSize, 1);
+		}else{
+			userRankingList = getUserRankingList("companyId",companyId, currentYear, currentMonth, startIndex, batchSize, 1);
+		}
 		
 		var tableData='';
 		if(userRankingList != null && userRankingList.length != 0){

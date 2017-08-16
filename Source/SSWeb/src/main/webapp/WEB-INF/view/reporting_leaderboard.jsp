@@ -21,6 +21,8 @@
 	</c:when>
 </c:choose>
 
+<c:set value="${columnName}" var="columnName"></c:set>
+<c:set value="${columnValue}" var="columnId"></c:set>
 
 <style>
 .block-display{
@@ -126,6 +128,13 @@ img.lead-img {
     margin-left: 75%;
 }
 
+.my-rank{
+	width: 100px;
+    margin: 0;
+    margin-left: 58%;
+    margin-top: 70px;
+}
+
 .lead-ranks-above{
 	width: 100px;
     margin: 0;
@@ -167,16 +176,22 @@ img.lead-img {
 	</div>
 </div>
 
-<div id="board-div" class="float-right board-div">
-	<span class="board-div-span">Board</span>
-	<div class="dash-btn-dl-sd-admin board-selector" >
-		<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
-			<option value=1 data-report="company">My Company</option>
-			<option value=2 data-report="region">My Region</option>
-			<option value=3 data-report="branch">My Branch</option>
-		</select>	
+<c:if test="${profilemasterid == 4}">
+	<div id="board-div" class="float-right board-div">
+		<span class="board-div-span">Board</span>
+		<div class="dash-btn-dl-sd-admin board-selector" >
+			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
+				<option value=1 data-report="company">My Company</option>
+				<option value=2 data-report="region">My Region</option>
+				<option value=3 data-report="branch">My Branch</option>
+			</select>	
+		</div>
 	</div>
-</div>
+	
+	<div id="my-rank" class="my-rank">
+		<div id="my-rank-btn" class="float-right paginate-button top-ten-ranks-btn">Me</div>
+	</div>
+</c:if>
 
 <div id="top-ten-ranks" class="top-ten-ranks">
 	<div id="top-ten-ranks-btn" class="float-right paginate-button top-ten-ranks-btn">Top Ten Ranks</div>
@@ -217,6 +232,9 @@ $(document).ready(function(){
 	var board = parseInt(boardStr);
 	var entityType = 'companyId';
 	
+	var columnName = "${columnName}";
+	var columnId = "${columnId}";
+	
 	switch(board){
 	case 1: entityType = 'companyId';
 		break;
@@ -248,7 +266,7 @@ $(document).ready(function(){
 	var userRankingCount =null;
 	
 	if(profileMasterId != 4){
-		userRankingCount = getUserRankingCountForAdmins(entityType, companyId, year, month, batchSize, timeFrame)
+		userRankingCount = getUserRankingCountForAdmins(columnName, columnId, year, month, batchSize, timeFrame)
 		if(userRankingCount != null){
 			startIndex= 0;
 			count=userRankingCount.Count;
@@ -300,7 +318,13 @@ $(document).on('click','#lead-ranks-above-btn',function(){
 	default: entityType = 'companyId'
 	}
 	
-	var userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	var userRankingList = null;
+	
+	if(profileMasterId != 4){
+		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	}
 	
 	if(userRankingList != null && userRankingList.length != 0){
 		tableData=drawLeaderboardTableStructure(userRankingList, userId)
@@ -358,7 +382,13 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 	default: entityType = 'companyId'
 	}
 	
-	var userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	var userRankingList = null;
+	
+	if(profileMasterId != 4){
+		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	}
 	
 	if(userRankingList != null && userRankingList.length != 0){
 		tableData=drawLeaderboardTableStructure(userRankingList, userId)
@@ -411,7 +441,7 @@ $(document).on('change', '#time-selector', function() {
 	}
 	
 	if(profileMasterId != 4){
-		userRankingCount = getUserRankingCountForAdmins(entityType, companyId, year, month, batchSize, timeFrame)
+		userRankingCount = getUserRankingCountForAdmins(columnName, columnId, year, month, batchSize, timeFrame)
 		if(userRankingCount != null){
 			startIndex= 0;
 			count=userRankingCount.Count;
@@ -424,7 +454,13 @@ $(document).on('change', '#time-selector', function() {
 		}
 	}
 	
-	var userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	var userRankingList = null;
+	
+	if(profileMasterId != 4){
+		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	}
 	
 	if(userRankingList != null && userRankingList.length != 0){
 		tableData=drawLeaderboardTableStructure(userRankingList, userId)
@@ -479,7 +515,7 @@ $(document).on('change', '#board-selector', function() {
 	}
 	
 	if(profileMasterId != 4){
-		userRankingCount = getUserRankingCountForAdmins(entityType, companyId, year, month, batchSize, timeFrame)
+		userRankingCount = getUserRankingCountForAdmins(columnName, columnId, year, month, batchSize, timeFrame)
 		if(userRankingCount != null){
 			startIndex= 0;
 			count=userRankingCount.Count;
@@ -492,7 +528,13 @@ $(document).on('change', '#board-selector', function() {
 		}
 	}
 	
-	var userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	var userRankingList = null;
+	
+	if(profileMasterId != 4){
+		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	}
 	
 	if(userRankingList != null && userRankingList.length != 0){
 		tableData=drawLeaderboardTableStructure(userRankingList, userId)
@@ -547,7 +589,87 @@ $(document).on('click','#top-ten-ranks-btn',function(){
 	default: entityType = 'companyId'
 	}
 	
-	var userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	var userRankingList = null;
+	
+	if(profileMasterId != 4){
+		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	}
+	
+	if(userRankingList != null && userRankingList.length != 0){
+		tableData=drawLeaderboardTableStructure(userRankingList, userId)
+		$('#leaderboard-list').removeClass('hide');
+		$('#leaderboard-tbl').html(tableData);
+		$('#leaderboard-empty-list-msg-div').addClass('hide');
+	}else{
+		$('#leaderboard-list').addClass('hide');
+		$('#leaderboard-empty-list-msg-div').removeClass('hide');
+	}
+	
+	showHideRankPaginateBtns(startIndex, count);
+	$('html, body').animate({
+        scrollTop: $('#leaderboard-tbl').offset().top - 20
+    }, 'slow');
+	hideOverlay();
+	
+});
+
+$(document).on('click','#my-rank-btn',function(){
+	showOverlay();
+	startIndex=0;
+	
+	timeFrameStr = $('#time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	
+	switch(timeFrame){
+	case 1: year = currentYear;
+		break;
+	case 2: year = currentYear;
+		month = currentMonth;
+		break;
+	case 3: year = currentYear - 1;
+		break;
+	case 4: year = currentYear;
+		month=currentMonth -1;
+		break;
+	}
+	
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
+	if(profileMasterId != 4){
+		userRankingCount = getUserRankingCountForAdmins(columnName, columnId, currentYear, currentMonth, batchSize,timeFrame)
+		if(userRankingCount != null){
+			startIndex= 0;
+			count=userRankingCount.Count;
+		}
+	}else{
+		userRankingCount = getUserRankingCount(entityType, companyId, currentYear, currentMonth, batchSize, timeFrame);
+		if(userRankingCount != null){
+			startIndex= userRankingCount.startIndex;
+			count=userRankingCount.Count;
+		}
+	}
+	
+	var userRankingList = null;
+	
+	if(profileMasterId != 4){
+		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	}
 	
 	if(userRankingList != null && userRankingList.length != 0){
 		tableData=drawLeaderboardTableStructure(userRankingList, userId)

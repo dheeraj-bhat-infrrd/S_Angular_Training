@@ -1,4 +1,4 @@
-
+drop table if exists user_ranking_this_month_main;
 CREATE TABLE `user_ranking_this_month_main` (
   `user_ranking_this_month_main_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE `user_ranking_this_month_main` (
   UNIQUE KEY `unique_keys_f11` (`user_id`,`this_month`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+drop table if exists user_ranking_this_month_branch;
 CREATE TABLE `user_ranking_this_month_branch` (
   `user_ranking_this_month_branch_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -47,6 +47,7 @@ CREATE TABLE `user_ranking_this_month_branch` (
   UNIQUE KEY `unique_keys_f10` (`user_id`,`branch_id`,`this_month`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+drop table if exists user_ranking_this_month_region;
 CREATE TABLE `user_ranking_this_month_region` (
   `user_ranking_this_month_region_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -71,7 +72,7 @@ CREATE TABLE `user_ranking_this_month_region` (
   UNIQUE KEY `unique_keys_f12` (`user_id`,`region_id`,`this_month`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+drop table if exists user_ranking_this_year_main;
 CREATE TABLE `user_ranking_this_year_main` (
   `user_ranking_this_year_main_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -94,7 +95,7 @@ CREATE TABLE `user_ranking_this_year_main` (
   UNIQUE KEY `unique_keys_f14` (`user_id`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+drop table if exists user_ranking_this_year_branch;
 CREATE TABLE `user_ranking_this_year_branch` (
   `user_ranking_this_year_branch_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -118,7 +119,7 @@ CREATE TABLE `user_ranking_this_year_branch` (
   UNIQUE KEY `unique_keys_f13` (`user_id`,`branch_id`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+drop table if exists user_ranking_this_year_region;
 CREATE TABLE `user_ranking_this_year_region` (
   `user_ranking_this_year_region_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -142,7 +143,7 @@ CREATE TABLE `user_ranking_this_year_region` (
   UNIQUE KEY `unique_keys_f15` (`user_id`,`region_id`,`this_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+drop table if exists user_ranking_past_month_main;
 CREATE TABLE `user_ranking_past_month_main` (
   `user_ranking_past_month_main_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -167,9 +168,7 @@ CREATE TABLE `user_ranking_past_month_main` (
   UNIQUE KEY `unique_key_f1` (`user_id`,`month_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-
-
+drop table if exists user_ranking_past_month_branch;
 CREATE TABLE `user_ranking_past_month_branch` (
   `user_ranking_past_month_branch_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -195,7 +194,7 @@ CREATE TABLE `user_ranking_past_month_branch` (
   UNIQUE KEY `unique_key_f2` (`user_id`,`branch_id`,`month_year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+drop table if exists user_ranking_past_month_region;
 CREATE TABLE `user_ranking_past_month_region` (
   `user_ranking_past_month_region_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -222,7 +221,7 @@ CREATE TABLE `user_ranking_past_month_region` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-
+drop table if exists user_ranking_past_year_main;
 CREATE TABLE `user_ranking_past_year_main` (
   `user_ranking_past_year_main_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -246,7 +245,7 @@ CREATE TABLE `user_ranking_past_year_main` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-
+drop table if exists user_ranking_past_year_branch;
 CREATE TABLE `user_ranking_past_year_branch` (
   `user_ranking_past_year_branch_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -270,7 +269,7 @@ CREATE TABLE `user_ranking_past_year_branch` (
   UNIQUE KEY `unique_keys_f4` (`user_id`,`branch_id`,`year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+drop table if exists user_ranking_past_year_region;
 CREATE TABLE `user_ranking_past_year_region` (
   `user_ranking_past_year_region_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -294,7 +293,7 @@ CREATE TABLE `user_ranking_past_year_region` (
   UNIQUE KEY `unique_keys_f6` (`user_id`,`region_id`,`year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+drop table if exists user_ranking_past_years_main;
 CREATE TABLE `user_ranking_past_years_main` (
   `user_ranking_past_years_main_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -316,7 +315,7 @@ CREATE TABLE `user_ranking_past_years_main` (
   UNIQUE KEY `unique_keys_f8` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+drop table if exists user_ranking_past_years_branch;
 CREATE TABLE `user_ranking_past_years_branch` (
   `user_ranking_past_years_branch_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
@@ -339,7 +338,7 @@ CREATE TABLE `user_ranking_past_years_branch` (
   UNIQUE KEY `unique_keys_f7` (`user_id`,`branch_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+drop table if exists user_ranking_past_years_region;
 CREATE TABLE `user_ranking_past_years_region` (
   `user_ranking_past_years_region_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,

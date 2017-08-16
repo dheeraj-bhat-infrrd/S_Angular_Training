@@ -50,17 +50,18 @@ public class UserRankingPastMonthRegionDaoImpl extends GenericReportingDaoImpl<U
 	}
 
 	@Override
-	public int fetchUserRankingRankForPastMonthRegion(Long userId, Long regionId, int year) {
+	public int fetchUserRankingRankForPastMonthRegion(Long userId, Long regionId, int year, int month) {
 		LOG.info( "method to fetch user ranking Region Rank for past month, fetchUserRankingRankFoPastMonthRegion() started" );
-        Query query = getSession().createSQLQuery( "SELECT internal_region_rank FROM user_ranking_past_month_region WHERE user_id = :userId " );
+        Query query = getSession().createSQLQuery( "SELECT internal_region_rank FROM user_ranking_past_month_region WHERE user_id = :userId AND month = :month" );
         query.setParameter( "userId", userId  );
+        query.setParameter( "month", month  );
         int UserRank = (int) query.uniqueResult();
         LOG.info( "method to fetch user ranking Region Rank for this month, fetchUserRankingRankFoPastMonthRegion() finished." );
         return UserRank;
 	}
 
 	@Override
-	public long fetchUserRankingCountForPastMonthRegion(Long regionId, int year, int month) {
+	public long fetchUserRankingCountForPastMonthRegion(Long regionId,  int month,int year) {
 		LOG.info( "method to fetch user ranking Region count for past month, fetchUserRankingCountForPastMonthRegion() started" );
         Criteria criteria = getSession().createCriteria( UserRankingPastMonthRegion.class );
         try {
