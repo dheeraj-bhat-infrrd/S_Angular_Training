@@ -212,13 +212,19 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var region_id &#x3d; 0&#xd;&#xa;&#xd;&#xa;if&#x28;REGION_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	region_id&#x3d; REGION_ID&#xd;&#xa;&#x7d;else if&#x28;REGION_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	region_id &#x3d; REGION_ID_1&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var region_id &#x3d; 0&#xd;&#xa;&#xd;&#xa;if&#x28;REGION_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	region_id&#x3d; REGION_ID&#xd;&#xa;&#x7d;else if&#x28;REGION_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	region_id &#x3d; REGION_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var internal_region_rank &#x3d; 0&#x3b;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>region_id</name>
         <rename>region_id</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
+      </field>      <field>        <name>internal_region_rank</name>
+        <rename>internal_region_rank</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>738</xloc>
@@ -565,6 +571,14 @@
         <field>
           <column_name>user_ranking_this_year_region_id</column_name>
           <stream_name>user_ranking_this_year_region_id</stream_name>
+        </field>
+        <field>
+          <column_name>internal_region_rank</column_name>
+          <stream_name>internal_region_rank</stream_name>
+        </field>
+        <field>
+          <column_name>average_rating</column_name>
+          <stream_name>average_rating</stream_name>
         </field>
     </fields>
      <cluster_schema/>
