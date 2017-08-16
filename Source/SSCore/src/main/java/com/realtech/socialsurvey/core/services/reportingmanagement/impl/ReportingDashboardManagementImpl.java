@@ -39,6 +39,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
 import com.realtech.socialsurvey.core.dao.SurveyResultsCompanyReportDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
@@ -61,9 +62,13 @@ import com.realtech.socialsurvey.core.dao.UserRankingThisMonthRegionDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearBranchDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearMainDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearRegionDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyUserReport;
 import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.RankingRequirements;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
@@ -197,6 +202,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Autowired
     private UserRankingPastYearsRegionDao userRankingPastYearsRegionDao;
     
+    @Autowired
+    private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
     
     @Value ( "${FILE_DIRECTORY_LOCATION}")
@@ -1704,4 +1711,31 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return RankingCountStartIndex;
      }
     
+    @Override
+    public RankingRequirements updateRankingRequirements(int minDaysOfRegistration , float minCompletedPercentage , int minNoOfReviews , int monthOffset , int yearOffset){
+        RankingRequirements rankingRequirements = null ;
+        rankingRequirements.setMinCompletedPercentage( minCompletedPercentage );
+        rankingRequirements.setMinDaysOfRegistration( minDaysOfRegistration );
+        rankingRequirements.setMinNoOfReviews( minNoOfReviews );
+        rankingRequirements.setMonthOffset( monthOffset );
+        rankingRequirements.setYearOffset( yearOffset );
+        return rankingRequirements;
+        
+    }
+    
+
+    // Reporting Ranking Requirements update
+    @Override
+    public RankingRequirements updateRankingRequirementsMongo( String collection, OrganizationUnitSettings unitSettings,
+        RankingRequirements rankingRequirements ) throws InvalidInputException
+    {
+        if ( rankingRequirements == null ) {
+            throw new InvalidInputException( "Social Tokens passed can not be null" );
+        }
+        LOG.info( "Updating Social Tokens information" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, rankingRequirements, unitSettings, collection );
+        LOG.info( "Social Tokens updated successfully" );
+        return rankingRequirements;
+    }
 }

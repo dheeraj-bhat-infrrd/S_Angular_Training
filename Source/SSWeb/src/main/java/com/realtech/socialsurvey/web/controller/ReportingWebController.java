@@ -31,9 +31,11 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
@@ -861,7 +863,71 @@ public class ReportingWebController
    @RequestMapping ( value = "/showrankingsettings", method = RequestMethod.GET)
    public String showRankingPage( Model model, HttpServletRequest request ) throws NonFatalException
    {
+       User user = sessionHelper.getCurrentUser();
+       OrganizationUnitSettings companySettings = organizationManagementService
+           .getCompanySettings( user.getCompany().getCompanyId() );
+       RankingRequirements rankingRequirements  = companySettings.getRankingRequirements();
+       model.addAttribute( "minDaysOfRegistration", rankingRequirements.getMinDaysOfRegistration() );
+       model.addAttribute( "minCompletedPercentage", rankingRequirements.getMinCompletedPercentage() );
+       model.addAttribute( "minNoOfReviews", rankingRequirements.getMinNoOfReviews() );
+       model.addAttribute( "monthOffset", rankingRequirements.getMonthOffset() );
+       model.addAttribute( "yearOffset", rankingRequirements.getYearOffset() );
        return JspResolver.RANKING_SETTINGS;
+   }
+   
+   //Updating Ranking settings
+   @ResponseBody
+   @RequestMapping ( value = "/saverankingsettings", method = RequestMethod.PUT)
+   public String saveRankingSettings( Model model, HttpServletRequest request ) throws NonFatalException
+   {
+       LOG.info( "Method changeSelectedRankingSettings() " );
+       User user = sessionHelper.getCurrentUser();
+       HttpSession session = request.getSession( false );
+       long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+       String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+       String minDaysOfRegistrationStr = request.getParameter( "minDaysOfRegistration" );
+       String minCompletedPercentageStr = request.getParameter( "minCompletedPercentage" );
+       String minNoOfReviewsStr = request.getParameter( "minNoOfReviews" );
+       String monthOffsetStr = request.getParameter( "monthOffset" );
+       String yearOffsetStr = request.getParameter( "yearOffset" );
+       int minDaysOfRegistration = 0;
+       float minCompletedPercentage = 0;
+       int minNoOfReviews = 0;
+       int monthOffset = 0;
+       int yearOffset = 0;
+       String message = null;
+       
+       
+       if( minDaysOfRegistrationStr != null && !minDaysOfRegistrationStr.isEmpty()){
+           minDaysOfRegistration = Integer.parseInt( minDaysOfRegistrationStr );
+       }
+       if( minCompletedPercentageStr != null && !minCompletedPercentageStr.isEmpty()){
+           minCompletedPercentage = Float.parseFloat( minCompletedPercentageStr );
+       }
+       if( minNoOfReviewsStr != null && !minNoOfReviewsStr.isEmpty()){
+           minNoOfReviews = Integer.parseInt( minNoOfReviewsStr );
+       }
+       if( monthOffsetStr != null && !monthOffsetStr.isEmpty()){
+           monthOffset = Integer.parseInt( monthOffsetStr );
+       }
+       if( yearOffsetStr != null && !yearOffsetStr.isEmpty()){
+           yearOffset = Integer.parseInt( yearOffsetStr );
+       }
+
+       
+       if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+           OrganizationUnitSettings companySettings = organizationManagementService
+               .getCompanySettings( user.getCompany().getCompanyId() );
+           if ( companySettings == null ) {
+               throw new InvalidInputException( "No company settings found in current session" );
+           }
+           RankingRequirements rankingRequirements = reportingDashboardManagement.updateRankingRequirements(
+               minDaysOfRegistration, minCompletedPercentage, minNoOfReviews , monthOffset , yearOffset );
+           reportingDashboardManagement.updateRankingRequirementsMongo(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, rankingRequirements );
+       }
+
+       message = "The ranking requirements are changed";
+       return message;
    }
    
    @ResponseBody

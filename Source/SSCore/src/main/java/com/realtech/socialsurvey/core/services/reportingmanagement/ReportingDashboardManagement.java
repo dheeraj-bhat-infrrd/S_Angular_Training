@@ -11,6 +11,8 @@ import java.util.Map;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -91,6 +93,12 @@ public interface ReportingDashboardManagement
     Map<String, Object> fetchRankingCountPastYears( long entityId, String entityType, int BatchSize ) throws NonFatalException;
 
     List<List<Object>> getUserRankingPastYears( String entityType, Long entityId, int startIndex, int batchSize );
+
+    RankingRequirements updateRankingRequirements( int minimumRegistrationDays, float minimumCompletedPercentage,
+        int minReviews, int monthOffset, int yearOffset );
+
+    RankingRequirements updateRankingRequirementsMongo( String collection, OrganizationUnitSettings unitSettings,
+        RankingRequirements rankingRequirements ) throws InvalidInputException;
 
     
 }
