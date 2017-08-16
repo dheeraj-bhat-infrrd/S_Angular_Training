@@ -59,7 +59,7 @@ public class UserRankingThisMonthBranchDaoImpl extends GenericReportingDaoImpl<U
 	}
 
 	@Override
-	public long fetchUserRankingCountForThisMonthBranch(Long branchId, int year, int month) {
+	public long fetchUserRankingCountForThisMonthBranch(Long branchId, int month,  int year) {
 		 LOG.info( "method to fetch user ranking Branch count for this month, fetchUserRankingCountForThisMonthBranch() started" );
 	        Criteria criteria = getSession().createCriteria( UserRankingThisMonthBranch.class );
 	        try {

@@ -11,5 +11,5 @@ public interface UserRankingThisMonthBranchDao extends GenericReportingDao<UserR
 
     int fetchUserRankingRankForThisMonthBranch( Long userId, Long branchId, int year );
 
-    long fetchUserRankingCountForThisMonthBranch( Long branchId, int year, int month );
+    long fetchUserRankingCountForThisMonthBranch( Long branchId,  int month,int year );
 }

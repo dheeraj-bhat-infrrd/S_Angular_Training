@@ -9,5 +9,5 @@ public interface UserRankingThisMonthRegionDao extends GenericReportingDao<UserR
 	
 	int fetchUserRankingRankForThisMonthRegion( Long userId, Long regionId, int year );
 
-    long fetchUserRankingCountForThisMonthRegion( Long regionId, int year, int month );
+    long fetchUserRankingCountForThisMonthRegion( Long regionId, int month , int year);
 }
