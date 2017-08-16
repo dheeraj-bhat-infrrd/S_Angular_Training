@@ -203,22 +203,24 @@
   <hop> <from>user_profile</from><to>GroupUserByCompany</to><enabled>Y</enabled> </hop>
   <hop> <from>overview_user</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>MergeOnUserId</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortBasedOnCompanyId</from><to>MergeOnCompanyId</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortOnEntityId</from><to>MergeOnCompanyId</to><enabled>Y</enabled> </hop>
   <hop> <from>Select All Values</from><to>jsForMainCompany</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 2</from><to>jsForPercentage</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_overview_company</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForMainCompany</from><to>UUID_overview_company</to><enabled>Y</enabled> </hop>
-  <hop> <from>jsForIncompleteSurveys</from><to>Write to log 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>MergeOnCompanyId</from><to>Select All Values</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForPercentage</from><to>jsForIncompleteSurveys</to><enabled>Y</enabled> </hop>
-  <hop> <from>Write to log 2</from><to>jsToConvertNullToZero</to><enabled>Y</enabled> </hop>
-  <hop> <from>jsToConvertNullToZero</from><to>overview_company_output</to><enabled>Y</enabled> </hop>
+  <hop> <from>ConvertNullToZero</from><to>overview_company_output</to><enabled>Y</enabled> </hop>
   <hop> <from>MergeOnUserId</from><to>Group byCompanyId2</to><enabled>Y</enabled> </hop>
   <hop> <from>Group byCompanyId2</from><to>SortBasedOnCompanyId</to><enabled>Y</enabled> </hop>
   <hop> <from>SortByEntityId</from><to>GroupByCompanyId</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupByCompanyId</from><to>SortOnEntityId</to><enabled>Y</enabled> </hop>
   <hop> <from>overview_company_output</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>mismatched surveys input</from><to>GroupByCompanyId_mismatched</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortBasedOnCompanyId</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortOnEntityId</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort_OnCompanyId</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>GroupByCompanyId_mismatched</from><to>Sort_OnCompanyId</to><enabled>Y</enabled> </hop>
+  <hop> <from>Multiway Merge Join</from><to>Select All Values</to><enabled>Y</enabled> </hop>
+  <hop> <from>jsForIncompleteSurveys</from><to>ConvertNullToZero</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Dummy &#x28;do nothing&#x29;</name>
@@ -233,8 +235,8 @@
            </partitioning>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>172</xloc>
-      <yloc>538</yloc>
+      <xloc>75</xloc>
+      <yloc>630</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -278,12 +280,6 @@
         <field>
           <aggregate>total_corrupted_count</aggregate>
           <subject>total_corrupted</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>total_mismatched_count</aggregate>
-          <subject>unassigned</subject>
           <type>SUM</type>
           <valuefield/>
         </field>
@@ -350,8 +346,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>536</xloc>
-      <yloc>192</yloc>
+      <xloc>597</xloc>
+      <yloc>166</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -383,8 +379,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>527</xloc>
-      <yloc>298</yloc>
+      <xloc>597</xloc>
+      <yloc>314</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -427,34 +423,6 @@
     </step>
 
   <step>
-    <name>MergeOnCompanyId</name>
-    <type>MergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<join_type>FULL OUTER</join_type>
-<step1>SortOnEntityId</step1>
-<step2>SortBasedOnCompanyId</step2>
-    <keys_1>
-      <key>ENTITY_ID</key>
-    </keys_1>
-    <keys_2>
-      <key>COMPANY_ID</key>
-    </keys_2>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>769</xloc>
-      <yloc>244</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>MergeOnUserId</name>
     <type>MergeJoin</type>
     <description/>
@@ -476,8 +444,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>413</xloc>
-      <yloc>190</yloc>
+      <xloc>408</xloc>
+      <yloc>167</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -565,11 +533,15 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>COMPANY_ID_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>935</xloc>
-      <yloc>229</yloc>
+      <xloc>1281</xloc>
+      <yloc>314</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -622,10 +594,6 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>total_corrupted</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>unassigned</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -684,7 +652,7 @@
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>235</xloc>
+      <xloc>225</xloc>
       <yloc>220</yloc>
       <draw>Y</draw>
       </GUI>
@@ -788,8 +756,8 @@
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>933</xloc>
-      <yloc>435</yloc>
+      <xloc>1281</xloc>
+      <yloc>630</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -822,8 +790,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>640</xloc>
-      <yloc>210</yloc>
+      <xloc>859</xloc>
+      <yloc>169</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -857,7 +825,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>408</xloc>
-      <yloc>312</yloc>
+      <yloc>314</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -890,8 +858,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>640</xloc>
-      <yloc>280</yloc>
+      <xloc>859</xloc>
+      <yloc>314</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -915,115 +883,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>935</xloc>
-      <yloc>377</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Write to log 2</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>ENTITY_ID</name>
-        </field>
-      <field>
-        <name>total_shared_by</name>
-        </field>
-      <field>
-        <name>COMPANY_ID</name>
-        </field>
-      <field>
-        <name>total_detractors_count</name>
-        </field>
-      <field>
-        <name>total_passives_count</name>
-        </field>
-      <field>
-        <name>total_promoters_count</name>
-        </field>
-      <field>
-        <name>total_corrupted_count</name>
-        </field>
-      <field>
-        <name>total_mismatched_count</name>
-        </field>
-      <field>
-        <name>total_duplicate_count</name>
-        </field>
-      <field>
-        <name>total_archieved_count</name>
-        </field>
-      <field>
-        <name>total_incomplete_transactions_count</name>
-        </field>
-      <field>
-        <name>total_survey_sent_count</name>
-        </field>
-      <field>
-        <name>total_survey_completed_count</name>
-        </field>
-      <field>
-        <name>total_zillow_reviews_count</name>
-        </field>
-      <field>
-        <name>total_reviews_count</name>
-        </field>
-      <field>
-        <name>rating_count</name>
-        </field>
-      <field>
-        <name>total_processed</name>
-        </field>
-      <field>
-        <name>total_unprocessed</name>
-        </field>
-      <field>
-        <name>main_CompanyId</name>
-        </field>
-      <field>
-        <name>rating</name>
-        </field>
-      <field>
-        <name>overview_company_id</name>
-        </field>
-      <field>
-        <name>sps_score_var</name>
-        </field>
-      <field>
-        <name>detractors_percentage_var</name>
-        </field>
-      <field>
-        <name>passives_percentage_var</name>
-        </field>
-      <field>
-        <name>promoter_percentage_var</name>
-        </field>
-      <field>
-        <name>complete_percentage</name>
-        </field>
-      <field>
-        <name>incomplete_percentage</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>568</xloc>
-      <yloc>536</yloc>
+      <xloc>1281</xloc>
+      <yloc>525</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1058,8 +919,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>777</xloc>
-      <yloc>536</yloc>
+      <xloc>859</xloc>
+      <yloc>630</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1079,10 +940,10 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var main_CompanyId &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_CompanyId&#x3d;COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;ENTITY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_CompanyId&#x3d;ENTITY_ID&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;total_reviews_count &#x21;&#x3d; null &#x26;&#x26; total_reviews_count &#x21;&#x3d; 0&#x29;&#xd;&#xa;var rating &#x3d; rating_count &#x2f; total_reviews_count&#x3b;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var main_CompanyId &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_CompanyId&#x3d;COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;ENTITY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_CompanyId&#x3d;ENTITY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_CompanyId&#x3d;COMPANY_ID_1&#x3b;	&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;total_reviews_count &#x21;&#x3d; null &#x26;&#x26; total_reviews_count &#x21;&#x3d; 0&#x29;&#xd;&#xa;var rating &#x3d; rating_count &#x2f; total_reviews_count&#x3b;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>main_CompanyId</name>
         <rename>main_CompanyId</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
@@ -1094,8 +955,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>928</xloc>
-      <yloc>307</yloc>
+      <xloc>1281</xloc>
+      <yloc>421</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1142,14 +1003,14 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>934</xloc>
-      <yloc>536</yloc>
+      <xloc>1088</xloc>
+      <yloc>630</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>jsToConvertNullToZero</name>
+    <name>ConvertNullToZero</name>
     <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
@@ -1286,8 +1147,8 @@
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>459</xloc>
-      <yloc>536</yloc>
+      <xloc>597</xloc>
+      <yloc>630</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1316,8 +1177,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>273</xloc>
-      <yloc>312</yloc>
+      <xloc>225</xloc>
+      <yloc>314</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1450,8 +1311,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>312</xloc>
-      <yloc>539</yloc>
+      <xloc>408</xloc>
+      <yloc>630</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1468,7 +1329,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  overview_user_id&#xd;&#xa;, user_id&#xd;&#xa;, sps_score&#xd;&#xa;, total_detractors&#xd;&#xa;, detractors_percentage&#xd;&#xa;, total_passives&#xd;&#xa;, passives_percentage&#xd;&#xa;, total_promoters&#xd;&#xa;, promoter_percentage&#xd;&#xa;, total_corrupted&#xd;&#xa;, unassigned&#xd;&#xa;, total_duplicate&#xd;&#xa;, total_archieved&#xd;&#xa;, incomplete&#xd;&#xa;, total_survey_sent&#xd;&#xa;, completed&#xd;&#xa;, social_posts&#xd;&#xa;, zillow_reviews&#xd;&#xa;, total_reviews&#xd;&#xa;, rating&#xd;&#xa;, completed_percentage&#xd;&#xa;, incomplete_percentage&#xd;&#xa;, processed&#xd;&#xa;, unprocessed&#xd;&#xa;FROM overview_user&#xd;&#xa;order by user_id</sql>
+    <sql>SELECT&#xd;&#xa;  overview_user_id&#xd;&#xa;, user_id&#xd;&#xa;, sps_score&#xd;&#xa;, total_detractors&#xd;&#xa;, detractors_percentage&#xd;&#xa;, total_passives&#xd;&#xa;, passives_percentage&#xd;&#xa;, total_promoters&#xd;&#xa;, promoter_percentage&#xd;&#xa;, total_corrupted&#xd;&#xa;, total_duplicate&#xd;&#xa;, total_archieved&#xd;&#xa;, incomplete&#xd;&#xa;, total_survey_sent&#xd;&#xa;, completed&#xd;&#xa;, social_posts&#xd;&#xa;, zillow_reviews&#xd;&#xa;, total_reviews&#xd;&#xa;, rating&#xd;&#xa;, completed_percentage&#xd;&#xa;, incomplete_percentage&#xd;&#xa;, processed&#xd;&#xa;, unprocessed&#xd;&#xa;FROM overview_user&#xd;&#xa;order by user_id</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1476,8 +1337,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>76</xloc>
-      <yloc>219</yloc>
+      <xloc>75</xloc>
+      <yloc>220</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1502,8 +1363,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>85</xloc>
-      <yloc>311</yloc>
+      <xloc>75</xloc>
+      <yloc>314</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1530,6 +1391,128 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>75</xloc>
       <yloc>116</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>mismatched surveys input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, STATUS&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;where STATUS &#x3d; 10&#xd;&#xa;order by COMPANY_ID&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>75</xloc>
+      <yloc>439</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>GroupByCompanyId_mismatched</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>COMPANY_ID</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>total_mismatched_count</aggregate>
+          <subject>SURVEY_PRE_INITIATION_ID</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>597</xloc>
+      <yloc>439</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Multiway Merge Join</name>
+    <type>MultiwayMergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <join_type>FULL OUTER</join_type>
+    <step0>SortBasedOnCompanyId</step0>
+    <step1>SortOnEntityId</step1>
+    <step2>Sort_OnCompanyId</step2>
+    <number_input>3</number_input>
+    <keys>
+      <key>COMPANY_ID</key>
+      <key>ENTITY_ID</key>
+      <key>COMPANY_ID</key>
+    </keys>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1088</xloc>
+      <yloc>314</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort_OnCompanyId</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>Y</unique_rows>
+    <fields>
+      <field>
+        <name>COMPANY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>859</xloc>
+      <yloc>439</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
