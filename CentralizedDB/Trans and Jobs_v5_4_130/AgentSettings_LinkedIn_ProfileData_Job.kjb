@@ -134,7 +134,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>49</xloc>
-      <yloc>112</yloc>
+      <yloc>113</yloc>
       </entry>
     <entry>
       <name>LinkedIn Profile data</name>
@@ -166,8 +166,8 @@
       </parameters>      <parallel>Y</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>156</xloc>
-      <yloc>112</yloc>
+      <xloc>191</xloc>
+      <yloc>113</yloc>
       </entry>
     <entry>
       <name>LinkedIn Picture Data</name>
@@ -199,8 +199,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>297</xloc>
-      <yloc>89</yloc>
+      <xloc>388</xloc>
+      <yloc>113</yloc>
       </entry>
     <entry>
       <name>LinkedIn Location data</name>
@@ -232,8 +232,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>435</xloc>
-      <yloc>112</yloc>
+      <xloc>586</xloc>
+      <yloc>113</yloc>
       </entry>
     <entry>
       <name>LinkedIn Country Data</name>
@@ -265,8 +265,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>573</xloc>
-      <yloc>86</yloc>
+      <xloc>804</xloc>
+      <yloc>113</yloc>
       </entry>
     <entry>
       <name>LinkedIn Profile Values Data</name>
@@ -298,8 +298,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>713</xloc>
-      <yloc>112</yloc>
+      <xloc>1042</xloc>
+      <yloc>113</yloc>
       </entry>
     <entry>
       <name>LinkedIn Positions Data</name>
@@ -331,8 +331,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>155</xloc>
-      <yloc>256</yloc>
+      <xloc>191</xloc>
+      <yloc>289</yloc>
       </entry>
   </entries>
   <hops>

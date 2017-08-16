@@ -198,7 +198,7 @@
   <hop> <from>Filter rows</from><to>UUID_LinkdInLoc</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_LinkdInLoc</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
   <hop> <from>Insert &#x2f; Update</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows</from><to>Dummy &#x28;do nothing&#x29; 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Dummy &#x28;do nothing&#x29;</name>
@@ -213,8 +213,8 @@
            </partitioning>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>594</xloc>
-      <yloc>45</yloc>
+      <xloc>493</xloc>
+      <yloc>356</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -231,7 +231,7 @@
            <schema_name/>
            </partitioning>
 <send_true_to>UUID_LinkdInLoc</send_true_to>
-<send_false_to>Dummy &#x28;do nothing&#x29; 2</send_false_to>
+<send_false_to>Dummy &#x28;do nothing&#x29;</send_false_to>
     <compare>
 <condition>
  <negated>N</negated>
@@ -242,8 +242,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>198</xloc>
-      <yloc>45</yloc>
+      <xloc>317</xloc>
+      <yloc>162</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -289,8 +289,8 @@
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>452</xloc>
-      <yloc>45</yloc>
+      <xloc>659</xloc>
+      <yloc>162</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1583,8 +1583,8 @@
       </mongo_field>
     </mongo_fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>65</xloc>
-      <yloc>45</yloc>
+      <xloc>114</xloc>
+      <yloc>162</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1608,27 +1608,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>317</xloc>
-      <yloc>45</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Dummy &#x28;do nothing&#x29; 2</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>194</xloc>
-      <yloc>154</yloc>
+      <xloc>493</xloc>
+      <yloc>162</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
