@@ -81,7 +81,7 @@
 		
 		var tableData='';
 		if(userRankingList != null && userRankingList.length != 0){
-			tableData=drawLeaderboardTableStructure(userRankingList, userId)
+			tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
 			$('#leaderboard-list').removeClass('hide');
 			$('#leaderboard-tbl').html(tableData);
 			$('#leaderboard-empty-list-msg-div').addClass('hide');

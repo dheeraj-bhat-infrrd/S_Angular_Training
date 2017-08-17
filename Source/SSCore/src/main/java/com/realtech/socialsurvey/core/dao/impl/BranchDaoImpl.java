@@ -165,5 +165,18 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
         LOG.info( "Method to get all branch ids under company id : " + companyId + ",getBranchIdsUnderCompany() ended." );
         return criteria.list();
     }
+
+
+	@Override
+	public long getRegionIdByBranchId(long branchId) {
+		LOG.info( "method to fetch regionId from branchId getRegionIdByBranchId() started" );
+		Query query = getSession().createSQLQuery( "SELECT region_id FROM branch WHERE branch_id = :branchId " );
+        query.setParameter( "branchId", branchId  );
+        long regionId = (int) query.uniqueResult();
+        LOG.info( "method to fetch regionId from branchId getRegionIdByBranchId() finished" );
+        return regionId;
+	}
+    
+    
 }
 // JIRA SS-42 By RM-05 EOC

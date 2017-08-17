@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.hibernate.Query;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.impl.BranchDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -995,6 +998,9 @@ public class ReportingWebController
     	   entityId = branchId;
        }
        
+       if(columnType.equals(CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals(CommonConstants.REGION_ID_COLUMN)){
+    	   entityId = reportingDashboardManagement.getRegionIdFromBranchId(branchId);
+       }
        switch(timeFrame){
            case 1: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingRankCountForThisYear(userId , entityId, entityType, year,batchSize);
                break;
@@ -1077,6 +1083,10 @@ public class ReportingWebController
     	   entityId = branchId;
        }
        
+       if(columnType.equals(CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals(CommonConstants.REGION_ID_COLUMN)){
+    	   entityId = reportingDashboardManagement.getRegionIdFromBranchId(branchId);
+       }
+       
        switch(timeFrame){
            case 1: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForThisYear(entityId, entityType, year,batchSize);
                    break;
@@ -1155,6 +1165,10 @@ public class ReportingWebController
        }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)&& !columnType.equals(CommonConstants.COMPANY_ID_COLUMN ) && !columnType.equals(CommonConstants.REGION_ID_COLUMN ) && !columnType.equals(CommonConstants.BRANCH_ID_COLUMN )){
     	   branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
     	   entityId = branchId;
+       }
+       
+       if(columnType.equals(CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals(CommonConstants.REGION_ID_COLUMN)){
+    	   entityId = reportingDashboardManagement.getRegionIdFromBranchId(branchId);
        }
        
        switch(timeFrame){

@@ -197,9 +197,9 @@ img.lead-img {
 		<span class="board-div-span">Board</span>
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
-				<option value=1 data-report="company">Branch</option>
+				<option value=3 data-report="company">Branch</option>
 				<option value=2 data-report="region">My Region</option>
-				<option value=2 data-report="region">My Company</option>
+				<option value=1 data-report="region">My Company</option>
 			</select>	
 		</div>
 	</div>
@@ -210,7 +210,7 @@ img.lead-img {
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
 				<option value=2 data-report="region">Region</option>
-				<option value=2 data-report="region">My Company</option>
+				<option value=1 data-report="region">My Company</option>
 			</select>	
 		</div>
 	</div>
@@ -221,7 +221,7 @@ img.lead-img {
 		<span class="board-div-span">Board</span>
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
-				<option value=2 data-report="region">Company</option>
+				<option value=1 data-report="region">Company</option>
 			</select>	
 		</div>
 	</div>
@@ -242,7 +242,7 @@ img.lead-img {
 
 <div id="leaderboard-empty-list-msg-div" class="hide">
 	<div style="text-align:center; margin:30% auto">
-		<span class="incomplete-trans-span">No records found for the chosen time frame</span>
+		<span class="incomplete-trans-span" style="font-size:large">No records found for the chosen time frame</span>
 	</div>
 </div>
 <script>
@@ -297,10 +297,17 @@ $(document).ready(function(){
 		break;
 	}
 	
-	var userRankingCount =null;
+	var entityId = companyId;
 	
 	if(profileMasterId != 4){
-		userRankingCount = getUserRankingCountForAdmins(columnName, columnId, year, month, batchSize, timeFrame)
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingCount = getUserRankingCountForAdmins(entityType, entityId, year, month, batchSize, timeFrame)
 		if(userRankingCount != null){
 			startIndex= 0;
 			count=userRankingCount.Count;
@@ -355,13 +362,20 @@ $(document).on('click','#lead-ranks-above-btn',function(){
 	var userRankingList = null;
 	
 	if(profileMasterId != 4){
-		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingList = getUserRankingList(entityType,entityId, year, month, startIndex, batchSize, timeFrame);
 	}else{
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
 	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId)
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
 		$('#leaderboard-list').removeClass('hide');
 		$('#leaderboard-tbl').html(tableData);
 		$('#leaderboard-empty-list-msg-div').addClass('hide');
@@ -419,13 +433,20 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 	var userRankingList = null;
 	
 	if(profileMasterId != 4){
-		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingList = getUserRankingList(entityType,entityId, year, month, startIndex, batchSize, timeFrame);
 	}else{
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
 	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId)
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
 		$('#leaderboard-list').removeClass('hide');
 		$('#leaderboard-tbl').html(tableData);
 		$('#leaderboard-empty-list-msg-div').addClass('hide');
@@ -474,8 +495,17 @@ $(document).on('change', '#time-selector', function() {
 	default: entityType = 'companyId'
 	}
 	
+	var entityId = companyId;
+	
 	if(profileMasterId != 4){
-		userRankingCount = getUserRankingCountForAdmins(columnName, columnId, year, month, batchSize, timeFrame)
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingCount = getUserRankingCountForAdmins(entityType, entityId, year, month, batchSize, timeFrame)
 		if(userRankingCount != null){
 			startIndex= 0;
 			count=userRankingCount.Count;
@@ -491,13 +521,20 @@ $(document).on('change', '#time-selector', function() {
 	var userRankingList = null;
 	
 	if(profileMasterId != 4){
-		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingList = getUserRankingList(entityType,entityId, year, month, startIndex, batchSize, timeFrame);
 	}else{
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
 	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId)
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
 		$('#leaderboard-list').removeClass('hide');
 		$('#leaderboard-tbl').html(tableData);
 		$('#leaderboard-empty-list-msg-div').addClass('hide');
@@ -547,9 +584,17 @@ $(document).on('change', '#board-selector', function() {
 		break;
 	default: entityType = 'companyId'
 	}
+	var entityId = companyId;
 	
 	if(profileMasterId != 4){
-		userRankingCount = getUserRankingCountForAdmins(columnName, columnId, year, month, batchSize, timeFrame)
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingCount = getUserRankingCountForAdmins(entityType, entityId, year, month, batchSize, timeFrame)
 		if(userRankingCount != null){
 			startIndex= 0;
 			count=userRankingCount.Count;
@@ -565,13 +610,20 @@ $(document).on('change', '#board-selector', function() {
 	var userRankingList = null;
 	
 	if(profileMasterId != 4){
-		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingList = getUserRankingList(entityType,entityId, year, month, startIndex, batchSize, timeFrame);
 	}else{
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
 	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId)
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
 		$('#leaderboard-list').removeClass('hide');
 		$('#leaderboard-tbl').html(tableData);
 		$('#leaderboard-empty-list-msg-div').addClass('hide');
@@ -626,13 +678,20 @@ $(document).on('click','#top-ten-ranks-btn',function(){
 	var userRankingList = null;
 	
 	if(profileMasterId != 4){
-		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingList = getUserRankingList(entityType,entityId, year, month, startIndex, batchSize, timeFrame);
 	}else{
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
 	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId)
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
 		$('#leaderboard-list').removeClass('hide');
 		$('#leaderboard-tbl').html(tableData);
 		$('#leaderboard-empty-list-msg-div').addClass('hide');
@@ -683,30 +742,20 @@ $(document).on('click','#my-rank-btn',function(){
 	default: entityType = 'companyId'
 	}
 	
-	if(profileMasterId != 4){
-		userRankingCount = getUserRankingCountForAdmins(columnName, columnId, currentYear, currentMonth, batchSize,timeFrame)
-		if(userRankingCount != null){
-			startIndex= 0;
-			count=userRankingCount.Count;
-		}
-	}else{
-		userRankingCount = getUserRankingCount(entityType, companyId, currentYear, currentMonth, batchSize, timeFrame);
-		if(userRankingCount != null){
+	
+	userRankingCount = getUserRankingCount(entityType, companyId, currentYear, currentMonth, batchSize, timeFrame);
+	if(userRankingCount != null){
 			startIndex= userRankingCount.startIndex;
 			count=userRankingCount.Count;
-		}
 	}
+	
 	
 	var userRankingList = null;
 	
-	if(profileMasterId != 4){
-		userRankingList = getUserRankingList(columnName,columnId, year, month, startIndex, batchSize, timeFrame);
-	}else{
-		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
-	}
+	userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	
 	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId)
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
 		$('#leaderboard-list').removeClass('hide');
 		$('#leaderboard-tbl').html(tableData);
 		$('#leaderboard-empty-list-msg-div').addClass('hide');
