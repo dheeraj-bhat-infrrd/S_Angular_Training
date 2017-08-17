@@ -1378,9 +1378,9 @@ DROP TABLE IF EXISTS `lender_ref`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `lender_ref` (
-  `LENDER_REF_ID` int(10) NOT NULL,
+  `LENDER_REF_ID` varchar(36) NOT NULL,
   `ZILLOW_TOKEN_ID` varchar(45) DEFAULT NULL,
-  `NMLS_ID` int(11) DEFAULT NULL,
+  `NMLS_ID` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`LENDER_REF_ID`),
   KEY `FK_ZILLOW_TOKEN_ID_idx` (`ZILLOW_TOKEN_ID`),
   CONSTRAINT `FK_ZILLOW_TOKEN_ID` FOREIGN KEY (`ZILLOW_TOKEN_ID`) REFERENCES `zillow_token` (`ZILLOW_TOKEN_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
