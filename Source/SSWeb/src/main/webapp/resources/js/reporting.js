@@ -1472,6 +1472,7 @@ function drawLeaderboardTableStructure(userRankingList,userId){
 				if(userRankingList[i][0] == userId){
 					tableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
 					$('#rank-span').html(userRankingList[i][1]);
+					$('#user-score-span').html(userRankingList[i][4]);
 				}else{
 					tableData+='<tr class="u-tbl-row leaderboard-row">';
 				}
@@ -1497,7 +1498,8 @@ function drawLeaderboardTableStructure(userRankingList,userId){
 				
 				if(userRankingList[i][0] == "${userId}"){
 					nonRankedTableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
-					$('#rank-span').html('NA');
+					$('#rank-span').html('NR');
+					$('#user-score-span').html(userRankingList[i][4]);
 				}else{
 					nonRankedTableData+='<tr class="u-tbl-row leaderboard-row">';
 				}

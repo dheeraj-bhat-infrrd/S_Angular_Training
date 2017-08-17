@@ -38,7 +38,7 @@
 			</div>
 			<div id="rep-user-score" style="display:inline-flex;">
 				<span>Userscore</span>
-				<span style="font-size: 23px;font-weight: bold !important;margin-left: 8px;line-height: 15px;">NA</span>
+				<span id="user-score-span" style="font-size: 23px;font-weight: bold !important;margin-left: 8px;line-height: 15px;">NA</span>
 			</div>
 		</div>
 		<div class="rep-prof-pic-circle rep-prof-circle-user">
