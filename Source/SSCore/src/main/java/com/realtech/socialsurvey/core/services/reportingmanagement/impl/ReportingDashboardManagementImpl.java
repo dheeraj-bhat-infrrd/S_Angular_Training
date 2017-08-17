@@ -1713,7 +1713,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Override
     public RankingRequirements updateRankingRequirements(int minDaysOfRegistration , float minCompletedPercentage , int minNoOfReviews , int monthOffset , int yearOffset){
-        RankingRequirements rankingRequirements = null ;
+        RankingRequirements rankingRequirements = new RankingRequirements() ;
         rankingRequirements.setMinCompletedPercentage( minCompletedPercentage );
         rankingRequirements.setMinDaysOfRegistration( minDaysOfRegistration );
         rankingRequirements.setMinNoOfReviews( minNoOfReviews );
@@ -1732,10 +1732,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         if ( rankingRequirements == null ) {
             throw new InvalidInputException( "Social Tokens passed can not be null" );
         }
-        LOG.info( "Updating Social Tokens information" );
+        LOG.info( "Updating Ranking Requirements Information" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, rankingRequirements, unitSettings, collection );
-        LOG.info( "Social Tokens updated successfully" );
+            MongoOrganizationUnitSettingDaoImpl.KEY_RANKING_REQUIREMENTS, rankingRequirements, unitSettings, collection );
+        LOG.info( "Ranking Requirements updated successfully" );
         return rankingRequirements;
     }
 }
