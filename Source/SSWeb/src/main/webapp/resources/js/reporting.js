@@ -1439,7 +1439,7 @@ function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame)
 	return userRankingCount;
 }
 
-function drawLeaderboardTableStructure(userRankingList,userId){
+function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
 	
 	var tableHeaderData='<table id="leaderboard-table" class="v-um-tbl leaderboard-table">'
 		+'<tr id="u-tbl-header" class="u-tbl-header">'
@@ -1469,7 +1469,7 @@ function drawLeaderboardTableStructure(userRankingList,userId){
 				}else{
 					imageDiv='<div id="lead-prof-image-edit" class="prof-image prof-image-edit pers-default-big pos-relative leaderboard-pic-circle"></div>';
 				}
-				if(userRankingList[i][0] == userId){
+				if(userRankingList[i][0] == userId  && profileMasterId == 4){
 					tableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
 					$('#rank-span').html(userRankingList[i][1]);
 					$('#user-score-span').html(userRankingList[i][4]);
@@ -1633,3 +1633,5 @@ function getAndSaveRankingSettingsVal(isRealTechOrSSAdmin,monthOff,yearOff){
 	
 	return message;
 }
+
+

@@ -100,5 +100,6 @@ public interface ReportingDashboardManagement
     RankingRequirements updateRankingRequirementsMongo( String collection, OrganizationUnitSettings unitSettings,
         RankingRequirements rankingRequirements ) throws InvalidInputException;
 
+    Long getRegionIdFromBranchId(long branchId);
     
 }

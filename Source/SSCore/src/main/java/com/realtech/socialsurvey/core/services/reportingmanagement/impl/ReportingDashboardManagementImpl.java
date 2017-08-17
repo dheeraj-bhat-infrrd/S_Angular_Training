@@ -28,6 +28,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.api.builder.SSApiBatchIntegrationBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
@@ -62,6 +64,7 @@ import com.realtech.socialsurvey.core.dao.UserRankingThisMonthRegionDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearBranchDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearMainDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearRegionDao;
+import com.realtech.socialsurvey.core.dao.impl.BranchDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyUserReport;
@@ -147,6 +150,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Autowired
     private CompanyUserReportDao companyUserReportDao;
+    
+    @Autowired
+    @Qualifier("branch")
+    private BranchDao branchDao;
     
     @Autowired
     private SSApiBatchIntegrationBuilder ssApiBatchIntergrationBuilder;
@@ -1124,7 +1131,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 				userRankingThisYearMainList.add(userRankingThisYearMain.getTotalReviews());
 				userRankingThisYearMainList.add(userRankingThisYearMain.getAverageRating());
 				userRankingThisYearMainList.add(userRankingThisYearMain.getSps());
-				userRankingThisYearMainList.add(userRankingThisYearMain.getCompleted());
+				userRankingThisYearMainList.add(userRankingThisYearMain.getCompletedPercentage());
 				userRankingThisYearMainList.add(userRankingThisYearMain.getIsEligible());
 				userRanking.add(userRankingThisYearMainList);
 			}
@@ -1139,7 +1146,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 				userRankingThisYearRegionList.add(userRankingThisYearRegion.getTotalReviews());
 				userRankingThisYearRegionList.add(userRankingThisYearRegion.getAverageRating());
 				userRankingThisYearRegionList.add(userRankingThisYearRegion.getSps());
-				userRankingThisYearRegionList.add(userRankingThisYearRegion.getCompleted());
+				userRankingThisYearRegionList.add(userRankingThisYearRegion.getCompletedPercentage());
 				userRankingThisYearRegionList.add(userRankingThisYearRegion.getIsEligible());
 				userRanking.add(userRankingThisYearRegionList);
 			}
@@ -1154,7 +1161,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 				userRankingThisYearBranchList.add(userRankingThisYearBranch.getTotalReviews());
 				userRankingThisYearBranchList.add(userRankingThisYearBranch.getAverageRating());
 				userRankingThisYearBranchList.add(userRankingThisYearBranch.getSps());
-				userRankingThisYearBranchList.add(userRankingThisYearBranch.getCompleted());
+				userRankingThisYearBranchList.add(userRankingThisYearBranch.getCompletedPercentage());
 				userRankingThisYearBranchList.add(userRankingThisYearBranch.getIsEligible());
 				userRanking.add(userRankingThisYearBranchList);
 			}
@@ -1178,7 +1185,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 					userRankingThisMonthMainList.add(userRankingThisMonthMain.getTotalReviews());
 					userRankingThisMonthMainList.add(userRankingThisMonthMain.getAverageRating());
 					userRankingThisMonthMainList.add(userRankingThisMonthMain.getSps());
-					userRankingThisMonthMainList.add(userRankingThisMonthMain.getCompleted());
+					userRankingThisMonthMainList.add(userRankingThisMonthMain.getCompletedPercentage());
 					userRankingThisMonthMainList.add(userRankingThisMonthMain.getIsEligible());
 					userRanking.add(userRankingThisMonthMainList);
 				}
@@ -1193,7 +1200,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getTotalReviews());
 					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getAverageRating());
 					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getSps());
-					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getCompleted());
+					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getCompletedPercentage());
 					userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getIsEligible());
 					userRanking.add(userRankingThisMonthRegionList);
 				}
@@ -1208,7 +1215,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getTotalReviews());
 					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getAverageRating());
 					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getSps());
-					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getCompleted());
+					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getCompletedPercentage());
 					userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getIsEligible());
 					userRanking.add(userRankingThisMonthBranchList);
 				}
@@ -1232,7 +1239,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getTotalReviews());
     			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getAverageRating());
     			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getSps());
-    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getCompleted());
+    			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getCompletedPercentage());
     			userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getIsEligible());
     			userRanking.add(userRankingPastMonthRegionList);
     		}
@@ -1247,7 +1254,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     			userRankingPastMonthMainList.add(userRankingPastMonthMain.getTotalReviews());
     			userRankingPastMonthMainList.add(userRankingPastMonthMain.getAverageRating());
     			userRankingPastMonthMainList.add(userRankingPastMonthMain.getSps());
-    			userRankingPastMonthMainList.add(userRankingPastMonthMain.getCompleted());
+    			userRankingPastMonthMainList.add(userRankingPastMonthMain.getCompletedPercentage());
     			userRankingPastMonthMainList.add(userRankingPastMonthMain.getIsEligible());
     			userRanking.add(userRankingPastMonthMainList);
     		}
@@ -1262,7 +1269,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getTotalReviews());
     			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getAverageRating());
     			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getSps());
-    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getCompleted());
+    			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getCompletedPercentage());
     			userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getIsEligible());
     			userRanking.add(userRankingPastMonthBranchList);
     		}
@@ -1285,7 +1292,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     			userRankingPastYearRegionList.add(userRankingPastYearRegion.getTotalReviews());
     			userRankingPastYearRegionList.add(userRankingPastYearRegion.getAverageRating());
     			userRankingPastYearRegionList.add(userRankingPastYearRegion.getSps());
-    			userRankingPastYearRegionList.add(userRankingPastYearRegion.getCompleted());
+    			userRankingPastYearRegionList.add(userRankingPastYearRegion.getCompletedPercentage());
     			userRankingPastYearRegionList.add(userRankingPastYearRegion.getIsEligible());
     			userRanking.add(userRankingPastYearRegionList);
     		}
@@ -1300,7 +1307,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     			userRankingPastYearMainList.add(userRankingPastYearMain.getTotalReviews());
     			userRankingPastYearMainList.add(userRankingPastYearMain.getAverageRating());
     			userRankingPastYearMainList.add(userRankingPastYearMain.getSps());
-    			userRankingPastYearMainList.add(userRankingPastYearMain.getCompleted());
+    			userRankingPastYearMainList.add(userRankingPastYearMain.getCompletedPercentage());
     			userRankingPastYearMainList.add(userRankingPastYearMain.getIsEligible());
     			userRanking.add(userRankingPastYearMainList);
     		}
@@ -1315,7 +1322,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     			userRankingPastYearBranchList.add(userRankingPastYearBranch.getTotalReviews());
     			userRankingPastYearBranchList.add(userRankingPastYearBranch.getAverageRating());
     			userRankingPastYearBranchList.add(userRankingPastYearBranch.getSps());
-    			userRankingPastYearBranchList.add(userRankingPastYearBranch.getCompleted());
+    			userRankingPastYearBranchList.add(userRankingPastYearBranch.getCompletedPercentage());
     			userRankingPastYearBranchList.add(userRankingPastYearBranch.getIsEligible());
     			userRanking.add(userRankingPastYearBranchList);
     		}
@@ -1338,7 +1345,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getTotalReviews());
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getAverageRating());
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getSps());
-                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getCompleted());
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getCompletedPercentage());
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getIsEligible());
                 userRanking.add(userRankingPastYearsRegionList);
             }
@@ -1353,7 +1360,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getTotalReviews());
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getAverageRating());
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getSps());
-                userRankingPastYearsMainList.add(userRankingPastYearsMain.getCompleted());
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.getCompletedPercentage());
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getIsEligible());
                 userRanking.add(userRankingPastYearsMainList);
             }
@@ -1368,7 +1375,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getTotalReviews());
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getAverageRating());
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getSps());
-                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getCompleted());
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getCompletedPercentage());
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getIsEligible());
                 userRanking.add(userRankingPastYearsBranchList);
             }
@@ -1738,4 +1745,11 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         LOG.info( "Ranking Requirements updated successfully" );
         return rankingRequirements;
     }
+
+	@Override
+	public Long getRegionIdFromBranchId(long branchId) {
+		
+		long regionId=branchDao.getRegionIdByBranchId(branchId);
+		return regionId;
+	}
 }
