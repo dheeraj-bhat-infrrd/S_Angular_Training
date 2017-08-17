@@ -192,6 +192,40 @@ img.lead-img {
 		<div id="my-rank-btn" class="float-right paginate-button top-ten-ranks-btn">Me</div>
 	</div>
 </c:if>
+<c:if test="${profilemasterid == 3}">
+	<div id="board-div" class="float-right board-div">
+		<span class="board-div-span">Board</span>
+		<div class="dash-btn-dl-sd-admin board-selector" >
+			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
+				<option value=1 data-report="company">Branch</option>
+				<option value=2 data-report="region">My Region</option>
+				<option value=2 data-report="region">My Company</option>
+			</select>	
+		</div>
+	</div>
+</c:if>
+<c:if test="${profilemasterid == 2}">
+	<div id="board-div" class="float-right board-div">
+		<span class="board-div-span">Board</span>
+		<div class="dash-btn-dl-sd-admin board-selector" >
+			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
+				<option value=2 data-report="region">Region</option>
+				<option value=2 data-report="region">My Company</option>
+			</select>	
+		</div>
+	</div>
+</c:if>
+
+<c:if test="${profilemasterid == 1}">
+	<div id="board-div" class="float-right board-div">
+		<span class="board-div-span">Board</span>
+		<div class="dash-btn-dl-sd-admin board-selector" >
+			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
+				<option value=2 data-report="region">Company</option>
+			</select>	
+		</div>
+	</div>
+</c:if>
 
 <div id="top-ten-ranks" class="top-ten-ranks">
 	<div id="top-ten-ranks-btn" class="float-right paginate-button top-ten-ranks-btn">Top Ten Ranks</div>
