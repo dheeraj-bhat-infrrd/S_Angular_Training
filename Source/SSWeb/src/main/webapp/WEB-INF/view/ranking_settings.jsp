@@ -2,6 +2,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="isRealTechOrSSAdmin" value="${ isRealTechOrSSAdmin }"></c:set>
+<c:set var="monthOffset" value="${monthOffset}"></c:set>
+<c:set var="yearOffset" value="${yearOffset}"></c:set>
 <style>
 	.ranking-settings-ip-div{
 		position: relative;
@@ -42,42 +46,57 @@
 </div>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
-	<div class="container pos-relative">
+	<div id="min-req-container" class="container pos-relative">
 		<div id="min-req-settings">
 			<div class="st-score-rt-top width-three-five-zero">Minimum Requirements</div>
 			<div class="min-req-div">
 				<div class="v-um-hdr-right ranking-settings-ip-div float-left">
-					<input id="days-registration" class="ranking-settings-ip" placeholder="60">
+					<input id="days-registration" class="ranking-settings-ip" placeholder="${minDaysOfRegistration}">
 				</div>
 				<span class="min-req-span">Days registration</span>
 			</div>
 			<div class="min-req-div">
 				<div class="v-um-hdr-right ranking-settings-ip-div float-left">
-					<input id="survey-completion" class="ranking-settings-ip" placeholder="40%">
+					<input id="survey-completion" class="ranking-settings-ip" placeholder="${minCompletedPercentage}">
 				</div>
 				<span class="min-req-span">Survey Completion</span>
 			</div>
 			<div class="min-req-div">
 				<div class="v-um-hdr-right ranking-settings-ip-div float-left">
-					<input id="minimum-reviews" class="ranking-settings-ip" placeholder="25">
+					<input id="minimum-reviews" class="ranking-settings-ip" placeholder="${minNoOfReviews}">
 				</div>
 				<span class="min-req-span">Minimum Reviews</span>
 			</div>
 		</div>
-		<div id="offset-value-settings" style="margin-top:20px">
-			<div class="st-score-rt-top width-three-five-zero">Offset Value</div>
-			<div class="min-req-div">
-				<div class="v-um-hdr-right ranking-settings-ip-div float-left">
-					<input id="days-registration" class="ranking-settings-ip" placeholder="3">
+		<c:if test="${ isRealTechOrSSAdmin == true}">
+			<div id="offset-value-settings" style="margin-top:20px">
+				<div class="st-score-rt-top width-three-five-zero">Offset Value</div>
+				<div class="min-req-div">
+					<div class="v-um-hdr-right ranking-settings-ip-div float-left">
+						<input id="month-offset" class="ranking-settings-ip" placeholder="${monthOffset}">
+					</div>
+					<span class="min-req-span">Month Offset</span>
 				</div>
-				<span class="min-req-span">Monthly Offset</span>
-			</div>
-			<div class="min-req-div">
-				<div class="v-um-hdr-right ranking-settings-ip-div float-left">
-					<input id="survey-completion" class="ranking-settings-ip" placeholder="-1">
+				<div class="min-req-div">
+					<div class="v-um-hdr-right ranking-settings-ip-div float-left">
+						<input id="year-offset" class="ranking-settings-ip" placeholder="${yearOffset}">
+					</div>
+					<span class="min-req-span">Year Offset</span>
 				</div>
-				<span class="min-req-span">Yearly Offset</span>
 			</div>
-		</div>
+		</c:if>
 	</div>
 </div>
+<script>
+var isRealTechOrSSAdmin = "${isRealTechOrSSAdmin}";
+var monthOffset = "${monthOffset}";
+var yearOffset = "${yearOffset}";
+
+$(document).ready(function(){
+	$('#min-req-container').on('blur','.ranking-settings-ip',function(e){
+		var message = getAndSaveRankingSettingsVal(isRealTechOrSSAdmin,monthOffset,yearOffset);
+		$('#overlay-toast').html(message);
+		showToast();
+	});
+});
+</script>

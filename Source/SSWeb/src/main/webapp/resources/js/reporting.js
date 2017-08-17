@@ -1564,3 +1564,70 @@ function getProfileImageByUserId(userId){
 	
 	return profileImageUrlData;
 }
+
+function saveRankingSettings(minDaysOfRegistration, minCompletedPercentage, minNoOfReviews, monthOffset, yearOffset){
+	
+	var url = "/saverankingsettings.do?minDaysOfRegistration="+minDaysOfRegistration
+		+"&minCompletedPercentage="+minCompletedPercentage
+		+"&minNoOfReviews="+minNoOfReviews
+		+"&monthOffset="+monthOffset
+		+"&yearOffset="+yearOffset;
+	$.ajax({
+		async : false,
+		url : url,
+		type : "PUT",
+		cache : false,
+		dataType : "text",
+		success : function(data) {
+			message = data;						
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			message = "Setting for Ranking Could not be Saved"; 
+		}
+	});
+	return message;
+}
+
+function getAndSaveRankingSettingsVal(isRealTechOrSSAdmin,monthOff,yearOff){
+	var minDaysOfRegistration = $('#days-registration').attr('placeholder');
+	var minCompletedPercentage = $('#survey-completion').attr('placeholder');
+	var	minNoOfReviews = $('#minimum-reviews').attr('placeholder');
+	var	monthOffset = monthOff;
+	var yearOffset = yearOff;
+	
+	if($('#days-registration').val() != ""){
+		minDaysOfRegistration = $('#days-registration').val();
+	}
+	
+	if($('#survey-completion').val() != ""){
+		minCompletedPercentage = $('#survey-completion').val();	
+	}
+	
+	if($('#minimum-reviews').val() != ""){
+		minNoOfReviews = $('#minimum-reviews').val();
+	}
+	
+	if(isRealTechOrSSAdmin){
+		
+		if($('#month-offset').val() != ""){
+			monthOffset = $('#month-offset').val();
+		}else{
+			monthOffset = $('#month-offset').attr('placeholder');
+		}
+		
+		if($('#year-offset').val() != ""){
+			yearOffset = $('#year-offset').val();
+		}else{
+			yearOffset = $('#year-offset').attr('placeholder');
+		}
+		
+	}
+	
+	var message = saveRankingSettings(minDaysOfRegistration, minCompletedPercentage, minNoOfReviews, monthOffset, yearOffset);
+	
+	return message;
+}
