@@ -55,7 +55,6 @@
 		var columnName = "${columnName}";
 		var columnId = "${columnId}";
 		
-		console.log(columnName,columnId);
 		if(profileMasterId != 4){
 			userRankingCount = getUserRankingCountForAdmins(columnName, columnId, currentYear, currentMonth, batchSize, 1)
 			if(userRankingCount != null){

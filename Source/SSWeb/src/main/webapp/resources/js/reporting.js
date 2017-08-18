@@ -1613,7 +1613,7 @@ function getAndSaveRankingSettingsVal(isRealTechOrSSAdmin,monthOff,yearOff){
 		minNoOfReviews = $('#minimum-reviews').val();
 	}
 	
-	if(isRealTechOrSSAdmin){
+	if(isRealTechOrSSAdmin == true || isRealTechOrSSAdmin == 'true'){
 		
 		if($('#month-offset').val() != ""){
 			monthOffset = $('#month-offset').val();

@@ -866,6 +866,7 @@ public class ReportingWebController
    @RequestMapping ( value = "/showrankingsettings", method = RequestMethod.GET)
    public String showRankingPage( Model model, HttpServletRequest request ) throws NonFatalException
    {
+	   HttpSession session = request.getSession( false );
        User user = sessionHelper.getCurrentUser();
        OrganizationUnitSettings companySettings = organizationManagementService
            .getCompanySettings( user.getCompany().getCompanyId() );
@@ -875,6 +876,15 @@ public class ReportingWebController
        model.addAttribute( "minNoOfReviews", rankingRequirements.getMinNoOfReviews() );
        model.addAttribute( "monthOffset", rankingRequirements.getMonthOffset() );
        model.addAttribute( "yearOffset", rankingRequirements.getYearOffset() );
+       
+     //REALTECH_USER_ID is set only for real tech and SS admin
+       boolean isRealTechOrSSAdmin = false;
+       Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+       if ( adminUserid != null ) {
+           isRealTechOrSSAdmin = true;
+       }
+       model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
+       
        return JspResolver.RANKING_SETTINGS;
    }
    
