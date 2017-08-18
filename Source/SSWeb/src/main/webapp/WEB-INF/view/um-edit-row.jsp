@@ -27,6 +27,16 @@
 					<input type="hidden" name="selectedUserId" id="selected-userid-hidden" value='${userId}'/>
 				</div>
 			</div>
+			
+			<c:if test="${partnerSurveyAllowedForCompany}">
+				<div class="margin-top-twenty">
+								<div id="alw-ptnr-srvy-for-usr-chk-box" class="float-left bd-check-img-1 <c:if test='${! partnerSurveyAllowedForUser}'>bd-check-img-checked</c:if> "></div>
+								<input type="hidden" id="at-pst-cb" name="allowpartnersurveyuser" value='${partnerSurveyAllowedForUser}'>
+								<div class="float-left bd-check-txt">Allow partner survey</div>
+							</div>
+			</c:if>		
+			
+			
 			<div id="user-assignment-cont" class="hide">
 				<c:choose>
 				    <c:when test="${accountType == 'Enterprise'}">

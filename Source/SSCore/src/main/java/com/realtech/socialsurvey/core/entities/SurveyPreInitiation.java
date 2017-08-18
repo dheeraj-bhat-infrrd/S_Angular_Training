@@ -71,6 +71,9 @@ public class SurveyPreInitiation implements Serializable
 
     @Column ( name = "ENGAGEMENT_CLOSED_TIME")
     private Timestamp engagementClosedTime;
+    
+    @Column ( name = "IS_SURVEY_REQUEST_SENT")
+    private int isSurveyRequestSent;
 
     @Column ( name = "REMINDER_COUNTS")
     private int reminderCounts;
@@ -106,7 +109,11 @@ public class SurveyPreInitiation implements Serializable
 	@Column ( name = "TRANSACTION_TYPE")
 	private String transactionType;
 
-    @Transient
+	@Column( name = "PARTICIPANT_TYPE")
+	private int participantType;
+	
+        
+	@Transient
     private String errorCodeDescription;
 
 
@@ -314,6 +321,18 @@ public class SurveyPreInitiation implements Serializable
     }
 
 
+    public int getIsSurveyRequestSent()
+    {
+        return isSurveyRequestSent;
+    }
+
+
+    public void setIsSurveyRequestSent( int isSurveyRequestSent )
+    {
+        this.isSurveyRequestSent = isSurveyRequestSent;
+    }
+
+
     public int getReminderCounts()
     {
         return reminderCounts;
@@ -419,5 +438,16 @@ public class SurveyPreInitiation implements Serializable
     public void setTransactionType( String transactionType )
     {
         this.transactionType = transactionType;
+    }
+    
+    public int getParticipantType()
+    {
+        return participantType;
+    }
+
+
+    public void setParticipantType( int participantType )
+    {
+        this.participantType = participantType;
     }
 }

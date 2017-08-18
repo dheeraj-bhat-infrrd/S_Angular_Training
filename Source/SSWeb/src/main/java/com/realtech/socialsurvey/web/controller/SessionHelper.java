@@ -97,6 +97,8 @@ public class SessionHelper {
     String paramOrderTakeSurveyCustomer;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
+    @Value ( "${PARAM_ORDER_SURVEY_PARTICIPATION}")
+    String paramOrderSurveyParticipation;
     @Value ( "${PARAM_ORDER_SURVEY_COPLETION_MAIL}")
     String paramOrderSurveyCompletionMail;
     @Value ( "${PARAM_ORDER_SOCIAL_POST_REMINDER}")
@@ -196,7 +198,7 @@ public class SessionHelper {
 			LOG.debug("Setting default survey participation mail body.");
 
 			try {
-				List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
+				List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderSurveyParticipation.split(",")));
 				body = fileOperations.replaceFileContents(replacements);
 				body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
 				/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/

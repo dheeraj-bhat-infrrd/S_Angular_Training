@@ -95,7 +95,6 @@ namespace EncompassSocialSurvey
 
                         var ssEnv = System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.SETUP_ENVIRONMENT];
                         Logger.Debug("SSEnv = " + ssEnv);
-                        string fieldId = forCompCredential.EncompassCredential.fieldId;
                         string emailDomain = null;
                         string emailPrefix = null;
                         if (ssEnv.Equals(EncompassSocialSurveyConstant.SETUP_ENVIRONMENT_TEST))
@@ -111,7 +110,7 @@ namespace EncompassSocialSurvey
                             LoanUtility _loanUtility = new LoanUtility();
                             int noOfRecordsInserted=0;
 
-                            var loansVM = _loanUtility.PopulateLoanList(encompassGlobal,forCompCredential.EncompassCredential.CompanyId, fieldId, isProductionRun, forCompCredential.EncompassCredential.numberOfDays, emailDomain, emailPrefix);
+                            var loansVM = _loanUtility.PopulateLoanList(encompassGlobal,forCompCredential.EncompassCredential, isProductionRun, emailDomain, emailPrefix);
 
                             if (isProductionRun)
                             {
@@ -180,7 +179,7 @@ namespace EncompassSocialSurvey
 
 
                         //send main to admin
-                        String EndMailSubject = "Starting loan processing for company: " + forCompCredential.CompanyName;
+                        String EndMailSubject = "Done loan processing for company: " + forCompCredential.CompanyName;
                         String EndMailBodyText = "Done loan processing for company: " + forCompCredential.CompanyName + " "
                          + "at : " + DateTime.Now;
                         CommonUtility.SendMailToAdmin(EndMailSubject, EndMailBodyText);

@@ -8,8 +8,21 @@ public abstract class CRMInfo {
 	private String crm_source;
 	private boolean connection_successful;
     private long companyId;
+    
+    private boolean allowPartnerSurvey;
 
-	public String getCrm_source() {
+
+    public boolean isAllowPartnerSurvey()
+    {
+        return allowPartnerSurvey;
+    }
+
+    public void setAllowPartnerSurvey( boolean allowPartnerSurvey )
+    {
+        this.allowPartnerSurvey = allowPartnerSurvey;
+    }
+   
+    public String getCrm_source() {
 		return crm_source;
 	}
 
@@ -34,7 +47,7 @@ public abstract class CRMInfo {
     {
         this.companyId = companyId;
     }
-
+    
     @Override
 	public String toString() {
 		return "crm_source: " + crm_source + "\t connection_successful: " + connection_successful;

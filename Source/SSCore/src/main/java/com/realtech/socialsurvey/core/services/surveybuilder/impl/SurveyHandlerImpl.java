@@ -39,6 +39,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,9 +63,11 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
+import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -373,13 +378,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @throws Exception
      */
     @Override
-    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage )
+    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage , boolean isUserRankingQuestion )
     {
         LOG.debug( "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
         SurveyResponse surveyResponse = new SurveyResponse();
         surveyResponse.setAnswer( answer );
         surveyResponse.setQuestion( question );
         surveyResponse.setQuestionType( questionType );
+        surveyResponse.setIsUserRankingQuestion( isUserRankingQuestion );
         surveyDetailsDao.updateCustomerResponse( surveyId, surveyResponse, stage );
         LOG.debug(
             "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
@@ -506,6 +512,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( surveyPreInitiation != null ) {
             surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiation.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
+            surveyPreInitiation.setIsSurveyRequestSent( 1 );
             surveyPreInitiationDao.merge( surveyPreInitiation );
         }
         LOG.debug( "Method to increase reminder count by 1, updateReminderCount() finished." );
@@ -642,20 +649,50 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     @Transactional
-    public List<SurveyPreInitiation> getIncompleteSurveyCustomersEmail( Company company )
+    public List<SurveyPreInitiation> getIncompleteSurveyForReminderEmail( Company company, Date minLastReminderDate , Date maxLastReminderDate, int maxReminderCount )
     {
-        LOG.debug( "started." );
+        LOG.debug( "method getIncompleteSurveyForReminderEmail started." );
 
         List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
 
-        LOG.debug( "Now fetching survey which are already processed " );
         Criterion companyCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
         Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN,
             Arrays.asList( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED, CommonConstants.SURVEY_STATUS_INITIATED ) );
 
+        Criterion minLastReminderCriteria = Restrictions.gt( CommonConstants.SURVEY_LAST_REMINDER_TIME, minLastReminderDate );
+        Criterion maxLastReminderCriteria = Restrictions.lt( CommonConstants.SURVEY_LAST_REMINDER_TIME, maxLastReminderDate );
+
+        Criterion reminderCountCriteria = Restrictions.lt( CommonConstants.SURVEY_REMINDER_COUNT, maxReminderCount );
+
+        LOG.info( "Criteria to getIncompleteSurveyForReminderEmail is  "  + companyCriteria.toString() + " " + statusCriteria.toString() + " " + minLastReminderCriteria.toString() + " " + maxLastReminderCriteria );
+        
         incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
-            statusCriteria );
-        LOG.debug( "finished." );
+            statusCriteria, minLastReminderCriteria , maxLastReminderCriteria , reminderCountCriteria  );
+        LOG.debug( "method getIncompleteSurveyForReminderEmail finished." );
+        return incompleteSurveyCustomers;
+    }
+    
+    
+    @Override
+    @Transactional
+    public List<SurveyPreInitiation> getSurveyListToSendInvitationMail( Company company , Date epochDate)
+    {
+
+        LOG.debug( "method getSurveyListToSendInvitationMail started." );
+
+        List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
+
+        Criterion companyCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
+        Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN,
+            Arrays.asList( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED, CommonConstants.SURVEY_STATUS_INITIATED ) );
+        
+        Criterion lastReminderCriteria = Restrictions.le( CommonConstants.SURVEY_LAST_REMINDER_TIME, epochDate );
+
+        LOG.info( "Criteria to getSurveyListToSendInvitationMail is  "  + companyCriteria.toString() + " " + statusCriteria.toString() + " " + lastReminderCriteria.toString() );
+
+        incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
+            statusCriteria, lastReminderCriteria );
+        LOG.debug( "method getSurveyListToSendInvitationMail finished." );
         return incompleteSurveyCustomers;
     }
 
@@ -1751,6 +1788,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyPreInitiation> ignoredEmailRecords = new ArrayList<>();
         List<SurveyPreInitiation> oldRecords = new ArrayList<>();
 
+        OrganizationUnitSettings companySettings = null;
+        AgentSettings agentSettings = null;
         Set<Long> companies = new HashSet<>();
         for ( SurveyPreInitiation survey : surveys ) {
             int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
@@ -1765,11 +1804,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         + survey.getCompanyId() );
                 }
 
+                
                 if ( user != null ) {
                     // check if survey has already been sent to the email id
-                    int duplicateSurveyInterval = 0;
-                    OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                    
+                    companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
                         user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                    try {
+                        agentSettings = userManagementService.getUserSettings( user.getUserId() );
+                    } catch ( InvalidInputException e ) {
+                        LOG.error( "No settings found in database for the user id:" + user.getUserId() );
+                    }
+                    
+                    int duplicateSurveyInterval = 0;
                     if ( companySettings != null && companySettings.getSurvey_settings() != null
                         && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 ){
                         duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();                        
@@ -1871,7 +1918,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 errorCode = SurveyErrorCode.MISMATCH_RECORD_INCORRECT_COMPANY.name();
                 invalidAgents.add( survey );
                 companies.add( survey.getCompanyId() );
+            } else if (survey.getParticipantType() == CommonConstants.SURVEY_PARTICIPANT_TYPE_BUYER_AGENT || survey.getParticipantType() == CommonConstants.SURVEY_PARTICIPANT_TYPE_SELLER_AGENT){
+                if( ! isPartnerSurveyAllowed( companySettings, agentSettings )){
+                    status = CommonConstants.STATUS_SURVEYPREINITIATION_SURVEY_NOT_ALLOWED;
+                    errorCode = SurveyErrorCode.SURVEY_NOT_ALLOWED.name();
+                    companies.add( survey.getCompanyId() );
+                }
             }
+            
             if ( status == CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED ) {
                 if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_DOTLOOP ) ) {
                     status = validateUnitsettingsForDotloop( user, survey );
@@ -1899,7 +1953,26 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return corruptRecords;
     }
 
-
+    
+    /**
+     * 
+     * @param companySettings
+     * @param agentSettings
+     * @return
+     */
+    boolean isPartnerSurveyAllowed(OrganizationUnitSettings companySettings , AgentSettings agentSettings){
+        
+        if(companySettings != null && agentSettings != null){
+            CRMInfo crmInfo = companySettings.getCrm_info();
+            if(crmInfo != null && crmInfo.isAllowPartnerSurvey()){
+                //check if agent is allowed for partner survey
+                if(agentSettings.isAllowPartnerSurvey())
+                    return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * 
      * @param emailId
@@ -3092,6 +3165,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setScore( surveyImportVO.getScore() );
         surveyDetails.setSurveyTransactionDate( surveyImportVO.getSurveyDate() );
         surveyDetails.setSurveyCompletedDate( surveyImportVO.getSurveyDate() );
+        surveyDetails.setSurveyUpdatedDate( surveyImportVO.getSurveyDate() );
+
         surveyDetails.setUrl(
             composeLink( user.getUserId(), surveyImportVO.getCustomerEmailAddress(), surveyImportVO.getCustomerFirstName(),
                 surveyImportVO.getCustomerLastName(), surveyPreInitiation.getSurveyPreIntitiationId(), false ) );
@@ -3757,7 +3832,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         //get pre initiated survey from sql
         List<SurveyPreInitiation> preInitiatedSurveys = null;
-        if ( sqlBatch > 0 &&  StringUtils.isEmpty( mood ) && startReviewDate == null ){
+        if ( ! status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) && sqlBatch > 0 &&  StringUtils.isEmpty( mood ) && startReviewDate == null ){
             Timestamp startEngagementClosedTime = null;
             if(startTransactionDate != null)
                 startEngagementClosedTime = new Timestamp( startTransactionDate.getTime() );
@@ -3987,4 +4062,289 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         }
     }
+    
+    /**
+     * 
+     */
+    @Override
+    public Map<String , Date> getMinMaxLastSurveyReminderTime( long systemTime, int reminderInterval )
+    {
+        
+        LOG.debug( "method getMinMaxLastSurveyReminderTime started" );
+        Date minLastReminderTime = new Date(systemTime - maxSurveyReminderInterval * ( 1000 * 60 * 60 * 24 ));
+        Date maxLastReminderTime = new Date(systemTime - reminderInterval * ( 1000 * 60 * 60 * 24 ));
+
+        
+        Map<String , Date> minMaxLastReminderTime = new HashMap<String , Date>();
+        minMaxLastReminderTime.put( "minLastReminderTime", minLastReminderTime );
+        minMaxLastReminderTime.put( "maxLastReminderTime", maxLastReminderTime );
+
+        LOG.debug( "method getMinMaxLastSurveyReminderTime ended" );
+
+        return minMaxLastReminderTime;
+    }
+
+    
+    /**
+     * @throws InvalidInputException 
+     * 
+     */
+    @Override
+    @Transactional
+    public void moveAllSurveysAlongWithUser( long agentId , long branchId, long regionId , long companyId ) throws InvalidInputException{
+        
+        LOG.info( "Method moveAllSurveysAlongWithUser() started for user  " + agentId );
+        User user = userManagementService.getUserByUserId( agentId );
+        surveyDetailsDao.moveSurveysAlongWithUser( agentId, branchId, regionId, companyId );
+        surveyPreInitiationDao.updateCompanyIdForAllRecordsForAgent( user.getEmailId(), companyId );
+        LOG.info( "Method moveSurveysAlongWithUser finished." );
+        
+    }
+    
+    
+    /**
+     * @throws InvalidInputException 
+     * 
+     */
+    @Override
+    @Transactional
+    public void disconnectAllSurveysFromWithUser( long agentId ) throws InvalidInputException{
+        
+        LOG.info( "Method disconnectAllSurveysFromWithUser() started for user  " + agentId );
+        surveyDetailsDao.disconnectSurveysFromWithUser( agentId );
+        surveyPreInitiationDao.disconnectSurveysFromAgent( agentId);
+        LOG.info( "Method disconnectAllSurveysFromWithUser finished." );
+        
+    }
+    
+    /**
+     * @throws InvalidInputException 
+     * 
+     */
+    @Override
+    @Transactional
+    public void copyAllSurveysAlongWithUser( long agentId , long branchId, long regionId , long companyId ) throws InvalidInputException{
+        
+        LOG.info( "Method copyAllSurveysAlongWithUser() started for user  " + agentId );
+        User user = userManagementService.getUserByUserId( agentId );
+        
+        Map<Long , Long> updatedsurveyPreInitiationIdMap = new HashMap<Long , Long>();
+        
+        //update mysql
+        List<SurveyPreInitiation> existingSurveyPreInitiations = surveyPreInitiationDao.findByColumn( SurveyPreInitiation.class, CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN, user.getLoginName() );
+        for(SurveyPreInitiation surveyPreInitiation : existingSurveyPreInitiations){           
+           //create new survey preinitiation object with updated data
+            if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE){
+                SurveyPreInitiation newSurveyPreInitiation = copySurveyPreinitiationObject( surveyPreInitiation );            
+                newSurveyPreInitiation.setCompanyId( companyId );
+                newSurveyPreInitiation = surveyPreInitiationDao.save( newSurveyPreInitiation );  
+                //add entry in map to update mongo
+                updatedsurveyPreInitiationIdMap.put( surveyPreInitiation.getSurveyPreIntitiationId() , newSurveyPreInitiation.getSurveyPreIntitiationId() );
+            }
+           
+        }
+
+        //update mongo
+        List<SurveyDetails> existingSurveyDetails = surveyDetailsDao.getSurveyDetailsForUser( agentId );
+        for(SurveyDetails surveyDetails : existingSurveyDetails){
+            //create new survey detail object with updated data
+            if(surveyDetails.getStage() == CommonConstants.SURVEY_STAGE_COMPLETE){
+                SurveyDetails newSurveyDetails = copySurveyDetailObject( surveyDetails );
+                newSurveyDetails.setBranchId( branchId );
+                newSurveyDetails.setCompanyId( companyId );
+                newSurveyDetails.setRegionId( regionId );
+                newSurveyDetails.setSurveyPreIntitiationId( updatedsurveyPreInitiationIdMap.get( surveyDetails.getSurveyPreIntitiationId() ) );
+                surveyDetailsDao.insertSurveyDetails( newSurveyDetails );
+            }
+        }
+        
+        LOG.info( "Method copyAllSurveysAlongWithUserk finished." );
+        
+    }
+    
+    private SurveyPreInitiation copySurveyPreinitiationObject(SurveyPreInitiation surveyPreInitiation)
+    {
+        SurveyPreInitiation newSurveyPreInitiation = new SurveyPreInitiation();
+        newSurveyPreInitiation.setAgentEmailId( surveyPreInitiation.getAgentEmailId() );
+        newSurveyPreInitiation.setAgentId( 0l );
+        newSurveyPreInitiation.setAgentName( surveyPreInitiation.getAgentName() );
+        newSurveyPreInitiation.setCity( surveyPreInitiation.getCity() );
+        newSurveyPreInitiation.setCompanyId( surveyPreInitiation.getCompanyId() );
+        newSurveyPreInitiation.setCreatedOn( surveyPreInitiation.getCreatedOn() );
+        newSurveyPreInitiation.setCustomerEmailId( surveyPreInitiation.getCustomerEmailId() );
+        newSurveyPreInitiation.setCustomerFirstName( surveyPreInitiation.getCustomerFirstName() );
+        newSurveyPreInitiation.setCustomerInteractionDetails( surveyPreInitiation.getCustomerInteractionDetails() );
+        newSurveyPreInitiation.setCustomerLastName( surveyPreInitiation.getCustomerLastName() );
+        newSurveyPreInitiation.setEngagementClosedTime( surveyPreInitiation.getEngagementClosedTime() );
+        newSurveyPreInitiation.setIsSurveyRequestSent( surveyPreInitiation.getIsSurveyRequestSent() );
+        newSurveyPreInitiation.setLastReminderTime( surveyPreInitiation.getLastReminderTime() );
+        newSurveyPreInitiation.setModifiedOn( surveyPreInitiation.getModifiedOn() );
+        newSurveyPreInitiation.setReminderCounts( surveyPreInitiation.getReminderCounts() );
+        newSurveyPreInitiation.setState( surveyPreInitiation.getState() );
+        newSurveyPreInitiation.setStatus( surveyPreInitiation.getStatus() );
+        newSurveyPreInitiation.setSurveySource( surveyPreInitiation.getSurveySource() );
+        newSurveyPreInitiation.setSurveySourceId( surveyPreInitiation.getSurveySourceId() );
+        newSurveyPreInitiation.setTransactionType( surveyPreInitiation.getTransactionType() );
+        
+        return newSurveyPreInitiation;
+        
+    }
+    
+    /**
+     * 
+     * @param surveyDetails
+     * @return
+     */
+    private SurveyDetails copySurveyDetailObject(SurveyDetails surveyDetails)
+    {
+        
+        SurveyDetails newSurveyDetails = new SurveyDetails();
+        newSurveyDetails.setAbuseRepByUser( surveyDetails.isAbuseRepByUser() );
+        newSurveyDetails.setAbusive( surveyDetails.isAbusive() );
+        newSurveyDetails.setAgentEmailId( surveyDetails.getAgentEmailId() );
+        newSurveyDetails.setAgentId( 0l );
+        newSurveyDetails.setAgentName( surveyDetails.getAgentName() );
+        newSurveyDetails.setAgreedToShare( surveyDetails.getAgreedToShare() );
+        newSurveyDetails.setBranchId( surveyDetails.getBranchId() );
+        newSurveyDetails.setCity( surveyDetails.getCity() );
+        newSurveyDetails.setCompanyId( surveyDetails.getCompanyId() );
+        newSurveyDetails.setCompleteProfileUrl( surveyDetails.getCompleteProfileUrl() );
+        newSurveyDetails.setCreatedOn( surveyDetails.getCreatedOn() );
+        newSurveyDetails.setCustomerEmail( surveyDetails.getCustomerEmail() );
+        newSurveyDetails.setCustomerFirstName( surveyDetails.getCustomerFirstName() );
+        newSurveyDetails.setCustomerLastName( surveyDetails.getCustomerLastName() );
+        newSurveyDetails.setCustRelationWithAgent( surveyDetails.getCustRelationWithAgent() );
+        newSurveyDetails.setEditable( surveyDetails.getEditable() );
+        newSurveyDetails.setLastReminderForIncompleteSurvey( surveyDetails.getLastReminderForIncompleteSurvey() );
+        newSurveyDetails.setLastReminderForSocialPost( surveyDetails.getLastReminderForSocialPost() );
+        newSurveyDetails.setModifiedOn( surveyDetails.getModifiedOn() );
+        newSurveyDetails.setMood( surveyDetails.getMood() );
+        newSurveyDetails.setRegionId( surveyDetails.getRegionId() );
+        newSurveyDetails.setReminderCount( surveyDetails.getReminderCount() );
+        newSurveyDetails.setRetakeSurvey( surveyDetails.isRetakeSurvey() );
+        newSurveyDetails.setReview( surveyDetails.getReview() );
+        newSurveyDetails.setScore( surveyDetails.getScore() );
+        newSurveyDetails.setShowSurveyOnUI( surveyDetails.isShowSurveyOnUI() );
+        newSurveyDetails.setSource( surveyDetails.getSource() );
+        newSurveyDetails.setSourceId( surveyDetails.getSourceId() );
+        newSurveyDetails.setStage( surveyDetails.getStage() );
+        newSurveyDetails.setState( surveyDetails.getState() );
+        newSurveyDetails.setSummary( surveyDetails.getSummary() );
+        newSurveyDetails.setSurveyCompletedDate( surveyDetails.getSurveyCompletedDate() );
+        newSurveyDetails.setSurveyGeoLocation( surveyDetails.getSurveyGeoLocation() );
+        newSurveyDetails.setSurveyResponse( surveyDetails.getSurveyResponse() );
+        newSurveyDetails.setSurveySentDate( surveyDetails.getSurveySentDate() );
+        newSurveyDetails.setSurveyTransactionDate( surveyDetails.getSurveyTransactionDate() );
+        newSurveyDetails.setSurveyType( surveyDetails.getSurveyType() );
+        newSurveyDetails.setSurveyUpdatedDate( surveyDetails.getSurveyUpdatedDate() );
+        newSurveyDetails.setUrl( surveyDetails.getUrl() );
+        
+        return newSurveyDetails;
+    }
+    
+ 
+    /**
+     * 
+     * @param surveyPreInitiations
+     * @return
+     * @throws InvalidInputException 
+     */
+    // Method to update agentId in SurveyPreInitiation 
+    @Override
+    @Transactional
+    public List<SurveyPreInitiation> validatePreinitiatedRecord(List<SurveyPreInitiation> surveyPreInitiations) throws InvalidInputException
+    {
+
+        LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord started " );
+
+
+        for ( SurveyPreInitiation survey : surveyPreInitiations ) {
+
+            User user = null;
+            try {
+                user = userManagementService.getActiveAgentByEmailAndCompany( survey.getCompanyId(), survey.getAgentEmailId() );
+                survey.setAgentId( user.getUserId() );
+            } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                LOG.error( "No user found in database for the email id: " + survey.getAgentEmailId() + " and company id : "
+                    + survey.getCompanyId() );
+                throw new InvalidInputException("Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId());
+            }
+
+            // check if survey has already been sent to the email id
+            int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany( user.getCompany().getCompanyId() );
+            List<SurveyPreInitiation> incompleteSurveyCustomers = null;
+            if ( duplicateSurveyInterval > 0 ) {
+                incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays(
+                    user.getUserId(), survey.getCustomerEmailId(), duplicateSurveyInterval );
+            } else {
+                incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( user.getUserId(),
+                    survey.getCustomerEmailId() );
+            }
+            
+            //get valid survey intervals
+            Timestamp engagementClosedTime = survey.getEngagementClosedTime();
+            Calendar calendar = Calendar.getInstance();
+            calendar.add( Calendar.DATE, -validSurveyInterval );
+            Date date = calendar.getTime();
+            
+            if(StringUtils.isEmpty( survey.getCustomerEmailId() ) || ! organizationManagementService.validateEmail(  survey.getCustomerEmailId() ) ){
+                LOG.warn( "Invalid Customer Email Id " );
+                throw new InvalidInputException("Can not process the record. Invalid Customer email id : " + survey.getCustomerEmailId() + "");
+            }else if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
+                LOG.warn( "Survey request already sent" );
+                throw new InvalidInputException("Can not process the record. A survey request for customer " + survey.getCustomerFirstName() + " has already received.");
+            }else if ( engagementClosedTime.before( date ) ) {
+                LOG.debug( "An old record found : " + survey.getSurveyPreIntitiationId() );
+                throw new InvalidInputException("Can not process the record. Request for customer " + survey.getCustomerFirstName() + " is older than " + validSurveyInterval + " days.");
+            } else if (  isEmailIsIgnoredEmail( survey.getAgentEmailId(), survey.getCompanyId() ) ) {
+                LOG.error( "no agent found with this email id and its an ignored record" );
+                throw new InvalidInputException("Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId());
+            } else if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
+                LOG.error( "Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId() );
+                throw new InvalidInputException("Can not process the record.  service provider email id is missing");
+            } else if ( ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() )
+                && ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() ) ) {
+                LOG.error( "No Name found for customer, hence this is an invalid survey " + survey.getSurveyPreIntitiationId() );
+                throw new InvalidInputException("Can not process the record. Customer Name is missing");
+            } else if ( survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty() ) {
+                LOG.error( "No customer email id found, invalid survey " + survey.getSurveyPreIntitiationId() );
+                throw new InvalidInputException("Can not process the record. Customer Email id is missing");
+            }else if ( user.getCompany() == null ) {
+                LOG.error( "Agent doesnt have an company associated with it " );
+                throw new InvalidInputException("Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId());
+            } else if ( user.getCompany().getCompanyId() != survey.getCompanyId() ) {
+                throw new InvalidInputException("Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId());
+            } 
+
+            survey.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
+        }
+
+        LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord finished " );
+        return surveyPreInitiations;
+    }
+    
+    /**
+     * 
+     * @param companyId
+     * @return
+     */
+    private int getDuplicateSurveyIntervalForCompany(long companyId){
+        
+        LOG.debug( "Method getDuplicateSurveyIntervalForCompany started for company " + companyId );
+        
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        int duplicateSurveyInterval = 0;
+        if ( companySettings != null && companySettings.getSurvey_settings() != null
+            && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 ) {
+            duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
+        } else {
+            duplicateSurveyInterval = defaultSurveyRetakeInterval;
+        }
+        LOG.debug( "Method getDuplicateSurveyIntervalForCompany finished for company " + companyId );
+        return duplicateSurveyInterval;
+
+    }
+    
 }

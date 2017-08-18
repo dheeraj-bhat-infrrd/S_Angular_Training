@@ -87,6 +87,8 @@
 				<value>com.realtech.socialsurvey.core.entities.Event</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyHiddenNotification</value>
 				<value>com.realtech.socialsurvey.core.entities.VendastaSingleSignOnTicket</value>
+				<value>com.realtech.socialsurvey.core.entities.BatchTrackerHistory</value>
+				<value>com.realtech.socialsurvey.core.entities.EncompassSdkVersion</value>
 			</list>
 		</property>
 	</bean>

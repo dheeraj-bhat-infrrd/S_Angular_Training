@@ -24,6 +24,8 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -1160,7 +1162,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.setTitle( agentSettings.getContact_details().getTitle() );
             user.setLocation( agentSettings.getContact_details().getLocation() );
             user.setIndustry( agentSettings.getContact_details().getIndustry() );
-            user.setAboutMe( agentSettings.getContact_details().getAbout_me() );
+            if( agentSettings.getContact_details().getAbout_me() != null ){
+            user.setAboutMe( Jsoup.clean( agentSettings.getContact_details().getAbout_me(), Whitelist.none() ) );
+            }
             //JIRA SS-1104 search results not updated with correct number of reviews
             long reviewCount = profileManagementService.getReviewsCount( agentSettings.getIden(), 0, 5,
                 CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
@@ -1793,6 +1797,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         // Send reset password link to the user email ID
         emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName, holdSendingMail,
             hiddenSection );
+        
+        // if the email is supposed to be either sent immediately or by batch without holding it, then update the invite sent date for the user 
+        if( !holdSendingMail ){
+        updateLastInviteSentDateIfUserExistsInDB( emailId );
+        }
     }
 
 
@@ -1947,6 +1956,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Calling email services to send registration invitation mail" );
         emailServices.sendRegistrationInviteMail( url, emailId, firstName, lastName );
+        
+        updateLastInviteSentDateIfUserExistsInDB( emailId );
 
         LOG.debug( "Method inviteUser finished successfully" );
     }
@@ -2655,6 +2666,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             agentSettings.setSurvey_settings( surveySettings );
         }
 
+        //get company setting
+        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+        if(companySettings != null && companySettings.getCrm_info() != null && companySettings.getCrm_info().isAllowPartnerSurvey() ){
+            agentSettings.setAllowPartnerSurvey(true);
+        }
+        
         MailIdSettings mail_ids = new MailIdSettings();
         mail_ids.setWork( user.getEmailId() );
         contactSettings.setMail_ids( mail_ids );
@@ -3702,6 +3719,38 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+ // Method to return active agent with provided email and company
+    @Transactional
+    @Override
+    public User getActiveAgentByEmailAndCompany( long companyId, String emailId )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "Method getActiveAgentByEmailAndCompany() called from UserManagementService" );
+
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id is null or empty in getUserByEmailAndCompany()" );
+        }
+
+        Company company = companyDao.findById( Company.class, companyId );
+        if ( company == null ) {
+            throw new NoRecordsFetchedException( "No company found with the id " + companyId );
+        }
+
+        User user = getUserByEmailAddress( emailId );
+        if ( user.getCompany().getCompanyId() != companyId ) {
+            throw new InvalidInputException( "The user is not part of the specified company" );
+        }
+        
+        List<UserProfile> userProfiles = user.getUserProfiles();
+        for(UserProfile profile : userProfiles){
+            if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID)
+                return user;
+        }
+        //if no agent profile found throw an exception
+        throw new NoRecordsFetchedException( "No agent found" );
+
+    }
+    
     /**
      *  Method to get a map of userId - review count given a list of userIds
      * @param userIds
@@ -4103,6 +4152,28 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
     }
+    
+    @Transactional
+    @Override
+    public void updateUserEmailMapping( UserEmailMapping userEmailMapping ) throws InvalidInputException
+    {
+        LOG.debug( "Method to updateUserEmailMapping started." );
+        if ( userEmailMapping == null ) {
+            throw new InvalidInputException( "Passed parameter userEmailMapping is null " );
+        }
+         
+        long userEmailMappingId = userEmailMapping.getUserEmailMappingId();
+        userEmailMapping = userEmailMappingDao.findById( UserEmailMapping.class, userEmailMapping.getUserEmailMappingId() );
+
+
+        if ( userEmailMapping == null ) {
+            throw new InvalidInputException( "No userEmailMapping found for emailMapping id : " + userEmailMappingId );
+        }
+
+        userEmailMappingDao.update( userEmailMapping );
+
+        LOG.debug( "Method to  update UserEmailMapping ended." );
+    }
 
 
     @Transactional
@@ -4206,6 +4277,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+    @SuppressWarnings ( "unchecked")
     private void sendCorruptDataFromCrmNotificationMail( Map<String, Object> corruptRecords )
     {
         List<SurveyPreInitiation> unavailableAgents = (List<SurveyPreInitiation>) corruptRecords.get( "unavailableAgents" );
@@ -4405,21 +4477,84 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER,
                 CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER );
 
+            LOG.info( "Batch incompleteSurveyReminderSender started" );
+            
             for ( Company company : organizationManagementService.getAllCompanies() ) {
+                
+                LOG.info( "getting reminder information for company with id " + company.getCompanyId()  );
+                
                 Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
                 int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
                 int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
-                LOG.debug( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
+                LOG.info( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
+                
+                //getting epoch date
                 SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
-                Date epochReminderDate = null;
+                Date epochReminderDate = sdf.parse( CommonConstants.EPOCH_REMINDER_TIME );
+               
+                
+                //get survey list to send invitation mail
+                LOG.info( "getting survey list to send invitation mail for company with id " + company.getCompanyId()  );
+                List<SurveyPreInitiation> surveysForInvitationMail = surveyHandler
+                    .getSurveyListToSendInvitationMail( company , epochReminderDate );
+                LOG.info( "Found " + ( surveysForInvitationMail != null ? surveysForInvitationMail.size() : 0 )
+                    + " surveysForInvitationMail for company id " + company.getCompanyId() );
+                
+                //iterating throgh the surveys
+                for ( SurveyPreInitiation survey : surveysForInvitationMail ) {
+                    
+                    User user = null;
+                    try {
+                        user = getUserByUserId( survey.getAgentId() );
+                    } catch ( InvalidInputException ie ) {
+                        LOG.warn( "Invalid user mapped to the agent id" );
+                        continue;
+                    }
+                    //If agent is deleted, mark survey as corrupt and fetch next survey
+                    if ( user != null && checkIfSurveyAgentIsDeleted( user, survey ) ) {
+                        LOG.debug( "The agent id : " + survey.getAgentId() + " is deleted. Skipping record." );
+                        continue;
+                    }
+                    
+                    //check if we have send invitation mail already
+                    if(survey.getLastReminderTime().compareTo( epochReminderDate )  > 0){
+                        LOG.warn( "We have already send invitation mail for customer " + survey.getCustomerEmailId() );
+                        continue;
+                    }
+                    
+                    
+                    try {
+                        LOG.debug( "Sending survey initiation mail" );
+                        surveyHandler.prepareAndSendInvitationMail( survey );
+                        surveyHandler.markSurveyAsSent( survey );
+                        surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), false );
+                    
+                    } catch ( ProfileNotFoundException | InvalidInputException   e ) {
+                    LOG.error(
+                        "ProfileNotFoundException / InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
+                        e );
+                    }
+                }
+                
+                
+                //getting minLastReminderTime and maxLastReminderTime
+                long currentTime = System.currentTimeMillis();
+                Map<String , Date> lastReminderTimeCriterias = surveyHandler.getMinMaxLastSurveyReminderTime( currentTime, reminderInterval );
+                Date minLastReminderTime = lastReminderTimeCriterias.get( "minLastReminderTime" );
+                Date maxLastReminderTime = lastReminderTimeCriterias.get( "maxLastReminderTime" );
+                LOG.info( "minLastReminderTime is " +  minLastReminderTime + " and maxLastReminderTime is " + maxLastReminderTime + " for company with id " + company.getCompanyId() );
+ 
+                
+                //get survey list to send survey reminder mail
+                LOG.info( "getting survey list to send survey reminder mail for company with id " + company.getCompanyId()  );
                 List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler
-                    .getIncompleteSurveyCustomersEmail( company );
-                LOG.debug( "Found " + ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 )
-                    + " surveys sent for company id " + company.getCompanyId() );
+                    .getIncompleteSurveyForReminderEmail( company ,minLastReminderTime , maxLastReminderTime ,reminderCount);
+                LOG.info( "Found " + ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 )
+                    + " incompleteSurveyCustomers for company id " + company.getCompanyId() );
+                
+                
                 for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
                     LOG.debug( "Processing survey pre initiation id: " + survey.getSurveyPreIntitiationId() );
-
-                    LOG.debug( "Survey pre initiation id: " + survey.getSurveyPreIntitiationId() + " within reminder counts" );
 
                     User user = null;
                     try {
@@ -4434,58 +4569,29 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         continue;
                     }
 
-                    boolean reminder = false;
-                    try {
-                        epochReminderDate = sdf.parse( CommonConstants.EPOCH_REMINDER_TIME );
-                    } catch ( Exception e ) {
-                        LOG.error( "Exception caught " + e.getMessage() );
+                  //check if we have send reminder mail already
+                    if(survey.getReminderCounts() >= reminderCount){
+                        LOG.warn( "We have already send max reminder mail for customer " + survey.getCustomerEmailId() );
                         continue;
                     }
-                    LOG.debug( "Last reminder time: " + String.valueOf( survey.getLastReminderTime() ) );
-                    if ( survey.getLastReminderTime().after( epochReminderDate ) ) {
-                        LOG.debug( "Reminder mail for incomplete survey id: " + survey.getSurveyPreIntitiationId() );
-                        reminder = true;
-                    } else {
-                        LOG.debug(
-                            "Initial survey request mail for incomplete survey id: " + survey.getSurveyPreIntitiationId() );
-                        reminder = false;
-                    }
-
+                    
+                    try{
+                    
                     // send a survey invitation mail if reminder is false or a reminder mail if reminder is true
-                    try {
-                        if ( reminder ) {
-                            LOG.debug( "Check if survey is eligible for a reminder mail" );
-                            long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
-                            long currentTime = System.currentTimeMillis();
-                            if ( surveyHandler.checkSurveyReminderEligibility( surveyLastRemindedTime, currentTime,
-                                reminderInterval ) ) {
-                                if ( survey.getReminderCounts() < reminderCount ) {
-                                    surveyHandler.sendSurveyReminderEmail( survey );
-                                    surveyHandler.markSurveyAsSent( survey );
-                                    surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
-                                } else {
-                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId()
-                                        + " has exceeded the reminder count " );
-                                }
-                            }
-                        } else {
-                            LOG.debug( "Sending survey initiation mail" );
-                            // check if the mail is an older mail
-                            surveyHandler.prepareAndSendInvitationMail( survey );
-                            surveyHandler.markSurveyAsSent( survey );
-                            surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
+                    surveyHandler.sendSurveyReminderEmail( survey );
+                    surveyHandler.markSurveyAsSent( survey );
+                    surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
+                                
 
-                        }
-                    } catch ( InvalidInputException e ) {
+                    } catch ( ProfileNotFoundException | InvalidInputException   e ) {
                         LOG.error(
-                            "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
+                            "ProfileNotFoundException / InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
                             e );
-                    } catch ( ProfileNotFoundException e ) {
-                        LOG.error( "Error while sending incomplete survey mail ", e );
                     }
+                    
                 }
             }
-            LOG.debug( "Completed IncompleteSurveyReminderSender" );
+            LOG.info( "Completed IncompleteSurveyReminderSender" );
             //Update last build time in batch tracker table
             batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER );
         } catch ( Exception e ) {
@@ -4684,5 +4790,43 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         LOG.info( "method temporaryInactiveCompanyAdmin finished for companyId : " + companyId );
 
+    }
+
+
+    @Override
+    @Transactional
+    public void updateUserProfileObject( UserProfile userProfile ) throws InvalidInputException
+    {     
+        LOG.info( "method updateUserProfileObject started" ); 
+        if ( userProfile == null ){
+            throw new InvalidInputException( "Passed parameter userProfile is null" );
+        }
+        userProfileDao.update( userProfile );
+        LOG.info( "method updateUserProfileObject finished for User : " + userProfile.getAgentId() );
+    }
+    
+    /**
+     * method to update the last invitation sent date in users table in MySQL if the user entry exists.
+     *
+     * @param emailId
+     * @return
+     */
+    @Override
+    public void updateLastInviteSentDateIfUserExistsInDB( String emailId )
+    {
+        LOG.debug( "Method updateLastInviteSentDateIfUserExists started." );
+        try {
+            Map<String, Object> columns = new HashMap<>();
+            columns.put( "emailId", emailId );
+            List<User> usersWithTheGivenEmailId = userDao.findByKeyValue( User.class, columns );
+            if ( usersWithTheGivenEmailId != null && !usersWithTheGivenEmailId.isEmpty() ) {
+                usersWithTheGivenEmailId.get( CommonConstants.INITIAL_INDEX )
+                    .setLastInvitationSentDate( new Timestamp( System.currentTimeMillis() ) );
+                userDao.update( usersWithTheGivenEmailId.get( CommonConstants.INITIAL_INDEX ) );
+            }
+            LOG.debug( "Method updateLastInviteSentDateIfUserExists finished." );
+        } catch ( Exception databaseException ) {
+            LOG.error( "Exception caught while checking for email id in USERS table." );
+        }
     }
 }

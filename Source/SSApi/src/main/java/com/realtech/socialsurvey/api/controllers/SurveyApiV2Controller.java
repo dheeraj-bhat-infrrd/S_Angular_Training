@@ -100,6 +100,14 @@ public class SurveyApiV2Controller
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request, companyId );
         }
 
+        
+        try {
+        	surveyPreInitiations = surveyHandler.validatePreinitiatedRecord( surveyPreInitiations );
+		} catch (InvalidInputException e) {
+            return restUtils.getRestResponseEntity( HttpStatus.NOT_ACCEPTABLE, e.getMessage(), null, null, request, companyId );
+            }
+
+        
         //save the object to database
         Map<String, Long> surveyIds = new HashMap<String, Long>();
         try {
@@ -222,8 +230,8 @@ public class SurveyApiV2Controller
         }
 
         if ( status == null ) {
-            status = "all";
-        } else if ( !status.equalsIgnoreCase( "complete" ) && !status.equalsIgnoreCase( "incomplete" ) ) {
+            status = CommonConstants.SURVEY_API_SURVEY_STATUS_ALL;
+        } else if ( !status.equalsIgnoreCase( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) && !status.equalsIgnoreCase( CommonConstants.SURVEY_API_SURVEY_STATUS_INCOMPLETE ) ) {
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter status is invalid", null, null,
                 request, companyId );
         }
