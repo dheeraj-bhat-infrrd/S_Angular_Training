@@ -637,8 +637,7 @@ public class OrganizationUnitSettings
         this.ranking_requirements = ranking_requirements;
     }
 
-
-    @Override
+	
     public boolean isContactUsEmailsRoutedToCompanyAdmin() {
 		return contactUsEmailsRoutedToCompanyAdmin;
 	}
