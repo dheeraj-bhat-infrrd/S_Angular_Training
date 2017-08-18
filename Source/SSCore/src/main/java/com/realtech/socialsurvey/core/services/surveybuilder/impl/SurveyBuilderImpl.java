@@ -89,9 +89,9 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
-	public SurveyQuestion getSurveyQuestionFromMapping(long surveyQuestionMappingId) throws InvalidInputException {
+	public SurveyQuestionsMapping getSurveyQuestionFromMapping(long surveyQuestionMappingId) throws InvalidInputException {
 		SurveyQuestionsMapping surveyQuestionsMapping = surveyQuestionsMappingDao.findById(SurveyQuestionsMapping.class, surveyQuestionMappingId);
-		return surveyQuestionsMapping.getSurveyQuestion();
+		return surveyQuestionsMapping;
 	}
 
 	@Override
@@ -410,6 +410,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.debug("Method mapQuestionToSurvey() started to map questions with survey.");
 		SurveyQuestionsMapping surveyQuestionsMapping = new SurveyQuestionsMapping();
 		surveyQuestionsMapping.setIsRatingQuestion(surveyQuestionDetails.getIsRatingQuestion());
+        surveyQuestionsMapping.setIsUserRankingQuestion( surveyQuestionDetails.getIsUserRankingQuestion() );
 		surveyQuestionsMapping.setQuestionOrder(surveyQuestionDetails.getQuestionOrder());
 		surveyQuestionsMapping.setSurveyQuestion(surveyQuestion);
 		surveyQuestionsMapping.setStatus(status);
@@ -541,6 +542,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			surveyQuestionDetails.setQuestionType(surveyQuestionsMapping.getSurveyQuestion().getSurveyQuestionsCode());
 			surveyQuestionDetails.setQuestionOrder(surveyQuestionsMapping.getQuestionOrder());
 			surveyQuestionDetails.setIsRatingQuestion(surveyQuestionsMapping.getIsRatingQuestion());
+            surveyQuestionDetails.setIsUserRankingQuestion( surveyQuestionsMapping.getIsUserRankingQuestion() );
 
 			// For each answer
 			answerOptionsToQuestion = new ArrayList<SurveyAnswerOptions>();
@@ -613,6 +615,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			
 			// updating question rating status
 			mapping.setIsRatingQuestion(questionDetails.getIsRatingQuestion());
+	        mapping.setIsUserRankingQuestion(questionDetails.getIsUserRankingQuestion());
 			surveyQuestionsMappingDao.saveOrUpdate(mapping);
 			surveyQuestionsMappingDao.flush();
 		}

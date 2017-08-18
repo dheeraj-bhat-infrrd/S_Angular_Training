@@ -11,8 +11,19 @@ public class AgentSettings extends OrganizationUnitSettings {
 	private CompanyProfileData companyProfileData;
 	private String surveyUrl;
 	private String userEncryptedId;
+	private boolean allowPartnerSurvey;
 
-	public String getUserEncryptedId()
+	public boolean isAllowPartnerSurvey()
+    {
+        return allowPartnerSurvey;
+    }
+
+    public void setAllowPartnerSurvey( boolean allowPartnerSurvey )
+    {
+        this.allowPartnerSurvey = allowPartnerSurvey;
+    }
+
+    public String getUserEncryptedId()
     {
         return userEncryptedId;
     }

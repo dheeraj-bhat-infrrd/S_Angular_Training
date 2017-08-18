@@ -37,6 +37,9 @@ public class SurveyQuestionsMapping implements Serializable {
 
 	@Column(name="IS_RATING_QUESTION")
 	private int isRatingQuestion;
+	
+	@Column(name="IS_USER_RANKING_QUESTION")
+    private int isUserRankingQuestion;
 
 	@Column(name="MODIFIED_BY")
 	private String modifiedBy;
@@ -95,7 +98,17 @@ public class SurveyQuestionsMapping implements Serializable {
 		this.isRatingQuestion = isRatingQuestion;
 	}
 
-	public String getModifiedBy() {
+	public int getIsUserRankingQuestion()
+    {
+        return isUserRankingQuestion;
+    }
+
+    public void setIsUserRankingQuestion( int isUserRankingQuestion )
+    {
+        this.isUserRankingQuestion = isUserRankingQuestion;
+    }
+
+    public String getModifiedBy() {
 		return this.modifiedBy;
 	}
 

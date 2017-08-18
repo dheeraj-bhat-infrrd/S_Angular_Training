@@ -69,9 +69,9 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
             review.setRating( String.valueOf( d.getScore() ) );
             review.setReviewDate( d.getModifiedOn().toString() );
             review.setRetakeSurvey( d.isRetakeSurvey() );
-            if ( d.getModifiedOn() != null ) {
+            if ( d.getSurveyUpdatedDate() != null ) {
                 review.setReviewUpdatedDateTime(
-                    CommonUtils.formatDate( d.getModifiedOn(), CommonConstants.SURVEY_API_DATE_FORMAT ) );
+                    CommonUtils.formatDate( d.getSurveyUpdatedDate(), CommonConstants.SURVEY_API_DATE_FORMAT ) );
             }
             review.setSource( d.getSource() );
             review.setAgreedToShare( Boolean.parseBoolean( d.getAgreedToShare() ) );
@@ -100,7 +100,7 @@ public class SurveyTransformer implements Transformer<SurveyGetVO, SurveyDetails
             boolean isCRMVerified = false;
             if ( d.getSource() != null )
                 if ( d.getSource().equalsIgnoreCase( "encompass" ) || d.getSource().equalsIgnoreCase( "DOTLOOP" )
-                    || d.getSource().equalsIgnoreCase( "FTP" ) || d.getSource().equalsIgnoreCase( "LONEWOLF" ) )
+                		|| d.getSource().equalsIgnoreCase( "API" ) || d.getSource().equalsIgnoreCase( "FTP" ) || d.getSource().equalsIgnoreCase( "LONEWOLF" ) )
                     isCRMVerified = true;
             review.setIsCRMVerified( isCRMVerified );
 

@@ -6,6 +6,14 @@
 	<c:set value="${fn:trim(surveyQuestion.questionType)}" var="questionType" />
 </c:if>
 
+<c:set value="${surveyQuestion.isUserRankingQuestion }" var="isUserRankingQuestion" />
+
+<c:set value="false" var="isUserRankingQuestionVal" />
+<c:if test="${isUserRankingQuestion == 1}">
+	<c:set value="true" var="isUserRankingQuestionVal" />
+</c:if>
+
+
 <div class="sb-edit-q-wrapper">
 	<form id="bs-question-edit-${surveyQuestion.questionId}" data-quesnum="${surveyQuestion.questionId}">
 		<div class="bd-q-pu-header bd-q-pu-header-margin-override clearfix">
@@ -91,6 +99,18 @@
 							</div>
 						</div> --%>
 					</div>
+					
+					<div class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
+						<div id="user-ranking-chkbox-wrapper-edit" class="clearfix" style="width: 200px;">
+								
+									<div id="user-ranking-chkbox-edit" class='float-left user-ranking-chkbox bd-check-img <c:if test="${ isUserRankingQuestion == 0}">bd-check-img-checked</c:if>'></div>
+									<input type="hidden" id="user-ranking-ques-edit" name="user-ranking-ques" value=${ isUserRankingQuestionVal }>
+								
+								
+								<div class="float-left  listing-access-txt cursor-pointer">Considered for User Ranking</div>
+							</div>
+  					</div>
+					
 				</div>
 				
 				<c:set var="mcqclass" scope="page" value=""/>

@@ -61,13 +61,16 @@ public class OrganizationUnitSettings
     private boolean sendEmailFromCompany;
     private String reviewSortCriteria;
     private String sendEmailThrough;
-    
+    public boolean hideFromBreadCrumb;
+
+
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
     
     //Reporting ranking requirements
     private RankingRequirements ranking_requirements;
-
+    //are the 'Contact Us' emails routed to the company admin always?
+    private boolean contactUsEmailsRoutedToCompanyAdmin;
 
     public boolean isSendEmailFromCompany()
     {
@@ -622,7 +625,6 @@ public class OrganizationUnitSettings
     {
         this.sendEmailThrough = sendEmailThrough;
     }
-
     
     public RankingRequirements getRankingRequirements()
     {
@@ -637,6 +639,28 @@ public class OrganizationUnitSettings
 
 
     @Override
+    public boolean isContactUsEmailsRoutedToCompanyAdmin() {
+		return contactUsEmailsRoutedToCompanyAdmin;
+	}
+
+
+	public void setContactUsEmailsRoutedToCompanyAdmin( boolean contactUsEmailsRoutedToCompanyAdmin ) {
+		this.contactUsEmailsRoutedToCompanyAdmin = contactUsEmailsRoutedToCompanyAdmin;
+	}
+    
+    public boolean getHideFromBreadCrumb()
+    {
+        return hideFromBreadCrumb;
+    }
+
+
+    public void setHideFromBreadCrumb( boolean hideFromBreadCrumb )
+    {
+        this.hideFromBreadCrumb = hideFromBreadCrumb;
+    }
+
+
+	@Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier

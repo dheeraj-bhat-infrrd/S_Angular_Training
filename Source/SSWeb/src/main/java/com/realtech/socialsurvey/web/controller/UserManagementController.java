@@ -1522,13 +1522,21 @@ public class UserManagementController
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
             User user = null;
+            AgentSettings agentSettings = null;
             try {
                 user = userManagementService.getUserByUserId( userId );
+                agentSettings = userManagementService.getUserSettings( userId );
             } catch ( InvalidInputException e ) {
                 throw new InvalidInputException( "InvalidInputException while getting user.Reason: " + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
+            
+            //partner survey details
+            model.addAttribute( "partnerSurveyAllowedForCompany", organizationManagementService.isPartnerSurveyAllowedForComapny( user.getCompany().getCompanyId() ) );
+            model.addAttribute( "partnerSurveyAllowedForUser", agentSettings.isAllowPartnerSurvey() );
+           
 
+            //user assignments
             UserHierarchyAssignments assignments = (UserHierarchyAssignments) session
                 .getAttribute( CommonConstants.USER_ASSIGNMENTS );
             Map<Long, String> regions = assignments.getRegions();
@@ -1805,7 +1813,7 @@ public class UserManagementController
         LOG.info( "Method deleteUserProfile() called from UserManagementController" );
         try {
             try {
-                User user = sessionHelper.getCurrentUser();
+                User sessionUser = sessionHelper.getCurrentUser();
                 long profileId = Long.parseLong( request.getParameter( "profileId" ) );
                 int status = CommonConstants.STATUS_INACTIVE;
 
@@ -1818,19 +1826,24 @@ public class UserManagementController
                         DisplayMessageType.ERROR_MESSAGE ).getMessage();
                 }
 
-                userManagementService.updateUserProfile( user, profileId, status );
-                userManagementService.updateUserProfilesStatus( user, profileId );
+                userManagementService.updateUserProfile( sessionUser, profileId, status );
+                userManagementService.updateUserProfilesStatus( sessionUser, profileId );
                 userManagementService.removeUserProfile( profileId );
 
                 userManagementService.updatePrimaryProfileOfUser( updatedUser );
                 updatedUser = userManagementService.getUserByUserId( updatedUser.getUserId() );
                 userManagementService.updateUserInSolr( updatedUser );
                 
+                
+                //move surveys if deleted assignment is an agent assignment and user also has another agent assignment
+                organizationManagementService.updateSurveyAssignments( updatedUser,userprofileList ,profileId);
+            
+                
                 userManagementService.updateUserCountModificationNotification( updatedUser.getCompany() );
 
-                if ( user.getUserId() == updatedUser.getUserId() ) {
+                if ( sessionUser.getUserId() == updatedUser.getUserId() ) {
                     try {
-                        sessionHelper.processAssignments( request.getSession( false ), user );
+                        sessionHelper.processAssignments( request.getSession( false ), sessionUser );
                     } catch ( NonFatalException e ) {
                         throw new NonFatalException(
                             "Exception occurred while processing user assignments in. Reason : " + e.getMessage(), e );

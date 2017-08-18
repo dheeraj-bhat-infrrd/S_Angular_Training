@@ -7,16 +7,20 @@ import java.util.Map;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.ZillowTempPost;
@@ -24,6 +28,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
 import facebook4j.Facebook;
@@ -303,5 +308,20 @@ public interface SocialManagementService
 
 
     boolean checkLinkedInTokenExpiry( LinkedInToken linkedInToken );
+    
+    
+    public void updateSocialPostAfterHierarchyRelocation( SocialPost socialPost );
+
+
+    public void processSocialPostsAndSocialConnectionsForUserAfterRelocation( User user, HierarchyRelocationTarget targetLocation ) throws InvalidInputException, SolrException;
+
+
+    public void processSocialPostsAndSocialConnectionsForBranchDuringRelocation( Branch branch, HierarchyRelocationTarget targetLocation ) throws InvalidInputException, SolrException;
+
+
+    public void processSocialPostsAndSocialConnectionsForRegionDuringRelocation( Region region, HierarchyRelocationTarget targetLocation ) throws InvalidInputException, SolrException;
+
+
+    public void updateSocialConnectionHistoryAfterHierarchyRelocation( SocialUpdateAction socialUpdateAction );
 }
 // JIRA SS-34 BY RM02 BOC

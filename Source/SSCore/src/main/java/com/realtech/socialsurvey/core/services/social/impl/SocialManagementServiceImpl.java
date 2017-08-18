@@ -53,6 +53,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.ZillowTempPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -67,6 +68,7 @@ import com.realtech.socialsurvey.core.entities.EntityMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
 import com.realtech.socialsurvey.core.entities.FacebookPage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.MediaPostDetails;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -78,12 +80,14 @@ import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.ZillowTempPost;
+import com.realtech.socialsurvey.core.enums.HierarchyType;
 import com.realtech.socialsurvey.core.enums.ProfileStages;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
@@ -106,6 +110,7 @@ import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandle
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.CommonUtils;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.core.vo.UserList;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
@@ -115,7 +120,6 @@ import facebook4j.Account;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
-import facebook4j.Post;
 import facebook4j.PostUpdate;
 import facebook4j.Reading;
 import facebook4j.ResponseList;
@@ -288,6 +292,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private CommonUtils commonUtils;
+    
+    @Autowired
+    private EncryptionHelper encryptionHelper;
 
     private final int batchSize = 50;
 
@@ -584,10 +591,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                         String imageUrl = applicationLogoUrlForLinkedin;
 
-                        if ( agentSettings.getProfileImageUrl() != null && !agentSettings.getProfileImageUrl().isEmpty() ) {
-                            imageUrl = agentSettings.getProfileImageUrl();
-                        } else if ( companySettings.getLogo() != null && !companySettings.getLogo().isEmpty() ) {
-                            imageUrl = companySettings.getLogo();
+                        if ( agentSettings.getProfileImageUrlThumbnail() != null && !agentSettings.getProfileImageUrlThumbnail().isEmpty() ) {
+                            imageUrl = agentSettings.getProfileImageUrlThumbnail();
+                        } else if ( companySettings.getLogoThumbnail() != null && !companySettings.getLogoThumbnail().isEmpty() ) {
+                            imageUrl = companySettings.getLogoThumbnail();
                         }
                         String profileUrl = "";
                         if ( surveyId != null && !surveyId.isEmpty() ) {
@@ -3555,102 +3562,124 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
+/**
+     * method to return a user specific site link with the priority given to agent submitted link and then branch submitted link and so on
+     * @param agentId
+     * @param unitSettings
+     * @param collectionType
+     * @return String
+     * @throws InvalidInputException 
+     */
     @Override
     public String getClientCompanyProfileUrlForAgentToPostInSocialMedia( Long agentId, OrganizationUnitSettings unitSettings,
         String collectionType ) throws InvalidInputException
     {
+        LOG.info( "getClientCompanyProfileUrlForAgentToPostInSocialMedia started" );
 
-        String profileLink = null;
-
-        Map<String, List<OrganizationUnitSettings>> settingsMap = getSettingsForBranchesAndRegionsInHierarchy( agentId );
-        List<OrganizationUnitSettings> companySettings = settingsMap
-            .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        List<OrganizationUnitSettings> regionSettings = settingsMap
-            .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-        List<OrganizationUnitSettings> branchSettings = settingsMap
-            .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-
+        // Null checks
+        if ( agentId <= 0 ) {
+            throw new InvalidInputException( "agent ID can't be null" );
+        }
         if ( unitSettings == null ) {
             throw new InvalidInputException( "unitSettings can't be null" );
         }
+        if ( StringUtils.isEmpty( collectionType ) ) {
+            throw new InvalidInputException( "collection type can't be null or empty" );
+        }
 
-        if ( companySettings.get( 0 ).getSurvey_settings().isAutoPostLinkToUserSiteEnabled() ) {
+        String profileLink = "";
+        OrganizationUnitSettings companySettings = organizationManagementService
+            .getCompanySettings( userManagementService.getUserByUserId( agentId ) );
+
+
+        // if auto post with user site setting is enabled
+        if ( companySettings.getSurvey_settings().isAutoPostLinkToUserSiteEnabled() ) {
+
+            OrganizationUnitSettings agentSettings = collectionType
+                .equals( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
+                    ? unitSettings : userManagementService.getUserSettings( agentId );
+
+
+            // Return with user site link if the user profile has a site link
+            if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getWeb_addresses() != null
+                && agentSettings.getContact_details().getWeb_addresses().getWork() != null ) {
+                return encryptionHelper.getNullSafeString( agentSettings.getContact_details().getWeb_addresses().getWork() );
+            }
+
+            OrganizationUnitSettings primaryRegionSettings = null;
+            OrganizationUnitSettings primaryBranchSettings = null;
+
+            // search for the appropriate site link
             switch ( collectionType ) {
-                case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
-                    if ( unitSettings.getContact_details() != null
-                        && unitSettings.getContact_details().getWeb_addresses() != null
-                        && unitSettings.getContact_details().getWeb_addresses().getWork() != null ) {
-                        profileLink = unitSettings.getContact_details().getWeb_addresses().getWork();
-                    }
-                case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
-                    if ( collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-                        if ( profileLink != null ) {
-                            return profileLink;
-                        } else {
-                            if ( branchSettings != null && branchSettings.size() != 0
-                                && branchSettings.get( 0 ).getContact_details() != null
-                                && branchSettings.get( 0 ).getContact_details().getWeb_addresses() != null
-                                && branchSettings.get( 0 ).getContact_details().getWeb_addresses().getWork() != null ) {
-                                profileLink = branchSettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
-                            }
-                        }
-                    } else {
-                        if ( unitSettings.getContact_details() != null
-                            && unitSettings.getContact_details().getWeb_addresses() != null
-                            && unitSettings.getContact_details().getWeb_addresses().getWork() != null ) {
-                            profileLink = unitSettings.getContact_details().getWeb_addresses().getWork();
-                        }
-                    }
-                case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
-                    if ( collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION )
-                        || collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-                        if ( profileLink != null ) {
-                            return profileLink;
-                        } else {
-                            if ( regionSettings != null && regionSettings.size() != 0
-                                && regionSettings.get( 0 ).getContact_details() != null
-                                && regionSettings.get( 0 ).getContact_details().getWeb_addresses() != null
-                                && regionSettings.get( 0 ).getContact_details().getWeb_addresses().getWork() != null ) {
-                                profileLink = regionSettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
-                            }
-                        }
-                    } else {
-                        if ( unitSettings.getContact_details() != null
-                            && unitSettings.getContact_details().getWeb_addresses() != null
-                            && unitSettings.getContact_details().getWeb_addresses().getWork() != null ) {
-                            profileLink = unitSettings.getContact_details().getWeb_addresses().getWork();
-                        }
-                    }
-                case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
-                    if ( collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION )
-                        || collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
-                        || collectionType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-                        if ( profileLink != null ) {
-                            return profileLink;
-                        } else {
-                            if ( companySettings != null && companySettings.size() != 0
-                                && companySettings.get( 0 ).getContact_details() != null
-                                && companySettings.get( 0 ).getContact_details().getWeb_addresses() != null
-                                && companySettings.get( 0 ).getContact_details().getWeb_addresses().getWork() != null ) {
-                                profileLink = companySettings.get( 0 ).getContact_details().getWeb_addresses().getWork();
-                            }
-                        }
-                    } else {
-                        if ( unitSettings.getContact_details() != null
-                            && unitSettings.getContact_details().getWeb_addresses() != null
-                            && unitSettings.getContact_details().getWeb_addresses().getWork() != null ) {
-                            profileLink = unitSettings.getContact_details().getWeb_addresses().getWork();
-                        }
-                    }
-                    break;
 
-                default:
+                case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION: {
+
+                    // assign primary branch settings
+                    try {
+                        primaryBranchSettings = organizationManagementService.getBranchSettings(
+                            userManagementService.getBranchesAssignedToUser( userManagementService.getUserByUserId( agentId ) )
+                                .get( 0 ).getBranchId() )
+                            .getOrganizationUnitSettings();
+                    } catch ( NoRecordsFetchedException error ) {
+                        LOG.error( "No branch found for the user, searching for region or company website" );
+                    }
+                }
+
+                case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION: {
+
+                    // assign branch settings
+                    primaryBranchSettings = primaryBranchSettings != null ? primaryBranchSettings : unitSettings;
+
+
+                    // Return with branch site if the branch site link is available
+                    if ( primaryBranchSettings.getContact_details() != null
+                        && primaryBranchSettings.getContact_details().getWeb_addresses() != null
+                        && primaryBranchSettings.getContact_details().getWeb_addresses().getWork() != null ) {
+                        return encryptionHelper
+                            .getNullSafeString( primaryBranchSettings.getContact_details().getWeb_addresses().getWork() );
+                    }
+
+                    //assign primary region settings
+                    primaryRegionSettings = organizationManagementService.getRegionSettings( organizationManagementService
+                        .getPrimaryRegionByBranch( primaryBranchSettings.getIden() ).getRegionId() );
+                }
+
+                case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION: {
+
+                    //assign region settings
+                    primaryRegionSettings = primaryRegionSettings != null ? primaryRegionSettings : unitSettings;
+
+                    // Return with region site if the region site link is available
+                    if ( primaryRegionSettings.getContact_details() != null
+                        && primaryRegionSettings.getContact_details().getWeb_addresses() != null
+                        && primaryRegionSettings.getContact_details().getWeb_addresses().getWork() != null ) {
+                        return encryptionHelper
+                            .getNullSafeString( primaryRegionSettings.getContact_details().getWeb_addresses().getWork() );
+                    }
+                }
+
+                case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION: {
+
+                    // Return with company site if the company site link is available
+                    if ( companySettings.getContact_details() != null
+                        && companySettings.getContact_details().getWeb_addresses() != null
+                        && companySettings.getContact_details().getWeb_addresses().getWork() != null ) {
+                        return encryptionHelper
+                            .getNullSafeString( companySettings.getContact_details().getWeb_addresses().getWork() );
+                    }
+
+                    break;
+                }
+
+                default: {
                     throw new InvalidInputException( "Invalid collection type" );
+                }
             }
         }
+
+        LOG.info( "getClientCompanyProfileUrlForAgentToPostInSocialMedia finished" );
         return profileLink;
     }
-
     
     
     /**
@@ -3734,6 +3763,253 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
 
         return false;
+    }
 
+    @Override
+    public void updateSocialPostAfterHierarchyRelocation( SocialPost socialPost )
+    {
+        LOG.info( "method updateSocialPostByEntity started " );
+        socialPostDao.updateSocialPostAfterHierarchyRelocation( socialPost );
+        LOG.info( "method updateSocialPostByEntity finished " );
+    }
+
+
+    @Override
+    public void updateSocialConnectionHistoryAfterHierarchyRelocation( SocialUpdateAction socialUpdateAction )
+    {
+        LOG.info( "Method updateSocialConnectionHistoryForUser started" );
+        socialPostDao.updateSocialConnectionHistoryAfterHierarchyRelocation( socialUpdateAction );
+        LOG.info( "Method updateSocialConnectionHistoryForUser finished" );
+    }
+
+
+    /*
+     * updates the Ids for the concerned user in social posts and social connections 
+     */
+    @Override
+    public void processSocialPostsAndSocialConnectionsForUserAfterRelocation( User user,
+        HierarchyRelocationTarget targetLocation ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation started " );
+
+
+        if ( user == null ) {
+            LOG.error( "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: user is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: user is null " );
+        } else if ( targetLocation == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget is null " );
+        } else if ( targetLocation.getTargetCompany() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetCompany is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetCompany is null " );
+        } else if ( targetLocation.getTargetRegion() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetRegion is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetRegion is null " );
+        } else if ( targetLocation.getTargetBranch() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetBranch is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForUserAfterRelocation: HierarchyRelocationTarget.targetBranch is null " );
+        }
+
+        if ( targetLocation.getHierarchyType().equals( HierarchyType.USER ) ) {
+            List<SocialPost> postsForUser = socialPostDao.getSocialPosts( user.getUserId(), MongoSocialPostDaoImpl.KEY_AGENT_ID,
+                -1, -1 );
+            List<SocialUpdateAction> actionsForUser = socialPostDao
+                .getSocialConnectionHistoryByEntity( MongoSocialPostDaoImpl.KEY_AGENT_ID, user.getUserId() );
+
+            //update social posts for a user
+            for ( SocialPost post : postsForUser ) {
+                switch ( targetLocation.getHierarchyType() ) {
+                    case USER: {
+                        if ( user.isCompanyAdmin() ) {
+                            LOG.warn( "Cannot relocate social posts of Company Admin to another Company" );
+                            return;
+                        } else {
+                            post.setBranchId( targetLocation.getTargetBranch().getBranchId() );
+                            post.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                            post.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        }
+                    }
+                    case BRANCH: {
+                        if ( !user.isCompanyAdmin() ) {
+                            post.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                            post.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        } else {
+                            post.setBranchId( 0 );
+                        }
+                    }
+                    case REGION: {
+                        if ( !user.isCompanyAdmin() ) {
+                            post.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        } else {
+                            post.setRegionId( 0 );
+                        }
+                        break;
+                    }
+                    default: {
+                        LOG.error( "Invalid Hierarchy Type" );
+                        throw new InvalidInputException(
+                            "Method HierarchyLocationManagementService.updateSocialConnectionHistoryAfterHierarchyRelocation(): Invalid Hierarchy Type" );
+                    }
+                }
+                updateSocialPostAfterHierarchyRelocation( post );
+
+            }
+
+            //update social connections for a user
+            for ( SocialUpdateAction action : actionsForUser ) {
+                switch ( targetLocation.getHierarchyType() ) {
+                    case USER: {
+                        if ( user.isCompanyAdmin() ) {
+                            LOG.warn( "Cannot relocate social connections of Company Admin to another Company" );
+                            return;
+                        } else {
+                            action.setBranchId( targetLocation.getTargetBranch().getBranchId() );
+                            action.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                            action.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        }
+                    }
+                    case BRANCH: {
+                        if ( !user.isCompanyAdmin() ) {
+                            action.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                            action.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        } else {
+                            action.setBranchId( 0 );
+                        }
+                    }
+                    case REGION: {
+                        if ( !user.isCompanyAdmin() ) {
+                            action.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                        } else {
+                            action.setRegionId( 0 );
+                        }
+                        break;
+                    }
+                    default: {
+                        LOG.error( "Invalid Hierarchy Type" );
+                        throw new InvalidInputException(
+                            "Method HierarchyLocationManagementService.updateSocialConnectionHistoryAfterHierarchyRelocation(): Invalid Hierarchy Type" );
+                    }
+                }
+                updateSocialConnectionHistoryAfterHierarchyRelocation( action );
+            }
+            
+            //update user in solr
+            if(postsForUser != null && ! postsForUser.isEmpty())
+                solrSearchService.addSocialPostsToSolr( postsForUser );
+        }
+        LOG.info( "Method processSocialPostsForUserAfterRelocation finished " );
+    }
+
+
+    /*
+     * updates the Ids for the concerned branch in social posts and social connections 
+     */
+    @Override
+    public void processSocialPostsAndSocialConnectionsForBranchDuringRelocation( Branch branch,
+        HierarchyRelocationTarget targetLocation ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation started " );
+
+        if ( branch == null ) {
+            LOG.error( "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: branch is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: branch is null " );
+        } else if ( targetLocation == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget is null " );
+        } else if ( targetLocation.getTargetCompany() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget.targetCompany is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget.targetCompany is null " );
+        } else if ( targetLocation.getTargetRegion() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget.targetRegion is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation: HierarchyRelocationTarget.targetRegion is null " );
+        }
+
+        List<SocialPost> postsForBranch = socialPostDao.getSocialPostsForBranchOnly( branch.getBranchId() );
+        List<SocialUpdateAction> actionsForBranch = socialPostDao
+            .getSocialConnectionHistoryForBranchOnly( branch.getBranchId() );
+
+        //update social posts for a branch
+        if ( targetLocation.getHierarchyType().equals( HierarchyType.BRANCH ) ) {
+            for ( SocialPost post : postsForBranch ) {
+                post.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                post.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                updateSocialPostAfterHierarchyRelocation( post );
+            }
+
+            //update user in branch
+            solrSearchService.addSocialPostsToSolr( postsForBranch );
+
+            //update social connections for a branch
+            for ( SocialUpdateAction action : actionsForBranch ) {
+                action.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                action.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+                updateSocialConnectionHistoryAfterHierarchyRelocation( action );
+            }
+        }
+        LOG.info( "Method processSocialPostsAndSocialConnectionsForBranchDuringRelocation finished " );
+    }
+
+
+    /*
+     * updates the Ids for the concerned region in social posts and social connections 
+     */
+    @Override
+    public void processSocialPostsAndSocialConnectionsForRegionDuringRelocation( Region region,
+        HierarchyRelocationTarget targetLocation ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation started " );
+
+        if ( region == null ) {
+            LOG.error( "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: region is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: region is null " );
+        } else if ( targetLocation == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: HierarchyRelocationTarget is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: HierarchyRelocationTarget is null " );
+        } else if ( targetLocation.getTargetCompany() == null ) {
+            LOG.error(
+                "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: HierarchyRelocationTarget.targetCompany is null " );
+            throw new InvalidInputException(
+                "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation: HierarchyRelocationTarget.targetCompany is null " );
+        }
+
+
+        List<SocialPost> postsForRegion = socialPostDao.getSocialPostsForRegionOnly( region.getRegionId() );
+        List<SocialUpdateAction> actionsForBranch = socialPostDao
+            .getSocialConnectionHistoryForRegionOnly( region.getRegionId() );
+
+        //update social posts for a region
+        for ( SocialPost post : postsForRegion ) {
+            post.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+            updateSocialPostAfterHierarchyRelocation( post );
+        }
+
+        //update region in solr
+        solrSearchService.addSocialPostsToSolr( postsForRegion );
+
+        //update social connections for a region
+        for ( SocialUpdateAction action : actionsForBranch ) {
+            action.setCompanyId( targetLocation.getTargetCompany().getCompanyId() );
+            updateSocialConnectionHistoryAfterHierarchyRelocation( action );
+        }
+        LOG.info( "Method processSocialPostsAndSocialConnectionsForRegionDuringRelocation finished " );
     }
 }

@@ -865,5 +865,34 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         return criteria.list();
 
     }
+    
+    
+    @Override
+    public void updateCompanyIdForAllRecordsForAgent( String agentEmailId , long companyId)
+    {
+        
+        LOG.debug( "Method updateCompanyIdForAllRecordsForAgent started." );
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET  COMPANY_ID = ? WHERE AGENT_EMAILID = ?";
+        Query query = getSession().createSQLQuery( queryStr );
+        query.setParameter( 0, companyId );
+        query.setParameter( 1, agentEmailId );
+        LOG.info( "query to update company id is " + query.toString() );
+        query.executeUpdate();
+        LOG.debug( "Method updateCompanyIdForAllRecordsForAgent  ended." );
+    }
+    
+    
+    @Override
+    public void disconnectSurveysFromAgent( long agentId)
+    {
+        
+        LOG.debug( "Method updateCompanyIdForAllRecordsForAgent started." );
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET  AGENT_ID = 0 WHERE AGENT_ID = ?";
+        Query query = getSession().createSQLQuery( queryStr );
+        query.setParameter( 0, agentId );
+        LOG.info( "query to update company id is " + query.toString() );
+        query.executeUpdate();
+        LOG.debug( "Method updateCompanyIdForAllRecordsForAgent  ended." );
+    }
 
 }

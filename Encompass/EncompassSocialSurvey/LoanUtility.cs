@@ -99,12 +99,16 @@ namespace EncompassSocialSurvey
         /// <param name="emailDomain"></param>
         /// <param name="emailPrefix"></param>
         /// <returns></returns>
-        public List<LoanViewModel> PopulateLoanList(EncompassGlobal encompassGlobal, long runningCompanyId, string fieldid, Boolean isProductionRun, int noOfDaysToFetch, string emailDomain, string emailPrefix)
+        public List<LoanViewModel> PopulateLoanList(EncompassGlobal encompassGlobal, EncompassCredential encompassCredential, Boolean isProductionRun, string emailDomain, string emailPrefix)
         {
             Logger.Info("Entering the method LoanUtility.PopulateLoanList() ");
-            int noOfDays = 0;
+            int noOfDaysToFetch = encompassCredential.numberOfDays;
+            long runningCompanyId = encompassCredential.CompanyId;
+            string fieldid = encompassCredential.fieldId;
             List<LoanViewModel> returnLoansViewModel = null;
             CRMBatchTrackerEntity crmBatchTracker = null;
+            int noOfDays = 0;
+
             try
             {
                 returnLoansViewModel = new List<LoanViewModel>();
@@ -114,6 +118,18 @@ namespace EncompassSocialSurvey
                 StringList fieldIds = encompassGlobal.InitialFieldList();
                 fieldIds = AppendInitialFieldIdList(fieldIds, fieldid);
 
+                if (encompassCredential.allowPartnerSurvey)
+                {
+                    Logger.Info("Partner survey allowed for company " + encompassCredential.CompanyId);
+                    //append field for buyer agent
+                    fieldIds.Insert( EncompassSocialSurveyConstant.BUYER_AGENT_EMAIL_INDEX, encompassCredential.buyerAgentEmail); // Buyers Agent Email
+                    fieldIds.Insert(EncompassSocialSurveyConstant.BUYER_AGENT_NAME_INDEX, encompassCredential.buyerAgentName); // Buyers Agent Name
+                    //append fields for seller agent
+                    fieldIds.Insert(EncompassSocialSurveyConstant.SELLER_AGENT_EMAIL_INDEX, encompassCredential.sellerAgentEmail); //Seller Agent Email
+                    fieldIds.Insert(EncompassSocialSurveyConstant.SELLER_AGENT_NAME_INDEX, encompassCredential.sellerAgentName); //Buyer Agent Name
+                }
+              
+                
                 #endregion
 
                 LoanService loanService = new LoanService();
@@ -169,8 +185,6 @@ namespace EncompassSocialSurvey
                 Logger.Info("Company Id  " + runningCompanyId);
 
                 //fieldIds[8] is the loan closed date
-
-
                 LoanIdentityList loanIdentityList = encompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(noOfDays, fieldIds[8]));
                 
                 LoanIdentity[] loanIdentityArray = loanIdentityList.ToArray();
@@ -178,7 +192,6 @@ namespace EncompassSocialSurvey
                 Logger.Info("No of loan ids received from encomass : " + loanIdSize);
 
                 #region Load the list
-
                 foreach (LoanIdentity id in loanIdentityList)
                 {
                     try
@@ -191,39 +204,42 @@ namespace EncompassSocialSurvey
                         if (false == string.IsNullOrWhiteSpace(runningLoan.LoanOfficerID))
                             loanOfficer = encompassGlobal.EncompassLoginSession.Users.GetUser(runningLoan.LoanOfficerID);
 
-                        LoanViewModel forLoanVM_Borrower = new LoanViewModel();
-                        forLoanVM_Borrower.SurveySource = EncompassSocialSurveyConstant.SURVEY_SOURCE;
-                        Logger.Debug("EngagementClosedTime for loan is : " + fieldValues[8]);
+                        String State = fieldValues[9];
+                        String City = fieldValues[10];
+
                         //check if engagement closed time is greater than current time
                         DateTime engagementClosedTime = Convert.ToDateTime(fieldValues[8]);
+                        Logger.Debug("EngagementClosedTime for loan is : " + engagementClosedTime);
                         int result = DateTime.Compare(engagementClosedTime, DateTime.Now);
                         if (result > 0)
                         {
-                            Logger.Debug("Engagement cloed time " + fieldValues[8] + " is greater than current date so skipping the record");
+                            Logger.Debug("Engagement cloed time " + engagementClosedTime + " is greater than current date so skipping the record");
                             continue;
                         }
+
+
+                        LoanViewModel forLoanVM_Borrower = new LoanViewModel();
+                        forLoanVM_Borrower.SurveySource = EncompassSocialSurveyConstant.SURVEY_SOURCE;
                         //Set loan number
                         forLoanVM_Borrower.LoanNumber = runningLoan.LoanNumber;
                         // remove the flower bracket from GUID
                         //forLoanVM_Borrower.SurveySourceId = id.Guid.ToString().Replace("{", "").Replace("}", "");
                         forLoanVM_Borrower.SurveySourceId = runningLoan.LoanNumber;
-
                         forLoanVM_Borrower.CompanyId = runningCompanyId;
                         forLoanVM_Borrower.AgentId = (loanOfficer != null) ? loanOfficer.ID : "";
                         forLoanVM_Borrower.AgentName = (loanOfficer != null) ? loanOfficer.FullName : "";
-
-
                         forLoanVM_Borrower.CustomerFirstName = fieldValues[2];
                         forLoanVM_Borrower.CustomerLastName = fieldValues[3];
-                        forLoanVM_Borrower.State = fieldValues[9];
-                        forLoanVM_Borrower.City = fieldValues[10];
+                        forLoanVM_Borrower.State = State;
+                        forLoanVM_Borrower.City = City;
+
+
                         Logger.Info("State is  " + fieldValues[9] + " and city is " + fieldValues[10]);
                         string agentEmailId = (loanOfficer != null) ? loanOfficer.Email : "";
                         string emailId = fieldValues[4];
 
                         if (string.IsNullOrWhiteSpace(emailDomain))
                         {
-
                             forLoanVM_Borrower.CustomerEmailId = emailId;
                             forLoanVM_Borrower.AgentEmailId = agentEmailId;
                         }
@@ -237,15 +253,16 @@ namespace EncompassSocialSurvey
                         forLoanVM_Borrower.LastReminderTime = EncompassSocialSurveyConstant.LAST_REMINDER_TIME;
                         forLoanVM_Borrower.EngagementClosedTime = fieldValues[8];
                         forLoanVM_Borrower.Status = EncompassSocialSurveyConstant.STATUS;
+                        forLoanVM_Borrower.ParticipantType = EncompassSocialSurveyConstant.PARTICIPANT_TYPE_BORROWER;
 
                         returnLoansViewModel.Add(forLoanVM_Borrower);
 
+                        //add coborrower
                         if ((string.IsNullOrWhiteSpace(fieldValues[5]) && string.IsNullOrWhiteSpace(fieldValues[6])) == false)
                         {
                             Logger.Debug("Found CoBorrower , fetching the required details");
                             LoanViewModel forLoanVM_Co_Borrower = new LoanViewModel();
                             forLoanVM_Co_Borrower.SurveySource = EncompassSocialSurveyConstant.SURVEY_SOURCE;
-                            //forLoanVM_Co_Borrower.SurveySourceId = id.Guid.ToString().Replace("{", "").Replace("}", "");
                             forLoanVM_Co_Borrower.SurveySourceId = runningLoan.LoanNumber;
                             forLoanVM_Co_Borrower.CompanyId = runningCompanyId;
 
@@ -269,18 +286,101 @@ namespace EncompassSocialSurvey
                                 forLoanVM_Co_Borrower.CustomerEmailId = ReplaceEmailAddress(coborrowerEmailId, emailDomain, emailPrefix);
                                 forLoanVM_Co_Borrower.AgentEmailId = ReplaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
                             }
-
-
-
+                            
                             forLoanVM_Co_Borrower.ReminderCounts = EncompassSocialSurveyConstant.REMINDER_COUNT;
                             forLoanVM_Co_Borrower.LastReminderTime = EncompassSocialSurveyConstant.LAST_REMINDER_TIME;
                             forLoanVM_Co_Borrower.EngagementClosedTime = fieldValues[8];
                             forLoanVM_Co_Borrower.Status = EncompassSocialSurveyConstant.STATUS;
-                            forLoanVM_Co_Borrower.State = fieldValues[9];
-                            forLoanVM_Co_Borrower.City = fieldValues[10];
-                        
-                            returnLoansViewModel.Add(forLoanVM_Co_Borrower);
+                            forLoanVM_Co_Borrower.State = State;
+                            forLoanVM_Co_Borrower.City = City;
+                            forLoanVM_Co_Borrower.ParticipantType = EncompassSocialSurveyConstant.PARTICIPANT_TYPE_CO_BORROWER;
+
+                            returnLoansViewModel.Add(forLoanVM_Co_Borrower);  
                         }
+                  
+                        //check for partner survey
+                        if (encompassCredential.allowPartnerSurvey)
+                        {
+                            //for adding buyer agent
+                            String buyerEmail = fieldValues[EncompassSocialSurveyConstant.BUYER_AGENT_EMAIL_INDEX];
+                            String buyerName = fieldValues[EncompassSocialSurveyConstant.BUYER_AGENT_NAME_INDEX];
+                            if (string.IsNullOrWhiteSpace(buyerEmail) == false)
+                            {
+                                LoanViewModel forLoanVM_buyer_agent = new LoanViewModel();
+                                forLoanVM_buyer_agent.SurveySource = EncompassSocialSurveyConstant.SURVEY_SOURCE;
+                                forLoanVM_buyer_agent.SurveySourceId = runningLoan.LoanNumber;
+                                forLoanVM_buyer_agent.CompanyId = runningCompanyId;
+                                
+                                forLoanVM_buyer_agent.AgentId = (loanOfficer != null) ? loanOfficer.ID : "";
+                                forLoanVM_buyer_agent.AgentName = (loanOfficer != null) ? loanOfficer.FullName : "";
+
+                                forLoanVM_buyer_agent.CustomerFirstName = buyerName;
+                                forLoanVM_buyer_agent.CustomerLastName = "";
+
+                                if (string.IsNullOrWhiteSpace(emailDomain))
+                                {
+                                    forLoanVM_buyer_agent.CustomerEmailId = buyerEmail;
+                                    forLoanVM_buyer_agent.AgentEmailId = agentEmailId;
+                                }
+                                else
+                                {
+                                    forLoanVM_buyer_agent.CustomerEmailId = ReplaceEmailAddress(buyerEmail, emailDomain, emailPrefix);
+                                    forLoanVM_buyer_agent.AgentEmailId = ReplaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
+                                }
+
+                                forLoanVM_buyer_agent.ReminderCounts = EncompassSocialSurveyConstant.REMINDER_COUNT;
+                                forLoanVM_buyer_agent.LastReminderTime = EncompassSocialSurveyConstant.LAST_REMINDER_TIME;
+                                forLoanVM_buyer_agent.EngagementClosedTime = fieldValues[8];
+                                forLoanVM_buyer_agent.Status = EncompassSocialSurveyConstant.STATUS;
+                                forLoanVM_buyer_agent.State = State;
+                                forLoanVM_buyer_agent.City = City;
+                                forLoanVM_buyer_agent.ParticipantType = EncompassSocialSurveyConstant.PARTICIPANT_TYPE_BUYER_AGENT;
+
+                                returnLoansViewModel.Add(forLoanVM_buyer_agent);
+                            }
+
+                            // add seller agent
+
+                            String sellerEmail = fieldValues[EncompassSocialSurveyConstant.SELLER_AGENT_EMAIL_INDEX];
+                            String sellerName = fieldValues[EncompassSocialSurveyConstant.SELLER_AGENT_NAME_INDEX];
+
+                            if (string.IsNullOrWhiteSpace(sellerEmail) == false)
+                            {
+                                LoanViewModel forLoanVM_seller_agent = new LoanViewModel();
+                                forLoanVM_seller_agent.SurveySource = EncompassSocialSurveyConstant.SURVEY_SOURCE;
+                                forLoanVM_seller_agent.SurveySourceId = runningLoan.LoanNumber;
+                                forLoanVM_seller_agent.CompanyId = runningCompanyId;
+
+                                forLoanVM_seller_agent.AgentId = (loanOfficer != null) ? loanOfficer.ID : "";
+                                forLoanVM_seller_agent.AgentName = (loanOfficer != null) ? loanOfficer.FullName : "";
+
+                                forLoanVM_seller_agent.CustomerFirstName = sellerName;
+                                forLoanVM_seller_agent.CustomerLastName = "";
+
+                                if (string.IsNullOrWhiteSpace(emailDomain))
+                                {
+                                    forLoanVM_seller_agent.CustomerEmailId = sellerEmail;
+                                    forLoanVM_seller_agent.AgentEmailId = agentEmailId;
+                                }
+                                else
+                                {
+                                    forLoanVM_seller_agent.CustomerEmailId = ReplaceEmailAddress(sellerEmail, emailDomain, emailPrefix);
+                                    forLoanVM_seller_agent.AgentEmailId = ReplaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
+                                }
+
+                                forLoanVM_seller_agent.ReminderCounts = EncompassSocialSurveyConstant.REMINDER_COUNT;
+                                forLoanVM_seller_agent.LastReminderTime = EncompassSocialSurveyConstant.LAST_REMINDER_TIME;
+                                forLoanVM_seller_agent.EngagementClosedTime = fieldValues[8];
+                                forLoanVM_seller_agent.Status = EncompassSocialSurveyConstant.STATUS;
+                                forLoanVM_seller_agent.State = State;
+                                forLoanVM_seller_agent.City = City;
+                                forLoanVM_seller_agent.ParticipantType = EncompassSocialSurveyConstant.PARTICIPANT_TYPE_LISTING_AGENT;
+
+                                returnLoansViewModel.Add(forLoanVM_seller_agent);
+                            }
+
+                        }
+
 
                         if (null != runningLoan)
                         {
@@ -320,6 +420,8 @@ namespace EncompassSocialSurvey
 
                     //update last run end date
                     UpdateLastRunEndTimeInCrmBatchTracker(crmBatchTracker,loanService);
+
+                    
                 }
 
 

@@ -1427,6 +1427,11 @@ span.footer-ul a:hover {
 	pointer-events: none;
 }
 
+
+.enable-click{
+	pointer-events:auto;
+}
+
 .dd-tl {
 	font-size: 12px;
 	line-height: 15px;

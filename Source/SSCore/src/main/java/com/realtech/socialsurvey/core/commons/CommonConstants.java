@@ -150,6 +150,14 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_IGNORED_RECORD = 9;
     public static final int STATUS_SURVEYPREINITIATION_DELETED = 0;
     public static final int STATUS_SURVEYPREINITIATION_MISMATCH_RECORD = 10;
+    public static final int STATUS_SURVEYPREINITIATION_SURVEY_NOT_ALLOWED = 11;
+    
+    public static final int SURVEY_PARTICIPANT_TYPE_BORROWER = 1;
+    public static final int SURVEY_PARTICIPANT_TYPE_COBORROWER = 2;
+    public static final int SURVEY_PARTICIPANT_TYPE_BUYER_AGENT = 3;
+    public static final int SURVEY_PARTICIPANT_TYPE_SELLER_AGENT = 4;
+    
+    
 
     /**
      * Hibernate entities and column name constants
@@ -202,6 +210,7 @@ public interface CommonConstants
     public static final String SURVEY_LAST_REMINDER_TIME = "lastReminderTime";
     public static final String PROFILE_VALUE_COLUMN = "profileValue";
     public static final String PROFILE_LEVEL_COLUMN = "profileLevel";
+    public static final String ENCOMPASS_SDK_VERSION_COLUMN = "sdkVersion";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
@@ -324,6 +333,8 @@ public interface CommonConstants
     public static final String SURVEY_TRANSACTION_DATE_COLUMN = "surveyTransactionDate";
     public static final String ACCOUNT_DISABLE_DATE_COLUMN = "disableDate";
     public static final String IS_FORCE_DELETE_COLUMN = "isForceDelete";
+    public static final String SURVEY_LAST_ABUSE_REPORTED_DATE = "lastAbuseReportedDate";
+    
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -423,6 +434,7 @@ public interface CommonConstants
     public static final String POPUP_FLAG_IN_SESSION = "popupStatus";
     public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
     public static final String NO_GOOGLE_PLUS_FOUND = "nogoogleplusfound";
+    public static final String ENCOMPASS_VERSION_LIST = "encompassVersionList";
 
     public static final String BILLING_MODE_ATTRIBUTE_IN_SESSION = "billingMode";
 
@@ -870,7 +882,7 @@ public interface CommonConstants
 
     public static final String REGION_OBJECT = "region";
 
-    public static final String SURVEY_REMINDER_COUNT = "reminderCount";
+    public static final String SURVEY_REMINDER_COUNT = "reminderCounts";
     public static final String SURVEY_REMINDER_INTERVAL = "reminderInterval";
 
     //Session variable
@@ -1010,8 +1022,8 @@ public interface CommonConstants
     public static final String URL_COLUMN = "url";
 
     //mark abusive by application constant
-    public static final String REPORT_ABUSE_BY_APPLICSTION_NAME = "Application";
-    public static final String REPORT_ABUSE_BY_APPLICSTION_EMAIL = "Reported By Application";
+    public static final String REPORT_ABUSE_BY_APPLICATION_NAME = "Application";
+    public static final String REPORT_ABUSE_BY_APPLICATION_EMAIL = "Reported By Application";
 
     // sendgrid inbound mail status
     public static final String SENDGRID_OK_STATUS = "OK";
@@ -1318,6 +1330,7 @@ public interface CommonConstants
     public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
     public static final String SURVEY_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     
+<<<<<<< HEAD
     //Reporting constants
     public static final String REPORTING_SURVEY_STATS_REPORT = "Survey Stats Report";
     public static final String REPORTING_USER_ADOPTION_REPORT = "User Adoption Report";
@@ -1340,4 +1353,16 @@ public interface CommonConstants
     public static final String INTERNAL_BRANCH_RANK = "internalBranchRank";
     public static final String INTERNAL_REGION_RANK = "internalRegionRank";
     
+=======
+    //Survey API survey status
+    public static final String SURVEY_API_SURVEY_STATUS_COMPLETE = "complete";
+    public static final String SURVEY_API_SURVEY_STATUS_INCOMPLETE = "incomplete";
+    public static final String SURVEY_API_SURVEY_STATUS_ALL = "all";
+
+    
+    public static final String NOT_AVAILABLE = "N/A";
+    
+    //Encompass test connection htt prequest initial
+    public static final String HTTP_REQUEST_URL_INITIAL = "http://";
+>>>>>>> a2921e2f30539fa8b5d1aa0dec67f960ef66e7c7
 }

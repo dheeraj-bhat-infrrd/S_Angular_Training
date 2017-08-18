@@ -167,14 +167,15 @@ public interface EmailServices
 
     /**
      * Sends the survey complete admin mail
-     * 
-     * @param recipientMailId
-     * @param displayName
      * @param agentName
+     * @param recipientMailId
+     * @param customerDetail TODO
+     * @param displayName
+     * 
      * @throws InvalidInputException
      */
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
-        String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink )
+        String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink, String customerDetail )
         throws InvalidInputException, UndeliveredEmailException;
 
 
@@ -369,7 +370,7 @@ public interface EmailServices
 
     //SS-1435: Send survey details too
     void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String mood,
-        String rating, String surveyDetail ) throws InvalidInputException, UndeliveredEmailException;
+        String rating, String surveySourceId, String surveyDetail ) throws InvalidInputException, UndeliveredEmailException;
 
 
     /**
