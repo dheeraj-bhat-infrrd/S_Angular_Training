@@ -1330,7 +1330,6 @@ public interface CommonConstants
     public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
     public static final String SURVEY_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     
-<<<<<<< HEAD
     //Reporting constants
     public static final String REPORTING_SURVEY_STATS_REPORT = "Survey Stats Report";
     public static final String REPORTING_USER_ADOPTION_REPORT = "User Adoption Report";
@@ -1352,8 +1351,7 @@ public interface CommonConstants
     public static final String RANK = "rank";
     public static final String INTERNAL_BRANCH_RANK = "internalBranchRank";
     public static final String INTERNAL_REGION_RANK = "internalRegionRank";
-    
-=======
+
     //Survey API survey status
     public static final String SURVEY_API_SURVEY_STATUS_COMPLETE = "complete";
     public static final String SURVEY_API_SURVEY_STATUS_INCOMPLETE = "incomplete";
@@ -1364,5 +1362,4 @@ public interface CommonConstants
     
     //Encompass test connection htt prequest initial
     public static final String HTTP_REQUEST_URL_INITIAL = "http://";
->>>>>>> a2921e2f30539fa8b5d1aa0dec67f960ef66e7c7
 }
