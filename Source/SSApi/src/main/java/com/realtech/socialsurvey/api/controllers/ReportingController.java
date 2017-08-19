@@ -304,7 +304,7 @@ public class ReportingController
         if(type == 1){
             userRankingList = reportingDashboardManagement.getUserRankingReportForYear( entityId, entityType, year );
         }else {
-            userRankingList = null;
+            userRankingList = reportingDashboardManagement.getUserRankingReportForMonth( entityId, entityType, year, month );
         }
         json = new Gson().toJson( userRankingList );
         return json;

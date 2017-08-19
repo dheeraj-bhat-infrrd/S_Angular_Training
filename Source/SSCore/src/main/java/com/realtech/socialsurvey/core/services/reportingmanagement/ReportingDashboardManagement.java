@@ -103,5 +103,7 @@ public interface ReportingDashboardManagement
     Long getRegionIdFromBranchId(long branchId);
 
     List<List<Object>> getUserRankingReportForYear( Long entityId, String entityType, int year );
+
+    List<List<Object>> getUserRankingReportForMonth( Long entityId, String entityType, int year, int month );
     
 }
