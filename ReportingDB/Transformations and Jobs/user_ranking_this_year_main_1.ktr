@@ -142,7 +142,6 @@
   <hop> <from>Sort rows 6</from><to>Merge Join 4</to><enabled>Y</enabled> </hop>
   <hop> <from>TableMinReq</from><to>Sort rows 7</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 7</from><to>Merge Join 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Null to Zero</from><to>jsMinRequirements</to><enabled>Y</enabled> </hop>
   <hop> <from>Calculator</from><to>Sort rows 8</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 8</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveyPreInitiation</from><to>Sort rows 9</to><enabled>Y</enabled> </hop>
@@ -163,6 +162,9 @@
   <hop> <from>DatabaseId</from><to>Database join FOR NMLS</to><enabled>Y</enabled> </hop>
   <hop> <from>Database join</from><to>DatabaseId</to><enabled>Y</enabled> </hop>
   <hop> <from>Database join FOR NMLS</from><to>Null to Zero</to><enabled>Y</enabled> </hop>
+  <hop> <from>Unique rows</from><to>jsMinRequirements</to><enabled>Y</enabled> </hop>
+  <hop> <from>Null to Zero</from><to>Sort rows 14</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 14</from><to>Unique rows</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AverageScoreGroupBy</name>
@@ -279,6 +281,66 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1547</xloc>
       <yloc>293</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Database join FOR NMLS</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>SELECT NMLS_ID FROM lender_ref WHERE ZILLOW_TOKEN_ID &#x3d; &#x28;SELECT ZILLOW_TOKEN_ID FROM zillow_token WHERE type &#x3d; 4 AND id &#x3d; &#x3f;&#x29;&#x3b;</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>AGENT_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1547</xloc>
+      <yloc>473</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>DatabaseId</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>select r.REGION_ID , b.BRANCH_ID from user_profile up &#xd;&#xa;left join region r on up.region_id &#x3d; r.region_id and r.IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;left join branch b on up.region_id &#x3d; b.branch_id and b.IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;where up.IS_PRIMARY &#x3d; 1 and up.STATUS &#x3d; 1 and up.USER_ID &#x3d; &#x3f;</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>AGENT_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1547</xloc>
+      <yloc>368</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -447,8 +509,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>896</xloc>
-      <yloc>543</yloc>
+      <xloc>801</xloc>
+      <yloc>538</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -803,8 +865,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1062</xloc>
-      <yloc>543</yloc>
+      <xloc>976</xloc>
+      <yloc>538</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1110,7 +1172,7 @@
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1547</xloc>
-      <yloc>543</yloc>
+      <yloc>538</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2262,7 +2324,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>654</xloc>
-      <yloc>543</yloc>
+      <yloc>538</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2289,6 +2351,33 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1222</xloc>
       <yloc>395</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Unique rows</name>
+    <type>Unique</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <count_rows>N</count_rows>
+      <count_field/>
+      <reject_duplicate_row>N</reject_duplicate_row>
+      <error_description/>
+    <fields>      <field>        <name>AGENT_ID</name>
+        <case_insensitive>N</case_insensitive>
+        </field>      <field>        <name>Year_Data_Final</name>
+        <case_insensitive>N</case_insensitive>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1282</xloc>
+      <yloc>538</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2457,15 +2546,15 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1230</xloc>
-      <yloc>543</yloc>
+      <xloc>1138</xloc>
+      <yloc>538</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Database join FOR NMLS</name>
-    <type>DBJoin</type>
+    <name>Sort rows 14</name>
+    <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -2474,51 +2563,31 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <rowlimit>0</rowlimit>
-    <sql>SELECT NMLS_ID FROM lender_ref WHERE ZILLOW_TOKEN_ID &#x3d; &#x28;SELECT ZILLOW_TOKEN_ID FROM zillow_token WHERE type &#x3d; 4 AND id &#x3d; &#x3f;&#x29;&#x3b;</sql>
-    <outer_join>Y</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
       <field>
         <name>AGENT_ID</name>
-        <type>None</type>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
       </field>
-    </parameter>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1547</xloc>
-      <yloc>473</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>DatabaseId</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <rowlimit>0</rowlimit>
-    <sql>select r.REGION_ID , b.BRANCH_ID from user_profile up &#xd;&#xa;left join region r on up.region_id &#x3d; r.region_id and r.IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;left join branch b on up.region_id &#x3d; b.branch_id and b.IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;where up.IS_PRIMARY &#x3d; 1 and up.STATUS &#x3d; 1 and up.USER_ID &#x3d; &#x3f;</sql>
-    <outer_join>Y</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
       <field>
-        <name>AGENT_ID</name>
-        <type>None</type>
+        <name>Year_Data_Final</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
       </field>
-    </parameter>
+    </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1547</xloc>
-      <yloc>368</yloc>
+      <xloc>1395</xloc>
+      <yloc>538</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
