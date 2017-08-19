@@ -8,5 +8,5 @@
 <script type="text/javascript">
 	$(window).resize(function(){
 		drawCompletionRateGraph();
-	 });
+	});
 </script>

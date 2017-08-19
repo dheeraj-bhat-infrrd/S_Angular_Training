@@ -1340,4 +1340,6 @@ public interface CommonConstants
     public static final String INTERNAL_BRANCH_RANK = "internalBranchRank";
     public static final String INTERNAL_REGION_RANK = "internalRegionRank";
     
+    public static final String MONTH_VAL = "monthVal";
+    public static final String YEAR_VAL = "yearVal";
 }
