@@ -34,10 +34,7 @@
 </div>
 
 <div id="temp-div"></div>
-<div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25"
-	data-hpy="${surveysettings.happyText}" data-hpy-compl="${surveysettings.happyTextComplete}" 
-	data-nutl="${surveysettings.neutralText}" data-nutl-compl="${surveysettings.neutralTextComplete}" 
-	data-sad="${surveysettings.sadText}" data-sad-compl="${surveysettings.sadTextComplete}">
+<div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
 	
 	<div class="container">
 
@@ -75,10 +72,10 @@
 										<div class="st-score-rt-top margin-top-twenty email-sel-item-resp sort-resp">
 											<spring:message code="label.review.sort.criteria.key" />
 										</div>
-										<select id="sort-criteria-sel" class="float-left review-sort-sel-item email-sel-item-resp">
-											<option data-sort="Date" value="date">Sort responses by Date</option>										
-											<option data-sort="Featured Reviews" value="feature">Sort responses by Featured Reviews</option>
-										</select>
+										<div class="sort-sel-wrapper">
+											<input type="text" id="sort-criteria-sel" class="float-left dd-arrow-dn cursor-pointer review-sort-sel-item">
+										</div>
+										<div class="sort-option-wrapper review-sort-wrapper-resp hide" id="sort-options"></div>
 									</div>
 								</div>
 							</c:if>	
@@ -89,22 +86,34 @@
 									<input type="hidden" id="at-pst-lnk-usr-ste-cb" name="autopostlinktousersite" value="${autoPostLinkToUserSite}">
 									<div class="float-left customized-settings-child cust-resp-txt">Allow autopost link to the user's website</div>
 								</c:if>
+								
+								<!-- partner survey settings -->
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
+									<div id="alw-ptnr-srvy-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="alw-ptnr-srvy-cb" name="allowpartnersurvey" value="${allowPartnerSurvey}">
+									<div class="float-left customized-settings-child cust-resp-txt">Allow partner survey</div>
+								</c:if>
+								
 								<c:if test="${ columnName != 'agentId' and accountMasterId != 1 }">
 									<div id="vndsta-access-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
 									<div class="float-left listing-access-txt cust-resp-txt">Allow access to Listings Manager</div>
 								</c:if>
+								
 							</c:if>
+							
 							<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 							<div class="send-email-sel-col">
 								<div class="clearfix padding-bottom-twenty">
 									<div class="float-left st-score-rt-top email-setting-sel-lbl">
 										<spring:message code="label.send.email.via.key" />
 									</div>
-									<select id="email-sel" class="float-left email-sel-item email-resp email-resp-margin">
-										<option data-email-option="socialsurvey.me" value="socialsurvey.me">socialsurvey.me</option>
-										<option data-email-option="socialsurvey.us" value="socialsurvey.us">socialsurvey.us</option>
-									</select>
+									<div class="email-sel-wrapper email-resp email-resp-margin">
+										<div class="email-sel-item">
+											<input type="text" id="email-sel" class="float-left dd-arrow-dn cursor-pointer email-item-wrapper" spellcheck="false">
+										</div>
+										<div class="email-option-wrapper hide" id="email-options"></div>
+									</div>
 								</div>
 							</div>
 					</c:if>
@@ -255,17 +264,20 @@ $(document).ready(function() {
 		$('#customized-setting-div').addClass('cust-resp');
 		$('#customized-setting-div').addClass('cust-div-resp');
 	}
-	$("#sort-criteria-sel").val("${reviewSortCriteria}");
+	
+	if( "${reviewSortCriteria}" == "feature" ){
+		$("#sort-criteria-sel").val("Sort responses by Featured Reviews");
+	} else {
+		$("#sort-criteria-sel").val("Sort responses by Date");
+	}
 	$("#email-sel").val("${sendEmailThrough}");
 
 	//social media urls
 	loadSocialMediaUrlInSettingsPage();
 	updateViewAsScroll();
-	setUpListenerForSortCriteriaDropdown();
 	if("${autoPostEnabled}" == "false"){
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 	}
-	setUpListenerForEmailOptionDropdown();
 	
 	if("${autoPostLinkToUserSite}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
 		$('#atpst-lnk-usr-ste-chk-box').addClass('bd-check-img-checked');
@@ -275,6 +287,10 @@ $(document).ready(function() {
 		$('#vndsta-access-chk-box').addClass('bd-check-img-checked');
 	}
 
+	if("${allowPartnerSurvey}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
+		$('#alw-ptnr-srvy-chk-box').addClass('bd-check-img-checked');
+	}
+	
 	var accountMasterId = "${accountMasterId}";
 	if (accountMasterId != 5) {
 		
@@ -282,35 +298,60 @@ $(document).ready(function() {
 		changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
 		$('#rating-min-post').off('click');
 		$('#rating-min-post').on('click', function(){
+			$('#email-options').hide();
+			$('#sort-options').hide();
 			$('#st-dd-wrapper-min-post').slideToggle(200);
+			$(document).mouseup(ratingMouseUp);
 		});
 		
+		autoAppendSortOrderDropdown('#sort-options', "sort-option-item");
+		$('#sort-criteria-sel').off('click');
+		$('#sort-criteria-sel').on('click', function(){
+			$('#email-options').hide();
+			$('#st-dd-wrapper-min-post').hide();
+			$('#sort-options').slideToggle(200);
+			$(document).mouseup(sortCriteriaMouseUp);
+		});
+		
+		autoAppendEmailCriteriaDropdown('#email-options', "email-option-item");
+		$('#email-sel').off('click');
+		$('#email-sel').on('click', function(){
+			$('#sort-options').hide();
+			$('#st-dd-wrapper-min-post').hide();
+			$('#email-options').slideToggle(200);
+			$(document).mouseup(emailCriteriaMouseUp);
+		});
+		
+		setUpListenerForEmailOptionDropdown();
+		setUpListenerForSortCriteriaDropdown();
+
+
 		autoSetCheckboxStatus('#st-settings-location-on', '#st-settings-location-off', '#other-location');
 		autoSetCheckboxStatus('#st-settings-account-on', '#st-settings-account-off', '#other-account');
 		autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
 		autoSetReminderIntervalStatus();
-		var happyTxt=$('#hm-main-content-wrapper').attr("data-hpy");
+		var happyTxt="${surveysettings.happyText}";
 		if(happyTxt == ""){
-			happyTxt = "${defaultSurveyProperties.happyText}";
+			happyTxt = '${defaultSurveyProperties.happyText}';
 		}
-		var nuTxt=$('#hm-main-content-wrapper').attr("data-nutl");
+		var nuTxt="${surveysettings.neutralText}";
 		if(nuTxt == ""){
 			nuTxt = "${defaultSurveyProperties.neutralText}";
 		}
 		
-		var sadTxt=$('#hm-main-content-wrapper').attr("data-sad");
+		var sadTxt="${surveysettings.sadText}";
 		if(sadTxt == ""){
 			sadTxt = "${defaultSurveyProperties.sadText}";
 		}
-		var happyTxtComplete=$('#hm-main-content-wrapper').attr("data-hpy-compl");
+		var happyTxtComplete="${surveysettings.happyTextComplete}";
 		if(happyTxtComplete == ""){
 			happyTxtComplete = "${defaultSurveyProperties.happyTextComplete}";
 		}
-		var nuTxtComplete=$('#hm-main-content-wrapper').attr("data-nutl-compl");
+		var nuTxtComplete="${surveysettings.neutralTextComplete}";
 		if(nuTxtComplete == ""){
 			nuTxtComplete = "${defaultSurveyProperties.neutralTextComplete}";
 		}
-		var sadTxtComplete=$('#hm-main-content-wrapper').attr("data-sad-compl");
+		var sadTxtComplete="${surveysettings.sadTextComplete}";
 		if(sadTxtComplete == ""){
 			sadTxtComplete = "${defaultSurveyProperties.sadTextComplete}";
 		}

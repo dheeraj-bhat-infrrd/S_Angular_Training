@@ -68,7 +68,7 @@
 				<span class="min-req-span">Minimum Reviews</span>
 			</div>
 		</div>
-		<c:if test="${ isRealTechOrSSAdmin == true}">
+		<c:if test="${ (isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true') and columnName == 'companyId' }">
 			<div id="offset-value-settings" style="margin-top:20px">
 				<div class="st-score-rt-top width-three-five-zero">Offset Value</div>
 				<div class="min-req-div">

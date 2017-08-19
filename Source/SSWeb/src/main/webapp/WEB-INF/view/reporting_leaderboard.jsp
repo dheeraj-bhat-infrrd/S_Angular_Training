@@ -361,6 +361,8 @@ $(document).on('click','#lead-ranks-above-btn',function(){
 	
 	var userRankingList = null;
 	
+	var entityId = companyId;
+	
 	if(profileMasterId != 4){
 		if(entityType == "regionId" && profileMasterId == 2){
 			entityId = columnId;
@@ -431,6 +433,8 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 	}
 	
 	var userRankingList = null;
+	
+	var entityId = companyId;
 	
 	if(profileMasterId != 4){
 		if(entityType == "regionId" && profileMasterId == 2){
@@ -674,6 +678,8 @@ $(document).on('click','#top-ten-ranks-btn',function(){
 		break;
 	default: entityType = 'companyId'
 	}
+	
+	var entityId = companyId;
 	
 	var userRankingList = null;
 	

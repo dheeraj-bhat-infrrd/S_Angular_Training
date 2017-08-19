@@ -108,6 +108,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_REVIEW_SORT_CRITERIA = "reviewSortCriteria";
     public static final String KEY_SEND_EMAIL_THROUGH = "sendEmailThrough";
     public static final String KEY_RANKING_REQUIREMENTS = "ranking_requirements";
+    public static final String KEY_ALLOW_PARTNER_SURVEY = "allowPartnerSurvey";
 
 
     @Value ( "${CDN_PATH}")

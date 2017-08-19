@@ -7,6 +7,7 @@ public class BreadCrumb {
 
 	public String breadCrumbProfile;
 	public String breadCrumbUrl;
+	public boolean hideFromBreadCrumb;
 
 	public String getBreadCrumbProfile() {
 		return breadCrumbProfile;
@@ -23,6 +24,18 @@ public class BreadCrumb {
 	public void setBreadCrumbUrl(String breadCrumbUrl) {
 		this.breadCrumbUrl = breadCrumbUrl;
 	}
+	
+	public boolean isHideFromBreadCrumb()
+    {
+        return hideFromBreadCrumb;
+    }
+
+    public void setHideFromBreadCrumb( boolean hideFromBreadCrumb )
+    {
+        this.hideFromBreadCrumb = hideFromBreadCrumb;
+    }
+
+
 
 	@Override
 	public String toString() {

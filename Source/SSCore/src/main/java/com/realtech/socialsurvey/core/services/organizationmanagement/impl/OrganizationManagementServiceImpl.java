@@ -37,6 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +56,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.RemovedUserDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
@@ -72,6 +76,7 @@ import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.Event;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
@@ -90,6 +95,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
+import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.RetriedTransaction;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.StateLookup;
@@ -101,6 +107,7 @@ import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserApiKey;
+import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -197,6 +204,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private GenericDao<ZipCodeLookup, Integer> zipCodeLookupDao;
 
     @Autowired
+    private GenericDao<EncompassSdkVersion, Long> encompassSdkVersionDao;
+    
+    @Autowired
     private DisabledAccountDao disabledAccountDao;
 
     @Resource
@@ -229,6 +239,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private UsercountModificationNotificationDao usercountModificationNotificationDao;
+    
+    @Autowired
+    private SurveyDetailsDao surveyDetailsDao;
 
     @Autowired
     private Utils utils;
@@ -2960,6 +2973,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         //check if new profile will be primary or not
         int isPrimary = checkWillNewProfileBePrimary( userProfileNew, userProfiles );
         userProfileNew.setIsPrimary( isPrimary );
+        
+        //move reviews
+        if(userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId );            
+        }
 
         // Remove if the profile from list
         if ( indexToRemove != -1 ) {
@@ -3128,6 +3146,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         int isPrimary = checkWillNewProfileBePrimary( userProfileNew, userProfiles );
         userProfileNew.setIsPrimary( isPrimary );
 
+        //move reviews
+        if(userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), branchId, regionId );            
+        }
+        
+        
         // Remove if the profile from list
         if ( indexToRemove != -1 ) {
             userProfiles.remove( indexToRemove );
@@ -4819,6 +4843,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 //Update user profiles here.
                 userProfileDao.updateRegionIdForBranch( branchId, region.getRegionId() );
 
+                //update survey details
+                surveyDetailsDao.updateRegionIdForAllSurveysOfBranch( branchId, region.getRegionId() );
+                
                 //Get and update user
                 SolrDocumentList users = null;
                 int pageNo = 1;
@@ -7990,6 +8017,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     //END JIRA SS-975
     
+
     /**
      * 
      * @param companySettings
@@ -8052,5 +8080,139 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             throw new NonFatalException("Error while processing Deactivate Company");
          }
         LOG.info( "processDeactivateCompany company: " + company.getCompanyId() + " finished");
+    }
+    
+    
+    @Override
+    public void updateAllowPartnerSurveyForAllUsers( Set<Long> userIds, boolean allowPartnerSurvey )
+        throws InvalidInputException
+    {
+        if ( userIds == null ) {
+            throw new InvalidInputException( "User ids cannot be null." );
+        }
+
+        LOG.info( "Updating AllowPartnerSurvey for users with allowPartnerSurvey value : " + allowPartnerSurvey );
+        List<Object> userIdList = new ArrayList<Object>();
+        userIdList.addAll( userIds );
+        
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY, 
+            allowPartnerSurvey, MongoOrganizationUnitSettingDaoImpl.KEY_IDEN, userIdList, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        LOG.info( "Updated the AllowPartnerSurvey for users successfully" );
+    }
+    
+    
+    @Override
+    public void updatellowPartnerSurveyForUser( AgentSettings agentSettings, boolean allowPartnerSurvey )
+    {
+        LOG.debug( "Inside method updatellowPartnerSurveyForUser for user : " + agentSettings.getIden() );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY,
+            allowPartnerSurvey, agentSettings );
+    }
+    
+    
+    @Override
+    public boolean isPartnerSurveyAllowedForComapny( long companyId )
+    {
+        LOG.debug( "Inside method isPartnerSurveyAllowedForComapny for company : " + companyId );
+        OrganizationUnitSettings companySettings =  organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        if(companySettings != null){
+            if(companySettings.getCrm_info() != null){
+                if(companySettings.getCrm_info().isAllowPartnerSurvey())
+                    return true;
+            }
+        }
+        return false;
+    }
+        
+    public void updateSurveyAssignments( User user, List<UserProfile> userProfileList , long oldUserProfileId )
+    {
+        LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() started for agentId + " + user.getUserId() );
+        for(UserProfile profile : userProfileList){
+            if(profile.getUserProfileId() != oldUserProfileId){
+                if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+                    surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( user.getUserId(), profile.getBranchId(), profile.getRegionId() );
+                    break;
+                }
+            }
+        }
+        LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() finished for agentId + " +  user.getUserId() );
+    }
+
+    @Override
+    public List<User> getUsersUnderBranch( Branch branch ) throws InvalidInputException
+    {
+        LOG.info( "getUsersUnderBranch started" );
+        List<User> usersUnderBranch = new ArrayList<>();
+        for ( long userId : userProfileDao.findUserIdsByBranch( branch.getBranchId() ) ) {
+            usersUnderBranch.add( userManagementService.getUserByUserId( userId ) );
+        }
+        LOG.info( "getUsersUnderBranch finished" );
+        return usersUnderBranch;
+    }
+
+
+    /* updating MySQL tables with company specific data 
+     */
+    @Override
+    @Transactional
+    public void updateCompanyIdInMySQLForUser( User userToBeRelocated, Company targetCompany ) throws InvalidInputException
+    {
+        LOG.info( "Method updateCompanyIdInMySQLForUser started" );
+
+        if ( !userToBeRelocated.isCompanyAdmin() ) {
+            //update user details in MySQL database
+            userToBeRelocated.setCompany( targetCompany );
+            userManagementService.updateUser( userToBeRelocated );
+
+            //update UserEmailMapping table with CompanyId in MySQL database
+            try {
+                for ( UserEmailMapping userEmailMapping : userManagementService
+                    .getUserEmailMappingsForUser( userToBeRelocated.getUserId() ) ) {
+                    userEmailMapping.setCompany( targetCompany );
+                    userManagementService.updateUserEmailMapping( userEmailMapping );
+                }
+            } catch ( NoRecordsFetchedException noRecordsFetchedException ) {
+                LOG.warn( "No user email mappings found, proceeding to update other MySQL entities " );
+            }
+
+
+            //updating removed user table with CompanyId
+            for ( RemovedUser removedUser : removedUserDao.findByColumn( RemovedUser.class, CommonConstants.USER_COLUMN,
+                userToBeRelocated ) ) {
+                removedUser.setCompany( targetCompany );
+                removedUserDao.update( removedUser );
+            }
+        }
+        LOG.info( "Method updateCompanyIdInMySQLForUser finished" );
+    }
+    
+    
+    @Override
+    public List<EncompassSdkVersion> getActiveEncompassSdkVersions()
+    {
+        LOG.info( "Method getActiveEncompassSdkVersions started" );
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<EncompassSdkVersion> encompassSdkVersions =  encompassSdkVersionDao.findByKeyValue( EncompassSdkVersion.class, queries );
+        LOG.info( "Method getActiveEncompassSdkVersions finisshed" );
+        return encompassSdkVersions;
+
+    }
+    
+    @Override
+    public String getEncompassHostByVersion(String sdkVersion) throws InvalidInputException
+    {
+        LOG.info( "Method getActiveEncompassSdkVersions started" );
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        queries.put( CommonConstants.ENCOMPASS_SDK_VERSION_COLUMN, sdkVersion );
+        List<EncompassSdkVersion> encompassSdkVersions =  encompassSdkVersionDao.findByKeyValue( EncompassSdkVersion.class, queries );
+        if(encompassSdkVersions == null || encompassSdkVersions.size() == 0){
+            throw new InvalidInputException("Unsupported Encompass Version");
+        }
+        LOG.info( "Method getActiveEncompassSdkVersions finisshed" );
+        return encompassSdkVersions.get(CommonConstants.INITIAL_INDEX).getHostName();
+
     }
 }

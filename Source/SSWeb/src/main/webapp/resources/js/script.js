@@ -24,6 +24,8 @@ var phoneFormat = '(ddd) ddd-dddd'; // defualt phone format
 var selectedCountryRegEx = "";
 var findProCompanyProfileName;
 
+const PRICING_URL = "http://www.socialsurvey.com/pricing/";
+
 function getPhoneNumber(phoneId) {
 	var countryData = $('#' + phoneId).intlTelInput("getSelectedCountryData");
 	var number = $('#' + phoneId).intlTelInput("getNumber");
@@ -859,7 +861,7 @@ $(document).on('click', '.hdr-log-btn', function() {
 	window.location = "/login.do";
 });
 $(document).on('click', '.hdr-reg-btn', function() {
-	window.location = "/accountsignupredirect.do?newUser=true";
+	window.location = PRICING_URL;
 });
 $(document).on('click', '.hdr-logo', function() {
 	showOverlay();

@@ -156,9 +156,10 @@ public class ProfileViewController
                     profileManagementService.processSortCriteria( companyId, null ) );
                 model.addAttribute( "reviews", reviews );
 
-                List<SocialPost> posts = profileManagementService.getSocialPosts( companyProfile.getIden(),
+                /* It was decided not to show Social posts on the UI. So not fetching this anymore.
+				List<SocialPost> posts = profileManagementService.getSocialPosts( companyProfile.getIden(),
                     CommonConstants.COMPANY_ID_COLUMN, -1, CommonConstants.USER_AGENT_NUMBER_POST );
-                model.addAttribute( "posts", posts );
+                model.addAttribute( "posts", posts );*/
             }
         } catch ( InvalidInputException e ) {
             throw new InternalServerException(
@@ -288,10 +289,11 @@ public class ProfileViewController
                     CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_REGION, false, null, null,
                     profileManagementService.processSortCriteria( companyProfile.getIden(), null ) );
                 model.addAttribute( "reviews", reviews );
-
+                
+                /*It was decided not to show Social posts on the UI. So not fetching this anymore.
                 List<SocialPost> posts = profileManagementService.getSocialPosts( regionProfile.getIden(),
                     CommonConstants.REGION_ID_COLUMN, -1, CommonConstants.USER_AGENT_NUMBER_POST );
-                model.addAttribute( "posts", posts );
+                model.addAttribute( "posts", posts );*/
             }
         } catch ( ProfileNotFoundException e ) {
             LOG.error( "Excpetion caught " + e.getMessage() );
@@ -428,9 +430,10 @@ public class ProfileViewController
                     profileManagementService.processSortCriteria( companyProfile.getIden(), null ) );
                 model.addAttribute( "reviews", reviews );
 
+                /*It was decided not to show Social posts on the UI. So not fetching this anymore.
                 List<SocialPost> posts = profileManagementService.getSocialPosts( branchProfile.getIden(),
                     CommonConstants.BRANCH_ID_COLUMN, -1, CommonConstants.USER_AGENT_NUMBER_POST );
-                model.addAttribute( "posts", posts );
+                model.addAttribute( "posts", posts );*/
             }
         } catch ( ProfileNotFoundException e ) {
             LOG.error( "Excpetion caught " + e.getMessage() );
@@ -662,9 +665,10 @@ public class ProfileViewController
                         profileManagementService.processSortCriteria( companyProfile.getIden(), null ) );
                     model.addAttribute( "reviews", reviews );
 
+                    /*It was decided not to show Social posts on the UI. So not fetching this anymore.
                     List<SocialPost> posts = profileManagementService.getSocialPosts( individualProfile.getIden(),
                         CommonConstants.AGENT_ID_COLUMN, -1, CommonConstants.USER_AGENT_NUMBER_POST );
-                    model.addAttribute( "posts", posts );
+                    model.addAttribute( "posts", posts );*/
                 }
 
                 model.addAttribute( "agentFirstName", individualProfile.getContact_details().getFirstName() );
@@ -703,6 +707,7 @@ public class ProfileViewController
             return JspResolver.MESSAGE_HEADER;
         }
 
+        model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
         model.addAttribute( "agentProfileName", agentProfileName );
         model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_INDIVIDUAL );
 
@@ -753,6 +758,7 @@ public class ProfileViewController
                 throw new InvalidInputException( "Profile type not mentioned!" );
             }
 
+            String companyProfileName = request.getParameter( "companyprofilename" );
             String profileName = request.getParameter( "profilename" );
             String senderName = request.getParameter( "name" );
             String senderMailId = request.getParameter( "email" );
@@ -778,7 +784,7 @@ public class ProfileViewController
 
             LOG.debug( "Sending mail to :  " + profileName + " from : " + senderMailId );
 
-            profileManagementService.findProfileMailIdAndSendMail( profileName, message, senderName, senderMailId,
+            profileManagementService.findProfileMailIdAndSendMail( companyProfileName, profileName, message, senderName, senderMailId,
                 profileType );
             LOG.debug( "Mail sent!" );
             returnMessage = messageUtils

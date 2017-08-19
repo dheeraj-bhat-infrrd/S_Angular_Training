@@ -183,14 +183,18 @@ namespace EncompassSocialSurvey.Service
                 String filePath = EncompassSocialSurveyConfiguration.TempFolderPath + Path.DirectorySeparatorChar + fileName;
                 // Write header
                 var csv = new System.Text.StringBuilder();
-                var newLine = string.Format("{0},{1},{2},{3},{4},{5},{6}", "Loan Number", "Customer First Name", "Customer Last Name", "Customer Email Address", "Agent Email Address", "Loan Id", "Engagement Closed Time");
+                var newLine = string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", "Loan Number", "Customer First Name", "Customer Last Name", "Customer Email Address", "Agent Email Address", "Loan Id", "Engagement Closed Time", "Participant Type");
                 csv.AppendLine(newLine);
                 if (null != loansVM)
                 {
                     foreach (var loanVM in loansVM)
                     {
+                        String ParticipantType = GetParticipantType(loanVM.ParticipantType);
+                        String CustomerFirstName = loanVM.CustomerFirstName.Replace("," , " ");
+                        String CustomerLastName = loanVM.CustomerLastName.Replace(",", " ");
+                        
                         newLine = null;
-                        newLine = string.Format("{0},{1},{2},{3},{4},{5},{6}", loanVM.LoanNumber, loanVM.CustomerFirstName, loanVM.CustomerLastName, loanVM.CustomerEmailId, loanVM.AgentEmailId, loanVM.SurveySourceId, loanVM.EngagementClosedTime);
+                        newLine = string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", loanVM.LoanNumber, CustomerFirstName, CustomerLastName, loanVM.CustomerEmailId, loanVM.AgentEmailId, loanVM.SurveySourceId, loanVM.EngagementClosedTime, ParticipantType);
                         csv.AppendLine(newLine);
                     }
                 }
@@ -209,62 +213,7 @@ namespace EncompassSocialSurvey.Service
         /// <param name="loansVM"></param>
         /// <param name="companyName"></param>
         /// <returns></returns>
-        public String CreateExcelSpreadSheetForLoanlist(List<LoanViewModel> loansVM , String companyName)
-        {
-            Logger.Info("Entering the method LoanService.createExcelSpreadSheetForLoanlist for company : " + companyName);
-            Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
-            if (xlApp == null)
-            {
-                Logger.Error("Error while creating excel sheet for company. Can't able to create excel application object" );
-                return null;
-            }
-
-            Excel.Workbook xlWorkBook;
-            Excel.Worksheet xlWorkSheet;
-            object misValue = System.Reflection.Missing.Value;
-
-            try {
-                xlWorkBook = xlApp.Workbooks.Add(misValue);
-                xlWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.ActiveSheet;
-                xlWorkSheet.Cells[1, 1] = "Customer First Name";
-                xlWorkSheet.Cells[1, 2] = "Customer Last Name";
-                xlWorkSheet.Cells[1, 3] = "Customer Email Address";
-                xlWorkSheet.Cells[1, 4] = "Agent Email Address";
-                xlWorkSheet.Cells[1, 5] = "Loan Id";
-                xlWorkSheet.Cells[1, 6] = "Engagement Closed Time";
-
-                int rowCount = 1;
-                if (null != loansVM)
-                {
-                    foreach (var loanVM in loansVM)
-                    {
-                        rowCount++;
-                        xlWorkSheet.Cells[rowCount, 1] = loanVM.CustomerFirstName;
-                        xlWorkSheet.Cells[rowCount, 2] = loanVM.CustomerLastName;
-                        xlWorkSheet.Cells[rowCount, 3] = loanVM.CustomerEmailId;
-                        xlWorkSheet.Cells[rowCount, 4] = loanVM.AgentEmailId;
-                        xlWorkSheet.Cells[rowCount, 5] = loanVM.SurveySourceId;
-                        xlWorkSheet.Cells[rowCount, 6] = loanVM.EngagementClosedTime;
-                    }
-                }
-
-
-                var celLrangE = xlWorkSheet.Range[xlWorkSheet.Cells[1, 1], xlWorkSheet.Cells[rowCount, 6]];
-                celLrangE.EntireColumn.AutoFit();
-
-                String fileName = companyName + "_" + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".xlsx";
-                String filePath = EncompassSocialSurveyConfiguration.TempFolderPath + Path.DirectorySeparatorChar + fileName;
-                xlWorkBook.SaveAs(filePath, Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
-                xlWorkBook.Close(true, misValue, misValue);
-                xlApp.Quit();
-                Logger.Debug("Successfully created user report for compnay : " + companyName + " at : " + filePath);
-                return filePath;
-            }catch(Exception e){
-                Logger.Error("Error while generating excel sheet for company " + companyName + " Message : " + e.Message);
-                throw e;
-            }                   
-        }
-
+     
         /// <summary>
         /// insert crm batch tracker history with count of records fetched
         /// </summary>
@@ -286,6 +235,29 @@ namespace EncompassSocialSurvey.Service
             Logger.Info("Exit method LoanService.InsertCrmBatchTrackerHistory for CRM ID: " + entity.CrmBatchTrackerID);
         }
 
+        private String GetParticipantType(int participantTypeInt)
+        {
+            String participantType = "";
+            if (participantTypeInt == EncompassSocialSurveyConstant.PARTICIPANT_TYPE_BORROWER)
+            {
+                participantType = "Borrower";
+            }
+            else if (participantTypeInt == EncompassSocialSurveyConstant.PARTICIPANT_TYPE_CO_BORROWER)
+            {
+                participantType = "CoBorrower";
+            }
+            else if (participantTypeInt == EncompassSocialSurveyConstant.PARTICIPANT_TYPE_BUYER_AGENT)
+            {
+                participantType = "Buyer Agent";
+            }
+            else if (participantTypeInt == EncompassSocialSurveyConstant.PARTICIPANT_TYPE_LISTING_AGENT)
+            {
+                participantType = "Seller Agent";
+            }
+            return participantType;
+        }
+
         #endregion
     }
+    
 }

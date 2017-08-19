@@ -449,7 +449,7 @@ public interface ProfileManagementService
      * @throws NoRecordsFetchedException
      * @throws UndeliveredEmailException
      */
-    public void findProfileMailIdAndSendMail( String agentProfileName, String message, String senderName, String senderMailId,
+    public void findProfileMailIdAndSendMail( String companyProfileName, String agentProfileName, String message, String senderName, String senderMailId,
         String profileType )
         throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException;
 
