@@ -48,6 +48,23 @@ public class UserRankingPastYearBranchDaoImpl extends GenericReportingDaoImpl<Us
 	}
 
 	@Override
+    public List<UserRankingPastYearBranch> fetchUserRankingReportForPastYearBranch(Long branchId, int year) {
+        LOG.info( "method to fetch user ranking branch list for past year, fetchUserRankingForPastYearBranch() started" );
+        Criteria criteria = getSession().createCriteria( UserRankingPastYearBranch.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
+            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) ); 
+            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_BRANCH_RANK ) );
+            }
+        catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchUserRankingForPastYearBranch() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingForPastYearBranch() ", hibernateException );
+        }
+
+        LOG.info( "method to fetch user ranking branch list for past year, fetchUserRankingForPastYearBranch() finished." );
+        return (List<UserRankingPastYearBranch>) criteria.list();
+    }
+	@Override
 	public int fetchUserRankingRankForPastYearBranch(Long userId, Long branchId, int year) {
 		LOG.info( "method to fetch user ranking Branch Rank for past year, fetchUserRankingRankForPastYearBranch() started" );
         Query query = getSession().createSQLQuery( "SELECT internal_branch_rank FROM user_ranking_past_year_branch WHERE user_id = :userId " );

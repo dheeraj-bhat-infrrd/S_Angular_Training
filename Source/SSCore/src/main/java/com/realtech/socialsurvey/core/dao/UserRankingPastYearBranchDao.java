@@ -11,4 +11,6 @@ public interface UserRankingPastYearBranchDao extends GenericReportingDao<UserRa
     int fetchUserRankingRankForPastYearBranch( Long userId, Long branchId, int year );
 
     long fetchUserRankingCountForPastYearBranch( Long branchId, int year );
+
+    List<UserRankingPastYearBranch> fetchUserRankingReportForPastYearBranch( Long branchId, int year );
 }

@@ -48,6 +48,24 @@ public class UserRankingThisYearRegionDaoImpl extends GenericReportingDaoImpl<Us
         LOG.info( "method to fetch user ranking region list for this year, fetchUserRankingForThisYearRegion() finished." );
         return (List<UserRankingThisYearRegion>) criteria.list();
 	}
+	
+	@Override
+    public List<UserRankingThisYearRegion> fetchUserRankinReportForThisYearRegion(Long regionId, int year ) {
+        LOG.info( "method to fetch user ranking region list for this year, fetchUserRankinReportForThisYearRegion() started" );
+        Criteria criteria = getSession().createCriteria( UserRankingThisYearRegion.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
+            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );   
+            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_REGION_RANK ) );
+            }
+        catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchUserRankinReportForThisYearRegion() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankinReportForThisYearRegion() ", hibernateException );
+        }
+
+        LOG.info( "method to fetch user ranking region list for this year, fetchUserRankinReportForThisYearRegion() finished." );
+        return (List<UserRankingThisYearRegion>) criteria.list();
+    }
 
 	@Override
 	public int fetchUserRankingRankForThisYearRegion(Long userId, Long regionId, int year) {

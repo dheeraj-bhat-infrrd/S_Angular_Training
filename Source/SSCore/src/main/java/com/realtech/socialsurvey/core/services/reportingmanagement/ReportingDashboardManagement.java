@@ -101,5 +101,7 @@ public interface ReportingDashboardManagement
         RankingRequirements rankingRequirements ) throws InvalidInputException;
 
     Long getRegionIdFromBranchId(long branchId);
+
+    List<List<Object>> getUserRankingReportForYear( Long entityId, String entityType, int year );
     
 }

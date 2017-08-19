@@ -293,6 +293,23 @@ public class ReportingController
         return json;
     }
     
+    @RequestMapping( value = "/getuserrankingreportforreporting", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch User Ranking Report For Reporting ")
+    public String getUserRankingReport( Long entityId, String entityType , int year , int month , int type) throws NonFatalException 
+    {
+        LOGGER.info( "Fetch Survey Transaction Report For Reporting" );
+        
+        String json = null;
+        List<List <Object>> userRankingList = null;
+        if(type == 1){
+            userRankingList = reportingDashboardManagement.getUserRankingReportForYear( entityId, entityType, year );
+        }else {
+            userRankingList = null;
+        }
+        json = new Gson().toJson( userRankingList );
+        return json;
+    }
+    
     @RequestMapping( value = "/getmonthdataoverviewfordashboard", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Month Data For Overview ")
     public String getMonthDataOverviewForDashboard( Long entityId, String entityType , int month , int year ) throws NonFatalException 

@@ -53,6 +53,26 @@ public class UserRankingThisMonthRegionDaoImpl extends GenericReportingDaoImpl<U
 	}
 
 	@Override
+    public List<UserRankingThisMonthRegion> fetchUserRankingReportForThisMonthRegion(Long regionId, int month, int year ) {
+        LOG.info( "method to fetch user ranking region list for this month, fetchUserRankingForThisMonthRegion() started" );
+        Criteria criteria = getSession().createCriteria( UserRankingThisMonthRegion.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
+            criteria.add( Restrictions.eq( CommonConstants.THIS_MONTH, month ) );
+            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );  
+            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_REGION_RANK ) );
+            }
+        catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchUserRankingForThisMonthRegion() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingForThisMonthRegion() ", hibernateException );
+        }
+
+        LOG.info( "method to fetch user ranking region list for this month, fetchUserRankingForThisMonthRegion() finished." );
+        return (List<UserRankingThisMonthRegion>) criteria.list();
+        
+    }
+
+	@Override
 	public int fetchUserRankingRankForThisMonthRegion(Long userId, Long regionId, int year) {
 		LOG.info( "method to fetch user ranking Region Rank for this month, fetchUserRankingRankForThisMonthRegion() started" );
         Query query = getSession().createSQLQuery( "SELECT internal_region_rank FROM user_ranking_this_month_region WHERE user_id = :userId " );

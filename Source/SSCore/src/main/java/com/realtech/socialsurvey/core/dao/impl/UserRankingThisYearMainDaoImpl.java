@@ -46,6 +46,24 @@ public class UserRankingThisYearMainDaoImpl extends GenericReportingDaoImpl<User
         return (List<UserRankingThisYearMain>) criteria.list();
 	}
 	
+	@Override
+    public List<UserRankingThisYearMain> fetchUserRankingReportForThisYearMain(Long companyId, int year) {
+        LOG.info( "method to fetch user ranking Main list for this year, fetchUserRankingForThisYearMain() started" );
+        Criteria criteria = getSession().createCriteria( UserRankingThisYearMain.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );    
+            criteria.addOrder( Order.asc( CommonConstants.RANK ) );
+            }
+        catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchUserRankingReportForThisYearMain() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingReportForThisYearMain() ", hibernateException );
+        }
+
+        LOG.info( "method to fetch user ranking main list for this year, fetchUserRankingReportForThisYearMain() finished." );
+        return (List<UserRankingThisYearMain>) criteria.list();
+    }
+	
 	
 	@Override
     public int fetchUserRankingRankForThisYearMain(Long userId , Long companyId, int year) {

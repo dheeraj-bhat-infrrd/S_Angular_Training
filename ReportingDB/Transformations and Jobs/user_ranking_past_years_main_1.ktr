@@ -264,7 +264,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>select FIRST_NAME , LAST_NAME ,  DATEDIFF&#x28;DATE&#x28;NOW&#x28;&#x29;&#x29;, CREATED_ON_EST&#x29; AS days_of_registration  from users where user_id &#x3d; &#x3f;</sql>
+    <sql>select FIRST_NAME , LAST_NAME , EMAIL_ID, DATEDIFF&#x28;DATE&#x28;NOW&#x28;&#x29;&#x29;, CREATED_ON_EST&#x29; AS days_of_registration  from users where user_id &#x3d; &#x3f;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -2178,6 +2178,10 @@
         <field>
           <column_name>nmls_id</column_name>
           <stream_name>NMLS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>email_id</column_name>
+          <stream_name>EMAIL_ID</stream_name>
         </field>
     </fields>
      <cluster_schema/>
