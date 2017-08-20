@@ -259,6 +259,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT );            
         }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT );            
+        }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT){
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT );            
+        }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT );            
         }
         
         if ( startDate != null ) {
@@ -893,6 +897,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingThisYearMainList.add( userRankingThisYearMain.getEmailId() );
                     userRankingThisYearMainList.add( userRankingThisYearMain.getUserId() );
+                    userRankingThisYearMainList.add( userRankingThisYearMain.getNmlsId() );
                     userRankingThisYearMainList.add( company.getCompany() );
                     if(userRankingThisYearMain.getRegionId() != 0){
                         Region region = regionDao.findById( Region.class, userRankingThisYearMain.getRegionId() );
@@ -935,6 +940,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingPastYearMainList.add( userRankingPastYearMain.getEmailId() );
                     userRankingPastYearMainList.add( userRankingPastYearMain.getUserId() );
+                    userRankingPastYearMainList.add( userRankingPastYearMain.getNmlsId() );
                     userRankingPastYearMainList.add( company.getCompany() );
                     if(userRankingPastYearMain.getRegionId() != 0){
                         Region region = regionDao.findById( Region.class, userRankingPastYearMain.getRegionId() );
@@ -982,6 +988,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingThisYearRegionList.add( userRankingThisYearRegion.getEmailId() );
                     userRankingThisYearRegionList.add( userRankingThisYearRegion.getUserId() );
+                    userRankingThisYearRegionList.add( userRankingThisYearRegion.getNmlsId() );
                     Company company = companyDao.findById( Company.class , userRankingThisYearRegion.getCompanyId() );
                     userRankingThisYearRegionList.add( company.getCompany() );
                     
@@ -1023,6 +1030,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingPastYearRegionList.add( userRankingPastYearRegion.getEmailId() );
                     userRankingPastYearRegionList.add( userRankingPastYearRegion.getUserId() );
+                    userRankingPastYearRegionList.add( userRankingPastYearRegion.getNmlsId() );
                     Company company = companyDao.findById( Company.class , userRankingPastYearRegion.getCompanyId() );
                     userRankingPastYearRegionList.add( company.getCompany() );
                     
@@ -1067,6 +1075,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingThisYearBranchList.add( userRankingThisYearBranch.getEmailId() );
                     userRankingThisYearBranchList.add( userRankingThisYearBranch.getUserId() );
+                    userRankingThisYearBranchList.add( userRankingThisYearBranch.getNmlsId() );
                     Company company = companyDao.findById( Company.class , userRankingThisYearBranch.getCompanyId() );
                     userRankingThisYearBranchList.add( company.getCompany() );
                     if(userRankingThisYearBranch.getRegionId() != 0){
@@ -1107,6 +1116,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingPastYearBranchList.add( userRankingPastYearBranch.getEmailId() );
                     userRankingPastYearBranchList.add( userRankingPastYearBranch.getUserId() );
+                    userRankingPastYearBranchList.add( userRankingPastYearBranch.getNmlsId() );
                     Company company = companyDao.findById( Company.class , userRankingPastYearBranch.getCompanyId() );
                     userRankingPastYearBranchList.add( company.getCompany() );
                     if(userRankingPastYearBranch.getRegionId() != 0){
@@ -1163,6 +1173,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingThisMonthMainList.add( userRankingThisMonthMain.getEmailId() );
                     userRankingThisMonthMainList.add( userRankingThisMonthMain.getUserId() );
+                    userRankingThisMonthMainList.add( userRankingThisMonthMain.getNmlsId() );
                     userRankingThisMonthMainList.add( company.getCompany() );
                     if(userRankingThisMonthMain.getRegionId() != 0){
                         Region region = regionDao.findById( Region.class, userRankingThisMonthMain.getRegionId() );
@@ -1205,6 +1216,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingPastMonthMainList.add( userRankingPastMonthMain.getEmailId() );
                     userRankingPastMonthMainList.add( userRankingPastMonthMain.getUserId() );
+                    userRankingPastMonthMainList.add( userRankingPastMonthMain.getNmlsId() );
                     userRankingPastMonthMainList.add( company.getCompany() );
                     if(userRankingPastMonthMain.getRegionId() != 0){
                         Region region = regionDao.findById( Region.class, userRankingPastMonthMain.getRegionId() );
@@ -1252,6 +1264,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getEmailId() );
                     userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getUserId() );
+                    userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getNmlsId() );
                     Company company = companyDao.findById( Company.class , userRankingThisMonthRegion.getCompanyId() );
                     userRankingThisMonthRegionList.add( company.getCompany() );
                     
@@ -1293,6 +1306,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getEmailId() );
                     userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getUserId() );
+                    userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getNmlsId() );
                     Company company = companyDao.findById( Company.class , userRankingPastMonthRegion.getCompanyId() );
                     userRankingPastMonthRegionList.add( company.getCompany() );
                     
@@ -1337,6 +1351,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getEmailId() );
                     userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getUserId() );
+                    userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getNmlsId() );
                     Company company = companyDao.findById( Company.class , userRankingThisMonthBranch.getCompanyId() );
                     userRankingMonthYearBranchList.add( company.getCompany() );
                     if(userRankingThisMonthBranch.getRegionId() != 0){
@@ -1377,6 +1392,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     
                     userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getEmailId() );
                     userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getUserId() );
+                    userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getNmlsId() );
                     Company company = companyDao.findById( Company.class , userRankingPastMonthBranch.getCompanyId() );
                     userRankingPastMonthBranchList.add( company.getCompany() );
                     if(userRankingPastMonthBranch.getRegionId() != 0){
@@ -1423,6 +1439,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_REUSLTS_COMPANY_REPORT );
             }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_TRANSACTION_REPORT );
+            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_MONTHLY_REPORT );
+            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_YEARLY_REPORT );
             }
             recentActivityList.add( fileUpload.getStartDate() );
             recentActivityList.add( fileUpload.getEndDate() );
@@ -1600,6 +1620,40 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         Type listType = new TypeToken <List<List<String>>>() {}.getType();
         surveyTransactionReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
         Map<Integer, List<Object>> data = workbookData.getSurveyTransactionReportToBeWrittenInSheet(surveyTransactionReport);
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+        return workbook;
+        
+    }
+    
+    @Override
+    public String generateUserRankingForReporting(Long entityId , String entityType , Long userId ,Timestamp startDate , int type) throws UnsupportedEncodingException, NonFatalException{
+        User user = userManagementService.getUserByUserId( userId );
+        Calendar calender = Calendar.getInstance();
+        calender.setTimeInMillis(startDate.getTime());
+        int year = calender.get(Calendar.YEAR);
+        int month = calender.get(Calendar.MONTH) + 1;
+        //file is too big for windows hence uncomment the alternative 
+        String fileName = "User_Ranking_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+          + (Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadUserRankingForReporting( entityId , entityType, year, month , type );
+        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+        return LocationInS3;
+        
+    }
+    
+    
+    @SuppressWarnings ( "unchecked")
+    public XSSFWorkbook downloadUserRankingForReporting( long entityId , String entityType ,int year , int month , int type){
+        Response response =  ssApiBatchIntergrationBuilder.getIntegrationApi().getUserRankingReport(entityId, entityType,year,month,type);
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        //since the string has ""abc"" an extra quote
+        responseString = responseString.substring(1, responseString.length()-1);
+        //Escape characters
+        responseString = StringEscapeUtils.unescapeJava(responseString);
+        List<List<String>> userRankingReport = null;
+        Type listType = new TypeToken <List<List<String>>>() {}.getType();
+        userRankingReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
+        Map<Integer, List<Object>> data = workbookData.getUserRankingReportToBeWrittenInSheet(userRankingReport);
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
         return workbook;
         

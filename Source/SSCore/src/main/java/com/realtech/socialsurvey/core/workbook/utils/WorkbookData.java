@@ -1038,5 +1038,56 @@ public class WorkbookData
         
     }
     
+    public Map<Integer, List<Object>> getUserRankingReportToBeWrittenInSheet( List<List<String>> userRankingReport )
+    {
+     // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>>  userRankingData = new TreeMap<>();
+        
+        Integer userRankingCounter = 1;
+        
+        List<Object> userRankingReportToPopulate = new ArrayList<>();
+                
+        for(List<String> row : userRankingReport ){
+            userRankingReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 3 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 4 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 5 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 6 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 7 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 8 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 9 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 10 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 11 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 12 ) ));
+           
+            userRankingData.put(++userRankingCounter ,userRankingReportToPopulate );
+            userRankingReportToPopulate = new ArrayList<>();
+            
+        }
+       
+        // Setting up user sheet headers
+        userRankingReportToPopulate.add( "First Name" );
+        userRankingReportToPopulate.add( "Last Name" );
+        userRankingReportToPopulate.add( "Email Address" );
+        userRankingReportToPopulate.add( "User ID " );
+        userRankingReportToPopulate.add( "NMLS " );
+        userRankingReportToPopulate.add( "Company Name" );
+        userRankingReportToPopulate.add( "Region Name" );
+        userRankingReportToPopulate.add( "Branch Name" );
+        userRankingReportToPopulate.add( "Total number of reviews [Zillow + Social Survey]" );
+        userRankingReportToPopulate.add( "Average Score of Reviews [Average of Social Reviews" );
+        userRankingReportToPopulate.add( "Rank Score" );
+        userRankingReportToPopulate.add( "SPS Score");
+        userRankingReportToPopulate.add( "Position in the Company");
+       
+
+        userRankingData.put( 1, userRankingReportToPopulate );
+        
+        return userRankingData;
+        
+    }
+    
     
 }
