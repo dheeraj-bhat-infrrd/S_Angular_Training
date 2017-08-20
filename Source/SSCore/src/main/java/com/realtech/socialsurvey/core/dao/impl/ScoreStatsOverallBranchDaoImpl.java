@@ -7,12 +7,14 @@ import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallBranchDao;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallBranch;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
+@Component
 public class ScoreStatsOverallBranchDaoImpl extends GenericReportingDaoImpl<ScoreStatsOverallBranch, String> implements ScoreStatsOverallBranchDao{
 
 	private static final Logger LOG = LoggerFactory.getLogger( ScoreStatsOverallBranchDaoImpl.class );

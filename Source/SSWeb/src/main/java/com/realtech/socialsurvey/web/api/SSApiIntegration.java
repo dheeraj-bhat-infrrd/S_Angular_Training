@@ -179,6 +179,10 @@ public interface SSApiIntegration
     @GET("/v1/getuserrankingcountpastyears")
     Response getUserRankingCountForPastYears(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("batchSize") int batchSize);
     
+    @GET("/v1/getscorestatsoverall")
+    Response getScoreStatsOverall(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("currentMonth") int currentMonth, @Query ("currentYear") int currentYear);
     
+    @GET("/v1/getscorestatsquestion")
+    Response getScoreStatsQuestion(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("currentMonth") int currentMonth, @Query ("currentYear") int currentYear);
     //reporting:END
 }
