@@ -1,6 +1,5 @@
 .project
 /.settings/*
-.gitignore
 .classpath
 .settings
 .project
@@ -17,3 +16,7 @@ Source/**/*.iml
 Source/standalone/
 /**/target/
 /.metadata/*
+.gitignore
+.DS_Store
+.*
+target

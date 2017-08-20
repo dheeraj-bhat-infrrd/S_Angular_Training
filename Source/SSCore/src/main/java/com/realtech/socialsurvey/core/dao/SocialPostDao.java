@@ -57,4 +57,28 @@ public interface SocialPostDao {
     List<SocialUpdateAction> getSocialConnectionHistoryByEntityIds( String entityType, List<Long> entityIds );
 
 	void removeSocialPostsForEntityAndSource( String entityType, long entityId, String source );
+
+
+    public void updateSocialPostAfterHierarchyRelocation( SocialPost socialPost );
+
+
+    public void updateSocialConnectionHistoryAfterHierarchyRelocation( SocialUpdateAction action );
+
+
+    public List<SocialPost> getSocialPostsForRegionOnly( long regionId );
+
+
+    public List<SocialPost> getSocialPostsForBranchOnly( long branchId );
+
+
+    public List<SocialPost> getSocialPostsForUser( long agentId );
+
+
+    public List<SocialUpdateAction> getSocialConnectionHistoryForRegionOnly( long regionId );
+
+
+    public List<SocialUpdateAction> getSocialConnectionHistoryForUser( long agentId );
+
+
+    public List<SocialUpdateAction> getSocialConnectionHistoryForBranchOnly( long branchId );
 }

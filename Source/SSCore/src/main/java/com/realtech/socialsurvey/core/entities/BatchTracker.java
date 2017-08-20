@@ -2,10 +2,13 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 
@@ -48,6 +51,9 @@ public class BatchTracker implements Serializable
 
     @Column ( name = "ERROR")
     private String error;
+    
+    @OneToMany(mappedBy = "batchTracker", fetch = FetchType.LAZY)
+    private List<BatchTrackerHistory> batchTrackerHistories;
     
     public String getBatchName()
     {
@@ -169,6 +175,18 @@ public class BatchTracker implements Serializable
     public void setModifiedBy( String modifiedBy )
     {
         this.modifiedBy = modifiedBy;
+    }
+
+
+    public List<BatchTrackerHistory> getBatchTrackerHistories()
+    {
+        return batchTrackerHistories;
+    }
+
+
+    public void setBatchTrackerHistories( List<BatchTrackerHistory> batchTrackerHistories )
+    {
+        this.batchTrackerHistories = batchTrackerHistories;
     }
 
 

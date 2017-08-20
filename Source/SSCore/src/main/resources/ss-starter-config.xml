@@ -489,7 +489,7 @@
 	<bean id="incompletesurveycron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="incompletesurveyjobdetail" />
-		<property name="cronExpression" value="0 0/15 * * * ?" />
+		<property name="cronExpression" value="0 43 * * * ?" />
 	</bean>
 
 	<!-- setting cron for update subscription price -->
@@ -503,14 +503,14 @@
 	<bean id="socialfeedingestercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialfeedingesterjobdetail" />
-		<property name="cronExpression" value="0 0 19,20,21,22,23,0,1,2,3,4,5,6,7 * * ?" />
+		<property name="cronExpression" value="0 0 19,20,21,22,23,0,1,2,3 * * ?" />
 	</bean>
 
 	<!-- setting cron for social post import -->
 	<bean id="socialpostimportcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialpostsimportjobdetail" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 1 * * * ?" />
 	</bean>
 
 	<!-- setting cron for isprofileimgset batch -->
@@ -585,7 +585,7 @@
 	<bean id="crmdataagentidmappercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="crmdataagentidmapperjobdetail" />
-		<property name="cronExpression" value="0 0/15 * * * ?" />
+		<property name="cronExpression" value="0 30 * * * ?" />
 	</bean>
 
 	<!-- setting cron for loading image from linkedin to amazon server -->
@@ -660,7 +660,7 @@
 	<bean id="zillowreviewprocessandautopostcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="zillowreviewprocessandautopostjobdetail" />
-		<property name="cronExpression" value="0 0 8 * * ?" />
+		<property name="cronExpression" value="0 05 6 * * ?" />
 	</bean>
 
 	<bean id="userencryptedidupdatercron"

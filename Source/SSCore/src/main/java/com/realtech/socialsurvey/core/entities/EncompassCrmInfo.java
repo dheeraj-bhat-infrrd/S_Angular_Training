@@ -11,21 +11,27 @@ public class EncompassCrmInfo extends CRMInfo
     private int numberOfDays;
     private String emailAddressForReport;
     private boolean generateReport;
-    private String encompassVersion;
+    private String version;
+    
+    private String buyerAgentEmail;
+    private String buyerAgentName;
+    private String sellerAgentEmail;
+    private String sellerAgentName;
+    
 
 
-    public String getEncompassVersion()
+    public String getVersion()
     {
-        return encompassVersion;
+        return version;
     }
 
 
-    public void setEncompassVersion( String encompassVersion )
+    public void setVersion( String version )
     {
-        this.encompassVersion = encompassVersion;
+        this.version = version;
     }
 
-
+    
     public String getCrm_username()
     {
         return crm_username;
@@ -119,6 +125,53 @@ public class EncompassCrmInfo extends CRMInfo
     public void setGenerateReport( boolean generateReport )
     {
         this.generateReport = generateReport;
+    }
+
+    public String getBuyerAgentEmail()
+    {
+        return buyerAgentEmail;
+    }
+
+
+    public void setBuyerAgentEmail( String buyerAgentEmail )
+    {
+        this.buyerAgentEmail = buyerAgentEmail;
+    }
+
+
+    public String getBuyerAgentName()
+    {
+        return buyerAgentName;
+    }
+
+
+    public void setBuyerAgentName( String buyerAgentName )
+    {
+        this.buyerAgentName = buyerAgentName;
+    }
+
+
+    public String getSellerAgentEmail()
+    {
+        return sellerAgentEmail;
+    }
+
+
+    public void setSellerAgentEmail( String sellerAgentEmail )
+    {
+        this.sellerAgentEmail = sellerAgentEmail;
+    }
+
+
+    public String getSellerAgentName()
+    {
+        return sellerAgentName;
+    }
+
+
+    public void setSellerAgentName( String sellerAgentName )
+    {
+        this.sellerAgentName = sellerAgentName;
     }
 
 

@@ -2185,7 +2185,6 @@
     .email-sel-wrapper {
     	float: left;
         margin-bottom: 10px;
-        margin-top: 200px;
     }
     .sort-sel-item-resp {
 	width: 88%;
@@ -2606,6 +2605,10 @@
     }
     .dsh-graph-txt-3{
         left: -40px;
+    }
+    .review-sort-wrapper-resp {
+     	width: 250px;
+        margin-left: 10px;
     }
     .stats-right {
         margin-left: 10px;

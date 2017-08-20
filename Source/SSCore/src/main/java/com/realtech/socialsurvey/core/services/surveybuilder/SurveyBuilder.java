@@ -2,10 +2,12 @@ package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.util.List;
 import java.util.Map;
+
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyQuestion;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
+import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyTemplate;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -129,7 +131,9 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public SurveyQuestion getSurveyQuestion(long surveyQuestionId) throws InvalidInputException;
-	public SurveyQuestion getSurveyQuestionFromMapping(long surveyQuestionMappingId) throws InvalidInputException;
+	
+	
+	public SurveyQuestionsMapping getSurveyQuestionFromMapping(long surveyQuestionMappingId) throws InvalidInputException;
 
 	/**
 	 * Method to update Survey Question and answers

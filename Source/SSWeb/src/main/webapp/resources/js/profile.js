@@ -157,21 +157,19 @@ $(document).on('click', '.lp-button', function(event){
 		data = "";
 		if($("#agent-profile-name").val() != ""){
 			data += "profilename=" + $("#agent-profile-name").val();
-			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
 		}
 		else if($("#region-profile-name").val() != ""){
 			data += "profilename=" + $("#region-profile-name").val();
-			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
 		}
 		else if($("#branch-profile-name").val() != ""){
 			data += "profilename=" + $("#branch-profile-name").val();
-			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
 		}
 		else if($("#company-profile-name").val() != ""){
 			data += "profilename=" + $("#company-profile-name").val();
-			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
 		}
 		
+		data += "&companyprofilename=" + $("#company-profile-name").val();
+		data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
 		data += "&name=" + $('#lp-input-name').val();
 		data += "&email=" + $('#lp-input-email').val();
 		data += "&message=" + $('#lp-input-message').val();
@@ -401,11 +399,14 @@ function paintBreadCrums(url) {
 					+ entityJson[0].breadCrumbProfile + '</a>';
 			
 			for(var i=1; i<entityJson.length; i++) {
-				htmlContent += '<span class="brd-crm-divider">&gt;&gt;</span>';
-				htmlContent += '<a target="_blank" class="brd-crm brd-crm-link" href="'
-						+ entityJson[i].breadCrumbUrl
-						+ '">'
-						+ entityJson[i].breadCrumbProfile + '</a>';
+				//show entity only if not hidden from bredcrumb
+				if( ! entityJson[i].hideFromBreadCrumb){
+					htmlContent += '<span class="brd-crm-divider">&gt;&gt;</span>';
+					htmlContent += '<a target="_blank" class="brd-crm brd-crm-link" href="'
+							+ entityJson[i].breadCrumbUrl
+							+ '">'
+							+ entityJson[i].breadCrumbProfile + '</a>';
+				}
 			}
 			
 			$('#bread-crum-cont').html(htmlContent);
@@ -751,7 +752,7 @@ function paintReviews(result){
 		reviewsHtml += '    	<div class="float-left ppl-header-right">';
 		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
 		reviewsHtml += '		</div>';
-		if(reviewItem.source=="encompass"||reviewItem.source=="DOTLOOP" || reviewItem.source == "FTP" || reviewItem.source=="LONEWOLF"){
+			if(reviewItem.source=="encompass"||reviewItem.source=="DOTLOOP"||reviewItem.source=="API" || reviewItem.source == "FTP" || reviewItem.source=="LONEWOLF"){
 			reviewsHtml +=' <div class="verified-badge  verify-image float-right" title="Click here to know more"></div>';
 			}
 		else if(reviewItem.source=="Zillow"){

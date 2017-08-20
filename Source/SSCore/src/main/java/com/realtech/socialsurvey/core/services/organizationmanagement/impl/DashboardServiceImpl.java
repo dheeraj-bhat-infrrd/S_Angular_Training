@@ -1265,8 +1265,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                     userReportToPopulate.add( "" );
 
                 //10. DATE_LAST_INVITE_SENT
-                //TODO
-                userReportToPopulate.add( "" );
+                if( user.getLastInvitationSentDate() != null && !user.getLastInvitationSentDate().equals( new Timestamp( 0 ) ) ){
+                    userReportToPopulate.add( user.getLastInvitationSentDate().toLocaleString());
+                } else{
+                    userReportToPopulate.add( "" );
+                }
 
                 //11.PROFILE_VERIFIED
                 if ( user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED )

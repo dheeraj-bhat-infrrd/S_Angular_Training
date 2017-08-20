@@ -146,4 +146,10 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 
     List<SurveyPreInitiation> getPreInitiatedSurveyForCompanyByCriteria( int start, int row, List<Long> userIds , Long startSurveyPreinitiationId, Timestamp startEngagementClosedTime ,  long companyId );
+
+
+    void updateCompanyIdForAllRecordsForAgent( String  agentEmailId, long companyId );
+
+
+    void disconnectSurveysFromAgent( long agentId );
 }

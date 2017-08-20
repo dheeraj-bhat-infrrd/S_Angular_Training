@@ -52,6 +52,10 @@
 						<div class='verified-badge  verify-image float-right'
 							title='Click here to know more'></div>
 					</c:when>
+					<c:when test="${feedback.source =='API'}">
+						<div class='verified-badge  verify-image float-right'
+							title='Click here to know more'></div>
+					</c:when>
 					<c:when test="${feedback.source =='FTP'}">
 						<div class='verified-badge  verify-image float-right' 
 							title='Click here to know more'></div>

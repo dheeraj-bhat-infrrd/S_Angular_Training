@@ -107,7 +107,7 @@ public class EncompassController extends AbstractController
     @ResponseBody
     @RequestMapping ( value = "/testcredentials")
     public String testCompanyCredentials( @QueryParam ( value = "username") String username,
-        @QueryParam ( value = "password") String password, @QueryParam ( value = "url") String url )
+        @QueryParam ( value = "password") String password, @QueryParam ( value = "url") String url, @QueryParam ( value = "version") String version )
     {
         LOG.info( "Method to test encompass credentials started for username : " + username + " password : " + password
             + " url : " + url + " started." );
@@ -127,6 +127,10 @@ public class EncompassController extends AbstractController
                 if ( url == null || url.isEmpty() ) {
                     throw new InvalidInputException( "URL cannot be empty" );
                 }
+                
+                if ( version == null || version.isEmpty() ) {
+                    throw new InvalidInputException( "URL cannot be empty" );
+                }
 
                 Map<String, String> jsonMap = new HashMap<String, String>();
                 jsonMap.put( CommonConstants.ENCOMPASS_CLIENT_URL_COLUMN, url );
@@ -138,6 +142,9 @@ public class EncompassController extends AbstractController
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType( MediaType.APPLICATION_JSON );
                 headers.setAccept( Arrays.asList( MediaType.APPLICATION_JSON ) );
+                
+                //get host name
+                String hostName = organizationManagementService.getEncompassHostByVersion( version );
 
                 HttpEntity<String> requestEntity = new HttpEntity<String>( jsonString, headers );
                 HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
@@ -147,7 +154,7 @@ public class EncompassController extends AbstractController
                 restTemplate.getMessageConverters().add( new FormHttpMessageConverter() );
                 restTemplate.getMessageConverters().add( new MappingJackson2HttpMessageConverter() );
                 //Make request to the encompass application and get the response
-                String responseBody = restTemplate.postForObject( encompassTestUrl, requestEntity, String.class );
+                String responseBody = restTemplate.postForObject( CommonConstants.HTTP_REQUEST_URL_INITIAL + hostName + encompassTestUrl, requestEntity, String.class );
                 Map<String, String> responseMap = new Gson().fromJson( responseBody,
                     new TypeToken<Map<String, String>>() {}.getType() );
                 if ( Boolean.parseBoolean( responseMap.get( CommonConstants.STATUS_COLUMN ) ) ) {

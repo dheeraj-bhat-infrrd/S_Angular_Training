@@ -33,6 +33,7 @@ import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
@@ -115,6 +116,9 @@ public class OrganizationManagementServiceImplTest
 
     @Mock
     private UserProfileDao userProfileDao;
+    
+    @Mock
+    private SurveyDetailsDao surveyDetailsDao;
 
 
     @BeforeClass
@@ -1755,6 +1759,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.doNothing().when( userProfileDao ).updateRegionIdForBranch( Mockito.anyLong(), Mockito.anyLong() );
         Mockito.when( solrSearchService.findUsersInBranch( Mockito.anyLong(), Mockito.anyInt(), Mockito.anyInt() ) )
             .thenReturn( null );
+        Mockito.doNothing().when(surveyDetailsDao).updateRegionIdForAllSurveysOfBranch( Mockito.anyLong(), Mockito.anyLong() );;
         Mockito.doReturn( null ).when( organizationManagementServiceImpl ).updateRegionIdForUsers(
             (SolrDocumentList) Matchers.any(), Matchers.anyLong(), Matchers.anyLong(), Matchers.anyLong() );
         Mockito.doNothing().when( solrSearchService ).updateRegionsForMultipleUsers( Mockito.anyMap() );

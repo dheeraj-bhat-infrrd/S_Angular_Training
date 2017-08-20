@@ -12,6 +12,12 @@
 					<c:set var="encompassurl" value="${appSettings.crm_info.url}" />
 					<c:set var="encompassfieldid" value="${appSettings.crm_info.crm_fieldId}" />
 					<c:set var="encompassstate" value="${ appSettings.crm_info.state }" />
+					<c:set var="encompassversion" value="${ appSettings.crm_info.version }" />
+					
+					<c:set var="buyerAgentEmail" value="${ appSettings.crm_info.buyerAgentEmail }" />
+					<c:set var="buyerAgentName" value="${ appSettings.crm_info.buyerAgentName }" />
+					<c:set var="sellerAgentEmail" value="${ appSettings.crm_info.sellerAgentEmail }" />
+					<c:set var="sellerAgentName" value="${ appSettings.crm_info.sellerAgentName }" />
 				</c:if>
 				<form id="encompass-form">
 					<input id="encompass-state" type="hidden" value="${ encompassstate }" />
@@ -63,7 +69,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding">
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
 								<spring:message code="label.crm.url.key" />
@@ -75,7 +81,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden" style="margin-bottom: 30px;">
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden"">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
 								<spring:message code="label.crm.fieldId.key" />
@@ -91,7 +97,87 @@
 							</div>
 						</div>
 					</div>
-					<div class="encompass-btn">
+					
+					<!-- buyers agent details -->
+					
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item ">
+						<div class="hm-item-row item-row-OR clearfix float-left">
+							<div class="um-item-row-left text-right">
+								<spring:message code="label.crm.buyerAgentEmail.key" />
+							</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-url en-icn"></div>
+								<input id="buyer-agent-email" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Buyer Agent Email Id" name="buyer-agent-email" value="${buyerAgentEmail}">
+								<div id="encompass-url-error" class="hm-item-err-2"></div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden " >
+						<div class="hm-item-row item-row-OR clearfix float-left">
+							<div class="um-item-row-left text-right">
+								<spring:message code="label.crm.buyerAgentName.key" />
+							</div>
+							<div class="clearfix float-right ">
+								<div class="um-item-row-icon margin-left-0"></div>
+								<div class="um-item-row-icon margin-left-0"></div>
+							</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-field-id en-icn"></div>
+								<input id="buyer-agent-name" type="text" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Buyer Agent Name" name="buyer-agent-name" value="${buyerAgentName}">
+								<div id="encompass-fieldId-error" class="hm-item-err-2"></div>
+							</div>
+						</div>
+					</div>
+					
+					
+					<!-- Seller agent details -->
+					
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
+						<div class="hm-item-row item-row-OR clearfix float-left">
+							<div class="um-item-row-left text-right">
+								<spring:message code="label.crm.sellerAgentEmail.key" />
+							</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-url en-icn"></div>
+								<input id="seller-agent-email" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Seller Agent Email Id" name="seller-agnt-email" value="${sellerAgentEmail}">
+								<div id="encompass-url-error" class="hm-item-err-2"></div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden" >
+						<div class="hm-item-row item-row-OR clearfix float-left">
+							<div class="um-item-row-left text-right">
+								<spring:message code="label.crm.sellerAgentName.key" />
+							</div>
+							<div class="clearfix float-right ">
+								<div class="um-item-row-icon margin-left-0"></div>
+								<div class="um-item-row-icon margin-left-0"></div>
+							</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-field-id en-icn"></div>
+								<input id="seller-agent-name" type="text" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Seller Agent Name" name="seller-agnt-name" value="${sellerAgentName}">
+								<div id="encompass-fieldId-error" class="hm-item-err-2"></div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- ENCOMPASS SDK VERSION -->
+					
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding overflow-hidden">
+							<div class="um-item-row-left text-right">SDK Version</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<select id="sdk-version-selection-list" name="sdk-version-selection-list" class="float-left app-stng-sel-item">
+								<c:forEach items="${encompassVersionList}" var="version">
+    								<option value="${version.sdkVersion}" <c:if test ="${version.sdkVersion == encompassversion}">selected</c:if>>${version.sdkVersion}</option>
+       							</c:forEach>
+								</select>
+								<div id="encompass-version-error" class="hm-item-err-2" style="display: none;"></div>
+							</div>
+					</div>
+					
+					
+					
+					<div class="encompass-btn clearfix">
 						<div>
 							<div id="en-dry-save" class="float-left enc-state-icon cursor-pointer">Save</div>
 							<div id="en-dry-enable" class="float-left enc-state-icon cursor-pointer hide" style="display: none;">Enable</div>

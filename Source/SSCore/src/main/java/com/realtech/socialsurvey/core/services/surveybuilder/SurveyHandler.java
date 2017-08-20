@@ -8,10 +8,13 @@ import org.apache.solr.client.solrj.SolrServerException;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
@@ -56,7 +59,7 @@ public interface SurveyHandler
      * @param stage
      * @throws Exception
      */
-    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage );
+    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage, boolean isUserRankingQuestion );
 
 
     /*
@@ -92,7 +95,7 @@ public interface SurveyHandler
     public Map<String, String> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException;
 
 
-    public List<SurveyPreInitiation> getIncompleteSurveyCustomersEmail( Company company );
+    public List<SurveyPreInitiation> getIncompleteSurveyForReminderEmail( Company company, Date minLastReminderDate , Date maxLastReminderDate, int maxReminderCount );
 
 
     public void updateReminderCount( List<Long> agents, List<String> customers );
@@ -363,4 +366,21 @@ public interface SurveyHandler
 
 
     void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails );
+
+
+    public List<SurveyPreInitiation> getSurveyListToSendInvitationMail( Company company, Date epochDate );
+
+
+    Map<String, Date> getMinMaxLastSurveyReminderTime( long systemTime, int reminderInterval );
+
+    void moveAllSurveysAlongWithUser( long agentId, long branchId, long regionId, long companyId ) throws InvalidInputException;
+
+
+    void copyAllSurveysAlongWithUser( long agentId, long branchId, long regionId, long companyId ) throws InvalidInputException;
+
+
+    void disconnectAllSurveysFromWithUser( long agentId ) throws InvalidInputException;
+
+
+    List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations ) throws InvalidInputException;
 }
