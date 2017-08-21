@@ -38,6 +38,7 @@
 							<c:if test="${profilemasterid != 4}">
 								<option value=101 data-report="survey-stats">Survey Statistics</option>
 								<option value=102 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option>
+								<option value=106 data-report="user-ranking">User Ranking</option>
 							</c:if>
 							<c:if test="${profilemasterid == 1}"> 
 								<option value=103 data-report="company-user">Company User</option>
@@ -45,6 +46,17 @@
 							</c:if>
 								<option value=105 data-report="survey-transaction-summary">Survey Transaction Summary</option>
 						</select>	
+					</div>
+					<div id="report-time-div" class="float-left board-div hide">
+						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px">
+							<select id="report-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
+								<option value=1 data-report="thisYear">This Year</option>
+								<option value=2 data-report="thisMonth">This Month</option>
+								<option value=3 data-report="lastYear">Last Year</option>
+								<option value=4 data-report="lastMonth">Last Month</option>
+								<option value=5 data-report="pastYears">Past Years</option>
+							</select>	
+						</div>
 					</div>
 					<div class="generate-report-date-range" id="date-pickers">
 						<div style="display:inline-flex;">
@@ -97,10 +109,17 @@ $(document).ready(function() {
 	$(document).attr("title", "Reports");
 	updateViewAsScroll();
 	bindDatePickerforSurveyDownload();
+	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103){
+	if(key == 101 || key == 102 || key == 103 || key == 106){
 	$('#date-pickers').hide();
+	}
+	
+	if(key == 106){
+		$('#report-time-div').removeClass('hide');
+	}else{
+		$('#report-time-div').addClass('hide');
 	}
 	
 	var startIndex=0;

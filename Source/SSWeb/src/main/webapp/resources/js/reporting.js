@@ -969,18 +969,74 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103){
+	if(key == 101 || key == 102 || key == 103 || key == 106){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
 	}
+	
+	if(key == 106){
+		$('#report-time-div').removeClass('hide');
+	}else{
+		$('#report-time-div').addClass('hide');
+	}
 });
+
+function getTimeFrameForUserRankingReport(){
+	var currentDate = new Date();
+	var currentYear = currentDate.getFullYear();
+	var currentMonth = currentDate.getMonth()+1;
+	
+	var year = currentYear;
+	var month = currentMonth;
+	
+	var timeFrameStr = $('#report-time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	
+	switch(timeFrame){
+	case 1: year = currentYear;
+		break;
+	case 2: year = currentYear;
+		month = currentMonth;
+		break;
+	case 3: year = currentYear - 1;
+		break;
+	case 4: year = currentYear;
+		month=currentMonth -1;
+		break;
+	case 5: year = currentYear - 1
+	}
+	
+	var dateTimeFrame = month+"/01/"+year;
+	
+	return dateTimeFrame;
+}
 
 $(document).on('click', '#reports-generate-report-btn', function(e) {
 	var selectedValue = $('#generate-survey-reports').val();
 	var key = parseInt(selectedValue);
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
+	
+	if(key == 106){
+		startDate = getTimeFrameForUserRankingReport();
+		var timeFrameStr = $('#report-time-selector').val();
+		timeFrame = parseInt(timeFrameStr);
+		
+		switch(timeFrame){
+		case 1: key = 107;
+			break;
+		case 2: key = 106;
+			break;
+		case 3: key = 107;
+			break;
+		case 4: key = 106;
+			break;
+		case 5: key = 107;
+			break;
+		}
+		
+	}
 	
 	var success = false;
 	var messageToDisplay;
@@ -1651,6 +1707,8 @@ function drawLineGraphForScoreStats(chartDiv,chartData){
 							chartArea : {
 							width : '95%'
 							},
+							width: 600,
+							height : 300,
 							vAxis : {
 								minValue : 0,
 								maxValue : 5,
@@ -1667,4 +1725,43 @@ function drawLineGraphForScoreStats(chartDiv,chartData){
 	});
 }
 
-
+function getOverallScoreStats(entityId,entityType){
+	
+	var currentDate = new Date();
+	var currentMonth = currentDate.getMonth();
+	var currentYear = currentDate.getFullYear();
+	
+	var url = "/getoverallscorestats.do?entityId="+entityId+"&entityType="+entityType+"&currentMonth="+currentMonth+"&currentYear="+currentYear;
+	
+	var overallScoreStats=null;
+	
+	$.ajax({
+		async : false,
+		url : url,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			if (data.status == 200) {
+				$.ajax({
+							async:false,
+							url : data.url,
+							type : "GET",
+							cache : false,
+							dataType : "json",
+							success : function(response) {
+								overallScoreStats = JSON.parse(response);
+							}
+						});
+			}
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+	console.log(overallScoreStats);
+	return overallScoreStats;
+}
