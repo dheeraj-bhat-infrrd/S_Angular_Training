@@ -24,11 +24,19 @@ public class UserRankingPastYearsMain
     @Column( name = "company_id")
     private long companyId;
     
+    @Column( name = "region_id")
+    private long regionId;
+    
+    @Column( name = "branch_id")
+    private long branchId;
     @Column( name = "first_name")
     private String firstName;
     
     @Column(name = "last_name")
     private String lastName;
+    
+    @Column(name = "email_id")
+    private String emailId;
     
     @Column(name = "ranking_score")
     private float rankingScore;
@@ -60,6 +68,9 @@ public class UserRankingPastYearsMain
     @Column(name = "is_eligible")
     private	int isEligible;
 
+    @Column(name = "nmls_id")
+    private int nmlsId; 
+    
     public String getUserRankingPastYearsMainId()
     {
         return userRankingPastYearsMainId;
@@ -108,6 +119,17 @@ public class UserRankingPastYearsMain
     public void setLastName( String lastName )
     {
         this.lastName = lastName;
+    }
+
+    
+    public String getEmailId()
+    {
+        return emailId;
+    }
+
+    public void setEmailId( String emailId )
+    {
+        this.emailId = emailId;
     }
 
     public float getRankingScore()
@@ -208,14 +230,46 @@ public class UserRankingPastYearsMain
 		this.isEligible = isEligible;
 	}
 
-	@Override
+	
+	public long getRegionId()
+    {
+        return regionId;
+    }
+
+    public void setRegionId( long regionId )
+    {
+        this.regionId = regionId;
+    }
+
+    public long getBranchId()
+    {
+        return branchId;
+    }
+
+    public void setBranchId( long branchId )
+    {
+        this.branchId = branchId;
+    }
+
+    public int getNmlsId()
+    {
+        return nmlsId;
+    }
+
+    public void setNmlsId( int nmlsId )
+    {
+        this.nmlsId = nmlsId;
+    }
+
+    @Override
     public String toString()
     {
         return "UserRankingPastYearsMain [userRankingPastYearsMainId=" + userRankingPastYearsMainId + ", userId=" + userId
-            + ", companyId=" + companyId + ", firstName=" + firstName + ", lastName=" + lastName + ", rankingScore="
-            + rankingScore + ", rank=" + rank + ", sps=" + sps + ", daysOfRegistration=" + daysOfRegistration + ", completed="
-            + completed + ", sent=" + sent + ", completedPercentage=" + completedPercentage + ", totalReviews=" + totalReviews
-            + ", averageRating=" + averageRating + ", isEligible=" + isEligible + "]";
+            + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId=" + branchId + ", firstName=" + firstName
+            + ", lastName=" + lastName + ", emailId=" + emailId + ", rankingScore=" + rankingScore + ", rank=" + rank + ", sps="
+            + sps + ", daysOfRegistration=" + daysOfRegistration + ", completed=" + completed + ", sent=" + sent
+            + ", completedPercentage=" + completedPercentage + ", totalReviews=" + totalReviews + ", averageRating="
+            + averageRating + ", isEligible=" + isEligible + ", nmlsId=" + nmlsId + "]";
     }
     
     

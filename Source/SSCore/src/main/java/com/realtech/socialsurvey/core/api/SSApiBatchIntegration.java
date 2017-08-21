@@ -34,4 +34,7 @@ public interface SSApiBatchIntegration
     @GET("/v1/getsurveytransactionreportforreporting")
     Response getSurveyTransactionReport(@Query ("entityId") Long entityId , @Query ("entityType") String entityType, @Query ("startDate") Timestamp startDate, @Query ("endDate") Timestamp endDate);
 
+    @GET("/v1/getuserrankingreportforreporting")
+    Response getUserRankingReport(@Query ("entityId") Long entityId , @Query ("entityType") String entityType, @Query ("year") int year, @Query ("month") int month , @Query ("type") int type);
+
 }

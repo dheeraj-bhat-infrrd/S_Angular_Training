@@ -12,4 +12,6 @@ public interface UserRankingThisMonthMainDao extends GenericReportingDao<UserRan
 
     long fetchUserRankingCountForThisMonthMain( Long companyId, int year, int month );
 
+    List<UserRankingThisMonthMain> fetchUserRankingReportForThisMonthMain( Long companyId, int month, int year );
+
 }

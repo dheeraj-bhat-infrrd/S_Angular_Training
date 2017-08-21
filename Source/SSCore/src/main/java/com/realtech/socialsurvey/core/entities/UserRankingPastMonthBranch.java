@@ -25,6 +25,9 @@ public class UserRankingPastMonthBranch
     @Column( name = "company_id")
     private long companyId;
     
+    @Column( name = "region_id")
+    private long regionId;
+    
     @Column( name = "branch_id")
     private long branchId;
     
@@ -39,6 +42,9 @@ public class UserRankingPastMonthBranch
     
     @Column(name = "last_name")
     private String lastName;
+    
+    @Column(name = "email_id")
+    private String emailId;
     
     @Column(name = "ranking_score")
     private float rankingScore;
@@ -73,6 +79,10 @@ public class UserRankingPastMonthBranch
     @Column(name = "internal_branch_rank")
     int internalBranchRank;
 
+    @Column(name = "nmls_id")
+    private int nmlsId; 
+    
+    
 	public String getUserRankingPastMonthBranchId() {
 		return userRankingPastMonthBranchId;
 	}
@@ -137,7 +147,17 @@ public class UserRankingPastMonthBranch
 		this.lastName = lastName;
 	}
 
-	public float getRankingScore() {
+	public String getEmailId()
+    {
+        return emailId;
+    }
+
+    public void setEmailId( String emailId )
+    {
+        this.emailId = emailId;
+    }
+
+    public float getRankingScore() {
 		return rankingScore;
 	}
 
@@ -225,15 +245,37 @@ public class UserRankingPastMonthBranch
 		this.internalBranchRank = internalBranchRank;
 	}
 
-	@Override
-	public String toString() {
-		return "UserRankingPastMonthBranch [userRankingPastMonthBranchId=" + userRankingPastMonthBranchId + ", userId="
-				+ userId + ", companyId=" + companyId + ", branchId=" + branchId + ", month=" + month + ", year=" + year
-				+ ", firstName=" + firstName + ", lastName=" + lastName + ", rankingScore=" + rankingScore + ", rank="
-				+ rank + ", sps=" + sps + ", daysOfRegistration=" + daysOfRegistration + ", completed=" + completed
-				+ ", sent=" + sent + ", completedPercentage=" + completedPercentage + ", totalReviews=" + totalReviews
-				+ ", averageRating=" + averageRating + ", isEligible=" + isEligible + ", internalBranchRank="
-				+ internalBranchRank + "]";
-	}
+	
+	public long getRegionId()
+    {
+        return regionId;
+    }
+
+    public void setRegionId( long regionId )
+    {
+        this.regionId = regionId;
+    }
+
+    public int getNmlsId()
+    {
+        return nmlsId;
+    }
+
+    public void setNmlsId( int nmlsId )
+    {
+        this.nmlsId = nmlsId;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "UserRankingPastMonthBranch [userRankingPastMonthBranchId=" + userRankingPastMonthBranchId + ", userId=" + userId
+            + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId=" + branchId + ", month=" + month + ", year="
+            + year + ", firstName=" + firstName + ", lastName=" + lastName + ", emailId=" + emailId + ", rankingScore="
+            + rankingScore + ", rank=" + rank + ", sps=" + sps + ", daysOfRegistration=" + daysOfRegistration + ", completed="
+            + completed + ", sent=" + sent + ", completedPercentage=" + completedPercentage + ", totalReviews=" + totalReviews
+            + ", averageRating=" + averageRating + ", isEligible=" + isEligible + ", internalBranchRank=" + internalBranchRank
+            + ", nmlsId=" + nmlsId + "]";
+    }
 
 }
