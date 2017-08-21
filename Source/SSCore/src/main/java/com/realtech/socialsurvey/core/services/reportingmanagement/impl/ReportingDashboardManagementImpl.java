@@ -41,6 +41,7 @@ import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallBranchDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallCompanyDao;
@@ -50,6 +51,7 @@ import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionBranchDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionCompanyDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionRegionDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionUserDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
 import com.realtech.socialsurvey.core.dao.SurveyResultsCompanyReportDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
@@ -74,6 +76,7 @@ import com.realtech.socialsurvey.core.dao.UserRankingThisYearMainDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearRegionDao;
 import com.realtech.socialsurvey.core.dao.impl.BranchDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyUserReport;
 import com.realtech.socialsurvey.core.entities.FileUpload;
@@ -87,6 +90,7 @@ import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionBranch;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionRegion;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
@@ -170,6 +174,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Autowired
     @Qualifier("branch")
     private BranchDao branchDao;
+    
+    @Autowired
+    private GenericDao<Region, Long> regionDao;
     
     @Autowired
     private SSApiBatchIntegrationBuilder ssApiBatchIntergrationBuilder;
@@ -291,6 +298,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT );            
         }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT );            
+        }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT){
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT );            
+        }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT );            
         }
         
         if ( startDate != null ) {
@@ -900,6 +911,556 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
     
     @Override
+    @Transactional(value = "transactionManagerForReporting")
+    public List<List<Object>> getUserRankingReportForYear(Long entityId , String entityType ,int year){
+        Calendar calender = Calendar.getInstance();
+        int this_year = calender.get(Calendar.YEAR);
+        List<List<Object>> userRanking = new ArrayList<>();
+
+        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+            Company company = companyDao.findById( Company.class, entityId );
+            if( year == this_year){
+                for(UserRankingThisYearMain userRankingThisYearMain : userRankingThisYearMainDao.fetchUserRankingReportForThisYearMain( entityId,year)){
+                    List<Object> userRankingThisYearMainList = new ArrayList<>();
+                    if(userRankingThisYearMain.getFirstName() != null && !userRankingThisYearMain.getFirstName().isEmpty()){
+                        userRankingThisYearMainList.add( userRankingThisYearMain.getFirstName() );
+                    }else{
+                        userRankingThisYearMainList.add( "" );
+                    }
+                    
+                    if(userRankingThisYearMain.getLastName() != null && !userRankingThisYearMain.getLastName().isEmpty()){
+                        userRankingThisYearMainList.add( userRankingThisYearMain.getLastName() );
+                    }else{
+                        userRankingThisYearMainList.add( "" );
+                    }
+                    
+                    userRankingThisYearMainList.add( userRankingThisYearMain.getEmailId() );
+                    userRankingThisYearMainList.add( userRankingThisYearMain.getUserId() );
+                    userRankingThisYearMainList.add( userRankingThisYearMain.getNmlsId() );
+                    userRankingThisYearMainList.add( company.getCompany() );
+                    if(userRankingThisYearMain.getRegionId() != 0){
+                        Region region = regionDao.findById( Region.class, userRankingThisYearMain.getRegionId() );
+                        userRankingThisYearMainList.add(region.getProfileName() );
+                    }else{
+                        userRankingThisYearMainList.add( "" );
+                    }
+                    if(userRankingThisYearMain.getBranchId() != 0){
+                        Branch branch = branchDao.findById( Branch.class, userRankingThisYearMain.getBranchId() );
+                        userRankingThisYearMainList.add(branch.getProfileName());
+                    }else{
+                        userRankingThisYearMainList.add( "" );
+                    }
+                    userRankingThisYearMainList.add( userRankingThisYearMain.getTotalReviews() );
+                    userRankingThisYearMainList.add( userRankingThisYearMain.getAverageRating() );
+                    userRankingThisYearMainList.add( userRankingThisYearMain.getRankingScore() );
+                    userRankingThisYearMainList.add( userRankingThisYearMain.getSps() );
+                    if(userRankingThisYearMain.getIsEligible() == 1){
+                        userRankingThisYearMainList.add( userRankingThisYearMain.getRank() );
+                    }else{
+                        userRankingThisYearMainList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingThisYearMainList );
+                }
+            }else{
+                for(UserRankingPastYearMain userRankingPastYearMain : userRankingPastYearMainDao.fetchUserRankingReportForPastYearMain( entityId,year)){
+                    List<Object> userRankingPastYearMainList = new ArrayList<>();
+                    if(userRankingPastYearMain.getFirstName() != null && !userRankingPastYearMain.getFirstName().isEmpty()){
+                        userRankingPastYearMainList.add( userRankingPastYearMain.getFirstName() );
+                    }else{
+                        userRankingPastYearMainList.add( "" );
+                    }
+                    
+                    if(userRankingPastYearMain.getLastName() != null && !userRankingPastYearMain.getLastName().isEmpty()){
+                        userRankingPastYearMainList.add( userRankingPastYearMain.getLastName() );
+                    }else{
+                        userRankingPastYearMainList.add( "" );
+                    }
+                    
+                    userRankingPastYearMainList.add( userRankingPastYearMain.getEmailId() );
+                    userRankingPastYearMainList.add( userRankingPastYearMain.getUserId() );
+                    userRankingPastYearMainList.add( userRankingPastYearMain.getNmlsId() );
+                    userRankingPastYearMainList.add( company.getCompany() );
+                    if(userRankingPastYearMain.getRegionId() != 0){
+                        Region region = regionDao.findById( Region.class, userRankingPastYearMain.getRegionId() );
+                        userRankingPastYearMainList.add(region.getProfileName() );
+                    }else{
+                        userRankingPastYearMainList.add( "" );
+                    }
+                    if(userRankingPastYearMain.getBranchId() != 0){
+                        Branch branch = branchDao.findById( Branch.class, userRankingPastYearMain.getBranchId() );
+                        userRankingPastYearMainList.add(branch.getProfileName());
+                    }else{
+                        userRankingPastYearMainList.add( "" );
+                    }
+                    userRankingPastYearMainList.add( userRankingPastYearMain.getTotalReviews() );
+                    userRankingPastYearMainList.add( userRankingPastYearMain.getAverageRating() );
+                    userRankingPastYearMainList.add( userRankingPastYearMain.getRankingScore() );
+                    userRankingPastYearMainList.add( userRankingPastYearMain.getSps() );
+                    if(userRankingPastYearMain.getIsEligible() == 1){
+                        userRankingPastYearMainList.add( userRankingPastYearMain.getRank() );
+                    }else{
+                        userRankingPastYearMainList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingPastYearMainList );
+                }
+
+            }
+            
+        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
+            Region region = regionDao.findById( Region.class, entityId);
+            if( year == this_year){
+                for(UserRankingThisYearRegion userRankingThisYearRegion : userRankingThisYearRegionDao.fetchUserRankinReportForThisYearRegion( entityId,year)){
+                    List<Object> userRankingThisYearRegionList = new ArrayList<>();
+                    if(userRankingThisYearRegion.getFirstName() != null && !userRankingThisYearRegion.getFirstName().isEmpty()){
+                        userRankingThisYearRegionList.add( userRankingThisYearRegion.getFirstName() );
+                    }else{
+                        userRankingThisYearRegionList.add( "" );
+                    }
+                    
+                    if(userRankingThisYearRegion.getLastName() != null && !userRankingThisYearRegion.getLastName().isEmpty()){
+                        userRankingThisYearRegionList.add( userRankingThisYearRegion.getLastName() );
+                    }else{
+                        userRankingThisYearRegionList.add( "" );
+                    }
+                    
+                    userRankingThisYearRegionList.add( userRankingThisYearRegion.getEmailId() );
+                    userRankingThisYearRegionList.add( userRankingThisYearRegion.getUserId() );
+                    userRankingThisYearRegionList.add( userRankingThisYearRegion.getNmlsId() );
+                    Company company = companyDao.findById( Company.class , userRankingThisYearRegion.getCompanyId() );
+                    userRankingThisYearRegionList.add( company.getCompany() );
+                    
+                    userRankingThisYearRegionList.add(region.getProfileName() );
+                    
+                    if(userRankingThisYearRegion.getBranchId() != 0){
+                        Branch branch = branchDao.findById( Branch.class, userRankingThisYearRegion.getBranchId() );
+                        userRankingThisYearRegionList.add(branch.getProfileName());
+                    }else{
+                        userRankingThisYearRegionList.add( "" );
+                    }
+                    userRankingThisYearRegionList.add( userRankingThisYearRegion.getTotalReviews() );
+                    userRankingThisYearRegionList.add( userRankingThisYearRegion.getAverageRating() );
+                    userRankingThisYearRegionList.add( userRankingThisYearRegion.getRankingScore() );
+                    userRankingThisYearRegionList.add( userRankingThisYearRegion.getSps() );
+                    if(userRankingThisYearRegion.getIsEligible() == 1){
+                        userRankingThisYearRegionList.add( userRankingThisYearRegion.getRank() );
+                    }else{
+                        userRankingThisYearRegionList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingThisYearRegionList );
+                }
+            }else{
+
+                for(UserRankingPastYearRegion userRankingPastYearRegion : userRankingPastYearRegionDao.fetchUserRankingReportForPastYearRegion( entityId,year)){
+                    List<Object> userRankingPastYearRegionList = new ArrayList<>();
+                    if(userRankingPastYearRegion.getFirstName() != null && !userRankingPastYearRegion.getFirstName().isEmpty()){
+                        userRankingPastYearRegionList.add( userRankingPastYearRegion.getFirstName() );
+                    }else{
+                        userRankingPastYearRegionList.add( "" );
+                    }
+                    
+                    if(userRankingPastYearRegion.getLastName() != null && !userRankingPastYearRegion.getLastName().isEmpty()){
+                        userRankingPastYearRegionList.add( userRankingPastYearRegion.getLastName() );
+                    }else{
+                        userRankingPastYearRegionList.add( "" );
+                    }
+                    
+                    userRankingPastYearRegionList.add( userRankingPastYearRegion.getEmailId() );
+                    userRankingPastYearRegionList.add( userRankingPastYearRegion.getUserId() );
+                    userRankingPastYearRegionList.add( userRankingPastYearRegion.getNmlsId() );
+                    Company company = companyDao.findById( Company.class , userRankingPastYearRegion.getCompanyId() );
+                    userRankingPastYearRegionList.add( company.getCompany() );
+                    
+                    userRankingPastYearRegionList.add(region.getProfileName() );
+                    
+                    if(userRankingPastYearRegion.getBranchId() != 0){
+                        Branch branch = branchDao.findById( Branch.class, userRankingPastYearRegion.getBranchId() );
+                        userRankingPastYearRegionList.add(branch.getProfileName());
+                    }else{
+                        userRankingPastYearRegionList.add( "" );
+                    }
+                    userRankingPastYearRegionList.add( userRankingPastYearRegion.getTotalReviews() );
+                    userRankingPastYearRegionList.add( userRankingPastYearRegion.getAverageRating() );
+                    userRankingPastYearRegionList.add( userRankingPastYearRegion.getRankingScore() );
+                    userRankingPastYearRegionList.add( userRankingPastYearRegion.getSps() );
+                    if(userRankingPastYearRegion.getIsEligible() == 1){
+                        userRankingPastYearRegionList.add( userRankingPastYearRegion.getRank() );
+                    }else{
+                        userRankingPastYearRegionList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingPastYearRegionList );
+                }
+            }
+
+        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
+            Branch branch = branchDao.findById( Branch.class, entityId );
+            if( year == this_year){
+                for(UserRankingThisYearBranch userRankingThisYearBranch : userRankingThisYearBranchDao.fetchUserRankingReportForThisYearBranch( entityId,year)){
+                    List<Object> userRankingThisYearBranchList = new ArrayList<>();
+                    if(userRankingThisYearBranch.getFirstName() != null && !userRankingThisYearBranch.getFirstName().isEmpty()){
+                        userRankingThisYearBranchList.add( userRankingThisYearBranch.getFirstName() );
+                    }else{
+                        userRankingThisYearBranchList.add( "" );
+                    }
+                    
+                    if(userRankingThisYearBranch.getLastName() != null && !userRankingThisYearBranch.getLastName().isEmpty()){
+                        userRankingThisYearBranchList.add( userRankingThisYearBranch.getLastName() );
+                    }else{
+                        userRankingThisYearBranchList.add( "" );
+                    }
+                    
+                    userRankingThisYearBranchList.add( userRankingThisYearBranch.getEmailId() );
+                    userRankingThisYearBranchList.add( userRankingThisYearBranch.getUserId() );
+                    userRankingThisYearBranchList.add( userRankingThisYearBranch.getNmlsId() );
+                    Company company = companyDao.findById( Company.class , userRankingThisYearBranch.getCompanyId() );
+                    userRankingThisYearBranchList.add( company.getCompany() );
+                    if(userRankingThisYearBranch.getRegionId() != 0){
+                        Region region = regionDao.findById( Region.class, userRankingThisYearBranch.getRegionId() );
+                        userRankingThisYearBranchList.add(region.getProfileName() );
+                    }else{
+                        userRankingThisYearBranchList.add( "" );
+                    }
+                    userRankingThisYearBranchList.add(branch.getProfileName());
+                   
+                    userRankingThisYearBranchList.add( userRankingThisYearBranch.getTotalReviews() );
+                    userRankingThisYearBranchList.add( userRankingThisYearBranch.getAverageRating() );
+                    userRankingThisYearBranchList.add( userRankingThisYearBranch.getRankingScore() );
+                    userRankingThisYearBranchList.add( userRankingThisYearBranch.getSps() );
+                    if(userRankingThisYearBranch.getIsEligible() == 1){
+                        userRankingThisYearBranchList.add( userRankingThisYearBranch.getRank() );
+                    }else{
+                        userRankingThisYearBranchList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingThisYearBranchList );
+                }
+            }else{
+
+                for(UserRankingPastYearBranch userRankingPastYearBranch : userRankingPastYearBranchDao.fetchUserRankingReportForPastYearBranch( entityId,year)){
+                    List<Object> userRankingPastYearBranchList = new ArrayList<>();
+                    if(userRankingPastYearBranch.getFirstName() != null && !userRankingPastYearBranch.getFirstName().isEmpty()){
+                        userRankingPastYearBranchList.add( userRankingPastYearBranch.getFirstName() );
+                    }else{
+                        userRankingPastYearBranchList.add( "" );
+                    }
+                    
+                    if(userRankingPastYearBranch.getLastName() != null && !userRankingPastYearBranch.getLastName().isEmpty()){
+                        userRankingPastYearBranchList.add( userRankingPastYearBranch.getLastName() );
+                    }else{
+                        userRankingPastYearBranchList.add( "" );
+                    }
+                    
+                    userRankingPastYearBranchList.add( userRankingPastYearBranch.getEmailId() );
+                    userRankingPastYearBranchList.add( userRankingPastYearBranch.getUserId() );
+                    userRankingPastYearBranchList.add( userRankingPastYearBranch.getNmlsId() );
+                    Company company = companyDao.findById( Company.class , userRankingPastYearBranch.getCompanyId() );
+                    userRankingPastYearBranchList.add( company.getCompany() );
+                    if(userRankingPastYearBranch.getRegionId() != 0){
+                        Region region = regionDao.findById( Region.class, userRankingPastYearBranch.getRegionId() );
+                        userRankingPastYearBranchList.add(region.getProfileName() );
+                    }else{
+                        userRankingPastYearBranchList.add( "" );
+                    }
+                    userRankingPastYearBranchList.add(branch.getProfileName());
+                   
+                    userRankingPastYearBranchList.add( userRankingPastYearBranch.getTotalReviews() );
+                    userRankingPastYearBranchList.add( userRankingPastYearBranch.getAverageRating() );
+                    userRankingPastYearBranchList.add( userRankingPastYearBranch.getRankingScore() );
+                    userRankingPastYearBranchList.add( userRankingPastYearBranch.getSps() );
+                    if(userRankingPastYearBranch.getIsEligible() == 1){
+                        userRankingPastYearBranchList.add( userRankingPastYearBranch.getRank() );
+                    }else{
+                        userRankingPastYearBranchList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingPastYearBranchList );
+                }
+            }
+
+        }
+        return userRanking;
+    }
+    
+    @Override
+    @Transactional(value = "transactionManagerForReporting")
+    public List<List<Object>> getUserRankingReportForMonth(Long entityId , String entityType ,int year , int month){
+        Calendar calender = Calendar.getInstance();
+        int this_year = calender.get(Calendar.YEAR);
+        int this_month = calender.get(Calendar.MONTH) + 1;
+
+        List<List<Object>> userRanking = new ArrayList<>();
+
+        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+            Company company = companyDao.findById( Company.class, entityId );
+            if( month == this_month && year == this_year){
+                for(UserRankingThisMonthMain userRankingThisMonthMain : userRankingThisMonthMainDao.fetchUserRankingReportForThisMonthMain( entityId , month , year)){
+                    List<Object> userRankingThisMonthMainList = new ArrayList<>();
+                    if(userRankingThisMonthMain.getFirstName() != null && !userRankingThisMonthMain.getFirstName().isEmpty()){
+                        userRankingThisMonthMainList.add( userRankingThisMonthMain.getFirstName() );
+                    }else{
+                        userRankingThisMonthMainList.add( "" );
+                    }
+                    
+                    if(userRankingThisMonthMain.getLastName() != null && !userRankingThisMonthMain.getLastName().isEmpty()){
+                        userRankingThisMonthMainList.add( userRankingThisMonthMain.getLastName() );
+                    }else{
+                        userRankingThisMonthMainList.add( "" );
+                    }
+                    
+                    userRankingThisMonthMainList.add( userRankingThisMonthMain.getEmailId() );
+                    userRankingThisMonthMainList.add( userRankingThisMonthMain.getUserId() );
+                    userRankingThisMonthMainList.add( userRankingThisMonthMain.getNmlsId() );
+                    userRankingThisMonthMainList.add( company.getCompany() );
+                    if(userRankingThisMonthMain.getRegionId() != 0){
+                        Region region = regionDao.findById( Region.class, userRankingThisMonthMain.getRegionId() );
+                        userRankingThisMonthMainList.add(region.getProfileName() );
+                    }else{
+                        userRankingThisMonthMainList.add( "" );
+                    }
+                    if(userRankingThisMonthMain.getBranchId() != 0){
+                        Branch branch = branchDao.findById( Branch.class, userRankingThisMonthMain.getBranchId() );
+                        userRankingThisMonthMainList.add(branch.getProfileName());
+                    }else{
+                        userRankingThisMonthMainList.add( "" );
+                    }
+                    userRankingThisMonthMainList.add( userRankingThisMonthMain.getTotalReviews() );
+                    userRankingThisMonthMainList.add( userRankingThisMonthMain.getAverageRating() );
+                    userRankingThisMonthMainList.add( userRankingThisMonthMain.getRankingScore() );
+                    userRankingThisMonthMainList.add( userRankingThisMonthMain.getSps() );
+                    if(userRankingThisMonthMain.getIsEligible() == 1){
+                        userRankingThisMonthMainList.add( userRankingThisMonthMain.getRank() );
+                    }else{
+                        userRankingThisMonthMainList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingThisMonthMainList );
+                }
+            }else{
+                for(UserRankingPastMonthMain userRankingPastMonthMain : userRankingPastMonthMainDao.fetchUserRankingrReportForPastMonthMain( entityId,month ,year)){
+                    List<Object> userRankingPastMonthMainList = new ArrayList<>();
+                    if(userRankingPastMonthMain.getFirstName() != null && !userRankingPastMonthMain.getFirstName().isEmpty()){
+                        userRankingPastMonthMainList.add( userRankingPastMonthMain.getFirstName() );
+                    }else{
+                        userRankingPastMonthMainList.add( "" );
+                    }
+                    
+                    if(userRankingPastMonthMain.getLastName() != null && !userRankingPastMonthMain.getLastName().isEmpty()){
+                        userRankingPastMonthMainList.add( userRankingPastMonthMain.getLastName() );
+                    }else{
+                        userRankingPastMonthMainList.add( "" );
+                    }
+                    
+                    userRankingPastMonthMainList.add( userRankingPastMonthMain.getEmailId() );
+                    userRankingPastMonthMainList.add( userRankingPastMonthMain.getUserId() );
+                    userRankingPastMonthMainList.add( userRankingPastMonthMain.getNmlsId() );
+                    userRankingPastMonthMainList.add( company.getCompany() );
+                    if(userRankingPastMonthMain.getRegionId() != 0){
+                        Region region = regionDao.findById( Region.class, userRankingPastMonthMain.getRegionId() );
+                        userRankingPastMonthMainList.add(region.getProfileName() );
+                    }else{
+                        userRankingPastMonthMainList.add( "" );
+                    }
+                    if(userRankingPastMonthMain.getBranchId() != 0){
+                        Branch branch = branchDao.findById( Branch.class, userRankingPastMonthMain.getBranchId() );
+                        userRankingPastMonthMainList.add(branch.getProfileName());
+                    }else{
+                        userRankingPastMonthMainList.add( "" );
+                    }
+                    userRankingPastMonthMainList.add( userRankingPastMonthMain.getTotalReviews() );
+                    userRankingPastMonthMainList.add( userRankingPastMonthMain.getAverageRating() );
+                    userRankingPastMonthMainList.add( userRankingPastMonthMain.getRankingScore() );
+                    userRankingPastMonthMainList.add( userRankingPastMonthMain.getSps() );
+                    if(userRankingPastMonthMain.getIsEligible() == 1){
+                        userRankingPastMonthMainList.add( userRankingPastMonthMain.getRank() );
+                    }else{
+                        userRankingPastMonthMainList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingPastMonthMainList );
+                }
+
+            }
+            
+        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
+            Region region = regionDao.findById( Region.class, entityId);
+            if(month == this_month && year == this_year){
+                for(UserRankingThisMonthRegion userRankingThisMonthRegion : userRankingThisMonthRegionDao.fetchUserRankingReportForThisMonthRegion( entityId,month,year)){
+                    List<Object> userRankingThisMonthRegionList = new ArrayList<>();
+                    if(userRankingThisMonthRegion.getFirstName() != null && !userRankingThisMonthRegion.getFirstName().isEmpty()){
+                        userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getFirstName() );
+                    }else{
+                        userRankingThisMonthRegionList.add( "" );
+                    }
+                    
+                    if(userRankingThisMonthRegion.getLastName() != null && !userRankingThisMonthRegion.getLastName().isEmpty()){
+                        userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getLastName() );
+                    }else{
+                        userRankingThisMonthRegionList.add( "" );
+                    }
+                    
+                    userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getEmailId() );
+                    userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getUserId() );
+                    userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getNmlsId() );
+                    Company company = companyDao.findById( Company.class , userRankingThisMonthRegion.getCompanyId() );
+                    userRankingThisMonthRegionList.add( company.getCompany() );
+                    
+                    userRankingThisMonthRegionList.add(region.getProfileName() );
+                    
+                    if(userRankingThisMonthRegion.getBranchId() != 0){
+                        Branch branch = branchDao.findById( Branch.class, userRankingThisMonthRegion.getBranchId() );
+                        userRankingThisMonthRegionList.add(branch.getProfileName());
+                    }else{
+                        userRankingThisMonthRegionList.add( "" );
+                    }
+                    userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getTotalReviews() );
+                    userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getAverageRating() );
+                    userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getRankingScore() );
+                    userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getSps() );
+                    if(userRankingThisMonthRegion.getIsEligible() == 1){
+                        userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getRank() );
+                    }else{
+                        userRankingThisMonthRegionList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingThisMonthRegionList );
+                }
+            }else{
+
+                for(UserRankingPastMonthRegion userRankingPastMonthRegion : userRankingPastMonthRegionDao.fetchUserRankingReportForPastMonthRegion( entityId,month,year)){
+                    List<Object> userRankingPastMonthRegionList = new ArrayList<>();
+                    if(userRankingPastMonthRegion.getFirstName() != null && !userRankingPastMonthRegion.getFirstName().isEmpty()){
+                        userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getFirstName() );
+                    }else{
+                        userRankingPastMonthRegionList.add( "" );
+                    }
+                    
+                    if(userRankingPastMonthRegion.getLastName() != null && !userRankingPastMonthRegion.getLastName().isEmpty()){
+                        userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getLastName() );
+                    }else{
+                        userRankingPastMonthRegionList.add( "" );
+                    }
+                    
+                    userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getEmailId() );
+                    userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getUserId() );
+                    userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getNmlsId() );
+                    Company company = companyDao.findById( Company.class , userRankingPastMonthRegion.getCompanyId() );
+                    userRankingPastMonthRegionList.add( company.getCompany() );
+                    
+                    userRankingPastMonthRegionList.add(region.getProfileName() );
+                    
+                    if(userRankingPastMonthRegion.getBranchId() != 0){
+                        Branch branch = branchDao.findById( Branch.class, userRankingPastMonthRegion.getBranchId() );
+                        userRankingPastMonthRegionList.add(branch.getProfileName());
+                    }else{
+                        userRankingPastMonthRegionList.add( "" );
+                    }
+                    userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getTotalReviews() );
+                    userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getAverageRating() );
+                    userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getRankingScore() );
+                    userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getSps() );
+                    if(userRankingPastMonthRegion.getIsEligible() == 1){
+                        userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getRank() );
+                    }else{
+                        userRankingPastMonthRegionList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingPastMonthRegionList );
+                }
+            }
+
+        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
+            Branch branch = branchDao.findById( Branch.class, entityId );
+            if( month == this_month && year == this_year){
+                for(UserRankingThisMonthBranch userRankingThisMonthBranch : userRankingThisMonthBranchDao.fetchUserRankingReportForThisMonthBranch( entityId,month,year)){
+                    List<Object> userRankingMonthYearBranchList = new ArrayList<>();
+                    if(userRankingThisMonthBranch.getFirstName() != null && !userRankingThisMonthBranch.getFirstName().isEmpty()){
+                        userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getFirstName() );
+                    }else{
+                        userRankingMonthYearBranchList.add( "" );
+                    }
+                    
+                    if(userRankingThisMonthBranch.getLastName() != null && !userRankingThisMonthBranch.getLastName().isEmpty()){
+                        userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getLastName() );
+                    }else{
+                        userRankingMonthYearBranchList.add( "" );
+                    }
+                    
+                    userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getEmailId() );
+                    userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getUserId() );
+                    userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getNmlsId() );
+                    Company company = companyDao.findById( Company.class , userRankingThisMonthBranch.getCompanyId() );
+                    userRankingMonthYearBranchList.add( company.getCompany() );
+                    if(userRankingThisMonthBranch.getRegionId() != 0){
+                        Region region = regionDao.findById( Region.class, userRankingThisMonthBranch.getRegionId() );
+                        userRankingMonthYearBranchList.add(region.getProfileName() );
+                    }else{
+                        userRankingMonthYearBranchList.add( "" );
+                    }
+                    userRankingMonthYearBranchList.add(branch.getProfileName());
+                   
+                    userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getTotalReviews() );
+                    userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getAverageRating() );
+                    userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getRankingScore() );
+                    userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getSps() );
+                    if(userRankingThisMonthBranch.getIsEligible() == 1){
+                        userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getRank() );
+                    }else{
+                        userRankingMonthYearBranchList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingMonthYearBranchList );
+                }
+            }else{
+
+                for(UserRankingPastMonthBranch userRankingPastMonthBranch : userRankingPastMonthBranchDao.fetchUserRankingReportForPastMonthBranch( entityId,month,year)){
+                    List<Object> userRankingPastMonthBranchList = new ArrayList<>();
+                    if(userRankingPastMonthBranch.getFirstName() != null && !userRankingPastMonthBranch.getFirstName().isEmpty()){
+                        userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getFirstName() );
+                    }else{
+                        userRankingPastMonthBranchList.add( "" );
+                    }
+                    
+                    if(userRankingPastMonthBranch.getLastName() != null && !userRankingPastMonthBranch.getLastName().isEmpty()){
+                        userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getLastName() );
+                    }else{
+                        userRankingPastMonthBranchList.add( "" );
+                    }
+                    
+                    userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getEmailId() );
+                    userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getUserId() );
+                    userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getNmlsId() );
+                    Company company = companyDao.findById( Company.class , userRankingPastMonthBranch.getCompanyId() );
+                    userRankingPastMonthBranchList.add( company.getCompany() );
+                    if(userRankingPastMonthBranch.getRegionId() != 0){
+                        Region region = regionDao.findById( Region.class, userRankingPastMonthBranch.getRegionId() );
+                        userRankingPastMonthBranchList.add(region.getProfileName() );
+                    }else{
+                        userRankingPastMonthBranchList.add( "" );
+                    }
+                    userRankingPastMonthBranchList.add(branch.getProfileName());
+                   
+                    userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getTotalReviews() );
+                    userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getAverageRating() );
+                    userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getRankingScore() );
+                    userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getSps() );
+                    if(userRankingPastMonthBranch.getIsEligible() == 1){
+                        userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getRank() );
+                    }else{
+                        userRankingPastMonthBranchList.add( "NR" );
+                    }
+                    
+                    userRanking.add( userRankingPastMonthBranchList );
+                }
+            }
+
+        }
+        return userRanking;
+    }
+    
+    @Override
     public List<List<Object>> getRecentActivityList(Long entityId , String entityType , int startIndex , int batchSize) throws InvalidInputException{
         List<List<Object>> recentActivity = new ArrayList<>();
         for(FileUpload fileUpload : fileUploadDao.findRecentActivityForReporting(entityId, entityType, startIndex, batchSize)){
@@ -917,6 +1478,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_REUSLTS_COMPANY_REPORT );
             }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_TRANSACTION_REPORT );
+            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_MONTHLY_REPORT );
+            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_YEARLY_REPORT );
             }
             recentActivityList.add( fileUpload.getStartDate() );
             recentActivityList.add( fileUpload.getEndDate() );
@@ -1094,6 +1659,40 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         Type listType = new TypeToken <List<List<String>>>() {}.getType();
         surveyTransactionReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
         Map<Integer, List<Object>> data = workbookData.getSurveyTransactionReportToBeWrittenInSheet(surveyTransactionReport);
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+        return workbook;
+        
+    }
+    
+    @Override
+    public String generateUserRankingForReporting(Long entityId , String entityType , Long userId ,Timestamp startDate , int type) throws UnsupportedEncodingException, NonFatalException{
+        User user = userManagementService.getUserByUserId( userId );
+        Calendar calender = Calendar.getInstance();
+        calender.setTimeInMillis(startDate.getTime());
+        int year = calender.get(Calendar.YEAR);
+        int month = calender.get(Calendar.MONTH) + 1;
+        //file is too big for windows hence uncomment the alternative 
+        String fileName = "User_Ranking_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+          + (Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        XSSFWorkbook workbook = this.downloadUserRankingForReporting( entityId , entityType, year, month , type );
+        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+        return LocationInS3;
+        
+    }
+    
+    
+    @SuppressWarnings ( "unchecked")
+    public XSSFWorkbook downloadUserRankingForReporting( long entityId , String entityType ,int year , int month , int type){
+        Response response =  ssApiBatchIntergrationBuilder.getIntegrationApi().getUserRankingReport(entityId, entityType,year,month,type);
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        //since the string has ""abc"" an extra quote
+        responseString = responseString.substring(1, responseString.length()-1);
+        //Escape characters
+        responseString = StringEscapeUtils.unescapeJava(responseString);
+        List<List<String>> userRankingReport = null;
+        Type listType = new TypeToken <List<List<String>>>() {}.getType();
+        userRankingReport =  (List<List<String>>) ( new Gson().fromJson(responseString, listType) )  ;
+        Map<Integer, List<Object>> data = workbookData.getUserRankingReportToBeWrittenInSheet(userRankingReport);
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
         return workbook;
         

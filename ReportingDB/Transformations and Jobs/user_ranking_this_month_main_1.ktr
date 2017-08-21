@@ -157,10 +157,14 @@
   <hop> <from>SurveyDetails 2</from><to>Sort rows 10 3</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 10 3</from><to>Filter rows 4</to><enabled>Y</enabled> </hop>
   <hop> <from>SortAgent 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join 4</from><to>Database join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Database join</from><to>Null to Zero</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join 4</from><to>DatabaseFirstNameLAst</to><enabled>Y</enabled> </hop>
   <hop> <from>jsMinRequirements</from><to>If field value is null</to><enabled>Y</enabled> </hop>
-  <hop> <from>If field value is null</from><to>Generate random value</to><enabled>Y</enabled> </hop>
+  <hop> <from>DatabaseFirstNameLAst</from><to>DatabaseId</to><enabled>Y</enabled> </hop>
+  <hop> <from>DatabaseId</from><to>Database join FOR NMLS</to><enabled>Y</enabled> </hop>
+  <hop> <from>Database join FOR NMLS</from><to>Null to Zero</to><enabled>Y</enabled> </hop>
+  <hop> <from>Unique rows</from><to>Generate random value</to><enabled>Y</enabled> </hop>
+  <hop> <from>If field value is null</from><to>Sort rows 13</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 13</from><to>Unique rows</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AverageScoreGroupBy</name>
@@ -264,7 +268,7 @@
     </step>
 
   <step>
-    <name>Database join</name>
+    <name>Database join FOR NMLS</name>
     <type>DBJoin</type>
     <description/>
     <distribute>Y</distribute>
@@ -276,7 +280,37 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>select FIRST_NAME , LAST_NAME ,  DATEDIFF&#x28;DATE&#x28;NOW&#x28;&#x29;&#x29;, CREATED_ON_EST&#x29; AS days_of_registration  from users where user_id &#x3d; &#x3f;</sql>
+    <sql>SELECT NMLS_ID FROM lender_ref WHERE ZILLOW_TOKEN_ID &#x3d; &#x28;SELECT ZILLOW_TOKEN_ID FROM zillow_token WHERE type &#x3d; 4 AND id &#x3d; &#x3f;&#x29;&#x3b;</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>AGENT_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1507</xloc>
+      <yloc>605</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>DatabaseFirstNameLAst</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>select FIRST_NAME , LAST_NAME , EMAIL_ID, DATEDIFF&#x28;DATE&#x28;NOW&#x28;&#x29;&#x29;, CREATED_ON_EST&#x29; AS days_of_registration  from users where user_id &#x3d; &#x3f;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -289,6 +323,36 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1507</xloc>
       <yloc>426</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>DatabaseId</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>select r.REGION_ID , b.BRANCH_ID from user_profile up &#xd;&#xa;left join region r on up.region_id &#x3d; r.region_id and r.IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;left join branch b on up.region_id &#x3d; b.branch_id and b.IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;where up.IS_PRIMARY &#x3d; 1 and up.STATUS &#x3d; 1 and up.USER_ID &#x3d; &#x3f;</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>AGENT_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1508</xloc>
+      <yloc>500</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -457,8 +521,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1106</xloc>
-      <yloc>590</yloc>
+      <xloc>827</xloc>
+      <yloc>679</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -810,6 +874,58 @@
     </step>
 
   <step>
+    <name>If field value is null</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <replaceAllByValue>0</replaceAllByValue>
+      <replaceAllMask/>
+      <selectFields>Y</selectFields>
+      <selectValuesType>N</selectValuesType>
+      <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>RankingScore</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>BRANCH_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>REGION_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>NMLS_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1178</xloc>
+      <yloc>678</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Memory Group by</name>
     <type>MemoryGroupBy</type>
     <description/>
@@ -1133,8 +1249,8 @@
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1509</xloc>
-      <yloc>501</yloc>
+      <xloc>1508</xloc>
+      <yloc>677</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1590,6 +1706,52 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>322</xloc>
       <yloc>42</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 13</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data_final</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>MONTH_Data_Final</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1057</xloc>
+      <yloc>682</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2341,11 +2503,23 @@
           <column_name>this_year</column_name>
           <stream_name>year_data_final</stream_name>
         </field>
+        <field>
+          <column_name>region_id</column_name>
+          <stream_name>REGION_ID</stream_name>
+        </field>
+        <field>
+          <column_name>branch_id</column_name>
+          <stream_name>BRANCH_ID</stream_name>
+        </field>
+        <field>
+          <column_name>nmls_id</column_name>
+          <stream_name>NMLS_ID</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>906</xloc>
-      <yloc>591</yloc>
+      <xloc>688</xloc>
+      <yloc>677</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2372,6 +2546,35 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1296</xloc>
       <yloc>343</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Unique rows</name>
+    <type>Unique</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <count_rows>N</count_rows>
+      <count_field/>
+      <reject_duplicate_row>N</reject_duplicate_row>
+      <error_description/>
+    <fields>      <field>        <name>AGENT_ID</name>
+        <case_insensitive>N</case_insensitive>
+        </field>      <field>        <name>year_data_final</name>
+        <case_insensitive>N</case_insensitive>
+        </field>      <field>        <name>MONTH_Data_Final</name>
+        <case_insensitive>N</case_insensitive>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>961</xloc>
+      <yloc>679</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2564,41 +2767,25 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1514</xloc>
-      <yloc>584</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>If field value is null</name>
-    <type>IfNull</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <replaceAllByValue>0</replaceAllByValue>
-      <replaceAllMask/>
-      <selectFields>N</selectFields>
-      <selectValuesType>N</selectValuesType>
-      <setEmptyStringAll>N</setEmptyStringAll>
-    <valuetypes>
-      </valuetypes>
-    <fields>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1321</xloc>
-      <yloc>585</yloc>
+      <xloc>1320</xloc>
+      <yloc>677</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
+      <error>
+        <source_step>Table output</source_step>
+        <target_step/>
+        <is_enabled>N</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
   </step_error_handling>
    <slave-step-copy-partition-distribution>
 </slave-step-copy-partition-distribution>

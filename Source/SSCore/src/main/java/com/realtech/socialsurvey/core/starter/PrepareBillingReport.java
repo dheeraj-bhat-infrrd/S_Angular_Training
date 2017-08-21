@@ -128,15 +128,26 @@ public class PrepareBillingReport implements Runnable
                              locationInS3 = reportingDashboardManagement.generateSurveyTransactionForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                                  fileUpload.getAdminUserId(),fileUpload.getStartDate(),fileUpload.getEndDate() );
 
-                                    fileUpload.getAdminUserId();
+                        }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT){
+                            //change this to have user ranking report 
+                            int type = 2;
+                            locationInS3 = reportingDashboardManagement.generateUserRankingForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                fileUpload.getAdminUserId(),fileUpload.getStartDate() , type);
 
-                         }
+                       }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+                           //change this to have user ranking report 
+                           int type = 1;
+                           locationInS3 = reportingDashboardManagement.generateUserRankingForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                               fileUpload.getAdminUserId(),fileUpload.getStartDate() , type);
+
+                      }
                         
                         // update the status to be processed
                         fileUpload.setStatus( CommonConstants.STATUS_DONE );
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT 
-                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
                             fileUpload.setFileName( locationInS3 );
                         }
                         csvUploadService.updateFileUploadRecord( fileUpload );
@@ -173,9 +184,13 @@ public class PrepareBillingReport implements Runnable
                             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT ){
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_ADOPTION_REPORT;
                             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT ){
-                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTIND_COMPANY_USER_REPORT;
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_COMPANY_USER_REPORT;
                             }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
-                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTIND_SURVEY_RESULTS_COMPANY_REPORT;
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_RESULTS_COMPANY_REPORT;
+                            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_MONTHLY_REPORT;
+                            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_YEARLY_REPORT;
                             }
                             String batchName = CommonConstants.BATCH_NAME_FILE_UPLOAD_REPORTS_GENERATOR + " For " + reportType;
                             batchTrackerService.sendMailToAdminRegardingBatchError( batchName, System.currentTimeMillis(), e );

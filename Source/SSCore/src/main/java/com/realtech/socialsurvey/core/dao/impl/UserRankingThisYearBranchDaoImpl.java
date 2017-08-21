@@ -46,6 +46,24 @@ public class UserRankingThisYearBranchDaoImpl extends GenericReportingDaoImpl<Us
         LOG.info( "method to fetch user ranking branch list for this year, fetchUserRankingForThisYearBranch() finished." );
         return (List<UserRankingThisYearBranch>) criteria.list();
 	}
+	
+	@Override
+    public List<UserRankingThisYearBranch> fetchUserRankingReportForThisYearBranch(Long branchId, int year ) {
+        LOG.info( "method to fetch user ranking branch list for this year, fetchUserRankingReportForThisYearBranch() started" );
+        Criteria criteria = getSession().createCriteria( UserRankingThisYearBranch.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
+            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );
+            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_BRANCH_RANK ) );
+            }
+        catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchUserRankingReportForThisYearBranch() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingReportForThisYearBranch() ", hibernateException );
+        }
+
+        LOG.info( "method to fetch user ranking branch list for this year, fetchUserRankingReportForThisYearBranch() finished." );
+        return (List<UserRankingThisYearBranch>) criteria.list();
+    }
 
 	@Override
 	public int fetchUserRankingRankForThisYearBranch(Long userId, Long branchId, int year) {

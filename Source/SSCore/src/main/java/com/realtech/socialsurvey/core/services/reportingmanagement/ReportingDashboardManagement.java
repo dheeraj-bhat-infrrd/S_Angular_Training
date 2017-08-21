@@ -101,6 +101,13 @@ public interface ReportingDashboardManagement
         RankingRequirements rankingRequirements ) throws InvalidInputException;
 
     Long getRegionIdFromBranchId(long branchId);
+
+    List<List<Object>> getUserRankingReportForYear( Long entityId, String entityType, int year );
+
+    List<List<Object>> getUserRankingReportForMonth( Long entityId, String entityType, int year, int month );
+
+    String generateUserRankingForReporting( Long entityId, String entityType, Long userId, Timestamp startDate, int type )
+        throws UnsupportedEncodingException, NonFatalException;
     
     List<List<Object>> getScoreStatsForOverall(Long entityId, String entityType, int currentMonth, int currentYear);
     

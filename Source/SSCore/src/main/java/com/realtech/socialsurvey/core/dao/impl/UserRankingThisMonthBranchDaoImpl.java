@@ -49,6 +49,25 @@ public class UserRankingThisMonthBranchDaoImpl extends GenericReportingDaoImpl<U
 	}
 
 	@Override
+    public List<UserRankingThisMonthBranch> fetchUserRankingReportForThisMonthBranch(Long branchId, int month, int year ) {
+        LOG.info( "method to fetch user ranking branch list for this month, fetchUserRankingReportForThisMonthBranch() started" );
+        Criteria criteria = getSession().createCriteria( UserRankingThisMonthBranch.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
+            criteria.add( Restrictions.eq( CommonConstants.THIS_MONTH, month ) ); 
+            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );   
+            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_BRANCH_RANK ) );
+            }
+        catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchUserRankingReportForThisMonthBranch() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingReportForThisMonthBranch() ", hibernateException );
+        }
+
+        LOG.info( "method to fetch user ranking branch list for this month, fetchUserRankingReportForThisMonthBranch() finished." );
+        return (List<UserRankingThisMonthBranch>) criteria.list();
+    }
+
+	@Override
 	public int fetchUserRankingRankForThisMonthBranch(Long userId, Long branchId, int year) {
 		LOG.info( "method to fetch user ranking Branch Rank for this month, fetchUserRankingRankForThisMonthBranch() started" );
         Query query = getSession().createSQLQuery( "SELECT internal_branch_rank FROM user_ranking_this_month_branch WHERE user_id = :userId " );

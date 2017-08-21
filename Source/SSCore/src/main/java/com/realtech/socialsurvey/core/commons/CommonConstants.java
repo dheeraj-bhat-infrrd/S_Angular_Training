@@ -273,9 +273,12 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT = "User adoption report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_STATS_REPORT = "Survey stats report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_ADOPTION_REPORT = "User adoption report for reporting";
-    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTIND_COMPANY_USER_REPORT = "Company user report for reporting";
-    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTIND_SURVEY_RESULTS_COMPANY_REPORT = "Survey results company report for reporting";
-    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTIND_SURVEY_TRANSACTION_REPORT = "Survey transaction report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_COMPANY_USER_REPORT = "Company user report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = "Survey results company report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_TRANSACTION_REPORT = "Survey transaction report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_MONTHLY_REPORT = "User ranking monthly report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_YEARLY_REPORT = "User ranking yearly report for reporting";
+
 
     
     /**
@@ -959,6 +962,9 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT = 103;
     public static final int FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = 104;
     public static final int FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT = 105;
+    public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
+    public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
+
     
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
@@ -1336,6 +1342,9 @@ public interface CommonConstants
     public static final String REPORTING_COMPANY_USERS_REPORT = "Company User Report";
     public static final String REPORTING_SURVEY_REUSLTS_COMPANY_REPORT = "Survey Results Company Report";
     public static final String REPORTING_SURVEY_TRANSACTION_REPORT = "Survey Transaction Report";
+    public static final String REPORTING_USER_RANKING_MONTHLY_REPORT = "User Ranking Report For Month";
+    public static final String REPORTING_USER_RANKING_YEARLY_REPORT = "User Ranking Report For Year";
+
 
     
     public static final String SURVEY_DETAILS_ID_COLUMN="surveyDetailsId";
