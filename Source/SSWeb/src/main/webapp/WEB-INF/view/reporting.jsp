@@ -107,8 +107,9 @@
 					<div class="tab-pane fade col-lg-12 col-md-12 col-sm-12 col-xs-12" id="leaderboard-tab">
 						<jsp:include page="reporting_leaderboard.jsp"></jsp:include>
 					</div>
-					<div class="tab-pane fade" id="score-stats-tab"></div>
-					<div class="tab-pane fade" id="activity-tab"></div>
+					<div class="tab-pane fade col-lg-12 col-md-12 col-sm-12 col-xs-12" id="score-stats-tab">
+						<jsp:include page="reporting_score_stats.jsp"></jsp:include>
+					</div>
 					<div class="tab-pane fade" id="reviews-tab">
 						<jsp:include page="reporting_reviews.jsp"></jsp:include>
 					</div>

@@ -1052,7 +1052,7 @@ public class ReportingWebController
        }
        if ( ( entityType == null || entityType.isEmpty() ) ) {
            LOG.error( "Invalid value (null/empty) passed for profile level." );
-           throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+           throw new InvalidInputException( "Invalid value (null/empty) passed for entityType" );
        }
        if(timeFrameStr!=null && !timeFrameStr.isEmpty()){
            timeFrame = Integer.parseInt(timeFrameStr);
@@ -1200,6 +1200,92 @@ public class ReportingWebController
             default: throw new NonFatalException( "NonFatalException while choosing time frame for leaderboard" );
        }
        
+       return response;
+   }
+   
+   @ResponseBody
+   @RequestMapping ( value = "/getoverallscorestats", method = RequestMethod.GET)
+   public Response getOverallScoreStats(Model model, HttpServletRequest request) throws NonFatalException{
+	   
+	   LOG.info( "Get Overall Score Stats " );
+       
+       LOG.info( "Method to get overall score stats getOverallScoreStats() started." );
+       Long entityId = (long) 0;
+       int currentYear = 0;
+       int currentMonth = 0;
+       String entityIdStr = request.getParameter("entityId");
+       String entityType = request.getParameter("entityType");
+       String currentYearStr = request.getParameter("currentYear");
+       String currentMonthStr = request.getParameter("currentMonth");
+       Response response = null;
+       
+       if ( ( entityType == null || entityType.isEmpty() ) ) {
+           LOG.error( "Invalid value (null/empty) passed for entityType." );
+           throw new InvalidInputException( "Invalid value (null/empty) passed for entityType." );
+       }
+       
+       if ( entityIdStr != null && !entityIdStr.isEmpty() ) {
+           try {
+               entityId = Long.parseLong( entityIdStr );
+           } catch ( NumberFormatException e ) {
+               LOG.error( "NumberFormatException caught while parsing entityId in getReviews(). Nested exception is ",
+                   e );
+               throw e;
+           }
+       }
+       if(currentYearStr != null && !currentYearStr.isEmpty()){
+           currentYear = Integer.parseInt( currentYearStr );
+       }
+       if(currentMonthStr != null && !currentMonthStr.isEmpty()){
+           currentMonth = Integer.parseInt( currentMonthStr );
+       }
+       
+       response = ssApiIntergrationBuilder.getIntegrationApi().getScoreStatsOverall(entityId, entityType, currentMonth, currentYear);
+       
+       LOG.info( "Method to get overall score stats getOverallScoreStats() finished." );
+       return response;
+   }
+   
+   @ResponseBody
+   @RequestMapping ( value = "/getquestionscorestats", method = RequestMethod.GET)
+   public Response getQuestionScoreStats(Model model, HttpServletRequest request) throws NonFatalException{
+	   
+	   LOG.info( "Get Overall Score Stats " );
+       
+       LOG.info( "Method to get overall score stats getOverallScoreStats() started." );
+       Long entityId = (long) 0;
+       int currentYear = 0;
+       int currentMonth = 0;
+       String entityIdStr = request.getParameter("entityId");
+       String entityType = request.getParameter("entityType");
+       String currentYearStr = request.getParameter("currentYear");
+       String currentMonthStr = request.getParameter("currentMonth");
+       Response response = null;
+       
+       if ( ( entityType == null || entityType.isEmpty() ) ) {
+           LOG.error( "Invalid value (null/empty) passed for entityType." );
+           throw new InvalidInputException( "Invalid value (null/empty) passed for entityType." );
+       }
+       
+       if ( entityIdStr != null && !entityIdStr.isEmpty() ) {
+           try {
+               entityId = Long.parseLong( entityIdStr );
+           } catch ( NumberFormatException e ) {
+               LOG.error( "NumberFormatException caught while parsing entityId in getReviews(). Nested exception is ",
+                   e );
+               throw e;
+           }
+       }
+       if(currentYearStr != null && !currentYearStr.isEmpty()){
+           currentYear = Integer.parseInt( currentYearStr );
+       }
+       if(currentMonthStr != null && !currentMonthStr.isEmpty()){
+           currentMonth = Integer.parseInt( currentMonthStr );
+       }
+       
+       response = ssApiIntergrationBuilder.getIntegrationApi().getScoreStatsQuestion(entityId, entityType, currentMonth, currentYear);
+       
+       LOG.info( "Method to get overall score stats getOverallScoreStats() finished." );
        return response;
    }
    

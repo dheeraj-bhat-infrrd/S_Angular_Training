@@ -570,5 +570,30 @@ public class ReportingController
         return json;
         
     }
-
+    
+    @RequestMapping( value = "/getscorestatsoverall" , method = RequestMethod.GET)
+    @ApiOperation( value = "Fetch Score Stats Overall")
+    public String getScoreStatsOverall(Long entityId, String entityType, int currentMonth, int currentYear){
+    	
+    	LOGGER.info("Fetching Score Stats Overall");
+    	
+    	String json = null;
+    	List<List<Object>> scoreStatsOverall = new ArrayList<>();
+    	scoreStatsOverall = reportingDashboardManagement.getScoreStatsForOverall(entityId, entityType, currentMonth, currentYear);
+    	json = new Gson().toJson(scoreStatsOverall);
+    	return json;
+    }
+    
+    @RequestMapping( value = "/getscorestatsquestion" , method = RequestMethod.GET)
+    @ApiOperation( value = "Fetch Score Stats Question")
+    public String getScoreStatsQuestion(Long entityId, String entityType, int currentMonth, int currentYear){
+    
+    	LOGGER.info("Fetching Score Stats Question");
+    	
+    	String json = null;
+    	Map<String, List<List<Object>>> scoreStatsQuestion = new HashMap<>();
+    	scoreStatsQuestion = reportingDashboardManagement.getScoreStatsForQuestion(entityId, entityType, currentMonth, currentYear);
+    	json = new Gson().toJson(scoreStatsQuestion);
+    	return json;
+    }
 }

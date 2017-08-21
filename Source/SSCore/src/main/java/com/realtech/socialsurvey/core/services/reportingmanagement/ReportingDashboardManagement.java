@@ -109,4 +109,9 @@ public interface ReportingDashboardManagement
     String generateUserRankingForReporting( Long entityId, String entityType, Long userId, Timestamp startDate, int type )
         throws UnsupportedEncodingException, NonFatalException;
     
+    List<List<Object>> getScoreStatsForOverall(Long entityId, String entityType, int currentMonth, int currentYear);
+    
+    Map<String,List<List<Object>>> getScoreStatsForQuestion(Long entityId, String entityType, int currentMonth, int currentYear);
+    
+    
 }

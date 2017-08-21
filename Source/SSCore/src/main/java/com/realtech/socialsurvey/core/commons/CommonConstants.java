@@ -1360,15 +1360,18 @@ public interface CommonConstants
     public static final String RANK = "rank";
     public static final String INTERNAL_BRANCH_RANK = "internalBranchRank";
     public static final String INTERNAL_REGION_RANK = "internalRegionRank";
+	
+    public static final String MONTH_VAL = "monthVal";
+    public static final String YEAR_VAL = "yearVal";
+    public static final String QUESTION_ID = "question_id";
 
     //Survey API survey status
     public static final String SURVEY_API_SURVEY_STATUS_COMPLETE = "complete";
     public static final String SURVEY_API_SURVEY_STATUS_INCOMPLETE = "incomplete";
     public static final String SURVEY_API_SURVEY_STATUS_ALL = "all";
 
-    
     public static final String NOT_AVAILABLE = "N/A";
-    
+
     //Encompass test connection htt prequest initial
     public static final String HTTP_REQUEST_URL_INITIAL = "http://";
 }

@@ -1634,4 +1634,37 @@ function getAndSaveRankingSettingsVal(isRealTechOrSSAdmin,monthOff,yearOff){
 	return message;
 }
 
+function drawLineGraphForScoreStats(chartDiv,chartData){
+	google.charts.load('current', {'packages':['corechart']});
+	google.charts.setOnLoadCallback(function(){
+		var scoreStatsChartData = [
+									['Month','Rating'],
+									[ '', 0 ] ];
+				
+			if(chartData != null && chartData.length > 0){
+				scoreStatsChartData = chartData;
+			}
+				
+			var data = google.visualization.arrayToDataTable(scoreStatsChartData);
+
+			var options = {
+							chartArea : {
+							width : '95%'
+							},
+							vAxis : {
+								minValue : 0,
+								maxValue : 5,
+								gridlines : {
+									count : 6
+								}
+							},
+							pointSize : 5,
+							legend: {position:'none'}
+						};
+			
+			var chart = new google.visualization.LineChart(document.getElementById(chartDiv));
+			chart.draw(data, options);
+	});
+}
+
 
