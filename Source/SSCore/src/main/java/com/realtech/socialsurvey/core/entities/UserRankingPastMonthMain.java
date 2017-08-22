@@ -77,7 +77,7 @@ public class UserRankingPastMonthMain
     private	int isEligible;
     
     @Column(name = "nmls_id")
-    private int nmlsId;     
+    private String nmlsId;     
     
 	public int getAverageRating() {
 		return averageRating;
@@ -282,18 +282,13 @@ public class UserRankingPastMonthMain
         this.branchId = branchId;
     }
 
+    public String getNmlsId() {
+  		return nmlsId;
+  	}
 
-    public int getNmlsId()
-    {
-        return nmlsId;
-    }
-
-
-    public void setNmlsId( int nmlsId )
-    {
-        this.nmlsId = nmlsId;
-    }
-
+  	public void setNmlsId(String nmlsId) {
+  		this.nmlsId = nmlsId;
+  	}
 
     @Override
     public String toString()

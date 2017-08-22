@@ -74,7 +74,7 @@ public class UserRankingPastYearsRegion
     int internalRegionRank;
 
     @Column(name = "nmls_id")
-    private int nmlsId; 
+    private String nmlsId; 
     
     public String getUserRankingPastYearsRegionId()
     {
@@ -264,15 +264,13 @@ public class UserRankingPastYearsRegion
         this.branchId = branchId;
     }
 
-    public int getNmlsId()
-    {
-        return nmlsId;
-    }
+    public String getNmlsId() {
+  		return nmlsId;
+  	}
 
-    public void setNmlsId( int nmlsId )
-    {
-        this.nmlsId = nmlsId;
-    }
+  	public void setNmlsId(String nmlsId) {
+  		this.nmlsId = nmlsId;
+  	}
 
     @Override
     public String toString()

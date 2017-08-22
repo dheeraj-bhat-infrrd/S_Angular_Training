@@ -19,7 +19,7 @@
 <div id="overall-ratings-div" class="col-md-12 col-lg-12 col-sm-12 col-xs-12" style="margin-top: 10px; display: inline-block; float:left; width:100%;height:350px; margin-left:15px">
 	<span class="rep-sps-lbl" style="margin-top: 13px;">Overall Rating</span>
 	<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12"> 
-		<div id="overall-rating-chart" style="width:80%; height:300px; "></div>
+		<div id="overall-rating-chart" style="width:80%; height:300px;margin: 20px 20px 20px 60px;"></div>
 	</div>
 </div>
 
@@ -36,5 +36,8 @@ var overallChartData = [
 					[ 'Jul/2017', 3.5 ],
 					[ 'Aug/2017', 4.0 ]];
 drawLineGraphForScoreStats(overallChartDiv, overallChartData);
+
+
+getOverallScoreStats(3, "companyId");
 
 </script>
