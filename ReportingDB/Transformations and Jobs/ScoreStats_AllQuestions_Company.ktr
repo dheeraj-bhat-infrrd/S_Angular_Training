@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>ScoreStats_Overall_User</name>
+    <name>ScoreStats_AllQuestions_Company</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -66,10 +66,10 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;08&#x2f;17 16&#x3a;22&#x3a;12.497</created_date>
+  <created_date>2017&#x2f;08&#x2f;21 20&#x3a;59&#x3a;09.321</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;08&#x2f;17 16&#x3a;22&#x3a;12.497</modified_date>
-    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+  <modified_date>2017&#x2f;08&#x2f;21 20&#x3a;59&#x3a;09.321</modified_date>
+    <key_for_session_key/>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -131,37 +131,37 @@
     </attributes>
   </connection>
   <order>
+  <hop> <from>Filter 1</from><to>Sort 1</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter 2</from><to>Sort 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter 3</from><to>Sort 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter 4</from><to>Sort 4</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter 5</from><to>Sort 5</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group 4</from><to>Sort qsn 4</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group by 1</from><to>Sort qsn 1</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group by 2</from><to>Sort qsn 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group by 3</from><to>Sort qsn 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group by 5</from><to>Sort qsn 5</to><enabled>Y</enabled> </hop>
+  <hop> <from>If field value is null</from><to>Insert &#x2f; Update All Questions Users</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Filter 1</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Filter 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Filter 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Filter 4</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Filter 5</to><enabled>Y</enabled> </hop>
+  <hop> <from>Modified Java Script Value</from><to>ScoreStats Id</to><enabled>Y</enabled> </hop>
+  <hop> <from>Multiway Merge Join</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
+  <hop> <from>ScoreStats Id</from><to>If field value is null</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort 1</from><to>Group by 1</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort 2</from><to>Group by 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort 3</from><to>Group by 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort 4</from><to>Group 4</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort 5</from><to>Group by 5</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort qsn 1</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort qsn 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort qsn 3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort qsn 4</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort qsn 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveyDetails Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveyResponse Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>Filter 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter 5</from><to>Sort 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort 5</from><to>Group by 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort 4</from><to>Group 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>Filter 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter 4</from><to>Sort 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by 5</from><to>Sort qsn 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group 4</from><to>Sort qsn 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by 3</from><to>Sort qsn 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort 3</from><to>Group by 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter 2</from><to>Sort 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by 2</from><to>Sort qsn 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort 2</from><to>Group by 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter 1</from><to>Sort 1</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by 1</from><to>Sort qsn 1</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort 1</from><to>Group by 1</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>Filter 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>Filter 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>Filter 1</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort qsn 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort qsn 4</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort qsn 3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort qsn 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort qsn 1</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Multiway Merge Join</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter 3</from><to>Sort 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Modified Java Script Value</from><to>ScoreStats Id</to><enabled>Y</enabled> </hop>
-  <hop> <from>ScoreStats Id</from><to>If field value is null</to><enabled>Y</enabled> </hop>
-  <hop> <from>If field value is null</from><to>Score Stats Overall User Output</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Filter 1</name>
@@ -186,8 +186,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>911</xloc>
-      <yloc>313</yloc>
+      <xloc>794</xloc>
+      <yloc>346</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -215,8 +215,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>771</xloc>
-      <yloc>313</yloc>
+      <xloc>660</xloc>
+      <yloc>346</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -244,8 +244,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>646</xloc>
-      <yloc>313</yloc>
+      <xloc>512</xloc>
+      <yloc>346</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -273,8 +273,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>500</xloc>
-      <yloc>313</yloc>
+      <xloc>383</xloc>
+      <yloc>346</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -302,8 +302,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>386</xloc>
-      <yloc>313</yloc>
+      <xloc>269</xloc>
+      <yloc>346</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -329,10 +329,13 @@
       <give_back_row>N</give_back_row>
       <group>
         <field>
-          <name>AGENT_ID</name>
+          <name>COMPANY_ID</name>
         </field>
         <field>
           <name>TRX_MONTH</name>
+        </field>
+        <field>
+          <name>QUESTION_ID</name>
         </field>
       </group>
       <fields>
@@ -354,11 +357,17 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>QUESTION</aggregate>
+          <subject>QUESTION</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>495</xloc>
-      <yloc>545</yloc>
+      <xloc>378</xloc>
+      <yloc>578</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -384,10 +393,13 @@
       <give_back_row>N</give_back_row>
       <group>
         <field>
-          <name>AGENT_ID</name>
+          <name>COMPANY_ID</name>
         </field>
         <field>
           <name>TRX_MONTH</name>
+        </field>
+        <field>
+          <name>QUESTION_ID</name>
         </field>
       </group>
       <fields>
@@ -409,11 +421,17 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>QUESTION</aggregate>
+          <subject>QUESTION</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>911</xloc>
-      <yloc>545</yloc>
+      <xloc>794</xloc>
+      <yloc>578</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -439,10 +457,13 @@
       <give_back_row>N</give_back_row>
       <group>
         <field>
-          <name>AGENT_ID</name>
+          <name>COMPANY_ID</name>
         </field>
         <field>
           <name>TRX_MONTH</name>
+        </field>
+        <field>
+          <name>QUESTION_ID</name>
         </field>
       </group>
       <fields>
@@ -464,11 +485,17 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>QUESTION</aggregate>
+          <subject>QUESTION</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>771</xloc>
-      <yloc>545</yloc>
+      <xloc>660</xloc>
+      <yloc>578</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -494,10 +521,13 @@
       <give_back_row>N</give_back_row>
       <group>
         <field>
-          <name>AGENT_ID</name>
+          <name>COMPANY_ID</name>
         </field>
         <field>
           <name>TRX_MONTH</name>
+        </field>
+        <field>
+          <name>QUESTION_ID</name>
         </field>
       </group>
       <fields>
@@ -519,11 +549,17 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>QUESTION</aggregate>
+          <subject>QUESTION</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>629</xloc>
-      <yloc>545</yloc>
+      <xloc>512</xloc>
+      <yloc>578</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -549,10 +585,13 @@
       <give_back_row>N</give_back_row>
       <group>
         <field>
-          <name>AGENT_ID</name>
+          <name>COMPANY_ID</name>
         </field>
         <field>
           <name>TRX_MONTH</name>
+        </field>
+        <field>
+          <name>QUESTION_ID</name>
         </field>
       </group>
       <fields>
@@ -574,11 +613,17 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>QUESTION</aggregate>
+          <subject>QUESTION</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>381</xloc>
-      <yloc>545</yloc>
+      <xloc>264</xloc>
+      <yloc>578</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -605,8 +650,113 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1026</xloc>
-      <yloc>982</yloc>
+      <xloc>794</xloc>
+      <yloc>1015</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update All Questions Users</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>score_stats_question_company</table>
+      <key>
+        <name>final_company_id</name>
+        <field>company_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>final_month_data</name>
+        <field>month_val</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>final_year_data</name>
+        <field>year_val</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>final_question_id</name>
+        <field>question_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>score_stats_question_company_id</name>
+        <rename>score_stats_question_company_id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>company_id</name>
+        <rename>final_company_id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>month_val</name>
+        <rename>final_month_data</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>year_val</name>
+        <rename>final_year_data</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>question_id</name>
+        <rename>final_question_id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>question</name>
+        <rename>final_question_text</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>5_star</name>
+        <rename>5_star_count</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>4_star</name>
+        <rename>4_star_count</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>3_star</name>
+        <rename>3_star_count</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>2_star</name>
+        <rename>2_star_count</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>1_star</name>
+        <rename>1_star_count</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>794</xloc>
+      <yloc>886</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -633,8 +783,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>623</xloc>
-      <yloc>200</yloc>
+      <xloc>512</xloc>
+      <yloc>233</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -654,9 +804,9 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var final_agent_id &#x3d; 0&#x3b;&#xd;&#xa;var final_month_data &#x3d; 0&#x3b;&#xd;&#xa;var final_year_data &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_4&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>final_agent_id</name>
-        <rename>final_agent_id</rename>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var final_company_id &#x3d; 0&#x3b;&#xd;&#xa;var final_month_data &#x3d; 0&#x3b;&#xd;&#xa;var final_year_data &#x3d; 0&#x3b;&#xd;&#xa;var final_question_id &#x3d; 0&#x3b;&#xd;&#xa;var final_question_text &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;QUESTION &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_text &#x3d; QUESTION&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_text &#x3d; QUESTION_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_text &#x3d; QUESTION_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_text &#x3d; QUESTION_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_text &#x3d; QUESTION_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;QUESTION_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; QUESTION_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; QUESTION_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; QUESTION_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; QUESTION_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; QUESTION_ID_4&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>final_company_id</name>
+        <rename>final_company_id</rename>
         <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -673,10 +823,22 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
+      </field>      <field>        <name>final_question_id</name>
+        <rename>final_question_id</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_question_text</name>
+        <rename>final_question_text</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>629</xloc>
-      <yloc>982</yloc>
+      <xloc>512</xloc>
+      <yloc>1015</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -700,90 +862,16 @@
     <step4>Sort qsn 1</step4>
     <number_input>5</number_input>
     <keys>
-      <key>AGENT_ID</key>
-      <key>AGENT_ID</key>
-      <key>AGENT_ID</key>
-      <key>AGENT_ID</key>
-      <key>AGENT_ID</key>
+      <key>COMPANY_ID,QUESTION_ID</key>
+      <key>COMPANY_ID,QUESTION_ID</key>
+      <key>COMPANY_ID,QUESTION_ID</key>
+      <key>COMPANY_ID,QUESTION_ID</key>
+      <key>COMPANY_ID,QUESTION_ID</key>
     </keys>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>629</xloc>
-      <yloc>853</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Score Stats Overall User Output</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>score_stats_overall_user</table>
-    <commit>10000</commit>
-    <truncate>Y</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>score_stats_overall_user_id</column_name>
-          <stream_name>scorestats_overall_user_id</stream_name>
-        </field>
-        <field>
-          <column_name>user_id</column_name>
-          <stream_name>final_agent_id</stream_name>
-        </field>
-        <field>
-          <column_name>month_val</column_name>
-          <stream_name>final_month_data</stream_name>
-        </field>
-        <field>
-          <column_name>year_val</column_name>
-          <stream_name>final_year_data</stream_name>
-        </field>
-        <field>
-          <column_name>5_star</column_name>
-          <stream_name>5_star_count</stream_name>
-        </field>
-        <field>
-          <column_name>4_star</column_name>
-          <stream_name>4_star_count</stream_name>
-        </field>
-        <field>
-          <column_name>3_star</column_name>
-          <stream_name>3_star_count</stream_name>
-        </field>
-        <field>
-          <column_name>2_star</column_name>
-          <stream_name>2_star_count</stream_name>
-        </field>
-        <field>
-          <column_name>1_star</column_name>
-          <stream_name>1_star_count</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1250</xloc>
-      <yloc>982</yloc>
+      <xloc>512</xloc>
+      <yloc>886</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -801,14 +889,14 @@
            </partitioning>
     <fields>
       <field>
-        <name>scorestats_overall_user_id</name>
+        <name>score_stats_question_company_id</name>
         <type>random uuid</type>
       </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>859</xloc>
-      <yloc>982</yloc>
+      <xloc>660</xloc>
+      <yloc>1015</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -833,7 +921,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>COMPANY_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -844,11 +932,17 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>QUESTION_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>911</xloc>
-      <yloc>437</yloc>
+      <xloc>794</xloc>
+      <yloc>470</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -873,7 +967,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>COMPANY_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -884,11 +978,17 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>QUESTION_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>771</xloc>
-      <yloc>437</yloc>
+      <xloc>660</xloc>
+      <yloc>470</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -913,7 +1013,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>COMPANY_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -924,11 +1024,17 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>QUESTION_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>629</xloc>
-      <yloc>437</yloc>
+      <xloc>512</xloc>
+      <yloc>470</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -953,7 +1059,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>COMPANY_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -964,11 +1070,17 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>QUESTION_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>497</xloc>
-      <yloc>437</yloc>
+      <xloc>380</xloc>
+      <yloc>470</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -993,7 +1105,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>COMPANY_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1004,11 +1116,17 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>QUESTION_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>383</xloc>
-      <yloc>437</yloc>
+      <xloc>266</xloc>
+      <yloc>470</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1033,7 +1151,13 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>COMPANY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>QUESTION_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1041,8 +1165,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>911</xloc>
-      <yloc>684</yloc>
+      <xloc>794</xloc>
+      <yloc>717</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1067,7 +1191,13 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>COMPANY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>QUESTION_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1075,8 +1205,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>771</xloc>
-      <yloc>684</yloc>
+      <xloc>660</xloc>
+      <yloc>717</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1101,7 +1231,13 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>COMPANY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>QUESTION_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1109,8 +1245,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>629</xloc>
-      <yloc>684</yloc>
+      <xloc>512</xloc>
+      <yloc>717</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1135,7 +1271,13 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>COMPANY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>QUESTION_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1143,8 +1285,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>495</xloc>
-      <yloc>684</yloc>
+      <xloc>378</xloc>
+      <yloc>717</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1169,7 +1311,13 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>COMPANY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>QUESTION_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1177,8 +1325,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>378</xloc>
-      <yloc>684</yloc>
+      <xloc>261</xloc>
+      <yloc>717</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1195,7 +1343,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, CUSTOMER_EMAIL&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, STAGE&#xd;&#xa;, STATE&#xd;&#xa;, MOOD&#xd;&#xa;, SURVEY_CLICKED&#xd;&#xa;, SURVEY_COMPLETED_DATE&#xd;&#xa;, SURVEY_TRANSACTION_DATE&#xd;&#xa;, SURVEY_UPDATED_DATE&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, CITY&#xd;&#xa;, COMPLETE_PROFILE_URL&#xd;&#xa;, EDITABLE&#xd;&#xa;, IS_ABUSE_REP_BY_USER&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST&#xd;&#xa;, REMINDER_COUNT&#xd;&#xa;, REMINDERS_FOR_SOCIAL_POSTS&#xd;&#xa;, RETAKE_SURVEY&#xd;&#xa;, REVIEW&#xd;&#xa;, SCORE&#xd;&#xa;, SHOW_SURVEY_ON_UI&#xd;&#xa;, SOCIAL_POSTS_REMINDER&#xd;&#xa;, SUMMARY&#xd;&#xa;, UNDER_RESOLUTION&#xd;&#xa;, URL&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, MODIFIED_ON_EST&#xd;&#xa;, SURVEY_COMPLETED_DATE_EST&#xd;&#xa;, SURVEY_TRANSACTION_DATE_EST&#xd;&#xa;, SURVEY_UPDATED_DATE_EST&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST_EST&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details where date&#x28;CREATED_ON_EST&#x29; between date_format&#x28;last_day&#x28;curdate&#x28;&#x29;-interval 11 month&#x29;,&#x27;&#x25;Y-&#x25;m-01 00&#x3a;00&#x3a;00&#x27;&#x29; and date_format&#x28;last_day&#x28;curdate&#x28;&#x29;-interval 1 month&#x29;,&#x27;&#x25;Y-&#x25;m-&#x25;d 23&#x3a;59&#x3a;59&#x27;&#x29; &#xd;&#xa;order by SURVEY_DETAILS_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, CUSTOMER_EMAIL&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, STAGE&#xd;&#xa;, STATE&#xd;&#xa;, MOOD&#xd;&#xa;, SURVEY_CLICKED&#xd;&#xa;, SURVEY_COMPLETED_DATE&#xd;&#xa;, SURVEY_TRANSACTION_DATE&#xd;&#xa;, SURVEY_UPDATED_DATE&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, CITY&#xd;&#xa;, COMPLETE_PROFILE_URL&#xd;&#xa;, EDITABLE&#xd;&#xa;, IS_ABUSE_REP_BY_USER&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST&#xd;&#xa;, REMINDER_COUNT&#xd;&#xa;, REMINDERS_FOR_SOCIAL_POSTS&#xd;&#xa;, RETAKE_SURVEY&#xd;&#xa;, REVIEW&#xd;&#xa;, SCORE&#xd;&#xa;, SHOW_SURVEY_ON_UI&#xd;&#xa;, SOCIAL_POSTS_REMINDER&#xd;&#xa;, SUMMARY&#xd;&#xa;, UNDER_RESOLUTION&#xd;&#xa;, URL&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, MODIFIED_ON_EST&#xd;&#xa;, SURVEY_COMPLETED_DATE_EST&#xd;&#xa;, SURVEY_TRANSACTION_DATE_EST&#xd;&#xa;, SURVEY_UPDATED_DATE_EST&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST_EST&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details where month&#x28;CREATED_ON_EST&#x29; &#x3d; month&#x28;curdate&#x28;&#x29;&#x29; and year&#x28;CREATED_ON_EST&#x29; &#x3d; year&#x28;curdate&#x28;&#x29;&#x29; &#xd;&#xa;order by SURVEY_DETAILS_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1203,8 +1351,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>825</xloc>
-      <yloc>51</yloc>
+      <xloc>794</xloc>
+      <yloc>55</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1229,8 +1377,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>412</xloc>
-      <yloc>51</yloc>
+      <xloc>269</xloc>
+      <yloc>55</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
