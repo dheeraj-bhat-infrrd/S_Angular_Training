@@ -1004,7 +1004,6 @@ function getTimeFrameForUserRankingReport(){
 	case 4: year = currentYear;
 		month=currentMonth -1;
 		break;
-	case 5: year = currentYear - 1
 	}
 	
 	var dateTimeFrame = month+"/01/"+year;
@@ -1031,8 +1030,6 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 		case 3: key = 107;
 			break;
 		case 4: key = 106;
-			break;
-		case 5: key = 107;
 			break;
 		}
 		

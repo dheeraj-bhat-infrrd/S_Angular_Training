@@ -54,7 +54,6 @@
 								<option value=2 data-report="thisMonth">This Month</option>
 								<option value=3 data-report="lastYear">Last Year</option>
 								<option value=4 data-report="lastMonth">Last Month</option>
-								<option value=5 data-report="pastYears">Past Years</option>
 							</select>	
 						</div>
 					</div>
