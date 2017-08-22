@@ -6,6 +6,8 @@
 <c:set var="isRealTechOrSSAdmin" value="${ isRealTechOrSSAdmin }"></c:set>
 <c:set var="monthOffset" value="${monthOffset}"></c:set>
 <c:set var="yearOffset" value="${yearOffset}"></c:set>
+<c:set var="columnName" value="${columnName}"></c:set>
+<c:set var="columnId" value="${columnId}"></c:set>
 <style>
 	.ranking-settings-ip-div{
 		position: relative;
@@ -91,10 +93,12 @@
 var isRealTechOrSSAdmin = "${isRealTechOrSSAdmin}";
 var monthOffset = "${monthOffset}";
 var yearOffset = "${yearOffset}";
+var columnName = "${columnName}";
+var columnId = "${columnId}";
 
 $(document).ready(function(){
 	$('#min-req-container').on('blur','.ranking-settings-ip',function(e){
-		var message = getAndSaveRankingSettingsVal(isRealTechOrSSAdmin,monthOffset,yearOffset);
+		var message = getAndSaveRankingSettingsVal(columnName,isRealTechOrSSAdmin,monthOffset,yearOffset);
 		$('#overlay-toast').html(message);
 		showToast();
 	});

@@ -877,6 +877,12 @@ public class ReportingWebController
        model.addAttribute( "monthOffset", rankingRequirements.getMonthOffset() );
        model.addAttribute( "yearOffset", rankingRequirements.getYearOffset() );
        
+       long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+       String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+       
+       model.addAttribute("columnName",entityType);
+       model.addAttribute("columnId", entityId);
+       
      //REALTECH_USER_ID is set only for real tech and SS admin
        boolean isRealTechOrSSAdmin = false;
        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );

@@ -1647,7 +1647,7 @@ function saveRankingSettings(minDaysOfRegistration, minCompletedPercentage, minN
 	return message;
 }
 
-function getAndSaveRankingSettingsVal(isRealTechOrSSAdmin,monthOff,yearOff){
+function getAndSaveRankingSettingsVal(columnName,isRealTechOrSSAdmin,monthOff,yearOff){
 	var minDaysOfRegistration = $('#days-registration').attr('placeholder');
 	var minCompletedPercentage = $('#survey-completion').attr('placeholder');
 	var	minNoOfReviews = $('#minimum-reviews').attr('placeholder');
@@ -1666,7 +1666,7 @@ function getAndSaveRankingSettingsVal(isRealTechOrSSAdmin,monthOff,yearOff){
 		minNoOfReviews = $('#minimum-reviews').val();
 	}
 	
-	if(isRealTechOrSSAdmin == true || isRealTechOrSSAdmin == 'true'){
+	if((isRealTechOrSSAdmin == true || isRealTechOrSSAdmin == 'true') && columnId == 'companyId'){
 		
 		if($('#month-offset').val() != ""){
 			monthOffset = $('#month-offset').val();
