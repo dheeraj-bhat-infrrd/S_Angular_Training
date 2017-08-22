@@ -28,77 +28,12 @@
 </div>
 
 <script>
-var overallChartDiv = "overall-rating-chart";
-var overallChartData = [
-					['Month','Rating'],
-					[ 'Sep/2016', 1.0 ],
-					[ 'Oct/2016', 2.0 ],
-					[ 'Nov/2016', 3.0 ],
-					[ 'Dec/2016', 2.5 ],
-					[ 'Jan/2017', 3.5 ],
-					[ 'Feb/2017', 5.0 ],
-					[ 'Mar/2017', 3.0 ],
-					[ 'Apr/2017', 3.0 ],
-					[ 'May/2017', 4.5 ],
-					[ 'Jun/2017', 5.0 ],
-					[ 'Jul/2017', 3.5 ],
-					[ 'Aug/2017', 4.0 ]];
-drawLineGraphForScoreStats(overallChartDiv, overallChartData);
-
-var questionOneChartData = [
-        					['Month','Rating'],
-        					[ 'Sep/2016', 5.0 ],
-        					[ 'Oct/2016', 2.0 ],
-        					[ 'Nov/2016', 1.0 ],
-        					[ 'Dec/2016', 3.5 ],
-        					[ 'Jan/2017', 3.5 ],
-        					[ 'Feb/2017', 5.0 ],
-        					[ 'Mar/2017', 4.0 ],
-        					[ 'Apr/2017', 3.0 ],
-        					[ 'May/2017', 4.5 ],
-        					[ 'Jun/2017', 5.0 ],
-        					[ 'Jul/2017', 3.5 ],
-        					[ 'Aug/2017', 4.0 ]];
-        					
-var questionTwoChartData = [
-        					['Month','Rating'],
-        					[ 'Sep/2016', 4.0 ],
-        					[ 'Oct/2016', 5.0 ],
-        					[ 'Nov/2016', 2.0 ],
-        					[ 'Dec/2016', 4.5 ],
-        					[ 'Jan/2017', 3.5 ],
-        					[ 'Feb/2017', 2.0 ],
-        					[ 'Mar/2017', 4.0 ],
-        					[ 'Apr/2017', 3.0 ],
-        					[ 'May/2017', 4.5 ],
-        					[ 'Jun/2017', 5.0 ],
-        					[ 'Jul/2017', 3.5 ],
-        					[ 'Aug/2017', 4.0 ]];
-        					
-var questionThreeChartData = [
-        					['Month','Rating'],
-							[ 'Sep/2016', 1.0 ],
-							[ 'Oct/2016', 2.0 ],
-							[ 'Nov/2016', 3.0 ],
-							[ 'Dec/2016', 2.5 ],
-							[ 'Jan/2017', 3.5 ],
-							[ 'Feb/2017', 5.0 ],
-							[ 'Mar/2017', 3.0 ],
-							[ 'Apr/2017', 3.0 ],
-							[ 'May/2017', 4.5 ],
-							[ 'Jun/2017', 5.0 ],
-							[ 'Jul/2017', 3.5 ],
-							[ 'Aug/2017', 4.0 ]];
-							
-var questionChartData = [ questionOneChartData, questionTwoChartData, questionThreeChartData];
 
 var questionOne = "Was your Rental Agent, friendly and knowledgeable?";
 var questionTwo = "How would you rate Advantage Rent A Car Team?";
 var questionThree = "How would you rate cleanliness and condition of your car?";
 
 var questions = [questionOne , questionTwo , questionThree ];
-
-var count = 3;
 
 for(var i=0 ; i<3 ; i++){
 	var graphDivHtml = '';
@@ -110,11 +45,4 @@ for(var i=0 ; i<3 ; i++){
 	
 	$('#question-ratings-div').append(graphDivHtml);
 }
-
-for(var i=0; i<3 ; i++){
-	drawLineGraphForScoreStats("question-rating-chart-"+i, questionChartData[i]);
-}
-
-getOverallScoreStats(3, "companyId");
-
 </script>
