@@ -1666,7 +1666,7 @@ function getAndSaveRankingSettingsVal(columnName,isRealTechOrSSAdmin,monthOff,ye
 		minNoOfReviews = $('#minimum-reviews').val();
 	}
 	
-	if((isRealTechOrSSAdmin == true || isRealTechOrSSAdmin == 'true') && columnId == 'companyId'){
+	if((isRealTechOrSSAdmin == true || isRealTechOrSSAdmin == 'true') && columnName == 'companyId'){
 		
 		if($('#month-offset').val() != ""){
 			monthOffset = $('#month-offset').val();
