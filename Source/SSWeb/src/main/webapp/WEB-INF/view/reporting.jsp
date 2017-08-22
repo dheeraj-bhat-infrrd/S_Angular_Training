@@ -163,5 +163,74 @@
 			$('#overviewFailure').hide();
 		}
 		
+	//Score stats
+		var overallChartDiv = "overall-rating-chart";
+		var overallChartData = [
+							['Month','Rating'],
+							[ 'Sep/2016', 1.0 ],
+							[ 'Oct/2016', 2.0 ],
+							[ 'Nov/2016', 3.0 ],
+							[ 'Dec/2016', 2.5 ],
+							[ 'Jan/2017', 3.5 ],
+							[ 'Feb/2017', 5.0 ],
+							[ 'Mar/2017', 3.0 ],
+							[ 'Apr/2017', 3.0 ],
+							[ 'May/2017', 4.5 ],
+							[ 'Jun/2017', 5.0 ],
+							[ 'Jul/2017', 3.5 ],
+							[ 'Aug/2017', 4.0 ]];
+
+		drawLineGraphForScoreStats(overallChartDiv, overallChartData);
+			
+		var questionOneChartData = [
+		        					['Month','Rating'],
+		        					[ 'Sep/2016', 5.0 ],
+		        					[ 'Oct/2016', 2.0 ],
+		        					[ 'Nov/2016', 1.0 ],
+		        					[ 'Dec/2016', 3.5 ],
+		        					[ 'Jan/2017', 3.5 ],
+		        					[ 'Feb/2017', 5.0 ],
+		        					[ 'Mar/2017', 4.0 ],
+		        					[ 'Apr/2017', 3.0 ],
+		        					[ 'May/2017', 4.5 ],
+		        					[ 'Jun/2017', 5.0 ],
+		        					[ 'Jul/2017', 3.5 ],
+		        					[ 'Aug/2017', 4.0 ]];
+		        					
+		var questionTwoChartData = [
+		        					['Month','Rating'],
+		        					[ 'Sep/2016', 4.0 ],
+		        					[ 'Oct/2016', 5.0 ],
+		        					[ 'Nov/2016', 2.0 ],
+		        					[ 'Dec/2016', 4.5 ],
+		        					[ 'Jan/2017', 3.5 ],
+		        					[ 'Feb/2017', 2.0 ],
+		        					[ 'Mar/2017', 4.0 ],
+		        					[ 'Apr/2017', 3.0 ],
+		        					[ 'May/2017', 4.5 ],
+		        					[ 'Jun/2017', 5.0 ],
+		        					[ 'Jul/2017', 3.5 ],
+		        					[ 'Aug/2017', 4.0 ]];
+		        					
+		var questionThreeChartData = [
+		        					['Month','Rating'],
+									[ 'Sep/2016', 1.0 ],
+									[ 'Oct/2016', 2.0 ],
+									[ 'Nov/2016', 3.0 ],
+									[ 'Dec/2016', 2.5 ],
+									[ 'Jan/2017', 3.5 ],
+									[ 'Feb/2017', 5.0 ],
+									[ 'Mar/2017', 3.0 ],
+									[ 'Apr/2017', 3.0 ],
+									[ 'May/2017', 4.5 ],
+									[ 'Jun/2017', 5.0 ],
+									[ 'Jul/2017', 3.5 ],
+									[ 'Aug/2017', 4.0 ]];
+									
+		var questionChartData = [ questionOneChartData, questionTwoChartData, questionThreeChartData];
+
+		for(var i=0; i<3 ; i++){
+			drawLineGraphForScoreStats("question-rating-chart-"+i, questionChartData[i]);
+		}
 	});
 </script>
