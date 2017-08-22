@@ -101,8 +101,8 @@
   <notepads>
     <notepad>
       <note>Since in the present SurveyResponse we restrict the array size to 4 ,&#xd;&#xa; it can be any number , trying an alternative soln&#xd;&#xa;when parsing for answer,question,type -Error parsing string &#x5b;Unexpected character &#x28;s&#x29; at position 0.&#x5d;&#x21;</note>
-      <xloc>98</xloc>
-      <yloc>646</yloc>
+      <xloc>972</xloc>
+      <yloc>135</yloc>
       <width>1042</width>
       <heigth>115</heigth>
       <fontname>Segoe Print</fontname>
@@ -181,8 +181,6 @@
   <hop> <from>UUID_SURVEY_RESPONSE_ID</from><to>null_check</to><enabled>Y</enabled> </hop>
   <hop> <from>Response input</from><to>Sort input</to><enabled>Y</enabled> </hop>
   <hop> <from>null_check</from><to>Select values</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select values</from><to>SortSelect</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortSelect</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort input</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Synchronize after merge</to><enabled>Y</enabled> </hop>
   <hop> <from>Synchronize after merge</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
@@ -191,7 +189,60 @@
   <hop> <from>Fast JSON Input 2</from><to>null_check 2</to><enabled>Y</enabled> </hop>
   <hop> <from>null_check 2</from><to>Fast JSON Input 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Fast JSON Input 2 2</from><to>UUID_SURVEY_RESPONSE_ID</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values</from><to>Sort Questions</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values 2</from><to>SortSelect</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortSelect</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>SurveyQuestions Input</from><to>Join Survey Questions</to><enabled>Y</enabled> </hop>
+  <hop> <from>SurveyQuestionsMapping Input</from><to>Join Survey Questions</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join Survey Questions</from><to>Sort SurveyId</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort SurveyId</from><to>Join Survey Id</to><enabled>Y</enabled> </hop>
+  <hop> <from>SurveyCompanyMapping IP</from><to>Join Survey Id</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join Survey Id</from><to>Company Questions</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort Questions</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Company Questions</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Final Question</to><enabled>Y</enabled> </hop>
+  <hop> <from>Final Question</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   </order>
+  <step>
+    <name>Company Questions</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>SURVEY_QUESTION</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>COMPANY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>375</xloc>
+      <yloc>603</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step>
     <name>Dummy &#x28;do nothing&#x29;</name>
     <type>Dummy</type>
@@ -205,8 +256,8 @@
            </partitioning>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1306</xloc>
-      <yloc>453</yloc>
+      <xloc>1313</xloc>
+      <yloc>438</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -318,6 +369,19 @@
         <trim_type>none</trim_type>
         <repeat>N</repeat>
       </field>
+      <field>
+        <name>companyId</name>
+        <path>&#x24;.companyId</path>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
     </fields>
     <limit>0</limit>
     <IsInFields>Y</IsInFields>
@@ -343,7 +407,7 @@
     <name>Fast JSON Input 2 2</name>
     <type>FastJsonInput</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -443,6 +507,122 @@
     </step>
 
   <step>
+    <name>Final Question</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var final_question_id &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;SURVEY_QUESTIONS_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; SURVEY_QUESTIONS_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SURVEY_QUESTIONS_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; SURVEY_QUESTIONS_ID&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>final_question_id</name>
+        <rename>final_question_id</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>657</xloc>
+      <yloc>603</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Join Survey Id</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>INNER</join_type>
+<step1>Sort SurveyId</step1>
+<step2>SurveyCompanyMapping IP</step2>
+    <keys_1>
+      <key>SURVEY_ID</key>
+    </keys_1>
+    <keys_2>
+      <key>SURVEY_ID</key>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>213</xloc>
+      <yloc>603</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Join Survey Questions</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>INNER</join_type>
+<step1>SurveyQuestions Input</step1>
+<step2>SurveyQuestionsMapping Input</step2>
+    <keys_1>
+      <key>SURVEY_QUESTIONS_ID</key>
+    </keys_1>
+    <keys_2>
+      <key>SURVEY_QUESTIONS_ID</key>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>213</xloc>
+      <yloc>310</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Merge Join</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>LEFT OUTER</join_type>
+<step1>Sort Questions</step1>
+<step2>Company Questions</step2>
+    <keys_1>
+      <key>QUESTION</key>
+      <key>COMPANY_ID</key>
+    </keys_1>
+    <keys_2>
+      <key>SURVEY_QUESTION</key>
+      <key>COMPANY_ID</key>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>535</xloc>
+      <yloc>603</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Merge Rows &#x28;diff&#x29;</name>
     <type>MergeRows</type>
     <description/>
@@ -464,6 +644,8 @@
       <value>ANSWER</value>
       <value>QUESTION</value>
       <value>QUESTION_TYPE</value>
+      <value>IS_USER_RANKING_QUESTION</value>
+      <value>QUESTION_ID</value>
     </values>
 <flag_field>ResponseFlag</flag_field>
 <reference>Sort input</reference>
@@ -472,8 +654,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>859</xloc>
-      <yloc>453</yloc>
+      <xloc>1095</xloc>
+      <yloc>606</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -482,7 +664,7 @@
     <name>MongoDB Input</name>
     <type>MongoDbInput</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -526,7 +708,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_RESPONSE_ID&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;, ANSWER&#xd;&#xa;, QUESTION&#xd;&#xa;, QUESTION_TYPE&#xd;&#xa;FROM survey_response&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_RESPONSE_ID&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;, ANSWER&#xd;&#xa;, QUESTION&#xd;&#xa;, QUESTION_TYPE&#xd;&#xa;, case when IS_USER_RANKING_QUESTION &#x3c;&#x3e; 1 then false else true end as IS_USER_RANKING_QUESTION &#xd;&#xa;, QUESTION_ID&#xd;&#xa;FROM survey_response&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -534,8 +716,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>859</xloc>
-      <yloc>255</yloc>
+      <xloc>1095</xloc>
+      <yloc>280</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -571,11 +753,406 @@
         <rename>QUESTION_TYPE</rename>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>isUserRankingQuestion</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>companyId</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
+      <meta>        <name>isUserRankingQuestion</name>
+        <rename>IS_USER_RANKING_QUESTION</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>companyId</name>
+        <rename>COMPANY_ID</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>684</xloc>
-      <yloc>358</yloc>
+      <xloc>535</xloc>
+      <yloc>257</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values 2</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>      <field>        <name>SURVEY_RESPONSE_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_DETAILS_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>ANSWER</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>QUESTION</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>QUESTION_TYPE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>IS_USER_RANKING_QUESTION</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>COMPANY_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_QUESTIONS_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_QUESTION</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_QUESTIONS_MAPPING_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_QUESTIONS_ID_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>QUESTION_ORDER</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>IS_RATING_QUESTION</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>IS_USER_RANKING_QUESTION_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>STATUS</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CREATED_ON</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CREATED_BY</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MODIFIED_ON</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MODIFIED_BY</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CREATED_ON_EST</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MODIFIED_ON_EST</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_COMPANY_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>SURVEY_ID_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>COMPANY_ID_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>STATUS_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CREATED_ON_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CREATED_BY_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MODIFIED_ON_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MODIFIED_BY_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CREATED_ON_EST_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MODIFIED_ON_EST_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>final_question_id</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+      <remove>        <name>COMPANY_ID</name>
+      </remove>      <remove>        <name>SURVEY_QUESTIONS_ID</name>
+      </remove>      <remove>        <name>SURVEY_QUESTION</name>
+      </remove>      <remove>        <name>SURVEY_QUESTIONS_MAPPING_ID</name>
+      </remove>      <remove>        <name>SURVEY_ID</name>
+      </remove>      <remove>        <name>SURVEY_QUESTIONS_ID_1</name>
+      </remove>      <remove>        <name>QUESTION_ORDER</name>
+      </remove>      <remove>        <name>IS_RATING_QUESTION</name>
+      </remove>      <remove>        <name>IS_USER_RANKING_QUESTION_1</name>
+      </remove>      <remove>        <name>STATUS</name>
+      </remove>      <remove>        <name>CREATED_ON</name>
+      </remove>      <remove>        <name>CREATED_BY</name>
+      </remove>      <remove>        <name>MODIFIED_ON</name>
+      </remove>      <remove>        <name>MODIFIED_BY</name>
+      </remove>      <remove>        <name>CREATED_ON_EST</name>
+      </remove>      <remove>        <name>MODIFIED_ON_EST</name>
+      </remove>      <remove>        <name>SURVEY_COMPANY_ID</name>
+      </remove>      <remove>        <name>SURVEY_ID_1</name>
+      </remove>      <remove>        <name>COMPANY_ID_1</name>
+      </remove>      <remove>        <name>STATUS_1</name>
+      </remove>      <remove>        <name>CREATED_ON_1</name>
+      </remove>      <remove>        <name>CREATED_BY_1</name>
+      </remove>      <remove>        <name>MODIFIED_ON_1</name>
+      </remove>      <remove>        <name>MODIFIED_BY_1</name>
+      </remove>      <remove>        <name>CREATED_ON_EST_1</name>
+      </remove>      <remove>        <name>MODIFIED_ON_EST_1</name>
+      </remove>      <meta>        <name>SURVEY_RESPONSE_ID</name>
+        <rename>SURVEY_RESPONSE_ID</rename>
+        <type>None</type>
+        <length>36</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>SURVEY_DETAILS_ID</name>
+        <rename>SURVEY_DETAILS_ID</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>ANSWER</name>
+        <rename>ANSWER</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>QUESTION</name>
+        <rename>QUESTION</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>QUESTION_TYPE</name>
+        <rename>QUESTION_TYPE</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>IS_USER_RANKING_QUESTION</name>
+        <rename>IS_USER_RANKING_QUESTION</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_question_id</name>
+        <rename>QUESTION_ID</rename>
+        <type>Integer</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>777</xloc>
+      <yloc>606</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort Questions</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>QUESTION</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>COMPANY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>535</xloc>
+      <yloc>427</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort SurveyId</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>SURVEY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>213</xloc>
+      <yloc>455</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -620,8 +1197,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>859</xloc>
-      <yloc>358</yloc>
+      <xloc>1095</xloc>
+      <yloc>435</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -666,8 +1243,86 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>684</xloc>
-      <yloc>453</yloc>
+      <xloc>902</xloc>
+      <yloc>606</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>SurveyCompanyMapping IP</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  SURVEY_COMPANY_ID&#xd;&#xa;, SURVEY_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, MODIFIED_ON_EST&#xd;&#xa;FROM survey_company_mapping&#xd;&#xa;order by SURVEY_ID</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>24</xloc>
+      <yloc>603</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>SurveyQuestions Input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  SURVEY_QUESTIONS_ID&#xd;&#xa;, SURVEY_QUESTION&#xd;&#xa;FROM survey_questions&#xd;&#xa;order by SURVEY_QUESTIONS_ID&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>99</xloc>
+      <yloc>178</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>SurveyQuestionsMapping Input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  SURVEY_QUESTIONS_MAPPING_ID&#xd;&#xa;, SURVEY_ID&#xd;&#xa;, SURVEY_QUESTIONS_ID&#xd;&#xa;, QUESTION_ORDER&#xd;&#xa;, IS_RATING_QUESTION&#xd;&#xa;, IS_USER_RANKING_QUESTION&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, MODIFIED_ON_EST&#xd;&#xa;FROM survey_questions_mapping&#xd;&#xa;order by SURVEY_QUESTIONS_ID&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>360</xloc>
+      <yloc>178</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -684,7 +1339,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <tablename_in_field>N</tablename_in_field>
     <tablename_field/>
     <use_batch>N</use_batch>
@@ -739,11 +1394,21 @@
         <rename>QUESTION_TYPE</rename>
         <update>N</update>
       </value>
+      <value>
+        <name>IS_USER_RANKING_QUESTION</name>
+        <rename>IS_USER_RANKING_QUESTION</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>QUESTION_ID</name>
+        <rename>QUESTION_ID</rename>
+        <update>Y</update>
+      </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1078</xloc>
-      <yloc>453</yloc>
+      <xloc>1313</xloc>
+      <yloc>606</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
