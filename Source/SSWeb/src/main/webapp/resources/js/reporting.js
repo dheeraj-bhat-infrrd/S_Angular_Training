@@ -1704,7 +1704,7 @@ function drawLineGraphForScoreStats(chartDiv,chartData){
 							chartArea : {
 							width : '95%'
 							},
-							width: 600,
+							width: 800,
 							height : 300,
 							vAxis : {
 								minValue : 0,
