@@ -6,6 +6,7 @@ import com.realtech.socialsurvey.core.entities.ScoreStatsOverallBranch;
 
 public interface ScoreStatsOverallBranchDao extends GenericReportingDao<ScoreStatsOverallBranch, String>{
 
-	List<ScoreStatsOverallBranch> fetchScoreStatsOverallForBranch(Long branchId,int startMonth, int endMonth,int year);
+    List<ScoreStatsOverallBranch> fetchScoreStatsOverallForBranch( Long branchId, int startMonth, int startYear, int endMonth,
+        int endYear );
 
 }
