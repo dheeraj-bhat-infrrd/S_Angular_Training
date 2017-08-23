@@ -6,6 +6,7 @@ import com.realtech.socialsurvey.core.entities.ScoreStatsOverallRegion;
 
 public interface ScoreStatsOverallRegionDao extends GenericReportingDao<ScoreStatsOverallRegion, String>{
 
-	List<ScoreStatsOverallRegion> fetchScoreStatsOverallForRegion(Long regionId,int startMonth, int endMonth,int year);
+    List<ScoreStatsOverallRegion> fetchScoreStatsOverallForRegion( Long regionId, int startMonth, int startYear, int endMonth,
+        int endYear );
 	
 }

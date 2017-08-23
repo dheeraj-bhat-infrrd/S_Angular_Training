@@ -5,8 +5,7 @@ import java.util.List;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser;
 
 public interface ScoreStatsQuestionUserDao extends GenericReportingDao<ScoreStatsQuestionUser, String>{
-	
-	public List<ScoreStatsQuestionUser> fetchScoreStatsQuestionForUser(Long userId, Long questionId, int startMonth, int endMonth, int year);
-	
-	public List<Long> fetchActiveQuestionsForUser(Long userId, int startMonth, int endMonth, int year);
+
+    List<ScoreStatsQuestionUser> fetchScoreStatsQuestionForUser( Long userId, int startMonth, int startYear, int endMonth,
+        int endYear );
 }

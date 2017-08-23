@@ -2395,118 +2395,60 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	public List<List<Object>> getScoreStatsForOverall(Long entityId, String entityType, int currentMonth, int currentYear) {
 		
 		List<List<Object>> scoreStatsForOverall = new ArrayList<>();
-	
-		int monthDiff = 12 - currentMonth;
-		int year = currentYear-1;
+		int start_month = 0;
+        int start_year = currentYear - 1;
+        //current month is usually 
+        //the graph shows 12 months in which the month 12 months back is +1 from current month except for when current month is dec
+        if( currentMonth < 12){
+            start_month = currentMonth + 1;
+        }else if(currentMonth == 12){
+            start_month = 1;
+        }
 		if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
 			
-			if(monthDiff != 0){
-				for(ScoreStatsOverallCompany scoreStatsOverallCompany : scoreStatsOverallCompanyDao.fetchScoreStatsOverallForCompany(entityId, monthDiff, 12, year)){
-					List<Object> scoreStatsOverallCompanyList = new ArrayList<>();
-					scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getMonthVal());
-					scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getYearVal());
-					scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getFiveStar());
-					scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getFourStar());
-					scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getThreeStar());
-					scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getTwoStar());
-					scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getOneStar());
-					scoreStatsForOverall.add(scoreStatsOverallCompanyList);
-				}
-			}
-			
-			for(ScoreStatsOverallCompany scoreStatsOverallCompany : scoreStatsOverallCompanyDao.fetchScoreStatsOverallForCompany(entityId, 1, currentMonth, currentYear)){
+			for(ScoreStatsOverallCompany scoreStatsOverallCompany : scoreStatsOverallCompanyDao.fetchScoreStatsOverallForCompany(entityId, start_month, start_year,currentMonth,currentYear)){
 				List<Object> scoreStatsOverallCompanyList = new ArrayList<>();
-				scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getMonthVal());
-				scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getYearVal());
-				scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getFiveStar());
-				scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getFourStar());
-				scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getThreeStar());
-				scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getTwoStar());
-				scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getOneStar());
+				double average_score = (((scoreStatsOverallCompany.getFiveStar() * 5.0)+(scoreStatsOverallCompany.getFourStar() * 4.0)+(scoreStatsOverallCompany.getThreeStar() * 3.0)+
+                    (scoreStatsOverallCompany.getTwoStar() * 2.0)+(scoreStatsOverallCompany.getOneStar()) * 1.0)/(scoreStatsOverallCompany.getFiveStar()+scoreStatsOverallCompany.getFourStar()+
+                        scoreStatsOverallCompany.getThreeStar()+scoreStatsOverallCompany.getTwoStar()+scoreStatsOverallCompany.getOneStar()));
+				scoreStatsOverallCompanyList.add(scoreStatsOverallCompany.getMonthVal()+"/"+scoreStatsOverallCompany.getYearVal());
+				scoreStatsOverallCompanyList.add(average_score);
 				scoreStatsForOverall.add(scoreStatsOverallCompanyList);
-			}
+		}
 			
 		}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
-			
-			if(monthDiff != 0){
-				for(ScoreStatsOverallRegion scoreStatsOverallRegion : scoreStatsOverallRegionDao.fetchScoreStatsOverallForRegion(entityId, monthDiff, 12, year)){
-					List<Object> scoreStatsOverallRegionList = new ArrayList<>();
-					scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getMonthVal());
-					scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getYearVal());
-					scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getFiveStar());
-					scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getFourStar());
-					scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getThreeStar());
-					scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getTwoStar());
-					scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getOneStar());
-					scoreStatsForOverall.add(scoreStatsOverallRegionList);
-				}
-			}
-			
-			for(ScoreStatsOverallRegion scoreStatsOverallRegion : scoreStatsOverallRegionDao.fetchScoreStatsOverallForRegion(entityId, 1, currentMonth, currentYear)){
+
+			for(ScoreStatsOverallRegion scoreStatsOverallRegion : scoreStatsOverallRegionDao.fetchScoreStatsOverallForRegion(entityId,start_month, start_year,currentMonth,currentYear)){
 				List<Object> scoreStatsOverallRegionList = new ArrayList<>();
-				scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getMonthVal());
-				scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getYearVal());
-				scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getFiveStar());
-				scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getFourStar());
-				scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getThreeStar());
-				scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getTwoStar());
-				scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getOneStar());
+				double average_score = (((scoreStatsOverallRegion.getFiveStar() * 5.0)+(scoreStatsOverallRegion.getFourStar() * 4.0)+(scoreStatsOverallRegion.getThreeStar() * 3.0)+
+                    (scoreStatsOverallRegion.getTwoStar() * 2.0)+(scoreStatsOverallRegion.getOneStar()) * 1.0)/(scoreStatsOverallRegion.getFiveStar()+scoreStatsOverallRegion.getFourStar()+
+                        scoreStatsOverallRegion.getThreeStar()+scoreStatsOverallRegion.getTwoStar()+scoreStatsOverallRegion.getOneStar()));
+				scoreStatsOverallRegionList.add(scoreStatsOverallRegion.getMonthVal()+"/"+scoreStatsOverallRegion.getYearVal());
+				scoreStatsOverallRegionList.add(average_score);
 				scoreStatsForOverall.add(scoreStatsOverallRegionList);
 			}
 			
 		}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
 
-			if(monthDiff != 0){
-				for(ScoreStatsOverallBranch scoreStatsOverallBranch : scoreStatsOverallBranchDao.fetchScoreStatsOverallForBranch(entityId, monthDiff, 12, year)){
-					List<Object> scoreStatsOverallBranchList = new ArrayList<>();
-					scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getMonthVal());
-					scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getYearVal());
-					scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getFiveStar());
-					scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getFourStar());
-					scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getThreeStar());
-					scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getTwoStar());
-					scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getOneStar());
-					scoreStatsForOverall.add(scoreStatsOverallBranchList);
-				}
-			}
-			
-			for(ScoreStatsOverallBranch scoreStatsOverallBranch : scoreStatsOverallBranchDao.fetchScoreStatsOverallForBranch(entityId, 1, currentMonth, currentYear)){
+			for(ScoreStatsOverallBranch scoreStatsOverallBranch : scoreStatsOverallBranchDao.fetchScoreStatsOverallForBranch(entityId, start_month, start_year,currentMonth,currentYear)){
 				List<Object> scoreStatsOverallBranchList = new ArrayList<>();
-				scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getMonthVal());
-				scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getYearVal());
-				scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getFiveStar());
-				scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getFourStar());
-				scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getThreeStar());
-				scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getTwoStar());
-				scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getOneStar());
+				double average_score = (((scoreStatsOverallBranch.getFiveStar() * 5.0)+(scoreStatsOverallBranch.getFourStar() * 4.0)+(scoreStatsOverallBranch.getThreeStar() * 3.0)+
+                    (scoreStatsOverallBranch.getTwoStar() * 2.0)+(scoreStatsOverallBranch.getOneStar()) * 1.0)/(scoreStatsOverallBranch.getFiveStar()+scoreStatsOverallBranch.getFourStar()+
+                        scoreStatsOverallBranch.getThreeStar()+scoreStatsOverallBranch.getTwoStar()+scoreStatsOverallBranch.getOneStar()));
+				scoreStatsOverallBranchList.add(scoreStatsOverallBranch.getMonthVal()+"/"+scoreStatsOverallBranch.getYearVal());
+				scoreStatsOverallBranchList.add(average_score);
 				scoreStatsForOverall.add(scoreStatsOverallBranchList);
 			}
 			
 		}else if(entityType.equals(CommonConstants.USER_ID)){
-			
-			if(monthDiff != 0){
-				for(ScoreStatsOverallUser scoreStatsOverallUser : scoreStatsOverallUserDao.fetchScoreStatsOverallForUser(entityId, monthDiff, 12, year)){
-					List<Object> scoreStatsOverallUserList = new ArrayList<>();
-					scoreStatsOverallUserList.add(scoreStatsOverallUser.getMonthVal());
-					scoreStatsOverallUserList.add(scoreStatsOverallUser.getYearVal());
-					scoreStatsOverallUserList.add(scoreStatsOverallUser.getFiveStar());
-					scoreStatsOverallUserList.add(scoreStatsOverallUser.getFourStar());
-					scoreStatsOverallUserList.add(scoreStatsOverallUser.getThreeStar());
-					scoreStatsOverallUserList.add(scoreStatsOverallUser.getTwoStar());
-					scoreStatsOverallUserList.add(scoreStatsOverallUser.getOneStar());
-					scoreStatsForOverall.add(scoreStatsOverallUserList);
-				}
-			}
-			
-			for(ScoreStatsOverallUser scoreStatsOverallUser : scoreStatsOverallUserDao.fetchScoreStatsOverallForUser(entityId, 1, currentMonth, currentYear)){
+	
+			for(ScoreStatsOverallUser scoreStatsOverallUser : scoreStatsOverallUserDao.fetchScoreStatsOverallForUser(entityId,start_month, start_year,currentMonth,currentYear)){
 				List<Object> scoreStatsOverallUserList = new ArrayList<>();
-				scoreStatsOverallUserList.add(scoreStatsOverallUser.getMonthVal());
-				scoreStatsOverallUserList.add(scoreStatsOverallUser.getYearVal());
-				scoreStatsOverallUserList.add(scoreStatsOverallUser.getFiveStar());
-				scoreStatsOverallUserList.add(scoreStatsOverallUser.getFourStar());
-				scoreStatsOverallUserList.add(scoreStatsOverallUser.getThreeStar());
-				scoreStatsOverallUserList.add(scoreStatsOverallUser.getTwoStar());
-				scoreStatsOverallUserList.add(scoreStatsOverallUser.getOneStar());
+				double average_score = (((scoreStatsOverallUser.getFiveStar() * 5.0)+(scoreStatsOverallUser.getFourStar() * 4.0)+(scoreStatsOverallUser.getThreeStar() * 3.0)+
+                    (scoreStatsOverallUser.getTwoStar() * 2.0)+(scoreStatsOverallUser.getOneStar()) * 1.0)/(scoreStatsOverallUser.getFiveStar()+scoreStatsOverallUser.getFourStar()+
+                        scoreStatsOverallUser.getThreeStar()+scoreStatsOverallUser.getTwoStar()+scoreStatsOverallUser.getOneStar()));
+				scoreStatsOverallUserList.add(scoreStatsOverallUser.getMonthVal()+"/"+scoreStatsOverallUser.getYearVal());
+				scoreStatsOverallUserList.add(average_score);
 				scoreStatsForOverall.add(scoreStatsOverallUserList);
 			}
 			
@@ -2516,163 +2458,73 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	}
 
 	@Override
-	public Map<String, List<List<Object>>> getScoreStatsForQuestion(Long entityId, String entityType, int currentMonth,int currentYear) {
+	public List<List<Object>> getScoreStatsForQuestion(Long entityId, String entityType, int currentMonth,int currentYear) {
 		
-		Map<String, List<List<Object>>> scoreStatsForQuestion = new HashMap<String,List<List<Object>>>();
-		
-		int monthDiff = 12 - currentMonth;
-		int year = currentYear-1;
-		
-		if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
-			
-			for(Long questionId : scoreStatsQuestionCompanyDao.fetchActiveQuestionsForCompany(entityId, 1, 12, year)){
-				List<List<Object>> scoreStatsQuestionList =  new ArrayList<>();
-				if(monthDiff != 0){
-					for(ScoreStatsQuestionCompany scoreStatsQuestionCompany : scoreStatsQuestionCompanyDao.fetchScoreStatsQuestionForCompany(entityId, questionId, 12-monthDiff, 12, year)){
-						if (scoreStatsQuestionCompany != null) {
-							List<Object> scoreStatsQuestionCompanyList = new ArrayList<>();
-							scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getMonthVal());
-							scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getYearVal());
-							scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getQuestion());
-							scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getFiveStar());
-							scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getFourStar());
-							scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getThreeStar());
-							scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getTwoStar());
-							scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getOneStar());
-							scoreStatsQuestionList.add(scoreStatsQuestionCompanyList);
-						}
-					}	
-				}
-				for(ScoreStatsQuestionCompany scoreStatsQuestionCompany : scoreStatsQuestionCompanyDao.fetchScoreStatsQuestionForCompany(entityId, questionId, 1, currentMonth, currentYear)){
-					if (scoreStatsQuestionCompany != null) {
-						List<Object> scoreStatsQuestionCompanyList = new ArrayList<>();
-						scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getMonthVal());
-						scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getYearVal());
-						scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getQuestion());
-						scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getFiveStar());
-						scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getFourStar());
-						scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getThreeStar());
-						scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getTwoStar());
-						scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getOneStar());
-						scoreStatsQuestionList.add(scoreStatsQuestionCompanyList);
-					}
-				}
-				scoreStatsForQuestion.put("Question"+questionId, scoreStatsQuestionList);
-			
-			}
-		}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
-			
-			for(Long questionId : scoreStatsQuestionRegionDao.fetchActiveQuestionsForRegion(entityId, 1, 12, year)){
-				List<List<Object>> scoreStatsQuestionList =  new ArrayList<>();
-				if(monthDiff != 0){
-					for(ScoreStatsQuestionRegion scoreStatsQuestionRegion : scoreStatsQuestionRegionDao.fetchScoreStatsQuestionForRegion(entityId, questionId, 12-monthDiff, 12, year)){
-						if (scoreStatsQuestionRegion != null) {
-							List<Object> scoreStatsQuestionRegionList = new ArrayList<>();
-							scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getMonthVal());
-							scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getYearVal());
-							scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getQuestion());
-							scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getFiveStar());
-							scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getFourStar());
-							scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getThreeStar());
-							scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getTwoStar());
-							scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getOneStar());
-							scoreStatsQuestionList.add(scoreStatsQuestionRegionList);
-						}
-					}	
-				}
-				for(ScoreStatsQuestionRegion scoreStatsQuestionRegion : scoreStatsQuestionRegionDao.fetchScoreStatsQuestionForRegion(entityId, questionId, 1, currentMonth, currentYear)){
-					if (scoreStatsQuestionRegion != null) {
-						List<Object> scoreStatsQuestionRegionList = new ArrayList<>();
-						scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getMonthVal());
-						scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getYearVal());
-						scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getQuestion());
-						scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getFiveStar());
-						scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getFourStar());
-						scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getThreeStar());
-						scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getTwoStar());
-						scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getOneStar());
-						scoreStatsQuestionList.add(scoreStatsQuestionRegionList);
-					}
-				}
-				scoreStatsForQuestion.put("Question"+questionId, scoreStatsQuestionList);
-			
-			}
-		}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
-			
-			for(Long questionId : scoreStatsQuestionBranchDao.fetchActiveQuestionsForBranch(entityId, 1, 12, year)){
-				List<List<Object>> scoreStatsQuestionList =  new ArrayList<>();
-				if(monthDiff != 0){
-					for(ScoreStatsQuestionBranch scoreStatsQuestionBranch : scoreStatsQuestionBranchDao.fetchScoreStatsQuestionForBranch(entityId, questionId, 12-monthDiff, 12, year)){
-						if (scoreStatsQuestionBranch != null) {
-							List<Object> scoreStatsQuestionBranchList = new ArrayList<>();
-							scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getMonthVal());
-							scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getYearVal());
-							scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getQuestion());
-							scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getFiveStar());
-							scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getFourStar());
-							scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getThreeStar());
-							scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getTwoStar());
-							scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getOneStar());
-							scoreStatsQuestionList.add(scoreStatsQuestionBranchList);
-						}
-					}	
-				}
-				for(ScoreStatsQuestionBranch scoreStatsQuestionBranch : scoreStatsQuestionBranchDao.fetchScoreStatsQuestionForBranch(entityId, questionId, 1, currentMonth, currentYear)){
-					if (scoreStatsQuestionBranch != null) {
-						List<Object> scoreStatsQuestionBranchList = new ArrayList<>();
-						scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getMonthVal());
-						scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getYearVal());
-						scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getQuestion());
-						scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getFiveStar());
-						scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getFourStar());
-						scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getThreeStar());
-						scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getTwoStar());
-						scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getOneStar());
-						scoreStatsQuestionList.add(scoreStatsQuestionBranchList);
-					}
-				}
-				scoreStatsForQuestion.put("Question"+questionId, scoreStatsQuestionList);
-			
-			}
-		}else if(entityType.equals(CommonConstants.USER_ID)){
-			
-			for(Long questionId : scoreStatsQuestionUserDao.fetchActiveQuestionsForUser(entityId, 1, 12, year)){
-				List<List<Object>> scoreStatsQuestionList =  new ArrayList<>();
-				if(monthDiff != 0){
-					for(ScoreStatsQuestionUser scoreStatsQuestionUser : scoreStatsQuestionUserDao.fetchScoreStatsQuestionForUser(entityId, questionId, 12-monthDiff, 12, year)){
-						if (scoreStatsQuestionUser != null) {
-							List<Object> scoreStatsQuestionUserList = new ArrayList<>();
-							scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getMonthVal());
-							scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getYearVal());
-							scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getQuestion());
-							scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getFiveStar());
-							scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getFourStar());
-							scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getThreeStar());
-							scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getTwoStar());
-							scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getOneStar());
-							scoreStatsQuestionList.add(scoreStatsQuestionUserList);
-						}
-					}	
-				}
-				for(ScoreStatsQuestionUser scoreStatsQuestionUser : scoreStatsQuestionUserDao.fetchScoreStatsQuestionForUser(entityId, questionId, 1, currentMonth, currentYear)){
-					if (scoreStatsQuestionUser != null) {
-						List<Object> scoreStatsQuestionUserList = new ArrayList<>();
-						scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getMonthVal());
-						scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getYearVal());
-						scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getQuestion());
-						scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getFiveStar());
-						scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getFourStar());
-						scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getThreeStar());
-						scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getTwoStar());
-						scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getOneStar());
-						scoreStatsQuestionList.add(scoreStatsQuestionUserList);
-					}
-				}
-				scoreStatsForQuestion.put("Question"+questionId, scoreStatsQuestionList);
-			
-			}
+		List<List<Object>> scoreStatsForQuestion = new ArrayList<>();
+		int start_month = 0;
+        int start_year = currentYear - 1;
+		//current month is usually 
+		//the graph shows 12 months in which the month 12 months back is +1 from current month except for when current month is dec
+		if( currentMonth < 12){
+		    start_month = currentMonth + 1;
+		}else if(currentMonth == 12){
+		    start_month = 1;
 		}
 		
+		if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
+			for(ScoreStatsQuestionCompany scoreStatsQuestionCompany : scoreStatsQuestionCompanyDao.fetchScoreStatsQuestionForCompany(entityId, start_month, start_year,currentMonth,currentYear)){
+				List<Object> scoreStatsQuestionCompanyList = new ArrayList<>();
+				double average_score = (((scoreStatsQuestionCompany.getFiveStar() * 5.0)+(scoreStatsQuestionCompany.getFourStar() * 4.0)+(scoreStatsQuestionCompany.getThreeStar() * 3.0)+
+				    (scoreStatsQuestionCompany.getTwoStar() * 2.0)+(scoreStatsQuestionCompany.getOneStar()) * 1.0)/(scoreStatsQuestionCompany.getFiveStar()+scoreStatsQuestionCompany.getFourStar()+
+				    scoreStatsQuestionCompany.getThreeStar()+scoreStatsQuestionCompany.getTwoStar()+scoreStatsQuestionCompany.getOneStar()));
+                scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getQuestionId());
+				scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getQuestion());
+				scoreStatsQuestionCompanyList.add(scoreStatsQuestionCompany.getMonthVal()+"/"+scoreStatsQuestionCompany.getYearVal());
+				scoreStatsQuestionCompanyList.add(average_score);
+				scoreStatsForQuestion.add(scoreStatsQuestionCompanyList);
+			}	
+				
+		}else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
+			for(ScoreStatsQuestionRegion scoreStatsQuestionRegion : scoreStatsQuestionRegionDao.fetchScoreStatsQuestionForRegion(entityId, start_month, start_year,currentMonth,currentYear)){
+					List<Object> scoreStatsQuestionRegionList = new ArrayList<>();
+					double average_score = (((scoreStatsQuestionRegion.getFiveStar() * 5.0)+(scoreStatsQuestionRegion.getFourStar() * 4.0)+(scoreStatsQuestionRegion.getThreeStar() * 3.0)+
+	                    (scoreStatsQuestionRegion.getTwoStar() * 2.0)+(scoreStatsQuestionRegion.getOneStar()) * 1.0)/(scoreStatsQuestionRegion.getFiveStar()+scoreStatsQuestionRegion.getFourStar()+
+	                        scoreStatsQuestionRegion.getThreeStar()+scoreStatsQuestionRegion.getTwoStar()+scoreStatsQuestionRegion.getOneStar()));
+					scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getQuestionId());
+					scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getQuestion());
+					scoreStatsQuestionRegionList.add(scoreStatsQuestionRegion.getMonthVal()+"/"+scoreStatsQuestionRegion.getYearVal());
+					scoreStatsQuestionRegionList.add(average_score);
+					scoreStatsForQuestion.add(scoreStatsQuestionRegionList);
+			}	
+				
+		}else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
+			for(ScoreStatsQuestionBranch scoreStatsQuestionBranch : scoreStatsQuestionBranchDao.fetchScoreStatsQuestionForBranch(entityId, start_month, start_year,currentMonth,currentYear)){
+					List<Object> scoreStatsQuestionBranchList = new ArrayList<>();
+					double average_score = (((scoreStatsQuestionBranch.getFiveStar() * 5.0)+(scoreStatsQuestionBranch.getFourStar() * 4.0)+(scoreStatsQuestionBranch.getThreeStar() * 3.0)+
+                        (scoreStatsQuestionBranch.getTwoStar() * 2.0)+(scoreStatsQuestionBranch.getOneStar()) * 1.0)/(scoreStatsQuestionBranch.getFiveStar()+scoreStatsQuestionBranch.getFourStar()+
+                            scoreStatsQuestionBranch.getThreeStar()+scoreStatsQuestionBranch.getTwoStar()+scoreStatsQuestionBranch.getOneStar()));
+					scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getQuestionId());
+					scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getQuestion());
+					scoreStatsQuestionBranchList.add(scoreStatsQuestionBranch.getMonthVal()+"/"+scoreStatsQuestionBranch.getYearVal());
+                    scoreStatsQuestionBranchList.add(average_score);
+					scoreStatsForQuestion.add(scoreStatsQuestionBranchList);
+			}	
+		}else if(entityType.equals(CommonConstants.USER_ID)){
+			
+			for(ScoreStatsQuestionUser scoreStatsQuestionUser : scoreStatsQuestionUserDao.fetchScoreStatsQuestionForUser(entityId, start_month, start_year,currentMonth,currentYear)){
+					List<Object> scoreStatsQuestionUserList = new ArrayList<>();
+					double average_score = (((scoreStatsQuestionUser.getFiveStar() * 5.0)+(scoreStatsQuestionUser.getFourStar() * 4.0)+(scoreStatsQuestionUser.getThreeStar() * 3.0)+
+                        (scoreStatsQuestionUser.getTwoStar() * 2.0)+(scoreStatsQuestionUser.getOneStar()) * 1.0)/(scoreStatsQuestionUser.getFiveStar()+scoreStatsQuestionUser.getFourStar()+
+                            scoreStatsQuestionUser.getThreeStar()+scoreStatsQuestionUser.getTwoStar()+scoreStatsQuestionUser.getOneStar()));
+	                scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getQuestionId());
+					scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getQuestion());
+                    scoreStatsQuestionUserList.add(scoreStatsQuestionUser.getMonthVal()+"/"+scoreStatsQuestionUser.getYearVal());
+                    scoreStatsQuestionUserList.add(average_score);
+					scoreStatsForQuestion.add(scoreStatsQuestionUserList);
+			}	
+
+		}
+	
 		return scoreStatsForQuestion;
 	}
 }
