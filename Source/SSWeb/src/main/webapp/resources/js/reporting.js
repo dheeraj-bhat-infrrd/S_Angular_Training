@@ -71,9 +71,11 @@ function drawSpsStatsGraph(){
 
 												for (var i = 1; i <= chartData.length; i++) {
 													var monthName = monthNamesList[(chartData[i - 1][1]) - 1];
+													var yearStr = (chartData[i-1][0]).toString();
+													var yearValue = yearStr.match(/.{1,2}/g)[1];
 													spsChartData[i][0] = monthName
-															+ "/"
-															+ chartData[i - 1][0];
+															+ " "
+															+ yearValue;
 													spsChartData[i][1] = chartData[i - 1][2];
 													spsChartData[i][2] = chartData[i - 1][3];
 													spsChartData[i][3] = chartData[i - 1][4];
@@ -198,9 +200,12 @@ function drawCompletionRateGraph(){
 
 												for (var i = 1; i <= chartData.length; i++) {
 													var monthName = monthNamesList[(chartData[i - 1][1]) - 1];
+													var yearStr = (chartData[i-1][0]).toString();
+													var yearValue = yearStr.match(/.{1,2}/g)[1];
+													console.log(yearStr.match(/.{1,2}/g)[1]);
 													compRateChartData[i][0] = monthName
-															+ "/"
-															+ chartData[i - 1][0];
+															+ " "
+															+ yearValue;
 													compRateChartData[i][1] = chartData[i - 1][2];
 													compRateChartData[i][2] = chartData[i - 1][3];
 
@@ -218,7 +223,7 @@ function drawCompletionRateGraph(){
 												if (maxTransactionValue < 10) {
 													maxVAxisValue = maxTransactionValue + 5;
 												} else {
-													maxVAxisValue = maxTransactionValue + 10;
+													maxVAxisValue = maxTransactionValue + 5;
 												}
 
 												var data = google.visualization
