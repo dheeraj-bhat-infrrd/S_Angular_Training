@@ -69,7 +69,7 @@
   <created_date>2017&#x2f;08&#x2f;21 11&#x3a;19&#x3a;29.342</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;08&#x2f;21 11&#x3a;19&#x3a;29.342</modified_date>
-    <key_for_session_key/>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -161,7 +161,8 @@
   <hop> <from>Sort qsn 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveyDetails Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveyResponse Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>If field value is null</from><to>ScoreStats_AllQuestions_User_PastMonths</to><enabled>Y</enabled> </hop>
+  <hop> <from>If field value is null</from><to>Calculate Average</to><enabled>Y</enabled> </hop>
+  <hop> <from>Calculate Average</from><to>ScoreStats_AllQuestions_User_PastMonths</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Filter 1</name>
@@ -340,7 +341,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>4_star_count</aggregate>
+          <aggregate>four_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -404,7 +405,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>1_star_count</aggregate>
+          <aggregate>one_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -468,7 +469,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>2_star_count</aggregate>
+          <aggregate>two_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -532,7 +533,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>3_star_count</aggregate>
+          <aggregate>three_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -596,7 +597,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>5_star_count</aggregate>
+          <aggregate>five_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -650,7 +651,7 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>736</xloc>
+      <xloc>796</xloc>
       <yloc>1032</yloc>
       <draw>Y</draw>
       </GUI>
@@ -790,7 +791,93 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>602</xloc>
+      <xloc>640</xloc>
+      <yloc>1032</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>ScoreStats_AllQuestions_User_PastMonths</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <schema/>
+    <table>score_stats_question_user</table>
+    <commit>10000</commit>
+    <truncate>Y</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>score_stats_question_user_id</column_name>
+          <stream_name>score_stats_question_user_id</stream_name>
+        </field>
+        <field>
+          <column_name>user_id</column_name>
+          <stream_name>final_agent_id</stream_name>
+        </field>
+        <field>
+          <column_name>month_val</column_name>
+          <stream_name>final_month_data</stream_name>
+        </field>
+        <field>
+          <column_name>year_val</column_name>
+          <stream_name>final_year_data</stream_name>
+        </field>
+        <field>
+          <column_name>question_id</column_name>
+          <stream_name>final_question_id</stream_name>
+        </field>
+        <field>
+          <column_name>question</column_name>
+          <stream_name>final_question_text</stream_name>
+        </field>
+        <field>
+          <column_name>avg_score</column_name>
+          <stream_name>avg_score</stream_name>
+        </field>
+        <field>
+          <column_name>five_star</column_name>
+          <stream_name>five_star_count</stream_name>
+        </field>
+        <field>
+          <column_name>four_star</column_name>
+          <stream_name>four_star_count</stream_name>
+        </field>
+        <field>
+          <column_name>three_star</column_name>
+          <stream_name>three_star_count</stream_name>
+        </field>
+        <field>
+          <column_name>two_star</column_name>
+          <stream_name>two_star_count</stream_name>
+        </field>
+        <field>
+          <column_name>one_star</column_name>
+          <stream_name>one_star_count</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1272</xloc>
       <yloc>1032</yloc>
       <draw>Y</draw>
       </GUI>
@@ -1279,8 +1366,8 @@
     </step>
 
   <step>
-    <name>ScoreStats_AllQuestions_User_PastMonths</name>
-    <type>TableOutput</type>
+    <name>Calculate Average</name>
+    <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1289,73 +1376,21 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>score_stats_question_user</table>
-    <commit>10000</commit>
-    <truncate>Y</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>score_stats_question_user_id</column_name>
-          <stream_name>score_stats_question_user_id</stream_name>
-        </field>
-        <field>
-          <column_name>user_id</column_name>
-          <stream_name>final_agent_id</stream_name>
-        </field>
-        <field>
-          <column_name>month_val</column_name>
-          <stream_name>final_month_data</stream_name>
-        </field>
-        <field>
-          <column_name>year_val</column_name>
-          <stream_name>final_year_data</stream_name>
-        </field>
-        <field>
-          <column_name>question_id</column_name>
-          <stream_name>final_question_id</stream_name>
-        </field>
-        <field>
-          <column_name>question</column_name>
-          <stream_name>final_question_text</stream_name>
-        </field>
-        <field>
-          <column_name>5_star</column_name>
-          <stream_name>5_star_count</stream_name>
-        </field>
-        <field>
-          <column_name>4_star</column_name>
-          <stream_name>4_star_count</stream_name>
-        </field>
-        <field>
-          <column_name>3_star</column_name>
-          <stream_name>3_star_count</stream_name>
-        </field>
-        <field>
-          <column_name>2_star</column_name>
-          <stream_name>2_star_count</stream_name>
-        </field>
-        <field>
-          <column_name>1_star</column_name>
-          <stream_name>1_star_count</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var avg_score &#x3d; 0.00&#x3b;&#xd;&#xa;var total_counts &#x3d; five_star_count &#x2b; four_star_count &#x2b; three_star_count &#x2b; two_star_count &#x2b; one_star_count&#x3b;&#xd;&#xa;&#xd;&#xa;if &#x28; total_counts &#x3e; 0 &#x29; &#x7b;&#xd;&#xa;	avg_score &#x3d; &#x28;&#x28;5&#x2a;five_star_count&#x29; &#x2b; &#x28;4&#x2a;four_star_count&#x29; &#x2b; &#x28;3&#x2a;three_star_count&#x29; &#x2b; &#x28;2&#x2a;two_star_count&#x29; &#x2b; &#x28;1&#x2a;one_star_count&#x29;&#x29;&#x2f;total_counts&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>avg_score</name>
+        <rename>avg_score</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>736</xloc>
-      <yloc>903</yloc>
+      <xloc>989</xloc>
+      <yloc>1032</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
