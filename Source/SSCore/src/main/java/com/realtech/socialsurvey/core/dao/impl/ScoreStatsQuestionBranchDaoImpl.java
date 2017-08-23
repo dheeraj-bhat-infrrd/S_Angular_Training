@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -24,50 +25,35 @@ public class ScoreStatsQuestionBranchDaoImpl extends GenericReportingDaoImpl<Sco
 	private static final Logger LOG = LoggerFactory.getLogger( ScoreStatsQuestionBranchDaoImpl.class );
 
 	@Override
-	public List<ScoreStatsQuestionBranch> fetchScoreStatsQuestionForBranch(Long branchId, Long questionId, int startMonth, int endMonth, int year) {
+	public List<ScoreStatsQuestionBranch> fetchScoreStatsQuestionForBranch(Long branchId , int startMonth, int startYear , int endMonth , int endYear) {
 		LOG.info( "Method to fetch all the score stats question for branch,fetchScoreStatsQuestionForBranch() started." );
         Criteria criteria = getSession().createCriteria( ScoreStatsQuestionBranch.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
-            criteria.add( Restrictions.eq( CommonConstants.QUESTION_ID, questionId ) );
-            criteria.add( Restrictions.ge( CommonConstants.MONTH_VAL, startMonth ) );
-            criteria.add( Restrictions.le( CommonConstants.MONTH_VAL, endMonth ) );
-            criteria.add( Restrictions.eq( CommonConstants.YEAR_VAL, year ) );
+            Criterion rest1= Restrictions.and(Restrictions.eq( CommonConstants.YEAR_VAL, endYear ), 
+                Restrictions.le( CommonConstants.MONTH_VAL, endMonth ));
+            if( startMonth != 1){
+                Criterion rest2= Restrictions.and(Restrictions.eq( CommonConstants.YEAR_VAL, startYear ), 
+                    Restrictions.ge( CommonConstants.MONTH_VAL, startMonth ));
+                criteria.add(Restrictions.or(rest1, rest2));
+            }else if( startMonth == 1){
+                criteria.add(rest1);
+
+            }
+            
+            criteria.addOrder( Order.asc( CommonConstants.QUESTION_ID ) );
+            criteria.addOrder( Order.asc( CommonConstants.YEAR_VAL ) );
+            criteria.addOrder( Order.asc( CommonConstants.MONTH_VAL ) );
+            
+            LOG.info( "Method to fetch all the score stats question for branch,fetchScoreStatsQuestionForBranch() finished." );
+
+            return (List<ScoreStatsQuestionBranch>) criteria.list();
         } catch ( HibernateException hibernateException ) {
             LOG.error( "Exception caught in fetchScoreStatsQuestionForBranch() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchScoreStatsQuestionForBranch() ", hibernateException );
         }
 
-        LOG.info( "Method to fetch all the score stats question for branch,fetchScoreStatsQuestionForBranch() finished." );
-
-        return (List<ScoreStatsQuestionBranch>) criteria.list();
-	}
-
-	@Override
-	public List<Long> fetchActiveQuestionsForBranch(Long branchId, int startMonth, int endMonth, int year) {
-		LOG.info( "Method to fetch active questions for branch,fetchActiveQuestionForBranch() started." );
-
-		Criteria criteria = getSession().createCriteria(ScoreStatsQuestionBranch.class);
-		try {
-            criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
-            criteria.add( Restrictions.ge( CommonConstants.MONTH_VAL, startMonth ) );
-            criteria.add( Restrictions.le( CommonConstants.MONTH_VAL, endMonth ) );
-            criteria.add( Restrictions.eq( CommonConstants.YEAR_VAL, year ) );
-            criteria.setProjection(Projections.distinct(Projections.property(CommonConstants.QUESTION_ID)));
-            criteria.addOrder( Order.asc( CommonConstants.QUESTION_ID ) );
-        } catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchActiveQuestionForBranch() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchActiveQuestionForBranch() ", hibernateException );
-        }
-		
-		LOG.info( "Method to fetch active questions for branch,fetchActiveQuestionForBranch() finished." );
-		
-		List<Long> activeQuestionsList = new ArrayList<>();
-		
-		for( ScoreStatsQuestionBranch scoreStatsQuestionBranch : (List<ScoreStatsQuestionBranch>) criteria.list()){
-			activeQuestionsList.add(scoreStatsQuestionBranch.getQuestionId());
-		}
-		return activeQuestionsList;
+       
 	}
 
 }

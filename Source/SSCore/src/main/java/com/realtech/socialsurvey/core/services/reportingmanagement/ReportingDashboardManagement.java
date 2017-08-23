@@ -111,7 +111,7 @@ public interface ReportingDashboardManagement
     
     List<List<Object>> getScoreStatsForOverall(Long entityId, String entityType, int currentMonth, int currentYear);
     
-    Map<String,List<List<Object>>> getScoreStatsForQuestion(Long entityId, String entityType, int currentMonth, int currentYear);
+    List<List<Object>> getScoreStatsForQuestion(Long entityId, String entityType, int currentMonth, int currentYear);
     
     
 }

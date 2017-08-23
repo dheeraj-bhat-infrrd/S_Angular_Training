@@ -591,7 +591,7 @@ public class ReportingController
     	LOGGER.info("Fetching Score Stats Question");
     	
     	String json = null;
-    	Map<String, List<List<Object>>> scoreStatsQuestion = new HashMap<>();
+    	List<List<Object>> scoreStatsQuestion = new ArrayList<>();
     	scoreStatsQuestion = reportingDashboardManagement.getScoreStatsForQuestion(entityId, entityType, currentMonth, currentYear);
     	json = new Gson().toJson(scoreStatsQuestion);
     	return json;

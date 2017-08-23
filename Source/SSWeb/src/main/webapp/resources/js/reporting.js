@@ -1666,7 +1666,7 @@ function getAndSaveRankingSettingsVal(columnName,isRealTechOrSSAdmin,monthOff,ye
 		minNoOfReviews = $('#minimum-reviews').val();
 	}
 	
-	if((isRealTechOrSSAdmin == true || isRealTechOrSSAdmin == 'true') && columnName == 'companyId'){
+	if((isRealTechOrSSAdmin == true || isRealTechOrSSAdmin == 'true')){
 		
 		if($('#month-offset').val() != ""){
 			monthOffset = $('#month-offset').val();
@@ -1761,4 +1761,186 @@ function getOverallScoreStats(entityId,entityType){
 	});
 	console.log(overallScoreStats);
 	return overallScoreStats;
+}
+
+function getQuestionScoreStats(entityId,entityType){
+	var currentDate = new Date();
+	var currentMonth = currentDate.getMonth();
+	var currentYear = currentDate.getFullYear();
+	
+	var url = "/getquestionscorestats.do?entityId="+entityId+"&entityType="+entityType+"&currentMonth="+currentMonth+"&currentYear="+currentYear;
+	
+	var questionScoreStats=null;
+	
+	$.ajax({
+		async : false,
+		url : url,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			if (data.status == 200) {
+				$.ajax({
+							async:false,
+							url : data.url,
+							type : "GET",
+							cache : false,
+							dataType : "json",
+							success : function(response) {
+								questionScoreStats = JSON.parse(response);
+							}
+						});
+			}
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+	console.log(questionScoreStats);
+	return questionScoreStats;
+}
+
+function splitAndEditDate(monthYear){
+	
+	var splitStr = monthYear.split('/');
+	
+	var month = parseInt(splitStr[0]);
+	
+	var monthStr = "Jan"
+		
+	switch(month){
+	case 1: monthStr = "Jan";
+		break;
+	case 2: monthStr = "Feb";
+		break;
+	case 3: monthStr = "Mar";
+		break;
+	case 4: monthStr = "Apr";
+		break;
+	case 5: monthStr = "May";
+		break;
+	case 6: monthStr = "Jun";
+		break;
+	case 7: monthStr = "Jul";
+		break;
+	case 8: monthStr = "Aug";
+		break;
+	case 9: monthStr = "Sep";
+		break;
+	case 10: monthStr = "Oct";
+		break;
+	case 11: monthStr = "Nov";
+		break;
+	case 12: monthStr = "Dec";
+		break;
+	}
+	
+	var year = splitStr[1];
+	
+	var yearStr = year.match(/.{1,2}/g)[1];
+	
+	return (monthStr + " " + yearStr);
+}
+
+function drawOverallScoreStatsGraph(entityId, entityType){
+	var overallChartDiv = "overall-rating-chart";
+	var overallScoreStats = getOverallScoreStats(entityId, entityType);
+	
+	if(overallScoreStats != null && overallScoreStats.length != 0){
+		for(var i=0; i<overallScoreStats.length; i++){
+			var monthYear = overallScoreStats[i][0];
+		
+			overallScoreStats[i][0] = splitAndEditDate(monthYear);
+		}
+
+		var overallChartData = new Array(overallScoreStats.length + 1);
+		for(var i=0; i<overallChartData.length; i++){
+			overallChartData[i] = new Array(2);
+		}
+	
+		overallChartData[0]=['Month','Rating'];
+	
+		for(var i=0; i<overallScoreStats.length; i++){
+			overallChartData[i+1] = overallScoreStats[i];
+		}
+	
+		drawLineGraphForScoreStats(overallChartDiv, overallChartData);
+	}else{
+		var emptyChartData = [['Month','Ratings'],['',0]];
+		drawLineGraphForScoreStats(overallChartDiv, emptyChartData);
+	}
+}
+
+function drawQuestionScoreStatsGraph(entityId,entityType){
+	var questionScoreStats = getQuestionScoreStats(entityId, entityType);
+	
+	if(questionScoreStats != null && questionScoreStats.length != 0){
+		
+		$('#question-ratings-div').removeClass('hide');
+		$('#empty-questions-div').addClass('hide');
+		
+		var questionIdArray = new Array();
+		var questionArray = new Array();
+		
+		var questionIterator = 0;
+		for(var i=0; i<questionScoreStats.length; i++){
+			if(!isContainsQuestion(questionIdArray, questionScoreStats[i][0])){
+				questionIdArray[questionIterator] = questionScoreStats[i][0];
+				questionArray[questionIterator++] = questionScoreStats[i][1];
+			}
+		}
+		
+		var questionScoreStatsArray = new Array();
+		var questionScoreStatsIndex = 0;
+				
+		for(var i=0; i<questionIdArray.length; i++){
+			var count = 0;
+			for(var j=0; j<questionScoreStats.length; j++){
+				if(questionScoreStats[j][0] == questionIdArray[i]){
+					count++;
+				}
+			}
+			var scoreStatsArray = new Array(count+1);
+			var index = 1;
+			scoreStatsArray[0]=['Month','Rating'];
+			for(var j=0; j<questionScoreStats.length; j++){
+				if(questionScoreStats[j][0] == questionIdArray[i]){
+					monthYear = splitAndEditDate(questionScoreStats[j][2]);
+					scoreStatsArray[index++] = [monthYear,questionScoreStats[j][3]];
+				}
+			}
+			
+			questionScoreStatsArray[questionScoreStatsIndex++] = scoreStatsArray;
+		}
+		
+		for(var i=0; i<questionScoreStatsArray.length ; i++){
+			
+			var graphDivHtml = '';
+			graphDivHtml += '<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12" style="margin-top: 10px; display: inline-block; float:left; width:100%;height:350px; margin-left:15px">'
+						+ '<span class="rep-sps-lbl" style="margin-top: 13px;">'+ (i+1)+') ' + questionArray[i] + '</span>'
+						+ '<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12"> '
+						+ '<div id="question-rating-chart-'+i+'" style="width:80%; height:300px;margin: 20px 20px 20px 60px;"></div>'
+						+ '</div></div>';
+			
+			$('#question-ratings-div').append(graphDivHtml);
+			drawLineGraphForScoreStats("question-rating-chart-"+i, questionScoreStatsArray[i]);
+		}
+	}else{
+		$('#question-ratings-div').addClass('hide');
+		$('#empty-questions-div').removeClass('hide');
+	}
+	
+}
+
+function isContainsQuestion(array,questionId){
+	for(var i=0; i<array.length; i++){
+		if(array[i] == questionId){
+			return true;
+		}
+	}
+	
+	return false;
 }
