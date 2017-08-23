@@ -782,8 +782,7 @@ public class OrganizationManagementController
             }
 
             //enocode before sending to UI
-            encodeSurveySettings( surveySettings );
-            unitSettings.setSurvey_settings( surveySettings );
+            encodeSurveySettings( unitSettings.getSurvey_settings() );
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
             
             //get default setting and store in model
