@@ -163,5 +163,12 @@
 			$('#overviewFailure').hide();
 		}
 		
+	//Score stats
+		var entityType = "${columnName}";
+		var entityId = "${columnValue}";
+
+		drawOverallScoreStatsGraph(entityId, entityType);		
+		
+		drawQuestionScoreStatsGraph(entityId, entityType);
 	});
 </script>

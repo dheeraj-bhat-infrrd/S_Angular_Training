@@ -1,79 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>survey_questions</name>
+    <name>ScoreStats_Overall_Company_PastMonths</name>
     <description/>
     <extended_description/>
     <trans_version/>
-    <trans_type>SerialSingleThreaded</trans_type>
-    <trans_status>0</trans_status>
+    <trans_type>Normal</trans_type>
     <directory>&#x2f;</directory>
     <parameters>
-        <parameter>
-            <name>mongo_host</name>
-            <default_value>localhost</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mongo_port</name>
-            <default_value>27017</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_host</name>
-            <default_value>localhost</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_host</name>
-            <default_value>ss-rdbms-demo.c3n1qsdsmjxc.us-west-2.rds.amazonaws.com</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_password</name>
-            <default_value>shipra744772</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_port_no</name>
-            <default_value>3306</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_schema_name</name>
-            <default_value>ss_user</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_user_name</name>
-            <default_value>shipra</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_master_schema_name</name>
-            <default_value>ss_user</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_password</name>
-            <default_value>root</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_port_no</name>
-            <default_value>3306</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_schema_name</name>
-            <default_value>ss_centralized_mongodb</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_user_name</name>
-            <default_value>root</default_value>
-            <description/>
-        </parameter>
     </parameters>
     <log>
 <trans-log-table><connection/>
@@ -132,68 +66,14 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;05&#x2f;25 17&#x3a;07&#x3a;15.120</created_date>
+  <created_date>2017&#x2f;08&#x2f;22 15&#x3a;59&#x3a;39.749</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;05&#x2f;25 17&#x3a;07&#x3a;15.120</modified_date>
-    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+  <modified_date>2017&#x2f;08&#x2f;22 15&#x3a;59&#x3a;39.749</modified_date>
+    <key_for_session_key/>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
-  <connection>
-    <name>Local instance MySQL57</name>
-    <server>&#x24;&#x7b;mysql_host &#x7d;</server>
-    <type>MYSQL</type>
-    <access>Native</access>
-    <database>&#x24;&#x7b;mysql_schema_name &#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no &#x7d;</port>
-    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password &#x7d;</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no &#x7d;</attribute></attribute>
-      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
-  <connection>
-    <name>MySql_Con</name>
-    <server>localhost</server>
-    <type>MYSQL</type>
-    <access>Native</access>
-    <database>sakila</database>
-    <port>3306</port>
-    <username>&#x24;&#x7b;db_user_name&#x7d;</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
-      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
   <connection>
     <name>SS_Centralized_Mysql_Conn</name>
     <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
@@ -251,12 +131,16 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Survey Questions Input</from><to>Convert to EST</to><enabled>Y</enabled> </hop>
-  <hop> <from>Convert to EST</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Generate random value</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Memory Group by</from><to>Generate random value</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Sort COMPANY ID</to><enabled>Y</enabled> </hop>
+  <hop> <from>Score Stats Overall User Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort COMPANY ID</from><to>Memory Group by</to><enabled>Y</enabled> </hop>
+  <hop> <from>User Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>Convert to EST</name>
-    <type>ScriptValueMod</type>
+    <name>Generate random value</name>
+    <type>RandomValue</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -265,53 +149,16 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST5EDT&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; sdf.format&#x28;CREATED_ON&#x29;&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; sdf.format&#x28;MODIFIED_ON&#x29;&#x3b;&#xd;&#xa;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>CREATED_ON_EST</name>
-        <rename>CREATED_ON_EST</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>MODIFIED_ON_EST</name>
-        <rename>MODIFIED_ON_EST</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>484</xloc>
-      <yloc>155</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Survey Questions Input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_INFO_CONNECTION</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_QUESTIONS_ID&#xd;&#xa;, SURVEY_QUESTIONS_CODE&#xd;&#xa;, SURVEY_QUESTION&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;FROM SURVEY_QUESTIONS&#xd;&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>Y</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
+    <fields>
+      <field>
+        <name>score_stats_overall_company_id</name>
+        <type>random uuid</type>
+      </field>
+    </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>312</xloc>
-      <yloc>155</yloc>
+      <xloc>919</xloc>
+      <yloc>146</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -332,68 +179,264 @@
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
-      <table>survey_questions</table>
+      <table>score_stats_overall_company</table>
       <key>
-        <name>SURVEY_QUESTIONS_ID</name>
-        <field>SURVEY_QUESTIONS_ID</field>
+        <name>COMPANY_ID</name>
+        <field>company_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>month_val</name>
+        <field>month_val</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>year_val</name>
+        <field>year_val</field>
         <condition>&#x3d;</condition>
         <name2/>
       </key>
       <value>
-        <name>SURVEY_QUESTIONS_ID</name>
-        <rename>SURVEY_QUESTIONS_ID</rename>
+        <name>month_val</name>
+        <rename>month_val</rename>
         <update>N</update>
       </value>
       <value>
-        <name>SURVEY_QUESTIONS_CODE</name>
-        <rename>SURVEY_QUESTIONS_CODE</rename>
+        <name>year_val</name>
+        <rename>year_val</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>1_star</name>
+        <rename>1_star</rename>
         <update>Y</update>
       </value>
       <value>
-        <name>SURVEY_QUESTION</name>
-        <rename>SURVEY_QUESTION</rename>
+        <name>2_star</name>
+        <rename>2_star</rename>
         <update>Y</update>
       </value>
       <value>
-        <name>STATUS</name>
-        <rename>STATUS</rename>
+        <name>3_star</name>
+        <rename>3_star</rename>
         <update>Y</update>
       </value>
       <value>
-        <name>CREATED_ON</name>
-        <rename>CREATED_ON</rename>
+        <name>4_star</name>
+        <rename>4_star</rename>
         <update>Y</update>
       </value>
       <value>
-        <name>CREATED_BY</name>
-        <rename>CREATED_BY</rename>
+        <name>5_star</name>
+        <rename>5_star</rename>
         <update>Y</update>
       </value>
       <value>
-        <name>MODIFIED_ON</name>
-        <rename>MODIFIED_ON</rename>
-        <update>Y</update>
+        <name>company_id</name>
+        <rename>COMPANY_ID</rename>
+        <update>N</update>
       </value>
       <value>
-        <name>MODIFIED_BY</name>
-        <rename>MODIFIED_BY</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>CREATED_ON_EST</name>
-        <rename>CREATED_ON_EST</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MODIFIED_ON_EST</name>
-        <rename>MODIFIED_ON_EST</rename>
-        <update>Y</update>
+        <name>score_stats_overall_company_id</name>
+        <rename>score_stats_overall_company_id</rename>
+        <update>N</update>
       </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>689</xloc>
-      <yloc>155</yloc>
+      <xloc>1125</xloc>
+      <yloc>148</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Memory Group by</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>COMPANY_ID</name>
+        </field>
+        <field>
+          <name>month_val</name>
+        </field>
+        <field>
+          <name>year_val</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>1_star</aggregate>
+          <subject>1_star</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>2_star</aggregate>
+          <subject>2_star</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>3_star</aggregate>
+          <subject>3_star</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>4_star</aggregate>
+          <subject>4_star</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>5_star</aggregate>
+          <subject>5_star</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>718</xloc>
+      <yloc>147</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Merge Join</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>INNER</join_type>
+<step1>User Input</step1>
+<step2>Score Stats Overall User Input</step2>
+    <keys_1>
+      <key>USER_ID</key>
+    </keys_1>
+    <keys_2>
+      <key>user_id</key>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>346</xloc>
+      <yloc>147</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Score Stats Overall User Input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  score_stats_overall_user_id&#xd;&#xa;, user_id&#xd;&#xa;, 5_star&#xd;&#xa;, 4_star&#xd;&#xa;, 3_star&#xd;&#xa;, 2_star&#xd;&#xa;, 1_star&#xd;&#xa;, month_val&#xd;&#xa;, year_val&#xd;&#xa;FROM score_stats_overall_user&#xd;&#xa;where &#x28;month_val &#x3e; month&#x28;curdate&#x28;&#x29;&#x29; and year_val &#x3d; year&#x28;curdate&#x28;&#x29;&#x29;-1&#x29; or &#x28;month_val &#x3c; month&#x28;curdate&#x28;&#x29;&#x29; and year_val &#x3d; year&#x28;curdate&#x28;&#x29;&#x29;&#x29;  &#xd;&#xa;order by user_id&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>153</xloc>
+      <yloc>220</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort COMPANY ID</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>COMPANY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_val</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_val</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>541</xloc>
+      <yloc>147</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>User Input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, LOGIN_NAME&#xd;&#xa;, LOGIN_PASSWORD&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_USER_ID&#xd;&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xd;&#xa;, IS_OWNER&#xd;&#xa;, STATUS&#xd;&#xa;, LAST_LOGIN&#xd;&#xa;, NUM_OF_LOGINS&#xd;&#xa;, SUPER_ADMIN&#xd;&#xa;, IS_ZILLOW_CONNECTED&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ZILLOW_AVERAGE_SCORE&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, REGISTRATION_STAGE&#xd;&#xa;, FORCE_PASSWORD&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, MODIFIED_ON_EST&#xd;&#xa;, LAST_LOGIN_EST&#xd;&#xa;FROM users&#xd;&#xa;order by USER_ID&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>153</xloc>
+      <yloc>64</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
