@@ -161,8 +161,39 @@
   <hop> <from>Sort qsn 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveyDetails Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveyResponse Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>If field value is null</from><to>Insert &#x2f; Update Score stats overall user current month</to><enabled>Y</enabled> </hop>
+  <hop> <from>If field value is null</from><to>Calculate Average</to><enabled>Y</enabled> </hop>
+  <hop> <from>Calculate Average</from><to>Insert &#x2f; Update Score stats overall user current month</to><enabled>Y</enabled> </hop>
   </order>
+  <step>
+    <name>Calculate Average</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var avg_score &#x3d; 0.00&#x3b;&#xd;&#xa;var total_counts &#x3d; five_star_count &#x2b; four_star_count &#x2b; three_star_count &#x2b; two_star_count &#x2b; one_star_count&#x3b;&#xd;&#xa;&#xd;&#xa;if &#x28; total_counts &#x3e; 0 &#x29; &#x7b;&#xd;&#xa;	avg_score &#x3d; &#x28;&#x28;5&#x2a;five_star_count&#x29; &#x2b; &#x28;4&#x2a;four_star_count&#x29; &#x2b; &#x28;3&#x2a;three_star_count&#x29; &#x2b; &#x28;2&#x2a;two_star_count&#x29; &#x2b; &#x28;1&#x2a;one_star_count&#x29;&#x29;&#x2f;total_counts&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>avg_score</name>
+        <rename>avg_score</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1060</xloc>
+      <yloc>972</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step>
     <name>Filter 1</name>
     <type>FilterRows</type>
@@ -337,7 +368,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>4_star_count</aggregate>
+          <aggregate>four_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -392,7 +423,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>1_star_count</aggregate>
+          <aggregate>one_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -447,7 +478,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>2_star_count</aggregate>
+          <aggregate>two_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -502,7 +533,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>3_star_count</aggregate>
+          <aggregate>three_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -557,7 +588,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>5_star_count</aggregate>
+          <aggregate>five_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -605,8 +636,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>962</xloc>
-      <yloc>969</yloc>
+      <xloc>887</xloc>
+      <yloc>972</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -667,35 +698,40 @@
         <update>N</update>
       </value>
       <value>
-        <name>5_star</name>
-        <rename>5_star_count</rename>
+        <name>avg_score</name>
+        <rename>avg_score</rename>
         <update>Y</update>
       </value>
       <value>
-        <name>4_star</name>
-        <rename>4_star_count</rename>
+        <name>five_star</name>
+        <rename>five_star_count</rename>
         <update>Y</update>
       </value>
       <value>
-        <name>3_star</name>
-        <rename>3_star_count</rename>
+        <name>four_star</name>
+        <rename>four_star_count</rename>
         <update>Y</update>
       </value>
       <value>
-        <name>2_star</name>
-        <rename>2_star_count</rename>
+        <name>three_star</name>
+        <rename>three_star_count</rename>
         <update>Y</update>
       </value>
       <value>
-        <name>1_star</name>
-        <rename>1_star_count</rename>
+        <name>two_star</name>
+        <rename>two_star_count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>one_star</name>
+        <rename>one_star_count</rename>
         <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>962</xloc>
-      <yloc>815</yloc>
+      <xloc>1060</xloc>
+      <yloc>830</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -765,7 +801,7 @@
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>565</xloc>
-      <yloc>969</yloc>
+      <yloc>972</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -822,8 +858,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>795</xloc>
-      <yloc>969</yloc>
+      <xloc>735</xloc>
+      <yloc>972</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
