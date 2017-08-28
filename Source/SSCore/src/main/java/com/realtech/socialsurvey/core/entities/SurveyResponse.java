@@ -5,6 +5,7 @@ public class SurveyResponse {
 	private String question;
 	private String questionType;
 	private String answer;
+	private boolean isUserRankingQuestion;
 	
 	public String getQuestion() {
 		return question;
@@ -24,4 +25,12 @@ public class SurveyResponse {
 	public void setAnswer(String answer) {
 		this.answer = answer;
 	}
+    public boolean getIsUserRankingQuestion()
+    {
+        return isUserRankingQuestion;
+    }
+    public void setIsUserRankingQuestion( boolean isUserRankingQuestion )
+    {
+        this.isUserRankingQuestion = isUserRankingQuestion;
+    }
 }

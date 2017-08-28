@@ -105,6 +105,9 @@ public class User implements UserDetails, Serializable
 
     @Column ( name = "FORCE_PASSWORD")
     private int isForcePassword;
+    
+    @Column ( name = "LAST_INVITATION_SENT_DATE")
+    private Timestamp lastInvitationSentDate;
 
     @Transient
     private boolean agent;
@@ -148,7 +151,18 @@ public class User implements UserDetails, Serializable
     @OneToMany ( mappedBy = "user", fetch = FetchType.LAZY)
     private List<SurveyPreInitiation> surveyPreInitiation;
 
+    public Timestamp getLastInvitationSentDate()
+    {
+        return lastInvitationSentDate;
+    }
 
+
+    public void setLastInvitationSentDate( Timestamp lastInvitationSentDate )
+    {
+        this.lastInvitationSentDate = lastInvitationSentDate;
+    }
+    
+    
     public long getUserId()
     {
         return this.userId;
