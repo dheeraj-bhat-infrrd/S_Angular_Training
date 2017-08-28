@@ -1735,7 +1735,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         // SAVE REPORT IN S3
         if ( excelCreated ) {
-            fileUploadService.uploadFileAtSpeicifiedBucket( file, fileName, bucketName, false );;
+            fileUploadService.uploadFileAtSpeicifiedBucket( file, fileName, bucketName, false );
             String fileNameInS3 = endpoint + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( fileName, "UTF-8" );
             responseString = fileNameInS3;
         }
