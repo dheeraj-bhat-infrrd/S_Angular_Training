@@ -4609,6 +4609,8 @@ function resetTextForMoodFlow(mood, resetId) {
 }
 
 function saveTextForMoodFlow(content, mood) {
+	//encode text before sending to server
+	var content = window.btoa( unescape( encodeURIComponent( content ) ) );
 	var payload = {
 		"text" : content,
 		"mood" : mood
@@ -4624,13 +4626,13 @@ function saveTextForMoodFlow(content, mood) {
 }
 
 function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete) {
-	$('#happy-text').val(atob(happyText));
-	$('#neutral-text').val(atob(neutralText));
-	$('#sad-text').val(atob(sadText));
+	$('#happy-text').text(decodeURIComponent( escape( window.atob( happyText ) ) ));
+	$('#neutral-text').text(decodeURIComponent( escape( window.atob( neutralText ) ) ));
+	$('#sad-text').text(decodeURIComponent( escape( window.atob( sadText ) ) ));
 
-	$('#happy-text-complete').val(atob(happyTextComplete));
-	$('#neutral-text-complete').val(atob(neutralTextComplete));
-	$('#sad-text-complete').val(atob(sadTextComplete));
+	$('#happy-text-complete').text(decodeURIComponent( escape( window.atob( happyTextComplete ) ) ));
+	$('#neutral-text-complete').text(decodeURIComponent( escape( window.atob( neutralTextComplete ) ) ));
+	$('#sad-text-complete').text(decodeURIComponent( escape( window.atob( sadTextComplete ) ) ));
 }
 
 // User management
