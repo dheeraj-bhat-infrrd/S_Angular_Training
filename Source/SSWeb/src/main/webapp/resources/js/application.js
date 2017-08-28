@@ -122,6 +122,8 @@ var zillowCallBreak = false;
 var existingCall;
 var classificationsList = [];
 
+var ratingQuestionCount= 0;
+
 /**
  * js functions for landing page
  */
@@ -1847,44 +1849,84 @@ $(document).on('click', '.da-dd-item', function(e) {
 });
 
 function setUpListenerForSortCriteriaDropdown(){
-	$("#sort-criteria-sel").on('change',function(event){
+	$('.sort-option-item').on('click',function(event){
+		$('#sort-criteria-sel').val($(this).html());
+		$('#sort-options').slideToggle(200);
+		
+		var sortCr;
+		if( $('#sort-criteria-sel').val() == "Sort responses by Featured Reviews" ){
+			sortCr = "feature";
+		} else {
+			sortCr = "date";
+		}
+		
 		var payload = {
-			"sortCriteria" : $("#sort-criteria-sel").val()
+			"sortCriteria" : sortCr
 		};
 		
 		callAjaxPostWithPayloadData( "./updatesortcriteria.do", function(data){
 				var message = JSON.parse(data);
-				if (message.type != "ERROR_MESSAGE") {
-					$('#overlay-toast').html(message.message + ' to ' + $("#sort-criteria-sel").find(":selected").attr('data-sort'));
-					showToast();
-				}
-				else {
-					$('#overlay-toast').html(message.message);
-					showToast();
-				}
+				$('#overlay-toast').html(message.message);
+				showToast();
 			}, payload, false);
 	});
 }
 
 function setUpListenerForEmailOptionDropdown(){
-	$("#email-sel").on('change',function(event){
+	$('.email-option-item').on('click',function(event){
+		$('#email-sel').val($(this).html());
+		$('#email-options').slideToggle(200);
 		var payload = {
 			"sendEmailThrough" : $("#email-sel").val()
 		};
 		
 		callAjaxPostWithPayloadData( "./updatesendemailthrough.do", function(data){
 				var message = JSON.parse(data);
-				if (message.type != "ERROR_MESSAGE") {
-					$('#overlay-toast').html(message.message + ' to ' + $("#email-sel").find(":selected").attr('data-email-option'));
-					showToast();
-				}
-				else {
-					$('#overlay-toast').html(message.message);
-					showToast();
-				}
+				$('#overlay-toast').html(message.message);
+				showToast();
 			}, payload, false);
 	});
 }
+
+function autoAppendSortOrderDropdown(sortOrderId, classes) {
+	autoAppendTextDropdown(sortOrderId, classes, ["Sort responses by Date", "Sort responses by Featured Reviews"]);
+}
+
+function autoAppendEmailCriteriaDropdown(emailCriteriaId, classes) {
+	autoAppendTextDropdown(emailCriteriaId, classes, ["socialsurvey.me" , "socialsurvey.us"]);
+}
+
+
+//Generic functions
+function autoAppendTextDropdown(elementId, classes, listOfValues) {
+	listOfValues.map(function( item ){
+		$(elementId).append($('<div/>').addClass(classes).text(item));
+	});
+}
+
+var ratingMouseUp = function (e){
+	var container = $('#st-dd-wrapper-min-post');
+	if (!container.is(e.target) && container.has(e.target).length == 0){
+		container.slideToggle(200);
+	}
+	$(document).unbind("mouseup",ratingMouseUp);
+};
+
+var sortCriteriaMouseUp = function (e){
+	var container = $('#sort-options');
+	if (!container.is(e.target) && container.has(e.target).length == 0){
+		container.slideToggle(200);
+	}
+	$(document).unbind("mouseup",sortCriteriaMouseUp);
+};
+
+var emailCriteriaMouseUp = function (e){
+	var container = $('#email-options');
+	if (!container.is(e.target) && container.has(e.target).length == 0){
+		container.slideToggle(200);
+	}
+	$(document).unbind("mouseup",emailCriteriaMouseUp);
+};
 
 $(document).click(function(e) {
 	e.stopPropagation();
@@ -1986,6 +2028,15 @@ function bindEditSurveyEvents() {
 	$('.srv-tbl-rem').on('click', function(e) {
 		e.stopPropagation();
 		var questionId = $(this).parent().parent().data('questionid');
+		
+		if( ratingQuestionCount <= 1 && $(this).parent().parent().data('rating-question') == true ){
+			$('#overlay-toast').html( "Cannot remove the question, there must be a minimum of 1 ranking type question." );
+			showToast();
+			return;
+		} else {
+			ratingQuestionCount--;
+		}
+		
 		var url = "./removequestionfromsurvey.do?questionId=" + questionId;
 
 		createPopupConfirm("Delete Question", "Do you want to delete the question ?", "Delete", "Cancel");
@@ -2220,6 +2271,47 @@ $(document).on('click', '.bd-com-chk', function() {
 		$(this).addClass('bd-com-unchk');
 	}
 });
+
+$(document).on('click', '#user-ranking-chkbox-wrapper', function() {
+	if ($('#user-ranking-chkbox').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques').val(true);
+	} else {		
+		$('#user-ranking-chkbox').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques').val(false);
+	}
+});
+
+$(document).on('click', '#user-ranking-chkbox-wrapper-edit', function() {
+	if ($('#user-ranking-chkbox-edit').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox-edit').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques-edit').val(true);
+	} else {		
+		$('#user-ranking-chkbox-edit').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques-edit').val(false);
+	}
+});
+
+$(document).on('click', '#user-ranking-chkbox-wrapper-overlay', function() {
+	if ($('#user-ranking-chkbox-overlay').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox-overlay').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques-overlay').val(true);
+	} else {		
+		$('#user-ranking-chkbox-overlay').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques-overlay').val(false);
+	}
+});
+
+$(document).on('click', '#user-ranking-chkbox-wrapper-new', function() {
+	if ($('#user-ranking-chkbox-new').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox-new').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques-new').val(true);
+	} else {		
+		$('#user-ranking-chkbox-new').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques-new').val(false);
+	}
+});
+
 
 // Submit previous question
 var currentQues = 1;
@@ -5647,6 +5739,11 @@ function initSurveyWithUrl(q) {
 				}else{
 					$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
 				}
+			} 
+			else {
+				$('.sq-ques-wrapper').addClass( 'sq-main-txt' );
+				$('.sq-ques-wrapper').empty();
+				$('.sq-ques-wrapper').html("Sorry, It looks like there are no questions associated with this survey.");
 			}
 		},
 		error : function(e) {
@@ -5918,6 +6015,7 @@ function storeCustomerAnswer(customerResponse) {
 		"answer" : customerResponse,
 		"question" : questionDetails.question,
 		"questionType" : questionDetails.questionType,
+		"isUserRankingQuestion" : questionDetails.isUserRankingQuestion,
 		"stage" : qno + 1,
 		"surveyId" : surveyId
 	};
@@ -11650,10 +11748,12 @@ function initiateEncompassSaveConnection(warn) {
 	var username = document.getElementById('encompass-username').value;
 	var password = document.getElementById('encompass-password').value;
 	var url = document.getElementById('encompass-url').value;
+	var version = $( "#sdk-version-selection-list option:selected" ).text();
 	var payload = {
 		"username" : username,
 		"password" : password,
-		"url" : url
+		"url" : url,
+		"version"  : version
 	};
 	//TODO uncomment the test connection after development 
 	// by passed test credentials for develpment
@@ -11854,10 +11954,12 @@ function encompassCretentials() {
 	var username = document.getElementById('encompass-username').value;
 	var password = document.getElementById('encompass-password').value;
 	var url = document.getElementById('encompass-url').value;
+	var version = $( "#sdk-version-selection-list option:selected" ).text();
 	var payload = {
 		"username" : username,
 		"password" : password,
-		"url" : url
+		"url" : url,
+		"version" : version
 	};
 
 	if (validateEncompassTestInput('encompass-form-div')) {

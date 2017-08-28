@@ -636,5 +636,12 @@ public interface UserManagementService
 
     public void updateUserProfileObject( UserProfile userProfile ) throws InvalidInputException;
 
+
+    public void updateLastInviteSentDateIfUserExistsInDB( String emailId );
+
+    
+    User getActiveAgentByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
+        NoRecordsFetchedException;
+
 }
 // JIRA SS-34 BY RM02 BOC

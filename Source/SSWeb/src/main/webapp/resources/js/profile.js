@@ -399,11 +399,14 @@ function paintBreadCrums(url) {
 					+ entityJson[0].breadCrumbProfile + '</a>';
 			
 			for(var i=1; i<entityJson.length; i++) {
-				htmlContent += '<span class="brd-crm-divider">&gt;&gt;</span>';
-				htmlContent += '<a target="_blank" class="brd-crm brd-crm-link" href="'
-						+ entityJson[i].breadCrumbUrl
-						+ '">'
-						+ entityJson[i].breadCrumbProfile + '</a>';
+				//show entity only if not hidden from bredcrumb
+				if( ! entityJson[i].hideFromBreadCrumb){
+					htmlContent += '<span class="brd-crm-divider">&gt;&gt;</span>';
+					htmlContent += '<a target="_blank" class="brd-crm brd-crm-link" href="'
+							+ entityJson[i].breadCrumbUrl
+							+ '">'
+							+ entityJson[i].breadCrumbProfile + '</a>';
+				}
 			}
 			
 			$('#bread-crum-cont').html(htmlContent);

@@ -72,10 +72,10 @@
 										<div class="st-score-rt-top margin-top-twenty email-sel-item-resp sort-resp">
 											<spring:message code="label.review.sort.criteria.key" />
 										</div>
-										<select id="sort-criteria-sel" class="float-left review-sort-sel-item email-sel-item-resp">
-											<option data-sort="Date" value="date">Sort responses by Date</option>										
-											<option data-sort="Featured Reviews" value="feature">Sort responses by Featured Reviews</option>
-										</select>
+										<div class="sort-sel-wrapper">
+											<input type="text" id="sort-criteria-sel" class="float-left dd-arrow-dn cursor-pointer review-sort-sel-item">
+										</div>
+										<div class="sort-option-wrapper review-sort-wrapper-resp hide" id="sort-options"></div>
 									</div>
 								</div>
 							</c:if>	
@@ -108,10 +108,12 @@
 									<div class="float-left st-score-rt-top email-setting-sel-lbl">
 										<spring:message code="label.send.email.via.key" />
 									</div>
-									<select id="email-sel" class="float-left email-sel-item email-resp email-resp-margin">
-										<option data-email-option="socialsurvey.me" value="socialsurvey.me">socialsurvey.me</option>
-										<option data-email-option="socialsurvey.us" value="socialsurvey.us">socialsurvey.us</option>
-									</select>
+									<div class="email-sel-wrapper email-resp email-resp-margin">
+										<div class="email-sel-item">
+											<input type="text" id="email-sel" class="float-left dd-arrow-dn cursor-pointer email-item-wrapper" spellcheck="false">
+										</div>
+										<div class="email-option-wrapper hide" id="email-options"></div>
+									</div>
 								</div>
 							</div>
 					</c:if>
@@ -262,17 +264,20 @@ $(document).ready(function() {
 		$('#customized-setting-div').addClass('cust-resp');
 		$('#customized-setting-div').addClass('cust-div-resp');
 	}
-	$("#sort-criteria-sel").val("${reviewSortCriteria}");
+	
+	if( "${reviewSortCriteria}" == "feature" ){
+		$("#sort-criteria-sel").val("Sort responses by Featured Reviews");
+	} else {
+		$("#sort-criteria-sel").val("Sort responses by Date");
+	}
 	$("#email-sel").val("${sendEmailThrough}");
 
 	//social media urls
 	loadSocialMediaUrlInSettingsPage();
 	updateViewAsScroll();
-	setUpListenerForSortCriteriaDropdown();
 	if("${autoPostEnabled}" == "false"){
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 	}
-	setUpListenerForEmailOptionDropdown();
 	
 	if("${autoPostLinkToUserSite}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
 		$('#atpst-lnk-usr-ste-chk-box').addClass('bd-check-img-checked');
@@ -293,9 +298,34 @@ $(document).ready(function() {
 		changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
 		$('#rating-min-post').off('click');
 		$('#rating-min-post').on('click', function(){
+			$('#email-options').hide();
+			$('#sort-options').hide();
 			$('#st-dd-wrapper-min-post').slideToggle(200);
+			$(document).mouseup(ratingMouseUp);
 		});
 		
+		autoAppendSortOrderDropdown('#sort-options', "sort-option-item");
+		$('#sort-criteria-sel').off('click');
+		$('#sort-criteria-sel').on('click', function(){
+			$('#email-options').hide();
+			$('#st-dd-wrapper-min-post').hide();
+			$('#sort-options').slideToggle(200);
+			$(document).mouseup(sortCriteriaMouseUp);
+		});
+		
+		autoAppendEmailCriteriaDropdown('#email-options', "email-option-item");
+		$('#email-sel').off('click');
+		$('#email-sel').on('click', function(){
+			$('#sort-options').hide();
+			$('#st-dd-wrapper-min-post').hide();
+			$('#email-options').slideToggle(200);
+			$(document).mouseup(emailCriteriaMouseUp);
+		});
+		
+		setUpListenerForEmailOptionDropdown();
+		setUpListenerForSortCriteriaDropdown();
+
+
 		autoSetCheckboxStatus('#st-settings-location-on', '#st-settings-location-off', '#other-location');
 		autoSetCheckboxStatus('#st-settings-account-on', '#st-settings-account-off', '#other-account');
 		autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
