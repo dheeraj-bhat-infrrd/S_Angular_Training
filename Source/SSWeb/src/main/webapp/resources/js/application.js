@@ -6013,9 +6013,12 @@ function retakeSurveyRequest() {
  */
 function storeCustomerAnswer(customerResponse) {
 	var success = false;
+	//encode question and response
+	var encodedCustomerResponse = window.btoa( unescape( encodeURIComponent( customerResponse ) ) );
+	var encodedQuestion =  window.btoa( unescape( encodeURIComponent( questionDetails.question ) ) );
 	var payload = {
-		"answer" : customerResponse,
-		"question" : questionDetails.question,
+		"answer" : encodedCustomerResponse,
+		"question" : encodedQuestion,
 		"questionType" : questionDetails.questionType,
 		"isUserRankingQuestion" : questionDetails.isUserRankingQuestion,
 		"stage" : qno + 1,
