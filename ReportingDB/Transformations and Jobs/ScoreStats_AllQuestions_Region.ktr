@@ -140,6 +140,36 @@
   <hop> <from>Calculate Average</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
   </order>
   <step>
+    <name>Calculate Average</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var avg_score &#x3d; 0.00&#x3b;&#xd;&#xa;var total_counts &#x3d; five_star_count &#x2b; four_star_count &#x2b; three_star_count &#x2b; two_star_count &#x2b; one_star_count&#x3b;&#xd;&#xa;&#xd;&#xa;if &#x28; total_counts &#x3e; 0 &#x29; &#x7b;&#xd;&#xa;	avg_score &#x3d; &#x28;&#x28;5&#x2a;five_star_count&#x29; &#x2b; &#x28;4&#x2a;four_star_count&#x29; &#x2b; &#x28;3&#x2a;three_star_count&#x29; &#x2b; &#x28;2&#x2a;two_star_count&#x29; &#x2b; &#x28;1&#x2a;one_star_count&#x29;&#x29;&#x2f;total_counts&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>avg_score</name>
+        <rename>avg_score</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1044</xloc>
+      <yloc>148</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Generate random value</name>
     <type>RandomValue</type>
     <description/>
@@ -221,31 +251,6 @@
         <update>N</update>
       </value>
       <value>
-        <name>5_star</name>
-        <rename>5_star</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>4_star</name>
-        <rename>4_star</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>3_star</name>
-        <rename>3_star</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>2_star</name>
-        <rename>2_star</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>1_star</name>
-        <rename>1_star</rename>
-        <update>Y</update>
-      </value>
-      <value>
         <name>region_id</name>
         <rename>REGION_ID</rename>
         <update>N</update>
@@ -258,6 +263,36 @@
       <value>
         <name>question</name>
         <rename>question</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>five_star</name>
+        <rename>five_star_count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>four_star</name>
+        <rename>four_star_count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>three_star</name>
+        <rename>three_star_count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>two_star</name>
+        <rename>two_star_count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>one_star</name>
+        <rename>one_star_count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>avg_score</name>
+        <rename>avg_score</rename>
         <update>Y</update>
       </value>
     </lookup>
@@ -469,36 +504,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>137</xloc>
       <yloc>65</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Calculate Average</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var avg_score &#x3d; 0.00&#x3b;&#xd;&#xa;var total_counts &#x3d; five_star_count &#x2b; four_star_count &#x2b; three_star_count &#x2b; two_star_count &#x2b; one_star_count&#x3b;&#xd;&#xa;&#xd;&#xa;if &#x28; total_counts &#x3e; 0 &#x29; &#x7b;&#xd;&#xa;	avg_score &#x3d; &#x28;&#x28;5&#x2a;five_star_count&#x29; &#x2b; &#x28;4&#x2a;four_star_count&#x29; &#x2b; &#x28;3&#x2a;three_star_count&#x29; &#x2b; &#x28;2&#x2a;two_star_count&#x29; &#x2b; &#x28;1&#x2a;one_star_count&#x29;&#x29;&#x2f;total_counts&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>avg_score</name>
-        <rename>avg_score</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1044</xloc>
-      <yloc>148</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
