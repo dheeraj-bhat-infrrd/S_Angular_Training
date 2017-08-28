@@ -274,10 +274,7 @@
   <hop> <from>Multiway Merge Join</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_stats_report_id</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>Sort Stream</to><enabled>Y</enabled> </hop>
-  <hop> <from>survey_stats_report_region - input</from><to>Sort Table</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort Stream</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort Table</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Survey Stats Region - Synchronize after merge</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort Stream</from><to>Survey Stats Region - Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Company Input</name>
@@ -2359,7 +2356,7 @@
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>931</xloc>
-      <yloc>1277</yloc>
+      <yloc>1273</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2953,6 +2950,597 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>27</xloc>
       <yloc>782</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <remove>        <name>COMPANY_ID</name>
+      </remove>      <remove>        <name>REGION_ID</name>
+      </remove>      <remove>        <name>TRX_MONTH</name>
+      </remove>      <remove>        <name>company_name</name>
+      </remove>      <remove>        <name>region_name</name>
+      </remove>      <remove>        <name>month_data</name>
+      </remove>      <remove>        <name>year_data</name>
+      </remove>      <remove>        <name>report_id</name>
+      </remove>      <remove>        <name>COMPANY_ID_1</name>
+      </remove>      <remove>        <name>REGION_ID_1</name>
+      </remove>      <remove>        <name>TRX_MONTH_1</name>
+      </remove>      <remove>        <name>company_name_1</name>
+      </remove>      <remove>        <name>region_name_1</name>
+      </remove>      <remove>        <name>month_data_1</name>
+      </remove>      <remove>        <name>year_data_1</name>
+      </remove>      <remove>        <name>report_id_1</name>
+      </remove>      <remove>        <name>COMPANY_ID_2</name>
+      </remove>      <remove>        <name>REGION_ID_2</name>
+      </remove>      <remove>        <name>TRX_MONTH_2</name>
+      </remove>      <remove>        <name>company_name_2</name>
+      </remove>      <remove>        <name>region_name_2</name>
+      </remove>      <remove>        <name>month_data_2</name>
+      </remove>      <remove>        <name>year_data_2</name>
+      </remove>      <remove>        <name>report_id_2</name>
+      </remove>      <remove>        <name>COMPANY_ID_3</name>
+      </remove>      <remove>        <name>REGION_ID_3</name>
+      </remove>      <remove>        <name>TRX_MONTH_3</name>
+      </remove>      <remove>        <name>company_name_3</name>
+      </remove>      <remove>        <name>region_name_3</name>
+      </remove>      <remove>        <name>month_data_3</name>
+      </remove>      <remove>        <name>year_data_3</name>
+      </remove>      <remove>        <name>report_id_3</name>
+      </remove>      <remove>        <name>COMPANY_ID_4</name>
+      </remove>      <remove>        <name>REGION_ID_4</name>
+      </remove>      <remove>        <name>TRX_MONTH_4</name>
+      </remove>      <remove>        <name>company_name_4</name>
+      </remove>      <remove>        <name>region_name_4</name>
+      </remove>      <remove>        <name>month_data_4</name>
+      </remove>      <remove>        <name>year_data_4</name>
+      </remove>      <remove>        <name>report_id_4</name>
+      </remove>      <remove>        <name>COMPANY_ID_5</name>
+      </remove>      <remove>        <name>REGION_ID_5</name>
+      </remove>      <remove>        <name>TRX_MONTH_5</name>
+      </remove>      <remove>        <name>company_name_5</name>
+      </remove>      <remove>        <name>region_name_5</name>
+      </remove>      <remove>        <name>month_data_5</name>
+      </remove>      <remove>        <name>year_data_5</name>
+      </remove>      <remove>        <name>report_id_5</name>
+      </remove>      <remove>        <name>COMPANY_ID_6</name>
+      </remove>      <remove>        <name>REGION_ID_6</name>
+      </remove>      <remove>        <name>TRX_MONTH_6</name>
+      </remove>      <remove>        <name>company_name_6</name>
+      </remove>      <remove>        <name>region_name_6</name>
+      </remove>      <remove>        <name>month_data_6</name>
+      </remove>      <remove>        <name>year_data_6</name>
+      </remove>      <remove>        <name>report_id_6</name>
+      </remove>      <remove>        <name>COMPANY_ID_7</name>
+      </remove>      <remove>        <name>REGION_ID_7</name>
+      </remove>      <remove>        <name>TRX_MONTH_7</name>
+      </remove>      <remove>        <name>company_name_7</name>
+      </remove>      <remove>        <name>region_name_7</name>
+      </remove>      <remove>        <name>month_data_7</name>
+      </remove>      <remove>        <name>year_data_7</name>
+      </remove>      <remove>        <name>report_id_7</name>
+      </remove>      <remove>        <name>COMPANY_ID_8</name>
+      </remove>      <remove>        <name>REGION_ID_8</name>
+      </remove>      <remove>        <name>TRX_MONTH_8</name>
+      </remove>      <remove>        <name>company_name_8</name>
+      </remove>      <remove>        <name>region_name_8</name>
+      </remove>      <remove>        <name>month_data_8</name>
+      </remove>      <remove>        <name>year_data_8</name>
+      </remove>      <remove>        <name>report_id_8</name>
+      </remove>      <remove>        <name>COMPANY_ID_9</name>
+      </remove>      <remove>        <name>REGION_ID_9</name>
+      </remove>      <remove>        <name>TRX_MONTH_9</name>
+      </remove>      <remove>        <name>company_name_9</name>
+      </remove>      <remove>        <name>region_name_9</name>
+      </remove>      <remove>        <name>month_data_9</name>
+      </remove>      <remove>        <name>year_data_9</name>
+      </remove>      <remove>        <name>report_id_9</name>
+      </remove>      <remove>        <name>COMPANY_ID_10</name>
+      </remove>      <remove>        <name>REGION_ID_10</name>
+      </remove>      <remove>        <name>TRX_MONTH_10</name>
+      </remove>      <remove>        <name>company_name_10</name>
+      </remove>      <remove>        <name>region_name_10</name>
+      </remove>      <remove>        <name>month_data_10</name>
+      </remove>      <remove>        <name>year_data_10</name>
+      </remove>      <remove>        <name>report_id_10</name>
+      </remove>      <remove>        <name>COMPANY_ID_11</name>
+      </remove>      <remove>        <name>REGION_ID_11</name>
+      </remove>      <remove>        <name>TRX_MONTH_11</name>
+      </remove>      <remove>        <name>company_name_11</name>
+      </remove>      <remove>        <name>region_name_11</name>
+      </remove>      <remove>        <name>month_data_11</name>
+      </remove>      <remove>        <name>year_data_11</name>
+      </remove>      <remove>        <name>report_id_11</name>
+      </remove>      <remove>        <name>COMPANY_ID_12</name>
+      </remove>      <remove>        <name>REGION_ID_12</name>
+      </remove>      <remove>        <name>TRX_MONTH_12</name>
+      </remove>      <remove>        <name>company_name_12</name>
+      </remove>      <remove>        <name>region_name_12</name>
+      </remove>      <remove>        <name>month_data_12</name>
+      </remove>      <remove>        <name>year_data_12</name>
+      </remove>      <remove>        <name>report_id_12</name>
+      </remove>      <remove>        <name>COMPANY_ID_13</name>
+      </remove>      <remove>        <name>REGION_ID_13</name>
+      </remove>      <remove>        <name>TRX_MONTH_13</name>
+      </remove>      <remove>        <name>company_name_13</name>
+      </remove>      <remove>        <name>region_name_13</name>
+      </remove>      <remove>        <name>month_data_13</name>
+      </remove>      <remove>        <name>year_data_13</name>
+      </remove>      <remove>        <name>report_id_13</name>
+      </remove>      <remove>        <name>COMPANY_ID_14</name>
+      </remove>      <remove>        <name>REGION_ID_14</name>
+      </remove>      <remove>        <name>TRX_MONTH_14</name>
+      </remove>      <remove>        <name>company_name_14</name>
+      </remove>      <remove>        <name>region_name_14</name>
+      </remove>      <remove>        <name>month_data_14</name>
+      </remove>      <remove>        <name>year_data_14</name>
+      </remove>      <remove>        <name>report_id_14</name>
+      </remove>      <remove>        <name>COMPANY_ID_15</name>
+      </remove>      <remove>        <name>REGION_ID_15</name>
+      </remove>      <remove>        <name>TRX_MONTH_15</name>
+      </remove>      <remove>        <name>company_name_15</name>
+      </remove>      <remove>        <name>region_name_15</name>
+      </remove>      <remove>        <name>month_data_15</name>
+      </remove>      <remove>        <name>year_data_15</name>
+      </remove>      <remove>        <name>report_id_15</name>
+      </remove>      <remove>        <name>COMPANY_ID_16</name>
+      </remove>      <remove>        <name>REGION_ID_16</name>
+      </remove>      <remove>        <name>TRX_MONTH_16</name>
+      </remove>      <remove>        <name>company_name_16</name>
+      </remove>      <remove>        <name>region_name_16</name>
+      </remove>      <remove>        <name>month_data_16</name>
+      </remove>      <remove>        <name>year_data_16</name>
+      </remove>      <remove>        <name>report_id_16</name>
+      </remove>      <meta>        <name>TRX_RCVD</name>
+        <rename>trx_rcvd</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Pending</name>
+        <rename>pending</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Duplicate</name>
+        <rename>duplicates</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Corrupted</name>
+        <rename>corrupted</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Old_Records</name>
+        <rename>old_records</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Ignored</name>
+        <rename>ignored</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Mismatched</name>
+        <rename>mismatched</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Completed</name>
+        <rename>completed</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Sent</name>
+        <rename>sent_count</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>incomplete</name>
+        <rename>incomplete</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Clicked</name>
+        <rename>clicked_count</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Partially_Completed</name>
+        <rename>partially_completed</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Abusive</name>
+        <rename>abusive</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>avg_rating</name>
+        <rename>avg_rating</rename>
+        <type>Number</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Detractors</name>
+        <rename>detractors</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Passives</name>
+        <rename>passives</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Promoters</name>
+        <rename>promoters</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>complete_percentage</name>
+        <rename>complete_percentage</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>delta</name>
+        <rename>delta</rename>
+        <type>Integer</type>
+        <length>16</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_company_id</name>
+        <rename>company_id</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_company_name</name>
+        <rename>company_name</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_date</name>
+        <rename>created_date</rename>
+        <type>Timestamp</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_month_val</name>
+        <rename>month</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_region_id</name>
+        <rename>region_id</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_region_name</name>
+        <rename>region_name</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_report_id</name>
+        <rename>Id</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_trx_month</name>
+        <rename>trx_month</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_year_val</name>
+        <rename>year</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>survey_stats_report_id</name>
+        <rename>survey_stats_report_id</rename>
+        <type>String</type>
+        <length>36</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>561</xloc>
+      <yloc>1273</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3636,6 +4224,52 @@
     </step>
 
   <step>
+    <name>Sort Stream</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>region_id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>425</xloc>
+      <yloc>1273</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Sort Survey Pre Initiation</name>
     <type>SortRows</type>
     <description/>
@@ -3719,7 +4353,7 @@
     <name>Sort User Profile</name>
     <type>SortRows</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -4720,784 +5354,15 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>684</xloc>
-      <yloc>1277</yloc>
+      <xloc>723</xloc>
+      <yloc>1273</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>survey_stats_report_region - input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  trx_rcvd&#xd;&#xa;, pending&#xd;&#xa;, duplicates&#xd;&#xa;, corrupted&#xd;&#xa;, old_records&#xd;&#xa;, ignored&#xd;&#xa;, mismatched&#xd;&#xa;, completed&#xd;&#xa;, sent_count&#xd;&#xa;, incomplete&#xd;&#xa;, clicked_count&#xd;&#xa;, partially_completed&#xd;&#xa;, abusive&#xd;&#xa;, avg_rating&#xd;&#xa;, detractors&#xd;&#xa;, passives&#xd;&#xa;, promoters&#xd;&#xa;, complete_percentage&#xd;&#xa;, delta&#xd;&#xa;, company_id&#xd;&#xa;, company_name&#xd;&#xa;, created_date&#xd;&#xa;, month&#xd;&#xa;, region_id&#xd;&#xa;, region_name&#xd;&#xa;, Id&#xd;&#xa;, trx_month&#xd;&#xa;, year&#xd;&#xa;, survey_stats_report_id&#xd;&#xa;FROM survey_stats_report_region&#xd;&#xa;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>217</xloc>
-      <yloc>1486</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Select values</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>        <select_unspecified>N</select_unspecified>
-      <remove>        <name>COMPANY_ID</name>
-      </remove>      <remove>        <name>REGION_ID</name>
-      </remove>      <remove>        <name>TRX_MONTH</name>
-      </remove>      <remove>        <name>company_name</name>
-      </remove>      <remove>        <name>region_name</name>
-      </remove>      <remove>        <name>month_data</name>
-      </remove>      <remove>        <name>year_data</name>
-      </remove>      <remove>        <name>report_id</name>
-      </remove>      <remove>        <name>COMPANY_ID_1</name>
-      </remove>      <remove>        <name>REGION_ID_1</name>
-      </remove>      <remove>        <name>TRX_MONTH_1</name>
-      </remove>      <remove>        <name>company_name_1</name>
-      </remove>      <remove>        <name>region_name_1</name>
-      </remove>      <remove>        <name>month_data_1</name>
-      </remove>      <remove>        <name>year_data_1</name>
-      </remove>      <remove>        <name>report_id_1</name>
-      </remove>      <remove>        <name>COMPANY_ID_2</name>
-      </remove>      <remove>        <name>REGION_ID_2</name>
-      </remove>      <remove>        <name>TRX_MONTH_2</name>
-      </remove>      <remove>        <name>company_name_2</name>
-      </remove>      <remove>        <name>region_name_2</name>
-      </remove>      <remove>        <name>month_data_2</name>
-      </remove>      <remove>        <name>year_data_2</name>
-      </remove>      <remove>        <name>report_id_2</name>
-      </remove>      <remove>        <name>COMPANY_ID_3</name>
-      </remove>      <remove>        <name>REGION_ID_3</name>
-      </remove>      <remove>        <name>TRX_MONTH_3</name>
-      </remove>      <remove>        <name>company_name_3</name>
-      </remove>      <remove>        <name>region_name_3</name>
-      </remove>      <remove>        <name>month_data_3</name>
-      </remove>      <remove>        <name>year_data_3</name>
-      </remove>      <remove>        <name>report_id_3</name>
-      </remove>      <remove>        <name>COMPANY_ID_4</name>
-      </remove>      <remove>        <name>REGION_ID_4</name>
-      </remove>      <remove>        <name>TRX_MONTH_4</name>
-      </remove>      <remove>        <name>company_name_4</name>
-      </remove>      <remove>        <name>region_name_4</name>
-      </remove>      <remove>        <name>month_data_4</name>
-      </remove>      <remove>        <name>year_data_4</name>
-      </remove>      <remove>        <name>report_id_4</name>
-      </remove>      <remove>        <name>COMPANY_ID_5</name>
-      </remove>      <remove>        <name>REGION_ID_5</name>
-      </remove>      <remove>        <name>TRX_MONTH_5</name>
-      </remove>      <remove>        <name>company_name_5</name>
-      </remove>      <remove>        <name>region_name_5</name>
-      </remove>      <remove>        <name>month_data_5</name>
-      </remove>      <remove>        <name>year_data_5</name>
-      </remove>      <remove>        <name>report_id_5</name>
-      </remove>      <remove>        <name>COMPANY_ID_6</name>
-      </remove>      <remove>        <name>REGION_ID_6</name>
-      </remove>      <remove>        <name>TRX_MONTH_6</name>
-      </remove>      <remove>        <name>company_name_6</name>
-      </remove>      <remove>        <name>region_name_6</name>
-      </remove>      <remove>        <name>month_data_6</name>
-      </remove>      <remove>        <name>year_data_6</name>
-      </remove>      <remove>        <name>report_id_6</name>
-      </remove>      <remove>        <name>COMPANY_ID_7</name>
-      </remove>      <remove>        <name>REGION_ID_7</name>
-      </remove>      <remove>        <name>TRX_MONTH_7</name>
-      </remove>      <remove>        <name>company_name_7</name>
-      </remove>      <remove>        <name>region_name_7</name>
-      </remove>      <remove>        <name>month_data_7</name>
-      </remove>      <remove>        <name>year_data_7</name>
-      </remove>      <remove>        <name>report_id_7</name>
-      </remove>      <remove>        <name>COMPANY_ID_8</name>
-      </remove>      <remove>        <name>REGION_ID_8</name>
-      </remove>      <remove>        <name>TRX_MONTH_8</name>
-      </remove>      <remove>        <name>company_name_8</name>
-      </remove>      <remove>        <name>region_name_8</name>
-      </remove>      <remove>        <name>month_data_8</name>
-      </remove>      <remove>        <name>year_data_8</name>
-      </remove>      <remove>        <name>report_id_8</name>
-      </remove>      <remove>        <name>COMPANY_ID_9</name>
-      </remove>      <remove>        <name>REGION_ID_9</name>
-      </remove>      <remove>        <name>TRX_MONTH_9</name>
-      </remove>      <remove>        <name>company_name_9</name>
-      </remove>      <remove>        <name>region_name_9</name>
-      </remove>      <remove>        <name>month_data_9</name>
-      </remove>      <remove>        <name>year_data_9</name>
-      </remove>      <remove>        <name>report_id_9</name>
-      </remove>      <remove>        <name>COMPANY_ID_10</name>
-      </remove>      <remove>        <name>REGION_ID_10</name>
-      </remove>      <remove>        <name>TRX_MONTH_10</name>
-      </remove>      <remove>        <name>company_name_10</name>
-      </remove>      <remove>        <name>region_name_10</name>
-      </remove>      <remove>        <name>month_data_10</name>
-      </remove>      <remove>        <name>year_data_10</name>
-      </remove>      <remove>        <name>report_id_10</name>
-      </remove>      <remove>        <name>COMPANY_ID_11</name>
-      </remove>      <remove>        <name>REGION_ID_11</name>
-      </remove>      <remove>        <name>TRX_MONTH_11</name>
-      </remove>      <remove>        <name>company_name_11</name>
-      </remove>      <remove>        <name>region_name_11</name>
-      </remove>      <remove>        <name>month_data_11</name>
-      </remove>      <remove>        <name>year_data_11</name>
-      </remove>      <remove>        <name>report_id_11</name>
-      </remove>      <remove>        <name>COMPANY_ID_12</name>
-      </remove>      <remove>        <name>REGION_ID_12</name>
-      </remove>      <remove>        <name>TRX_MONTH_12</name>
-      </remove>      <remove>        <name>company_name_12</name>
-      </remove>      <remove>        <name>region_name_12</name>
-      </remove>      <remove>        <name>month_data_12</name>
-      </remove>      <remove>        <name>year_data_12</name>
-      </remove>      <remove>        <name>report_id_12</name>
-      </remove>      <remove>        <name>COMPANY_ID_13</name>
-      </remove>      <remove>        <name>REGION_ID_13</name>
-      </remove>      <remove>        <name>TRX_MONTH_13</name>
-      </remove>      <remove>        <name>company_name_13</name>
-      </remove>      <remove>        <name>region_name_13</name>
-      </remove>      <remove>        <name>month_data_13</name>
-      </remove>      <remove>        <name>year_data_13</name>
-      </remove>      <remove>        <name>report_id_13</name>
-      </remove>      <remove>        <name>COMPANY_ID_14</name>
-      </remove>      <remove>        <name>REGION_ID_14</name>
-      </remove>      <remove>        <name>TRX_MONTH_14</name>
-      </remove>      <remove>        <name>company_name_14</name>
-      </remove>      <remove>        <name>region_name_14</name>
-      </remove>      <remove>        <name>month_data_14</name>
-      </remove>      <remove>        <name>year_data_14</name>
-      </remove>      <remove>        <name>report_id_14</name>
-      </remove>      <remove>        <name>COMPANY_ID_15</name>
-      </remove>      <remove>        <name>REGION_ID_15</name>
-      </remove>      <remove>        <name>TRX_MONTH_15</name>
-      </remove>      <remove>        <name>company_name_15</name>
-      </remove>      <remove>        <name>region_name_15</name>
-      </remove>      <remove>        <name>month_data_15</name>
-      </remove>      <remove>        <name>year_data_15</name>
-      </remove>      <remove>        <name>report_id_15</name>
-      </remove>      <remove>        <name>COMPANY_ID_16</name>
-      </remove>      <remove>        <name>REGION_ID_16</name>
-      </remove>      <remove>        <name>TRX_MONTH_16</name>
-      </remove>      <remove>        <name>company_name_16</name>
-      </remove>      <remove>        <name>region_name_16</name>
-      </remove>      <remove>        <name>month_data_16</name>
-      </remove>      <remove>        <name>year_data_16</name>
-      </remove>      <remove>        <name>report_id_16</name>
-      </remove>      <meta>        <name>TRX_RCVD</name>
-        <rename>trx_rcvd</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Pending</name>
-        <rename>pending</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Duplicate</name>
-        <rename>duplicates</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Corrupted</name>
-        <rename>corrupted</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Old_Records</name>
-        <rename>old_records</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Ignored</name>
-        <rename>ignored</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Mismatched</name>
-        <rename>mismatched</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Completed</name>
-        <rename>completed</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Sent</name>
-        <rename>sent_count</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>incomplete</name>
-        <rename>incomplete</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Clicked</name>
-        <rename>clicked_count</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Partially_Completed</name>
-        <rename>partially_completed</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Abusive</name>
-        <rename>abusive</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>avg_rating</name>
-        <rename>avg_rating</rename>
-        <type>Number</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Detractors</name>
-        <rename>detractors</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Passives</name>
-        <rename>passives</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Promoters</name>
-        <rename>promoters</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>complete_percentage</name>
-        <rename>complete_percentage</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>delta</name>
-        <rename>delta</rename>
-        <type>Integer</type>
-        <length>16</length>
-        <precision>2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>final_company_id</name>
-        <rename>company_id</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>final_company_name</name>
-        <rename>company_name</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>final_date</name>
-        <rename>created_date</rename>
-        <type>Timestamp</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>final_month_val</name>
-        <rename>month</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>final_region_id</name>
-        <rename>region_id</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>final_region_name</name>
-        <rename>region_name</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>final_report_id</name>
-        <rename>Id</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>final_trx_month</name>
-        <rename>trx_month</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>final_year_val</name>
-        <rename>year</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>survey_stats_report_id</name>
-        <rename>survey_stats_report_id</rename>
-        <type>String</type>
-        <length>36</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>522</xloc>
-      <yloc>1277</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort Stream</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>region_id</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>month</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>year</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>388</xloc>
-      <yloc>1277</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort Table</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>region_id</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>month</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>year</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>217</xloc>
-      <yloc>1390</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Merge Rows &#x28;diff&#x29;</name>
-    <type>MergeRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <keys>
-      <key>region_id</key>
-      <key>month</key>
-      <key>year</key>
-    </keys>
-    <values>
-      <value>trx_rcvd</value>
-      <value>pending</value>
-      <value>duplicates</value>
-      <value>corrupted</value>
-      <value>old_records</value>
-      <value>ignored</value>
-      <value>mismatched</value>
-      <value>completed</value>
-      <value>sent_count</value>
-      <value>incomplete</value>
-      <value>clicked_count</value>
-      <value>partially_completed</value>
-      <value>abusive</value>
-      <value>avg_rating</value>
-      <value>detractors</value>
-      <value>passives</value>
-      <value>promoters</value>
-      <value>complete_percentage</value>
-      <value>delta</value>
-      <value>company_id</value>
-      <value>company_name</value>
-      <value>created_date</value>
-      <value>month</value>
-      <value>region_id</value>
-      <value>region_name</value>
-      <value>Id</value>
-      <value>trx_month</value>
-      <value>year</value>
-      <value>survey_stats_report_id</value>
-    </values>
-<flag_field>flagfield</flag_field>
-<reference>Sort Table</reference>
-<compare>Sort Stream</compare>
-    <compare>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>217</xloc>
-      <yloc>1277</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Survey Stats Region - Synchronize after merge</name>
-    <type>SynchronizeAfterMerge</type>
+    <name>Survey Stats Region - Insert &#x2f; Update</name>
+    <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -5508,14 +5373,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <commit>10000</commit>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <use_batch>N</use_batch>
-    <perform_lookup>Y</perform_lookup>
-    <operation_order_field>flagfield</operation_order_field>
-    <order_insert>new</order_insert>
-    <order_update>changed</order_update>
-    <order_delete/>
+    <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
       <table>survey_stats_report_region</table>
@@ -5686,7 +5544,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>217</xloc>
-      <yloc>1140</yloc>
+      <yloc>1273</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
