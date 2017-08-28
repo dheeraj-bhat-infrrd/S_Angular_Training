@@ -870,6 +870,7 @@ public interface CommonConstants
 
     public static final String SURVEY_REMINDER_COUNT = "reminderCounts";
     public static final String SURVEY_REMINDER_INTERVAL = "reminderInterval";
+    public static final String IS_SURVEY_REMINDER_DISABLED = "isReminderDisabled";
 
     //Session variable
     public static final String REALTECH_USER_ID = "realTechAdminId";

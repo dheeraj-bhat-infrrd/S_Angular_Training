@@ -1696,6 +1696,22 @@ public class OrganizationManagementController
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
+            
+            else if ( mailCategory != null && mailCategory.equals( "max-reminder-count" ) ) {
+                int maxReminderCount = Integer.parseInt( request.getParameter( "max-reminder-count" ) );
+                if ( maxReminderCount == 0 ) {
+                    LOG.warn( "Reminder Count is 0." );
+                    throw new InvalidInputException( "Reminder Count is 0.", DisplayMessageConstants.GENERAL_ERROR );
+                }
+
+                originalSurveySettings = companySettings.getSurvey_settings();
+                if ( originalSurveySettings != null ) {
+                    originalSurveySettings.setMax_number_of_survey_reminders( maxReminderCount );
+                }
+                LOG.info( "Updating Survey Settings Reminder Count" );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_REMINDER_COUNT_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
 
             else if ( mailCategory != null && mailCategory.equals( "reminder-needed" ) ) {
                 boolean isReminderDisabled = Boolean.parseBoolean( request.getParameter( "reminder-needed-hidden" ) );
@@ -3743,6 +3759,41 @@ public class OrganizationManagementController
         if(surveySettings.getNeutralTextComplete() != null)
             surveySettings.setNeutralTextComplete(DatatypeConverter.printBase64Binary(surveySettings.getNeutralTextComplete().getBytes()));
         
+    }
+    
+    
+    @RequestMapping ( value = "/updatemanualsurveyremindercount", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSurveyReminderCount( HttpServletRequest request )
+    {
+        LOG.info( "Method to updateSurveyReminderCount started" );
+        HttpSession session = request.getSession();
+        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        int maxSurveyReminderCount;
+        try {
+            String maxSurveyReminderCountStr = request.getParameter( "surveyReminderCount" );
+            maxSurveyReminderCount = Integer.parseInt( maxSurveyReminderCountStr );
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            if(companySettings == null)
+                throw new InvalidInputException("No settings fould for company with id " + companyId);
+
+            SurveySettings surveySettings = companySettings.getSurvey_settings();
+            surveySettings.setMax_number_of_survey_reminders( maxSurveyReminderCount );
+            if ( organizationManagementService.updateScoreForSurvey(
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, surveySettings ) ) {
+                companySettings.setSurvey_settings( surveySettings );
+                LOG.info( "Updated Survey Settings" );
+            }
+
+        } catch ( Exception error ) {
+            LOG.error(
+                "Exception occured in updateAutoPostLinkToUserSiteForSurvey() while updating whether to enable autopost link to company site or not. Nested exception is ",
+                error );
+            return error.getMessage();
+        }
+
+        LOG.info( "Method to updateSurveyReminderCount finished" );
+        return "Successfully updated the max survey reminder count";
     }
 }
 // JIRA: SS-24 BY RM02 EOC

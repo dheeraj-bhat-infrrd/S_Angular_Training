@@ -1742,7 +1742,7 @@ function sendSurveyReminderMail(surveyPreInitiationId, customerName, disableEle)
 		complete : function(data) {
 			enable(disableEle);
 			if (success) {
-				$('#overlay-toast').html("Reminder Mail sent successfully to " + customerName);
+				$('#overlay-toast').html(data);
 				showToast();
 			}
 		},
