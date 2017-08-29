@@ -182,6 +182,54 @@
   <hop> <from>Synchronize after merge</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1391</xloc>
+      <yloc>347</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter rows</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows 3</send_true_to>
+<send_false_to>LinkedIn Constant 2</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>_id_3</leftvalue>
+ <function>IS NOT NULL</function>
+ <rightvalue/>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>281</xloc>
+      <yloc>185</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>LinkedIn Constant</name>
     <type>Constant</type>
     <description/>
@@ -323,7 +371,7 @@
     <fields_name/>
     <collection>AGENT_SETTINGS</collection>
     <json_field_name>json</json_field_name>
-    <json_query/>
+    <json_query>&#x7b;&#x24;query&#x3a;&#x7b;&#x22;modifiedOn&#x22; &#x3a;&#x7b;&#x24;gte&#x3a;&#x24;&#x7b;modifiedOnSettings&#x7d;&#x7d;&#x7d;&#x7d;</json_query>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -4525,54 +4573,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>623</xloc>
       <yloc>345</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter rows</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rows 3</send_true_to>
-<send_false_to>LinkedIn Constant 2</send_false_to>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>_id_3</leftvalue>
- <function>IS NOT NULL</function>
- <rightvalue/>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>281</xloc>
-      <yloc>185</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1391</xloc>
-      <yloc>347</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
