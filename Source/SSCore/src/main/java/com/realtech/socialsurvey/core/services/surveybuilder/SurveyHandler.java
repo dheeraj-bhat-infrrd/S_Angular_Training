@@ -1,10 +1,12 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -383,4 +385,8 @@ public interface SurveyHandler
 
 
     List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations ) throws InvalidInputException;
+
+
+    public boolean createEntryForSurveyUploadWithCsv( String hierarchyType, MultipartFile tempFile, String fileName, long hierarchyId,
+        User user ) throws NonFatalException, UnsupportedEncodingException;
 }

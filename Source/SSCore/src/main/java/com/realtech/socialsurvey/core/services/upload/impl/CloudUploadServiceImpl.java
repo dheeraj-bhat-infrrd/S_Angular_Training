@@ -2,17 +2,20 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -63,6 +66,9 @@ public class CloudUploadServiceImpl implements FileUploadService
     @Value ( "${AMAZON_BUCKET}")
     private String bucket;
 
+    @Value ( "${AMAZON_SURVEY_CSV_BUCKET}")
+    private String amazonSurveyCsvBucket;
+
     @Value ( "${AMAZON_ENV_PREFIX}")
     private String envPrefix;
 
@@ -85,9 +91,11 @@ public class CloudUploadServiceImpl implements FileUploadService
         }
     }
 
+
     @Override
-    public String uploadLogoImageFile(File file, String imageName, boolean preserveFileName) throws InvalidInputException{
-    	LOG.info( "Method uploadLogoImageFile inside AmazonUploadServiceImpl called" );
+    public String uploadLogoImageFile( File file, String imageName, boolean preserveFileName ) throws InvalidInputException
+    {
+        LOG.info( "Method uploadLogoImageFile inside AmazonUploadServiceImpl called" );
         try {
             return uploadImage( file, imageName, bucket + CommonConstants.FILE_SEPARATOR + logoBucket, preserveFileName );
         } catch ( InvalidInputException e ) {
@@ -95,7 +103,8 @@ public class CloudUploadServiceImpl implements FileUploadService
             throw new FatalException( "IOException occured while reading file. Reason : " + e.getMessage(), e );
         }
     }
-    
+
+
     @Override
     public String uploadLogo( MultipartFile fileLocal, String logoName ) throws InvalidInputException
     {
@@ -124,36 +133,74 @@ public class CloudUploadServiceImpl implements FileUploadService
     {
         uploadFile( file, fileName, bucket, false );
     }
-    
+
+
+    /*
+     * method to upload a csv file filled with customer details and return the URI
+     * 
+     * @param MultiPartFile
+     * @param String
+     * @return String
+     */
+    @Override
+    public String uploadFileAtSurveyCsvBucket( MultipartFile file, String fileName ) throws NonFatalException
+    {
+        LOG.debug( "Method uploadFileAtSurveyCsvBucket called" );
+
+        if ( !file.isEmpty() ) {
+            try {
+                File convFile = new File( URLEncoder.encode( fileName, "UTF-8" ) );
+                file.transferTo( convFile );
+
+                // uploading in social survey's application bucket, inside "amazonSurveyCsvBucket" folder
+                uploadFile( convFile, fileName, bucket + CommonConstants.FILE_SEPARATOR + amazonSurveyCsvBucket, false );
+
+                return endpoint + CommonConstants.FILE_SEPARATOR + bucket + CommonConstants.FILE_SEPARATOR
+                    + amazonSurveyCsvBucket + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( fileName, "UTF-8" );
+
+            } catch ( IOException e ) {
+                LOG.error( "IOException occured while reading file. Reason : " + e.getMessage(), e );
+                throw new FatalException( "IOException occured while reading file. Reason : " + e.getMessage(), e );
+            }
+        } else {
+            LOG.error( "Method fuploadFileAtSurveyCsvBucket failed to upload" );
+            throw new InvalidInputException( "Upload failed: because the file with name " + fileName + " was empty" );
+        }
+    }
+
 
     @Override
-    public void uploadFileAtSpeicifiedBucket(File file, String fileName, String bucketName, boolean expireImmediately) throws NonFatalException{
-    	LOG.info("Uploading file : "+fileName + " at bucket: " + bucketName);
-    	uploadFile(file, fileName, bucketName, expireImmediately);
-    }
-    
-    private String uploadImage( File convFile, String logoName, String bucket, boolean preserveFileName ) throws InvalidInputException
+    public void uploadFileAtSpeicifiedBucket( File file, String fileName, String bucketName, boolean expireImmediately )
+        throws NonFatalException
     {
-    	LOG.debug("Uploading file. preserving file name: "+preserveFileName);
+        LOG.info( "Uploading file : " + fileName + " at bucket: " + bucketName );
+        uploadFile( file, fileName, bucketName, expireImmediately );
+    }
+
+
+    private String uploadImage( File convFile, String logoName, String bucket, boolean preserveFileName )
+        throws InvalidInputException
+    {
+        LOG.debug( "Uploading file. preserving file name: " + preserveFileName );
         uploadUtils.validateFile( convFile );
 
         String fileName = null;
         StringBuilder amazonFileName = null;
-        
-        if(!preserveFileName){
-	        amazonFileName = new StringBuilder( envPrefix ).append( CommonConstants.SYMBOL_HYPHEN );
-	
-	        amazonFileName.append( encryptionHelper.encryptSHA512( logoName + ( System.currentTimeMillis() ) ) );
-	        if ( logoName.endsWith( ".jpg" ) || logoName.endsWith( ".JPG" ) ) {
-	            amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "jpg" );
-	        } else if ( logoName.endsWith( ".jpeg" ) || logoName.endsWith( ".JPEG" ) ) {
-	            amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "jpeg" );
-	        } else if ( logoName.endsWith( ".png" ) || logoName.endsWith( ".PNG" ) ) {
-	            amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "png" );
-	        }
-	        fileName = amazonFileName.toString();
-        }else{
-        	fileName = logoName;
+
+        if ( !preserveFileName ) {
+            amazonFileName = new StringBuilder( envPrefix ).append( CommonConstants.SYMBOL_HYPHEN );
+
+            amazonFileName.append( encryptionHelper.encryptSHA512( logoName + ( System.currentTimeMillis() ) ) );
+            if ( logoName.endsWith( ".jpg" ) || logoName.endsWith( ".JPG" ) ) {
+                amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "jpg" );
+            } else if ( logoName.endsWith( ".jpeg" ) || logoName.endsWith( ".JPEG" ) ) {
+                amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "jpeg" );
+            } else if ( logoName.endsWith( ".png" ) || logoName.endsWith( ".PNG" ) ) {
+                amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "png" );
+            }
+            fileName = amazonFileName.toString();
+        } else {
+            fileName = logoName;
         }
 
         try {
@@ -175,24 +222,24 @@ public class CloudUploadServiceImpl implements FileUploadService
         }
 
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DATE, 19);
-        cal.set(Calendar.MONTH, Calendar.JANUARY);
-        cal.set(Calendar.YEAR, 2038);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        cal.set(Calendar.MILLISECOND, 0);
-        
-        int maxAgeValue = (int) ( ( cal.getTimeInMillis() - System.currentTimeMillis() ) / 1000 ) ;
+        cal.set( Calendar.DATE, 19 );
+        cal.set( Calendar.MONTH, Calendar.JANUARY );
+        cal.set( Calendar.YEAR, 2038 );
+        cal.set( Calendar.HOUR_OF_DAY, 23 );
+        cal.set( Calendar.MINUTE, 59 );
+        cal.set( Calendar.SECOND, 59 );
+        cal.set( Calendar.MILLISECOND, 0 );
+
+        int maxAgeValue = (int) ( ( cal.getTimeInMillis() - System.currentTimeMillis() ) / 1000 );
 
         ObjectMetadata metadata = new ObjectMetadata();
-        if(expireImmediately){
-        	metadata.setCacheControl(CACHE_PUBLIC);
-        	metadata.setExpirationTime( new Date( System.currentTimeMillis() ) );
-        }else{
-        	metadata.setCacheControl( CACHE_MAX_AGE + maxAgeValue + CACHE_VALUE_SEPERATOR + CACHE_PUBLIC );
-        	// TODO: set expiration date properly later
-        	metadata.setExpirationTime( cal.getTime() );
+        if ( expireImmediately ) {
+            metadata.setCacheControl( CACHE_PUBLIC );
+            metadata.setExpirationTime( new Date( System.currentTimeMillis() ) );
+        } else {
+            metadata.setCacheControl( CACHE_MAX_AGE + maxAgeValue + CACHE_VALUE_SEPERATOR + CACHE_PUBLIC );
+            // TODO: set expiration date properly later
+            metadata.setExpirationTime( cal.getTime() );
             metadata.setHeader( "Expires", new SimpleDateFormat( "EEE, dd MMM yyyy HH:mm:ss z" ).format( cal.getTime() ) );
         }
         PutObjectRequest putObjectRequest = new PutObjectRequest( bucket, fileName, file );
@@ -200,13 +247,13 @@ public class CloudUploadServiceImpl implements FileUploadService
         putObjectRequest.withCannedAcl( CannedAccessControlList.PublicRead );
 
         AmazonS3 s3Client = createAmazonClient( endpoint, bucket );
-        
+
         PutObjectResult result = s3Client.putObject( putObjectRequest );
 
         LOG.info( "Amazon Upload Etag: " + result.getETag() );
         LOG.info( "Uploaded " + fileName + " to Amazon s3" );
     }
-   
+
 
     /**
      * Method that returns a list of all the keys in a bucket.
@@ -242,8 +289,8 @@ public class CloudUploadServiceImpl implements FileUploadService
             LOG.debug( "List successfully created" );
         } catch ( AmazonClientException e ) {
             LOG.error( "Amazon Client Exception caught while fetching list of keys : message : " + e.getMessage() );
-            throw new FatalException( "Amazon Client Exception caught while fetching list of keys : message : "
-                + e.getMessage(), e );
+            throw new FatalException(
+                "Amazon Client Exception caught while fetching list of keys : message : " + e.getMessage(), e );
         }
 
         LOG.info( "Returning the list." );

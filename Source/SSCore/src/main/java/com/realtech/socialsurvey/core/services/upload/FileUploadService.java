@@ -66,5 +66,8 @@ public interface FileUploadService {
 	 * @throws InvalidInputException
 	 */
 	public String uploadLogoImageFile(File file, String imageName, boolean preserveFileName) throws InvalidInputException;
+	
+	
+    public String uploadFileAtSurveyCsvBucket( MultipartFile tempFile, String fileName ) throws NonFatalException;
 
 }

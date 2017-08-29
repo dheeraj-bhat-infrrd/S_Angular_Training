@@ -736,6 +736,7 @@ public interface CommonConstants
     public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
     public static final String SOCIAL_HISTORY_COLLECTION = "SOCIAL_CONNECTION_HISTORY";
     public static final String UPLOAD_HIERARCHY_DETAILS_COLLECTION = "UPLOAD_HIERARCHY_DETAILS";
+    public static final String SURVEY_CSV_UPLOAD_COLLECTION = "SURVEY_CSV_UPLOAD";
 
     /*
      * Mongo social post Source

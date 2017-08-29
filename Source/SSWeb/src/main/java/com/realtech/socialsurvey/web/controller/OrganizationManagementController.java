@@ -161,9 +161,9 @@ public class OrganizationManagementController
     @Autowired
     private HierarchyStructureUploadService hierarchyStructureUploadService;
 
+
     @Value ( "${CDN_PATH}")
     private String endpoint;
-
     @Value ( "${APPLICATION_LOGO_URL}")
     private String applicationLogoUrl;
 
@@ -638,9 +638,10 @@ public class OrganizationManagementController
                 unitSettings = userManagementService.getUserSettings( user.getUserId() );
             }
             model.addAttribute( CommonConstants.USER_APP_SETTINGS, unitSettings );
-            
-            
-            model.addAttribute( CommonConstants.ENCOMPASS_VERSION_LIST, organizationManagementService.getActiveEncompassSdkVersions() );
+
+
+            model.addAttribute( CommonConstants.ENCOMPASS_VERSION_LIST,
+                organizationManagementService.getActiveEncompassSdkVersions() );
 
             //REALTECH_USER_ID is set only for real tech and SS admin
             boolean isRealTechOrSSAdmin = false;
@@ -757,12 +758,12 @@ public class OrganizationManagementController
 
             //set allow parter survey
             boolean allowPartnerSurvey = false;
-            if(unitSettings.getCrm_info() != null )
+            if ( unitSettings.getCrm_info() != null )
                 allowPartnerSurvey = unitSettings.getCrm_info().isAllowPartnerSurvey();
-            
+
             model.addAttribute( "allowPartnerSurvey", allowPartnerSurvey );
-            
-            
+
+
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
             model.addAttribute( "reviewSortCriteria", profileManagementService.processSortCriteria( companySettings.getIden(),
                 companySettings.getReviewSortCriteria() ) );
@@ -784,17 +785,17 @@ public class OrganizationManagementController
             //enocode before sending to UI
             encodeSurveySettings( surveySettings );
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
-            
+
             //get default setting and store in model
             SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
-          //enocode before sending to UI
+            //enocode before sending to UI
             encodeSurveySettings( defaultSurveySettings );
             model.addAttribute( "defaultSurveyProperties", defaultSurveySettings );
-            
-            if(companySettings.getSendEmailThrough()== null){
-                model.addAttribute("sendEmailThrough",CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME);
-            }else{
-                model.addAttribute("sendEmailThrough",companySettings.getSendEmailThrough()); 
+
+            if ( companySettings.getSendEmailThrough() == null ) {
+                model.addAttribute( "sendEmailThrough", CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME );
+            } else {
+                model.addAttribute( "sendEmailThrough", companySettings.getSendEmailThrough() );
             }
 
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
@@ -807,7 +808,6 @@ public class OrganizationManagementController
         return JspResolver.EDIT_SETTINGS;
     }
 
-   
 
     /**
      * Method to save encompass details / CRM info
@@ -829,14 +829,14 @@ public class OrganizationManagementController
         String encompassUrl = request.getParameter( "encompass-url" );
         String encompassFieldId = request.getParameter( "encompass-fieldId" );
         String state = request.getParameter( "encompass-state" );
-        
+
         String buyerAgentEmail = request.getParameter( "buyer-agent-email" );
         String buyerAgentName = request.getParameter( "buyer-agent-name" );
         String sellerAgentEmail = request.getParameter( "seller-agnt-email" );
         String sellerAgentName = request.getParameter( "seller-agnt-name" );
-        
+
         String version = request.getParameter( "sdk-version-selection-list" );
-        
+
         Map<String, Object> responseMap = new HashMap<String, Object>();
         String message;
         boolean status = true;
@@ -856,11 +856,11 @@ public class OrganizationManagementController
                 LOG.info( "Field Id is empty" );
                 encompassFieldId = CommonConstants.ENCOMPASS_DEFAULT_FEILD_ID;
             }
-            
+
             if ( version == null || version.isEmpty() ) {
                 throw new InvalidInputException( "version can not be empty" );
             }
-            
+
             if ( state == null || state.isEmpty() || state.equals( CommonConstants.CRM_INFO_DRY_RUN_STATE ) ) {
                 state = CommonConstants.CRM_INFO_DRY_RUN_STATE;
             } else {
@@ -888,24 +888,24 @@ public class OrganizationManagementController
             encompassCrmInfo.setCrm_password( cipherPassword );
             encompassCrmInfo.setUrl( encompassUrl );
             encompassCrmInfo.setVersion( version );
-            
+
             //check if it's need to update real state agent detail
-            if( !StringUtils.isEmpty( buyerAgentEmail ) ||  !StringUtils.isEmpty( buyerAgentName ) || !StringUtils.isEmpty( sellerAgentEmail ) || !StringUtils.isEmpty( sellerAgentName ))
-            {
-                
-                if (StringUtils.isEmpty( buyerAgentEmail )) {
+            if ( !StringUtils.isEmpty( buyerAgentEmail ) || !StringUtils.isEmpty( buyerAgentName )
+                || !StringUtils.isEmpty( sellerAgentEmail ) || !StringUtils.isEmpty( sellerAgentName ) ) {
+
+                if ( StringUtils.isEmpty( buyerAgentEmail ) ) {
                     throw new InvalidInputException( "Buyer agent email can not be empty" );
                 }
-                if (StringUtils.isEmpty( buyerAgentName )) {
+                if ( StringUtils.isEmpty( buyerAgentName ) ) {
                     throw new InvalidInputException( "Buyer agent name can not be empty" );
                 }
-                if (StringUtils.isEmpty( sellerAgentEmail )) {
+                if ( StringUtils.isEmpty( sellerAgentEmail ) ) {
                     throw new InvalidInputException( "Seller agent email can not be empty" );
                 }
-                if (StringUtils.isEmpty( sellerAgentName )) {
+                if ( StringUtils.isEmpty( sellerAgentName ) ) {
                     throw new InvalidInputException( "Seller agent name can not be empty" );
                 }
-                
+
                 encompassCrmInfo.setBuyerAgentEmail( buyerAgentEmail );
                 encompassCrmInfo.setBuyerAgentName( buyerAgentName );
                 encompassCrmInfo.setSellerAgentEmail( sellerAgentEmail );
@@ -1877,7 +1877,8 @@ public class OrganizationManagementController
                 boolean isAccountDisabled = Boolean.parseBoolean( request.getParameter( "other-account" ) );
 
                 // Calling services to update DB
-                organizationManagementService.processCancelSubscriptionRequest( companySettings, isAccountDisabled, user.getUserId() );
+                organizationManagementService.processCancelSubscriptionRequest( companySettings, isAccountDisabled,
+                    user.getUserId() );
                 // set the updated settings value in session
                 companySettings.setAccountDisabled( isAccountDisabled );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.ACCOUNT_SETTINGS_UPDATE_SUCCESSFUL,
@@ -2378,9 +2379,9 @@ public class OrganizationManagementController
             if ( user != null && user.isCompanyAdmin() ) {
                 // Add an entry into Disabled_Accounts table with disable_date as current date
                 // and status as inactive.
-               
-                organizationManagementService.processDeactivateCompany( user.getCompany() ,  user.getUserId());
-                
+
+                organizationManagementService.processDeactivateCompany( user.getCompany(), user.getUserId() );
+
                 LOG.info( "Company deactivated successfully, logging out now." );
                 request.getSession( false ).invalidate();
                 SecurityContextHolder.clearContext();
@@ -2901,6 +2902,62 @@ public class OrganizationManagementController
 
 
     @ResponseBody
+    @RequestMapping ( value = "/savesurveycsvfile", method = RequestMethod.POST)
+    public String saveSurveyCsvFile( Model model, @RequestParam ( "file") MultipartFile file,
+        @RequestParam ( "filename") String fileName, @RequestParam ( "uploaderEmail") String uploaderEmail,
+        HttpServletRequest request )
+    {
+        LOG.debug( "Saving the csv survey info file" );
+
+        boolean status = false;
+        Object message = null;
+        try {
+            String hierarchyType = request.getParameter( "hierarchyType" );
+            long hierarchyId;
+
+            if ( file == null || file.isEmpty() )
+                throw new InvalidInputException( "Please provide a valid CSV file." );
+
+            if ( StringUtils.isEmpty( fileName ) )
+                throw new InvalidInputException( "Please provide a valid CSV file name." );
+
+            if ( StringUtils.isEmpty( uploaderEmail ) )
+                throw new InvalidInputException( "Please provide a valid email for csv upload." );
+
+            if ( StringUtils.isEmpty( hierarchyType ) )
+                throw new InvalidInputException( "Please provide a valid hiearchyType." );
+
+            if ( !StringUtils.isEmpty( request.getParameter( "hierarchyValue" ) ) ) {
+                try {
+                    hierarchyId = Long.parseLong( request.getParameter( "hierarchyValue" ) );
+                } catch ( NumberFormatException unableToFormatId ) {
+                    throw new InvalidInputException( "please provide a valid hierarchy Identifier." );
+                }
+            } else {
+                throw new InvalidInputException( "Please provide a hiearchy Identifier." );
+            }
+            
+            status = surveyHandler.createEntryForSurveyUploadWithCsv( hierarchyType, file, fileName, hierarchyId,
+                sessionHelper.getCurrentUser() );
+            message = "CSV file uploaded successfully.";
+
+
+        } catch ( InvalidInputException expectedError ) {
+            status = false;
+            message = expectedError.getMessage();
+        } catch ( Exception unhandledError ) {
+            status = false;
+            message = "Sorry, Unable to upload csv, Please try again.";
+        }
+
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "message", message );
+        return new Gson().toJson( responseMap );
+    }
+
+
+    @ResponseBody
     @RequestMapping ( value = "/verifyxlsxfile", method = RequestMethod.POST)
     public String validateHierarchyFile( Model model, HttpServletRequest request ) throws InvalidInputException
     {
@@ -3112,7 +3169,7 @@ public class OrganizationManagementController
 
 
             surveyPreInitiationList = socialManagementService.getUnmatchedPreInitiatedSurveys( user.getCompany().getCompanyId(),
-                startIndex, batchSize ,count );
+                startIndex, batchSize, count );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
             return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
@@ -3136,7 +3193,7 @@ public class OrganizationManagementController
         int batchSize;
         long count;
 
-        if ( startIndexStr == null || batchSizeStr == null || countStr == null) {
+        if ( startIndexStr == null || batchSizeStr == null || countStr == null ) {
             LOG.error( "Null value found for startIndex or batch size." );
             return "Null value found for startIndex or batch size.";
         }
@@ -3158,7 +3215,7 @@ public class OrganizationManagementController
             }
 
             surveyPreInitiationList = socialManagementService.getProcessedPreInitiatedSurveys( user.getCompany().getCompanyId(),
-                startIndex, batchSize , count );
+                startIndex, batchSize, count );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
             return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_PROCESSED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
@@ -3202,7 +3259,7 @@ public class OrganizationManagementController
                 throw e;
             }
             surveyPreInitiationList = socialManagementService.getCorruptPreInitiatedSurveys( user.getCompany().getCompanyId(),
-                startIndex, batchSize , count );
+                startIndex, batchSize, count );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
             return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_CORRUPT_PREINITIATED_SURVEYS_UNSUCCESSFUL,
@@ -3281,7 +3338,7 @@ public class OrganizationManagementController
         String batchSizeStr = request.getParameter( "batchSize" );
         String countStr = request.getParameter( "count" );
 
-        if ( startIndexStr == null || batchSizeStr == null || countStr == null) {
+        if ( startIndexStr == null || batchSizeStr == null || countStr == null ) {
             LOG.error( "Null value found for startIndex or batch size." );
             return "Null value found for startIndex or batch size.";
         }
@@ -3309,7 +3366,7 @@ public class OrganizationManagementController
 
 
             userList = userManagementService.getUsersAndEmailMappingForCompany( user.getCompany().getCompanyId(), startIndex,
-                batchSize , count );
+                batchSize, count );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching UserWithAliasedEmails. Reason :" + nonFatalException.getMessage(),
                 nonFatalException );
@@ -3592,7 +3649,8 @@ public class OrganizationManagementController
         LOG.info( "Method UpdateSortCriteria of OrganizationManagementController finished" );
         return new Gson().toJson( message );
     }
-    
+
+
     //JIRA SS-975
     @RequestMapping ( value = "/updatesendemailthrough", method = RequestMethod.POST)
     @ResponseBody
@@ -3614,17 +3672,19 @@ public class OrganizationManagementController
                     if ( companySettings == null ) {
                         message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID,
                             DisplayMessageType.ERROR_MESSAGE );
-                    } else if ( user != null &&  adminUserid != null ) {
-                        if(sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME)|| sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US)){
+                    } else if ( user != null && adminUserid != null ) {
+                        if ( sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME )
+                            || sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US ) ) {
                             organizationManagementService.updateSendEmailThroughForCompany( companySettings, sendEmailThrough );
-                            message = messageUtils.getDisplayMessage( DisplayMessageConstants.SEND_EMAIL_THROUGH_SUCCESSFULLY_UPDATED,
+                            message = messageUtils.getDisplayMessage(
+                                DisplayMessageConstants.SEND_EMAIL_THROUGH_SUCCESSFULLY_UPDATED,
                                 DisplayMessageType.SUCCESS_MESSAGE );
-                        }
-                        else{
-                            message = messageUtils.getDisplayMessage( DisplayMessageConstants.SEND_EMAIL_THROUGH_UNSUCCESSFULLY_UPDATED,
+                        } else {
+                            message = messageUtils.getDisplayMessage(
+                                DisplayMessageConstants.SEND_EMAIL_THROUGH_UNSUCCESSFULLY_UPDATED,
                                 DisplayMessageType.ERROR_MESSAGE );
                         }
-                        
+
                     } else {
                         message = messageUtils.getDisplayMessage( DisplayMessageConstants.INSUFFICIENT_SENDGRID_USER_PERMISSION,
                             DisplayMessageType.ERROR_MESSAGE );
@@ -3643,8 +3703,8 @@ public class OrganizationManagementController
         LOG.info( "Method updateSendEmailThrough of OrganizationManagementController finished" );
         return new Gson().toJson( message );
     }
-    
-    
+
+
     @RequestMapping ( value = "/updateallowpartnersurveyforcompany", method = RequestMethod.POST)
     @ResponseBody
     public String updateAllowPartnerSurveyForCompany( HttpServletRequest request )
@@ -3691,14 +3751,14 @@ public class OrganizationManagementController
         LOG.info( "Method to update allow partner survey finished" );
         return "success";
     }
-    
-    
+
+
     @RequestMapping ( value = "/updateallowpartnersurveyforuser", method = RequestMethod.POST)
     @ResponseBody
     public String updateAllowPartnerSurveyForUser( HttpServletRequest request )
     {
         LOG.info( "Method to update updateAllowPartnerSurveyForUser started" );
-        
+
         try {
             String allowPartnerSurveyString = request.getParameter( "allowPartnerSurvey" );
             String userIdString = request.getParameter( "userId" );
@@ -3724,25 +3784,30 @@ public class OrganizationManagementController
         return "success";
     }
 
+
     /**
      * 
      * @param surveySettings
      */
-    private void encodeSurveySettings( SurveySettings surveySettings){
-        if(surveySettings.getHappyText() != null)
-            surveySettings.setHappyText(DatatypeConverter.printBase64Binary(surveySettings.getHappyText().getBytes()));
-        if(surveySettings.getSadText() != null)
-            surveySettings.setSadText(DatatypeConverter.printBase64Binary(surveySettings.getSadText().getBytes()));
-        if(surveySettings.getNeutralText() != null)
-            surveySettings.setNeutralText(DatatypeConverter.printBase64Binary(surveySettings.getNeutralText().getBytes()));
+    private void encodeSurveySettings( SurveySettings surveySettings )
+    {
+        if ( surveySettings.getHappyText() != null )
+            surveySettings.setHappyText( DatatypeConverter.printBase64Binary( surveySettings.getHappyText().getBytes() ) );
+        if ( surveySettings.getSadText() != null )
+            surveySettings.setSadText( DatatypeConverter.printBase64Binary( surveySettings.getSadText().getBytes() ) );
+        if ( surveySettings.getNeutralText() != null )
+            surveySettings.setNeutralText( DatatypeConverter.printBase64Binary( surveySettings.getNeutralText().getBytes() ) );
 
-        if(surveySettings.getHappyTextComplete() != null)
-            surveySettings.setHappyTextComplete(DatatypeConverter.printBase64Binary(surveySettings.getHappyTextComplete().getBytes()));
-        if(surveySettings.getSadTextComplete() != null)
-            surveySettings.setSadTextComplete(DatatypeConverter.printBase64Binary(surveySettings.getSadTextComplete().getBytes()));
-        if(surveySettings.getNeutralTextComplete() != null)
-            surveySettings.setNeutralTextComplete(DatatypeConverter.printBase64Binary(surveySettings.getNeutralTextComplete().getBytes()));
-        
+        if ( surveySettings.getHappyTextComplete() != null )
+            surveySettings.setHappyTextComplete(
+                DatatypeConverter.printBase64Binary( surveySettings.getHappyTextComplete().getBytes() ) );
+        if ( surveySettings.getSadTextComplete() != null )
+            surveySettings
+                .setSadTextComplete( DatatypeConverter.printBase64Binary( surveySettings.getSadTextComplete().getBytes() ) );
+        if ( surveySettings.getNeutralTextComplete() != null )
+            surveySettings.setNeutralTextComplete(
+                DatatypeConverter.printBase64Binary( surveySettings.getNeutralTextComplete().getBytes() ) );
+
     }
 }
 // JIRA: SS-24 BY RM02 EOC

@@ -3108,6 +3108,10 @@ button.paypal.is-active {
 	opacity: .5;
 }
 
+.opacity-complete-invisibility {
+	opacity: 0;
+}
+
 .sq-full-star {
 	background: url(../images/full_star.png) no-repeat center;
 }
@@ -5649,6 +5653,8 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	top: 0px;
 	opacity: 0;
 }
+
+
 
 .file-pick-logo-adj {
 	position: absolute;
@@ -9339,4 +9345,62 @@ ul.accordion li>a:before {
   	height: 22px !important; /* Height of new image */
 }
 
+.survey-csv-upload-logo {
+	width: 100px;
+    height: 62px;
+    background: url(http://www.localhost:8080/resources/images/upload.png);
+    margin: 0 auto;
+}
 
+.survey-csv-file-input {
+	width: 100px;
+    height: 62px;	
+    margin: 0 auto;
+}
+
+.survey-csv-button {
+    padding: 10px;
+    width: 140px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    background: #009FE0;
+    cursor: pointer;
+    margin: 15px 5px;
+}
+
+.survey-csv-file-info {
+    clear: both;
+	margin: 20px auto;
+    text-align: center;
+}
+
+.survey-upload-csv {
+	margin: 10px;
+}
+
+.survey-csv-buttons {
+	margin: 0 auto;
+	width: 300px;
+}
+
+.survey-csv-email-invalid {
+	margin: 10px;
+	text-align: center;
+}
+
+.display-load {
+	text-align: center;
+	font-weight: bold !important;
+	font-size: 20px;
+}
+
+.survey-csv-send-btn  {
+	width: 140px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    background: #009FE0;
+    cursor: pointer;
+    margin-left: 15px;
+}

@@ -6964,9 +6964,9 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 					webAddress.value = link;
 					webAddresses[i++] = webAddress;
 				} else {
-					return;
 					$(this).focus();
 					webAddressValid = false;
+					return;
 				}
 			}
 		});
@@ -9694,6 +9694,15 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 		$('#wc-review-table').perfectScrollbar('update');
 	}, 1000);
 });
+
+
+$(document).on('click', '#wc-send-survey-upload-csv', function() {
+	$('.welcome-popup-body-wrapper').hide();
+	$('.wc-btn-row').hide();
+	
+});
+
+
 var surveysent=false;
 var alreadysentsurvey=false;
 $(document).on('click', '#wc-send-survey', function() {
@@ -9707,20 +9716,16 @@ $(document).on('click', '#wc-send-survey', function() {
 	var agentname = "";
 	var myself = false;
 	var end = false;
+	
 	if(surveysent || alreadysentsurvey){
 		return;
 	}
+	
 	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
 			$(this).children().each(function() {
 				$(this).find(':nth-child(1)').removeClass("error-survey");
 				$(this).find(':nth-child(2)').addClass("hidden");
-			});
-		}
-	});
-	$('#wc-review-table-inner').children().each(function() {
-		if (!$(this).hasClass('wc-review-hdr')) {
-			$(this).children().each(function() {
 				if (!$(this).hasClass('last')) {
 					var input = $(this).children(":input").val();
 					if (input != "") {
@@ -12260,3 +12265,112 @@ function hideTapedMessages(){
 	hideErrorInvalid();
 	hideInfoInvalid();
 }
+
+
+// survey csv file functions
+
+$(document).on('change', '.survey-csv-file-input', function(){
+	$("#upload-email-invalid").hide();
+	processAndValidateCsvForm( true );
+});
+
+$(document).on('click','#wc-send-survey-upload-cancel',function(event){
+	$(".wc-btn-row").show();
+	$(".welcome-popup-body-wrapper").show();
+	$(".survey-upload-csv").hide();
+});
+
+$(document).on('click','#wc-send-survey-upload-confirm',function(event){
+	
+	if( !processAndValidateCsvForm( false ) ){
+		return;
+	}
+
+	var formData = new FormData();
+	formData.append("file", $('#survey-file-intake').prop("files")[0]);
+	formData.append("filename", $('#survey-file-intake').prop("files")[0].name);
+	formData.append( "uploaderEmail", $('#survey-uploader-email').val() );
+	formData.append("hierarchyType",$('#hierarchyType').val() );
+	formData.append("hierarchyValue",$('#hierarchyValue').val() );
+	showOverlay();
+	callAjaxPOSTWithTextData("./savesurveycsvfile.do", function(callbackData){
+		
+		response = JSON.parse(callbackData);
+		if( response.status ){
+			$("#overlay-toast").html(response.message);
+			showToast();
+		} else {
+			$("#overlay-toast").html(response.message);
+			showToast();
+		}
+		
+	}, false, formData);
+});
+
+$(document).on('click','#wc-send-survey-upload-csv',function(event){
+	$(".wc-btn-row").hide();
+	$(".welcome-popup-body-wrapper").hide();
+	$(".survey-upload-csv").show();
+});
+
+function csvFileValidate(inputFileElement, whileUploading) {
+	
+	$('.display-load').hide();
+	
+	if( whileUploading ){
+		$('.survey-csv-file-info').hide();
+	}
+
+	if ($(inputFileElement).attr("type") == "file") {
+		var fileName = $(inputFileElement).val();
+		if (fileName.length > 0) {
+			if (fileName.substr(fileName.length - 4, 4).toLowerCase() == ".csv") {
+								
+				var fileAddress = $(inputFileElement).val().split('\\');
+				$('#survey-csv-file-name').text(fileAddress[fileAddress.length - 1]);
+				$('.survey-csv-file-info').show();
+				return true;
+			}
+		} else {
+			$('.display-load').show();
+			$(inputFileElement).val = "";
+			return false;
+		}
+	} else {
+		$('.display-load').show();
+		return false;
+	}
+}
+
+function uploaderEmailValidate(){
+	return ( $('#survey-uploader-email').val() == undefined ||  $('#survey-uploader-email').val() == '' ) ? false : true;
+}
+
+function processAndValidateCsvForm(whileUploading){
+	
+	$("#upload-email-invalid").hide();
+	
+	if( !csvFileValidate("#survey-file-intake") )
+	{
+		if( !$("#wc-send-survey-upload-confirm").hasClass('disable') ){
+			$("#wc-send-survey-upload-confirm").addClass('disable');
+		}
+		$('.display-load').show();
+		$('.survey-csv-file-info').hide();
+		$("#overlay-toast").html("Please select a valid csv file");
+		showToast();
+		return false;
+	} else if( !uploaderEmailValidate() && !whileUploading){
+		$("#upload-email-invalid").show();
+		return false;
+	} else {
+		if( $("#wc-send-survey-upload-confirm").hasClass('disable') ){
+			$("#wc-send-survey-upload-confirm").removeClass('disable');
+		}
+		return true;
+	}
+}
+
+$(document).on('click', '#survey-uploader-email', function(){
+	$("#upload-email-invalid").hide();
+})

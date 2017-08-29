@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -44,6 +46,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -51,6 +54,7 @@ import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SurveyCsvUploadDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -73,6 +77,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -100,6 +105,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
 import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
@@ -119,6 +125,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private SurveyDetailsDao surveyDetailsDao;
+    
+    @Autowired
+    private SurveyCsvUploadDao surveyCsvUploadDao;
 
     @Autowired
     private UserDao userDao;
@@ -252,7 +261,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     private static final int CITY_INDEX = 9;
     private static final int STATE_INDEX = 10;
     private static final String DEFAULT_CUSTOMER_EMAIL_ID_FOR_3RD_PARTY = "none@socialsurvey.com";
-
+    
+    @Autowired 
+    private FileUploadService fileUploadService;
 
     /**
      * Method to store question and answer format into mongo.
@@ -4346,5 +4357,44 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return duplicateSurveyInterval;
 
     }
+    
+    @Override
+    public boolean createEntryForSurveyUploadWithCsv( String hierarchyType, MultipartFile tempFile, String fileName, long hierarchyId,
+        User user ) throws NonFatalException, UnsupportedEncodingException
+    {
+        LOG.debug( "createEntryForSurveyUploadWithCsv started for user with Id: " + user.getUserId() );
+        String stamp = "";
+
+        if( hierarchyId <= 0){
+            throw new InvalidInputException( "Please provide a valid hierarchy Identifier." );
+        }
+        
+        if ( Arrays.asList( CommonConstants.REGION_ID, CommonConstants.COMPANY_ID, CommonConstants.BRANCH_ID )
+            .contains( StringUtils.defaultString( hierarchyType ) ) ) {
+            stamp = "SURVEY_CSV_UPLOAD_ADMIN_";
+        } else if ( CommonConstants.AGENT_ID.equals( StringUtils.defaultString( hierarchyType ) ) ) {
+            stamp = "SURVEY_CSV_UPLOAD_AGENT_";
+        } else {
+            throw new InvalidInputException( "Please provide a valid hierarchy type." );
+        }
+        
+        // Set the new filename
+        String savedFileName = stamp + user.getUserId() + "_" + new Date( System.currentTimeMillis() ).toString() + ".csv";
+
+        String fileUrl = fileUploadService.uploadFileAtSurveyCsvBucket( tempFile, savedFileName );
+
+        SurveyCsvInfo csvInfo = new SurveyCsvInfo();
+        csvInfo.setFileName( fileName );
+        csvInfo.setFileUrl( fileUrl );
+        csvInfo.setHierarchyType( hierarchyType );
+        csvInfo.setHierarchyId( hierarchyId );
+        csvInfo.setUploadedDate( new Date() );
+        csvInfo.setUserId( user.getUserId() );
+
+        surveyCsvUploadDao.createEntryForSurveyCsvUpload( csvInfo );
+        LOG.debug( "createEntryForSurveyUploadWithCsv completed for user with Id: " + user.getUserId() );
+        return true;
+    }
+
     
 }

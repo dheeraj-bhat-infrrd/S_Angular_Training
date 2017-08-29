@@ -126,4 +126,11 @@ public class FileUploadServiceImpl implements FileUploadService {
 	public void uploadFileAtSpeicifiedBucket(File file, String fileName, String bucketName, boolean expireImmediately) throws NonFatalException{
 		
 	}
+
+    @Override
+    public String uploadFileAtSurveyCsvBucket( MultipartFile tempFile, String fileName ) throws NonFatalException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<input type="hidden" id="hierarchyType" value="${entityType}" />
+<input type="hidden" id="hierarchyValue" value="${entityId}" />
 <div id="welcome-popup-invite" class="welcome-popup-wrapper">
 	<div class="welcome-popup-hdr-wrapper clearfix">
 		<div class="float-left wc-hdr-txt"><spring:message code="label.sendsurvey.key" /></div>
@@ -55,8 +57,37 @@
 	 </div>
 	<div class="wc-btn-col float-left clearfix wc-dash-btn">
 		<div id="wc-skip-send-survey" class="wc-skip-btn float-left wc-final-skip"><spring:message code="label.skip.key" /></div>
-	<div id="wc-send-survey" class="wc-sub-send-btn float-left wc-final-submit"><spring:message code="label.send.key" /></div>
+		<div id="wc-send-survey" class="wc-sub-send-btn float-left wc-final-submit"><spring:message code="label.send.key" /></div>	
+		<div id="wc-send-survey-upload-csv" class="survey-csv-send-btn survey-csv-send-btn-resp float-left wc-final-upload-csv"><spring:message code="label.csv.upload.key" /></div>
 	</div>
+	</div>
+	
+	<div class="survey-upload-csv hide clearfix">
+		<div class="float-left " style="width: 50%;">
+	   		<div class="survey-csv-upload-logo">	
+	            <input type="file" class="rfr_input_fld opacity-complete-invisibility survey-csv-file-input" id="survey-file-intake">
+	            <div class="display-load"><spring:message code="label.survey.csv.load.file.key" /></div>
+		   	</div>
+		   	
+		   	<div class="survey-csv-file-info hide">
+				<div>
+					<spring:message code="label.survey.csv.upload.filename.key" /> 
+					<span id="survey-csv-file-name" class="rfr_txt_fld" style="font-weight: bold !important;">
+					</span>
+				</div>
+			</div>
+			
+	   	</div>
+		<div class="float-right" style="width: 50%;">
+	   		<div class="rfr_txt_fld" style=" margin: 0 auto;">
+				<input type="text" class="rfr_input_fld" id="survey-uploader-email" spellcheck="false" placeholder='<spring:message code="label.survey.uploader.email.placeholder.key"/>'>
+			</div>
+			<div id="upload-email-invalid" class="hm-item-err-2 survey-csv-email-invalid hide"><spring:message code="label.survey.csv.uploader.email.invalid.key"/></div>
+			<div class = "survey-csv-buttons-resp survey-csv-buttons">
+		   		<div id="wc-send-survey-upload-confirm" class=" float-left survey-csv-button disable">confirm</div>
+				<div id="wc-send-survey-upload-cancel" class=" float-left survey-csv-button">cancel</div>
+			</div>
+		</div>	
 	</div>
 </div>
 <script>
