@@ -827,7 +827,7 @@
     <fields_name/>
     <collection>SURVEY_DETAILS</collection>
     <json_field_name>json</json_field_name>
-    <json_query>&#x7b;&#x24;query&#x3a;&#x7b;&#x22;modifiedOn&#x22; &#x3a;&#x7b;&#x24;gte&#x3a;&#x24;&#x7b;modifiedOnSurveyDetails&#x7d;&#x7d;&#x7d;&#x7d;</json_query>
+    <json_query>&#x7b;&#x24;query&#x3a; &#x7b;&#x22;modifiedOn&#x22; &#x3a; &#x7b;&#x24;gte&#x3a;&#x7b;&#x24;date&#x3a;&#x24;&#x7b;modifiedOnSurveyDetails&#x7d;&#x7d;&#x7d;&#x7d; &#x7d;</json_query>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
