@@ -66,5 +66,7 @@ public interface FileUploadService {
 	 * @throws InvalidInputException
 	 */
 	public String uploadLogoImageFile(File file, String imageName, boolean preserveFileName) throws InvalidInputException;
+	
+    public void uploadReport( File file, String fileName ) throws NonFatalException;
 
 }

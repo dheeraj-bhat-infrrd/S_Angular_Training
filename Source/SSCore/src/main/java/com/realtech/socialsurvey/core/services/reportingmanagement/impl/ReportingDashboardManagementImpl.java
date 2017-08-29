@@ -262,11 +262,14 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
     
-    @Value ( "${CDN_REPORTING_PATH}")
+    @Value ( "${CDN_PATH}")
     private String endpoint;
     
-    @Value ( "${REPORTING_BUCKET}")
-    private String bucketName;
+    @Value ( "${AMAZON_BUCKET}")
+    private String bucket;
+    
+    @Value ( "${AMAZON_REPORTS_BUCKET}")
+    private String reportBucket;
     
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
@@ -1735,8 +1738,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         // SAVE REPORT IN S3
         if ( excelCreated ) {
-            fileUploadService.uploadFileAtSpeicifiedBucket( file, fileName, bucketName, false );
-            String fileNameInS3 = endpoint + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( fileName, "UTF-8" );
+            fileUploadService.uploadReport( file, fileName);
+            String fileNameInS3 = endpoint + CommonConstants.FILE_SEPARATOR + reportBucket + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( fileName, "UTF-8" );
             responseString = fileNameInS3;
         }
         return responseString;
