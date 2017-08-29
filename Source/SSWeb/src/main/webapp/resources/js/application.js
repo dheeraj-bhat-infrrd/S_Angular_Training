@@ -9702,9 +9702,7 @@ $(document).on('click', '#wc-send-survey-upload-csv', function() {
 	
 });
 
-
 var surveysent=false;
-var alreadysentsurvey=false;
 $(document).on('click', '#wc-send-survey', function() {
 	var allowrequest = true;
 	var receiversList = [];
@@ -9715,46 +9713,14 @@ $(document).on('click', '#wc-send-survey', function() {
 	var idx = 0;
 	var agentname = "";
 	var myself = false;
-	var end = false;
 	
-	if(surveysent || alreadysentsurvey){
+	if(surveysent ){
 		return;
 	}
 	
-	$('#wc-review-table-inner').children().each(function() {
-		if (!$(this).hasClass('wc-review-hdr')) {
-			$(this).children().each(function() {
-				$(this).find(':nth-child(1)').removeClass("error-survey");
-				$(this).find(':nth-child(2)').addClass("hidden");
-				if (!$(this).hasClass('last')) {
-					var input = $(this).children(":input").val();
-					if (input != "") {
-						end = true;
-					}
-				}
-			});
-		}
-	});
-	if (!end) {
-		$('#wc-review-table-inner').children().each(function() {
-			if (!$(this).hasClass('wc-review-hdr')) {
-				$(this).children().each(function() {
-					if ($(this).hasClass('survey-user')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
-						allowrequest = false;
-					} else if ($(this).hasClass('survey-fname')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
-						allowrequest = false;
-					} else if ($(this).hasClass('survey-email')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
-						allowrequest = false;
-					}
-				});
-			}
-		});
+	
+	if ( !removeErrorMessagesAndDetermineIfRequiredDataIsPresent() ) {
+		allowrequest = checkIfRequestCanBeMadeAndDisplayErrorMessagesIfNeeded();
 	}
 
 	$('#wc-review-table-inner').children().each(function() {
@@ -9927,10 +9893,6 @@ $(document).on('click', '#wc-send-survey', function() {
 	var surveyed = [];
 	var alreadysureyed = false;
 	if (allowrequest) {
-		if(alreadysentsurvey){
-			return;
-		}
-		alreadysentsurvey=true;
 		callAjaxPostWithPayloadData("./getalreadysurveyedemailids.do", function(data) {
 			var alreadySurveyedEmails = $.parseJSON(data);
 			// To check if the email had already surveyed
@@ -9958,7 +9920,6 @@ $(document).on('click', '#wc-send-survey', function() {
 
 			} else {
 				$('#send-survey-dash').removeClass("hide");
-				alreadysentsurvey=false;
 				if(surveysent){
 					return;
 				}
@@ -9995,6 +9956,52 @@ $(document).on('click', '#wc-send-survey', function() {
 		}, payload, true);
 	}
 });
+
+
+function checkIfRequestCanBeMadeAndDisplayErrorMessagesIfNeeded(){
+	var allowrequest = true;
+	$('#wc-review-table-inner').children().each(function() {
+		if (!$(this).hasClass('wc-review-hdr')) {
+			$(this).children().each(function() {
+				if ($(this).hasClass('survey-user')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
+					allowrequest = false;
+				} else if ($(this).hasClass('survey-fname')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
+					allowrequest = false;
+				} else if ($(this).hasClass('survey-email')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
+					allowrequest = false;
+				}
+			});
+		}
+	});
+	return allowrequest;
+}
+
+function removeErrorMessagesAndDetermineIfRequiredDataIsPresent(){
+	
+	var end = false;
+	$('#wc-review-table-inner').children().each(function() {
+		if (!$(this).hasClass('wc-review-hdr')) {
+			$(this).children().each(function() {
+				$(this).find(':nth-child(1)').removeClass("error-survey");
+				$(this).find(':nth-child(2)').addClass("hidden");
+				if (!$(this).hasClass('last')) {
+					var input = $(this).children(":input").val();
+					if (input != "") {
+						end = true;
+					}
+				}
+			});
+		}
+	});
+	return end;
+}
+
 
 $(document).on('click', '#wc-skip-send-survey', function() {
 	$('#overlay-send-survey').hide();
