@@ -93,32 +93,42 @@ public class ReportingController
         List<Object> overview = new ArrayList<>();
         Map<String,Object> overview_map = new HashMap<String,Object>();
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
-            OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType); 
-            overview_map.put( "SpsScore", overviewUser.getSpsScore() );
-            overview_map.put( "DetractorPercentage", overviewUser.getDetractorPercentage());
-            overview_map.put( "PassivesPercentage",  overviewUser.getPassivesPercentage() );
-            overview_map.put( "PromoterPercentage", overviewUser.getPromoterPercentage() );
+            OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType);
+            if(overviewUser != null){
+                overview_map.put( "SpsScore", overviewUser.getSpsScore() );
+                overview_map.put( "DetractorPercentage", overviewUser.getDetractorPercentage());
+                overview_map.put( "PassivesPercentage",  overviewUser.getPassivesPercentage() );
+                overview_map.put( "PromoterPercentage", overviewUser.getPromoterPercentage() );
+            }
+
           
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
             OverviewBranch overviewBranch = overviewManagement.fetchOverviewBranchDetails( entityId, entityType );
-            overview_map.put( "SpsScore", overviewBranch.getSpsScore() );
-            overview_map.put( "DetractorPercentage", overviewBranch.getDetractorPercentage());
-            overview_map.put( "PassivesPercentage",  overviewBranch.getPassivesPercentage() );
-            overview_map.put( "PromoterPercentage", overviewBranch.getPromoterPercentage() );
+            if(overviewBranch != null){
+                overview_map.put( "SpsScore", overviewBranch.getSpsScore() );
+                overview_map.put( "DetractorPercentage", overviewBranch.getDetractorPercentage());
+                overview_map.put( "PassivesPercentage",  overviewBranch.getPassivesPercentage() );
+                overview_map.put( "PromoterPercentage", overviewBranch.getPromoterPercentage() );
+            }
+
             
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
            OverviewRegion overviewRegion = overviewManagement.fetchOverviewRegionDetails( entityId, entityType );
-           overview_map.put( "SpsScore", overviewRegion.getSpsScore() );
-           overview_map.put( "DetractorPercentage", overviewRegion.getDetractorPercentage());
-           overview_map.put( "PassivesPercentage",  overviewRegion.getPassivesPercentage() );
-           overview_map.put( "PromoterPercentage", overviewRegion.getPromoterPercentage() );
-         
+           if(overviewRegion != null){
+               overview_map.put( "SpsScore", overviewRegion.getSpsScore() );
+               overview_map.put( "DetractorPercentage", overviewRegion.getDetractorPercentage());
+               overview_map.put( "PassivesPercentage",  overviewRegion.getPassivesPercentage() );
+               overview_map.put( "PromoterPercentage", overviewRegion.getPromoterPercentage() );
+           }
+          
         }else if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             OverviewCompany overviewCompany = overviewManagement.fetchOverviewCompanyDetails( entityId, entityType );
-            overview_map.put( "SpsScore", overviewCompany.getSpsScore() );
-            overview_map.put( "DetractorPercentage", overviewCompany.getDetractorPercentage());
-            overview_map.put( "PassivesPercentage",  overviewCompany.getPassivesPercentage() );
-            overview_map.put( "PromoterPercentage", overviewCompany.getPromoterPercentage() );
+            if(overviewCompany != null){
+                overview_map.put( "SpsScore", overviewCompany.getSpsScore() );
+                overview_map.put( "DetractorPercentage", overviewCompany.getDetractorPercentage());
+                overview_map.put( "PassivesPercentage",  overviewCompany.getPassivesPercentage() );
+                overview_map.put( "PromoterPercentage", overviewCompany.getPromoterPercentage() );
+            }
            
         }
         json = new Gson().toJson( overview_map );
@@ -140,67 +150,78 @@ public class ReportingController
         Map<String,Object> overview_map = new HashMap<String,Object>();
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
             OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType); 
-            overview_map.put( "Processed", overviewUser.getProcessed() );
-            overview_map.put( "Completed", overviewUser.getCompleted() );
-            overview_map.put( "CompletePercentage", overviewUser.getCompletedPercentage() );
-            overview_map.put( "Incomplete", overviewUser.getIncomplete() );
-            overview_map.put( "IncompletePercentage", overviewUser.getIncompletePercentage() );
-            overview_map.put( "SocialPosts", overviewUser.getSocialPosts());
-            overview_map.put( "ZillowReviews", overviewUser.getZillowReviews() );
-            overview_map.put( "Unprocessed", overviewUser.getUnprocessed() );
-            overview_map.put( "Unassigned", overviewUser.getUnassigned() );
-            overview_map.put( "Duplicate", overviewUser.getTotalDuplicate() );
-            overview_map.put( "Corrupted", overviewUser.getTotalCorrupted() );
-            overview_map.put( "Rating",overviewUser.getRating() );
-            overview_map.put( "TotalReview",overviewUser.getTotalReviews() );
+            if(overviewUser != null){
+                overview_map.put( "Processed", overviewUser.getProcessed() );
+                overview_map.put( "Completed", overviewUser.getCompleted() );
+                overview_map.put( "CompletePercentage", overviewUser.getCompletedPercentage() );
+                overview_map.put( "Incomplete", overviewUser.getIncomplete() );
+                overview_map.put( "IncompletePercentage", overviewUser.getIncompletePercentage() );
+                overview_map.put( "SocialPosts", overviewUser.getSocialPosts());
+                overview_map.put( "ZillowReviews", overviewUser.getZillowReviews() );
+                overview_map.put( "Unprocessed", overviewUser.getUnprocessed() );
+                overview_map.put( "Unassigned", overviewUser.getUnassigned() );
+                overview_map.put( "Duplicate", overviewUser.getTotalDuplicate() );
+                overview_map.put( "Corrupted", overviewUser.getTotalCorrupted() );
+                overview_map.put( "Rating",overviewUser.getRating() );
+                overview_map.put( "TotalReview",overviewUser.getTotalReviews() );
+            }     
           
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
             OverviewBranch overviewBranch = overviewManagement.fetchOverviewBranchDetails( entityId, entityType );
-            overview_map.put( "Processed", overviewBranch.getProcessed() );
-            overview_map.put( "Completed", overviewBranch.getCompleted() );
-            overview_map.put( "CompletePercentage", overviewBranch.getCompletedPercentage() );
-            overview_map.put( "Incomplete", overviewBranch.getIncomplete() );
-            overview_map.put( "IncompletePercentage", overviewBranch.getIncompletePercentage() );
-            overview_map.put( "SocialPosts", overviewBranch.getSocialPosts());
-            overview_map.put( "ZillowReviews", overviewBranch.getZillowReviews() );
-            overview_map.put( "Unprocessed", overviewBranch.getUnprocessed() );
-            overview_map.put( "Unassigned", overviewBranch.getUnassigned() );
-            overview_map.put( "Duplicate", overviewBranch.getTotalDuplicate() );
-            overview_map.put( "Corrupted", overviewBranch.getTotalCorrupted() );
-            overview_map.put( "Rating",overviewBranch.getRating() );
-            overview_map.put( "TotalReview",overviewBranch.getTotalReviews() );
+            if(overviewBranch != null){
+                overview_map.put( "Processed", overviewBranch.getProcessed() );
+                overview_map.put( "Completed", overviewBranch.getCompleted() );
+                overview_map.put( "CompletePercentage", overviewBranch.getCompletedPercentage() );
+                overview_map.put( "Incomplete", overviewBranch.getIncomplete() );
+                overview_map.put( "IncompletePercentage", overviewBranch.getIncompletePercentage() );
+                overview_map.put( "SocialPosts", overviewBranch.getSocialPosts());
+                overview_map.put( "ZillowReviews", overviewBranch.getZillowReviews() );
+                overview_map.put( "Unprocessed", overviewBranch.getUnprocessed() );
+                overview_map.put( "Unassigned", overviewBranch.getUnassigned() );
+                overview_map.put( "Duplicate", overviewBranch.getTotalDuplicate() );
+                overview_map.put( "Corrupted", overviewBranch.getTotalCorrupted() );
+                overview_map.put( "Rating",overviewBranch.getRating() );
+                overview_map.put( "TotalReview",overviewBranch.getTotalReviews() );
+            }
+           
             
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
            OverviewRegion overviewRegion = overviewManagement.fetchOverviewRegionDetails( entityId, entityType );
-           overview_map.put( "Processed", overviewRegion.getProcessed() );
-           overview_map.put( "Completed", overviewRegion.getCompleted() );
-           overview_map.put( "CompletePercentage", overviewRegion.getCompletedPercentage() );
-           overview_map.put( "Incomplete", overviewRegion.getIncomplete() );
-           overview_map.put( "IncompletePercentage", overviewRegion.getIncompletePercentage() );
-           overview_map.put( "SocialPosts", overviewRegion.getSocialPosts());
-           overview_map.put( "ZillowReviews", overviewRegion.getZillowReviews() );
-           overview_map.put( "Unprocessed", overviewRegion.getUnprocessed() );
-           overview_map.put( "Unassigned", overviewRegion.getUnassigned() );
-           overview_map.put( "Duplicate", overviewRegion.getTotalDuplicate() );
-           overview_map.put( "Corrupted", overviewRegion.getTotalCorrupted() );
-           overview_map.put( "Rating",overviewRegion.getRating() );
-           overview_map.put( "TotalReview",overviewRegion.getTotalReviews() );
+           if(overviewRegion != null){
+               overview_map.put( "Processed", overviewRegion.getProcessed() );
+               overview_map.put( "Completed", overviewRegion.getCompleted() );
+               overview_map.put( "CompletePercentage", overviewRegion.getCompletedPercentage() );
+               overview_map.put( "Incomplete", overviewRegion.getIncomplete() );
+               overview_map.put( "IncompletePercentage", overviewRegion.getIncompletePercentage() );
+               overview_map.put( "SocialPosts", overviewRegion.getSocialPosts());
+               overview_map.put( "ZillowReviews", overviewRegion.getZillowReviews() );
+               overview_map.put( "Unprocessed", overviewRegion.getUnprocessed() );
+               overview_map.put( "Unassigned", overviewRegion.getUnassigned() );
+               overview_map.put( "Duplicate", overviewRegion.getTotalDuplicate() );
+               overview_map.put( "Corrupted", overviewRegion.getTotalCorrupted() );
+               overview_map.put( "Rating",overviewRegion.getRating() );
+               overview_map.put( "TotalReview",overviewRegion.getTotalReviews() );
+             
+           }
          
         }else if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
             OverviewCompany overviewCompany = overviewManagement.fetchOverviewCompanyDetails( entityId, entityType );
-            overview_map.put( "Processed", overviewCompany.getProcessed() );
-            overview_map.put( "Completed", overviewCompany.getCompleted() );
-            overview_map.put( "CompletePercentage", overviewCompany.getCompletedPercentage() );
-            overview_map.put( "Incomplete", overviewCompany.getIncomplete() );
-            overview_map.put( "IncompletePercentage", overviewCompany.getIncompletePercentage() );
-            overview_map.put( "SocialPosts", overviewCompany.getSocialPosts());
-            overview_map.put( "ZillowReviews", overviewCompany.getZillowReviews() );
-            overview_map.put( "Unprocessed", overviewCompany.getUnprocessed() );
-            overview_map.put( "Unassigned", overviewCompany.getUnassigned() );
-            overview_map.put( "Duplicate", overviewCompany.getTotalDuplicate() );
-            overview_map.put( "Corrupted", overviewCompany.getTotalCorrupted() );
-            overview_map.put( "Rating",overviewCompany.getRating() );
-            overview_map.put( "TotalReview",overviewCompany.getTotalReviews() );
+            if(overviewCompany != null){
+                overview_map.put( "Processed", overviewCompany.getProcessed() );
+                overview_map.put( "Completed", overviewCompany.getCompleted() );
+                overview_map.put( "CompletePercentage", overviewCompany.getCompletedPercentage() );
+                overview_map.put( "Incomplete", overviewCompany.getIncomplete() );
+                overview_map.put( "IncompletePercentage", overviewCompany.getIncompletePercentage() );
+                overview_map.put( "SocialPosts", overviewCompany.getSocialPosts());
+                overview_map.put( "ZillowReviews", overviewCompany.getZillowReviews() );
+                overview_map.put( "Unprocessed", overviewCompany.getUnprocessed() );
+                overview_map.put( "Unassigned", overviewCompany.getUnassigned() );
+                overview_map.put( "Duplicate", overviewCompany.getTotalDuplicate() );
+                overview_map.put( "Corrupted", overviewCompany.getTotalCorrupted() );
+                overview_map.put( "Rating",overviewCompany.getRating() );
+                overview_map.put( "TotalReview",overviewCompany.getTotalReviews() );
+            }
+            
            
         }
         json = new Gson().toJson( overview_map );

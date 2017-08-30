@@ -62,6 +62,8 @@ import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
+import retrofit.mime.TypedInput;
 import scala.Console;
 import scala.collection.generic.BitOperations.Int;
 
@@ -466,7 +468,7 @@ public class ReportingWebController
     
     @ResponseBody
     @RequestMapping ( value = "/fetchspsfromreportingoverview", method = RequestMethod.GET)
-    public Response reportingOverviewSpsStats(Model model, HttpServletRequest request) throws NonFatalException
+    public String reportingOverviewSpsStats(Model model, HttpServletRequest request) throws NonFatalException
     {
         LOG.info( "Reporting Dashboard Page started" );
         HttpSession session = request.getSession( false );
@@ -479,13 +481,15 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         response = ssApiIntergrationBuilder.getIntegrationApi().getSpsStatsFromOverview( entityId, entityType );
-        return response;
+        String responseString = null;
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
         
     }   
     
     @ResponseBody
     @RequestMapping ( value = "/fetchalltimefromreportingoverview", method = RequestMethod.GET)
-    public Response reportingOverviewAllTimeStats(Model model, HttpServletRequest request) throws NonFatalException
+    public String reportingOverviewAllTimeStats(Model model, HttpServletRequest request) throws NonFatalException
     {
         LOG.info( "Reporting Dashboard Page started" );
         HttpSession session = request.getSession( false );
@@ -498,7 +502,9 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         response = ssApiIntergrationBuilder.getIntegrationApi().getAllTimeDataOverview( entityId, entityType );
-        return response;
+        String responseString = null;
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
         
     }   
   
@@ -610,7 +616,7 @@ public class ReportingWebController
    
    @ResponseBody
    @RequestMapping( value = "/fetchreportingspsstats", method = RequestMethod.GET)
-   public Response fetchSpsStats( Model model, HttpServletRequest request ) throws NonFatalException 
+   public String fetchSpsStats( Model model, HttpServletRequest request ) throws NonFatalException 
    {
         LOG.info( "Fetching Sps Stats Graph" );
         HttpSession session = request.getSession( false );
@@ -623,13 +629,15 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         response = ssApiIntergrationBuilder.getIntegrationApi().getReportingSpsStats( entityId, entityType );
-        return response;
+        String responseString = null;
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
         
    }
    
    @ResponseBody
    @RequestMapping( value = "/fetchreportingcompletionrate", method = RequestMethod.GET)
-   public Response fetchCompletionRate( Model model, HttpServletRequest request ) throws NonFatalException 
+   public String fetchCompletionRate( Model model, HttpServletRequest request ) throws NonFatalException 
    {
         LOG.info( "Fetching Completion Rate Graph" );
         HttpSession session = request.getSession( false );
@@ -642,13 +650,15 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         response = ssApiIntergrationBuilder.getIntegrationApi().getReportingCompletionRateApi(entityId,entityType);
-        return response;
+        String responseString = null;
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
         
    }
    
    @ResponseBody
    @RequestMapping( value = "/fetchmonthdataforoverview", method = RequestMethod.GET)
-   public Response fetchMonthDataForOverview( Model model, HttpServletRequest request ) throws NonFatalException 
+   public String fetchMonthDataForOverview( Model model, HttpServletRequest request ) throws NonFatalException 
    {
         LOG.info( "Fetching Overview Based On Month" );
         HttpSession session = request.getSession( false );
@@ -675,13 +685,15 @@ public class ReportingWebController
         }else {
             response = ssApiIntergrationBuilder.getIntegrationApi().getMonthDataOverviewForDashboard(entityId,entityType, month, year);
         }
-        return response;
+        String responseString = null;
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
         
    }
    
    @ResponseBody
    @RequestMapping( value = "/fetchyeardataforoverview", method = RequestMethod.GET)
-   public Response fetchYearDataForOverview( Model model, HttpServletRequest request ) throws NonFatalException 
+   public String fetchYearDataForOverview( Model model, HttpServletRequest request ) throws NonFatalException 
    {
         LOG.info( "Fetching Overview Based On Year" );
         HttpSession session = request.getSession( false );
@@ -703,7 +715,9 @@ public class ReportingWebController
         }else {
             response = ssApiIntergrationBuilder.getIntegrationApi().getYearDataOverviewForDashboard(entityId,entityType,year);
         }
-        return response;
+        String responseString = null;
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
         
    }
    
@@ -765,12 +779,13 @@ public class ReportingWebController
    
    @ResponseBody
    @RequestMapping( value = "/fetchrecentactivities", method = RequestMethod.GET)
-   public Response fetchRecentActivity( Model model, HttpServletRequest request ) throws NonFatalException 
+   public String fetchRecentActivity( Model model, HttpServletRequest request ) throws NonFatalException 
    {
         LOG.info( "Fetching Recent Activity Graph" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
         Response response = null;
+        String responseString = null;
 
         if ( user == null ) {
             throw new NonFatalException( "NonFatalException while logging in. " );
@@ -788,7 +803,8 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         response = ssApiIntergrationBuilder.getIntegrationApi().getRecentActivity(entityId,entityType, startIndex, batchSize);
-        return response;
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
         
    }
    
@@ -951,7 +967,7 @@ public class ReportingWebController
    
    @ResponseBody
    @RequestMapping ( value = "/getuserrankingrankandcount", method = RequestMethod.GET)
-   public Response getUserRankingRankAndCount(Model model, HttpServletRequest request) throws NonFatalException
+   public String getUserRankingRankAndCount(Model model, HttpServletRequest request) throws NonFatalException
    {     
        LOG.info( "Get User Ranking Rank And Count" );
        
@@ -1031,12 +1047,14 @@ public class ReportingWebController
            default: throw new NonFatalException( "NonFatalException while getting User Ranking Count" );
       }
       
-    return response;
+       String responseString = null;
+       responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+       return responseString;
    }
    
    @ResponseBody
    @RequestMapping ( value = "/getuserrankingcount", method = RequestMethod.GET)
-   public Response getUserRankingCount(Model model, HttpServletRequest request) throws NonFatalException
+   public String getUserRankingCount(Model model, HttpServletRequest request) throws NonFatalException
    {     
        LOG.info( "Get User Ranking Rank " );
        
@@ -1117,12 +1135,14 @@ public class ReportingWebController
            default: throw new NonFatalException( "NonFatalException while getting User Ranking Count" );
       }
       
-    return response;
+       String responseString = null;
+       responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+       return responseString;
    }
    
    @ResponseBody
    @RequestMapping ( value = "/getuserranking", method = RequestMethod.GET)
-   public Response getUserRanking(Model model, HttpServletRequest request) throws NonFatalException
+   public String getUserRanking(Model model, HttpServletRequest request) throws NonFatalException
    {     
        LOG.info( "Get User Ranking for this year" );
        
@@ -1206,12 +1226,15 @@ public class ReportingWebController
             default: throw new NonFatalException( "NonFatalException while choosing time frame for leaderboard" );
        }
        
-       return response;
+       String responseString = null;
+       responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+       return responseString;
+
    }
    
    @ResponseBody
    @RequestMapping ( value = "/getoverallscorestats", method = RequestMethod.GET)
-   public Response getOverallScoreStats(Model model, HttpServletRequest request) throws NonFatalException{
+   public String getOverallScoreStats(Model model, HttpServletRequest request) throws NonFatalException{
 	   
 	   LOG.info( "Get Overall Score Stats " );
        
@@ -1249,12 +1272,14 @@ public class ReportingWebController
        response = ssApiIntergrationBuilder.getIntegrationApi().getScoreStatsOverall(entityId, entityType, currentMonth, currentYear);
        
        LOG.info( "Method to get overall score stats getOverallScoreStats() finished." );
-       return response;
+       String responseString = null;
+       responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+       return responseString;
    }
    
    @ResponseBody
    @RequestMapping ( value = "/getquestionscorestats", method = RequestMethod.GET)
-   public Response getQuestionScoreStats(Model model, HttpServletRequest request) throws NonFatalException{
+   public String getQuestionScoreStats(Model model, HttpServletRequest request) throws NonFatalException{
 	   
 	   LOG.info( "Get Overall Score Stats " );
        
@@ -1292,7 +1317,9 @@ public class ReportingWebController
        response = ssApiIntergrationBuilder.getIntegrationApi().getScoreStatsQuestion(entityId, entityType, currentMonth, currentYear);
        
        LOG.info( "Method to get overall score stats getOverallScoreStats() finished." );
-       return response;
+       String responseString = null;
+       responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+       return responseString;
    }
    
    @ResponseBody

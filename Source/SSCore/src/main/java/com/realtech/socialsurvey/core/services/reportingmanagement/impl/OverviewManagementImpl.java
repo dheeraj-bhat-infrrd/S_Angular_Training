@@ -85,10 +85,11 @@ public class OverviewManagementImpl implements OverviewManagement
     @Override
     public OverviewUser fetchOverviewUserDetails(long entityId , String entityType)throws NonFatalException{
         String overviewUserId = overviewUserDao.getOverviewUserId( entityId );
+        OverviewUser overviewUser;
         if(overviewUserId == null){
-          throw new  NonFatalException(); 
+            overviewUser = null;
         }
-        OverviewUser overviewUser =  overviewUserDao.findOverviewUser( OverviewUser.class, overviewUserId ); 
+        overviewUser =  overviewUserDao.findOverviewUser( OverviewUser.class, overviewUserId ); 
         return overviewUser;
     }
 
@@ -98,10 +99,12 @@ public class OverviewManagementImpl implements OverviewManagement
       
       
            String overviewBranchId = overviewBranchDao.getOverviewBranchId( entityId );
+           OverviewBranch overviewBranch;
            if(overviewBranchId == null){
-               throw new  NonFatalException(); 
+               overviewBranch =  null;
+            }else{
+               overviewBranch = overviewBranchDao.findOverviewBranch( OverviewBranch.class , overviewBranchId ); 
             }
-           OverviewBranch overviewBranch = overviewBranchDao.findOverviewBranch( OverviewBranch.class , overviewBranchId ); 
            return overviewBranch;
        
     }
@@ -110,10 +113,12 @@ public class OverviewManagementImpl implements OverviewManagement
     @Override
     public OverviewRegion fetchOverviewRegionDetails( long entityId, String entityType )throws NonFatalException{
        String overviewRegionId = overviewRegionDao.getOverviewRegionId( entityId );
+       OverviewRegion overviewRegion;
        if(overviewRegionId == null){
-           throw new  NonFatalException(); 
-        }
-       OverviewRegion overviewRegion = overviewRegionDao.findOverviewRegion( OverviewRegion.class, overviewRegionId );
+           overviewRegion = null;
+       }else{
+           overviewRegion = overviewRegionDao.findOverviewRegion( OverviewRegion.class, overviewRegionId );
+       }
        return overviewRegion;
     }
 
@@ -121,10 +126,13 @@ public class OverviewManagementImpl implements OverviewManagement
     @Override
     public OverviewCompany fetchOverviewCompanyDetails( long entityId, String entityType )throws NonFatalException{
         String overviewCompanyId = overviewCompanyDao.getOverviewCompanyId( entityId );
+        OverviewCompany overviewCompany;
         if(overviewCompanyId == null){
-            throw new  NonFatalException(); 
+            overviewCompany = null;
+         }else{
+             overviewCompany = overviewCompanyDao.findOverviewCompany( OverviewCompany.class, overviewCompanyId );
          }
-        OverviewCompany overviewCompany = overviewCompanyDao.findOverviewCompany( OverviewCompany.class, overviewCompanyId );
+        
         return overviewCompany;
     }
 
