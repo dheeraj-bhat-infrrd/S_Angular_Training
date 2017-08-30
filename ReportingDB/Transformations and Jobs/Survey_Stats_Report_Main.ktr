@@ -190,10 +190,8 @@
   <hop> <from>Join User Survey</from><to>Filter Mismatched</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Completed</to><enabled>Y</enabled> </hop>
   <hop> <from>Survey Details</from><to>Join User Survey Details</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey Details</from><to>Filter Clicked</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Partially Complete</from><to>Sort rows Partially Completed</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows Partially Completed</from><to>Group Partially Completed</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey Details</from><to>Filter Partially Complete</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Sort Survey Pre Initiation</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Survey Pre Initiation</from><to>Join User Survey Details</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Sent</from><to>Sort Sent</to><enabled>Y</enabled> </hop>
@@ -275,6 +273,8 @@
   <hop> <from>Modified Java Script Value</from><to>survey_stats_report_id</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Corrupted</from><to>Sort Corrupted</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_stats_report_id</from><to>Select values</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey</from><to>Filter Clicked</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey</from><to>Filter Partially Complete</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Branch Input</name>
