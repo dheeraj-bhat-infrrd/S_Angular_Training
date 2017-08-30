@@ -635,8 +635,8 @@
            </partitioning>
     <keys>
       <key>SURVEY_DETAILS_ID</key>
-      <key>QUESTION</key>
       <key>QUESTION_TYPE</key>
+      <key>QUESTION_ID</key>
     </keys>
     <values>
       <value>SURVEY_RESPONSE_ID</value>
@@ -678,7 +678,7 @@
     <fields_name/>
     <collection>SURVEY_DETAILS</collection>
     <json_field_name>json</json_field_name>
-    <json_query/>
+    <json_query>&#x7b;&#x24;query&#x3a; &#x7b;&#x22;modifiedOn&#x22; &#x3a; &#x7b;&#x24;gte&#x3a;&#x7b;&#x24;date&#x3a;&#x24;&#x7b;modifiedOnSurveyDetails&#x7d;&#x7d;&#x7d;&#x7d; &#x7d;</json_query>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -1343,7 +1343,7 @@
     <tablename_in_field>N</tablename_in_field>
     <tablename_field/>
     <use_batch>N</use_batch>
-    <perform_lookup>N</perform_lookup>
+    <perform_lookup>Y</perform_lookup>
     <operation_order_field>ResponseFlag</operation_order_field>
     <order_insert>new</order_insert>
     <order_update>changed</order_update>
@@ -1358,8 +1358,8 @@
         <name2/>
       </key>
       <key>
-        <name>QUESTION</name>
-        <field>QUESTION</field>
+        <name>QUESTION_ID</name>
+        <field>QUESTION_ID</field>
         <condition>&#x3d;</condition>
         <name2/>
       </key>

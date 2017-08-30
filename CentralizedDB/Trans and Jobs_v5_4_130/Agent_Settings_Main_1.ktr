@@ -1782,7 +1782,7 @@
     <fields_name/>
     <collection>AGENT_SETTINGS</collection>
     <json_field_name>json</json_field_name>
-    <json_query/>
+    <json_query>&#x7b;&#x24;query&#x3a;&#x7b;&#x22;modifiedOn&#x22; &#x3a;&#x7b;&#x24;gte&#x3a;&#x24;&#x7b;modifiedOnSettings&#x7d;&#x7d;&#x7d;&#x7d;</json_query>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -3084,7 +3084,7 @@
     <fields_name/>
     <collection>AGENT_SETTINGS</collection>
     <json_field_name>json</json_field_name>
-    <json_query/>
+    <json_query>&#x7b;&#x24;query&#x3a;&#x7b;&#x22;modifiedOn&#x22; &#x3a;&#x7b;&#x24;gte&#x3a;&#x24;&#x7b;modifiedOnSettings&#x7d;&#x7d;&#x7d;&#x7d;</json_query>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>

@@ -196,24 +196,12 @@
   <hop> <from>Join User Survey Details</from><to>Filter Partially Complete</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Sort Survey Pre Initiation</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Survey Pre Initiation</from><to>Join User Survey Details</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 4</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 6</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 7</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 8</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 9</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 10</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Sent</from><to>Sort Sent</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Sent</from><to>Group Sent</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Sent</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 8 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Abusive</from><to>Sort rows Abusive</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows Abusive</from><to>Group Abusive</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Abusive</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 10 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Group TRX_RCVD</from><to>Report Id TRX_RCVD</to><enabled>Y</enabled> </hop>
   <hop> <from>Report Id TRX_RCVD</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Pending</from><to>Report Id Pending</to><enabled>Y</enabled> </hop>
@@ -238,13 +226,10 @@
   <hop> <from>Report Id Partially Completed</from><to>Sort rows 10</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Abusive</from><to>Report Id Abusive</to><enabled>Y</enabled> </hop>
   <hop> <from>Report Id Abusive</from><to>Sort rows 10 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Modified Java Script Value</from><to>Select values</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select values</from><to>survey_stats_report_id</to><enabled>Y</enabled> </hop>
   <hop> <from>Group AVg rating</from><to>Report Id Abusive 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows Avg Rating</from><to>Group AVg rating</to><enabled>Y</enabled> </hop>
   <hop> <from>Report Id Abusive 2</from><to>Sort Avg Rating</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Sort rows Avg Rating</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort Avg Rating</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Detractors</from><to>Sort rows Detractors</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Detractors</from><to>Report Id  Detractors</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows Detractors</from><to>Group Detractors</to><enabled>Y</enabled> </hop>
@@ -258,13 +243,8 @@
   <hop> <from>Join User Survey Details</from><to>Filter Detractors</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Passives</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Promoters</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort  Detractors</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort Passives</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort Promoters</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Multiway Merge Join</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Passives</from><to>Report Id Passives</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows Passives</from><to>Group Passives</to><enabled>Y</enabled> </hop>
-  <hop> <from>survey_stats_report_id</from><to>Insert &#x2f; Update Survey_Stats_Report_Main</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter RCVD</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter RCVD</from><to>Sort TRX_RCVD</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Incomplete</from><to>Report Id Incomplete</to><enabled>Y</enabled> </hop>
@@ -272,9 +252,29 @@
   <hop> <from>Sort Incomplete</from><to>Group Incomplete</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Incomplete</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Incomplete</from><to>Sort Incomplete</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 4</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 6</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 7</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 8</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 8 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows Incomplete</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter Corrupted</from><to>Write to log</to><enabled>Y</enabled> </hop>
-  <hop> <from>Write to log</from><to>Sort Corrupted</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 9</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 10</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 10 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort Avg Rating</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort  Detractors</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort Passives</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort Promoters</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Multiway Merge Join</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values</from><to>Sort Stream</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort Stream</from><to>Survey Stats Report Main - Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Modified Java Script Value</from><to>survey_stats_report_id</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter Corrupted</from><to>Sort Corrupted</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey_stats_report_id</from><to>Select values</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Branch Input</name>
@@ -455,7 +455,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>Write to log</send_true_to>
+<send_true_to>Sort Corrupted</send_true_to>
 <send_false_to/>
     <compare>
 <condition>
@@ -954,6 +954,12 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1021,6 +1027,12 @@
         <field>
           <aggregate>year_data</aggregate>
           <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1094,6 +1106,12 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1161,6 +1179,12 @@
         <field>
           <aggregate>year_data</aggregate>
           <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1234,6 +1258,12 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1301,6 +1331,12 @@
         <field>
           <aggregate>year_data</aggregate>
           <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1374,6 +1410,12 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1441,6 +1483,12 @@
         <field>
           <aggregate>year_data</aggregate>
           <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1514,6 +1562,12 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1581,6 +1635,12 @@
         <field>
           <aggregate>year_data</aggregate>
           <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1654,6 +1714,12 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1721,6 +1787,12 @@
         <field>
           <aggregate>year_data</aggregate>
           <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1794,6 +1866,12 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1861,6 +1939,12 @@
         <field>
           <aggregate>year_data</aggregate>
           <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1934,6 +2018,12 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -2001,6 +2091,12 @@
         <field>
           <aggregate>year_data</aggregate>
           <subject>Year_Data</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>region_id</aggregate>
+          <subject>REGION_ID</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -2085,206 +2181,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>44</xloc>
       <yloc>686</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Insert &#x2f; Update Survey_Stats_Report_Main</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>10000</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>survey_stats_report</table>
-      <key>
-        <name>final_branch_id</name>
-        <field>branch_id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>final_month_val</name>
-        <field>month</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>final_year_val</name>
-        <field>year</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>final_company_id</name>
-        <field>company_id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>month</name>
-        <rename>final_month_val</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>survey_stats_report_id</name>
-        <rename>survey_stats_report_id</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>year</name>
-        <rename>final_year_val</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>region_id</name>
-        <rename>region_id</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>Id</name>
-        <rename>final_report_id</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>abusive</name>
-        <rename>Abusive</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>avg_rating</name>
-        <rename>avg_rating</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>branch_id</name>
-        <rename>final_branch_id</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>clicked_count</name>
-        <rename>Clicked</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>company_id</name>
-        <rename>final_company_id</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>complete_percentage</name>
-        <rename>complete_percentage</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>completed</name>
-        <rename>Completed</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>corrupted</name>
-        <rename>Corrupted</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>created_date</name>
-        <rename>final_date</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>delta</name>
-        <rename>delta</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>detractors</name>
-        <rename>Detractors</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>duplicates</name>
-        <rename>Duplicate</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>ignored</name>
-        <rename>Ignored</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>mismatched</name>
-        <rename>Mismatched</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>old_records</name>
-        <rename>Old_Records</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>partially_completed</name>
-        <rename>Partially_Completed</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>passives</name>
-        <rename>Passives</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>pending</name>
-        <rename>Pending</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>promoters</name>
-        <rename>Promoters</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>sent_count</name>
-        <rename>Sent</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>trx_month</name>
-        <rename>final_trx_month</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>trx_rcvd</name>
-        <rename>TRX_RCVD</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>branch_name</name>
-        <rename>final_branch_name</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>company_name</name>
-        <rename>final_company_name</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>incomplete</name>
-        <rename>incomplete</rename>
-        <update>Y</update>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>778</xloc>
-      <yloc>1448</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2405,7 +2301,7 @@
     <name>Modified Java Script Value</name>
     <type>ScriptValueMod</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -2416,7 +2312,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;if&#x28;Sent &#x3e; 0&#x29;&#x7b;&#xd;&#xa;	var complete_percentage &#x3d; &#x28;Completed&#x2f;Sent&#x29;&#x2a;100&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var complete_percentage &#x3d; 0.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var delta &#x3d; TRX_RCVD - Duplicate - Corrupted - Abusive - Sent&#x3b;&#xd;&#xa;&#xd;&#xa;var final_branch_id &#x3d; 0&#x3b;&#xd;&#xa;var final_company_id &#x3d; 0&#x3b;&#xd;&#xa;var final_trx_month &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_report_id &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;BRANCH_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;report_id &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;TRX_MONTH &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var final_date &#x3d; getCurrentDate&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;function getCurrentDate&#x28;&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;var date &#x3d; new Date&#x28;&#x29;&#x3b;&#xd;&#xa;var year &#x3d; date.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;var month &#x3d; date.getMonth&#x28;&#x29;&#x2b;1&#x3b;&#xd;&#xa;var day &#x3d; date.getDate&#x28;&#x29;&#x3b;&#xd;&#xa;var hour &#x3d; date.getHours&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var min &#x3d; date.getMinutes&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var sec &#x3d; date.getSeconds&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;hour.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;hour &#x3d; &#x22;0&#x22;&#x2b;hour&#x3b;&#xd;&#xa;&#x7d; &#xd;&#xa;if&#x28;min.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;min &#x3d; &#x22;0&#x22;&#x2b;min&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sec.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;sec &#x3d; &#x22;0&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;hour&#x2b;&#x22;&#x3a;&#x22;&#x2b;min&#x2b;&#x22;&#x3a;&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var final_month_val &#x3d; final_trx_month.substring&#x28;5, 7&#x29;&#x3b;&#xd;&#xa;var final_year_val &#x3d; final_trx_month.substring&#x28;0, 4&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var final_branch_name &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_company_name &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;branch_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;company_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;TRX_RCVD &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var TRX_RCVD &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Pending &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	 var Pending &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Duplicate &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Duplicate &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Corrupted &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Corrupted &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Old_Records &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Old_Records &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Ignored &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Ignored &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Mismatched &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Mismatched &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Completed &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Completed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Clicked &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Clicked &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Partially_Completed &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Partially_Completed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Sent &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Sent &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Abusive &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Abusive &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;avg_rating &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var avg_rating &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Detractors &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Detractors &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Passives &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Passives &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Promoters &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Promoters &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Incomplete &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Incomplete &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;if&#x28;Sent &#x3e; 0&#x29;&#x7b;&#xd;&#xa;	var complete_percentage &#x3d; &#x28;Completed&#x2f;Sent&#x29;&#x2a;100&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var complete_percentage &#x3d; 0.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var delta &#x3d; TRX_RCVD - Duplicate - Corrupted - Abusive - Sent&#x3b;&#xd;&#xa;&#xd;&#xa;var final_branch_id &#x3d; 0&#x3b;&#xd;&#xa;var final_company_id &#x3d; 0&#x3b;&#xd;&#xa;var final_region_id &#x3d; 0&#x3b;&#xd;&#xa;var final_trx_month &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_report_id &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;BRANCH_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_15&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_16 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_id &#x3d; BRANCH_ID_16&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_15&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_16 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_16&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;report_id &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_15&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_16 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_16&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;region_id &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_15&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_16 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_region_id &#x3d; region_id_16&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;TRX_MONTH &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_15&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_16 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_16&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var final_date &#x3d; getCurrentDate&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;function getCurrentDate&#x28;&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;var date &#x3d; new Date&#x28;&#x29;&#x3b;&#xd;&#xa;var year &#x3d; date.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;var month &#x3d; date.getMonth&#x28;&#x29;&#x2b;1&#x3b;&#xd;&#xa;var day &#x3d; date.getDate&#x28;&#x29;&#x3b;&#xd;&#xa;var hour &#x3d; date.getHours&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var min &#x3d; date.getMinutes&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var sec &#x3d; date.getSeconds&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;hour.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;hour &#x3d; &#x22;0&#x22;&#x2b;hour&#x3b;&#xd;&#xa;&#x7d; &#xd;&#xa;if&#x28;min.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;min &#x3d; &#x22;0&#x22;&#x2b;min&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sec.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;sec &#x3d; &#x22;0&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;hour&#x2b;&#x22;&#x3a;&#x22;&#x2b;min&#x2b;&#x22;&#x3a;&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var final_month_val &#x3d; final_trx_month.substring&#x28;5, 7&#x29;&#x3b;&#xd;&#xa;var final_year_val &#x3d; final_trx_month.substring&#x28;0, 4&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var final_branch_name &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_company_name &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;branch_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_15&#x3b;&#xd;&#xa;&#x7d; else if&#x28;branch_name_16 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_branch_name &#x3d; branch_name_16&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;company_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_15&#x3b;&#xd;&#xa;&#x7d; else if&#x28;company_name_16 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_name &#x3d; company_name_16&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;TRX_RCVD &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var TRX_RCVD &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Pending &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	 var Pending &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Duplicate &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Duplicate &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Corrupted &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Corrupted &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Old_Records &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Old_Records &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Ignored &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Ignored &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Mismatched &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Mismatched &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Completed &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Completed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Clicked &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Clicked &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Partially_Completed &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Partially_Completed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Sent &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Sent &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Abusive &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Abusive &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;avg_rating &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var avg_rating &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Detractors &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Detractors &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Passives &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Passives &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Promoters &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Promoters &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Incomplete &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Incomplete &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>Abusive</name>
         <rename>Abusive</rename>
         <type>String</type>
@@ -2533,7 +2429,7 @@
         <replace>N</replace>
       </field>      <field>        <name>final_branch_id</name>
         <rename>final_branch_id</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
@@ -2545,7 +2441,7 @@
         <replace>N</replace>
       </field>      <field>        <name>final_company_id</name>
         <rename>final_company_id</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
@@ -2585,9 +2481,15 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
+      </field>      <field>        <name>final_region_id</name>
+        <rename>final_region_id</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1418</xloc>
+      <xloc>1424</xloc>
       <yloc>1448</yloc>
       <draw>Y</draw>
       </GUI>
@@ -2613,39 +2515,39 @@
     <step5>Sort rows 6</step5>
     <step6>Sort rows 7</step6>
     <step7>Sort rows 8</step7>
-    <step8>Sort rows 9</step8>
-    <step9>Sort rows 10</step9>
-    <step10>Sort rows 8 2</step10>
-    <step11>Sort rows 10 2</step11>
-    <step12>Sort Avg Rating</step12>
-    <step13>Sort  Detractors</step13>
-    <step14>Sort Passives</step14>
-    <step15>Sort Promoters</step15>
-    <step16>Sort rows Incomplete</step16>
+    <step8>Sort rows 8 2</step8>
+    <step9>Sort rows Incomplete</step9>
+    <step10>Sort rows 9</step10>
+    <step11>Sort rows 10</step11>
+    <step12>Sort rows 10 2</step12>
+    <step13>Sort Avg Rating</step13>
+    <step14>Sort  Detractors</step14>
+    <step15>Sort Passives</step15>
+    <step16>Sort Promoters</step16>
     <number_input>17</number_input>
     <keys>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
-      <key>BRANCH_ID,COMPANY_ID</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
+      <key>BRANCH_ID,month_data,year_data</key>
     </keys>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1416</xloc>
-      <yloc>1295</yloc>
+      <xloc>1424</xloc>
+      <yloc>1256</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3171,125 +3073,162 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>      <field>        <name>Abusive</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Clicked</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Completed</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Corrupted</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Detractors</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Duplicate</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Ignored</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Mismatched</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Old_Records</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Partially_Completed</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Passives</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Pending</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Promoters</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Sent</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>TRX_RCVD</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>avg_rating</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>complete_percentage</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>delta</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>final_branch_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>final_company_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>final_date</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>final_month_val</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>final_report_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>final_trx_month</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>final_year_val</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>final_branch_name</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>final_company_name</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>incomplete</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>region_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>Abusive</name>
-        <rename>Abusive</rename>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <remove>        <name>BRANCH_ID</name>
+      </remove>      <remove>        <name>BRANCH_ID_1</name>
+      </remove>      <remove>        <name>BRANCH_ID_10</name>
+      </remove>      <remove>        <name>BRANCH_ID_11</name>
+      </remove>      <remove>        <name>BRANCH_ID_12</name>
+      </remove>      <remove>        <name>BRANCH_ID_13</name>
+      </remove>      <remove>        <name>BRANCH_ID_14</name>
+      </remove>      <remove>        <name>BRANCH_ID_15</name>
+      </remove>      <remove>        <name>BRANCH_ID_16</name>
+      </remove>      <remove>        <name>BRANCH_ID_2</name>
+      </remove>      <remove>        <name>BRANCH_ID_3</name>
+      </remove>      <remove>        <name>BRANCH_ID_4</name>
+      </remove>      <remove>        <name>BRANCH_ID_5</name>
+      </remove>      <remove>        <name>BRANCH_ID_6</name>
+      </remove>      <remove>        <name>BRANCH_ID_7</name>
+      </remove>      <remove>        <name>BRANCH_ID_8</name>
+      </remove>      <remove>        <name>BRANCH_ID_9</name>
+      </remove>      <remove>        <name>COMPANY_ID</name>
+      </remove>      <remove>        <name>COMPANY_ID_1</name>
+      </remove>      <remove>        <name>COMPANY_ID_10</name>
+      </remove>      <remove>        <name>COMPANY_ID_11</name>
+      </remove>      <remove>        <name>COMPANY_ID_12</name>
+      </remove>      <remove>        <name>COMPANY_ID_13</name>
+      </remove>      <remove>        <name>COMPANY_ID_14</name>
+      </remove>      <remove>        <name>COMPANY_ID_15</name>
+      </remove>      <remove>        <name>COMPANY_ID_16</name>
+      </remove>      <remove>        <name>COMPANY_ID_2</name>
+      </remove>      <remove>        <name>COMPANY_ID_3</name>
+      </remove>      <remove>        <name>COMPANY_ID_4</name>
+      </remove>      <remove>        <name>COMPANY_ID_5</name>
+      </remove>      <remove>        <name>COMPANY_ID_6</name>
+      </remove>      <remove>        <name>COMPANY_ID_7</name>
+      </remove>      <remove>        <name>COMPANY_ID_8</name>
+      </remove>      <remove>        <name>COMPANY_ID_9</name>
+      </remove>      <remove>        <name>TRX_MONTH</name>
+      </remove>      <remove>        <name>TRX_MONTH_1</name>
+      </remove>      <remove>        <name>TRX_MONTH_10</name>
+      </remove>      <remove>        <name>TRX_MONTH_11</name>
+      </remove>      <remove>        <name>TRX_MONTH_12</name>
+      </remove>      <remove>        <name>TRX_MONTH_13</name>
+      </remove>      <remove>        <name>TRX_MONTH_14</name>
+      </remove>      <remove>        <name>TRX_MONTH_15</name>
+      </remove>      <remove>        <name>TRX_MONTH_16</name>
+      </remove>      <remove>        <name>TRX_MONTH_2</name>
+      </remove>      <remove>        <name>TRX_MONTH_3</name>
+      </remove>      <remove>        <name>TRX_MONTH_4</name>
+      </remove>      <remove>        <name>TRX_MONTH_5</name>
+      </remove>      <remove>        <name>TRX_MONTH_6</name>
+      </remove>      <remove>        <name>TRX_MONTH_7</name>
+      </remove>      <remove>        <name>TRX_MONTH_8</name>
+      </remove>      <remove>        <name>TRX_MONTH_9</name>
+      </remove>      <remove>        <name>branch_name</name>
+      </remove>      <remove>        <name>branch_name_1</name>
+      </remove>      <remove>        <name>branch_name_10</name>
+      </remove>      <remove>        <name>branch_name_11</name>
+      </remove>      <remove>        <name>branch_name_12</name>
+      </remove>      <remove>        <name>branch_name_13</name>
+      </remove>      <remove>        <name>branch_name_14</name>
+      </remove>      <remove>        <name>branch_name_15</name>
+      </remove>      <remove>        <name>branch_name_16</name>
+      </remove>      <remove>        <name>branch_name_2</name>
+      </remove>      <remove>        <name>branch_name_3</name>
+      </remove>      <remove>        <name>branch_name_4</name>
+      </remove>      <remove>        <name>branch_name_5</name>
+      </remove>      <remove>        <name>branch_name_6</name>
+      </remove>      <remove>        <name>branch_name_7</name>
+      </remove>      <remove>        <name>branch_name_8</name>
+      </remove>      <remove>        <name>branch_name_9</name>
+      </remove>      <remove>        <name>company_name</name>
+      </remove>      <remove>        <name>company_name_1</name>
+      </remove>      <remove>        <name>company_name_10</name>
+      </remove>      <remove>        <name>company_name_11</name>
+      </remove>      <remove>        <name>company_name_12</name>
+      </remove>      <remove>        <name>company_name_13</name>
+      </remove>      <remove>        <name>company_name_14</name>
+      </remove>      <remove>        <name>company_name_15</name>
+      </remove>      <remove>        <name>company_name_16</name>
+      </remove>      <remove>        <name>company_name_2</name>
+      </remove>      <remove>        <name>company_name_3</name>
+      </remove>      <remove>        <name>company_name_4</name>
+      </remove>      <remove>        <name>company_name_5</name>
+      </remove>      <remove>        <name>company_name_6</name>
+      </remove>      <remove>        <name>company_name_7</name>
+      </remove>      <remove>        <name>company_name_8</name>
+      </remove>      <remove>        <name>company_name_9</name>
+      </remove>      <remove>        <name>month_data</name>
+      </remove>      <remove>        <name>month_data_1</name>
+      </remove>      <remove>        <name>month_data_10</name>
+      </remove>      <remove>        <name>month_data_11</name>
+      </remove>      <remove>        <name>month_data_12</name>
+      </remove>      <remove>        <name>month_data_13</name>
+      </remove>      <remove>        <name>month_data_14</name>
+      </remove>      <remove>        <name>month_data_15</name>
+      </remove>      <remove>        <name>month_data_16</name>
+      </remove>      <remove>        <name>month_data_2</name>
+      </remove>      <remove>        <name>month_data_3</name>
+      </remove>      <remove>        <name>month_data_4</name>
+      </remove>      <remove>        <name>month_data_5</name>
+      </remove>      <remove>        <name>month_data_6</name>
+      </remove>      <remove>        <name>month_data_7</name>
+      </remove>      <remove>        <name>month_data_8</name>
+      </remove>      <remove>        <name>month_data_9</name>
+      </remove>      <remove>        <name>report_id</name>
+      </remove>      <remove>        <name>report_id_1</name>
+      </remove>      <remove>        <name>report_id_10</name>
+      </remove>      <remove>        <name>report_id_11</name>
+      </remove>      <remove>        <name>report_id_12</name>
+      </remove>      <remove>        <name>report_id_13</name>
+      </remove>      <remove>        <name>report_id_14</name>
+      </remove>      <remove>        <name>report_id_15</name>
+      </remove>      <remove>        <name>report_id_16</name>
+      </remove>      <remove>        <name>report_id_2</name>
+      </remove>      <remove>        <name>report_id_3</name>
+      </remove>      <remove>        <name>report_id_4</name>
+      </remove>      <remove>        <name>report_id_5</name>
+      </remove>      <remove>        <name>report_id_6</name>
+      </remove>      <remove>        <name>report_id_7</name>
+      </remove>      <remove>        <name>report_id_8</name>
+      </remove>      <remove>        <name>report_id_9</name>
+      </remove>      <remove>        <name>year_data</name>
+      </remove>      <remove>        <name>year_data_1</name>
+      </remove>      <remove>        <name>year_data_10</name>
+      </remove>      <remove>        <name>year_data_11</name>
+      </remove>      <remove>        <name>year_data_12</name>
+      </remove>      <remove>        <name>year_data_13</name>
+      </remove>      <remove>        <name>year_data_14</name>
+      </remove>      <remove>        <name>year_data_15</name>
+      </remove>      <remove>        <name>year_data_16</name>
+      </remove>      <remove>        <name>year_data_2</name>
+      </remove>      <remove>        <name>year_data_3</name>
+      </remove>      <remove>        <name>year_data_4</name>
+      </remove>      <remove>        <name>year_data_5</name>
+      </remove>      <remove>        <name>year_data_6</name>
+      </remove>      <remove>        <name>year_data_7</name>
+      </remove>      <remove>        <name>year_data_8</name>
+      </remove>      <remove>        <name>year_data_9</name>
+      </remove>      <remove>        <name>region_id_1</name>
+      </remove>      <remove>        <name>region_id_2</name>
+      </remove>      <remove>        <name>region_id_3</name>
+      </remove>      <remove>        <name>region_id_4</name>
+      </remove>      <remove>        <name>region_id_5</name>
+      </remove>      <remove>        <name>region_id_6</name>
+      </remove>      <remove>        <name>region_id_7</name>
+      </remove>      <remove>        <name>region_id_8</name>
+      </remove>      <remove>        <name>region_id_9</name>
+      </remove>      <remove>        <name>region_id_10</name>
+      </remove>      <remove>        <name>region_id_11</name>
+      </remove>      <remove>        <name>region_id_12</name>
+      </remove>      <remove>        <name>region_id_13</name>
+      </remove>      <remove>        <name>region_id_14</name>
+      </remove>      <remove>        <name>region_id_15</name>
+      </remove>      <remove>        <name>region_id_16</name>
+      </remove>      <remove>        <name>region_id</name>
+      </remove>      <meta>        <name>TRX_RCVD</name>
+        <rename>trx_rcvd</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3303,143 +3242,8 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>Clicked</name>
-        <rename>Clicked</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Completed</name>
-        <rename>Completed</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Corrupted</name>
-        <rename>Corrupted</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Detractors</name>
-        <rename>Detractors</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Duplicate</name>
-        <rename>Duplicate</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Ignored</name>
-        <rename>Ignored</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Mismatched</name>
-        <rename>Mismatched</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Old_Records</name>
-        <rename>Old_Records</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Partially_Completed</name>
-        <rename>Partially_Completed</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Passives</name>
-        <rename>Passives</rename>
+      </meta>      <meta>        <name>final_region_id</name>
+        <rename>region_id</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3454,7 +3258,7 @@
         <currency_symbol/>
         <storage_type/>
       </meta>      <meta>        <name>Pending</name>
-        <rename>Pending</rename>
+        <rename>pending</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3468,8 +3272,83 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>Promoters</name>
-        <rename>Promoters</rename>
+      </meta>      <meta>        <name>Duplicate</name>
+        <rename>duplicates</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Corrupted</name>
+        <rename>corrupted</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Old_Records</name>
+        <rename>old_records</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Ignored</name>
+        <rename>ignored</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Mismatched</name>
+        <rename>mismatched</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Completed</name>
+        <rename>completed</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3484,7 +3363,7 @@
         <currency_symbol/>
         <storage_type/>
       </meta>      <meta>        <name>Sent</name>
-        <rename>Sent</rename>
+        <rename>sent_count</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3498,8 +3377,53 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>TRX_RCVD</name>
-        <rename>TRX_RCVD</rename>
+      </meta>      <meta>        <name>Incomplete</name>
+        <rename>incomplete</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Clicked</name>
+        <rename>clicked_count</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Partially_Completed</name>
+        <rename>partially_completed</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Abusive</name>
+        <rename>abusive</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3528,11 +3452,56 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>complete_percentage</name>
-        <rename>complete_percentage</rename>
+      </meta>      <meta>        <name>Detractors</name>
+        <rename>detractors</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Passives</name>
+        <rename>passives</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Promoters</name>
+        <rename>promoters</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>complete_percentage</name>
+        <rename>complete_percentage</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
         <date_format_locale/>
@@ -3546,8 +3515,8 @@
       </meta>      <meta>        <name>delta</name>
         <rename>delta</rename>
         <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
+        <length>16</length>
+        <precision>2</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
         <date_format_locale/>
@@ -3559,7 +3528,7 @@
         <currency_symbol/>
         <storage_type/>
       </meta>      <meta>        <name>final_branch_id</name>
-        <rename>final_branch_id</rename>
+        <rename>branch_id</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3574,7 +3543,7 @@
         <currency_symbol/>
         <storage_type/>
       </meta>      <meta>        <name>final_branch_name</name>
-        <rename>final_branch_name</rename>
+        <rename>branch_name</rename>
         <type>String</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3589,7 +3558,7 @@
         <currency_symbol/>
         <storage_type/>
       </meta>      <meta>        <name>final_company_id</name>
-        <rename>final_company_id</rename>
+        <rename>company_id</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3604,7 +3573,7 @@
         <currency_symbol/>
         <storage_type/>
       </meta>      <meta>        <name>final_company_name</name>
-        <rename>final_company_name</rename>
+        <rename>company_name</rename>
         <type>String</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3619,8 +3588,8 @@
         <currency_symbol/>
         <storage_type/>
       </meta>      <meta>        <name>final_date</name>
-        <rename>final_date</rename>
-        <type>String</type>
+        <rename>created_date</rename>
+        <type>Timestamp</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -3634,7 +3603,7 @@
         <currency_symbol/>
         <storage_type/>
       </meta>      <meta>        <name>final_month_val</name>
-        <rename>final_month_val</rename>
+        <rename>month</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3649,7 +3618,7 @@
         <currency_symbol/>
         <storage_type/>
       </meta>      <meta>        <name>final_report_id</name>
-        <rename>final_report_id</rename>
+        <rename>Id</rename>
         <type>String</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3664,7 +3633,7 @@
         <currency_symbol/>
         <storage_type/>
       </meta>      <meta>        <name>final_trx_month</name>
-        <rename>final_trx_month</rename>
+        <rename>trx_month</rename>
         <type>String</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3679,7 +3648,7 @@
         <currency_symbol/>
         <storage_type/>
       </meta>      <meta>        <name>final_year_val</name>
-        <rename>final_year_val</rename>
+        <rename>year</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3693,25 +3662,10 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>incomplete</name>
-        <rename>incomplete</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>region_id</name>
-        <rename>region_id</rename>
-        <type>Integer</type>
-        <length>-2</length>
+      </meta>      <meta>        <name>survey_stats_report_id</name>
+        <rename>survey_stats_report_id</rename>
+        <type>String</type>
+        <length>36</length>
         <precision>-2</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
@@ -3725,8 +3679,8 @@
         <storage_type/>
       </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1224</xloc>
-      <yloc>1452</yloc>
+      <xloc>1000</xloc>
+      <yloc>1449</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3752,6 +3706,18 @@
     <fields>
       <field>
         <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -3786,6 +3752,18 @@
     <fields>
       <field>
         <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -4134,6 +4112,18 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -4164,6 +4154,18 @@
     <fields>
       <field>
         <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -4219,6 +4221,58 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1418</xloc>
       <yloc>581</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort Stream</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>branch_id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>company_id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>804</xloc>
+      <yloc>1449</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4362,6 +4416,18 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -4392,6 +4458,18 @@
     <fields>
       <field>
         <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -4430,6 +4508,18 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -4460,6 +4550,18 @@
     <fields>
       <field>
         <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -4498,6 +4600,18 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -4528,6 +4642,18 @@
     <fields>
       <field>
         <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -4566,6 +4692,18 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -4596,6 +4734,18 @@
     <fields>
       <field>
         <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -4634,6 +4784,18 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -4664,6 +4826,18 @@
     <fields>
       <field>
         <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -4702,6 +4876,18 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -4732,6 +4918,18 @@
     <fields>
       <field>
         <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -5000,6 +5198,18 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>month_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -5246,6 +5456,200 @@
     </step>
 
   <step>
+    <name>Survey Stats Report Main - Insert &#x2f; Update</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>survey_stats_report</table>
+      <key>
+        <name>branch_id</name>
+        <field>branch_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>month</name>
+        <field>month</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>year</name>
+        <field>year</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>branch_id</name>
+        <rename>branch_id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>survey_stats_report_id</name>
+        <rename>survey_stats_report_id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>month</name>
+        <rename>month</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>year</name>
+        <rename>year</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>region_id</name>
+        <rename>region_id</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>company_id</name>
+        <rename>company_id</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>trx_rcvd</name>
+        <rename>trx_rcvd</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>pending</name>
+        <rename>pending</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>duplicates</name>
+        <rename>duplicates</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>corrupted</name>
+        <rename>corrupted</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>old_records</name>
+        <rename>old_records</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>ignored</name>
+        <rename>ignored</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>mismatched</name>
+        <rename>mismatched</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>completed</name>
+        <rename>completed</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sent_count</name>
+        <rename>sent_count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>incomplete</name>
+        <rename>incomplete</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>clicked_count</name>
+        <rename>clicked_count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>partially_completed</name>
+        <rename>partially_completed</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>abusive</name>
+        <rename>abusive</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>avg_rating</name>
+        <rename>avg_rating</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>detractors</name>
+        <rename>detractors</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>passives</name>
+        <rename>passives</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>promoters</name>
+        <rename>promoters</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>complete_percentage</name>
+        <rename>complete_percentage</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>delta</name>
+        <rename>delta</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>branch_name</name>
+        <rename>branch_name</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>company_name</name>
+        <rename>company_name</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>created_date</name>
+        <rename>created_date</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>Id</name>
+        <rename>Id</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>trx_month</name>
+        <rename>trx_month</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>569</xloc>
+      <yloc>1449</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>User Profile</name>
     <type>TableInput</type>
     <description/>
@@ -5272,38 +5676,6 @@
     </step>
 
   <step>
-    <name>Write to log</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <limitRows>N</limitRows>
-      <limitRowsNumber>0</limitRowsNumber>
-      <logmessage/>
-    <fields>
-      <field>
-        <name>COMPANY_ID</name>
-        </field>
-      <field>
-        <name>SURVEY_PRE_INITIATION_ID</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>549</xloc>
-      <yloc>572</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>survey_stats_report_id</name>
     <type>RandomValue</type>
     <description/>
@@ -5322,8 +5694,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1060</xloc>
-      <yloc>1452</yloc>
+      <xloc>1207</xloc>
+      <yloc>1448</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

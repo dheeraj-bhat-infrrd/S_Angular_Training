@@ -403,8 +403,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>227</xloc>
-      <yloc>954</yloc>
+      <xloc>228</xloc>
+      <yloc>927</yloc>
       </entry>
     <entry>
       <name>company user report&#x28;2&#x29;</name>
@@ -437,7 +437,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>980</xloc>
-      <yloc>677</yloc>
+      <yloc>799</yloc>
       </entry>
     <entry>
       <name>SurveyResultsCompanyReport</name>
@@ -469,107 +469,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>733</xloc>
-      <yloc>677</yloc>
-      </entry>
-    <entry>
-      <name>SurveyTransactionReportMain</name>
-      <description/>
-      <type>TRANS</type>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;survey_transaction_summary_report.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>492</xloc>
-      <yloc>677</yloc>
-      </entry>
-    <entry>
-      <name>SurveyTransactionReportRegion</name>
-      <description/>
-      <type>TRANS</type>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;survey_transaction_summary_report_region.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>220</xloc>
-      <yloc>677</yloc>
-      </entry>
-    <entry>
-      <name>SurveyTransactionReportBranch</name>
-      <description/>
-      <type>TRANS</type>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;survey_transaction_summary_report_branch.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
       <xloc>980</xloc>
-      <yloc>806</yloc>
+      <yloc>663</yloc>
       </entry>
     <entry>
       <name>Overview_User_month</name>
@@ -865,7 +766,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>734</xloc>
-      <yloc>806</yloc>
+      <yloc>799</yloc>
       </entry>
     <entry>
       <name>this_year</name>
@@ -897,7 +798,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>486</xloc>
-      <yloc>806</yloc>
+      <yloc>799</yloc>
       </entry>
     <entry>
       <name>ScoreStats_ThisMonth</name>
@@ -929,7 +830,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>227</xloc>
-      <yloc>806</yloc>
+      <yloc>799</yloc>
       </entry>
   </entries>
   <hops>
@@ -981,24 +882,6 @@
     <hop>
       <from>survey_stats_report_company</from>
       <to>survey_stats_report_region</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>SurveyTransactionReportMain</from>
-      <to>SurveyResultsCompanyReport</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>SurveyTransactionReportRegion</from>
-      <to>SurveyTransactionReportMain</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -1096,24 +979,6 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>survey_stats_report_main</from>
-      <to>SurveyTransactionReportRegion</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>company user report&#x28;2&#x29;</from>
-      <to>SurveyTransactionReportBranch</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>this_month</from>
       <to>this_year</to>
       <from_nr>0</from_nr>
@@ -1150,8 +1015,17 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>SurveyTransactionReportBranch</from>
+      <from>company user report&#x28;2&#x29;</from>
       <to>this_month</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>survey_stats_report_main</from>
+      <to>SurveyResultsCompanyReport</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
