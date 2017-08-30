@@ -22,4 +22,6 @@ public interface BranchDao extends GenericDao<Branch, Long> {
 
 
     public List<Long> getBranchIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException;
+    
+    public long getRegionIdByBranchId(long branchId);
 }

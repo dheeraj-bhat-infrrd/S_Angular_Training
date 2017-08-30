@@ -129,6 +129,11 @@ public interface CommonConstants
     public static final String YES_STRING = "Y";
     public static final String NO_STRING = "N";
     public static final int DISABLED_ACCOUNT_PROCESSED = 2;
+    //Reporting status in file upload table 
+    public static final int STATUS_PENDING = 1;
+    public static final int STATUS_DONE = 0;
+    public static final int STATUS_FAIL = 2;
+    public static final int STATUS_DELETE = 3;
 
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
@@ -203,6 +208,8 @@ public interface CommonConstants
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
     public static final String IS_PRIMARY_COLUMN = "isPrimary";
     public static final String SURVEY_LAST_REMINDER_TIME = "lastReminderTime";
+    public static final String PROFILE_VALUE_COLUMN = "profileValue";
+    public static final String PROFILE_LEVEL_COLUMN = "profileLevel";
     public static final String ENCOMPASS_SDK_VERSION_COLUMN = "sdkVersion";
 
     //batch type constant for batch tracker
@@ -264,8 +271,16 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_SOCIAL_MONITOR_REPORT = "Social monitor report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_INCOMPLETE_SURVEY_REPORT = "Incomplete survey data report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT = "User adoption report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_STATS_REPORT = "Survey stats report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_ADOPTION_REPORT = "User adoption report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_COMPANY_USER_REPORT = "Company user report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = "Survey results company report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_TRANSACTION_REPORT = "Survey transaction report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_MONTHLY_REPORT = "User ranking monthly report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_YEARLY_REPORT = "User ranking yearly report for reporting";
 
 
+    
     /**
      * Mongo entities and column name constants
      */
@@ -432,6 +447,8 @@ public interface CommonConstants
     public static final String ENTITY_TYPE_COLUMN = "entityType";
 
     public static final String FILE_UPLOAD_TYPE_COLUMN = "uploadType";
+    
+    public static final String SHOW_ON_UI_COLUMN = "showOnUI";
 
     /**
      * Batch Constants
@@ -938,7 +955,17 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_SOCIAL_MONITOR_REPORT = 9;
     public static final int FILE_UPLOAD_INCOMPLETE_SURVEY_REPORT = 10;
     public static final int FILE_UPLOAD_USER_ADOPTION_REPORT = 11;
+    
+    //reporting file upload status 
+    public static final int FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT = 101;
+    public static final int FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT = 102;
+    public static final int FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT = 103;
+    public static final int FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = 104;
+    public static final int FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT = 105;
+    public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
+    public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
 
+    
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
     public static final String COMPANY_MEDIA_POST_DETAILS_COLUMN = "companyMediaPostDetails";
@@ -1309,14 +1336,42 @@ public interface CommonConstants
     public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
     public static final String SURVEY_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     
+    //Reporting constants
+    public static final String REPORTING_SURVEY_STATS_REPORT = "Survey Stats Report";
+    public static final String REPORTING_USER_ADOPTION_REPORT = "User Adoption Report";
+    public static final String REPORTING_COMPANY_USERS_REPORT = "Company User Report";
+    public static final String REPORTING_SURVEY_REUSLTS_COMPANY_REPORT = "Survey Results Company Report";
+    public static final String REPORTING_SURVEY_TRANSACTION_REPORT = "Survey Transaction Report";
+    public static final String REPORTING_USER_RANKING_MONTHLY_REPORT = "User Ranking Report For Month";
+    public static final String REPORTING_USER_RANKING_YEARLY_REPORT = "User Ranking Report For Year";
+
+
+    
+    public static final String SURVEY_DETAILS_ID_COLUMN="surveyDetailsId";
+    public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
+    public static final String SURVEY_RESULTS_IS_DELETED = "isDeleted";
+    public static final String TRX_MONTH = "trxMonth";
+    
+    public static final String THIS_MONTH="thisMonth";
+    public static final String THIS_YEAR="thisYear";
+    public static final String LEADERBOARD_YEAR="year";
+    public static final String LEADERBOARD_MONTH="month";
+    
+    public static final String RANK = "rank";
+    public static final String INTERNAL_BRANCH_RANK = "internalBranchRank";
+    public static final String INTERNAL_REGION_RANK = "internalRegionRank";
+	
+    public static final String MONTH_VAL = "monthVal";
+    public static final String YEAR_VAL = "yearVal";
+    public static final String QUESTION_ID = "questionId";
+
     //Survey API survey status
     public static final String SURVEY_API_SURVEY_STATUS_COMPLETE = "complete";
     public static final String SURVEY_API_SURVEY_STATUS_INCOMPLETE = "incomplete";
     public static final String SURVEY_API_SURVEY_STATUS_ALL = "all";
 
-    
     public static final String NOT_AVAILABLE = "N/A";
-    
+
     //Encompass test connection htt prequest initial
     public static final String HTTP_REQUEST_URL_INITIAL = "http://";
 }
