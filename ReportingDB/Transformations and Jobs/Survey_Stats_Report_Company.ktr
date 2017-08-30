@@ -198,9 +198,7 @@
   <hop> <from>Join User Survey</from><to>Filter Sent</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Sort Survey Pre Initiation</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Abusive</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey Details</from><to>Filter Clicked</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Detractors</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey Details</from><to>Filter Partially Complete</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Passives</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Promoters</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Sort rows Avg Rating</to><enabled>Y</enabled> </hop>
@@ -272,6 +270,8 @@
   <hop> <from>survey_stats_report_id</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>Sort Stream</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Stream</from><to>survey_stats_report_company - Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey</from><to>Filter Clicked</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey</from><to>Filter Partially Complete</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Company</name>
@@ -1897,185 +1897,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>148</xloc>
       <yloc>719</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>survey_stats_report_company - Insert &#x2f; Update</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>1000</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>survey_stats_report_company</table>
-      <key>
-        <name>company_id</name>
-        <field>company_id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>month</name>
-        <field>month</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>year</name>
-        <field>year</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>trx_rcvd</name>
-        <rename>trx_rcvd</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>pending</name>
-        <rename>pending</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>duplicates</name>
-        <rename>duplicates</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>corrupted</name>
-        <rename>corrupted</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>old_records</name>
-        <rename>old_records</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>ignored</name>
-        <rename>ignored</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>mismatched</name>
-        <rename>mismatched</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>completed</name>
-        <rename>completed</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>sent_count</name>
-        <rename>sent_count</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>incomplete</name>
-        <rename>incomplete</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>clicked_count</name>
-        <rename>clicked_count</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>partially_completed</name>
-        <rename>partially_completed</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>abusive</name>
-        <rename>abusive</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>avg_rating</name>
-        <rename>avg_rating</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>detractors</name>
-        <rename>detractors</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>passives</name>
-        <rename>passives</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>promoters</name>
-        <rename>promoters</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>complete_percentage</name>
-        <rename>complete_percentage</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>delta</name>
-        <rename>delta</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>company_id</name>
-        <rename>company_id</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>company_name</name>
-        <rename>company_name</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>created_date</name>
-        <rename>created_date</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>year</name>
-        <rename>year</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>Id</name>
-        <rename>Id</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>month</name>
-        <rename>month</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>trx_month</name>
-        <rename>trx_month</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>survey_stats_report_id</name>
-        <rename>survey_stats_report_id</rename>
-        <update>N</update>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>737</xloc>
-      <yloc>1455</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -5088,6 +4909,185 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1193</xloc>
       <yloc>37</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>survey_stats_report_company - Insert &#x2f; Update</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>1000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>survey_stats_report_company</table>
+      <key>
+        <name>company_id</name>
+        <field>company_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>month</name>
+        <field>month</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>year</name>
+        <field>year</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>trx_rcvd</name>
+        <rename>trx_rcvd</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>pending</name>
+        <rename>pending</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>duplicates</name>
+        <rename>duplicates</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>corrupted</name>
+        <rename>corrupted</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>old_records</name>
+        <rename>old_records</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>ignored</name>
+        <rename>ignored</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>mismatched</name>
+        <rename>mismatched</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>completed</name>
+        <rename>completed</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sent_count</name>
+        <rename>sent_count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>incomplete</name>
+        <rename>incomplete</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>clicked_count</name>
+        <rename>clicked_count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>partially_completed</name>
+        <rename>partially_completed</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>abusive</name>
+        <rename>abusive</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>avg_rating</name>
+        <rename>avg_rating</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>detractors</name>
+        <rename>detractors</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>passives</name>
+        <rename>passives</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>promoters</name>
+        <rename>promoters</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>complete_percentage</name>
+        <rename>complete_percentage</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>delta</name>
+        <rename>delta</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>company_id</name>
+        <rename>company_id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>company_name</name>
+        <rename>company_name</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>created_date</name>
+        <rename>created_date</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>year</name>
+        <rename>year</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>Id</name>
+        <rename>Id</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>month</name>
+        <rename>month</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>trx_month</name>
+        <rename>trx_month</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>survey_stats_report_id</name>
+        <rename>survey_stats_report_id</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>737</xloc>
+      <yloc>1455</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

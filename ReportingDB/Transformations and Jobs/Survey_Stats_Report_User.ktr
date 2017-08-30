@@ -171,9 +171,7 @@
   <hop> <from>Join User Survey</from><to>Filter Sent</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Sort Survey Pre Initiation</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Abusive</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey Details</from><to>Filter Clicked</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Detractors</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey Details</from><to>Filter Partially Complete</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Passives</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Promoters</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Sort rows Avg Rating</to><enabled>Y</enabled> </hop>
@@ -242,6 +240,8 @@
   <hop> <from>survey_stats_report_id</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>Sort Stream</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Stream</from><to>survey_stats_report_user - Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey</from><to>Filter Clicked</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey</from><to>Filter Partially Complete</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Filter Abusive</name>
