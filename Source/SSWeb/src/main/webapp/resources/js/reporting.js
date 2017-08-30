@@ -2,6 +2,7 @@
 
 var monthNamesList = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];	
 var overviewData=getOverviewData();
+var socialMediaList = new Array();
 
 function drawSpsStatsGraph(){
 	var chartData;
@@ -476,7 +477,7 @@ function drawUnclickedDonutChart(){
 
 	        var options = {
 	          pieStartAngle: 130,
-	          backgroundColor: '#f9f9fb',
+	          backgroundColor: '#f1f0f2',
 	          pieHole: 0.5,
 	          legend: { 
 	      	    position : 'none'
@@ -501,6 +502,28 @@ function drawUnclickedDonutChart(){
 
 	        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
 	        chart.draw(data, options);
+	        
+	        var optionsChartIcn = {
+		  	          pieStartAngle: 130,
+			          backgroundColor: '#f1f0f2',
+			          pieHole: 0.3,
+			          legend: { 
+			      	    position : 'none'
+			      	  },
+			      	  pieSliceText:'none',
+			      	  width:32,
+			      	  height:32,
+			      	  slices: [{color : '#0072c2'},{color: '#fa5b00'}],
+			      	  legend: 'none',
+			      	  tooltip: { trigger: 'none' },
+			      	  enableInteractivity: false
+			        };
+		        
+		        var chart = new google.visualization.PieChart(document.getElementById('chart-icn-chart'));
+		        
+		        chart.draw(data, optionsChartIcn);
+		        
+		        
 	      }
 }
 
@@ -541,7 +564,7 @@ function drawProcessedDonutChart(){
 
 	        var options = {
 	          pieStartAngle: 130,
-	          backgroundColor: '#f9f9fb',
+	          backgroundColor: '#f1f0f2',
 	          pieHole: 0.5,
 	          legend: { 
 	      	    position : 'none'
@@ -567,6 +590,7 @@ function drawProcessedDonutChart(){
 
 	        var chart = new google.visualization.PieChart(document.getElementById('processedDonutchart'));
 	        chart.draw(data, options);
+	       
 	      }
 }
 
@@ -615,7 +639,7 @@ function drawUnprocessedDonutChart(){
 
 	        var options = {
 	          pieStartAngle: 90,
-	          backgroundColor: '#f9f9fb',
+	          backgroundColor: '#f1f0f2',
 	          pieHole: 0.5,
 	          legend: { 
 	      	    position : 'none'
@@ -1948,4 +1972,176 @@ function isContainsQuestion(array,questionId){
 	}
 	
 	return false;
+}
+
+function getReportingSocialMediaConnections(columnName,columnValue){
+	var payload = {
+			"columnName" : columnName,
+			"columnValue" : columnValue
+		};
+		
+		var stages = null;
+		$.ajax({
+			url : './dashboardbuttonsorder.do',
+			headers: {          
+	            Accept : "text/plain; charset=utf-8"   
+			},
+			type : "GET",
+			data : payload,
+			async : false,
+			cache : false,
+			success : function(data){
+				data = $.parseJSON(data);
+				stages = data.stages;
+			},
+			complete: function(){
+				hideOverlay();
+				hideDashOverlay('#mid-dash');
+				hideDashOverlay('#top-dash');
+				hideDashOverlay('#latest-post-ep');
+			},
+			error : function(e) {
+				if(e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
+				if(e.status == 0) {
+					return;
+				}
+				redirectErrorpage();
+			}
+		});
+		return stages;
+}
+
+function drawReportingDashButtons(columnName, columnValue){
+	
+	var stages = getReportingSocialMediaConnections(columnName, columnValue);
+	
+	var max = 1;
+	
+	if(columnName == null){
+		return;
+	}
+	
+	if (stages != undefined && stages.length != 0) {
+		if (stages.length < max) {
+			$('#rep-social-media').addClass('hide');
+			$('#empty-rep-social-media').removeClass('hide');
+			max = stages.length;
+		}
+		for (var i = 0; i < max; i++) {
+			var contentToDisplay = '';
+			if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
+				contentToDisplay = 'Connect to Facebook';
+			} else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
+				contentToDisplay = 'Connect to Zillow';
+			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
+				contentToDisplay = 'Connect to Google+';
+			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
+				contentToDisplay = 'Connect to Twitter';
+			} else if (stages[i].profileStageKey == 'YELP_PRF') {
+				contentToDisplay = 'Connect to Yelp';
+			} else if (stages[i].profileStageKey == 'LINKEDIN_PRF') {
+				contentToDisplay = 'Connect to Linkedin';
+			} else if (stages[i].profileStageKey == 'LICENSE_PRF') {
+				contentToDisplay = 'Enter license details';
+			} else if (stages[i].profileStageKey == 'HOBBIES_PRF') {
+				contentToDisplay = 'Enter hobbies';
+			} else if (stages[i].profileStageKey == 'ACHIEVEMENTS_PRF') {
+				contentToDisplay = 'Enter achievements';
+			}
+			
+			if (i == 0) {
+				$('#rep-social-media').removeClass('hide');
+				$('#empty-rep-social-media').addClass('hide');
+				$('#dsh-btn2').data('social', stages[i].profileStageKey);
+				$('#dsh-btn2').html(contentToDisplay);
+				$('#dsh-btn2').removeClass('hide');
+				updateSocialMediaList(stages, stages[i].profileStageKey);
+			}
+		}
+		
+	}else{
+		$('#rep-social-media').addClass('hide');
+		$('#empty-rep-social-media').removeClass('hide');
+	}
+	
+	
+}
+
+function changeSocialMedia(columnName, columnValue){
+	
+	var profileStageKey = $('#dsh-btn2').data('social');
+	
+	var stages = getReportingSocialMediaConnections(columnName, columnValue);
+	
+	var max = 2;
+		
+	if (stages != undefined && stages.length != 0) {
+		if (stages.length < max) {
+			$('#rep-social-media').fadeIn(500);
+			$('#empty-rep-social-media').addClass('hide');
+		}else{
+			max = stages.length;
+			
+			for (var i = 0; i < max; i++) {
+				var contentToDisplay = '';
+				var isContainsSocialMedia = false;
+				for(var j=0; j<socialMediaList.length; j++){
+					if(stages[i].profileStageKey == socialMediaList[j]){
+						isContainsSocialMedia = true;
+					}
+				}
+				
+				if(isContainsSocialMedia){
+					continue;
+				}
+				
+				if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
+					contentToDisplay = 'Connect to Facebook';
+				} else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
+					contentToDisplay = 'Connect to Zillow';
+				} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
+					contentToDisplay = 'Connect to Google+';
+				} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
+					contentToDisplay = 'Connect to Twitter';
+				} else if (stages[i].profileStageKey == 'YELP_PRF') {
+					contentToDisplay = 'Connect to Yelp';
+				} else if (stages[i].profileStageKey == 'LINKEDIN_PRF') {
+					contentToDisplay = 'Connect to Linkedin';
+				} else if (stages[i].profileStageKey == 'LICENSE_PRF') {
+					contentToDisplay = 'Enter license details';
+				} else if (stages[i].profileStageKey == 'HOBBIES_PRF') {
+					contentToDisplay = 'Enter hobbies';
+				} else if (stages[i].profileStageKey == 'ACHIEVEMENTS_PRF') {
+					contentToDisplay = 'Enter achievements';
+				}
+				
+				if(contentToDisplay != ''){
+					$('#empty-rep-social-media').addClass('hide');
+					$('#dsh-btn2').data('social', stages[i].profileStageKey);
+					$('#dsh-btn2').html(contentToDisplay);
+					$('#dsh-btn2').removeClass('hide');
+					$('#rep-social-media').fadeIn(500);
+					updateSocialMediaList(stages, stages[i].profileStageKey);
+					break;
+				}
+			}
+			
+		}
+	}else{
+		$('#rep-social-media').addClass('hide');
+		$('#empty-rep-social-media').removeClass('hide');	
+	}
+	
+}
+
+function updateSocialMediaList(stages,socialMedia){
+	
+	socialMediaList.push(socialMedia);
+	
+	if(socialMediaList.length >= stages.length){
+		socialMediaList.length = 0;
+	}
 }

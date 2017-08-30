@@ -550,9 +550,9 @@ function paintReportingDashboard(profileMasterId, newProfileName, newProfileValu
 	colName = newProfileName;
 	colValue = newProfileValue;
 
-	if (newProfileName != null) {
+	/*if (newProfileName != null) {
 		showDashboardButtons(newProfileName, newProfileValue);
-	}
+	}*/
 	
 	fetchReviewsOnDashboard(false);
 }

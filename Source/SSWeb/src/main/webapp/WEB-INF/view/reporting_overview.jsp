@@ -11,14 +11,6 @@
 		line-height: 15px;
 	}
 	
-	.nav-tabs{
-		border-bottom:1px solid #c5c5c5;
-	}
-	
-	.nav>li>a:hover{
-       background-color: #009FE0 !important;
-     }
-     
      .rep-sps-lbl{
      	font-size: 20px;
     	position: absolute;

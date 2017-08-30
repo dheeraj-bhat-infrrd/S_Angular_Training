@@ -1,7 +1,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
-<div id="time-frame-wrapper" class="float-left clearfix hr-dsh-adj-lft hdr-prof-sel time-frame-prof-sel">
+<style>
+.ht-txt2{
+    padding-right: 49px;
+}
+</style>
+<div id="time-frame-wrapper" class="float-right clearfix hr-dsh-adj-lft hdr-prof-sel time-frame-prof-sel" style="margin-top:7px; margin-right: 10px;">
 	<div id="time-frame-sel" data-column-value="100" class="float-left hr-txt2 cursor-pointer time-frame-sel" >All Time</div>	
 	<div id="time-frame-options" class="time-frame-wrapper hide">
 		<div class="time-frame-item" data-column-value="100">All Time</div>
