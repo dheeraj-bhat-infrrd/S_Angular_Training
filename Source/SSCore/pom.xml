@@ -440,6 +440,14 @@
 				</filters>
 			</build>
 		</profile>
+		<profile>
+			<id>stage</id>
+			<build>
+				<filters>
+					<filter>src/main/resources/filler.stage.properties</filter>
+				</filters>
+			</build>
+		</profile>
 	</profiles>
 
 	<pluginRepositories>
