@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
@@ -184,6 +185,10 @@ public class SurveyManagementController
 		int isUserRankingQuestionInt = Integer.parseInt(request.getParameter("isUserRankingQuestion"));
 		String surveyId = request.getParameter("surveyId");
 
+		//encode question and response
+		question = new String( DatatypeConverter.parseBase64Binary(question) );
+		answer = new String( DatatypeConverter.parseBase64Binary(answer) );
+		
 		//get boolean value for isUserRankingQues
 		boolean isUserRankingQuestion = false;
 		if(isUserRankingQuestionInt == CommonConstants.QUESTION_RATING_VALUE_TRUE){
@@ -353,7 +358,7 @@ public class SurveyManagementController
 						if (survey.getCustomerLastName() != null)
 							displayName = displayName + " " + survey.getCustomerLastName();
 						emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), displayName,
-                            customerEmail, mood, surveyScore, survey.getSourceId(), surveyDetail );
+                            customerEmail, survey.getAgentName(), mood, surveyScore, survey.getSourceId(), surveyDetail );
 					}
 
 				}
