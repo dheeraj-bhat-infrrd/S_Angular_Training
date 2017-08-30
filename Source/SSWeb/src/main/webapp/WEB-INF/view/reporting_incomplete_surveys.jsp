@@ -8,10 +8,10 @@
 }
 
 </style>
-<div id="dash-survey-incomplete" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12" style="margin-left: 30px; width: 100%; padding-top:0; margin-top: -10px; margin-bottom: 20px;">
+<div id="dash-survey-incomplete" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12" style="width: 100%; padding-top:0; margin-top: -10px; margin-bottom: 20px;">
 	<div class="dash-lp-header clearfix" id="incomplete-survey-header">
 		<div class="float-left" style="font-size: 20px;"><spring:message code="label.incompletesurveys.key" /></div>
-		<div class="float-right dash-sur-link" onclick="showIncompleteSurveyListPopup(event)" style="font-size: 15pxpx;">View All</div>
+		<div class="float-right dash-sur-link" onclick="showIncompleteSurveyListPopup(event)" style="font-size: 15pxpx;"></div>
 	</div>
 	<div id="dsh-inc-srvey" class="dash-lp-item-grp clearfix" data-total="0" style="text-align:left">
 		<!-- Populated with dashboard_incompletesurveys.jsp -->

@@ -48,6 +48,9 @@ public class ScoreStatsQuestionUser {
     @Column ( name = "year_val")
     private int yearVal;
 
+    @Column ( name = "avg_score")
+    private float avgScore;
+    
 	public String getScoreStatsQuestionUserId() {
 		return scoreStatsQuestionUserId;
 	}
@@ -136,11 +139,20 @@ public class ScoreStatsQuestionUser {
 		this.yearVal = yearVal;
 	}
 
+	public float getAvgScore() {
+		return avgScore;
+	}
+
+	public void setAvgScore(float avgScore) {
+		this.avgScore = avgScore;
+	}
+
 	@Override
 	public String toString() {
 		return "ScoreStatsQuestionUser [scoreStatsQuestionUserId=" + scoreStatsQuestionUserId + ", userId=" + userId
 				+ ", questionId=" + questionId + ", question=" + question + ", fiveStar=" + fiveStar + ", fourStar="
 				+ fourStar + ", threeStar=" + threeStar + ", twoStar=" + twoStar + ", oneStar=" + oneStar
-				+ ", monthVal=" + monthVal + ", yearVal=" + yearVal + "]";
+				+ ", monthVal=" + monthVal + ", yearVal=" + yearVal + ", avgScore=" + avgScore + "]";
 	}
- }
+
+}

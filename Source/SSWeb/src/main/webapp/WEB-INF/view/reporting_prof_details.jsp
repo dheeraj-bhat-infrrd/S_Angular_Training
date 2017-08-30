@@ -94,10 +94,14 @@
 		</div>	
 	</div>
 	<div id="rep-social-media" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rep-social-media-div">
+		<button id="rep-dismiss-social-media" type="button" class="close" style="position: absolute; top: 0; right: 0; margin-right: 5px;">&times;</button>
 		<span>Extend your social reach by connecting to all your social media accounts.</span>
 		<div id="rep-pro-cmplt-stars" class="dsh-star-wrapper clearfix rep-dash-btn-wrapper" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}">
 			<div id="dsh-btn2" class="dsh-btn-complete dsh-btn-orange float-left hide rep-dash-btn"></div>
 		</div>
+	</div>
+	<div id="empty-rep-social-media" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rep-social-media-div hide" style="line-height: 40px;">
+		<span>You have successfully connected to all your social media accounts.</span>
 	</div>
 </div>
 
@@ -108,18 +112,28 @@
 			var buttonId = 'dsh-btn2';
 			var task = $('#dsh-btn2').data('social');
 			dashboardButtonAction(buttonId, task, colName, colValue);
-		});
-		
-		$('#rep-pro-cmplt-stars').on('click', '#dsh-btn3', function(e) {
-			e.stopPropagation();
-			var buttonId = 'dsh-btn3';
-			var task = $('#dsh-btn3').data('social');
-			dashboardButtonAction(buttonId, task, colName, colValue);
+			$('#rep-social-media').fadeOut(500);
+			delay(function(){
+				e.stopPropagation();
+				var currentProfileName = $('#prof-container').attr('data-column-name');
+				var currentProfileValue = $('#prof-container').attr('data-column-value');
+				changeSocialMedia(currentProfileName, currentProfileValue);
+			},500);
 		});
 		
 		$(document).on('click','#prof-company-review-count',function(e){
 			e.stopPropagation();
 			activaTab('reviews-tab');
+		});
+		
+		$('#rep-social-media').on('click','#rep-dismiss-social-media',function(e){
+			$('#rep-social-media').fadeOut(500);
+			delay(function(){
+				e.stopPropagation();
+				var currentProfileName = $('#prof-container').attr('data-column-name');
+				var currentProfileValue = $('#prof-container').attr('data-column-value');
+				changeSocialMedia(currentProfileName, currentProfileValue);
+			},500);
 		});
 	});
 </script>

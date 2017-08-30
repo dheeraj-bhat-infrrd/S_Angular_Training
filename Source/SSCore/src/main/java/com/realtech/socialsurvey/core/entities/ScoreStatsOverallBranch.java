@@ -42,6 +42,9 @@ public class ScoreStatsOverallBranch {
     @Column ( name = "year_val")
     private int yearVal;
 
+    @Column ( name = "avg_score")
+    private float avgScore;
+    
 	public String getScoreStatsOverallBranchId() {
 		return scoreStatsOverallBranchId;
 	}
@@ -114,11 +117,19 @@ public class ScoreStatsOverallBranch {
 		this.yearVal = yearVal;
 	}
 
+	public float getAvgScore() {
+		return avgScore;
+	}
+
+	public void setAvgScore(float avgScore) {
+		this.avgScore = avgScore;
+	}
+
 	@Override
 	public String toString() {
 		return "ScoreStatsOverallBranch [scoreStatsOverallBranchId=" + scoreStatsOverallBranchId + ", branchId="
 				+ branchId + ", fiveStar=" + fiveStar + ", fourStar=" + fourStar + ", threeStar=" + threeStar
 				+ ", twoStar=" + twoStar + ", oneStar=" + oneStar + ", monthVal=" + monthVal + ", yearVal=" + yearVal
-				+ "]";
+				+ ", avgScore=" + avgScore + "]";
 	}
 }

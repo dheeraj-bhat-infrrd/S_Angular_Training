@@ -19,7 +19,7 @@
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     text-align: center;
-    padding-top: 10px;
+    padding-top: 15px;
     height: 130px;
     width: 48%;
     margin-left: auto;
@@ -30,7 +30,7 @@
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     text-align: center;
-    padding-top: 10px;
+    padding-top: 15px;
     height: 130px;
     width: 48%;
 	}
@@ -1831,6 +1831,7 @@
 	
 	.rep-tab-content{
 	margin-left:0;
+	margin-right:0;
 	}
 	.processed-trans-div,.rep-trans-graphs,.unprocessed-trans-div{
 	width:60.7%;
@@ -1843,6 +1844,7 @@
 	}
 	
 	.time-frame-prof-sel {
+	width: 140px;
     border: 1px solid #d2cdcd;
     background: #ffffff;
     height: 36px;
@@ -1859,16 +1861,16 @@
 	}
 	
 	.time-frame-wrapper {
-    z-index: 999;
+	z-index: 999;
     border: 1px solid #dcdcdc;
     position: absolute;
     background-color: #fff;
     border-radius: 3px;
-    width: 100px;
+    width: 140px;
     color: #666;
     text-align: left;
-    top: 102px;
-    left: 89px;
+    top: 163px;
+    right: 114px;
     max-height: 400px;
     box-shadow: 3px 3px 30px #444;
 	}
@@ -1928,7 +1930,7 @@
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     text-align: center;
-    padding-top: 10px;
+    padding-top: 15px;
     height: 130px;
     width: 100%;
     margin: 0 auto;
@@ -1938,7 +1940,7 @@
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     text-align: center;
-    padding-top: 10px;
+    padding-top: 15px;
     height: 130px;
     width: 100%;
     margin: 10px auto;
@@ -2494,7 +2496,7 @@
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     text-align: center;
-    padding-top: 10px;
+    padding-top: 15px;
     height: 130px;
     width: 48%;
     margin-left: auto;
@@ -2505,7 +2507,7 @@
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     text-align: center;
-    padding-top: 10px;
+    padding-top: 15px;
     height: 130px;
     width: 48%;
 	}
@@ -2712,7 +2714,7 @@
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     text-align: center;
-    padding-top: 10px;
+    padding-top: 15px;
     height: 130px;
     width: 48%;
     }
@@ -2722,7 +2724,7 @@
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     text-align: center;
-    padding-top: 10px;
+    padding-top: 15px;
     height: 130px;
     width: 48%;
 }
