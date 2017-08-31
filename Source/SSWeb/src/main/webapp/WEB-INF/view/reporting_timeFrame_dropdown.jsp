@@ -68,7 +68,6 @@
 			$('#reporting-trans-details').fadeOut(500);
 			$('#reporting-trans-details').fadeIn(500);
 			updateReportingDashboard();
-			hideOverlay();
 			
 		});
 	});

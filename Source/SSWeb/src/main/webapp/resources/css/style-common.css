@@ -9775,3 +9775,41 @@ ul.accordion li>a:before {
 	display: inline-flex; 
 	margin-top: 10px;
 }
+
+.rep-fb-btn{
+	background: url(../images/fb_wide.png) no-repeat center #60769f;
+    border-radius: 4px;
+    height: 35px;
+}
+
+.rep-linked-in-btn{
+	background: url(../images/linkedin_wide.png) no-repeat center #0274b3;
+	height: 35px;
+    border-radius: 4px;
+}
+
+.rep-zillow-btn{
+	height: 35px;
+    background: url(../images/zillow_wide.png) no-repeat center #0074e4;
+    border-radius: 4px;
+}
+
+.rep-google-btn{
+	height: 35px;
+    background: url(../images/gPlus_wide.png) no-repeat center #cf4139;
+    border-radius: 4px;
+}
+
+.rep-twitter-btn{
+	height: 35px;
+    background: url(../images/twiter_wide.png) no-repeat center #00aee9;
+    border-radius: 4px;
+}
+
+.rep-yelp-btn{
+	height: 35px;
+    background: url(../images/yelp_wide.png) no-repeat center #c02e13;
+    border-radius: 4px;
+}
+
+.
