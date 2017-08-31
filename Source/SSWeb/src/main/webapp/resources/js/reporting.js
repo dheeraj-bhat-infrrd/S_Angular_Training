@@ -47,17 +47,10 @@ function drawSpsStatsGraph(){
 					type : "GET",
 					cache : false,
 					dataType : "json",
-					success : function(data) {
-						if (data.status == 200) {
-							$.ajax({
-										url : data.url,
-										type : "GET",
-										cache : false,
-										dataType : "json",
-										success : function(response) {
+					success : function(response) {
 											chartData = JSON.parse(response);
 
-											if (chartData.length == 0) {
+											if (chartData.length == 0 || chartData == null) {
 												drawEmptyChart();
 											} else {
 												var spsChartData = new Array(
@@ -106,19 +99,6 @@ function drawSpsStatsGraph(){
 																.getElementById('chart_div'));
 												chart.draw(data, options);
 											}
-										},
-										error : function(e) {
-
-											if (e.status == 504) {
-												redirectToLoginPageOnSessionTimeOut(e.status);
-												return;
-											}
-											drawEmptyChart();
-										}
-									});
-						}else{
-							drawEmptyChart();
-						}
 					},
 					error : function(e) {
 						if (e.status == 504) {
@@ -174,17 +154,10 @@ function drawCompletionRateGraph(){
 					type : "GET",
 					cache : false,
 					dataType : "json",
-					success : function(data) {
-						if (data.status == 200) {
-							$.ajax({
-										url : data.url,
-										type : "GET",
-										cache : false,
-										dataType : "json",
-										success : function(response) {
+					success : function(response) {
 											chartData = JSON.parse(response);
 
-											if (chartData.length == 0) {
+											if (chartData.length == 0 || chartData == null) {
 												drawEmptyChart();
 											} else {
 												var maxTransactionValue = 0;
@@ -254,19 +227,6 @@ function drawCompletionRateGraph(){
 
 												chart.draw(data, options);
 											}
-										},
-										error : function(e) {
-
-											if (e.status == 504) {
-												redirectToLoginPageOnSessionTimeOut(e.status);
-												return;
-											}
-											drawEmptyChart();
-										}
-									});
-						}else{
-							drawEmptyChart();
-						}
 					},
 					error : function(e) {
 						if (e.status == 504) {
@@ -288,16 +248,8 @@ function getOverviewMonthData(month,year) {
 		type : "GET",
 		cache : false,
 		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-					async : false,
-					url : data.url,
-					type : "GET",
-					cache : false,
-					dataType : "json",
-					success : function(response) {
-						if (response.length == 0) {
+		success : function(response) {
+						if (response.length == 0 || response == null) {
 							overviewMonthData = null;
 						} else {
 							if(response == "{}"){
@@ -306,18 +258,6 @@ function getOverviewMonthData(month,year) {
 								overviewMonthData = JSON.parse(response);
 							}
 						}
-					},
-					error : function(e) {
-						if (e.status == 504) {
-							redirectToLoginPageOnSessionTimeOut(e.status);
-							return;
-						}
-						overviewMonthData = null;
-					}
-				});
-			}else{
-				overviewMonthData = null;
-			}
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -342,16 +282,8 @@ $.ajax({
 	type : "GET",
 	cache : false,
 	dataType : "json",
-	success : function(data) {
-		if (data.status == 200) {
-			$.ajax({
-				async : false,
-				url : data.url,
-				type : "GET",
-				cache : false,
-				dataType : "json",
-				success : function(response) {
-					if (response.length == 0) {
+	success : function(response) {
+					if (response.length == 0 || response == null) {
 						overviewYearData = null;
 					} else {
 						if(response == "{}"){
@@ -361,18 +293,6 @@ $.ajax({
 						}
 						
 					}
-				},
-				error : function(e) {
-					if (e.status == 504) {
-						redirectToLoginPageOnSessionTimeOut(e.status);
-						return;
-					}
-					overviewYearData = null;
-				}
-			});
-		}else{
-			overviewYearData = null;
-		}
 	},
 	error : function(e) {
 		if (e.status == 504) {
@@ -396,15 +316,7 @@ function getoverviewAllTimeData() {
 		type : "GET",
 		cache : false,
 		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-					async : false,
-					url : data.url,
-					type : "GET",
-					cache : false,
-					dataType : "json",
-					success : function(response) {
+		success : function(response) {
 						if (response.length == 0) {
 							overviewAllTimeData = null;
 						} else {
@@ -415,18 +327,6 @@ function getoverviewAllTimeData() {
 							}
 							
 						}
-					},
-					error : function(e) {
-						if (e.status == 504) {
-							redirectToLoginPageOnSessionTimeOut(e.status);
-							return;
-						}
-						overviewAllTimeData = null;
-					}
-				});
-			}else{
-				overviewAllTimeData = null;
-			}
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -951,32 +851,15 @@ function getOverviewData() {
 		type : "GET",
 		cache : false,
 		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-					async : false,
-					url : data.url,
-					type : "GET",
-					cache : false,
-					dataType : "json",
-					success : function(response) {
+		success : function(response) {
 						if (response.length == 0) {
 							overviewData = null;
 						} else {
 							overviewData = JSON.parse(response);
 						}
 					},
-					error : function(e) {
-						if (e.status == 504) {
-							redirectToLoginPageOnSessionTimeOut(e.status);
-							return;
-						}
-						overviewData = null;
-					}
-				});
-			}else{
-				overviewData = null;
-			}
+		complete:function(){
+			hideOverlay();
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -1113,28 +996,8 @@ function getRecentActivityList(startIndex,batchSize){
 		type : "GET",
 		cache : false,
 		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-					async : false,
-					url : data.url,
-					type : "GET",
-					cache : false,
-					dataType : "json",
-					success : function(response) {
+		success : function(response) {
 						recentActivityList = JSON.parse(response);
-					},
-					error : function(e) {
-						if (e.status == 504) {
-							redirectToLoginPageOnSessionTimeOut(e.status);
-							return;
-						}
-						recentActivityList = null;
-					}
-				});
-			}else{
-				recentActivityList = null;
-			}
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -1293,6 +1156,7 @@ $(document).on('click','.downloadLink',function(e){
 });
 
 $(document).on('click','.recent-act-delete-x',function(e){
+	showOverlay();
 	var clickedID = this.id;
 	var indexRecentActivity = clickedID.match(/\d+$/)[0];
 	var fileUploadId=recentActivityList[indexRecentActivity][8];
@@ -1417,6 +1281,7 @@ function updateReportingDashboard(){
 	drawUnclickedDonutChart();
 	drawProcessedDonutChart();
 	drawUnprocessedDonutChart();
+	hideOverlay();
 }
 
 function getUserRankingList(entityType,entityId,year,month,startIndex,batchSize,timeFrame){
@@ -1428,20 +1293,12 @@ function getUserRankingList(entityType,entityId,year,month,startIndex,batchSize,
 		type : "GET",
 		cache : false,
 		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({	
-							async : false,
-							url : data.url,
-							type : "GET",
-							cache : false,
-							dataType : "json",
-							success : function(response) {
-								userRankingList = JSON.parse(response);		
-							}
-				});
-			}
-		},	
+		success : function(response) {
+					userRankingList = JSON.parse(response);	
+		},
+		complete: function(){
+			hideOverlay();
+		},
 		error : function(e) {
 			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
@@ -1462,19 +1319,8 @@ function getUserRankingCountForAdmins(entityType,entityId,year,month,batchSize,t
 		type : "GET",
 		cache : false,
 		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-							async:false,
-							url : data.url,
-							type : "GET",
-							cache : false,
-							dataType : "json",
-							success : function(response) {
-								userRankingCount = JSON.parse(response);
-							}
-						});
-			}
+		success : function(response) {
+					userRankingCount = JSON.parse(response);
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -1497,19 +1343,8 @@ function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame)
 		type : "GET",
 		cache : false,
 		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-							async:false,
-							url : data.url,
-							type : "GET",
-							cache : false,
-							dataType : "json",
-							success : function(response) {
-								userRankingCount = JSON.parse(response);
-							}
-						});
-			}
+		success :function(response) {
+					userRankingCount = JSON.parse(response);
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -1522,7 +1357,6 @@ function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame)
 }
 
 function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
-	
 	var tableHeaderData='<table id="leaderboard-table" class="v-um-tbl leaderboard-table">'
 		+'<tr id="u-tbl-header" class="u-tbl-header">'
 		+'<td class="lead-tbl-ln-of text-center">Rank</td>'
@@ -1637,6 +1471,9 @@ function getProfileImageByUserId(userId){
 		dataType : "json",
 		success : function(data) {
 			profileImageUrlData = data;						
+		},
+		complete:function(){
+			hideOverlay();
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -1767,19 +1604,8 @@ function getOverallScoreStats(entityId,entityType){
 		type : "GET",
 		cache : false,
 		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-							async:false,
-							url : data.url,
-							type : "GET",
-							cache : false,
-							dataType : "json",
-							success : function(response) {
-								overallScoreStats = JSON.parse(response);
-							}
-						});
-			}
+		success : function(response) {
+					overallScoreStats = JSON.parse(response);
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -1788,7 +1614,6 @@ function getOverallScoreStats(entityId,entityType){
 			}	
 		}
 	});
-	console.log(overallScoreStats);
 	return overallScoreStats;
 }
 
@@ -1807,19 +1632,8 @@ function getQuestionScoreStats(entityId,entityType){
 		type : "GET",
 		cache : false,
 		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-							async:false,
-							url : data.url,
-							type : "GET",
-							cache : false,
-							dataType : "json",
-							success : function(response) {
-								questionScoreStats = JSON.parse(response);
-							}
-						});
-			}
+		success : function(response) {
+					questionScoreStats = JSON.parse(response);
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -1828,7 +1642,6 @@ function getQuestionScoreStats(entityId,entityType){
 			}	
 		}
 	});
-	console.log(questionScoreStats);
 	return questionScoreStats;
 }
 
@@ -2033,17 +1846,17 @@ function drawReportingDashButtons(columnName, columnValue){
 		for (var i = 0; i < max; i++) {
 			var contentToDisplay = '';
 			if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
-				contentToDisplay = 'Connect to Facebook';
+				contentToDisplay = '<div class="rep-fb-btn"></div>';
 			} else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
-				contentToDisplay = 'Connect to Zillow';
+				contentToDisplay = '<div class="rep-zillow-btn"></div>';
 			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
-				contentToDisplay = 'Connect to Google+';
+				contentToDisplay = '<div class="rep-google-btn"></div>';
 			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
-				contentToDisplay = 'Connect to Twitter';
+				contentToDisplay = '<div class="rep-twitter-btn"></div>';
 			} else if (stages[i].profileStageKey == 'YELP_PRF') {
-				contentToDisplay = 'Connect to Yelp';
+				contentToDisplay = '<div class="rep-yelp-btn"></div>';
 			} else if (stages[i].profileStageKey == 'LINKEDIN_PRF') {
-				contentToDisplay = 'Connect to Linkedin';
+				contentToDisplay = '<div class="rep-linked-in-btn"></div>';
 			} else if (stages[i].profileStageKey == 'LICENSE_PRF') {
 				contentToDisplay = 'Enter license details';
 			} else if (stages[i].profileStageKey == 'HOBBIES_PRF') {
@@ -2099,17 +1912,17 @@ function changeSocialMedia(columnName, columnValue){
 				}
 				
 				if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
-					contentToDisplay = 'Connect to Facebook';
+					contentToDisplay = '<div class="rep-fb-btn"></div>';
 				} else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
-					contentToDisplay = 'Connect to Zillow';
+					contentToDisplay = '<div class="rep-zillow-btn"></div>';
 				} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
-					contentToDisplay = 'Connect to Google+';
+					contentToDisplay = '<div class="rep-google-btn"></div>';
 				} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
-					contentToDisplay = 'Connect to Twitter';
+					contentToDisplay = '<div class="rep-twitter-btn"></div>';
 				} else if (stages[i].profileStageKey == 'YELP_PRF') {
-					contentToDisplay = 'Connect to Yelp';
+					contentToDisplay = '<div class="rep-yelp-btn"></div>';
 				} else if (stages[i].profileStageKey == 'LINKEDIN_PRF') {
-					contentToDisplay = 'Connect to Linkedin';
+					contentToDisplay = '<div class="rep-linked-in-btn"></div>';
 				} else if (stages[i].profileStageKey == 'LICENSE_PRF') {
 					contentToDisplay = 'Enter license details';
 				} else if (stages[i].profileStageKey == 'HOBBIES_PRF') {

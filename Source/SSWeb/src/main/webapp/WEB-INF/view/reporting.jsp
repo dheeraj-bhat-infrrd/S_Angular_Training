@@ -192,5 +192,6 @@
 		drawOverallScoreStatsGraph(entityId, entityType);		
 		
 		drawQuestionScoreStatsGraph(entityId, entityType);
+		hideOverlay();
 	});
 </script>

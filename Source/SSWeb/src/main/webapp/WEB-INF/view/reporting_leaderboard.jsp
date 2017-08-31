@@ -401,7 +401,7 @@ $(document).on('click','#lead-ranks-above-btn',function(){
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
 	 
-	hideOverlay();
+	
 });
 
 $(document).on('click','#lead-ranks-below-btn',function(){
@@ -472,10 +472,10 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
-	hideOverlay();
 });
 
 $(document).on('change', '#time-selector', function() {
+	showOverlay();
 	timeFrameStr = $('#time-selector').val();
 	timeFrame = parseInt(timeFrameStr);
 	startIndex = 0;
@@ -562,10 +562,10 @@ $(document).on('change', '#time-selector', function() {
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
 	 
-	hideOverlay();
 });
 
 $(document).on('change', '#board-selector', function() {
+	showOverlay();
 	timeFrameStr = $('#time-selector').val();
 	timeFrame = parseInt(timeFrameStr);
 	startIndex = 0;
@@ -651,7 +651,6 @@ $(document).on('change', '#board-selector', function() {
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
 	 
-	hideOverlay();
 });
 
 $(document).on('click','#top-ten-ranks-btn',function(){
@@ -719,7 +718,6 @@ $(document).on('click','#top-ten-ranks-btn',function(){
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
-	hideOverlay();
 	
 });
 
@@ -783,7 +781,6 @@ $(document).on('click','#my-rank-btn',function(){
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
-	hideOverlay();
 	
 });
 
