@@ -460,12 +460,13 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     			String surveyDetailsId = SurveyResultsCompanyReport.getSurveyDetailsId();
     			
     			int questionCounter = 0;
-    			for(SurveyResponseTable surveyResponse: surveyResponseTableDao.fetchSurveyResponsesBySurveyDetailsId(surveyDetailsId)){
-    				questionCounter++;
+    			if(SurveyResultsCompanyReport.getSurveyResponseTable().size() > 0){
+    			    questionCounter = SurveyResultsCompanyReport.getSurveyResponseTable().size();
     			}
+ 
     			surveyResultsCompanyReportList.add(questionCounter);
     			
-    			for(SurveyResponseTable surveyResponse: surveyResponseTableDao.fetchSurveyResponsesBySurveyDetailsId(surveyDetailsId)){
+    			for(SurveyResponseTable surveyResponse: SurveyResultsCompanyReport.getSurveyResponseTable()){
     				if(surveyResponse.getAnswer() == null){
     					surveyResultsCompanyReportList.add("");
     				}else{
