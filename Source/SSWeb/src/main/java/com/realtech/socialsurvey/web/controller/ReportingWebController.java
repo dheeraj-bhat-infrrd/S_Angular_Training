@@ -113,7 +113,7 @@ public class ReportingWebController
         
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        
         boolean modelSet = false;
         if ( user.getCompany() != null && user.getCompany().getLicenseDetails() != null
             && !user.getCompany().getLicenseDetails().isEmpty()
@@ -459,6 +459,13 @@ public class ReportingWebController
 
         }
 
+      //REALTECH_USER_ID is set only for real tech and SS admin
+        boolean isRealTechOrSSAdmin = false;
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        if ( adminUserid != null ) {
+            isRealTechOrSSAdmin = true;
+        }
+        model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
         
         model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
         model.addAttribute( "profileSettings", profileSettings );

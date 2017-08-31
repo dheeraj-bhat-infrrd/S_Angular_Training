@@ -66,6 +66,8 @@
 	<input type="hidden" id="profile-id" value="${profile.userProfileId}" />
 	<input type="hidden" id="profile-min-post-score"
 		value="${profileSettings.survey_settings.show_survey_above_score}" />
+	<input type="hidden" id="rep-real-tech-check" value="${isRealTechOrSSAdmin}" />
+
 </div>
 
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
