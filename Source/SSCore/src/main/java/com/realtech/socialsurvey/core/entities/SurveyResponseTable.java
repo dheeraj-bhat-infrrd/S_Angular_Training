@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,15 +14,12 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "survey_response")
-public class SurveyResponseTable {
+public class SurveyResponseTable implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "SURVEY_RESPONSE_ID")
 	private String surveyResponseId;
-	
-	@Column(name = "SURVEY_DETAILS_ID")
-	private String surveyDetailsId;
 	
 	@Column(name = "ANSWER")
 	private String answer;
@@ -30,6 +29,12 @@ public class SurveyResponseTable {
 	
 	@Column(name = "QUESTION_TYPE")
 	private String questionType;
+	
+	// bi-directional many-to-one association to Survey Results 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name ="SURVEY_DETAILS_ID" , referencedColumnName  = "SURVEY_DETAILS_ID" )
+    private SurveyResultsCompanyReport surveyResultsCompanyReport;
+
 
 	public String getSurveyResponseId() {
 		return surveyResponseId;
@@ -37,14 +42,6 @@ public class SurveyResponseTable {
 
 	public void setSurveyResponseId(String surveyResponseId) {
 		this.surveyResponseId = surveyResponseId;
-	}
-
-	public String getSurveyDetailsId() {
-		return surveyDetailsId;
-	}
-
-	public void setSurveyDetailsId(String surveyDetailsId) {
-		this.surveyDetailsId = surveyDetailsId;
 	}
 
 	public String getAnswer() {
@@ -70,12 +67,25 @@ public class SurveyResponseTable {
 	public void setQuestionType(String questionType) {
 		this.questionType = questionType;
 	}
+	
+	
 
-	@Override
-	public String toString() {
-		return "SurveyResponseTable [surveyResponseId=" + surveyResponseId + ", surveyDetailsId=" + surveyDetailsId
-				+ ", answer=" + answer + ", question=" + question + ", questionType=" + questionType + "]";
-	}
+	public SurveyResultsCompanyReport getSurveyResultsCompanyReport()
+    {
+        return surveyResultsCompanyReport;
+    }
+
+    public void setSurveyResultsCompanyReport( SurveyResultsCompanyReport surveyResultsCompanyReport )
+    {
+        this.surveyResultsCompanyReport = surveyResultsCompanyReport;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "SurveyResponseTable [surveyResponseId=" + surveyResponseId + ", answer=" + answer + ", question=" + question + ", questionType=" + questionType
+            + ", surveyResultsCompanyReport=" + surveyResultsCompanyReport + "]";
+    }
 
 	
 }

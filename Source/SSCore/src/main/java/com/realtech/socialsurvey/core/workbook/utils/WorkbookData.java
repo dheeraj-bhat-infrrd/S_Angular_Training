@@ -762,6 +762,11 @@ public class WorkbookData
         int maxNumberOfQuestions=0;
         int count=0;
         for(List<String> row : surveyResultsCompany ){
+            if(maxNumberOfQuestions < Integer.valueOf(row.get(10))){
+                maxNumberOfQuestions =  Integer.valueOf(row.get(10));
+            }
+        }
+        for(List<String> row : surveyResultsCompany ){
         	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 0 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 1 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 2 ) ));
@@ -772,13 +777,19 @@ public class WorkbookData
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 7 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 8 ) ));
             surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 9 ) ));
-            if(maxNumberOfQuestions < Integer.valueOf(row.get(10))){
-            	maxNumberOfQuestions =  Integer.valueOf(row.get(10));
-            }
-            for(int questionCounter=11;questionCounter<11+Integer.valueOf(row.get(10));questionCounter++){
+    
+           int numberOfQuestions = Integer.valueOf(row.get(10));
+          
+            for(int questionCounter=11;questionCounter<11+numberOfQuestions;questionCounter++){
             	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( questionCounter ) ));
             }
-            int nextIndex= Integer.valueOf(row.get(10))+11;
+            if(numberOfQuestions < maxNumberOfQuestions){
+                int questionDiff = maxNumberOfQuestions - numberOfQuestions;
+                for(int questionDiffLoop=0;questionDiffLoop < questionDiff;questionDiffLoop++){
+                    surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
+                }
+            }
+            int nextIndex= numberOfQuestions+11;
             for(int nextI=nextIndex;nextI<row.size();nextI++){
             	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( nextI ) ));
             }
