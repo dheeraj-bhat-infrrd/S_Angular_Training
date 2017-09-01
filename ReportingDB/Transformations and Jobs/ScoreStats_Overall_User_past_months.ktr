@@ -337,7 +337,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>4_star_count</aggregate>
+          <aggregate>four_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -392,7 +392,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>1_star_count</aggregate>
+          <aggregate>one_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -447,7 +447,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>2_star_count</aggregate>
+          <aggregate>two_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -502,7 +502,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>3_star_count</aggregate>
+          <aggregate>three_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -557,7 +557,7 @@
       </group>
       <fields>
         <field>
-          <aggregate>5_star_count</aggregate>
+          <aggregate>five_star_count</aggregate>
           <subject>SURVEY_RESPONSE_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
@@ -731,7 +731,7 @@
     <commit>10000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
+    <use_batch>N</use_batch>
     <specify_fields>Y</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
     <partitioning_field/>
@@ -760,24 +760,24 @@
           <stream_name>final_year_data</stream_name>
         </field>
         <field>
-          <column_name>5_star</column_name>
-          <stream_name>5_star_count</stream_name>
+          <column_name>five_star</column_name>
+          <stream_name>five_star_count</stream_name>
         </field>
         <field>
-          <column_name>4_star</column_name>
-          <stream_name>4_star_count</stream_name>
+          <column_name>four_star</column_name>
+          <stream_name>four_star_count</stream_name>
         </field>
         <field>
-          <column_name>3_star</column_name>
-          <stream_name>3_star_count</stream_name>
+          <column_name>three_star</column_name>
+          <stream_name>three_star_count</stream_name>
         </field>
         <field>
-          <column_name>2_star</column_name>
-          <stream_name>2_star_count</stream_name>
+          <column_name>two_star</column_name>
+          <stream_name>two_star_count</stream_name>
         </field>
         <field>
-          <column_name>1_star</column_name>
-          <stream_name>1_star_count</stream_name>
+          <column_name>one_star</column_name>
+          <stream_name>one_star_count</stream_name>
         </field>
     </fields>
      <cluster_schema/>
