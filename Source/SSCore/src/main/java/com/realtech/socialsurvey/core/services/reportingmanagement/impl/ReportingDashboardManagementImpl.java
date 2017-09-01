@@ -403,7 +403,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         List<List<Object>> surveyResultsCompany = new ArrayList<>();
         if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN )){
             Map<String, List<SurveyResponseTable>> surveyResponseMap = surveyResponseTableDao.geSurveyResponseForCompanyId( entityId );
-            LOG.info( "output of mappping "+surveyResponseMap );
             for(SurveyResultsCompanyReport SurveyResultsCompanyReport: surveyResultsCompanyReportDao.fetchSurveyResultsCompanyReportByCompanyId(entityId,startDate,endDate)){
                 if(surveyResponseMap.containsKey( SurveyResultsCompanyReport.getSurveyDetailsId()  )){
                     List<Object> surveyResultsCompanyReportList = new ArrayList<>();
