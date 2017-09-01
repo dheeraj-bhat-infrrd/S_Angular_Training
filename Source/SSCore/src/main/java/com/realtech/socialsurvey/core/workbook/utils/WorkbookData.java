@@ -783,7 +783,11 @@ public class WorkbookData
             for(int questionCounter=11;questionCounter<11+numberOfQuestions;questionCounter++){
             	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( questionCounter ) ));
             }
-            if(numberOfQuestions < maxNumberOfQuestions){
+            if(numberOfQuestions == 0){
+                for(int questionDiffLoop = 0 ; questionDiffLoop < maxNumberOfQuestions-1 ;questionDiffLoop++){
+                    surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
+                }
+            }else if(numberOfQuestions < maxNumberOfQuestions){
                 int questionDiff = maxNumberOfQuestions - numberOfQuestions;
                 for(int questionDiffLoop=0;questionDiffLoop < questionDiff;questionDiffLoop++){
                     surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
