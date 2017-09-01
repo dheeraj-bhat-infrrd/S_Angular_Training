@@ -596,7 +596,7 @@ function getTimeFrameValue(){
   				return monthYear;
 		
 		case 104: monthYear.month=13;
-  				monthYear.year=currentYear+1;
+  				monthYear.year=currentYear-1;
   				return monthYear;
   		
 		case 1: monthYear.month=1;
