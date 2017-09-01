@@ -22,6 +22,9 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 
 	private static final Logger LOG = LoggerFactory.getLogger( SurveyResultsCompanyReportDaoImpl.class );
 	
+	
+
+	
 	@SuppressWarnings ( "unchecked")
     @Override
 	public List<SurveyResultsCompanyReport> fetchSurveyResultsCompanyReportByCompanyId(Long companyId,Timestamp startDate, Timestamp endDate) {
@@ -40,7 +43,6 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
                
             }
             criteria.setResultTransformer( Criteria.DISTINCT_ROOT_ENTITY );
-            testSurveyResult = (List<SurveyResultsCompanyReport>) criteria.list();
 
         } catch ( Exception hibernateException ) {
             LOG.error( "Exception caught in fetchSurveyResultsCompanyReportByCompanyId() ", hibernateException );

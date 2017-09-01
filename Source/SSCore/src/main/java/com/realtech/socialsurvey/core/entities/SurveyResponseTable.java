@@ -21,6 +21,9 @@ public class SurveyResponseTable implements Serializable {
 	@Column(name = "SURVEY_RESPONSE_ID")
 	private String surveyResponseId;
 	
+   @Column(name = "SURVEY_DETAILS_ID")
+    private String surveyDetailsId;
+	   
 	@Column(name = "ANSWER")
 	private String answer;
 	
@@ -29,11 +32,6 @@ public class SurveyResponseTable implements Serializable {
 	
 	@Column(name = "QUESTION_TYPE")
 	private String questionType;
-	
-	// bi-directional many-to-one association to Survey Results 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name ="SURVEY_DETAILS_ID" , referencedColumnName  = "SURVEY_DETAILS_ID" )
-    private SurveyResultsCompanyReport surveyResultsCompanyReport;
 
 
 	public String getSurveyResponseId() {
@@ -69,22 +67,22 @@ public class SurveyResponseTable implements Serializable {
 	}
 	
 	
-
-	public SurveyResultsCompanyReport getSurveyResultsCompanyReport()
+	
+    public String getSurveyDetailsId()
     {
-        return surveyResultsCompanyReport;
+        return surveyDetailsId;
     }
 
-    public void setSurveyResultsCompanyReport( SurveyResultsCompanyReport surveyResultsCompanyReport )
+    public void setSurveyDetailsId( String surveyDetailsId )
     {
-        this.surveyResultsCompanyReport = surveyResultsCompanyReport;
+        this.surveyDetailsId = surveyDetailsId;
     }
 
     @Override
     public String toString()
     {
-        return "SurveyResponseTable [surveyResponseId=" + surveyResponseId + ", answer=" + answer + ", question=" + question + ", questionType=" + questionType
-            + ", surveyResultsCompanyReport=" + surveyResultsCompanyReport + "]";
+        return "SurveyResponseTable [surveyResponseId=" + surveyResponseId + ", surveyDetailsId=" + surveyDetailsId
+            + ", answer=" + answer + ", question=" + question + ", questionType=" + questionType + "]";
     }
 
 	
