@@ -93,25 +93,10 @@ public class SurveyResultsCompanyReport implements Serializable {
 	@Column(name = "REPORT_MODIFIED_ON")
 	private Timestamp reportModifiedOn;
 	
-	// bi-directional many-to-one association to Survey Response
-    @OneToMany ( mappedBy = "surveyResultsCompanyReport", fetch = FetchType.EAGER)
-    private List<SurveyResponseTable> surveyResponseTable;
-	
-	@Override
-    public String toString()
-    {
-        return "SurveyResultsCompanyReport [surveyStatsReportId=" + surveyStatsReportId + ", surveyDetailsId=" + surveyDetailsId
-            + ", companyId=" + companyId + ", agentId=" + agentId + ", userFirstName=" + userFirstName + ", userLastName="
-            + userLastName + ", customerFirstName=" + customerFirstName + ", customerLastName=" + customerLastName
-            + ", surveySentDate=" + surveySentDate + ", surveyCompletedDate=" + surveyCompletedDate + ", timeInterval="
-            + timeInterval + ", surveySource=" + surveySource + ", surveySourceId=" + surveySourceId + ", surveyScore="
-            + surveyScore + ", gateway=" + gateway + ", customerComments=" + customerComments + ", agreedToShare="
-            + agreedToShare + ", branchName=" + branchName + ", clickTroughForCompany=" + clickTroughForCompany
-            + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
-            + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn
-            + ", surveyResponseTable=" + surveyResponseTable + ", isDeleted=" + isDeleted + "]";
-    }
 
+    @Column(name = "IS_DELETED")
+    private boolean isDeleted;
+  
 	public String getSurveyStatsReportId() {
 		return surveyStatsReportId;
 	}
@@ -304,19 +289,21 @@ public class SurveyResultsCompanyReport implements Serializable {
 		this.isDeleted = isDeleted;
 	}
 
-	public List<SurveyResponseTable> getSurveyResponseTable()
+    @Override
+    public String toString()
     {
-        return surveyResponseTable;
+        return "SurveyResultsCompanyReport [surveyStatsReportId=" + surveyStatsReportId + ", surveyDetailsId=" + surveyDetailsId
+            + ", companyId=" + companyId + ", agentId=" + agentId + ", userFirstName=" + userFirstName + ", userLastName="
+            + userLastName + ", customerFirstName=" + customerFirstName + ", customerLastName=" + customerLastName
+            + ", surveySentDate=" + surveySentDate + ", surveyCompletedDate=" + surveyCompletedDate + ", timeInterval="
+            + timeInterval + ", surveySource=" + surveySource + ", surveySourceId=" + surveySourceId + ", surveyScore="
+            + surveyScore + ", gateway=" + gateway + ", customerComments=" + customerComments + ", agreedToShare="
+            + agreedToShare + ", branchName=" + branchName + ", clickTroughForCompany=" + clickTroughForCompany
+            + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
+            + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn + ", isDeleted="
+            + isDeleted + "]";
     }
 
-    public void setSurveyResponseTable( List<SurveyResponseTable> surveyResponseTable )
-    {
-        this.surveyResponseTable = surveyResponseTable;
-    }
-
-    @Column(name = "IS_DELETED")
-	private boolean isDeleted;
-	
 	
 	
 }
