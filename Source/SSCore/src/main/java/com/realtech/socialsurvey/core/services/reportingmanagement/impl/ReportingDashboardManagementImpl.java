@@ -1201,10 +1201,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			        }
 			    }
 			}
-        }
-        catch(Exception e){
-        	
-        }
+        }catch (InvalidInputException e) {
+			LOG.error("Exception caught: EntityId cannot be less than 0",e);
+			LOG.info("Returning empty list as response");
+		}
         return userRanking;
     }
     
