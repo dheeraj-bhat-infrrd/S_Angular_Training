@@ -1374,4 +1374,14 @@ public interface CommonConstants
 
     //Encompass test connection htt prequest initial
     public static final String HTTP_REQUEST_URL_INITIAL = "http://";
+
+    //Ranking Requirements Defaults
+    public static final float MIN_COMPLETED_PERCENTAGE = 40.0f;
+    public static final int MIN_DAYS_OF_REGISTRATION = 90;
+    public static final int MIN_NO_OF_REVIEWS = 25;
+    public static final int MONTH_OFFSET = 3;
+    public static final int YEAR_OFFSET = -1;
+    
+    
+    
 }
