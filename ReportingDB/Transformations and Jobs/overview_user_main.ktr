@@ -141,6 +141,33 @@
   <notepads>
   </notepads>
   <connection>
+    <name>Local instance MySQL57</name>
+    <server>&#x24;&#x7b;mysql_host &#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;mysql_schema_name &#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no &#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password &#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no &#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
     <name>SS_Centralized_Mysql_Conn</name>
     <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
@@ -153,9 +180,8 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -170,24 +196,23 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
-    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
-    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
-    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -214,7 +239,6 @@
   <hop> <from>Select values 2</from><to>jsForPercentage</to><enabled>Y</enabled> </hop>
   <hop> <from>Write to log</from><to>jsToConvertNullToZero</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_details</from><to>SortAgent</to><enabled>Y</enabled> </hop>
-  <hop> <from>CalculateRating</from><to>SortAgent 5 2</to><enabled>Y</enabled> </hop>
   <hop> <from>jsToConvertNullToZero</from><to>FilterUserZero</to><enabled>Y</enabled> </hop>
   <hop> <from>FilterUserZero</from><to>overview_user_output</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows</from><to>Memory Group by agentId </to><enabled>Y</enabled> </hop>
@@ -230,8 +254,6 @@
   <hop> <from>jsForMood</from><to>GroupByAgentId</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupByZillow</from><to>SortAgent 5</to><enabled>Y</enabled> </hop>
   <hop> <from>FilterForZillow</from><to>GroupByZillow</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by</from><to>CalculateRating</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortAgent</from><to>Group by</to><enabled>Y</enabled> </hop>
   <hop> <from>SortByEntityId</from><to>Select values 3</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 3</from><to>GroupByAgentId2</to><enabled>Y</enabled> </hop>
   <hop> <from>SortAgent1</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
@@ -242,37 +264,9 @@
   <hop> <from>SortAgent 5 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Multiway Merge Join</from><to>Select All Values</to><enabled>Y</enabled> </hop>
   <hop> <from>overview_user_output</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortAgent</from><to>Group by for rating</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group by for rating</from><to>SortAgent 5 2</to><enabled>Y</enabled> </hop>
   </order>
-  <step>
-    <name>CalculateRating</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var rating &#x3d; average_score &#x2f; total_reviews&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>rating</name>
-        <rename>rating</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>706</xloc>
-      <yloc>605</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step>
     <name>Dummy &#x28;do nothing&#x29;</name>
     <type>Dummy</type>
@@ -351,45 +345,6 @@
     </step>
 
   <step>
-    <name>Group by</name>
-    <type>MemoryGroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>AGENT_ID</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>total_reviews</aggregate>
-          <subject>SURVEY_DETAILS_ID</subject>
-          <type>COUNT_ANY</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>average_score</aggregate>
-          <subject>SCORE</subject>
-          <type>AVERAGE</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>473</xloc>
-      <yloc>612</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Group by STATUS</name>
     <type>MemoryGroupBy</type>
     <description/>
@@ -421,6 +376,45 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>429</xloc>
       <yloc>144</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Group by for rating</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>AGENT_ID</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>total_reviews</aggregate>
+          <subject>SURVEY_DETAILS_ID</subject>
+          <type>COUNT_ANY</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>rating</aggregate>
+          <subject>SCORE</subject>
+          <type>AVERAGE</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>473</xloc>
+      <yloc>612</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -800,10 +794,6 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>average_score</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
       </field>      <field>        <name>rating</name>
         <rename/>
         <length>-2</length>
@@ -933,10 +923,6 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>total_reviews</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>average_score</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1767,9 +1753,39 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;sent_count &#x3d;&#x3d; null&#x29;var  sent_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_archieved &#x3d;&#x3d; null&#x29;var total_archieved &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_completed &#x3d;&#x3d; null&#x29;var total_completed &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_corrupted &#x3d;&#x3d; null&#x29;var total_corrupted &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_duplicate &#x3d;&#x3d; null&#x29;var total_duplicate &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_initiate &#x3d;&#x3d; null&#x29;var total_initiate &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_mismatched &#x3d;&#x3d; null&#x29;var total_mismatched&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_pre&#x3d;&#x3d; null&#x29;var total_pre &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_shared_by&#x3d;&#x3d; null&#x29;var total_shared_by &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_detractors &#x3d;&#x3d; null&#x29;var total_detractors&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_passives &#x3d;&#x3d; null&#x29;var total_passives &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_promoters &#x3d;&#x3d; null&#x29;var total_promoters &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;zillow_count &#x3d;&#x3d; null&#x29;var zillow_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_reviews &#x3d;&#x3d; null&#x29;var total_reviews &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;average_score &#x3d;&#x3d; null&#x29;var average_score&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;rating &#x3d;&#x3d; null&#x29;var rating &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;sps_score_var &#x3d;&#x3d; null&#x29;var sps_score_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;detractors_percentage_var &#x3d;&#x3d; null&#x29;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;passives_percentage_var &#x3d;&#x3d; null&#x29;var passives_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;promoter_percentage_var &#x3d;&#x3d; null&#x29;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_incomplete_transactions_var&#x3d;&#x3d; null&#x29;var total_incomplete_transactions_var &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>sent_count</name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;sent_count &#x3d;&#x3d; null&#x29;var  sent_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_archieved &#x3d;&#x3d; null&#x29;var total_archieved &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_completed &#x3d;&#x3d; null&#x29;var total_completed &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_corrupted &#x3d;&#x3d; null&#x29;var total_corrupted &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_duplicate &#x3d;&#x3d; null&#x29;var total_duplicate &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_initiate &#x3d;&#x3d; null&#x29;var total_initiate &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_mismatched &#x3d;&#x3d; null&#x29;var total_mismatched&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_pre&#x3d;&#x3d; null&#x29;var total_pre &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_shared_by&#x3d;&#x3d; null&#x29;var total_shared_by &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_detractors &#x3d;&#x3d; null&#x29;var total_detractors&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_passives &#x3d;&#x3d; null&#x29;var total_passives &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_promoters &#x3d;&#x3d; null&#x29;var total_promoters &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;zillow_count &#x3d;&#x3d; null&#x29;var zillow_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_reviews &#x3d;&#x3d; null&#x29;var total_reviews &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;rating &#x3d;&#x3d; null&#x29;var rating &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;sps_score_var &#x3d;&#x3d; null&#x29;var sps_score_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;detractors_percentage_var &#x3d;&#x3d; null&#x29;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;passives_percentage_var &#x3d;&#x3d; null&#x29;var passives_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;promoter_percentage_var &#x3d;&#x3d; null&#x29;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_incomplete_transactions_var&#x3d;&#x3d; null&#x29;var total_incomplete_transactions_var &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>detractors_percentage_var</name>
+        <rename>detractors_percentage_var</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>passives_percentage_var</name>
+        <rename>passives_percentage_var</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>promoter_percentage_var</name>
+        <rename>promoter_percentage_var</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>rating</name>
+        <rename>rating</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>sent_count</name>
         <rename>sent_count</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>sps_score_var</name>
+        <rename>sps_score_var</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1792,8 +1808,20 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
+      </field>      <field>        <name>total_detractors</name>
+        <rename>total_detractors</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>      <field>        <name>total_duplicate</name>
         <rename>total_duplicate</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_incomplete_transactions_var</name>
+        <rename>total_incomplete_transactions_var</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1810,26 +1838,14 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
-      </field>      <field>        <name>total_pre</name>
-        <rename>total_pre</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_shared_by</name>
-        <rename>total_shared_by</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_detractors</name>
-        <rename>total_detractors</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
       </field>      <field>        <name>total_passives</name>
         <rename>total_passives</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>total_pre</name>
+        <rename>total_pre</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1840,56 +1856,20 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
-      </field>      <field>        <name>zillow_count</name>
-        <rename>zillow_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
       </field>      <field>        <name>total_reviews</name>
         <rename>total_reviews</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
-      </field>      <field>        <name>average_score</name>
-        <rename>average_score</rename>
+      </field>      <field>        <name>total_shared_by</name>
+        <rename>total_shared_by</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
-      </field>      <field>        <name>rating</name>
-        <rename>rating</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>sps_score_var</name>
-        <rename>sps_score_var</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>detractors_percentage_var</name>
-        <rename>detractors_percentage_var</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>passives_percentage_var</name>
-        <rename>passives_percentage_var</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>promoter_percentage_var</name>
-        <rename>promoter_percentage_var</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_incomplete_transactions_var</name>
-        <rename>total_incomplete_transactions_var</rename>
+      </field>      <field>        <name>zillow_count</name>
+        <rename>zillow_count</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1962,12 +1942,24 @@
     <return_field/>
     <fields>
         <field>
-          <column_name>sps_score</column_name>
-          <stream_name>sps_score_var</stream_name>
+          <column_name>completed_percentage</column_name>
+          <stream_name>complete_percentage</stream_name>
         </field>
         <field>
           <column_name>detractors_percentage</column_name>
           <stream_name>detractors_percentage_var</stream_name>
+        </field>
+        <field>
+          <column_name>incomplete_percentage</column_name>
+          <stream_name>incomplete_percentage</stream_name>
+        </field>
+        <field>
+          <column_name>user_id</column_name>
+          <stream_name>main_AgentId</stream_name>
+        </field>
+        <field>
+          <column_name>overview_user_id</column_name>
+          <stream_name>overview_user_id</stream_name>
         </field>
         <field>
           <column_name>passives_percentage</column_name>
@@ -1978,84 +1970,72 @@
           <stream_name>promoter_percentage_var</stream_name>
         </field>
         <field>
-          <column_name>overview_user_id</column_name>
-          <stream_name>overview_user_id</stream_name>
-        </field>
-        <field>
-          <column_name>user_id</column_name>
-          <stream_name>main_AgentId</stream_name>
-        </field>
-        <field>
-          <column_name>total_archieved</column_name>
-          <stream_name>total_archieved</stream_name>
+          <column_name>rating</column_name>
+          <stream_name>rating</stream_name>
         </field>
         <field>
           <column_name>total_survey_sent</column_name>
           <stream_name>sent_count</stream_name>
         </field>
         <field>
-          <column_name>total_corrupted</column_name>
-          <stream_name>total_corrupted</stream_name>
+          <column_name>sps_score</column_name>
+          <stream_name>sps_score_var</stream_name>
         </field>
         <field>
-          <column_name>total_duplicate</column_name>
-          <stream_name>total_duplicate</stream_name>
-        </field>
-        <field>
-          <column_name>total_promoters</column_name>
-          <stream_name>total_promoters</stream_name>
-        </field>
-        <field>
-          <column_name>total_passives</column_name>
-          <stream_name>total_passives</stream_name>
-        </field>
-        <field>
-          <column_name>total_detractors</column_name>
-          <stream_name>total_detractors</stream_name>
-        </field>
-        <field>
-          <column_name>total_reviews</column_name>
-          <stream_name>total_reviews</stream_name>
-        </field>
-        <field>
-          <column_name>rating</column_name>
-          <stream_name>rating</stream_name>
-        </field>
-        <field>
-          <column_name>unassigned</column_name>
-          <stream_name>total_mismatched</stream_name>
-        </field>
-        <field>
-          <column_name>incomplete</column_name>
-          <stream_name>total_incomplete_transactions_var</stream_name>
+          <column_name>total_archieved</column_name>
+          <stream_name>total_archieved</stream_name>
         </field>
         <field>
           <column_name>completed</column_name>
           <stream_name>total_completed</stream_name>
         </field>
         <field>
-          <column_name>zillow_reviews</column_name>
-          <stream_name>zillow_count</stream_name>
+          <column_name>total_corrupted</column_name>
+          <stream_name>total_corrupted</stream_name>
         </field>
         <field>
-          <column_name>completed_percentage</column_name>
-          <stream_name>complete_percentage</stream_name>
+          <column_name>total_detractors</column_name>
+          <stream_name>total_detractors</stream_name>
+        </field>
+        <field>
+          <column_name>total_duplicate</column_name>
+          <stream_name>total_duplicate</stream_name>
+        </field>
+        <field>
+          <column_name>incomplete</column_name>
+          <stream_name>total_incomplete_transactions_var</stream_name>
+        </field>
+        <field>
+          <column_name>unassigned</column_name>
+          <stream_name>total_mismatched</stream_name>
+        </field>
+        <field>
+          <column_name>total_passives</column_name>
+          <stream_name>total_passives</stream_name>
         </field>
         <field>
           <column_name>processed</column_name>
           <stream_name>total_processed</stream_name>
         </field>
         <field>
-          <column_name>unprocessed</column_name>
-          <stream_name>total_unprocessed</stream_name>
+          <column_name>total_promoters</column_name>
+          <stream_name>total_promoters</stream_name>
+        </field>
+        <field>
+          <column_name>total_reviews</column_name>
+          <stream_name>total_reviews</stream_name>
         </field>
         <field>
           <column_name>social_posts</column_name>
           <stream_name>total_shared_by</stream_name>
         </field>
         <field>
-          <column_name>incomplete_percentage</column_name>
-          <stream_name>incomplete_percentage</stream_name>
+          <column_name>unprocessed</column_name>
+          <stream_name>total_unprocessed</stream_name>
+        </field>
+        <field>
+          <column_name>zillow_reviews</column_name>
+          <stream_name>zillow_count</stream_name>
         </field>
     </fields>
      <cluster_schema/>
