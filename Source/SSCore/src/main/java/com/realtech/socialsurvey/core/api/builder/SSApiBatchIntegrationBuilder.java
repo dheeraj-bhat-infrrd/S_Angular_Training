@@ -40,7 +40,7 @@ public class SSApiBatchIntegrationBuilder implements InitializingBean
         LOG.info( "Initialising rest builder" );
         final OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .readTimeout(4, TimeUnit.MINUTES)
-            .connectTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
             .build();
         
         
