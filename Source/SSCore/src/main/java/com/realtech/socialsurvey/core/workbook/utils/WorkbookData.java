@@ -761,45 +761,48 @@ public class WorkbookData
         List<Object> surveyResultsCompanyReportToPopulate = new ArrayList<>();
         int maxNumberOfQuestions=0;
         int count=0;
-        for(List<String> row : surveyResultsCompany ){
+        List<String> LastRow = surveyResultsCompany.get( surveyResultsCompany.size() - 1 );
+        maxNumberOfQuestions = Integer.valueOf(LastRow.get(1));
+        /*for(List<String> row : surveyResultsCompany ){
             if(maxNumberOfQuestions < Integer.valueOf(row.get(10))){
                 maxNumberOfQuestions =  Integer.valueOf(row.get(10));
             }
-        }
+        }*/
         for(List<String> row : surveyResultsCompany ){
-        	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 0 ) ));
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 1 ) ));
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 2 ) ));
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 3 ) ));
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 4 ) ));
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 5 ) ));
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 6 ) ));
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 7 ) ));
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 8 ) ));
-            surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 9 ) ));
-    
-           int numberOfQuestions = Integer.valueOf(row.get(10));
-          
-            for(int questionCounter=11;questionCounter<11+numberOfQuestions;questionCounter++){
-            	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( questionCounter ) ));
-            }
-            if(numberOfQuestions == 0){
-                for(int questionDiffLoop = 0 ; questionDiffLoop < maxNumberOfQuestions-1 ;questionDiffLoop++){
-                    surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
+            if(row != LastRow ){
+                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 3 ) ));
+                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 4 ) ));
+                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 5 ) ));
+                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 6 ) ));
+                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 7 ) ));
+                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 8 ) ));
+                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 9 ) ));
+        
+               int numberOfQuestions = Integer.valueOf(row.get(10));
+              
+                for(int questionCounter=11;questionCounter<11+numberOfQuestions;questionCounter++){
+                    surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( questionCounter ) ));
                 }
-            }else if(numberOfQuestions < maxNumberOfQuestions){
-                int questionDiff = maxNumberOfQuestions - numberOfQuestions;
-                for(int questionDiffLoop=0;questionDiffLoop < questionDiff;questionDiffLoop++){
-                    surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
+                if(numberOfQuestions == 0){
+                    for(int questionDiffLoop = 0 ; questionDiffLoop < maxNumberOfQuestions-1 ;questionDiffLoop++){
+                        surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
+                    }
+                }else if(numberOfQuestions < maxNumberOfQuestions){
+                    int questionDiff = maxNumberOfQuestions - numberOfQuestions;
+                    for(int questionDiffLoop=0;questionDiffLoop < questionDiff;questionDiffLoop++){
+                        surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
+                    }
                 }
-            }
-            int nextIndex= numberOfQuestions+11;
-            for(int nextI=nextIndex;nextI<row.size();nextI++){
-            	surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( nextI ) ));
-            }
-            surveyResultsCompanyData.put(++surveyResultCompanyCounter ,surveyResultsCompanyReportToPopulate );
-            surveyResultsCompanyReportToPopulate = new ArrayList<>();
-            
+                int nextIndex= numberOfQuestions+11;
+                for(int nextI=nextIndex;nextI<row.size();nextI++){
+                    surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( nextI ) ));
+                }
+                surveyResultsCompanyData.put(++surveyResultCompanyCounter ,surveyResultsCompanyReportToPopulate );
+                surveyResultsCompanyReportToPopulate = new ArrayList<>();
+            }   
         }
         // Setting up user sheet headers
         surveyResultsCompanyReportToPopulate.add( "User First Name" );
