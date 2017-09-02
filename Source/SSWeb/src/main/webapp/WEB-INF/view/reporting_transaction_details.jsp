@@ -88,6 +88,14 @@ hr{
 		</div>
 		<div class="prof-addline2 prof-name-txt rep-dsh-medium-text dsh-txt-2" style="padding-left: 7px; line-height: 18px; text-decoration: underline; border-left: 1px solid #d2cdcd;margin-top: 7px; height: 20px; font-size: small;">Transactions</div>
 	</div>
+	<div id="empty-rep-chart-div" class="hide" style="margin: 124px 0;">
+		<div style="text-align:center; margin:5% auto">
+			<span class="incomplete-trans-span" style="font-size:large">You have no</span>
+			<div style="clear: both">
+				<span class="incomplete-trans-span" style="font-size:large">Transactions for your account</span> 
+			</div>
+		</div>
+	</div>
 	<div id="unclicked-trans-graph" style="margin-top:40px" >
 		<div id="unclicked-graph-div" style="position:relative">
 			<div id="donutchart" style="width: 100%; height: 90%;"></div>
@@ -101,14 +109,6 @@ hr{
 	<div id="unprocessed-trans-graph" style="margin-top:40px" class="hide">
 		<div id="unprocessed-graph-div" style="position:relative">
 			<div id="unprocessedDonutchart" style="width: 100%; height: 90%;"></div>
-		</div>
-	</div>
-	<div id="empty-rep-chart-div" class="hide" style="margin: 124px 0;">
-		<div style="text-align:center; margin:5% auto">
-			<span class="incomplete-trans-span" style="font-size:large">You have no</span>
-			<div style="clear: both">
-				<span class="incomplete-trans-span" style="font-size:large">Transactions for your account</span> 
-			</div>
 		</div>
 	</div>
 </div>

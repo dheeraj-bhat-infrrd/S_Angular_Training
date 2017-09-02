@@ -1282,6 +1282,12 @@ function updateReportingDashboard(){
 	drawProcessedDonutChart();
 	drawUnprocessedDonutChart();
 	hideOverlay();
+	
+	if(overviewYearData==null){
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+	}
 }
 
 function getUserRankingList(entityType,entityId,year,month,startIndex,batchSize,timeFrame){
