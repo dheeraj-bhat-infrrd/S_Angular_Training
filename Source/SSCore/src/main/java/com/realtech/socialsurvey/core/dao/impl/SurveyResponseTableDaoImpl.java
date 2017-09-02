@@ -16,10 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
-import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
-import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
 @Component
@@ -59,14 +56,6 @@ public class SurveyResponseTableDaoImpl extends GenericReportingDaoImpl<SurveyRe
             Map<String, List<SurveyResponseTable>> surveyResponseMap = new HashMap<String, List<SurveyResponseTable>>();
             LOG.debug( "QUERY : " + query.getQueryString() );
             List<Object[]> rows = (List<Object[]>) query.list();
-            List<String> surveyDetailsList = new ArrayList<String>();
-            //create a list of surveyDetails Id
-            for ( Object[] row : rows ) {
-                String surveyDetailsId = String.valueOf( row[0] );
-                if(!surveyDetailsList.contains( surveyDetailsId )){
-                    surveyDetailsList.add( surveyDetailsId );
-                }
-            }
             
             //map the answer to the survey details id 
             for ( Object[] row : rows ) {
