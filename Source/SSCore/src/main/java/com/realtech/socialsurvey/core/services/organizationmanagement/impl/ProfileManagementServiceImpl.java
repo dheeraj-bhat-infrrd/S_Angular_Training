@@ -5599,4 +5599,41 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             default: return CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
         }
     }
+    
+    @Override
+    @SuppressWarnings ( "unchecked")
+    //method to return nmls_id
+    public Integer fetchAndSaveNmlsId( OrganizationUnitSettings profile, String collectionName, long companyId,
+        boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException
+    {
+        Integer nmlsId = null;
+        if ( profile == null )
+            throw new InvalidInputException( "Profile setting passed cannot be null" );
+        if ( collectionName == null || collectionName.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed cannot be null or empty" );
+        }
+        LOG.info( "Method to Fetch social feed for " + collectionName + " with iden: " + profile.getIden() + " started" );
+        List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
+        if ( profile != null && profile.getSocialMediaTokens() != null ) {
+
+            SocialMediaTokens token = profile.getSocialMediaTokens();
+            if ( token != null ) {
+                if ( token.getZillowToken() != null ) {
+                    LOG.info( "Starting to fetch the feed." );
+                    
+                    ZillowToken zillowToken = token.getZillowToken();
+                    LenderRef zillowLenderRef = zillowToken.getLenderRef();
+                    
+                   // if nmls found, return it 
+                    if(zillowLenderRef != null && zillowLenderRef.getNmlsId() != null) {
+                        LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : " + zillowLenderRef.getNmlsId() );
+                        nmlsId = zillowLenderRef.getNmlsId();
+                        
+                    }
+                }
+            }
+        }
+        LOG.info("NMLS id : " + nmlsId );
+        return nmlsId;
+    }
 }

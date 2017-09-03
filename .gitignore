@@ -4,6 +4,7 @@
 .settings
 .project
 .springBeans
+.recommenders
 Source/SSCore/.settings
 Source/SSWeb/.settings
 Source/SSBatch/.settings
@@ -14,6 +15,7 @@ Source/**/*.eml
 Source/**/*.iml
 Source/standalone/
 /**/target/
+/.metadata/*
 .gitignore
 .DS_Store
 .*

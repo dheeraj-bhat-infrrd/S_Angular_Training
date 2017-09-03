@@ -16,6 +16,21 @@
 			<value>${DATABASE_PASSWORD}</value>
 		</property>
 	</bean>
+	
+	<bean id="dataSourceForReporting" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="url">
+			<value>${REPORTING_DATABASE_URL}</value>
+		</property>
+		<property name="driverClassName">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property name="username">
+			<value>${REPORTING_DATABASE_USER}</value>
+		</property>
+		<property name="password">
+			<value>${REPORTING_DATABASE_PASSWORD}</value>
+		</property>
+	</bean>
 
 	<!-- setting solr review counter updater job detail -->
 	<bean id="solrreviewcounterupdaterjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">

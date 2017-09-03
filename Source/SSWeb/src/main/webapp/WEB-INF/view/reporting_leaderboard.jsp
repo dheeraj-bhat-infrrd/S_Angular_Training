@@ -1,0 +1,788 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set value="${cannonicalusersettings.companySettings.iden}" var="companyId"></c:set>
+<c:set value="${userId}" var="userId"></c:set>
+
+<c:choose>
+	<c:when test="${columnName == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+</c:choose>
+
+<c:set value="${columnName}" var="columnName"></c:set>
+<c:set value="${columnValue}" var="columnId"></c:set>
+
+<style>
+.block-display{
+ display:block !important;
+}
+.board-selector{
+	float: right;
+    margin-left: -40px;
+    width: 120px;
+    height: 40px;
+    border: 1px solid #dcdcdc;
+}
+
+.time-selector{
+	margin-top: 7px;
+    margin-right: 20px;
+    width: 120px;
+    height: 40px;
+    border: 1px solid #dcdcdc;
+}
+
+.board-selector-choice{
+	width: 100%;
+    border-bottom: 0 !important;
+    color: #666;
+    padding-left: 10px;
+    height: 38px;
+}
+
+.board-div-span{
+	height:30px;
+	line-height:38px;
+}
+
+.board-div{
+	    margin-bottom: 30px;
+}
+
+.leaderboard-pic-circle{
+	position: relative !important;
+    margin: 2px !important;
+    border-radius: 50% !important;
+    width: 55px !important;
+    height: 55px !important;
+}
+
+.leaderboard-name-div{
+	display: inline-flex;
+    width: 100%;
+    height: 42px;
+    padding-left:10%;
+}
+
+.selected-row td:first-child{
+    -moz-border-radius:15px 0 0 15px;
+    -webkit-border-radius:15px 0 0 15px;
+}
+.selected-row td:last-child{
+    -moz-border-radius:0 15x 15px 0;
+    -webkit-border-radius:0 15px 15px 0;
+}
+.selected-row td{
+	background:#4f85ca;
+	color:white;
+}
+
+.leaderboard-row{
+	border-bottom:0 !important;
+}
+
+.leaderboard-table{
+    border-collapse: separate;
+    border-spacing: 0 35px !important;
+}
+
+.lead-img-div{
+    margin-top: -8px;
+    position: absolute;
+    margin-left:-10px;
+}
+.lead-name-span{
+	line-height: 42px;
+    margin-left: 82px;
+    overflow: hidden;
+}
+
+img.lead-img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.lead-tbl-ln-of {
+    width: 10%;
+}
+
+.top-ten-ranks{
+	width: 100px;
+    margin: 0;
+    margin-left: 75%;
+}
+
+.my-rank{
+	width: 100px;
+    margin: 0;
+    margin-left: 58%;
+    margin-top: 70px;
+}
+
+.lead-ranks-above{
+	width: 100px;
+    margin: 0;
+    margin-left: 89%;
+}
+
+.top-ten-ranks-btn{
+	font-size: 14px;
+    font-weight: bold !important;
+    margin-bottom: -25px;
+}
+
+.lead-ranks-above-btn{
+	margin-bottom: -15px;
+    font-size: 14px;
+    font-weight: bold !important;
+}
+
+.lead-ranks-below{
+    width: 100px;
+    margin: 0;
+    margin-left: 89%
+}
+
+.lead-ranks-below-btn{
+	font-size: 14px;
+    font-weight: bold !important;
+}
+</style>
+<div class="hm-header-main-wrapper hm-hdr-bord-bot"
+	style="background: #2f69aa">
+	<div class="container">
+		<div class="hm-header-row clearfix">
+			<div id="time-div" class="float-right board-div" style="margin-bottom:0">
+				<div class="dash-btn-dl-sd-admin time-selector">
+					<select id="time-selector"
+						class="float-right dash-download-sel-item board-selector-choice">
+						<option value=1 data-report="thisYear">This Year</option>
+						<option value=2 data-report="thisMonth">This Month</option>
+						<option value=3 data-report="lastYear">Last Year</option>
+						<option value=4 data-report="lastMonth">Last Month</option>
+						<option value=5 data-report="pastYears">Past Years</option>
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<c:if test="${profilemasterid == 4}">
+	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 50px;">
+		<span class="board-div-span">Filter</span>
+		<div class="dash-btn-dl-sd-admin board-selector" >
+			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
+				<option value=1 data-report="company">My Company</option>
+				<option value=2 data-report="region">My Region</option>
+				<option value=3 data-report="branch">My Branch</option>
+			</select>	
+		</div>
+	</div>
+	
+	<div id="my-rank" class="my-rank">
+		<div id="my-rank-btn" class="float-right paginate-button top-ten-ranks-btn" style="margin-top: 20px;">Me</div>
+	</div>
+</c:if>
+<c:if test="${profilemasterid == 3}">
+	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 50px;">
+		<span class="board-div-span">Filter</span>
+		<div class="dash-btn-dl-sd-admin board-selector" >
+			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
+				<option value=3 data-report="company">Branch</option>
+				<option value=2 data-report="region">My Region</option>
+				<option value=1 data-report="region">My Company</option>
+			</select>	
+		</div>
+	</div>
+</c:if>
+<c:if test="${profilemasterid == 2}">
+	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 50px;">
+		<span class="board-div-span">Filter</span>
+		<div class="dash-btn-dl-sd-admin board-selector" >
+			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
+				<option value=2 data-report="region">Region</option>
+				<option value=1 data-report="region">My Company</option>
+			</select>	
+		</div>
+	</div>
+</c:if>
+
+<c:if test="${profilemasterid == 1}">
+	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 50px;">
+		<span class="board-div-span">Fitler</span>
+		<div class="dash-btn-dl-sd-admin board-selector" >
+			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
+				<option value=1 data-report="region">Company</option>
+			</select>	
+		</div>
+	</div>
+</c:if>
+
+<div id="top-ten-ranks" class="top-ten-ranks">
+	<div id="top-ten-ranks-btn" class="float-right paginate-button top-ten-ranks-btn">Top Ten Ranks</div>
+</div>
+<div id="lead-ranks-above" class="lead-ranks-above">
+	<div id="lead-ranks-above-btn" class="float-right paginate-button lead-ranks-above-btn">Load More</div>
+</div>
+<div class="v-um-tbl-wrapper" id="leaderboard-list" style="width:100%;">
+	<jsp:include page="leaderboard_list.jsp"></jsp:include>
+</div>
+<div id="lead-ranks-below" class="lead-ranks-below">
+	<div id="lead-ranks-below-btn" class="float-right paginate-button lead-ranks-below-btn">Load More</div>
+</div>
+
+<div id="leaderboard-empty-list-msg-div" class="hide">
+	<div style="text-align:center; margin:30% auto">
+		<span class="incomplete-trans-span" style="font-size:large">No records found for the chosen time frame</span>
+	</div>
+</div>
+<script>
+$(document).ready(function(){
+	var batchSize = 10;
+	var startIndex=0;
+	var count=0;
+	
+	var currentDate = new Date();
+	var currentYear = currentDate.getFullYear();
+	var currentMonth = currentDate.getMonth()+1;
+	
+	var companyId = "${companyId}";
+	var userId = "${userId}";
+	var profileMasterId = "${profilemasterid}";
+	
+	var timeFrameStr = $('#time-selector').val();
+	var timeFrame = parseInt(timeFrameStr);
+	
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	var columnName = "${columnName}";
+	var columnId = "${columnId}";
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
+	var year = currentYear;
+	var month = currentMonth;
+	
+	var tableData='';
+	
+	switch(timeFrame){
+	case 1: year = currentYear;
+		break;
+	case 2: year = currentYear;
+		month = currentMonth;
+		break;
+	case 3: year = currentYear - 1;
+		break;
+	case 4: year = currentYear;
+		month=currentMonth -1;
+		break;
+	}
+	
+	var entityId = companyId;
+	
+	if(profileMasterId != 4){
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingCount = getUserRankingCountForAdmins(entityType, entityId, year, month, batchSize, timeFrame)
+		if(userRankingCount != null){
+			startIndex= 0;
+			count=userRankingCount.Count;
+		}
+	}else{
+		userRankingCount = getUserRankingCount(entityType, companyId, year, month, batchSize, timeFrame);
+		if(userRankingCount != null){
+			startIndex= userRankingCount.startIndex;
+			count=userRankingCount.Count;
+		}
+	}
+	
+showHideRankPaginateBtns(startIndex, count);
+	
+$(document).on('click','#lead-ranks-above-btn',function(){
+	showOverlay();
+	startIndex -= 10;
+	if(startIndex<=0){
+		startIndex = 0;
+	}
+	
+	timeFrameStr = $('#time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	
+	switch(timeFrame){
+	case 1: year = currentYear;
+		break;
+	case 2: year = currentYear;
+		month = currentMonth;
+		break;
+	case 3: year = currentYear - 1;
+		break;
+	case 4: year = currentYear;
+		month=currentMonth -1;
+		break;
+	}
+	
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
+	var userRankingList = null;
+	
+	var entityId = companyId;
+	
+	if(profileMasterId != 4){
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingList = getUserRankingList(entityType,entityId, year, month, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	}
+	
+	if(userRankingList != null && userRankingList.length != 0){
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
+		$('#leaderboard-list').removeClass('hide');
+		$('#leaderboard-tbl').html(tableData);
+		$('#leaderboard-empty-list-msg-div').addClass('hide');
+	}else{
+		$('#leaderboard-list').addClass('hide');
+		$('#leaderboard-empty-list-msg-div').removeClass('hide');
+	}
+	
+	showHideRankPaginateBtns(startIndex, count);
+	
+	 $('html, body').animate({
+	        scrollTop: $('#leaderboard-tbl').offset().top - 20
+	    }, 'slow');
+	 
+	
+});
+
+$(document).on('click','#lead-ranks-below-btn',function(){
+	showOverlay();
+	startIndex += 10;
+	if(startIndex>=count){
+		startIndex = count;
+	}
+	
+	timeFrameStr = $('#time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	
+	switch(timeFrame){
+	case 1: year = currentYear;
+		break;
+	case 2: year = currentYear;
+		month = currentMonth;
+		break;
+	case 3: year = currentYear - 1;
+		break;
+	case 4: year = currentYear;
+		month=currentMonth -1;
+		break;
+	}
+	
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
+	var userRankingList = null;
+	
+	var entityId = companyId;
+	
+	if(profileMasterId != 4){
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingList = getUserRankingList(entityType,entityId, year, month, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	}
+	
+	if(userRankingList != null && userRankingList.length != 0){
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
+		$('#leaderboard-list').removeClass('hide');
+		$('#leaderboard-tbl').html(tableData);
+		$('#leaderboard-empty-list-msg-div').addClass('hide');
+	}else{
+		$('#leaderboard-list').addClass('hide');
+		$('#leaderboard-empty-list-msg-div').removeClass('hide');
+	}
+	
+	showHideRankPaginateBtns(startIndex, count);
+	$('html, body').animate({
+        scrollTop: $('#leaderboard-tbl').offset().top - 20
+    }, 'slow');
+});
+
+$(document).on('change', '#time-selector', function() {
+	showOverlay();
+	timeFrameStr = $('#time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	startIndex = 0;
+	
+	switch(timeFrame){
+	case 1: year = currentYear;
+		break;
+	case 2: year = currentYear;
+		month = currentMonth;
+		break;
+	case 3: year = currentYear - 1;
+		break;
+	case 4: year = currentYear;
+		month=currentMonth -1;
+		break;
+	case 5: year = currentYear - 1
+	}
+	
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
+	var entityId = companyId;
+	
+	if(profileMasterId != 4){
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingCount = getUserRankingCountForAdmins(entityType, entityId, year, month, batchSize, timeFrame)
+		if(userRankingCount != null){
+			startIndex= 0;
+			count=userRankingCount.Count;
+		}
+	}else{
+		userRankingCount = getUserRankingCount(entityType, companyId, year, month, batchSize, timeFrame);
+		if(userRankingCount != null){
+			startIndex= userRankingCount.startIndex;
+			count=userRankingCount.Count;
+		}
+	}
+	
+	var userRankingList = null;
+	
+	if(profileMasterId != 4){
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingList = getUserRankingList(entityType,entityId, year, month, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	}
+	
+	if(userRankingList != null && userRankingList.length != 0){
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
+		$('#leaderboard-list').removeClass('hide');
+		$('#leaderboard-tbl').html(tableData);
+		$('#leaderboard-empty-list-msg-div').addClass('hide');
+	}else{
+		$('#leaderboard-list').addClass('hide');
+		$('#leaderboard-empty-list-msg-div').removeClass('hide');
+	}
+	
+	showHideRankPaginateBtns(startIndex, count);
+	
+	 $('html, body').animate({
+	        scrollTop: $('#leaderboard-tbl').offset().top - 20
+	    }, 'slow');
+	 
+});
+
+$(document).on('change', '#board-selector', function() {
+	showOverlay();
+	timeFrameStr = $('#time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	startIndex = 0;
+	
+	switch(timeFrame){
+	case 1: year = currentYear;
+		break;
+	case 2: year = currentYear;
+		month = currentMonth;
+		break;
+	case 3: year = currentYear - 1;
+		break;
+	case 4: year = currentYear;
+		month=currentMonth -1;
+		break;
+	case 5: year = currentYear - 1
+	}
+	
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	var entityId = companyId;
+	
+	if(profileMasterId != 4){
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingCount = getUserRankingCountForAdmins(entityType, entityId, year, month, batchSize, timeFrame)
+		if(userRankingCount != null){
+			startIndex= 0;
+			count=userRankingCount.Count;
+		}
+	}else{
+		userRankingCount = getUserRankingCount(entityType, companyId, year, month, batchSize, timeFrame);
+		if(userRankingCount != null){
+			startIndex= userRankingCount.startIndex;
+			count=userRankingCount.Count;
+		}
+	}
+	
+	var userRankingList = null;
+	
+	if(profileMasterId != 4){
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingList = getUserRankingList(entityType,entityId, year, month, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	}
+	
+	if(userRankingList != null && userRankingList.length != 0){
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
+		$('#leaderboard-list').removeClass('hide');
+		$('#leaderboard-tbl').html(tableData);
+		$('#leaderboard-empty-list-msg-div').addClass('hide');
+	}else{
+		$('#leaderboard-list').addClass('hide');
+		$('#leaderboard-empty-list-msg-div').removeClass('hide');
+	}
+	
+	showHideRankPaginateBtns(startIndex, count);
+	
+	 $('html, body').animate({
+	        scrollTop: $('#leaderboard-tbl').offset().top - 20
+	    }, 'slow');
+	 
+});
+
+$(document).on('click','#top-ten-ranks-btn',function(){
+	showOverlay();
+	startIndex=0;
+	
+	timeFrameStr = $('#time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	
+	switch(timeFrame){
+	case 1: year = currentYear;
+		break;
+	case 2: year = currentYear;
+		month = currentMonth;
+		break;
+	case 3: year = currentYear - 1;
+		break;
+	case 4: year = currentYear;
+		month=currentMonth -1;
+		break;
+	}
+	
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
+	var entityId = companyId;
+	
+	var userRankingList = null;
+	
+	if(profileMasterId != 4){
+		if(entityType == "regionId" && profileMasterId == 2){
+			entityId = columnId;
+		}else if(profileMasterId == 3 && entityType == "regionId"){
+			entityId = columnId;
+		}else if(entityType == "branchId" && profileMasterId == 3){
+			entityId = columnId;
+		}
+		userRankingList = getUserRankingList(entityType,entityId, year, month, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	}
+	
+	if(userRankingList != null && userRankingList.length != 0){
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
+		$('#leaderboard-list').removeClass('hide');
+		$('#leaderboard-tbl').html(tableData);
+		$('#leaderboard-empty-list-msg-div').addClass('hide');
+	}else{
+		$('#leaderboard-list').addClass('hide');
+		$('#leaderboard-empty-list-msg-div').removeClass('hide');
+	}
+	
+	showHideRankPaginateBtns(startIndex, count);
+	$('html, body').animate({
+        scrollTop: $('#leaderboard-tbl').offset().top - 20
+    }, 'slow');
+	
+});
+
+$(document).on('click','#my-rank-btn',function(){
+	showOverlay();
+	startIndex=0;
+	
+	timeFrameStr = $('#time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	
+	switch(timeFrame){
+	case 1: year = currentYear;
+		break;
+	case 2: year = currentYear;
+		month = currentMonth;
+		break;
+	case 3: year = currentYear - 1;
+		break;
+	case 4: year = currentYear;
+		month=currentMonth -1;
+		break;
+	}
+	
+	var boardStr = $('#board-selector').val();
+	var board = parseInt(boardStr);
+	var entityType = 'companyId';
+	
+	switch(board){
+	case 1: entityType = 'companyId';
+		break;
+	case 2: entityType = 'regionId';
+		break;
+	case 3: entityType = 'branchId';
+		break;
+	default: entityType = 'companyId'
+	}
+	
+	
+	userRankingCount = getUserRankingCount(entityType, companyId, currentYear, currentMonth, batchSize, timeFrame);
+	if(userRankingCount != null){
+			startIndex= userRankingCount.startIndex;
+			count=userRankingCount.Count;
+	}
+	
+	
+	var userRankingList = null;
+	
+	userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
+	
+	if(userRankingList != null && userRankingList.length != 0){
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
+		$('#leaderboard-list').removeClass('hide');
+		$('#leaderboard-tbl').html(tableData);
+		$('#leaderboard-empty-list-msg-div').addClass('hide');
+	}else{
+		$('#leaderboard-list').addClass('hide');
+		$('#leaderboard-empty-list-msg-div').removeClass('hide');
+	}
+	
+	showHideRankPaginateBtns(startIndex, count);
+	$('html, body').animate({
+        scrollTop: $('#leaderboard-tbl').offset().top - 20
+    }, 'slow');
+	
+});
+
+});
+</script>
