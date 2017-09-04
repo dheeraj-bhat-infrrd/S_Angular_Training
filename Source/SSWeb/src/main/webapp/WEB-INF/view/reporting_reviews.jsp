@@ -22,7 +22,7 @@
 $(document).ready(function() {
 	$(window).off('scroll');
 	$(window).scroll(function() {
-		if(window.location.hash.substr(1) == "dashboard") {
+		if(window.location.hash.substr(1) == "showreportingpage") {
 			dashbaordReviewScroll();		
 		}
 	});
