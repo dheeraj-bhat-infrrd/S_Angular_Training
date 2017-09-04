@@ -329,6 +329,9 @@
         <field>
           <name>AGENT_ID</name>
         </field>
+        <field>
+          <name>Year_Data</name>
+        </field>
       </group>
       <fields>
         <field>
@@ -1075,6 +1078,12 @@
     <fields>
       <field>
         <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
