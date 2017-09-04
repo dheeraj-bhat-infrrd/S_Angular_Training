@@ -302,7 +302,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>100</commit>
+    <commit>10000</commit>
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
@@ -316,7 +316,7 @@
       <value>
         <name>SURVEY_ID</name>
         <rename>SURVEY_ID</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SURVEY_NAME</name>
