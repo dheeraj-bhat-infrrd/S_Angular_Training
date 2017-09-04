@@ -391,7 +391,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  score_stats_overall_user_id&#xd;&#xa;, user_id&#xd;&#xa;, five_star&#xd;&#xa;, four_star&#xd;&#xa;, three_star&#xd;&#xa;, two_star&#xd;&#xa;, one_star&#xd;&#xa;, avg_score&#xd;&#xa;, month_val&#xd;&#xa;, year_val&#xd;&#xa;FROM score_stats_overall_user&#xd;&#xa;where month_val &#x3d; month&#x28;curdate&#x28;&#x29;&#x29; and year_val &#x3d; year&#x28;curdate&#x28;&#x29;&#x29; &#xd;&#xa;order by user_id&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  score_stats_overall_user_id&#xd;&#xa;, user_id&#xd;&#xa;, five_star&#xd;&#xa;, four_star&#xd;&#xa;, three_star&#xd;&#xa;, two_star&#xd;&#xa;, one_star&#xd;&#xa;, avg_score&#xd;&#xa;, month_val&#xd;&#xa;, year_val&#xd;&#xa;FROM score_stats_overall_user&#xd;&#xa;where month_val &#x3d; month&#x28;subdate&#x28;current_date,1&#x29;&#x29; and year_val &#x3d; year&#x28;subdate&#x28;current_date,1&#x29;&#x29; &#xd;&#xa;order by user_id&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>

@@ -485,7 +485,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var FINAL_COMPANY_ID &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_COMPANY_ID &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;ENTITY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_COMPANY_ID &#x3d; ENTITY_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_COMPANY_ID &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var FINAL_YEAR_VAL &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;year &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; year&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;total_shared_by &#x3d;&#x3d; null&#x29;&#xd;&#xa;	var total_shared_by &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;unassigned &#x3d;&#x3d; null&#x29;&#xd;&#xa;	var unassigned &#x3d; 0&#x3b;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var FINAL_COMPANY_ID &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_COMPANY_ID &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;ENTITY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_COMPANY_ID &#x3d; ENTITY_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_COMPANY_ID &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var FINAL_YEAR_VAL &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;year &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; year&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;total_shared_by &#x3d;&#x3d; null&#x29;&#xd;&#xa;	var total_shared_by &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;unassigned &#x3d;&#x3d; null&#x29;&#xd;&#xa;	var unassigned &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;var unprocessed &#x3d; unprocessed &#x2b; unassigned&#x3b;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>FINAL_COMPANY_ID</name>
         <rename>FINAL_COMPANY_ID</rename>
         <type>Integer</type>
@@ -789,7 +789,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, STATUS&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;where STATUS&#x3d;10 order by COMPANY_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, STATUS&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;where STATUS&#x3d;10 AND SURVEY_SOURCE NOT IN&#x28;&#x22;Zillow&#x22; , &#x22;3rd Party Review&#x22; &#x29;&#xd;&#xa;order by COMPANY_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1041,7 +1041,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, SCORE&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, SCORE&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;WHERE STAGE&#x3d;-1</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1067,7 +1067,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  distinct USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;FROM user_profile order by USER_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  distinct USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;FROM user_profile &#xd;&#xa;WHERE status &#x3d;1 &#xd;&#xa;order by USER_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>

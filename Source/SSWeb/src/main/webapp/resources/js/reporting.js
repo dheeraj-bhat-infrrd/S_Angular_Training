@@ -1216,7 +1216,7 @@ function updateReportingDashboard(){
 		$('#processed-lbl-span').html(overviewYearData.Processed);
 		$('#completed-lbl-span').html(overviewYearData.Completed+' ('+overviewYearData.CompletePercentage+'%)');
 		$('#incomplete-lbl-span').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
-		$('#incomplete-lbl-span-sel').html(overviewYearData.Incomplete);
+		$('#incomplete-lbl-span-sel').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
 		$('#social-posts-lbl-span').html(overviewYearData.SocialPosts);
 		$('#zillow-lbl-span').html(overviewYearData.ZillowReviews);
 		$('#unprocessed-lbl-span').html(overviewYearData.Unprocessed);

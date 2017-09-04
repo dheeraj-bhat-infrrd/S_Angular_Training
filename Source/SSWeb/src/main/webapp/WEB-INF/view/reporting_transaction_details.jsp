@@ -203,7 +203,7 @@ $(document).ready(function(){
 		$('#processed-lbl-span').html(overviewYearData.Processed);
 		$('#completed-lbl-span').html(overviewYearData.Completed+' ('+overviewYearData.CompletePercentage+'%)');
 		$('#incomplete-lbl-span').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
-		$('#incomplete-lbl-span-sel').html(overviewYearData.Incomplete);
+		$('#incomplete-lbl-span-sel').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
 		$('#social-posts-lbl-span').html(overviewYearData.SocialPosts);
 		$('#zillow-lbl-span').html(overviewYearData.ZillowReviews);
 		$('#unprocessed-lbl-span').html(overviewYearData.Unprocessed);
@@ -309,8 +309,8 @@ $(document).ready(function(){
 	
 	$(document).on('click','#chart-icn-btn',function(e){
 		$('#incompleted-details-selectable').show();
-		$('#incompleted-details').removeClass('hide');
-		$('#incompleted-details').addClass('inline-flex-class');
+		$('#incompleted-details').addClass('hide');
+		$('#incompleted-details').removeClass('inline-flex-class');
 		$('#unassigned-details-selectable').show();
 		$('#unassigned-details').addClass('hide');
 		$('#unassigned-details').removeClass('inline-flex-class');
