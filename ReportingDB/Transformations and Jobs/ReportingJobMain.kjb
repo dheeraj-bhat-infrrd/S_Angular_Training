@@ -139,7 +139,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>220</xloc>
+      <xloc>223</xloc>
       <yloc>90</yloc>
       </entry>
     <entry>
@@ -172,7 +172,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>492</xloc>
+      <xloc>485</xloc>
       <yloc>90</yloc>
       </entry>
     <entry>
@@ -205,7 +205,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>733</xloc>
+      <xloc>734</xloc>
       <yloc>90</yloc>
       </entry>
     <entry>
@@ -238,7 +238,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>980</xloc>
+      <xloc>984</xloc>
       <yloc>90</yloc>
       </entry>
     <entry>
@@ -271,7 +271,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>220</xloc>
+      <xloc>223</xloc>
       <yloc>521</yloc>
       </entry>
     <entry>
@@ -304,7 +304,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>492</xloc>
+      <xloc>485</xloc>
       <yloc>521</yloc>
       </entry>
     <entry>
@@ -370,7 +370,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>980</xloc>
+      <xloc>984</xloc>
       <yloc>521</yloc>
       </entry>
     <entry>
@@ -403,8 +403,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>230</xloc>
-      <yloc>927</yloc>
+      <xloc>485</xloc>
+      <yloc>811</yloc>
       </entry>
     <entry>
       <name>company user report&#x28;2&#x29;</name>
@@ -436,8 +436,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>980</xloc>
-      <yloc>799</yloc>
+      <xloc>734</xloc>
+      <yloc>675</yloc>
       </entry>
     <entry>
       <name>SurveyResultsCompanyReport</name>
@@ -469,8 +469,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>980</xloc>
-      <yloc>663</yloc>
+      <xloc>485</xloc>
+      <yloc>673</yloc>
       </entry>
     <entry>
       <name>Overview_User_month</name>
@@ -502,7 +502,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>980</xloc>
+      <xloc>984</xloc>
       <yloc>219</yloc>
       </entry>
     <entry>
@@ -535,7 +535,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>733</xloc>
+      <xloc>734</xloc>
       <yloc>219</yloc>
       </entry>
     <entry>
@@ -568,7 +568,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>492</xloc>
+      <xloc>485</xloc>
       <yloc>219</yloc>
       </entry>
     <entry>
@@ -601,7 +601,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>220</xloc>
+      <xloc>223</xloc>
       <yloc>219</yloc>
       </entry>
     <entry>
@@ -634,7 +634,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>220</xloc>
+      <xloc>223</xloc>
       <yloc>380</yloc>
       </entry>
     <entry>
@@ -667,7 +667,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>492</xloc>
+      <xloc>485</xloc>
       <yloc>380</yloc>
       </entry>
     <entry>
@@ -733,7 +733,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>980</xloc>
+      <xloc>984</xloc>
       <yloc>380</yloc>
       </entry>
     <entry>
@@ -765,8 +765,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>734</xloc>
-      <yloc>799</yloc>
+      <xloc>984</xloc>
+      <yloc>678</yloc>
       </entry>
     <entry>
       <name>User Ranking This Year</name>
@@ -797,8 +797,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>492</xloc>
-      <yloc>799</yloc>
+      <xloc>984</xloc>
+      <yloc>811</yloc>
       </entry>
     <entry>
       <name>Score Stats</name>
@@ -829,8 +829,40 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>230</xloc>
-      <yloc>799</yloc>
+      <xloc>734</xloc>
+      <yloc>811</yloc>
+      </entry>
+    <entry>
+      <name>Survey Transaction Report</name>
+      <description/>
+      <type>JOB</type>
+      <specification_method>filename</specification_method>
+      <job_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;survey_transaction_report.kjb</filename>
+      <jobname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Nothing</loglevel>
+      <slave_server_name/>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <expand_remote_job>N</expand_remote_job>
+      <create_parent_folder>N</create_parent_folder>
+      <pass_export>N</pass_export>
+      <force_separate_logging>N</force_separate_logging>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <set_append_logfile>N</set_append_logfile>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>223</xloc>
+      <yloc>675</yloc>
       </entry>
   </entries>
   <hops>
@@ -1006,15 +1038,6 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>survey_stats_report_main</from>
-      <to>SurveyResultsCompanyReport</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>User Ranking This Year</from>
       <to>Score Stats</to>
       <from_nr>0</from_nr>
@@ -1026,6 +1049,24 @@
     <hop>
       <from>Score Stats</from>
       <to>User Adoption</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>survey_stats_report_main</from>
+      <to>Survey Transaction Report</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Survey Transaction Report</from>
+      <to>SurveyResultsCompanyReport</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
