@@ -25,7 +25,6 @@
     border-bottom-color: #2f69aa;
     }
 </style>
-<script src="${initParam.resourcesPath}/resources/js/googleloader.js"></script>
 <c:choose>
 	<c:when test="${columnName == 'companyId'}">
 		<c:set value="1" var="profilemasterid"></c:set>
