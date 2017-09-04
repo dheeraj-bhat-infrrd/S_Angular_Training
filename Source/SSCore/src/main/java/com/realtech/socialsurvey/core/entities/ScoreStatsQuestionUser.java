@@ -27,19 +27,19 @@ public class ScoreStatsQuestionUser {
     @Column ( name = "question")
     private String question;
     
-    @Column ( name = "5_star")
+    @Column ( name = "five_star")
     private int fiveStar;
     
-    @Column ( name = "4_star")
+    @Column ( name = "four_star")
     private int fourStar;
     
-    @Column ( name = "3_star")
+    @Column ( name = "three_star")
     private int threeStar;
     
-    @Column ( name = "2_star")
+    @Column ( name = "two_star")
     private int twoStar;
     
-    @Column ( name = "1_star")
+    @Column ( name = "one_star")
     private int oneStar;
     
     @Column ( name = "month_val")
