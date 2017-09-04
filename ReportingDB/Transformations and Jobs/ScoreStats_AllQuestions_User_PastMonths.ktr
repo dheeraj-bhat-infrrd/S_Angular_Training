@@ -148,7 +148,6 @@
   <hop> <from>Merge Join</from><to>Filter 5</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>ScoreStats Id</to><enabled>Y</enabled> </hop>
   <hop> <from>Multiway Merge Join</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
-  <hop> <from>ScoreStats Id</from><to>If field value is null</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort 1</from><to>Group by 1</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort 2</from><to>Group by 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort 3</from><to>Group by 3</to><enabled>Y</enabled> </hop>
@@ -161,8 +160,9 @@
   <hop> <from>Sort qsn 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveyDetails Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveyResponse Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>If field value is null</from><to>Calculate Average</to><enabled>Y</enabled> </hop>
-  <hop> <from>Calculate Average</from><to>ScoreStats_AllQuestions_User_PastMonths</to><enabled>Y</enabled> </hop>
+  <hop> <from>ScoreStats Id</from><to>Calculate Average</to><enabled>Y</enabled> </hop>
+  <hop> <from>Calculate Average</from><to>If field value is null</to><enabled>Y</enabled> </hop>
+  <hop> <from>If field value is null</from><to>ScoreStats_AllQuestions_User_PastMonths</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Calculate Average</name>
@@ -188,8 +188,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>989</xloc>
-      <yloc>1032</yloc>
+      <xloc>837</xloc>
+      <yloc>1036</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -681,8 +681,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>796</xloc>
-      <yloc>1032</yloc>
+      <xloc>1019</xloc>
+      <yloc>1036</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -764,7 +764,7 @@
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>454</xloc>
-      <yloc>1032</yloc>
+      <yloc>1036</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -822,7 +822,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>640</xloc>
-      <yloc>1032</yloc>
+      <yloc>1036</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -908,7 +908,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1272</xloc>
-      <yloc>1032</yloc>
+      <yloc>1036</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
