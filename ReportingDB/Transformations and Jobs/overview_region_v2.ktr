@@ -218,7 +218,10 @@
           <name>REGION_ID</name>
         </field>
         <field>
-          <name>TRX_MONTH</name>
+          <name>month</name>
+        </field>
+        <field>
+          <name>year</name>
         </field>
       </group>
       <fields>
@@ -289,21 +292,15 @@
           <valuefield/>
         </field>
         <field>
-          <aggregate>month</aggregate>
-          <subject>month</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>year</aggregate>
-          <subject>year</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
           <aggregate>num_of_users</aggregate>
           <subject>USER_ID</subject>
           <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>TRX_MONTH</aggregate>
+          <subject>TRX_MONTH</subject>
+          <type>FIRST</type>
           <valuefield/>
         </field>
       </fields>
@@ -332,7 +329,10 @@
           <name>ENTITY_ID</name>
         </field>
         <field>
-          <name>TRX_MONTH</name>
+          <name>MONTH_Data</name>
+        </field>
+        <field>
+          <name>Year_Data</name>
         </field>
       </group>
       <fields>
@@ -343,14 +343,8 @@
           <valuefield/>
         </field>
         <field>
-          <aggregate>MONTH_Data</aggregate>
-          <subject>MONTH_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Year_Data</aggregate>
-          <subject>Year_Data</subject>
+          <aggregate>TRX_MONTH</aggregate>
+          <subject>TRX_MONTH</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>

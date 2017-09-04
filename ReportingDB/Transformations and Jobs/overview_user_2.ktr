@@ -160,7 +160,6 @@
   <hop> <from>Select values 2</from><to>jsForPercentage</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_overview_user</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForMainAgent</from><to>UUID_overview_user</to><enabled>Y</enabled> </hop>
-  <hop> <from>jsForStatus</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>social_post</from><to>jsToCountPost</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_pre_initiation input</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2</from><to>Memory Group by</to><enabled>Y</enabled> </hop>
@@ -179,23 +178,23 @@
   <hop> <from>zillow_sort</from><to>Memory Group by Zillow</to><enabled>Y</enabled> </hop>
   <hop> <from>SortByEntityId</from><to>Memory Group by Social</to><enabled>Y</enabled> </hop>
   <hop> <from>Memory Group by Social</from><to>SortAgent_Social</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select values</from><to>Memory Group by Status</to><enabled>Y</enabled> </hop>
   <hop> <from>Memory Group by Status</from><to>SortAgent_Status</to><enabled>Y</enabled> </hop>
   <hop> <from>rating_sort</from><to>Memory Group by rating</to><enabled>Y</enabled> </hop>
   <hop> <from>Memory Group by rating</from><to>SortAgent_Rating</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_details</from><to>rating_sort</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForPercentage</from><to>jsToConvertNullToZero</to><enabled>Y</enabled> </hop>
   <hop> <from>jsToConvertNullToZero</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 3</from><to>Memory Group by AgentId for Sent_count</to><enabled>Y</enabled> </hop>
+  <hop> <from>Memory Group by AgentId for Sent_count</from><to>SortSentCount</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey_pre_initiation input</from><to>Filter rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows</from><to>Sort rows 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortSentCount</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SortAgent_Status</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SortAgent_Social</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SortAgent_Zillow</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Multiway Merge Join</from><to>Select All Values</to><enabled>Y</enabled> </hop>
   <hop> <from>SortAgent_Rating</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 3</from><to>Memory Group by AgentId for Sent_count</to><enabled>Y</enabled> </hop>
-  <hop> <from>Memory Group by AgentId for Sent_count</from><to>SortSentCount</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortSentCount</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>survey_pre_initiation input</from><to>Filter rows</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows</from><to>Sort rows 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Multiway Merge Join</from><to>Select All Values</to><enabled>Y</enabled> </hop>
+  <hop> <from>jsForStatus</from><to>Memory Group by Status</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Filter rows</name>
@@ -294,7 +293,10 @@
           <name>STATUS</name>
         </field>
         <field>
-          <name>TRX_MONTH</name>
+          <name>MONTH_Data</name>
+        </field>
+        <field>
+          <name>Year_Data</name>
         </field>
       </group>
       <fields>
@@ -305,14 +307,8 @@
           <valuefield/>
         </field>
         <field>
-          <aggregate>MONTH_Data</aggregate>
-          <subject>MONTH_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Year_Data</aggregate>
-          <subject>Year_Data</subject>
+          <aggregate>TRX_MONTH</aggregate>
+          <subject>TRX_MONTH</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -341,12 +337,24 @@
         <field>
           <name>AGENT_ID</name>
         </field>
+        <field>
+          <name>MONTH_Data</name>
+        </field>
+        <field>
+          <name>Year_Data</name>
+        </field>
       </group>
       <fields>
         <field>
           <aggregate>sent_count</aggregate>
           <subject>AGENT_ID</subject>
           <type>COUNT_ANY</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>TRX_MONTH</aggregate>
+          <subject>TRX_MONTH</subject>
+          <type>FIRST</type>
           <valuefield/>
         </field>
       </fields>
@@ -375,7 +383,10 @@
           <name>ENTITY_ID</name>
         </field>
         <field>
-          <name>TRX_MONTH</name>
+          <name>MONTH_Data</name>
+        </field>
+        <field>
+          <name>Year_Data</name>
         </field>
       </group>
       <fields>
@@ -386,14 +397,8 @@
           <valuefield/>
         </field>
         <field>
-          <aggregate>MONTH_Data</aggregate>
-          <subject>MONTH_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Year_Data</aggregate>
-          <subject>Year_Data</subject>
+          <aggregate>TRX_MONTH</aggregate>
+          <subject>TRX_MONTH</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -423,7 +428,10 @@
           <name>AGENT_ID</name>
         </field>
         <field>
-          <name>TRX_MONTH</name>
+          <name>MONTH_Data</name>
+        </field>
+        <field>
+          <name>Year_Data</name>
         </field>
       </group>
       <fields>
@@ -464,18 +472,6 @@
           <valuefield/>
         </field>
         <field>
-          <aggregate>MONTH_Data</aggregate>
-          <subject>MONTH_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Year_Data</aggregate>
-          <subject>Year_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
           <aggregate>total_archieved</aggregate>
           <subject>total_archieved</subject>
           <type>SUM</type>
@@ -491,6 +487,12 @@
           <aggregate>total_not_allowed</aggregate>
           <subject>total_not_allowed</subject>
           <type>SUM</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>TRX_MONTH</aggregate>
+          <subject>TRX_MONTH</subject>
+          <type>FIRST</type>
           <valuefield/>
         </field>
       </fields>
@@ -519,7 +521,10 @@
           <name>AGENT_ID</name>
         </field>
         <field>
-          <name>TRX_MONTH</name>
+          <name>MONTH_Data</name>
+        </field>
+        <field>
+          <name>Year_Data</name>
         </field>
       </group>
       <fields>
@@ -530,14 +535,8 @@
           <valuefield/>
         </field>
         <field>
-          <aggregate>MONTH_Data</aggregate>
-          <subject>MONTH_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Year_Data</aggregate>
-          <subject>Year_Data</subject>
+          <aggregate>TRX_MONTH</aggregate>
+          <subject>TRX_MONTH</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -567,7 +566,10 @@
           <name>AGENT_ID</name>
         </field>
         <field>
-          <name>TRX_MONTH</name>
+          <name>MONTH_Data</name>
+        </field>
+        <field>
+          <name>Year_Data</name>
         </field>
       </group>
       <fields>
@@ -578,21 +580,15 @@
           <valuefield/>
         </field>
         <field>
-          <aggregate>MONTH_Data</aggregate>
-          <subject>MONTH_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Year_Data</aggregate>
-          <subject>Year_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
           <aggregate>avg_rating</aggregate>
           <subject>SCORE</subject>
           <type>AVERAGE</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>TRX_MONTH</aggregate>
+          <subject>TRX_MONTH</subject>
+          <type>FIRST</type>
           <valuefield/>
         </field>
       </fields>
@@ -661,39 +657,6 @@
     </step>
 
   <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <join_type>FULL OUTER</join_type>
-    <step0>SortAgent_Status</step0>
-    <step1>SortAgent_Social</step1>
-    <step2>SortAgent_Zillow</step2>
-    <step3>SortAgent_Rating</step3>
-    <step4>SortSentCount</step4>
-    <number_input>5</number_input>
-    <keys>
-      <key>AGENT_ID,TRX_MONTH</key>
-      <key>ENTITY_ID,TRX_MONTH</key>
-      <key>AGENT_ID,TRX_MONTH</key>
-      <key>AGENT_ID,TRX_MONTH</key>
-      <key>AGENT_ID,TRX_MONTH</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1157</xloc>
-      <yloc>276</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Select All Values</name>
     <type>SelectValues</type>
     <description/>
@@ -708,34 +671,6 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>TRX_MONTH</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_completed</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_corrupted</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_duplicate</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_unassigned</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_initiated</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_pre_initiated</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
       </field>      <field>        <name>MONTH_Data</name>
         <rename/>
         <length>-2</length>
@@ -744,15 +679,15 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>ENTITY_ID</name>
+      </field>      <field>        <name>sent_count</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>TRX_MONTH_1</name>
+      </field>      <field>        <name>TRX_MONTH</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>total_shared_by</name>
+      </field>      <field>        <name>AGENT_ID_1</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -764,107 +699,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>TRX_MONTH_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>zillow_count</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>MONTH_Data_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Year_Data_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>TRX_MONTH_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_reviews</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>MONTH_Data_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Year_Data_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>avg_rating</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>sent_count</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_archieved</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_ignored</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_not_allowed</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1337</xloc>
-      <yloc>276</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Select values</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>      <field>        <name>AGENT_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>STATUS</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>TRX_MONTH</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>status_count</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>MONTH_Data</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Year_Data</name>
+      </field>      <field>        <name>total_completed</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -876,19 +711,15 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>total_completed</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
       </field>      <field>        <name>total_unassigned</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>total_pre_initiated</name>
+      </field>      <field>        <name>total_initiated</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>total_initiated</name>
+      </field>      <field>        <name>total_pre_initiated</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -904,11 +735,79 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>TRX_MONTH_1</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>ENTITY_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MONTH_Data_2</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>Year_Data_2</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>total_shared_by</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>TRX_MONTH_2</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>AGENT_ID_2</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MONTH_Data_3</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>Year_Data_3</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>zillow_count</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>TRX_MONTH_3</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>AGENT_ID_3</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>MONTH_Data_4</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>Year_Data_4</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>total_reviews</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>avg_rating</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>TRX_MONTH_4</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>664</xloc>
-      <yloc>104</yloc>
+      <xloc>1463</xloc>
+      <yloc>279</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1082,8 +981,8 @@
         <storage_type/>
       </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1337</xloc>
-      <yloc>632</yloc>
+      <xloc>1463</xloc>
+      <yloc>635</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1154,7 +1053,13 @@
         <presorted>N</presorted>
       </field>
       <field>
-        <name>TRX_MONTH</name>
+        <name>MONTH_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1228,7 +1133,13 @@
         <presorted>N</presorted>
       </field>
       <field>
-        <name>TRX_MONTH</name>
+        <name>MONTH_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1236,8 +1147,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>988</xloc>
-      <yloc>648</yloc>
+      <xloc>987</xloc>
+      <yloc>647</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1268,7 +1179,13 @@
         <presorted>N</presorted>
       </field>
       <field>
-        <name>TRX_MONTH</name>
+        <name>MONTH_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1308,7 +1225,13 @@
         <presorted>N</presorted>
       </field>
       <field>
-        <name>TRX_MONTH</name>
+        <name>MONTH_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1316,8 +1239,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1060</xloc>
-      <yloc>104</yloc>
+      <xloc>1065</xloc>
+      <yloc>113</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1348,7 +1271,13 @@
         <presorted>N</presorted>
       </field>
       <field>
-        <name>TRX_MONTH</name>
+        <name>MONTH_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1388,7 +1317,13 @@
         <presorted>N</presorted>
       </field>
       <field>
-        <name>TRX_MONTH</name>
+        <name>MONTH_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1427,6 +1362,18 @@
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
+      <field>
+        <name>MONTH_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1455,8 +1402,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1337</xloc>
-      <yloc>528</yloc>
+      <xloc>1463</xloc>
+      <yloc>531</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1529,8 +1476,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1337</xloc>
-      <yloc>410</yloc>
+      <xloc>1463</xloc>
+      <yloc>413</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1589,8 +1536,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1337</xloc>
-      <yloc>754</yloc>
+      <xloc>1463</xloc>
+      <yloc>757</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2139,7 +2086,13 @@
         <presorted>N</presorted>
       </field>
       <field>
-        <name>TRX_MONTH</name>
+        <name>MONTH_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2149,6 +2102,39 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>417</xloc>
       <yloc>525</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Multiway Merge Join</name>
+    <type>MultiwayMergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <join_type>FULL OUTER</join_type>
+    <step0>SortSentCount</step0>
+    <step1>SortAgent_Status</step1>
+    <step2>SortAgent_Social</step2>
+    <step3>SortAgent_Zillow</step3>
+    <step4>SortAgent_Rating</step4>
+    <number_input>5</number_input>
+    <keys>
+      <key>AGENT_ID,MONTH_Data,Year_Data</key>
+      <key>AGENT_ID,MONTH_Data,Year_Data</key>
+      <key>ENTITY_ID,MONTH_Data,Year_Data</key>
+      <key>AGENT_ID,MONTH_Data,Year_Data</key>
+      <key>AGENT_ID,MONTH_Data,Year_Data</key>
+    </keys>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1333</xloc>
+      <yloc>287</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
