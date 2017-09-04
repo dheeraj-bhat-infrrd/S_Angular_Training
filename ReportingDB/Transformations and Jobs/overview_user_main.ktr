@@ -687,6 +687,12 @@
           <type>SUM</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>total_deleted</aggregate>
+          <subject>total_deleted</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -867,6 +873,10 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>total_deleted</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -924,6 +934,10 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>total_ignored</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>total_deleted</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1020,6 +1034,10 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>total_not_allowed</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>total_deleted</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1592,7 +1610,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; total_initiate&#x2b; total_pre&#x3b;&#xd;&#xa;var total_processed &#x3d; total_initiate &#x2b; total_pre &#x2b; total_completed&#x3b;&#xd;&#xa;var total_unprocessed &#x3d; total_corrupted &#x2b; total_duplicate &#x2b; total_archieved &#x2b; total_ignored &#x2b; total_mismatched &#x2b; total_not_allowed&#x3b;&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_processed &#x21;&#x3d; 0 &#x7c;&#x7c; total_processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;total_completed&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;total_incomplete_transactions_var&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; total_initiate&#x2b; total_pre&#x3b;&#xd;&#xa;var total_processed &#x3d; total_initiate &#x2b; total_pre &#x2b; total_completed &#x2b; total_deleted&#x3b;&#xd;&#xa;var total_unprocessed &#x3d; total_corrupted &#x2b; total_duplicate &#x2b; total_archieved &#x2b; total_ignored &#x2b; total_mismatched &#x2b; total_not_allowed&#x3b;&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_processed &#x21;&#x3d; 0 &#x7c;&#x7c; total_processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;total_completed&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;total_incomplete_transactions_var&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>total_incomplete_transactions_var</name>
         <rename>total_incomplete_transactions_var</rename>
         <type>Number</type>
@@ -1772,7 +1790,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var total_corrupted &#x3d; 0&#x3b;&#xd;&#xa;var total_mismatched &#x3d; 0&#x3b;&#xd;&#xa;var total_duplicate &#x3d; 0&#x3b;&#xd;&#xa;var total_archieved &#x3d; 0&#x3b;&#xd;&#xa;var total_completed &#x3d; 0&#x3b;&#xd;&#xa;var total_initiate &#x3d; 0&#x3b;&#xd;&#xa;var total_pre&#x3d;0&#x3b;&#xd;&#xa;var total_ignored &#x3d; 0&#x3b;&#xd;&#xa;var total_not_allowed &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;	if&#x28;STATUS &#x3d;&#x3d; 3&#x29;&#x7b;&#xd;&#xa;	total_corrupted &#x3d; status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 5&#x29;&#x7b;&#xd;&#xa;	total_duplicate&#x3d;status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 7&#x29;&#x7b;&#xd;&#xa;	total_completed&#x3d;status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 8&#x29;&#x7b;&#xd;&#xa;	total_archieved&#x3d;status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 10&#x29;&#x7b;&#xd;&#xa;	total_mismatched &#x3d; status_count&#x3b;&#xd;&#xa;	&#x7d;&#x2f;&#x2f;not needed but for testing &#xd;&#xa;	else if&#x28;STATUS &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;	total_initiate&#x3d;status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 2&#x29;&#x7b;&#xd;&#xa;	total_pre&#x3d;status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 9&#x29;&#x7b;&#xd;&#xa;		total_ignored &#x3d; status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 11&#x29;&#x7b;&#xd;&#xa;		total_not_allowed &#x3d; status_count&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var total_corrupted &#x3d; 0&#x3b;&#xd;&#xa;var total_mismatched &#x3d; 0&#x3b;&#xd;&#xa;var total_duplicate &#x3d; 0&#x3b;&#xd;&#xa;var total_archieved &#x3d; 0&#x3b;&#xd;&#xa;var total_completed &#x3d; 0&#x3b;&#xd;&#xa;var total_initiate &#x3d; 0&#x3b;&#xd;&#xa;var total_pre&#x3d;0&#x3b;&#xd;&#xa;var total_ignored &#x3d; 0&#x3b;&#xd;&#xa;var total_not_allowed &#x3d; 0&#x3b;&#xd;&#xa;var total_deleted &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;	if&#x28;STATUS &#x3d;&#x3d; 0&#x29;&#x7b;&#xd;&#xa;	total_deleted &#x3d; status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 3&#x29;&#x7b;&#xd;&#xa;	total_corrupted &#x3d; status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 5&#x29;&#x7b;&#xd;&#xa;	total_duplicate&#x3d;status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 7&#x29;&#x7b;&#xd;&#xa;	total_completed&#x3d;status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 8&#x29;&#x7b;&#xd;&#xa;	total_archieved&#x3d;status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 10&#x29;&#x7b;&#xd;&#xa;	total_mismatched &#x3d; status_count&#x3b;&#xd;&#xa;	&#x7d;&#x2f;&#x2f;not needed but for testing &#xd;&#xa;	else if&#x28;STATUS &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;	total_initiate&#x3d;status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 2&#x29;&#x7b;&#xd;&#xa;	total_pre&#x3d;status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 9&#x29;&#x7b;&#xd;&#xa;		total_ignored &#x3d; status_count&#x3b;&#xd;&#xa;	&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 11&#x29;&#x7b;&#xd;&#xa;		total_not_allowed &#x3d; status_count&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>total_corrupted</name>
         <rename>total_corrupted</rename>
         <type>Number</type>
@@ -1823,6 +1841,12 @@
         <replace>N</replace>
       </field>      <field>        <name>total_not_allowed</name>
         <rename>total_not_allowed</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>total_deleted</name>
+        <rename>total_deleted</rename>
         <type>Number</type>
         <length>16</length>
         <precision>2</precision>
