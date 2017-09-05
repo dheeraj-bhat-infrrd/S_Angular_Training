@@ -543,6 +543,16 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	background-color: #fff;
 }
 
+#send-survey-csv-dash {
+	position: absolute;
+    width: 94%;
+    height: 60%;
+    z-index: 9999999;
+    background: url(../images/dashloader.gif) no-repeat 50%;
+    background-size: 50px 50px;
+    background-color: #fff;
+}
+
 #mid-dash {
 	position: absolute;
 	width: 100%;

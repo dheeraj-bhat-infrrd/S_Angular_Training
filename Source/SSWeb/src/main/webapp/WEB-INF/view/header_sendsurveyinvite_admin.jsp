@@ -63,6 +63,7 @@
 	</div>
 	
 	<div class="survey-upload-csv hide clearfix">
+		<div id="send-survey-csv-dash" class="hide"></div>
 		<div class="float-left " style="width: 50%;">
 	   		<div class="survey-csv-upload-logo">	
 	            <input type="file" class="rfr_input_fld opacity-complete-invisibility survey-csv-file-input" id="survey-file-intake">

@@ -12288,8 +12288,7 @@ $(document).on('click','#wc-send-survey-upload-cancel',function(event){
 });
 
 $(document).on('click','#wc-send-survey-upload-confirm',function(event){
-	event.stopPropagation();
-	showOverlay();
+	$('#send-survey-csv-dash').removeClass("hide");
 	if( !processAndValidateCsvForm( false ) ){
 		hideOverlay();
 		return;
@@ -12302,19 +12301,17 @@ $(document).on('click','#wc-send-survey-upload-confirm',function(event){
 	formData.append("hierarchyType",$('#hierarchyType').val() );
 	formData.append("hierarchyValue",$('#hierarchyValue').val() );
 	callAjaxPOSTWithTextData("./savesurveycsvfile.do", function(callbackData){
-		showOverlay();
+		$('#send-survey-csv-dash').addClass("hide");
 		response = JSON.parse(callbackData);
 		if( response.status ){
 			$("#overlay-toast").html(response.message);
-			hideOverlay();
 			showToast();
 		} else {
 			$("#overlay-toast").html(response.message);
-			hideOverlay();
 			showToast();
 		}
 		
-	}, false, formData);
+	}, true, formData);
 });
 
 $(document).on('click','#wc-send-survey-upload-csv',function(event){
