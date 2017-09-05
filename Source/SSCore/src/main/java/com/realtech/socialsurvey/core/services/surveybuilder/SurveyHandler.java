@@ -10,13 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
@@ -388,5 +385,11 @@ public interface SurveyHandler
 
 
     public boolean createEntryForSurveyUploadWithCsv( String hierarchyType, MultipartFile tempFile, String fileName, long hierarchyId,
-        User user ) throws NonFatalException, UnsupportedEncodingException;
+        User user, String uploaderEmail ) throws NonFatalException, UnsupportedEncodingException;
+
+
+    public void processActiveSurveyCsvUploads();
+
+
+    public boolean isFileAlreadyUploaded( String fileName, String uploaderEmail );
 }

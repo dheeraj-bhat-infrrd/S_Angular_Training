@@ -2793,12 +2793,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     public Boolean validateEmail( String emailId ) throws InvalidInputException
     {
-        boolean validEmail = true;
         LOG.debug( "Method validateAndParseEmailIds called" );
         Pattern pattern = Pattern.compile( CommonConstants.EMAIL_REGEX, Pattern.CASE_INSENSITIVE );
         Matcher matcher = pattern.matcher( emailId );
-        validEmail = matcher.matches();
-        return validEmail;
+        return matcher.matches();
     }
 
 

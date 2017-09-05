@@ -2913,7 +2913,7 @@ public class OrganizationManagementController
         Object message = null;
         try {
             String hierarchyType = request.getParameter( "hierarchyType" );
-            long hierarchyId;
+            long hierarchyId = 0l;
 
             if ( file == null || file.isEmpty() )
                 throw new InvalidInputException( "Please provide a valid CSV file." );
@@ -2921,8 +2921,8 @@ public class OrganizationManagementController
             if ( StringUtils.isEmpty( fileName ) )
                 throw new InvalidInputException( "Please provide a valid CSV file name." );
 
-            if ( StringUtils.isEmpty( uploaderEmail ) )
-                throw new InvalidInputException( "Please provide a valid email for csv upload." );
+            if ( StringUtils.isEmpty( uploaderEmail ) && organizationManagementService.validateEmail( uploaderEmail.trim() ) )
+                throw new InvalidInputException( "Please provide a valid uploader email for csv upload." );
 
             if ( StringUtils.isEmpty( hierarchyType ) )
                 throw new InvalidInputException( "Please provide a valid hiearchyType." );
@@ -2936,10 +2936,14 @@ public class OrganizationManagementController
             } else {
                 throw new InvalidInputException( "Please provide a hiearchy Identifier." );
             }
-            
-            status = surveyHandler.createEntryForSurveyUploadWithCsv( hierarchyType, file, fileName, hierarchyId,
-                sessionHelper.getCurrentUser() );
-            message = "CSV file uploaded successfully.";
+
+            if ( !surveyHandler.isFileAlreadyUploaded( fileName, uploaderEmail ) ) {
+                status = surveyHandler.createEntryForSurveyUploadWithCsv( hierarchyType, file, fileName, hierarchyId,
+                    sessionHelper.getCurrentUser(), uploaderEmail );
+                message = "CSV file uploaded successfully.";
+            } else {
+                message = "CSV file: " + fileName + " is already uploaded using the provided email.";
+            }
 
 
         } catch ( InvalidInputException expectedError ) {

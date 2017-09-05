@@ -449,6 +449,19 @@
 		<property name="durability" value="true" />
 	</bean>
 
+	<!-- Survey Csv Upload job detail -->
+	<bean id="surveycsvuploadjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.SurveyCsvUploadProcessor" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean> 
+	
+	
+	
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -682,6 +695,15 @@
 		<property name="jobDetail" ref="deleteUsedVendastaTickets" />
 		<property name="cronExpression" value="0 0 0/1 1/1 * ?" />
 	</bean>
+	
+	<!-- survey csv upload cron -->
+	<bean id="surveycsvuploadcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="surveycsvuploadjobdetail" />
+		<property name="cronExpression" value="0 0/1 * 1/1 * ? *" />
+	</bean>
+	
+	
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -716,7 +738,8 @@
 				<!-- <ref bean="updateExistingCompanyPrice" /> -->
 				<!-- <ref bean="hideUsersFromSearch" />	-->
 				<!-- <ref bean="surveysourceidupdater" /> -->
-				<!-- <ref bean="surveyquestionupdater" /> -->		
+				<!-- <ref bean="surveyquestionupdater" /> -->
+				<ref bean="surveycsvuploadjobdetail" />
 			</list>
 		</property>
 
@@ -753,6 +776,7 @@
 				<!--  <ref bean="deleteUsedVendastaTicketscron" />-->	
 				<!-- <ref bean="surveysourceidupdatercron" /> -->
 				<!-- <ref bean="surveyquestionupdatercron" /> -->
+				<ref bean="surveycsvuploadcron" />
 			</list>
 		</property>
 		<property name="quartzProperties">

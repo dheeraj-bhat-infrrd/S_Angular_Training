@@ -12288,8 +12288,10 @@ $(document).on('click','#wc-send-survey-upload-cancel',function(event){
 });
 
 $(document).on('click','#wc-send-survey-upload-confirm',function(event){
-	
+	event.stopPropagation();
+	showOverlay();
 	if( !processAndValidateCsvForm( false ) ){
+		hideOverlay();
 		return;
 	}
 
@@ -12299,15 +12301,16 @@ $(document).on('click','#wc-send-survey-upload-confirm',function(event){
 	formData.append( "uploaderEmail", $('#survey-uploader-email').val() );
 	formData.append("hierarchyType",$('#hierarchyType').val() );
 	formData.append("hierarchyValue",$('#hierarchyValue').val() );
-	showOverlay();
 	callAjaxPOSTWithTextData("./savesurveycsvfile.do", function(callbackData){
-		
+		showOverlay();
 		response = JSON.parse(callbackData);
 		if( response.status ){
 			$("#overlay-toast").html(response.message);
+			hideOverlay();
 			showToast();
 		} else {
 			$("#overlay-toast").html(response.message);
+			hideOverlay();
 			showToast();
 		}
 		

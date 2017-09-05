@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
@@ -30,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.ForwardMailDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Plan;
+import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -53,6 +55,8 @@ public class EmailServicesImpl implements EmailServices
 
     public static final Logger LOG = LoggerFactory.getLogger( EmailServicesImpl.class );
 
+    private static final DateFormat df = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+
     @Autowired
     private EmailFormatHelper emailFormatHelper;
 
@@ -64,11 +68,11 @@ public class EmailServicesImpl implements EmailServices
 
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-    
+
     @Value ( "${SOCIALSURVEYME_SENDER_EMAIL_DOMAIN}")
     private String defaultSendGridMeEmailDomain;
-    
-    @Value ("${SOCIALSURVEYUS_SENDER_EMAIL_DOMAIN}")
+
+    @Value ( "${SOCIALSURVEYUS_SENDER_EMAIL_DOMAIN}")
     private String defaultSendGridUsEmailDomain;
 
     @Value ( "${APPLICATION_BASE_URL}")
@@ -97,7 +101,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Autowired
     private UserManagementService userManagementService;
-    
+
     @Autowired
     private GenericDao<User, Long> userDao;
 
@@ -1047,8 +1051,8 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
-        String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink, String customerDetail )
-        throws InvalidInputException, UndeliveredEmailException
+        String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink,
+        String customerDetail ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1058,7 +1062,7 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "syrveyDetail parameter is empty or null for sending account upgrade mail " );
             throw new InvalidInputException( "surveyDetail parameter is empty or null for sending survey completion mail " );
         }
-        
+
         if ( customerDetail == null || customerDetail.isEmpty() ) {
             LOG.error( "customerDetail parameter is empty or null for sending survey completion mail " );
             throw new InvalidInputException( "customerDetail parameter is empty or null for sending survey completion mail " );
@@ -1078,8 +1082,8 @@ public class EmailServicesImpl implements EmailServices
 
         if ( logoUrl == null || logoUrl.isEmpty() ) {
             messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, customerName, rating,
-                agentName, customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
-                String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
+                agentName, customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId,
+                recipientMailId, String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         } else {
             messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName,
                 customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
@@ -1422,7 +1426,8 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName(
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.MANUAL_REGISTRATION_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, fullName, fullName, link, link, link, applicationSupportEmail ) );
+        messageBodyReplacements
+            .setReplacementArgs( Arrays.asList( appLogoUrl, fullName, fullName, link, link, link, applicationSupportEmail ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
@@ -1827,27 +1832,28 @@ public class EmailServicesImpl implements EmailServices
 
         //JIRA SS-975
         //get companyId
-        User user = userDao.findById( User.class,  agentSettings.getIden());
+        User user = userDao.findById( User.class, agentSettings.getIden() );
         long companyId = user.getCompany().getCompanyId();
         //get company settings
-        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
-            companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         //get sendemailthrough
-        String sendEmailThrough=companySettings.getSendEmailThrough();
-        
+        String sendEmailThrough = companySettings.getSendEmailThrough();
+
         emailEntity.setSendEmailThrough( sendEmailThrough );
-        
+
         //JIRA SS-975 end
-        
+
         //checking for the right defaultEmailDomain
-        String defaultEmailDomain = null ;
-        if( sendEmailThrough == null || sendEmailThrough.isEmpty() || sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME ) ){
-            defaultEmailDomain = defaultSendGridMeEmailDomain ;
-        }else if( sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US  )){
-            defaultEmailDomain = defaultSendGridUsEmailDomain ;
+        String defaultEmailDomain = null;
+        if ( sendEmailThrough == null || sendEmailThrough.isEmpty()
+            || sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME ) ) {
+            defaultEmailDomain = defaultSendGridMeEmailDomain;
+        } else if ( sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US ) ) {
+            defaultEmailDomain = defaultSendGridUsEmailDomain;
         }
         emailEntity.setSenderEmailId( "u-" + agentSettings.getUserEncryptedId() + "@" + defaultEmailDomain );
-        
+
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );
 
         LOG.debug( "Prepared email entity for sending mail" );
@@ -2109,7 +2115,8 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void forwardCustomerReplyMail( String recipientMailId, String subject, String mailBody, String senderName,
-        String senderEmailAddress, String messageId, String sendUsingDomain ) throws InvalidInputException, UndeliveredEmailException
+        String senderEmailAddress, String messageId, String sendUsingDomain )
+        throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Executing the sendSurveyReminderMail() method" );
         boolean saveForwardMailDetails = true;
@@ -2166,11 +2173,11 @@ public class EmailServicesImpl implements EmailServices
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         emailEntity.setSenderName( senderName );
         emailEntity.setSenderEmailId( senderEmailAddress );
-        
-        if(sendUsingDomain != null && sendUsingDomain.equals(defaultSendGridUsEmailDomain)){
-            emailEntity.setSendEmailThrough(CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US);
+
+        if ( sendUsingDomain != null && sendUsingDomain.equals( defaultSendGridUsEmailDomain ) ) {
+            emailEntity.setSendEmailThrough( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US );
         }
-        
+
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmail( emailEntity, subject, mailBody, true, false );
         LOG.info( "Successfully forwarded customer reply mail from " + senderEmailAddress + " to : " + recipientMailId );
@@ -2308,8 +2315,8 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.info( "Method sendSocialMediaTokenExpiryEmail() finished." );
     }
-    
-    
+
+
     @Async
     @Override
     public void sendPaymentFailedAlertEmail( String recipientMailId, String displayName, String companyName )
@@ -2330,18 +2337,16 @@ public class EmailServicesImpl implements EmailServices
             + EmailTemplateConstants.PAYMENT_RETRIES_FAILED_MAIL_SUBJECT;
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements
-            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.PAYMENT_RETRIES_FAILED_MAIL_BODY );
-        messageBodyReplacements
-            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, companyName ) );
+        messageBodyReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.PAYMENT_RETRIES_FAILED_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, companyName ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
         LOG.info( "Successfully sent payment faield alert mail" );
     }
-    
-    
-    
+
+
     @Async
     @Override
     public void sendCancelSubscriptionRequestAlertMail( String recipientMailId, String displayName, String companyName )
@@ -2362,10 +2367,9 @@ public class EmailServicesImpl implements EmailServices
             + EmailTemplateConstants.CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_SUBJECT;
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements
-            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_BODY );
-        messageBodyReplacements
-            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, companyName ) );
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, companyName ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
@@ -2373,6 +2377,117 @@ public class EmailServicesImpl implements EmailServices
     }
 
 
+    @Override
+    public void sendEmailToAdminForUnsuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String errorMessage )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "method sendEmailToAdminForUnsuccessfulSurveyCsvUpload called" );
+
+        if ( csvInfo == null ) {
+            LOG.error( "Upload information is missing." );
+            throw new InvalidInputException( "Can't send email: Survey csv Upload information is missing." );
+        }
+        if ( StringUtils.isEmpty( errorMessage ) ) {
+            LOG.error( "error message is missing." );
+            throw new InvalidInputException( "Can't send email: Survey csv Upload message is missing." );
+        }
+
+        LOG.debug( "Sending survey csv upload unsuccessful email to : " + applicationAdminEmail );
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( applicationAdminEmail );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SURVEY_CSV_UPLOAD_UNSUCCESSFUL_ADMIN_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+
+        messageBodyReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_CSV_UPLOAD_UNSUCCESSFUL_ADMIN_BODY );
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl,
+            StringUtils.isEmpty( csvInfo.getFileName() ) ? CommonConstants.NOT_AVAILABLE : csvInfo.getFileName(),
+            csvInfo.getUploadedDate() == null ? CommonConstants.NOT_AVAILABLE : df.format( csvInfo.getUploadedDate() ),
+            StringUtils.isEmpty( csvInfo.get_id() ) ? CommonConstants.NOT_AVAILABLE : csvInfo.get_id(), errorMessage ) );
+
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
+    }
+
+
+    @Override
+    public void sendEmailToUploaderForUnsuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String message )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "method sendEmailToUploaderForUnsuccessfulSurveyCsvUpload called" );
+
+        if ( csvInfo == null ) {
+            LOG.error( "Upload information is missing." );
+            throw new InvalidInputException( "Can't send email: Survey csv Upload information is missing." );
+        }
+
+        if ( StringUtils.isEmpty( message ) ) {
+            LOG.error( "error message is missing." );
+            throw new InvalidInputException( "Can't send email: Survey csv Upload message is missing." );
+        }
+
+        if ( StringUtils.isEmpty( csvInfo.getUploaderEmail() ) ) {
+            LOG.error( "Recipient email Id is Missing" );
+            throw new InvalidInputException( "Can't send email: Recipient email Id is Missing." );
+        }
+
+        LOG.debug( "Sending survey csv upload unsuccessful email to : " + csvInfo.getUploaderEmail() );
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( csvInfo.getUploaderEmail() );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SURVEY_CSV_UPLOAD_UNSUCCESSFUL_AGENT_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+
+        messageBodyReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_CSV_UPLOAD_UNSUCCESSFUL_AGENT_BODY );
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, csvInfo.getUploaderEmail().split( "@" )[0],
+            StringUtils.isEmpty( csvInfo.getFileName() ) ? CommonConstants.NOT_AVAILABLE : csvInfo.getFileName(),
+            csvInfo.getUploadedDate() == null ? CommonConstants.NOT_AVAILABLE : df.format( csvInfo.getUploadedDate() ),
+            StringUtils.isEmpty( csvInfo.get_id() ) ? CommonConstants.NOT_AVAILABLE : csvInfo.get_id(), message ) );
+
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
+
+    }
+
+
+    @Override
+    public void sendEmailToUploaderForSuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String results )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "method sendEmailToUploaderForSuccessfulSurveyCsvUpload called" );
+
+        if ( csvInfo == null ) {
+            LOG.error( "Upload information is missing." );
+            throw new InvalidInputException( "Can't send email: Survey csv Upload information is missing." );
+        }
+
+        if ( StringUtils.isEmpty( csvInfo.getUploaderEmail() ) ) {
+            LOG.error( "Recipient email Id is Missing" );
+            throw new InvalidInputException( "Can't send email: Recipient email Id is Missing." );
+        }
+
+        LOG.debug( "Sending survey csv upload unsuccessful email to : " + csvInfo.getUploaderEmail() );
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( csvInfo.getUploaderEmail() );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SURVEY_CSV_UPLOAD_SUCCESSFUL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+
+        messageBodyReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_CSV_UPLOAD_SUCCESSFUL_BODY );
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, csvInfo.getUploaderEmail().split( "@" )[0],
+            StringUtils.isEmpty( csvInfo.getFileName() ) ? CommonConstants.NOT_AVAILABLE : csvInfo.getFileName(),
+            csvInfo.getUploadedDate() == null ? CommonConstants.NOT_AVAILABLE : df.format( csvInfo.getUploadedDate() ),
+            results ) );
+
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
+    }
 
 }
 
