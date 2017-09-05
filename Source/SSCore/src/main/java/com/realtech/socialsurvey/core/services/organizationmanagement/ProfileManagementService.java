@@ -679,5 +679,8 @@ public interface ProfileManagementService
 
 
     public String processSortCriteria( long companyId, String sortCriteria );
+    
+    public Integer fetchAndSaveNmlsId( OrganizationUnitSettings profile, String collectionName, long companyId,
+        boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException;
 
 }

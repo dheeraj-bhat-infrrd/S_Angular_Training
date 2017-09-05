@@ -1801,7 +1801,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             User user = null;
             if ( survey.getAgentEmailId() != null ) {
                 try {
-                    user = userManagementService.getActiveUserByEmailAndCompany( survey.getCompanyId(),
+                    user = userManagementService.getActiveAgentByEmailAndCompany( survey.getCompanyId(),
                         survey.getAgentEmailId() );
                 } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                     LOG.error( "No user found in database for the email id: " + survey.getAgentEmailId() + " and company id : "

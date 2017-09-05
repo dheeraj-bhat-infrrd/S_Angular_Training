@@ -1319,28 +1319,43 @@ public class EmailServicesImplTest
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestRecipientMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( null, null, "test", null, null, null, "test" );
+        emailServicesImpl.sendComplaintHandleMail( null, null, "test", "test", null, null, null, "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestRecipientMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( "", null, "test", null, null, null, "test" );
+        emailServicesImpl.sendComplaintHandleMail( "", null, "test","test", null, null, null, "test" );
+    }
+
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendComplaintHandleMailTestAgentNameNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendComplaintHandleMail( "test", null, "test", null, null, null, null, "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
+    public void sendComplaintHandleMailTestAgentNameEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendComplaintHandleMail( "test", null, "test", "", null, null, null, "test" );
+    }
+    
+
+    @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestCustomerMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( "test", null, null, null, null, null, "test" );
+        emailServicesImpl.sendComplaintHandleMail( "test", null, null, "test", null, null, null, "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestCustomerMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( "test", null, "", null, null, null, "test" );
+        emailServicesImpl.sendComplaintHandleMail( "test", null, "", "test", null, null, null, "test" );
     }
 
 
@@ -1348,7 +1363,7 @@ public class EmailServicesImplTest
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestSurveyDetailNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( "test", null, "test", null, null, null, null );
+        emailServicesImpl.sendComplaintHandleMail( "test", null, "test", "test", null, null, null, null );
     }
 
 
@@ -1356,7 +1371,7 @@ public class EmailServicesImplTest
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestSurveyDetailEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( "test", null, "test", null, null, null, "" );
+        emailServicesImpl.sendComplaintHandleMail( "test", null, "test", "test", null, null, null, "" );
     }
 
 

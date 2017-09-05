@@ -92,12 +92,89 @@
 			</list>
 		</property>
 	</bean>
+	
+	<bean id="sessionFactoryForReporting"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSourceForReporting" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+				<!-- Configurations specific to c3p0 connection pooling -->
+
+				<prop key="hibernate.c3p0.acquire_increment">5</prop>
+				<prop key="hibernate.c3p0.idle_test_period">1800</prop>
+				<prop key="hibernate.c3p0.max_size">600</prop>
+				<prop key="hibernate.c3p0.max_statements">50</prop>
+				<prop key="hibernate.c3p0.min_size">5</prop>
+				<prop key="hibernate.c3p0.timeout">1800</prop>
+			</props>
+		</property>
+		<property name="annotatedClasses">
+			<list>
+				<value>com.realtech.socialsurvey.core.entities.OverviewUser</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewCompany</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyResponseTable</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyStatsReportUser</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyStatsReportRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyStatsReportCompany</value>
+				<value>com.realtech.socialsurvey.core.entities.UserAdoptionReport</value>
+				<value>com.realtech.socialsurvey.core.entities.CompanyUserReport</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyTransactionReport</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyTransactionReportRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyTransactionReportBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewUserMonth</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewBranchMonth</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewRegionMonth</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewCompanyMonth</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewUserYear</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewBranchYear</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewRegionYear</value>
+				<value>com.realtech.socialsurvey.core.entities.OverviewCompanyYear</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisMonthBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisMonthMain</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisMonthRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisYearBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisYearMain</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingThisYearRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearMain</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastMonthBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastMonthMain</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastMonthRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearsBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearsMain</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearsRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.ScoreStatsOverallCompany</value>
+				<value>com.realtech.socialsurvey.core.entities.ScoreStatsOverallRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.ScoreStatsOverallBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.ScoreStatsOverallUser</value>
+				<value>com.realtech.socialsurvey.core.entities.ScoreStatsQuestionCompany</value>
+				<value>com.realtech.socialsurvey.core.entities.ScoreStatsQuestionRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.ScoreStatsQuestionBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser</value>
+			</list>
+		</property>
+	</bean>
 
 	<tx:annotation-driven transaction-manager="transactionManager" />
 
 	<!-- Transaction Manager being used for hibernate transactions -->
-	<bean id="transactionManager"
+	<bean id="transactionManager" primary="true"
 		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManagerForReporting" />
+	
+	<bean id="transactionManagerForReporting"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactoryForReporting" />
 	</bean>
 </beans>
