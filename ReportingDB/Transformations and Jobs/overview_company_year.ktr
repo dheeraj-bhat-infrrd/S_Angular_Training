@@ -419,7 +419,7 @@
         <field>
           <aggregate>rating</aggregate>
           <subject>rating</subject>
-          <type>AVERAGE</type>
+          <type>SUM</type>
           <valuefield/>
         </field>
         <field>
