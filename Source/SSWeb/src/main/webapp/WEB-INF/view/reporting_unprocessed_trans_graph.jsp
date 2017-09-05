@@ -4,7 +4,6 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 	
 <script>
-drawUnprocessedDonutChart();
 </script>
 
 <div id="unprocessed-graph-div" style="position:relative">

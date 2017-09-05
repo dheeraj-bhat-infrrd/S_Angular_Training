@@ -39,6 +39,9 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
+
+<div class="overlay-loader hide"></div>
+
 <div id="prof-container" data-profile-master-id="${profileMasterId}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
 			data-column-value="${columnValue}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
@@ -169,7 +172,7 @@
 	var currentProfileValue = $('#prof-container').attr('data-column-value');
 	var accountType = $('#prof-container').attr('data-account-type');
 		
-	paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
+	paintReportingDashboard();
 	
 	drawReportingDashButtons(currentProfileName, currentProfileValue);
 	
@@ -180,8 +183,6 @@
 			$('#overviewFailure').show();
 		} else {
 			$('#overviewSuccess').show();
-			drawCompletionRateGraph();
-			drawSpsStatsGraph();
 			$(window).resize();
 			$('#overviewFailure').hide();
 		}

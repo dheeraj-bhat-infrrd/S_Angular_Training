@@ -19,12 +19,12 @@
 	</div>
 </div>
 <script>
-$(document).ready(function() {
+/*$(document).ready(function() {
 	$(window).off('scroll');
 	$(window).scroll(function() {
 		if(window.location.hash.substr(1) == "showreportingpage") {
 			dashbaordReviewScroll();		
 		}
 	});
-});
+});*/
 </script>
