@@ -206,7 +206,7 @@ img.lead-img {
 		<span class="board-div-span">Filter</span>
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
-				<option value=3 data-report="company">Branch</option>
+				<option value=3 data-report="company">My Branch</option>
 				<option value=2 data-report="region">My Region</option>
 				<option value=1 data-report="region">My Company</option>
 			</select>	
@@ -218,7 +218,7 @@ img.lead-img {
 		<span class="board-div-span">Filter</span>
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
-				<option value=2 data-report="region">Region</option>
+				<option value=2 data-report="region">My Region</option>
 				<option value=1 data-report="region">My Company</option>
 			</select>	
 		</div>
@@ -230,7 +230,7 @@ img.lead-img {
 		<span class="board-div-span">Filter</span>
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
-				<option value=1 data-report="region">Company</option>
+				<option value=1 data-report="region">My Company</option>
 			</select>	
 		</div>
 	</div>
