@@ -186,7 +186,7 @@ img.lead-img {
 </div>
 
 <c:if test="${profilemasterid == 4}">
-	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 50px;">
+	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 25px;">
 		<span class="board-div-span">Filter</span>
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
@@ -202,7 +202,7 @@ img.lead-img {
 	</div>
 </c:if>
 <c:if test="${profilemasterid == 3}">
-	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 50px;">
+	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 25px;">
 		<span class="board-div-span">Filter</span>
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
@@ -214,7 +214,7 @@ img.lead-img {
 	</div>
 </c:if>
 <c:if test="${profilemasterid == 2}">
-	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 50px;">
+	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 25px;">
 		<span class="board-div-span">Filter</span>
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
@@ -226,8 +226,8 @@ img.lead-img {
 </c:if>
 
 <c:if test="${profilemasterid == 1}">
-	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 50px;">
-		<span class="board-div-span">Fitler</span>
+	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 25px;">
+		<span class="board-div-span">Filter</span>
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
 				<option value=1 data-report="region">Company</option>
