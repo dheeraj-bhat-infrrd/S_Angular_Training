@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name= "user_ranking_past_year_region")
@@ -77,6 +78,9 @@ public class UserRankingPastYearRegion
     
     @Column(name = "nmls_id")
     private String nmlsId; 
+    
+    @Transient
+    private String profileImageUrlThumbnail;
     
 	public int getAverageRating() {
 		return averageRating;
@@ -252,6 +256,18 @@ public class UserRankingPastYearRegion
   	public void setNmlsId(String nmlsId) {
   		this.nmlsId = nmlsId;
   	}
+  	
+  	
+
+    public String getProfileImageUrlThumbnail()
+    {
+        return profileImageUrlThumbnail;
+    }
+
+    public void setProfileImageUrlThumbnail( String profileImageUrlThumbnail )
+    {
+        this.profileImageUrlThumbnail = profileImageUrlThumbnail;
+    }
 
     @Override
     public String toString()
@@ -262,7 +278,7 @@ public class UserRankingPastYearRegion
             + ", rank=" + rank + ", sps=" + sps + ", daysOfRegistration=" + daysOfRegistration + ", completed=" + completed
             + ", sent=" + sent + ", completedPercentage=" + completedPercentage + ", totalReviews=" + totalReviews
             + ", averageRating=" + averageRating + ", isEligible=" + isEligible + ", internalRegionRank=" + internalRegionRank
-            + ", nmlsId=" + nmlsId + "]";
+            + ", nmlsId=" + nmlsId + ", profileImageUrlThumbnail=" + profileImageUrlThumbnail + "]";
     }
 
 }

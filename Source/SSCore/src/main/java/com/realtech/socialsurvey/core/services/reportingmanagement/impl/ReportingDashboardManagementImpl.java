@@ -1791,7 +1791,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         List<List<Object>> userRanking = new ArrayList<>();
         
         if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
-            for(UserRankingThisYearMain userRankingThisYearMain : userRankingThisYearMainDao.fetchUserRankingForThisYearMain(entityId, year,startIndex,batchSize)){
+            for(UserRankingThisYearMain userRankingThisYearMain : userRankingThisYearMainDao.fetchUserRankingWithProfileForThisYearMain(entityId, year,startIndex,batchSize)){
                 List<Object> userRankingThisYearMainList = new ArrayList<>();
                 userRankingThisYearMainList.add(userRankingThisYearMain.getUserId());
                 userRankingThisYearMainList.add(userRankingThisYearMain.getRank());
@@ -1803,10 +1803,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingThisYearMainList.add(userRankingThisYearMain.getSps());
                 userRankingThisYearMainList.add(userRankingThisYearMain.getCompletedPercentage());
                 userRankingThisYearMainList.add(userRankingThisYearMain.getIsEligible());
+                userRankingThisYearMainList.add(userRankingThisYearMain.getProfileImageUrlThumbnail());
+
                 userRanking.add(userRankingThisYearMainList);
             }
         }else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
-            for(UserRankingThisYearRegion userRankingThisYearRegion : userRankingThisYearRegionDao.fetchUserRankingForThisYearRegion(entityId, year,startIndex,batchSize)){
+            for(UserRankingThisYearRegion userRankingThisYearRegion : userRankingThisYearRegionDao.fetchUserRankingWithProfileForThisYearRegion(entityId, year,startIndex,batchSize)){
                 List<Object> userRankingThisYearRegionList = new ArrayList<>();
                 userRankingThisYearRegionList.add(userRankingThisYearRegion.getUserId());
                 userRankingThisYearRegionList.add(userRankingThisYearRegion.getRank());
@@ -1818,10 +1820,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingThisYearRegionList.add(userRankingThisYearRegion.getSps());
                 userRankingThisYearRegionList.add(userRankingThisYearRegion.getCompletedPercentage());
                 userRankingThisYearRegionList.add(userRankingThisYearRegion.getIsEligible());
+                userRankingThisYearRegionList.add(userRankingThisYearRegion.getProfileImageUrlThumbnail());
+
                 userRanking.add(userRankingThisYearRegionList);
             }
         }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
-            for(UserRankingThisYearBranch userRankingThisYearBranch : userRankingThisYearBranchDao.fetchUserRankingForThisYearBranch(entityId, year,startIndex,batchSize)){
+            for(UserRankingThisYearBranch userRankingThisYearBranch : userRankingThisYearBranchDao.fetchUserRankingWithProfileForThisYearBranch(entityId, year,startIndex,batchSize)){
                 List<Object> userRankingThisYearBranchList = new ArrayList<>();
                 userRankingThisYearBranchList.add(userRankingThisYearBranch.getUserId());
                 userRankingThisYearBranchList.add(userRankingThisYearBranch.getRank());
@@ -1833,6 +1837,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingThisYearBranchList.add(userRankingThisYearBranch.getSps());
                 userRankingThisYearBranchList.add(userRankingThisYearBranch.getCompletedPercentage());
                 userRankingThisYearBranchList.add(userRankingThisYearBranch.getIsEligible());
+                userRankingThisYearBranchList.add(userRankingThisYearBranch.getProfileImageUrlThumbnail());
+
                 userRanking.add(userRankingThisYearBranchList);
             }
         }
@@ -1845,7 +1851,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             List<List<Object>> userRanking = new ArrayList<>();
             
             if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
-                for(UserRankingThisMonthMain userRankingThisMonthMain : userRankingThisMonthMainDao.fetchUserRankingForThisMonthMain(entityId,month,year,startIndex,batchSize)){
+                for(UserRankingThisMonthMain userRankingThisMonthMain : userRankingThisMonthMainDao.fetchUserRankingWithProfileForThisMonthMain(entityId,month,year,startIndex,batchSize)){
                     List<Object> userRankingThisMonthMainList = new ArrayList<>();
                     userRankingThisMonthMainList.add(userRankingThisMonthMain.getUserId());
                     userRankingThisMonthMainList.add(userRankingThisMonthMain.getRank());
@@ -1857,10 +1863,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     userRankingThisMonthMainList.add(userRankingThisMonthMain.getSps());
                     userRankingThisMonthMainList.add(userRankingThisMonthMain.getCompletedPercentage());
                     userRankingThisMonthMainList.add(userRankingThisMonthMain.getIsEligible());
+                    userRankingThisMonthMainList.add(userRankingThisMonthMain.getProfileImageUrlThumbnail());
+
                     userRanking.add(userRankingThisMonthMainList);
                 }
             }else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
-                for(UserRankingThisMonthRegion userRankingThisMonthRegion : userRankingThisMonthRegionDao.fetchUserRankingForThisMonthRegion(entityId,month,year,startIndex,batchSize)){
+                for(UserRankingThisMonthRegion userRankingThisMonthRegion : userRankingThisMonthRegionDao.fetchUserRankingWithProfileForThisMonthRegion(entityId,month,year,startIndex,batchSize)){
                     List<Object> userRankingThisMonthRegionList = new ArrayList<>();
                     userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getUserId());
                     userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getRank());
@@ -1872,10 +1880,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getSps());
                     userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getCompletedPercentage());
                     userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getIsEligible());
+                    userRankingThisMonthRegionList.add(userRankingThisMonthRegion.getProfileImageUrlThumbnail());
+
                     userRanking.add(userRankingThisMonthRegionList);
                 }
             }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
-                for(UserRankingThisMonthBranch userRankingThisMonthBranch : userRankingThisMonthBranchDao.fetchUserRankingForThisMonthBranch(entityId,month,year,startIndex,batchSize)){
+                for(UserRankingThisMonthBranch userRankingThisMonthBranch : userRankingThisMonthBranchDao.fetchUserRankingWithProfileForThisMonthBranch(entityId,month,year,startIndex,batchSize)){
                     List<Object> userRankingThisMonthBranchList = new ArrayList<>();
                     userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getUserId());
                     userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getRank());
@@ -1887,6 +1897,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getSps());
                     userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getCompletedPercentage());
                     userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getIsEligible());
+                    userRankingThisMonthBranchList.add(userRankingThisMonthBranch.getProfileImageUrlThumbnail());
+
                     userRanking.add(userRankingThisMonthBranchList);
                 }
             }
@@ -1899,7 +1911,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         List<List<Object>> userRanking = new ArrayList<>();
         
         if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
-            for(UserRankingPastMonthRegion userRankingPastMonthRegion : userRankingPastMonthRegionDao.fetchUserRankingForPastMonthRegion(entityId,month,year,startIndex,batchSize)){
+            for(UserRankingPastMonthRegion userRankingPastMonthRegion : userRankingPastMonthRegionDao.fetchUserRankingWithProfileForPastMonthRegion(entityId,month,year,startIndex,batchSize)){
                 List<Object> userRankingPastMonthRegionList = new ArrayList<>();
                 userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getUserId());
                 userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getRank());
@@ -1911,10 +1923,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getSps());
                 userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getCompletedPercentage());
                 userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getIsEligible());
+                userRankingPastMonthRegionList.add(userRankingPastMonthRegion.getProfileImageUrlThumbnail());
+
                 userRanking.add(userRankingPastMonthRegionList);
             }
         }else if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
-            for(UserRankingPastMonthMain userRankingPastMonthMain : userRankingPastMonthMainDao.fetchUserRankingForPastMonthMain(entityId,month,year,startIndex,batchSize)){
+            for(UserRankingPastMonthMain userRankingPastMonthMain : userRankingPastMonthMainDao.fetchUserRankingWithProfileForPastMonthMain(entityId,month,year,startIndex,batchSize)){
                 List<Object> userRankingPastMonthMainList = new ArrayList<>();
                 userRankingPastMonthMainList.add(userRankingPastMonthMain.getUserId());
                 userRankingPastMonthMainList.add(userRankingPastMonthMain.getRank());
@@ -1926,10 +1940,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastMonthMainList.add(userRankingPastMonthMain.getSps());
                 userRankingPastMonthMainList.add(userRankingPastMonthMain.getCompletedPercentage());
                 userRankingPastMonthMainList.add(userRankingPastMonthMain.getIsEligible());
+                userRankingPastMonthMainList.add(userRankingPastMonthMain.getProfileImageUrlThumbnail());
+
                 userRanking.add(userRankingPastMonthMainList);
             }
         }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
-            for(UserRankingPastMonthBranch userRankingPastMonthBranch : userRankingPastMonthBranchDao.fetchUserRankingForPastMonthBranch(entityId,month,year,startIndex,batchSize)){
+            for(UserRankingPastMonthBranch userRankingPastMonthBranch : userRankingPastMonthBranchDao.fetchUserRankingWithProfileForPastMonthBranch(entityId,month,year,startIndex,batchSize)){
                 List<Object> userRankingPastMonthBranchList = new ArrayList<>();
                 userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getUserId());
                 userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getRank());
@@ -1941,6 +1957,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getSps());
                 userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getCompletedPercentage());
                 userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getIsEligible());
+                userRankingPastMonthBranchList.add(userRankingPastMonthBranch.getProfileImageUrlThumbnail());
+
                 userRanking.add(userRankingPastMonthBranchList);
             }
         }
@@ -1952,7 +1970,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         List<List<Object>> userRanking = new ArrayList<>();
         
         if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
-            for(UserRankingPastYearRegion userRankingPastYearRegion : userRankingPastYearRegionDao.fetchUserRankingForPastYearRegion(entityId, year,startIndex,batchSize)){
+            for(UserRankingPastYearRegion userRankingPastYearRegion : userRankingPastYearRegionDao.fetchUserRankingWithProfileForPastYearRegion(entityId, year,startIndex,batchSize)){
                 List<Object> userRankingPastYearRegionList = new ArrayList<>();
                 userRankingPastYearRegionList.add(userRankingPastYearRegion.getUserId());
                 userRankingPastYearRegionList.add(userRankingPastYearRegion.getRank());
@@ -1964,10 +1982,11 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastYearRegionList.add(userRankingPastYearRegion.getSps());
                 userRankingPastYearRegionList.add(userRankingPastYearRegion.getCompletedPercentage());
                 userRankingPastYearRegionList.add(userRankingPastYearRegion.getIsEligible());
+                userRankingPastYearRegionList.add( userRankingPastYearRegion.getProfileImageUrlThumbnail() );
                 userRanking.add(userRankingPastYearRegionList);
             }
         }else if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
-            for(UserRankingPastYearMain userRankingPastYearMain : userRankingPastYearMainDao.fetchUserRankingForPastYearMain(entityId, year,startIndex,batchSize)){
+            for(UserRankingPastYearMain userRankingPastYearMain : userRankingPastYearMainDao.fetchUserRankingWithProfileForPastYearMain(entityId, year,startIndex,batchSize)){
                 List<Object> userRankingPastYearMainList = new ArrayList<>();
                 userRankingPastYearMainList.add(userRankingPastYearMain.getUserId());
                 userRankingPastYearMainList.add(userRankingPastYearMain.getRank());
@@ -1979,10 +1998,11 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastYearMainList.add(userRankingPastYearMain.getSps());
                 userRankingPastYearMainList.add(userRankingPastYearMain.getCompletedPercentage());
                 userRankingPastYearMainList.add(userRankingPastYearMain.getIsEligible());
+                userRankingPastYearMainList.add(userRankingPastYearMain.getProfileImageUrlThumbnail() );
                 userRanking.add(userRankingPastYearMainList);
             }
         }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
-            for(UserRankingPastYearBranch userRankingPastYearBranch : userRankingPastYearBranchDao.fetchUserRankingForPastYearBranch(entityId, year,startIndex,batchSize)){
+            for(UserRankingPastYearBranch userRankingPastYearBranch : userRankingPastYearBranchDao.fetchUserRankingWithProfileForPastYearBranch(entityId, year,startIndex,batchSize)){
                 List<Object> userRankingPastYearBranchList = new ArrayList<>();
                 userRankingPastYearBranchList.add(userRankingPastYearBranch.getUserId());
                 userRankingPastYearBranchList.add(userRankingPastYearBranch.getRank());
@@ -1994,6 +2014,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastYearBranchList.add(userRankingPastYearBranch.getSps());
                 userRankingPastYearBranchList.add(userRankingPastYearBranch.getCompletedPercentage());
                 userRankingPastYearBranchList.add(userRankingPastYearBranch.getIsEligible());
+                userRankingPastYearBranchList.add( userRankingPastYearBranch.getProfileImageUrlThumbnail() );
+
                 userRanking.add(userRankingPastYearBranchList);
             }
         }
@@ -2005,7 +2027,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         List<List<Object>> userRanking = new ArrayList<>();
         
         if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
-            for(UserRankingPastYearsRegion userRankingPastYearsRegion : userRankingPastYearsRegionDao.fetchUserRankingForPastYearsRegion(entityId,startIndex,batchSize)){
+            for(UserRankingPastYearsRegion userRankingPastYearsRegion : userRankingPastYearsRegionDao.fetchUserRankingWithProfileForPastYearsRegion(entityId,startIndex,batchSize)){
                 List<Object> userRankingPastYearsRegionList = new ArrayList<>();
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getUserId());
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getRank());
@@ -2017,10 +2039,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getSps());
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getCompletedPercentage());
                 userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getIsEligible());
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getProfileImageUrlThumbnail());
+
                 userRanking.add(userRankingPastYearsRegionList);
             }
         }else if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
-            for(UserRankingPastYearsMain userRankingPastYearsMain : userRankingPastYearsMainDao.fetchUserRankingForPastYearsMain(entityId, startIndex,batchSize)){
+            for(UserRankingPastYearsMain userRankingPastYearsMain : userRankingPastYearsMainDao.fetchUserRankingWithProfileForPastYearsMain(entityId, startIndex,batchSize)){
                 List<Object> userRankingPastYearsMainList = new ArrayList<>();
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getUserId());
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getRank());
@@ -2032,10 +2056,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getSps());
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getCompletedPercentage());
                 userRankingPastYearsMainList.add(userRankingPastYearsMain.getIsEligible());
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.getProfileImageUrlThumbnail());
+
                 userRanking.add(userRankingPastYearsMainList);
             }
         }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
-            for(UserRankingPastYearsBranch userRankingPastYearsBranch : userRankingPastYearsBranchDao.fetchUserRankingForPastYearsBranch(entityId, startIndex,batchSize)){
+            for(UserRankingPastYearsBranch userRankingPastYearsBranch : userRankingPastYearsBranchDao.fetchUserRankingWithProfileForPastYearsBranch(entityId, startIndex,batchSize)){
                 List<Object> userRankingPastYearsBranchList = new ArrayList<>();
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getUserId());
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getRank());
@@ -2047,6 +2073,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getSps());
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getCompletedPercentage());
                 userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getIsEligible());
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getProfileImageUrlThumbnail());
+
                 userRanking.add(userRankingPastYearsBranchList);
             }
         }

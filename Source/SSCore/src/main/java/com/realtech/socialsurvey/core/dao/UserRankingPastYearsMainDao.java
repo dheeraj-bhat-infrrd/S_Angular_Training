@@ -7,10 +7,10 @@ import com.realtech.socialsurvey.core.entities.UserRankingPastYearsMain;
 public interface UserRankingPastYearsMainDao extends GenericReportingDao<UserRankingPastYearsMain, String>
 {
 
-    List<UserRankingPastYearsMain> fetchUserRankingForPastYearsMain( Long companyId, int startIndex, int batchSize );
-
     int fetchUserRankingRankForPastYearsMain( Long userId, Long companyId );
 
     long fetchUserRankingCountForPastYearsMain( Long companyId );
+
+    List<UserRankingPastYearsMain> fetchUserRankingWithProfileForPastYearsMain( Long companyId, int startIndex, int batchSize );
 
 }
