@@ -29,30 +29,7 @@ public class UserRankingThisYearMainDaoImpl extends GenericReportingDaoImpl<User
 	private static final String getForThisYearQuery = "select u.user_id, u.rank, u.first_name, u.last_name, u.ranking_score, u.total_reviews,"
         + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_this_year_main u left outer join agent_settings a "
 	    +"  on a.USER_ID = u.user_id where u.company_id=? and u.this_year=? order by u.rank asc limit ?, ?;";
-	
-	@Override
-	public List<UserRankingThisYearMain> fetchUserRankingForThisYearMain(Long companyId, int year , int startIndex , int batchSize) {
-		LOG.info( "method to fetch user ranking Main list for this year, fetchUserRankingForThisYearMain() started" );
-        Criteria criteria = getSession().createCriteria( UserRankingThisYearMain.class );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );    
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
-            }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.RANK ) );
-            }
-        catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForThisYearMain() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForThisYearMain() ", hibernateException );
-        }
 
-        LOG.info( "method to fetch user ranking main list for this year, fetchUserRankingForThisYearMain() finished." );
-        return (List<UserRankingThisYearMain>) criteria.list();
-	}
 	
 	@Override
     public List<UserRankingThisYearMain> fetchUserRankingWithProfileForThisYearMain(Long companyId, int year , int startIndex , int batchSize) {

@@ -29,29 +29,6 @@ public class UserRankingPastYearRegionDaoImpl extends GenericReportingDaoImpl< U
         + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_past_year_region u left outer join agent_settings a "
         +"  on a.USER_ID = u.user_id where u.region_id=? and u.year=? order by u.internal_region_rank asc limit ?, ?;";
 
-	@Override
-	public List<UserRankingPastYearRegion> fetchUserRankingForPastYearRegion(Long regionId, int year , int startIndex , int batchSize) {
-		LOG.info( "method to fetch user ranking region list for past year, fetchUserRankingForPastYearRegion() started" );
-        Criteria criteria = getSession().createCriteria( UserRankingPastYearRegion.class );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
-            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) );  
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
-            }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_REGION_RANK ) );
-            }
-        catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForPastYearRegion() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForPastYearRegion() ", hibernateException );
-        }
-
-        LOG.info( "method to fetch user ranking region list for past year, fetchUserRankingForPastYearRegion() finished." );
-        return (List<UserRankingPastYearRegion>) criteria.list();
-	}
 	
 	@Override
     public List<UserRankingPastYearRegion> fetchUserRankingWithProfileForPastYearRegion(Long regionId, int year , int startIndex , int batchSize) {

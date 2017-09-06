@@ -31,31 +31,6 @@ public class UserRankingPastMonthRegionDaoImpl extends GenericReportingDaoImpl<U
         +"  on a.USER_ID = u.user_id where u.region_id=? and u.month=? and u.year=? order by u.internal_region_rank asc limit ?, ?;";
 	
 	@Override
-	public List<UserRankingPastMonthRegion> fetchUserRankingForPastMonthRegion(Long regionId, int month, int year , int startIndex , int batchSize) {
-		LOG.info( "method to fetch user ranking region list for past month, fetchUserRankingForPastMonthRegion() started" );
-        Criteria criteria = getSession().createCriteria( UserRankingPastMonthRegion.class );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
-            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_MONTH, month ) );   
-            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) ); 
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
-            }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_REGION_RANK ) );
-            }
-        catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForPastMonthRegion() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForPastMonthRegion() ", hibernateException );
-        }
-
-        LOG.info( "method to fetch user ranking region list for past month, fetchUserRankingForPastMonthRegion() finished." );
-        return (List<UserRankingPastMonthRegion>) criteria.list();
-	}
-	
-	@Override
     public List<UserRankingPastMonthRegion> fetchUserRankingWithProfileForPastMonthRegion(Long regionId, int month, int year , int startIndex , int batchSize) {
         LOG.info( "method to fetch user ranking region list for past month, fetchUserRankingWithProfileForPastMonthRegion() started" );
         Criteria criteria = getSession().createCriteria( UserRankingPastMonthRegion.class );

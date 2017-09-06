@@ -31,29 +31,6 @@ public class UserRankingPastYearsRegionDaoImpl extends GenericReportingDaoImpl<U
         +"  on a.USER_ID = u.user_id where u.region_id=? order by u.internal_region_rank asc limit ?, ?;";
 
     @Override
-    public List<UserRankingPastYearsRegion> fetchUserRankingForPastYearsRegion(Long regionId , int startIndex , int batchSize) {
-        LOG.info( "method to fetch user ranking region list for past years, fetchUserRankingForPastsYearRegion() started" );
-        Criteria criteria = getSession().createCriteria( UserRankingPastYearsRegion.class );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
-            }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_REGION_RANK ) );
-            }
-        catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForPastsYearRegion() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForPastsYearRegion() ", hibernateException );
-        }
-
-        LOG.info( "method to fetch user ranking region list for past years, fetchUserRankingForPastsYearRegion() finished." );
-        return (List<UserRankingPastYearsRegion>) criteria.list();
-    }
-    
-    @Override
     public List<UserRankingPastYearsRegion> fetchUserRankingWithProfileForPastYearsRegion(Long regionId, int startIndex , int batchSize) {
         LOG.info( "method to fetch user ranking region list for past years, fetchUserRankingWithProfileForPastYearsRegion() started" );
         Criteria criteria = getSession().createCriteria( UserRankingPastYearsRegion.class );

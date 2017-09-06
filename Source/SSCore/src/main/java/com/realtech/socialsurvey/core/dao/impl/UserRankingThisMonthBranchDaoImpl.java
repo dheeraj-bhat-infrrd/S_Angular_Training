@@ -27,31 +27,6 @@ public class UserRankingThisMonthBranchDaoImpl extends GenericReportingDaoImpl<U
 	private static final String getForThisYearQuery = "select u.user_id, u.rank, u.first_name, u.last_name, u.ranking_score, u.total_reviews,"
         + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_this_month_branch u left outer join agent_settings a "
         +"  on a.USER_ID = u.user_id where u.branch_id=? and u.this_month=? and u.this_year=? order by u.internal_branch_rank asc limit ?, ?;";
-	
-	@Override
-	public List<UserRankingThisMonthBranch> fetchUserRankingForThisMonthBranch(Long branchId, int month, int year , int startIndex , int batchSize) {
-		LOG.info( "method to fetch user ranking branch list for this month, fetchUserRankingForThisMonthBranch() started" );
-        Criteria criteria = getSession().createCriteria( UserRankingThisMonthBranch.class );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
-            criteria.add( Restrictions.eq( CommonConstants.THIS_MONTH, month ) ); 
-            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );   
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
-            }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_BRANCH_RANK ) );
-            }
-        catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForThisMonthBranch() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForThisMonthBranch() ", hibernateException );
-        }
-
-        LOG.info( "method to fetch user ranking branch list for this month, fetchUserRankingForThisMonthBranch() finished." );
-        return (List<UserRankingThisMonthBranch>) criteria.list();
-	}
 
 	@Override
     public List<UserRankingThisMonthBranch> fetchUserRankingWithProfileForThisMonthBranch(Long branchId, int month, int year , int startIndex , int batchSize) {

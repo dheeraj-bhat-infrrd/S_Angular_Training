@@ -28,28 +28,6 @@ public class UserRankingPastYearsMainDaoImpl extends GenericReportingDaoImpl<Use
         + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_past_years_main u left outer join agent_settings a "
         +"  on a.USER_ID = u.user_id where u.company_id=? order by u.rank asc limit ?, ?;";
 
-    @Override
-    public List<UserRankingPastYearsMain> fetchUserRankingForPastYearsMain(Long companyId, int startIndex , int batchSize) {
-        LOG.info( "method to fetch user ranking Main list for past year, fetchUserRankingForPastYearsMain() started" );
-        Criteria criteria = getSession().createCriteria( UserRankingPastYearsMain.class );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
-            }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.RANK ) );
-            }
-        catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForPastYearsMain() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForPastYearsMain() ", hibernateException );
-        }
-
-        LOG.info( "method to fetch user ranking main list for past years, fetchUserRankingForPastYearsMain() finished." );
-        return (List<UserRankingPastYearsMain>) criteria.list();
-    }
 
     @Override
     public List<UserRankingPastYearsMain> fetchUserRankingWithProfileForPastYearsMain(Long companyId, int startIndex , int batchSize) {

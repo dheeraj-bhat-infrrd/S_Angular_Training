@@ -29,31 +29,7 @@ public class UserRankingPastMonthBranchDaoImpl extends GenericReportingDaoImpl<U
         + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_past_month_branch u left outer join agent_settings a "
         +"  on a.USER_ID = u.user_id where u.branch_id=? and u.month=? and u.year=? order by u.internal_branch_rank asc limit ?, ?;";
 	
-	@Override
-	public List<UserRankingPastMonthBranch> fetchUserRankingForPastMonthBranch(Long branchId, int month, int year , int startIndex , int batchSize) {
-		LOG.info( "method to fetch user ranking branch list for past month, fetchUserRankingForPastMonthBranch() started" );
-        Criteria criteria = getSession().createCriteria( UserRankingPastMonthBranch.class );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
-            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_MONTH, month ) ); 
-            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) );  
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
-            }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_BRANCH_RANK ) );
-            }
-        catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForPastMonthBranch() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForPastMonthBranch() ", hibernateException );
-        }
 
-        LOG.info( "method to fetch user ranking branch list for past month, fetchUserRankingForPastMonthBranch() finished." );
-        return (List<UserRankingPastMonthBranch>) criteria.list();
-	}
-	
 	@Override
     public List<UserRankingPastMonthBranch> fetchUserRankingWithProfileForPastMonthBranch(Long branchId, int month, int year , int startIndex , int batchSize) {
         LOG.info( "method to fetch user ranking branch list for past month, fetchUserRankingWithProfileForPastMonthBranch() started" );

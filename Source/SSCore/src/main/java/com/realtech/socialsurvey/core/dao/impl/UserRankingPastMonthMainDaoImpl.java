@@ -28,31 +28,7 @@ public class UserRankingPastMonthMainDaoImpl extends GenericReportingDaoImpl<Use
         + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_past_month_main u left outer join agent_settings a "
         +"  on a.USER_ID = u.user_id where u.company_id=? and u.month=? and u.year=? order by u.rank asc limit ?, ?;";
 	
-	@Override
-	public List<UserRankingPastMonthMain> fetchUserRankingForPastMonthMain(Long companyId, int month, int year , int startIndex , int batchSize) {
-		LOG.info( "method to fetch user ranking Main list for past month, fetchUserRankingForPastMonthMain() started" );
-        Criteria criteria = getSession().createCriteria( UserRankingPastMonthMain.class );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_MONTH, month ) );
-            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) );
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
-            }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.RANK ) );
-            }
-        catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForPastMonthMain() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForPastMonthMain() ", hibernateException );
-        }
 
-        LOG.info( "method to fetch user ranking main list for past month, fetchUserRankingForPastMonthMain() finished." );
-        return (List<UserRankingPastMonthMain>) criteria.list();
-	}
-	
 	@Override
     public List<UserRankingPastMonthMain> fetchUserRankingWithProfileForPastMonthMain(Long companyId, int month, int year , int startIndex , int batchSize) {
         LOG.info( "method to fetch user ranking Main list for past month, fetchUserRankingWithProfileForPastMonthMain() started" );

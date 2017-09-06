@@ -28,29 +28,6 @@ public class UserRankingThisYearBranchDaoImpl extends GenericReportingDaoImpl<Us
         + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_this_year_branch u left outer join agent_settings a "
         +"  on a.USER_ID = u.user_id where u.branch_id=? and u.this_year=? order by u.internal_branch_rank asc limit ?, ?;";
 	
-	@Override
-	public List<UserRankingThisYearBranch> fetchUserRankingForThisYearBranch(Long branchId, int year , int startIndex, int batchSize ) {
-		LOG.info( "method to fetch user ranking branch list for this year, fetchUserRankingForThisYearBranch() started" );
-        Criteria criteria = getSession().createCriteria( UserRankingThisYearBranch.class );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
-            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
-            }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_BRANCH_RANK ) );
-            }
-        catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForThisYearBranch() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForThisYearBranch() ", hibernateException );
-        }
-
-        LOG.info( "method to fetch user ranking branch list for this year, fetchUserRankingForThisYearBranch() finished." );
-        return (List<UserRankingThisYearBranch>) criteria.list();
-	}
 	
 	@Override
     public List<UserRankingThisYearBranch> fetchUserRankingWithProfileForThisYearBranch(Long branchId, int year , int startIndex , int batchSize) {

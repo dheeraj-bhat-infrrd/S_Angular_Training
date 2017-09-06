@@ -31,31 +31,6 @@ public class UserRankingThisMonthRegionDaoImpl extends GenericReportingDaoImpl<U
         + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_this_month_region u left outer join agent_settings a "
         +"  on a.USER_ID = u.user_id where u.region_id=? and u.this_month=? and u.this_year=? order by u.internal_region_rank asc limit ?, ?;";
 
-	@Override
-	public List<UserRankingThisMonthRegion> fetchUserRankingForThisMonthRegion(Long regionId, int month, int year , int startIndex , int batchSize) {
-		LOG.info( "method to fetch user ranking region list for this month, fetchUserRankingForThisMonthRegion() started" );
-        Criteria criteria = getSession().createCriteria( UserRankingThisMonthRegion.class );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
-            criteria.add( Restrictions.eq( CommonConstants.THIS_MONTH, month ) );
-            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );  
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
-            }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_REGION_RANK ) );
-            }
-        catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForThisMonthRegion() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForThisMonthRegion() ", hibernateException );
-        }
-
-        LOG.info( "method to fetch user ranking region list for this month, fetchUserRankingForThisMonthRegion() finished." );
-        return (List<UserRankingThisMonthRegion>) criteria.list();
-		
-	}
 
 	@Override
     public List<UserRankingThisMonthRegion> fetchUserRankingWithProfileForThisMonthRegion(Long regionId, int month, int year , int startIndex , int batchSize) {
