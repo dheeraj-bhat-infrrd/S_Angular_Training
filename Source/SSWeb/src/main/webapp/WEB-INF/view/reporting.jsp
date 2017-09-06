@@ -172,7 +172,7 @@
 	var currentProfileValue = $('#prof-container').attr('data-column-value');
 	var accountType = $('#prof-container').attr('data-account-type');
 		
-	paintReportingDashboard();
+	paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
 	
 	drawReportingDashButtons(currentProfileName, currentProfileValue);
 	
