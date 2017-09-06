@@ -12,4 +12,7 @@ public interface UserRankingThisYearRegionDao extends GenericReportingDao<UserRa
     long fetchUserRankingCountForThisYearRegion( Long regionId, int year );
 
     List<UserRankingThisYearRegion> fetchUserRankinReportForThisYearRegion( Long regionId, int year );
+
+    List<UserRankingThisYearRegion> fetchUserRankingWithProfileForThisYearRegion( Long regionId, int year, int startIndex,
+        int batchSize );
 }

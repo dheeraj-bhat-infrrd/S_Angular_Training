@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -22,6 +23,10 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 public class UserRankingThisYearBranchDaoImpl extends GenericReportingDaoImpl<UserRankingThisYearBranch, String> implements UserRankingThisYearBranchDao{
 
 	private static final Logger LOG = LoggerFactory.getLogger( UserRankingThisYearBranchDaoImpl.class );
+	
+	private static final String getForThisYearQuery = "select u.user_id, u.rank, u.first_name, u.last_name, u.ranking_score, u.total_reviews,"
+        + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_this_year_branch u left outer join agent_settings a "
+        +"  on a.USER_ID = u.user_id where u.branch_id=? and u.this_year=? order by u.internal_branch_rank asc limit ?, ?;";
 	
 	@Override
 	public List<UserRankingThisYearBranch> fetchUserRankingForThisYearBranch(Long branchId, int year , int startIndex, int batchSize ) {
@@ -46,6 +51,49 @@ public class UserRankingThisYearBranchDaoImpl extends GenericReportingDaoImpl<Us
         LOG.info( "method to fetch user ranking branch list for this year, fetchUserRankingForThisYearBranch() finished." );
         return (List<UserRankingThisYearBranch>) criteria.list();
 	}
+	
+	@Override
+    public List<UserRankingThisYearBranch> fetchUserRankingWithProfileForThisYearBranch(Long branchId, int year , int startIndex , int batchSize) {
+        LOG.info( "method to fetch user ranking branch list for this year, fetchUserRankingWithProfileForThisYearBranch() started" );
+        Criteria criteria = getSession().createCriteria( UserRankingThisYearBranch.class );
+        List<UserRankingThisYearBranch> userRankingList = new ArrayList<>();
+
+        try {
+            Query query = getSession().createSQLQuery( getForThisYearQuery );
+            query.setParameter( 0, branchId );
+            query.setParameter( 1, year );
+            query.setParameter( 2, startIndex );
+            query.setParameter( 3, batchSize );
+
+            LOG.debug( "QUERY : " + query.getQueryString() );
+            List<Object[]> rows = (List<Object[]>) query.list();
+            
+            for ( Object[] row : rows ) {
+                UserRankingThisYearBranch userRankingThisYearBranch = new UserRankingThisYearBranch();
+                userRankingThisYearBranch.setUserId( Long.valueOf( String.valueOf( row[0] ) )  );
+                userRankingThisYearBranch.setRank( Integer.valueOf( String.valueOf( row[1] ) ) );
+                userRankingThisYearBranch.setFirstName( String.valueOf( row[2] ) );
+                userRankingThisYearBranch.setLastName( String.valueOf( row[3] ) );
+                userRankingThisYearBranch.setRankingScore( Float.valueOf( String.valueOf( row[4] ) ) );
+                userRankingThisYearBranch.setTotalReviews( Integer.valueOf( String.valueOf( row[5] ) ) );
+                userRankingThisYearBranch.setAverageRating( Integer.valueOf( String.valueOf( row[6] ) )  );
+                userRankingThisYearBranch.setSps(  Float.valueOf( String.valueOf( row[7] ) )  );
+                userRankingThisYearBranch.setCompletedPercentage(  Float.valueOf( String.valueOf( row[8] ) ) );
+                userRankingThisYearBranch.setIsEligible( Integer.valueOf( String.valueOf( row[9] ) ) );
+                userRankingThisYearBranch.setProfileImageUrlThumbnail( String.valueOf( row[10] ) );
+                userRankingList.add( userRankingThisYearBranch );
+                
+                
+            }
+            }
+        catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchUserRankingWithProfileForThisYearBranch() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingWithProfileForThisYearBranch() ", hibernateException );
+        }
+
+        LOG.info( "method to fetch user ranking branch list for this year, fetchUserRankingWithProfileForThisYearBranch() finished." );
+        return userRankingList;
+    }
 	
 	@Override
     public List<UserRankingThisYearBranch> fetchUserRankingReportForThisYearBranch(Long branchId, int year ) {

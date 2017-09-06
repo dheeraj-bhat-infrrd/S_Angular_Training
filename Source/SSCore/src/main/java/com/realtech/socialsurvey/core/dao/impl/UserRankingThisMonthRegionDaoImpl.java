@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -25,6 +26,10 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 public class UserRankingThisMonthRegionDaoImpl extends GenericReportingDaoImpl<UserRankingThisMonthRegion, String> implements UserRankingThisMonthRegionDao {
 	
 	private static final Logger LOG = LoggerFactory.getLogger( UserRankingThisMonthRegionDaoImpl.class );
+	
+	private static final String getForThisYearQuery = "select u.user_id, u.rank, u.first_name, u.last_name, u.ranking_score, u.total_reviews,"
+        + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_this_month_region u left outer join agent_settings a "
+        +"  on a.USER_ID = u.user_id where u.region_id=? and u.this_month=? and u.this_year=? order by u.internal_region_rank asc limit ?, ?;";
 
 	@Override
 	public List<UserRankingThisMonthRegion> fetchUserRankingForThisMonthRegion(Long regionId, int month, int year , int startIndex , int batchSize) {
@@ -52,6 +57,50 @@ public class UserRankingThisMonthRegionDaoImpl extends GenericReportingDaoImpl<U
 		
 	}
 
+	@Override
+    public List<UserRankingThisMonthRegion> fetchUserRankingWithProfileForThisMonthRegion(Long regionId, int month, int year , int startIndex , int batchSize) {
+        LOG.info( "method to fetch user ranking region list for this month, fetchUserRankingWithProfileForThisMonthRegion() started" );
+        Criteria criteria = getSession().createCriteria( UserRankingThisMonthRegion.class );
+        List<UserRankingThisMonthRegion> userRankingList = new ArrayList<>();
+
+        try {
+            Query query = getSession().createSQLQuery( getForThisYearQuery );
+            query.setParameter( 0, regionId );
+            query.setParameter( 1, month );
+            query.setParameter( 2, year );
+            query.setParameter( 3, startIndex );
+            query.setParameter( 4, batchSize );
+
+            LOG.debug( "QUERY : " + query.getQueryString() );
+            List<Object[]> rows = (List<Object[]>) query.list();
+            
+            for ( Object[] row : rows ) {
+                UserRankingThisMonthRegion userRankingThisMonthRegion = new UserRankingThisMonthRegion();
+                userRankingThisMonthRegion.setUserId( Long.valueOf( String.valueOf( row[0] ) )  );
+                userRankingThisMonthRegion.setRank( Integer.valueOf( String.valueOf( row[1] ) ) );
+                userRankingThisMonthRegion.setFirstName( String.valueOf( row[2] ) );
+                userRankingThisMonthRegion.setLastName( String.valueOf( row[3] ) );
+                userRankingThisMonthRegion.setRankingScore( Float.valueOf( String.valueOf( row[4] ) ) );
+                userRankingThisMonthRegion.setTotalReviews( Integer.valueOf( String.valueOf( row[5] ) ) );
+                userRankingThisMonthRegion.setAverageRating( Integer.valueOf( String.valueOf( row[6] ) )  );
+                userRankingThisMonthRegion.setSps(  Float.valueOf( String.valueOf( row[7] ) )  );
+                userRankingThisMonthRegion.setCompletedPercentage(  Float.valueOf( String.valueOf( row[8] ) ) );
+                userRankingThisMonthRegion.setIsEligible( Integer.valueOf( String.valueOf( row[9] ) ) );
+                userRankingThisMonthRegion.setProfileImageUrlThumbnail( String.valueOf( row[10] ) );
+                userRankingList.add( userRankingThisMonthRegion );
+                
+                
+            }
+            }
+        catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchUserRankingWithProfileForThisMonthRegion() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingWithProfileForThisMonthRegion() ", hibernateException );
+        }
+
+        LOG.info( "method to fetch user ranking region list for this month, fetchUserRankingWithProfileForThisMonthRegion() finished." );
+        return userRankingList;
+    }
+    
 	@Override
     public List<UserRankingThisMonthRegion> fetchUserRankingReportForThisMonthRegion(Long regionId, int month, int year ) {
         LOG.info( "method to fetch user ranking region list for this month, fetchUserRankingForThisMonthRegion() started" );
