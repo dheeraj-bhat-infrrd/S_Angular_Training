@@ -54,7 +54,7 @@
 		<div id="passivesValue" class="float-left dash-sel-lbl" style="color: #999999; text-align:left; margin-left:5px"></div>
 	</div>
 	<div class="rep-det-div">
-		<div class="float-left dash-sel-lbl rep-dash-lbl-sel-prom">Promotors</div>
+		<div class="float-left dash-sel-lbl rep-dash-lbl-sel-prom">Promoters</div>
 		<div id="promotersBar" class="float-left dash-sel-lbl"
 			style=" height:65%; background:#7ab400; margin:auto 2px"></div>
 		<div id="promotersValue" class="float-left dash-sel-lbl" style="color: #7ab400; text-align:left; margin-left:5px"></div>
