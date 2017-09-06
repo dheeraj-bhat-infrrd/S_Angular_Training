@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name= "user_ranking_this_year_main")
@@ -74,7 +75,10 @@ public class UserRankingThisYearMain
     private	int isEligible;
 
     @Column(name = "nmls_id")
-    private String nmlsId;     
+    private String nmlsId;   
+    
+    @Transient
+    private String profileImageUrlThumbnail;
     
 	public int getAverageRating() {
 		return averageRating;
@@ -243,6 +247,16 @@ public class UserRankingThisYearMain
 		this.nmlsId = nmlsId;
 	}
 	
+    public String getProfileImageUrlThumbnail()
+    {
+        return profileImageUrlThumbnail;
+    }
+
+    public void setProfileImageUrlThumbnail( String profileImageUrlThumbnail )
+    {
+        this.profileImageUrlThumbnail = profileImageUrlThumbnail;
+    }
+
     @Override
     public String toString()
     {
@@ -251,6 +265,7 @@ public class UserRankingThisYearMain
             + ", firstName=" + firstName + ", lastName=" + lastName + ", emailId=" + emailId + ", rankingScore=" + rankingScore
             + ", rank=" + rank + ", sps=" + sps + ", daysOfRegistration=" + daysOfRegistration + ", completed=" + completed
             + ", sent=" + sent + ", completedPercentage=" + completedPercentage + ", totalReviews=" + totalReviews
-            + ", averageRating=" + averageRating + ", isEligible=" + isEligible + ", nmlsId=" + nmlsId + "]";
+            + ", averageRating=" + averageRating + ", isEligible=" + isEligible + ", nmlsId=" + nmlsId
+            + ", profileImageUrlThumbnail=" + profileImageUrlThumbnail + "]";
     }
 }

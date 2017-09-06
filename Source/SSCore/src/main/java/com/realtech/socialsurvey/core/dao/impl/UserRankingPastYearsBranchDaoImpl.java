@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -24,28 +25,53 @@ public class UserRankingPastYearsBranchDaoImpl extends GenericReportingDaoImpl<U
 {
     private static final Logger LOG = LoggerFactory.getLogger( UserRankingPastYearsBranchDaoImpl.class );
 
+    private static final String getForThisYearQuery = "select u.user_id, u.rank, u.first_name, u.last_name, u.ranking_score, u.total_reviews,"
+        + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_past_years_branch u left outer join agent_settings a "
+        +"  on a.USER_ID = u.user_id where u.branch_id=? order by u.internal_branch_rank asc limit ?, ?;";
+    
+    
     @Override
-    public List<UserRankingPastYearsBranch> fetchUserRankingForPastYearsBranch(Long branchId , int startIndex , int batchSize) {
-        LOG.info( "method to fetch user ranking branch list for past years, fetchUserRankingForPastYearsBranch() started" );
+    public List<UserRankingPastYearsBranch> fetchUserRankingWithProfileForPastYearsBranch(Long branchId, int startIndex , int batchSize) {
+        LOG.info( "method to fetch user ranking branch list for past years, fetchUserRankingWithProfileForPastYearsBranch() started" );
         Criteria criteria = getSession().createCriteria( UserRankingPastYearsBranch.class );
+        List<UserRankingPastYearsBranch> userRankingList = new ArrayList<>();
+
         try {
-            criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
+            Query query = getSession().createSQLQuery( getForThisYearQuery );
+            query.setParameter( 0, branchId );
+            query.setParameter( 1, startIndex );
+            query.setParameter( 2, batchSize );
+
+            LOG.debug( "QUERY : " + query.getQueryString() );
+            List<Object[]> rows = (List<Object[]>) query.list();
+            
+            for ( Object[] row : rows ) {
+                UserRankingPastYearsBranch userRankingPastYearsBranch = new UserRankingPastYearsBranch();
+                userRankingPastYearsBranch.setUserId( Long.valueOf( String.valueOf( row[0] ) )  );
+                userRankingPastYearsBranch.setRank( Integer.valueOf( String.valueOf( row[1] ) ) );
+                userRankingPastYearsBranch.setFirstName( String.valueOf( row[2] ) );
+                userRankingPastYearsBranch.setLastName( String.valueOf( row[3] ) );
+                userRankingPastYearsBranch.setRankingScore( Float.valueOf( String.valueOf( row[4] ) ) );
+                userRankingPastYearsBranch.setTotalReviews( Integer.valueOf( String.valueOf( row[5] ) ) );
+                userRankingPastYearsBranch.setAverageRating( Integer.valueOf( String.valueOf( row[6] ) )  );
+                userRankingPastYearsBranch.setSps(  Float.valueOf( String.valueOf( row[7] ) )  );
+                userRankingPastYearsBranch.setCompletedPercentage(  Float.valueOf( String.valueOf( row[8] ) ) );
+                userRankingPastYearsBranch.setIsEligible( Integer.valueOf( String.valueOf( row[9] ) ) );
+                userRankingPastYearsBranch.setProfileImageUrlThumbnail( String.valueOf( row[10] ) );
+                userRankingList.add( userRankingPastYearsBranch );
+                
+                
             }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_BRANCH_RANK ) );
             }
         catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForPastYearsBranch() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForPastYearsBranch() ", hibernateException );
+            LOG.error( "Exception caught in fetchUserRankingWithProfileForPastYearsBranch() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingWithProfileForPastYearsBranch() ", hibernateException );
         }
 
-        LOG.info( "method to fetch user ranking branch list for past years, fetchUserRankingForPastYearsBranch() finished." );
-        return (List<UserRankingPastYearsBranch>) criteria.list();
+        LOG.info( "method to fetch user ranking branch list for past years, fetchUserRankingWithProfileForPastYearsBranch() finished." );
+        return userRankingList;
     }
+
 
 	@Override
 	public int fetchUserRankingRankForPastYearsBranch(Long userId, Long branchId) {

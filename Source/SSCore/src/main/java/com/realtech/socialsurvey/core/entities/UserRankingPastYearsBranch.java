@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name= "user_ranking_past_years_branch")
@@ -75,6 +76,9 @@ public class UserRankingPastYearsBranch
     @Column(name = "nmls_id")
     private String nmlsId; 
 
+    @Transient
+    private String profileImageUrlThumbnail;
+    
     public String getUserRankingPastYearsBranchId()
     {
         return userRankingPastYearsBranchId;
@@ -271,6 +275,16 @@ public class UserRankingPastYearsBranch
   		this.nmlsId = nmlsId;
   	}
 
+    public String getProfileImageUrlThumbnail()
+    {
+        return profileImageUrlThumbnail;
+    }
+
+    public void setProfileImageUrlThumbnail( String profileImageUrlThumbnail )
+    {
+        this.profileImageUrlThumbnail = profileImageUrlThumbnail;
+    }
+
     @Override
     public String toString()
     {
@@ -280,7 +294,7 @@ public class UserRankingPastYearsBranch
             + sps + ", daysOfRegistration=" + daysOfRegistration + ", completed=" + completed + ", sent=" + sent
             + ", completedPercentage=" + completedPercentage + ", totalReviews=" + totalReviews + ", averageRating="
             + averageRating + ", isEligible=" + isEligible + ", internalBranchRank=" + internalBranchRank + ", nmlsId=" + nmlsId
-            + "]";
+            + ", profileImageUrlThumbnail=" + profileImageUrlThumbnail + "]";
     }
 
 }
