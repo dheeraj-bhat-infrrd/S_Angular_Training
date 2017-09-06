@@ -532,8 +532,24 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-grph-sel-item');
 }
 
-function paintReportingDashboard() {
-		
+function paintReportingDashboard(profileMasterId, newProfileName, newProfileValue, typeoOfAccount) {
+	accountType = typeoOfAccount;
+	startIndexCmp = 0;
+	batchSizeCmp = 9;
+	doStopPaginationDashboard = false;
+	isDashboardReviewRequestRunning = false;
+	reviewsFetchedSoFar = 0;
+	startIndexInc = 0;
+	batchSizeInc = 10;
+	totalReviewsInc = 0;
+	surveyFetchedSoFarInc = 0;
+
+	lastColNameForCount = newProfileName;
+	lastColValueForCount = newProfileValue;
+
+	colName = newProfileName;
+	colValue = newProfileValue;
+
 	fetchReviewsOnDashboard(false);
 }
 
