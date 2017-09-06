@@ -1159,7 +1159,7 @@ function displayIncompleteSurveysOnDashboard() {
 $(document).on('click', '.dash-lp-rt-img', function() {
 	var surveyPreInitiationId = $(this).data("surveypreinitiationid");
 	var customerName = $(this).data("custname");
-	sendSurveyReminderMail(surveyPreInitiationId, customerName, '.dash-lp-rt-img');
+	sendSurveyReminderMail(surveyPreInitiationId, customerName, '#dsh-inc-srvey');
 });
 
 var isDashboardReviewRequestRunning = false;
@@ -1753,7 +1753,6 @@ function sendSurveyReminderMail(surveyPreInitiationId, customerName, disableEle)
 	}
 
 	disable(disableEle);
-	var success = false;
 	var payload = {
 		"surveyPreInitiationId" : surveyPreInitiationId
 	};
@@ -1764,15 +1763,20 @@ function sendSurveyReminderMail(surveyPreInitiationId, customerName, disableEle)
 		cache : false,
 		data : payload,
 		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
+			if (data.errMsg == undefined || data.errMsg == ""){
+				var toastmsg = data.success;
+				$('#overlay-toast').html(toastmsg);
+				showToastLong();
+			}else{
+				var toastmsg = data.errMsg;
+				$('#overlay-toast').html(toastmsg);
+				showToastLong();
+			}
+			
 		},
 		complete : function(data) {
 			enable(disableEle);
-			if (success) {
-				$('#overlay-toast').html(data);
-				showToast();
-			}
+			
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -8928,13 +8932,16 @@ $(document).on('click', '#resend-mult-sur-icn.mult-sur-icn-active', function() {
 });
 
 function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
+	showOverlay();
 	callAjaxPOSTWithTextData("/resendmultipleincompletesurveyrequest.do?surveysSelected=" + incompleteSurveyIds, function(data) {
-		if (data == "success") {
+		if (data.errMsg == undefined || data.errMsg == "") {
 			// unselect all the options after deleting
 			$('#icn-sur-popup-cont').data('selected-survey', []);
 
-			$('#overlay-toast').html('Survey reminder request resent successfully');
-			showToast();
+			var toastmsg = data.success;
+			$('#overlay-toast').html(toastmsg);
+			showToastLong();
+			
 			$('#del-mult-sur-icn').removeClass('mult-sur-icn-active');
 			$('#resend-mult-sur-icn').removeClass('mult-sur-icn-active');
 			$('#icn-sur-popup-cont').data('selected-survey', []);
@@ -8949,6 +8956,10 @@ function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
 			// update the page
 			var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
 			paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
+		}else{
+			var toastmsg = data.errMsg;
+			$('#overlay-toast').html(errCode);
+			showToastLong();
 		}
 	}, true, {});
 }

@@ -500,7 +500,7 @@ public interface CommonConstants
     public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
     public static final float DEFAULT_COMPLAINT_RES_SCORE = 2.5f;
     public static final int DEFAULT_REMINDERMAIL_INTERVAL = 3;
-    public static final int DEFAULT_MAX_REMINDER_COUNT = 1;
+    public static final int DEFAULT_MAX_REMINDER_COUNT = 3;
     public static final int DEFAULT_SOCIAL_POST_REMINDERMAIL_INTERVAL = 1;
     public static final int DEFAULT_MAX_SOCIAL_POST_REMINDER_COUNT = 1;
     public static final String USER_SELECTION_TYPE_SINGLE = "single";

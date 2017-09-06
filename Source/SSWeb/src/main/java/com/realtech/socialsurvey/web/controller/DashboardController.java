@@ -1095,6 +1095,8 @@ public class DashboardController
     {
         LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() started." );
 
+        Map<String, String> response = new HashMap<String, String>();
+        
         try {
             String surveyPreInitiationIdStr = request.getParameter( "surveyPreInitiationId" );
 
@@ -1126,25 +1128,30 @@ public class DashboardController
             
             //check if max survey reminder has been reached
             if(survey.getReminderCounts() >= maxReminderCount){
-                return new Gson().toJson( "No more reminder mails are allowed");
+                response.put("success" ,  "No more reminder mails are allowed for " + survey.getCustomerEmailId()  );
+                return new Gson().toJson( response );
             }
             
             Calendar yesterDayDate = Calendar.getInstance();
             yesterDayDate.add( Calendar.DATE, -1 );
             if(survey.getLastReminderTime().after(  yesterDayDate.getTime() )  ){
-                return new Gson().toJson( "Can't send reminder email. A reminder has already been sent in last 24 hours");
+                response.put("success" ,  "Can't send reminder email. A reminder has already been sent in last 24 hours to " + survey.getCustomerEmailId()   );
+                return new Gson().toJson( response );
             }
             
             surveyHandler.sendSurveyReminderEmail( survey );
             // Increasing value of reminder count by 1.
             surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
             
+            response.put("success" ,  "Reminder mail sent successfully to " + survey.getCustomerEmailId()   );
+            
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e );
+            response.put("errMsg" , e.getMessage());
         }
 
         LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() finished." );
-        return new Gson().toJson( "Reminder Mail successfully sent" );
+        return new Gson().toJson( response );
     }
 
 
@@ -1163,6 +1170,9 @@ public class DashboardController
 
         String surveysSelectedStr = request.getParameter( "surveysSelected" );
         String[] surveysSelectedArray = surveysSelectedStr.split( "," );
+        Map<String, String> response = new HashMap<String, String>();
+        String responseMsg = "";
+        
         try {
             for ( String incompleteSurveyIdStr : surveysSelectedArray ) {
                 try {
@@ -1189,29 +1199,33 @@ public class DashboardController
                     
                     //check if max survey reminder has been reached
                     if(survey.getReminderCounts() >= maxReminderCount){
-                        return new Gson().toJson( "No more reminder mails are allowed");
+                        responseMsg +=  "No more reminder mails are allowed to " + survey.getCustomerEmailId();
+                        continue;
                     }
                     
                     Calendar yesterDayDate = Calendar.getInstance();
                     yesterDayDate.add( Calendar.DATE, -1 );
                     if(survey.getLastReminderTime().after(  yesterDayDate.getTime() )  ){
-                        return new Gson().toJson( "Can't send reminder email. A reminder has already been sent in last 24 hours");
+                        responseMsg += "Can't send reminder email. A reminder has already been sent in last 24 hours for " + survey.getCustomerEmailId() ;
+                        continue;
                     }
                     
                     surveyHandler.sendSurveyReminderEmail( survey );
                     // Increasing value of reminder count by 1.
                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
+                    responseMsg += "Reminder mail sent successfully to " + survey.getCustomerEmailId();
                 } catch ( NumberFormatException e ) {
                     throw new NonFatalException(
                         "Number format exception occured while parsing incomplete survey id : " + incompleteSurveyIdStr, e );
                 }
             }
+            response.put("success" , responseMsg );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "Nonfatal exception occured in method sendMultipleSurveyReminders, reason : "
                 + nonFatalException.getMessage() );
-            return CommonConstants.ERROR;
+            response.put("errMsg" , nonFatalException.getMessage());
         }
-        return CommonConstants.SUCCESS_ATTRIBUTE;
+        return new Gson().toJson( response );
     }
 
 
