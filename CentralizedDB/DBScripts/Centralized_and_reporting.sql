@@ -1,5 +1,5 @@
-CREATE DATABASE  IF NOT EXISTS `ss_report_demo` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `ss_report_demo`;
+CREATE DATABASE  IF NOT EXISTS `ss_report` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `ss_report`;
 -- MySQL dump 10.13  Distrib 5.7.12, for Win64 (x86_64)
 --
 -- Host: ss-report-demo.c3n1qsdsmjxc.us-west-2.rds.amazonaws.com    Database: ss_report_demo
