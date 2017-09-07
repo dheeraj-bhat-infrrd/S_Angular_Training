@@ -743,8 +743,8 @@ public class WorkbookData
         userAdoptionReportToPopulate.add( "Region" );
         userAdoptionReportToPopulate.add( "Branch" );
         userAdoptionReportToPopulate.add( "Invited Users" );
-        userAdoptionReportToPopulate.add( "Active Users" );
-        userAdoptionReportToPopulate.add( "Adoption Reports" );
+        userAdoptionReportToPopulate.add( "Verified Users" );
+        userAdoptionReportToPopulate.add( "Adoption Percentage" );
         userAdoptionData.put( 1, userAdoptionReportToPopulate );
         
         return userAdoptionData;

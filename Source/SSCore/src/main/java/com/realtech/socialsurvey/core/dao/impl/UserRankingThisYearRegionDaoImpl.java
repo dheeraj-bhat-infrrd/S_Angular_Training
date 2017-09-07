@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -24,30 +25,54 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 public class UserRankingThisYearRegionDaoImpl extends GenericReportingDaoImpl<UserRankingThisYearRegion, String> implements UserRankingThisYearRegionDao{
 	
 	private static final Logger LOG = LoggerFactory.getLogger( UserRankingThisYearRegionDaoImpl.class );
+	
+	private static final String getForThisYearQuery = "select u.user_id, u.rank, u.first_name, u.last_name, u.ranking_score, u.total_reviews,"
+        + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_this_year_region u left outer join agent_settings a "
+        +"  on a.USER_ID = u.user_id where u.region_id=? and u.this_year=? order by u.internal_region_rank asc limit ?, ?;";
 
+	
 	@Override
-	public List<UserRankingThisYearRegion> fetchUserRankingForThisYearRegion(Long regionId, int year , int startIndex , int batchSize) {
-		LOG.info( "method to fetch user ranking region list for this year, fetchUserRankingForThisYearRegion() started" );
+    public List<UserRankingThisYearRegion> fetchUserRankingWithProfileForThisYearRegion(Long regionId, int year , int startIndex , int batchSize) {
+        LOG.info( "method to fetch user ranking region list for this year, fetchUserRankingWithProfileForThisYearRegion() started" );
         Criteria criteria = getSession().createCriteria( UserRankingThisYearRegion.class );
+        List<UserRankingThisYearRegion> userRankingList = new ArrayList<>();
+
         try {
-            criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
-            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );   
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
+            Query query = getSession().createSQLQuery( getForThisYearQuery );
+            query.setParameter( 0, regionId );
+            query.setParameter( 1, year );
+            query.setParameter( 2, startIndex );
+            query.setParameter( 3, batchSize );
+
+            LOG.debug( "QUERY : " + query.getQueryString() );
+            List<Object[]> rows = (List<Object[]>) query.list();
+            
+            for ( Object[] row : rows ) {
+                UserRankingThisYearRegion userRankingThisYearRegion = new UserRankingThisYearRegion();
+                userRankingThisYearRegion.setUserId( Long.valueOf( String.valueOf( row[0] ) )  );
+                userRankingThisYearRegion.setRank( Integer.valueOf( String.valueOf( row[1] ) ) );
+                userRankingThisYearRegion.setFirstName( String.valueOf( row[2] ) );
+                userRankingThisYearRegion.setLastName( String.valueOf( row[3] ) );
+                userRankingThisYearRegion.setRankingScore( Float.valueOf( String.valueOf( row[4] ) ) );
+                userRankingThisYearRegion.setTotalReviews( Integer.valueOf( String.valueOf( row[5] ) ) );
+                userRankingThisYearRegion.setAverageRating( Integer.valueOf( String.valueOf( row[6] ) )  );
+                userRankingThisYearRegion.setSps(  Float.valueOf( String.valueOf( row[7] ) )  );
+                userRankingThisYearRegion.setCompletedPercentage(  Float.valueOf( String.valueOf( row[8] ) ) );
+                userRankingThisYearRegion.setIsEligible( Integer.valueOf( String.valueOf( row[9] ) ) );
+                userRankingThisYearRegion.setProfileImageUrlThumbnail( String.valueOf( row[10] ) );
+                userRankingList.add( userRankingThisYearRegion );
+                
+                
             }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.INTERNAL_REGION_RANK ) );
             }
         catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForThisYearRegion() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForThisYearRegion() ", hibernateException );
+            LOG.error( "Exception caught in fetchUserRankingWithProfileForThisYearRegion() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingWithProfileForThisYearRegion() ", hibernateException );
         }
 
-        LOG.info( "method to fetch user ranking region list for this year, fetchUserRankingForThisYearRegion() finished." );
-        return (List<UserRankingThisYearRegion>) criteria.list();
-	}
+        LOG.info( "method to fetch user ranking region list for this year, fetchUserRankingWithProfileForThisYearRegion() finished." );
+        return userRankingList;
+    }
 	
 	@Override
     public List<UserRankingThisYearRegion> fetchUserRankinReportForThisYearRegion(Long regionId, int year ) {

@@ -25,6 +25,10 @@
     border-bottom-color: #2f69aa;
     }
 </style>
+
+<c:set value="${cannonicalusersettings.companySettings.iden}" var="companyId"></c:set>
+<c:set value="${userId}" var="userId"></c:set>
+
 <c:choose>
 	<c:when test="${columnName == 'companyId'}">
 		<c:set value="1" var="profilemasterid"></c:set>
@@ -39,6 +43,9 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
+
+<div class="overlay-loader hide"></div>
+
 <div id="prof-container" data-profile-master-id="${profileMasterId}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
 			data-column-value="${columnValue}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
@@ -103,7 +110,7 @@
 				<jsp:include page="reporting_transaction_details.jsp"></jsp:include>
 			</div>
 			
-			<div id="reportingDashTabs" class=" col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:5px; display:inline-block; padding: 0;">
+			<div id="reportingDashTabs" class=" col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:15px; display:inline-block; padding: 0;">
 				<ul class="nav nav-tabs" role="tablist">
 					<li id="overview-btn" class="active"><a href="#overview-tab" data-toggle="tab">Overview</a></li>
 					<li id="leaderboard-btn"><a href="#leaderboard-tab" data-toggle="tab">LeaderBoard</a></li>
@@ -147,11 +154,12 @@
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Reporting Dashboard");
-
+	
 		updateViewAsScroll();
 		
 		paintForReportingDash()
 		
+		$(window).resize();
 		
 	$('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
 			e.stopPropagation();
@@ -169,9 +177,9 @@
 	var currentProfileValue = $('#prof-container').attr('data-column-value');
 	var accountType = $('#prof-container').attr('data-account-type');
 		
-	paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
-	
 	drawReportingDashButtons(currentProfileName, currentProfileValue);
+	
+	drawOverviewPage();
 	
 	var showOverview = getOverviewData();
 	
@@ -180,9 +188,6 @@
 			$('#overviewFailure').show();
 		} else {
 			$('#overviewSuccess').show();
-			drawCompletionRateGraph();
-			drawSpsStatsGraph();
-			$(window).resize();
 			$('#overviewFailure').hide();
 		}
 		
@@ -190,9 +195,21 @@
 		var entityType = "${columnName}";
 		var entityId = "${columnValue}";
 
+		var companyId = "${companyId}";
+		var userId = "${userId}";
+		var profileMasterIdLead = "${profilemasterid}";
+		var columnName = "${columnName}";
+		var columnId = "${columnValue}";
+		
+		
+		drawLeaderboardPage(columnName, columnId, profileMasterIdLead, userId, companyId);
+		
 		drawOverallScoreStatsGraph(entityId, entityType);		
 		
 		drawQuestionScoreStatsGraph(entityId, entityType);
+		
+		paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
+		
 		hideOverlay();
 	});
 </script>

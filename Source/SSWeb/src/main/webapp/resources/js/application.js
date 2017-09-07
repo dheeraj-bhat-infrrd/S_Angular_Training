@@ -535,12 +535,12 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 function paintReportingDashboard(profileMasterId, newProfileName, newProfileValue, typeoOfAccount) {
 	accountType = typeoOfAccount;
 	startIndexCmp = 0;
-	batchSizeCmp = 5;
+	batchSizeCmp = 9;
 	doStopPaginationDashboard = false;
 	isDashboardReviewRequestRunning = false;
 	reviewsFetchedSoFar = 0;
 	startIndexInc = 0;
-	batchSizeInc = 6;
+	batchSizeInc = 10;
 	totalReviewsInc = 0;
 	surveyFetchedSoFarInc = 0;
 
@@ -550,10 +550,6 @@ function paintReportingDashboard(profileMasterId, newProfileName, newProfileValu
 	colName = newProfileName;
 	colValue = newProfileValue;
 
-	/*if (newProfileName != null) {
-		showDashboardButtons(newProfileName, newProfileValue);
-	}*/
-	
 	fetchReviewsOnDashboard(false);
 }
 
@@ -7910,62 +7906,6 @@ function paintForProfile() {
 	// Common call for all cases
 	fetchAvgRating(attrName, attrVal);
 	fetchReviewCount(attrName, attrVal, minScore);
-	fetchReviewsOnEditProfile(attrName, attrVal, false);
-}
-
-function paintForReportingDash() {
-	profileId = $('#profile-id').val();
-	var companyId = $('#prof-company-id').val();
-	var regionId = $('#prof-region-id').val();
-	var branchId = $('#prof-branch-id').val();
-	var agentId = $('#prof-agent-id').val();
-
-	if (companyId != undefined) {
-		attrName = "companyId";
-		attrVal = companyId;
-
-		fetchHierarchy("companyProfileName", $("#company-profile-name").val());
-	} else if (regionId != undefined) {
-		attrName = "regionId";
-		attrVal = regionId;
-
-		fetchHierarchy(attrName, attrVal);
-	} else if (branchId != undefined) {
-		attrName = "branchId";
-		attrVal = branchId;
-
-		fetchHierarchy(attrName, attrVal);
-	} else if (agentId != undefined) {
-		attrName = "agentId";
-		attrVal = agentId;
-	}
-	startIndex = 0;
-	doStopReviewsPaginationEditProfile = false;
-	isReviewsRequestRunningEditProfile = false;
-	$('#prof-review-item').html('');
-	
-	// Common call for all cases
-	var monthYear = getTimeFrameValue();
-	var overviewYearData;
-	
-	if(monthYear.month == 14){
-		overviewYearData = getoverviewAllTimeData();
-	}else if(monthYear.month == 13){
-    	overviewYearData =  getoverviewYearData(monthYear.year);
-    }else{
-    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
-    }
-	if(overviewYearData != null){
-		var avgRating = overviewYearData.Rating;
-		var reviewCount=  overviewYearData.TotalReview;
-		paintAvgRating(avgRating);
-		paintReviewCount(reviewCount);
-	}else{
-		var avgRating = 0;
-		var reviewCount=  0;
-		paintAvgRating(avgRating);
-		paintReviewCount(reviewCount);
-	}
 	fetchReviewsOnEditProfile(attrName, attrVal, false);
 }
 
