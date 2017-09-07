@@ -81,6 +81,7 @@ hr{
 	</div>
 </div>
 <div id="rep-trans-graphs" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 rep-trans-graphs" style="height: 341px;">
+	<div id="unclicked-graph-dash" class="hide" ></div>
 	<div id="chart-icn-btn" style="display:inline-flex; margin-left: -10px;" class="cursor-pointer">
 		<!--  img id="unclicked-chart-icn" class="unclicked-chart-icn prof-image-edit pos-relative cursor-pointer" src="${initParam.resourcesPath}/resources/images/unclicked-chart-icon-small.png"></img-->
 		<div id="chart-icn-graph-div" style="position:relative">

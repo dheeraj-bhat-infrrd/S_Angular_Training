@@ -62,14 +62,16 @@
 </div>
 
 <div class="col-lg-6 col-md-6 col-sm-6">
+	<div id="sps-dash" class="hide" ></div>
 	<jsp:include page="reporting_spsStatsGraph.jsp"></jsp:include>
 </div>
 
 <div id="graphTabs" class="col-md-12 col-lg-12 col-sm-12 col-xs-12" style="margin-top: 10px; display: inline-block; float:left; width:100%;height:360px; border-top:1px solid #d2cdcd;margin-left:15px">
 	<span class="rep-sps-lbl" style="margin-top: 13px;">Completion Rate</span>
+	<div id="completion-graph-dash" class="hide" ></div>
 	<jsp:include page="reporting_completionRateGraph.jsp"></jsp:include>
 </div>
 
 <script>
-drawOverviewPage();
+
 </script>
