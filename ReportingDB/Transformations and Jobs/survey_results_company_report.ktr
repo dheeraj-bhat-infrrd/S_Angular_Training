@@ -1435,7 +1435,7 @@
     <name>Select UserProfile Branch</name>
     <type>SelectValues</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -2738,7 +2738,7 @@
     <name>UserProfile Join Branch</name>
     <type>DBJoin</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>

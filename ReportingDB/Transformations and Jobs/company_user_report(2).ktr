@@ -494,7 +494,7 @@
     <name>DatabaseIsDefault</name>
     <type>DBJoin</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
