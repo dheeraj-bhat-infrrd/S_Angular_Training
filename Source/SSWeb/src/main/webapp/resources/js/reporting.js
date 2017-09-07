@@ -94,7 +94,7 @@ function paintForReportingDash() {
 }
 
 function drawLeaderboardPage(columnName, columnId,profileMasterId,userId,companyId){
-	
+	showDashOverlay('#leaderboard-dash');
 	var batchSize = 10;
 	var startIndex=0;
 	var count=0;
@@ -137,6 +137,10 @@ function drawLeaderboardPage(columnName, columnId,profileMasterId,userId,company
 		$('#leaderboard-list').addClass('hide');
 		$('#leaderboard-empty-list-msg-div').removeClass('hide');
 	}
+	
+	setTimeout(function(){
+		hideDashOverlay('#leaderboard-dash');
+	}, 2000);
 }
 //draw sps graphs and completion rate graphs functions
 function drawSpsStatsGraph(){

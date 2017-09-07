@@ -29,7 +29,6 @@
  display:block !important;
 }
 </style>
-
 <div class="hm-header-main-wrapper hm-hdr-bord-bot"
 	style="background: #2f69aa">
 	<div class="container">
@@ -198,6 +197,7 @@ $(document).ready(function(){
 showHideRankPaginateBtns(startIndex, count);
 	
 $(document).on('click','#lead-ranks-above-btn',function(){
+	showDashOverlay('#leaderboard-dash');
 	showOverlay();
 	startIndex -= 10;
 	if(startIndex<=0){
@@ -267,11 +267,14 @@ $(document).on('click','#lead-ranks-above-btn',function(){
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
 	 
-	
+	 setTimeout(function(){
+			hideDashOverlay('#leaderboard-dash');
+		}, 1000);
 });
 
 $(document).on('click','#lead-ranks-below-btn',function(){
-	showOverlay();
+	showDashOverlay('#leaderboard-dash'); 
+	
 	startIndex += 10;
 	if(startIndex>=count){
 		startIndex = count;
@@ -338,10 +341,14 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
+	
+	 setTimeout(function(){
+			hideDashOverlay('#leaderboard-dash');
+		}, 1000);
 });
 
 $(document).on('change', '#time-selector', function() {
-	showOverlay();
+	showDashOverlay('#leaderboard-dash');
 	timeFrameStr = $('#time-selector').val();
 	timeFrame = parseInt(timeFrameStr);
 	startIndex = 0;
@@ -427,11 +434,15 @@ $(document).on('change', '#time-selector', function() {
 	 $('html, body').animate({
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
+	 
+	 setTimeout(function(){
+			hideDashOverlay('#leaderboard-dash');
+		}, 1000);
 	 
 });
 
 $(document).on('change', '#board-selector', function() {
-	showOverlay();
+	showDashOverlay('#leaderboard-dash');
 	timeFrameStr = $('#time-selector').val();
 	timeFrame = parseInt(timeFrameStr);
 	startIndex = 0;
@@ -517,10 +528,13 @@ $(document).on('change', '#board-selector', function() {
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
 	 
+	 setTimeout(function(){
+			hideDashOverlay('#leaderboard-dash');
+		}, 1000);
 });
 
 $(document).on('click','#top-ten-ranks-btn',function(){
-	showOverlay();
+	showDashOverlay('#leaderboard-dash');
 	startIndex=0;
 	
 	timeFrameStr = $('#time-selector').val();
@@ -585,10 +599,13 @@ $(document).on('click','#top-ten-ranks-btn',function(){
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
 	
+	 setTimeout(function(){
+			hideDashOverlay('#leaderboard-dash');
+		}, 1000);
 });
 
 $(document).on('click','#my-rank-btn',function(){
-	showOverlay();
+	showDashOverlay('#leaderboard-dash');
 	startIndex=0;
 	
 	timeFrameStr = $('#time-selector').val();
@@ -648,6 +665,9 @@ $(document).on('click','#my-rank-btn',function(){
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
 	
+	setTimeout(function(){
+		hideDashOverlay('#leaderboard-dash');
+	}, 1000);
 });
 
 });

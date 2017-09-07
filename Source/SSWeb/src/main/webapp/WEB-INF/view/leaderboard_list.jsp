@@ -29,6 +29,9 @@
     padding-left: 11.1%;
 }
 </style>
+
+<div id="leaderboard-dash" class="hide" ></div>
+
 <div id="leaderboard-tbl">
 
 </div>
