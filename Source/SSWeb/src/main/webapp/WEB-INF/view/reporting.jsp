@@ -110,7 +110,7 @@
 				<jsp:include page="reporting_transaction_details.jsp"></jsp:include>
 			</div>
 			
-			<div id="reportingDashTabs" class=" col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:5px; display:inline-block; padding: 0;">
+			<div id="reportingDashTabs" class=" col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:15px; display:inline-block; padding: 0;">
 				<ul class="nav nav-tabs" role="tablist">
 					<li id="overview-btn" class="active"><a href="#overview-tab" data-toggle="tab">Overview</a></li>
 					<li id="leaderboard-btn"><a href="#leaderboard-tab" data-toggle="tab">LeaderBoard</a></li>

@@ -1655,9 +1655,6 @@ function updateSocialMediaList(stages,socialMedia){
 	
 	socialMediaList.push(socialMedia);
 	
-	if(socialMediaList.length >= stages.length){
-		socialMediaList.length = 0;
-	}
 }
 
 function clickProcessedDiv(){
@@ -2078,6 +2075,10 @@ function getProfileImageByUserId(userId){
 
 function saveRankingSettings(minDaysOfRegistration, minCompletedPercentage, minNoOfReviews, monthOffset, yearOffset){
 	
+	if(minCompletedPercentage>100 || minCompletedPercentage<0){
+		return "Invalid Value for Completion Percentage. Setting for Ranking Could not be Saved";
+	}
+	
 	var url = "/saverankingsettings.do?minDaysOfRegistration="+minDaysOfRegistration
 		+"&minCompletedPercentage="+minCompletedPercentage
 		+"&minNoOfReviews="+minNoOfReviews
@@ -2100,6 +2101,7 @@ function saveRankingSettings(minDaysOfRegistration, minCompletedPercentage, minN
 			message = "Setting for Ranking Could not be Saved"; 
 		}
 	});
+	
 	return message;
 }
 
