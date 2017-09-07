@@ -1195,6 +1195,7 @@ function updateReportingDashboard(){
 	drawUnclickedDonutChart(overviewYearData);
 	drawProcessedDonutChart(overviewYearData);
 	drawUnprocessedDonutChart(overviewYearData);
+	$(window).resize();
 	hideOverlay();
 	
 	if(overviewYearData==null){
@@ -1202,6 +1203,7 @@ function updateReportingDashboard(){
 		$('#processed-trans-graph').addClass('hide');
 		$('#unprocessed-trans-graph').addClass('hide');
 	}
+	
 }
 
 function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
