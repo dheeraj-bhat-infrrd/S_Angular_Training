@@ -6,6 +6,7 @@ var socialMediaList = new Array();
 
 function paintForReportingDash() {
 	
+	showDashOverlay('#unclicked-graph-dash');
 	var monthYear = getTimeFrameValue();
 	var overviewYearData = null;
 	
@@ -75,17 +76,71 @@ function paintForReportingDash() {
 	}	
 	
 	$(window).resize(function(){
+		 showDashOverlay('#unclicked-graph-dash');
 		 $('#unclicked-trans-graph').removeClass('hide');
 		 drawUnclickedDonutChart(overviewYearData);
 			drawProcessedDonutChart(overviewYearData);
 			drawUnprocessedDonutChart(overviewYearData);
 			$('#unprocessed-trans-graph').addClass('hide');
 			$('#processed-trans-graph').addClass('hide');
+			setTimeout(function(){
+				hideDashOverlay('#unclicked-graph-dash');
+			}, 3000);
 	 });
+	setTimeout(function(){
+		hideDashOverlay('#unclicked-graph-dash');
+	}, 3000);
+	
 }
 
+function drawLeaderboardPage(columnName, columnId,profileMasterId,userId,companyId){
+	
+	var batchSize = 10;
+	var startIndex=0;
+	var count=0;
+	var timeFrame = 1;
+	var currentDate = new Date();
+	var currentYear = currentDate.getFullYear();
+	var currentMonth = currentDate.getMonth()+1;
+	var userRankingCount =null;
+	
+	if(profileMasterId != 4){
+		userRankingCount = getUserRankingCountForAdmins(columnName, columnId, currentYear, currentMonth, batchSize, timeFrame)
+		if(userRankingCount != null){
+			startIndex= 0;
+			count=userRankingCount.Count;
+		}
+	}else{
+		userRankingCount = getUserRankingCount("companyId", companyId, currentYear, currentMonth, batchSize, timeFrame);
+		if(userRankingCount != null){
+			startIndex= userRankingCount.startIndex;
+			count=userRankingCount.Count;
+		}
+	}
+	
+	$('#rank-count').html('/'+count);
+	
+	var userRankingList = null;
+	if(profileMasterId != 4){
+		userRankingList = getUserRankingList(columnName,columnId, currentYear, currentMonth, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList("companyId",companyId, currentYear, currentMonth, startIndex, batchSize, timeFrame);
+	}
+	
+	var tableData='';
+	if(userRankingList != null && userRankingList.length != 0){
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
+		$('#leaderboard-list').removeClass('hide');
+		$('#leaderboard-tbl').html(tableData);
+		$('#leaderboard-empty-list-msg-div').addClass('hide');
+	}else{
+		$('#leaderboard-list').addClass('hide');
+		$('#leaderboard-empty-list-msg-div').removeClass('hide');
+	}
+}
 //draw sps graphs and completion rate graphs functions
 function drawSpsStatsGraph(){
+	showDashOverlay('#sps-dash');
 	var chartData;
 	var spsChartData = [[ 'SPS', 'Detractors', 'Passives', 'Promoters'],[]];
 	google.charts.load('current', {	packages : [ 'corechart', 'bar' ]});
@@ -180,18 +235,23 @@ function drawSpsStatsGraph(){
 												chart.draw(data, options);
 											}
 					},
+					complete:function(){
+						hideDashOverlay('#sps-dash');
+					},
 					error : function(e) {
 						if (e.status == 504) {
 							redirectToLoginPageOnSessionTimeOut(e.status);
 							return;
 						}
 						drawEmptyChart();
+						hideDashOverlay('#sps-dash')
 					}
 				});
 	}
 }
 
 function drawCompletionRateGraph(){
+	showDashOverlay('#completion-graph-dash');
 	google.charts.load('current', {'packages':['corechart']});
 	google.charts.setOnLoadCallback(drawChart);
 
@@ -306,12 +366,16 @@ function drawCompletionRateGraph(){
 												chart.draw(data, options);
 											}
 					},
+					complete: function(){
+						hideDashOverlay('#completion-graph-dash');
+					},
 					error : function(e) {
 						if (e.status == 504) {
 							redirectToLoginPageOnSessionTimeOut(e.status);
 							return;
 						}
 						drawEmptyChart();
+						hideDashOverlay('#completion-graph-dash');
 					}
 				});
 	}
@@ -1359,6 +1423,7 @@ function splitAndEditDate(monthYear){
 }
 
 function drawOverallScoreStatsGraph(entityId, entityType){
+		
 	var overallChartDiv = "overall-rating-chart";
 	var overallScoreStats = getOverallScoreStats(entityId, entityType);
 	
@@ -1388,6 +1453,7 @@ function drawOverallScoreStatsGraph(entityId, entityType){
 }
 
 function drawQuestionScoreStatsGraph(entityId,entityType){
+	
 	var questionScoreStats = getQuestionScoreStats(entityId, entityType);
 	
 	if(questionScoreStats != null && questionScoreStats.length != 0){

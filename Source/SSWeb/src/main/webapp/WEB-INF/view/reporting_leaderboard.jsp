@@ -28,143 +28,8 @@
 .block-display{
  display:block !important;
 }
-.board-selector{
-	float: right;
-    margin-left: -40px;
-    width: 120px;
-    height: 40px;
-    border: 1px solid #dcdcdc;
-}
-
-.time-selector{
-	margin-top: 7px;
-    margin-right: 20px;
-    width: 120px;
-    height: 40px;
-    border: 1px solid #dcdcdc;
-}
-
-.board-selector-choice{
-	width: 100%;
-    border-bottom: 0 !important;
-    color: #666;
-    padding-left: 10px;
-    height: 38px;
-}
-
-.board-div-span{
-	height:30px;
-	line-height:38px;
-}
-
-.board-div{
-	    margin-bottom: 30px;
-}
-
-.leaderboard-pic-circle{
-	position: relative !important;
-    margin: 2px !important;
-    border-radius: 50% !important;
-    width: 55px !important;
-    height: 55px !important;
-}
-
-.leaderboard-name-div{
-	display: inline-flex;
-    width: 100%;
-    height: 42px;
-    padding-left:10%;
-}
-
-.selected-row td:first-child{
-    -moz-border-radius:15px 0 0 15px;
-    -webkit-border-radius:15px 0 0 15px;
-}
-.selected-row td:last-child{
-    -moz-border-radius:0 15x 15px 0;
-    -webkit-border-radius:0 15px 15px 0;
-}
-.selected-row td{
-	background:#4f85ca;
-	color:white;
-}
-
-.leaderboard-row{
-	border-bottom:0 !important;
-}
-
-.leaderboard-table{
-    border-collapse: separate;
-    border-spacing: 0 35px !important;
-}
-
-.lead-img-div{
-    margin-top: -8px;
-    position: absolute;
-    margin-left:-10px;
-}
-.lead-name-span{
-	line-height: 42px;
-    margin-left: 82px;
-    overflow: hidden;
-}
-
-img.lead-img {
-    max-width: 100%;
-    max-height: 100%;
-    display: block;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-}
-
-.lead-tbl-ln-of {
-    width: 10%;
-}
-
-.top-ten-ranks{
-	width: 100px;
-    margin: 0;
-    margin-left: 75%;
-}
-
-.my-rank{
-	width: 100px;
-    margin: 0;
-    margin-left: 58%;
-    margin-top: 70px;
-}
-
-.lead-ranks-above{
-	width: 100px;
-    margin: 0;
-    margin-left: 89%;
-}
-
-.top-ten-ranks-btn{
-	font-size: 14px;
-    font-weight: bold !important;
-    margin-bottom: -25px;
-}
-
-.lead-ranks-above-btn{
-	margin-bottom: -15px;
-    font-size: 14px;
-    font-weight: bold !important;
-}
-
-.lead-ranks-below{
-    width: 100px;
-    margin: 0;
-    margin-left: 89%
-}
-
-.lead-ranks-below-btn{
-	font-size: 14px;
-    font-weight: bold !important;
-}
 </style>
+
 <div class="hm-header-main-wrapper hm-hdr-bord-bot"
 	style="background: #2f69aa">
 	<div class="container">
@@ -256,6 +121,7 @@ img.lead-img {
 </div>
 <script>
 $(document).ready(function(){
+	
 	var batchSize = 10;
 	var startIndex=0;
 	var count=0;
