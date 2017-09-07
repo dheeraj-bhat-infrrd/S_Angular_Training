@@ -55,7 +55,7 @@ public class UserRankingThisYearRegionDaoImpl extends GenericReportingDaoImpl<Us
                 userRankingThisYearRegion.setLastName( String.valueOf( row[3] ) );
                 userRankingThisYearRegion.setRankingScore( Float.valueOf( String.valueOf( row[4] ) ) );
                 userRankingThisYearRegion.setTotalReviews( Integer.valueOf( String.valueOf( row[5] ) ) );
-                userRankingThisYearRegion.setAverageRating( Integer.valueOf( String.valueOf( row[6] ) )  );
+                userRankingThisYearRegion.setAverageRating( Float.valueOf( String.valueOf( row[6] ) )  );
                 userRankingThisYearRegion.setSps(  Float.valueOf( String.valueOf( row[7] ) )  );
                 userRankingThisYearRegion.setCompletedPercentage(  Float.valueOf( String.valueOf( row[8] ) ) );
                 userRankingThisYearRegion.setIsEligible( Integer.valueOf( String.valueOf( row[9] ) ) );

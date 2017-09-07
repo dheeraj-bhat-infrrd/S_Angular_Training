@@ -53,7 +53,7 @@ public class UserRankingThisMonthMainDaoImpl extends GenericReportingDaoImpl<Use
                 userRankingThisMonthMain.setLastName( String.valueOf( row[3] ) );
                 userRankingThisMonthMain.setRankingScore( Float.valueOf( String.valueOf( row[4] ) ) );
                 userRankingThisMonthMain.setTotalReviews( Integer.valueOf( String.valueOf( row[5] ) ) );
-                userRankingThisMonthMain.setAverageRating( Integer.valueOf( String.valueOf( row[6] ) )  );
+                userRankingThisMonthMain.setAverageRating( Float.valueOf( String.valueOf( row[6] ) )  );
                 userRankingThisMonthMain.setSps(  Float.valueOf( String.valueOf( row[7] ) )  );
                 userRankingThisMonthMain.setCompletedPercentage(  Float.valueOf( String.valueOf( row[8] ) ) );
                 userRankingThisMonthMain.setIsEligible( Integer.valueOf( String.valueOf( row[9] ) ) );

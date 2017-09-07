@@ -52,7 +52,7 @@ public class UserRankingPastYearsMainDaoImpl extends GenericReportingDaoImpl<Use
                 userRankingPastYearsMain.setLastName( String.valueOf( row[3] ) );
                 userRankingPastYearsMain.setRankingScore( Float.valueOf( String.valueOf( row[4] ) ) );
                 userRankingPastYearsMain.setTotalReviews( Integer.valueOf( String.valueOf( row[5] ) ) );
-                userRankingPastYearsMain.setAverageRating( Integer.valueOf( String.valueOf( row[6] ) )  );
+                userRankingPastYearsMain.setAverageRating( Float.valueOf( String.valueOf( row[6] ) )  );
                 userRankingPastYearsMain.setSps(  Float.valueOf( String.valueOf( row[7] ) )  );
                 userRankingPastYearsMain.setCompletedPercentage(  Float.valueOf( String.valueOf( row[8] ) ) );
                 userRankingPastYearsMain.setIsEligible( Integer.valueOf( String.valueOf( row[9] ) ) );

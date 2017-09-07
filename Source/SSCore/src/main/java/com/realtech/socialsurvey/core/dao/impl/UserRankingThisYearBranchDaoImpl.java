@@ -53,7 +53,7 @@ public class UserRankingThisYearBranchDaoImpl extends GenericReportingDaoImpl<Us
                 userRankingThisYearBranch.setLastName( String.valueOf( row[3] ) );
                 userRankingThisYearBranch.setRankingScore( Float.valueOf( String.valueOf( row[4] ) ) );
                 userRankingThisYearBranch.setTotalReviews( Integer.valueOf( String.valueOf( row[5] ) ) );
-                userRankingThisYearBranch.setAverageRating( Integer.valueOf( String.valueOf( row[6] ) )  );
+                userRankingThisYearBranch.setAverageRating( Float.valueOf( String.valueOf( row[6] ) )  );
                 userRankingThisYearBranch.setSps(  Float.valueOf( String.valueOf( row[7] ) )  );
                 userRankingThisYearBranch.setCompletedPercentage(  Float.valueOf( String.valueOf( row[8] ) ) );
                 userRankingThisYearBranch.setIsEligible( Integer.valueOf( String.valueOf( row[9] ) ) );

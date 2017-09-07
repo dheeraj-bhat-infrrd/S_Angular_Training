@@ -55,7 +55,7 @@ public class UserRankingPastMonthBranchDaoImpl extends GenericReportingDaoImpl<U
                 userRankingPastMonthBranch.setLastName( String.valueOf( row[3] ) );
                 userRankingPastMonthBranch.setRankingScore( Float.valueOf( String.valueOf( row[4] ) ) );
                 userRankingPastMonthBranch.setTotalReviews( Integer.valueOf( String.valueOf( row[5] ) ) );
-                userRankingPastMonthBranch.setAverageRating( Integer.valueOf( String.valueOf( row[6] ) )  );
+                userRankingPastMonthBranch.setAverageRating( Float.valueOf( String.valueOf( row[6] ) )  );
                 userRankingPastMonthBranch.setSps(  Float.valueOf( String.valueOf( row[7] ) )  );
                 userRankingPastMonthBranch.setCompletedPercentage(  Float.valueOf( String.valueOf( row[8] ) ) );
                 userRankingPastMonthBranch.setIsEligible( Integer.valueOf( String.valueOf( row[9] ) ) );

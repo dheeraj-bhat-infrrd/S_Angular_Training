@@ -9777,6 +9777,7 @@ ul.accordion li>a:before {
 }
 
 .rep-user-info{
+	padding:0;
 	margin-top: 15px;
 }
 
