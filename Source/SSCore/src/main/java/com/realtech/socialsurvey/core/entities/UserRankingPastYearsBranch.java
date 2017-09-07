@@ -65,7 +65,7 @@ public class UserRankingPastYearsBranch
     private int totalReviews;
     
     @Column(name = "average_rating")
-    private int averageRating;
+    private float averageRating;
     
     @Column(name = "is_eligible")
     private	int isEligible;
@@ -230,15 +230,13 @@ public class UserRankingPastYearsBranch
         this.totalReviews = totalReviews;
     }
 
-    public int getAverageRating()
-    {
-        return averageRating;
-    }
+    public float getAverageRating() {
+		return averageRating;
+	}
 
-    public void setAverageRating( int averageRating )
-    {
-        this.averageRating = averageRating;
-    }
+	public void setAverageRating(float averageRating) {
+		this.averageRating = averageRating;
+	}
 
 	public int getIsEligible() {
 		return isEligible;
