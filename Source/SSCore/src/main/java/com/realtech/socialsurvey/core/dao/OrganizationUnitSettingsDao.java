@@ -272,6 +272,4 @@ public interface OrganizationUnitSettingsDao
     public List<Long> fetchEntityIdsWithHiddenAttribute( String collection );
 
 
-    void updateParticularKeyAndModifiedOnOrganizationUnitSettings( String keyToUpdate, Object updatedRecord,
-        OrganizationUnitSettings unitSettings, String collectionName );
 }

@@ -2462,7 +2462,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             throw new InvalidInputException( "Social Tokens passed can not be null" );
         }
         LOG.info( "Updating Ranking Requirements Information" );
-        organizationUnitSettingsDao.updateParticularKeyAndModifiedOnOrganizationUnitSettings(
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_RANKING_REQUIREMENTS, rankingRequirements, unitSettings, collection );
         LOG.info( "Ranking Requirements updated successfully" );
         return rankingRequirements;
