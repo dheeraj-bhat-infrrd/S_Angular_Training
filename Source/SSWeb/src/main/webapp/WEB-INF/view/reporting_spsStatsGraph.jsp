@@ -7,6 +7,8 @@
 </div>
  <script>
  $(window).resize(function(){
-	drawSpsStatsGraph();
+	 if($('#chart_div').length>0){
+		 drawSpsStatsGraph();
+	 }
  });
 </script>
