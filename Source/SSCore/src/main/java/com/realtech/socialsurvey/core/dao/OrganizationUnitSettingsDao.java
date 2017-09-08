@@ -270,6 +270,4 @@ public interface OrganizationUnitSettingsDao
 
 
     public List<Long> fetchEntityIdsWithHiddenAttribute( String collection );
-
-
 }
