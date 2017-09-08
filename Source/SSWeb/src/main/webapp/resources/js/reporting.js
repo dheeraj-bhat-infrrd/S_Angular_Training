@@ -78,9 +78,17 @@ function paintForReportingDash() {
 	$(window).resize(function(){
 		 showDashOverlay('#unclicked-graph-dash');
 		 $('#unclicked-trans-graph').removeClass('hide');
-		 drawUnclickedDonutChart(overviewYearData);
-			drawProcessedDonutChart(overviewYearData);
-			drawUnprocessedDonutChart(overviewYearData);
+		 	if($('#donutchart').length > 0 ){
+		 		drawUnclickedDonutChart(overviewYearData);
+		 	}
+		 	if($('#processedDonutchart').length > 0 ){
+		 		drawProcessedDonutChart(overviewYearData);
+		 	}
+			
+		 	if($('#unprocessedDonutchart').length > 0 ){
+		 		drawUnprocessedDonutChart(overviewYearData);
+		 	}
+			
 			$('#unprocessed-trans-graph').addClass('hide');
 			$('#processed-trans-graph').addClass('hide');
 			setTimeout(function(){

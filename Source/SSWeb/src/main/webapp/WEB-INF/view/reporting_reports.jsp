@@ -48,7 +48,7 @@
 						</select>	
 					</div>
 					<div id="report-time-div" class="float-left board-div hide">
-						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px">
+						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-3px">
 							<select id="report-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
 								<option value=1 data-report="thisYear">This Year</option>
 								<option value=2 data-report="thisMonth">This Month</option>
