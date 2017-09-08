@@ -235,7 +235,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             + " wtih value: " + updatedRecord );
         Query query = new Query();
         query.addCriteria( Criteria.where( "_id" ).is( unitSettings.getId() ) );
-        Update update = new Update().set( keyToUpdate, updatedRecord );
+        Update update = new Update();
+        update.set( keyToUpdate, updatedRecord );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
         LOG.debug( "Updating the unit settings" );
         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
         LOG.debug( "Updated the unit setting" );
