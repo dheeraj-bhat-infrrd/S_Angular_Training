@@ -291,7 +291,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;FROM users &#xd;&#xa;where STATUS in &#x28;1,2&#x29; &#xd;&#xa;and   USER_ID &#x3d; &#x3f;&#xd;&#xa;order by USER_ID&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;FROM users where USER_ID &#x3d; &#x3f;&#xd;&#xa;order by USER_ID&#x3b;&#xd;&#xa;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -3958,7 +3958,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  USER_PROFILE_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, PROFILES_MASTER_ID&#xd;&#xa;, USER_PROFILE_TYPE&#xd;&#xa;FROM user_profile&#xd;&#xa;where status &#x3d; 1 and  BRANCH_ID &#x21;&#x3d; 0&#xd;&#xa;order by BRANCH_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_PROFILE_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, PROFILES_MASTER_ID&#xd;&#xa;, USER_PROFILE_TYPE&#xd;&#xa;FROM user_profile&#xd;&#xa;where BRANCH_ID &#x21;&#x3d; 0&#xd;&#xa;order by BRANCH_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -3984,7 +3984,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  USER_PROFILE_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, PROFILES_MASTER_ID&#xd;&#xa;, USER_PROFILE_TYPE&#xd;&#xa;FROM user_profile&#xd;&#xa;where status &#x3d; 1 and  REGION_ID&#x21;&#x3d; 0&#xd;&#xa;order by REGION_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_PROFILE_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, PROFILES_MASTER_ID&#xd;&#xa;, USER_PROFILE_TYPE&#xd;&#xa;FROM user_profile&#xd;&#xa;where REGION_ID&#x21;&#x3d; 0&#xd;&#xa;order by REGION_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
