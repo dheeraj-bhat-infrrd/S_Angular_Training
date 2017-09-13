@@ -37,7 +37,7 @@
 						<select id="generate-survey-reports" class="float-left dash-download-sel-item report-selector-choice">
 							<c:if test="${profilemasterid != 4}">
 								<option value=101 data-report="survey-stats">Survey Statistics</option>
-								<option value=102 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option>
+								<option value=102 data-report="user-adoption"><spring:message code="label.reports.verfied.users.report.key" /></option>
 								<option value=106 data-report="user-ranking">User Ranking</option>
 							</c:if>
 							<c:if test="${profilemasterid == 1}"> 
@@ -48,7 +48,7 @@
 						</select>	
 					</div>
 					<div id="report-time-div" class="float-left board-div hide">
-						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-3px">
+						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
 							<select id="report-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
 								<option value=1 data-report="thisYear">This Year</option>
 								<option value=2 data-report="thisMonth">This Month</option>
