@@ -38,7 +38,7 @@ hr{
 
 </style>
 <div id="processed-trans-div" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 cursor-pointer processed-trans-div">
-	<div id="processed-div" style="display:inline-grid; padding-left: 45px;">
+	<div id="processed-div" style="display:inline-grid; padding-left: 30px;">
 		<div id="processed-details" class="inline-flex-class" style="margin-bottom: 0px; margin-top: 45px;">
 			<div id="processed-background-rect" class="background-rect hide"></div>
 			<div id="processed-lbl-rect" class="processed-lbl-rect-div"></div>
@@ -114,7 +114,7 @@ hr{
 	</div>
 </div>
 <div id="unprocessed-trans-div" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 cursor-pointer unprocessed-trans-div">
-	<div id="unprocessed-div" style="display:inline-grid; padding-left: 45px; width: 100%;">
+	<div id="unprocessed-div" style="display:inline-grid; padding-left: 30px; width: 100%;">
 		<div id="unprocessed-details" class="inline-flex-class" style="margin-bottom: 0px; margin-top: 45px;">
 			<div id="unprocessed-background-rect" class="background-rect hide"></div>
 			<div id="unprocessed-lbl-rect" class="unprocessed-lbl-rect-div"></div>

@@ -370,7 +370,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1210</xloc>
+      <xloc>1216</xloc>
       <yloc>261</yloc>
       </entry>
     <entry>
@@ -470,8 +470,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1207</xloc>
-      <yloc>388</yloc>
+      <xloc>1070</xloc>
+      <yloc>409</yloc>
       </entry>
     <entry>
       <name>GetLastModifiedTime</name>
@@ -505,6 +505,38 @@
       <nr>0</nr>
       <xloc>101</xloc>
       <yloc>151</yloc>
+      </entry>
+    <entry>
+      <name>Reporting Job</name>
+      <description/>
+      <type>JOB</type>
+      <specification_method>filename</specification_method>
+      <job_object_id/>
+      <filename>&#x24;&#x7b;REPORTING_JOB_LOCATION&#x7d;&#x5c;ReportingJobMain.kjb</filename>
+      <jobname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Nothing</loglevel>
+      <slave_server_name/>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <expand_remote_job>N</expand_remote_job>
+      <create_parent_folder>N</create_parent_folder>
+      <pass_export>N</pass_export>
+      <force_separate_logging>N</force_separate_logging>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <set_append_logfile>N</set_append_logfile>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>1216</xloc>
+      <yloc>409</yloc>
       </entry>
   </entries>
   <hops>
@@ -591,6 +623,15 @@
     </hop>
     <hop>
       <from>CompanySettings</from>
+      <to>Reporting Job</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Reporting Job</from>
       <to>FinishJobLog</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>

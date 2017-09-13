@@ -9526,8 +9526,9 @@ ul.accordion li>a:before {
 }
 
 .inline-flex-class{
+	display: -webkit-box;
 	display:inline-flex;
-	 width: 72%;
+	 width: 100%;
 	 margin-bottom:15px;
 }
 
@@ -9777,6 +9778,7 @@ ul.accordion li>a:before {
 }
 
 .rep-user-info{
+	padding:0;
 	margin-top: 15px;
 }
 

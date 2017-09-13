@@ -7,6 +7,8 @@
 </div>
 <script type="text/javascript">
 	$(window).resize(function(){
-		drawCompletionRateGraph();
+		if($('#completion_chart_div').length>0){
+			drawCompletionRateGraph();
+		}
 	});
 </script>

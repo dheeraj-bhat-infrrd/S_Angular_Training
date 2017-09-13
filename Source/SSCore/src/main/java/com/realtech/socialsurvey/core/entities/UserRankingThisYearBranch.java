@@ -68,7 +68,7 @@ public class UserRankingThisYearBranch
     private int totalReviews;
     
     @Column(name = "average_rating")
-    private int averageRating;
+    private float averageRating;
     
     @Column(name = "is_eligible")
     private	int isEligible;
@@ -81,12 +81,12 @@ public class UserRankingThisYearBranch
     
     @Transient
     private String profileImageUrlThumbnail;
-    
-	public int getAverageRating() {
+   
+	public float getAverageRating() {
 		return averageRating;
 	}
 
-	public void setAverageRating(int averageRating) {
+	public void setAverageRating(float averageRating) {
 		this.averageRating = averageRating;
 	}
 
