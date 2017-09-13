@@ -1027,12 +1027,13 @@ function drawRecentActivity(start,batchSize,tableHeader){
 		var statusString = getStatusString(recentActivityList[i][6]);
 		var startDate = getDateFromDateTime(recentActivityList[i][2]);
 		var endDate =getDateFromDateTime(recentActivityList[i][3]);
+		var monthStartDate = getMonthFromDateTime(recentActivityList[i][2]);
 		
 		tableData += "<tr id='recent-activity-row"+i+"' class=\"u-tbl-row user-row \">"
 			+"<td class=\"v-tbl-recent-activity fetch-name hide\">"+i+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>"
-			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("recent-activity-date-range\">"+" "):("\">"+startDate))+" - "+(endDate==null?" ":endDate)+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("\">"+"All Time till date "):("\">"+(endDate==null?monthStartDate:startDate)))+(endDate==null?" ":" - "+endDate)+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
 		
 		if(recentActivityList[i][6]==0){	
@@ -1069,6 +1070,13 @@ function getDateFromDateTime(dateTime){
 	return null;
 }
 
+function getMonthFromDateTime(dateTime){
+	if(dateTime != null){
+		return (dateTime.match(/[a-zA-z]{3}/)[0] + " " + dateTime.match(/\d{4}/)[0]);
+		}
+		
+		return null;
+}
 
 $(document).on('click','.downloadLink',function(e){
 	var clickedID = this.id;
