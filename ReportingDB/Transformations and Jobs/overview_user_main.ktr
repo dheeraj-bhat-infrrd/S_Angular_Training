@@ -240,27 +240,7 @@
   <hop> <from>survey_pre_initiation input</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForIncompleteSurveys</from><to>jsToConvertNullToZero</to><enabled>Y</enabled> </hop>
-  <hop> <from>overview_user_output</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
-  <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>164</xloc>
-      <yloc>745</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step>
     <name>Filter rows</name>
     <type>FilterRows</type>
@@ -353,11 +333,11 @@
 <send_false_to/>
     <compare>
 <condition>
- <negated>Y</negated>
+ <negated>N</negated>
  <leftvalue>main_AgentId</leftvalue>
- <function>&#x3d;</function>
+ <function>&#x3c;&#x3e;</function>
  <rightvalue/>
- <value><name>constant</name><type>String</type><text>0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;</mask></value> </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1555,7 +1535,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; total_initiate&#x2b; total_pre&#x3b;&#xd;&#xa;var total_processed &#x3d; total_initiate &#x2b; total_pre &#x2b; total_completed &#x2b; total_deleted&#x3b;&#xd;&#xa;var total_unprocessed &#x3d; total_corrupted &#x2b; total_duplicate &#x2b; total_archieved &#x2b; total_ignored &#x2b; total_mismatched &#x2b; total_not_allowed&#x3b;&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_processed &#x21;&#x3d; 0 &#x7c;&#x7c; total_processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;total_completed&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;total_incomplete_transactions_var&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; total_initiate &#x2b; total_pre &#x2b; total_deleted&#x3b;&#xd;&#xa;var total_processed &#x3d; total_initiate &#x2b; total_pre &#x2b; total_completed &#x2b; total_deleted&#x3b;&#xd;&#xa;var total_unprocessed &#x3d; total_corrupted &#x2b; total_duplicate &#x2b; total_archieved &#x2b; total_ignored &#x2b; total_mismatched &#x2b; total_not_allowed&#x3b;&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_processed &#x21;&#x3d; 0 &#x26;&#x26; total_processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;total_completed&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;total_incomplete_transactions_var&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>total_incomplete_transactions_var</name>
         <rename>total_incomplete_transactions_var</rename>
         <type>Number</type>
@@ -1609,7 +1589,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var main_AgentId &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_5&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_3&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var main_AgentId &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_5&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_3&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_AgentId&#x3d;AGENT_ID_4&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>main_AgentId</name>
         <rename>main_AgentId</rename>
         <type>String</type>
@@ -1681,7 +1661,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var sps_score_var &#x3d; 0&#x3b;&#xd;&#xa;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var passives_percentage_var &#x3d;0&#x3b;&#xd;&#xa;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;total_completed &#x21;&#x3d; 0 &#x26;&#x26; total_completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	sps_score_var&#x3d;&#x28; &#x28;total_promoters-total_detractors&#x29;&#x2f;&#x28;total_promoters&#x2b;total_passives&#x2b;total_detractors&#x29;&#x29;&#x2a;100&#x3b;&#xd;&#xa;	detractors_percentage_var &#x3d; &#x28;total_detractors&#x2f;&#x28;total_promoters&#x2b;total_passives&#x2b;total_detractors&#x29;&#x29;&#x2a;100&#x3b;&#xd;&#xa;	passives_percentage_var &#x3d; &#x28;total_passives&#x2f;&#x28;total_promoters&#x2b;total_passives&#x2b;total_detractors&#x29;&#x29;&#x2a;100&#x3b;&#xd;&#xa;	promoter_percentage_var &#x3d; &#x28;total_promoters&#x2f;&#x28;total_promoters&#x2b;total_passives&#x2b;total_detractors&#x29;&#x29;&#x2a;100&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var sps_score_var &#x3d; 0&#x3b;&#xd;&#xa;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var passives_percentage_var &#x3d;0&#x3b;&#xd;&#xa;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; 0&#x3b;&#xd;&#xa;var total_completed_survey_details &#x3d; total_promoters&#x2b;total_passives&#x2b;total_detractors&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;total_completed_survey_details &#x21;&#x3d; 0 &#x26;&#x26; total_completed_survey_details &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	sps_score_var&#x3d;&#x28; &#x28;total_promoters-total_detractors&#x29;&#x2f;total_completed_survey_details&#x29;&#x2a;100&#x3b;&#xd;&#xa;	detractors_percentage_var &#x3d; &#x28;total_detractors&#x2f;total_completed_survey_details&#x29;&#x2a;100&#x3b;&#xd;&#xa;	passives_percentage_var &#x3d; &#x28;total_passives&#x2f;total_completed_survey_details&#x29;&#x2a;100&#x3b;&#xd;&#xa;	promoter_percentage_var &#x3d; &#x28;total_promoters&#x2f;total_completed_survey_details&#x29;&#x2a;100&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>sps_score_var</name>
         <rename>sps_score_var</rename>
         <type>Number</type>
@@ -2150,7 +2130,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, MOOD&#xd;&#xa;,SCORE&#xd;&#xa;FROM survey_details&#xd;&#xa;WHERE STAGE&#x3d;-1</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, MOOD&#xd;&#xa;,SCORE&#xd;&#xa;FROM survey_details&#xd;&#xa;WHERE STAGE&#x3d;-1 and AGENT_ID &#x3c;&#x3e; 0</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2234,7 +2214,7 @@
       <error>
         <source_step>overview_user_output</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
+        <is_enabled>N</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
         <fields_valuename/>

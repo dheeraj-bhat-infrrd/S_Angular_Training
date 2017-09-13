@@ -924,8 +924,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>169</xloc>
-      <yloc>89</yloc>
+      <xloc>172</xloc>
+      <yloc>86</yloc>
       </entry>
     <entry>
       <name>Error Job log</name>
@@ -1392,12 +1392,21 @@
     </hop>
     <hop>
       <from>START</from>
-      <to>overview_user</to>
+      <to>Update Job Logs</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
       <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>Update Job Logs</from>
+      <to>overview_user</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
     </hop>
   </hops>
   <notepads>
