@@ -1706,7 +1706,7 @@
       <give_back_row>N</give_back_row>
       <group>
         <field>
-          <name>COMPANY_ID</name>
+          <name>AGENT_ID</name>
         </field>
         <field>
           <name>TRX_MONTH</name>
@@ -2803,7 +2803,6 @@
       </remove>      <remove>        <name>year_data</name>
       </remove>      <remove>        <name>last_name</name>
       </remove>      <remove>        <name>report_id</name>
-      </remove>      <remove>        <name>COMPANY_ID</name>
       </remove>      <remove>        <name>TRX_MONTH_1</name>
       </remove>      <remove>        <name>first_name_1</name>
       </remove>      <remove>        <name>month_data_1</name>
@@ -4071,7 +4070,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>COMPANY_ID</name>
+        <name>AGENT_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
