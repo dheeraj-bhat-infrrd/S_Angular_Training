@@ -293,8 +293,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         fileUpload.setModifiedOn(new Timestamp(System.currentTimeMillis()));
         if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT){
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT );
-        }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT){
-            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT );            
+        }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT){
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT );            
         }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT );            
         }else if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
@@ -1526,8 +1526,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             //Set the ReportName according to the upload type 
             if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT ){
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_STATS_REPORT );
-            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT){
-                recentActivityList.add( CommonConstants.REPORTING_USER_ADOPTION_REPORT );
+            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_VERIFIED_USERS_REPORT );
             }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
                 recentActivityList.add( CommonConstants.REPORTING_COMPANY_USERS_REPORT );
             }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
@@ -1605,7 +1605,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public String generateUserAdoptionForReporting(Long entityId , String entityType , Long userId) throws UnsupportedEncodingException, NonFatalException{
         User user = userManagementService.getUserByUserId( userId );
         //file is too big for windows hence uncomment the alternative 
-        String fileName = "User_Adoption_Report-" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+        String fileName = "Verified_Users_Report-" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + (Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadUserAdoptionForReporting( entityId , entityType );
         String LocationInS3 = this.createExcelFileAndSaveInAmazonS3(fileName, workbook);

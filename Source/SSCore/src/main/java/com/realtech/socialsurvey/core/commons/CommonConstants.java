@@ -272,7 +272,8 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_INCOMPLETE_SURVEY_REPORT = "Incomplete survey data report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT = "User adoption report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_STATS_REPORT = "Survey stats report for reporting";
-    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_ADOPTION_REPORT = "User adoption report for reporting";
+  //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_VERIFIED_USERS_REPORT = "Verified users report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_COMPANY_USER_REPORT = "Company user report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = "Survey results company report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_TRANSACTION_REPORT = "Survey transaction report for reporting";
@@ -958,7 +959,8 @@ public interface CommonConstants
     
     //reporting file upload status 
     public static final int FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT = 101;
-    public static final int FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT = 102;
+    //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
+    public static final int FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT = 102;
     public static final int FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT = 103;
     public static final int FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = 104;
     public static final int FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT = 105;
@@ -1338,7 +1340,8 @@ public interface CommonConstants
     
     //Reporting constants
     public static final String REPORTING_SURVEY_STATS_REPORT = "Survey Stats Report";
-    public static final String REPORTING_USER_ADOPTION_REPORT = "User Adoption Report";
+    //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
+    public static final String REPORTING_VERIFIED_USERS_REPORT = "Verified Users Report";
     public static final String REPORTING_COMPANY_USERS_REPORT = "Company User Report";
     public static final String REPORTING_SURVEY_REUSLTS_COMPANY_REPORT = "Survey Results Company Report";
     public static final String REPORTING_SURVEY_TRANSACTION_REPORT = "Survey Transaction Report";
