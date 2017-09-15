@@ -102,34 +102,6 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
-  <connection>
-    <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
-    <type>MYSQL</type>
-    <access>Native</access>
-    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
-    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
-    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
-    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
-      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
   <order>
   <hop> <from>overview_user</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>user_profile</from><to>Merge Join</to><enabled>Y</enabled> </hop>
@@ -146,12 +118,55 @@
   <hop> <from>sort survey details</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_details</from><to>sort survey details</to><enabled>Y</enabled> </hop>
   <hop> <from>Memory Group by Social</from><to>SortRegion_Social</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortRegion_Social</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Multiway Merge Join</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortRegion</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value 2</from><to>If field value is null</to><enabled>Y</enabled> </hop>
   <hop> <from>If field value is null</from><to>Generate random value</to><enabled>Y</enabled> </hop>
+  <hop> <from>MergeOnUserId 2</from><to>Group byRegionId2</to><enabled>Y</enabled> </hop>
+  <hop> <from>overview_user 2</from><to>Sort rows 2 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 2</from><to>MergeOnUserId 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 2 2</from><to>MergeOnUserId 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>region_input</from><to>Database join</to><enabled>Y</enabled> </hop>
+  <hop> <from>user_profile 2</from><to>Memory Group by 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Memory Group by 2</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group byRegionId2</from><to>Modified Java Script Value 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Modified Java Script Value 3</from><to>SortBasedOnRegionId</to><enabled>Y</enabled> </hop>
+  <hop> <from>Database join</from><to>Modified Java Script Value 3 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Modified Java Script Value 3 2</from><to>SortBasedOnRegionId 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortRegion</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortRegion_Social</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortBasedOnRegionId</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortBasedOnRegionId 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Multiway Merge Join</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>
   </order>
+  <step>
+    <name>Database join</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>select sum&#x28;social_posts&#x29; as branch_social_post , month , year from overview_branch_month where branch_id in&#xd;&#xa; &#x28;Select branch_id from branch  where region_id &#x3d; &#x3f; and IS_DEFAULT_BY_SYSTEM &#x3d; 0&#x29;  &#xd;&#xa;group by month,year&#xd;&#xa;</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>REGION_ID</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>600</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step>
     <name>Generate random value</name>
     <type>RandomValue</type>
@@ -171,8 +186,47 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1247</xloc>
-      <yloc>539</yloc>
+      <xloc>1307</xloc>
+      <yloc>526</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Group byRegionId2</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>region_id</name>
+        </field>
+        <field>
+          <name>month</name>
+        </field>
+        <field>
+          <name>year</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>direct_user_social_post</aggregate>
+          <subject>social_posts</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>540</xloc>
+      <yloc>488</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -275,7 +329,7 @@
         <set_empty_string>N</set_empty_string>
         </field>
       <field>
-        <name>total_shared_by</name>
+        <name>total_social_posts</name>
         <value>0</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
@@ -283,8 +337,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1249</xloc>
-      <yloc>468</yloc>
+      <xloc>1309</xloc>
+      <yloc>455</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -401,6 +455,36 @@
     </step>
 
   <step>
+    <name>Memory Group by 2</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>USER_ID</name>
+        </field>
+        <field>
+          <name>REGION_ID</name>
+        </field>
+      </group>
+      <fields>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>177</xloc>
+      <yloc>428</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Memory Group by Social</name>
     <type>MemoryGroupBy</type>
     <description/>
@@ -439,8 +523,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>827</xloc>
-      <yloc>322</yloc>
+      <xloc>766</xloc>
+      <yloc>276</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -495,8 +579,36 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>505</xloc>
-      <yloc>322</yloc>
+      <xloc>495</xloc>
+      <yloc>275</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>MergeOnUserId 2</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>INNER</join_type>
+<step1>Sort rows 2</step1>
+<step2>Sort rows 2 2</step2>
+    <keys_1>
+      <key>USER_ID</key>
+    </keys_1>
+    <keys_2>
+      <key>user_id</key>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>400</xloc>
+      <yloc>486</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -516,7 +628,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;processed &#x21;&#x3d; 0 &#x26;&#x26; processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;completed&#x2f;processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;incomplete&#x2f;processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;total_review &#x21;&#x3d; null &#x26;&#x26; total_review &#x21;&#x3d; 0&#x29;&#xd;&#xa;var rating &#x3d; rating &#x2f; num_of_users&#x3b;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;processed &#x21;&#x3d; 0 &#x26;&#x26; processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;completed&#x2f;processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;incomplete&#x2f;processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;total_review &#x21;&#x3d; null &#x26;&#x26; total_review &#x21;&#x3d; 0&#x29;&#xd;&#xa;var rating &#x3d; rating &#x2f; num_of_users&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;month &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	if&#x28;month.toString&#x28;&#x29;.length &#x3d;&#x3d; 1 &#x29;&#x7b;&#xd;&#xa; var month &#x3d; &#x22;0&#x22;&#x2b;month&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>complete_percentage</name>
         <rename>complete_percentage</rename>
         <type>Number</type>
@@ -531,9 +643,15 @@
         <replace>N</replace>
       </field>      <field>        <name>rating</name>
         <rename>rating</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>month</name>
+        <rename>month</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -558,62 +676,35 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var FINAL_REGION_ID &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;REGION_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_REGION_ID &#x3d; REGION_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;ENTITY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_REGION_ID &#x3d; ENTITY_ID&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var FINAL_MONTH_VAL &#x3d; 0&#x3b;&#xd;&#xa;var FINAL_YEAR_VAL &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;month &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; month&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;year &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; year&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;total_shared_by &#x3d;&#x3d; null&#x29;&#xd;&#xa;	var total_shared_by &#x3d; 0&#x3b;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var FINAL_REGION_ID &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;REGION_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_REGION_ID &#x3d; REGION_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;ENTITY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_REGION_ID &#x3d; ENTITY_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;region_id_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_REGION_ID &#x3d; region_id_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;REGION_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_REGION_ID &#x3d; REGION_ID_2&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var FINAL_MONTH_VAL &#x3d; 0&#x3b;&#xd;&#xa;var FINAL_YEAR_VAL &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;month &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; month&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;month_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; month_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;month_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d;month_2&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;year &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; year&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;year_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; year_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;year_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d;year_2&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var total_social_posts &#x3d; total_shared_by &#x2b; direct_user_social_post &#x2b; branch_social_post &#x3b;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>FINAL_REGION_ID</name>
         <rename>FINAL_REGION_ID</rename>
-        <type>Integer</type>
+        <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>FINAL_MONTH_VAL</name>
         <rename>FINAL_MONTH_VAL</rename>
-        <type>Integer</type>
+        <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>FINAL_YEAR_VAL</name>
         <rename>FINAL_YEAR_VAL</rename>
-        <type>Integer</type>
+        <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
-      </field>      <field>        <name>total_shared_by</name>
-        <rename>total_shared_by</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
+      </field>      <field>        <name>total_social_posts</name>
+        <rename>total_social_posts</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1245</xloc>
-      <yloc>386</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <join_type>FULL OUTER</join_type>
-    <step0>SortRegion</step0>
-    <step1>SortRegion_Social</step1>
-    <number_input>2</number_input>
-    <keys>
-      <key>REGION_ID,month,year</key>
-      <key>ENTITY_ID,MONTH_Data,Year_Data</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1249</xloc>
-      <yloc>232</yloc>
+      <xloc>1305</xloc>
+      <yloc>373</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -659,6 +750,166 @@
     </step>
 
   <step>
+    <name>Sort rows 2</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>user_id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>305</xloc>
+      <yloc>456</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 2 2</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>user_id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>246</xloc>
+      <yloc>512</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>SortBasedOnRegionId</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>Y</unique_rows>
+    <fields>
+      <field>
+        <name>region_id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>976</xloc>
+      <yloc>490</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>SortBasedOnRegionId 2</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>Y</unique_rows>
+    <fields>
+      <field>
+        <name>REGION_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>990</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>SortByEntityId</name>
     <type>SortRows</type>
     <description/>
@@ -692,8 +943,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>632</xloc>
-      <yloc>322</yloc>
+      <xloc>622</xloc>
+      <yloc>275</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -738,8 +989,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>963</xloc>
-      <yloc>133</yloc>
+      <xloc>1003</xloc>
+      <yloc>135</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -784,8 +1035,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1025</xloc>
-      <yloc>322</yloc>
+      <xloc>920</xloc>
+      <yloc>279</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -814,8 +1065,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>220</xloc>
-      <yloc>322</yloc>
+      <xloc>210</xloc>
+      <yloc>275</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -891,7 +1142,7 @@
         </field>
         <field>
           <column_name>social_posts</column_name>
-          <stream_name>total_shared_by</stream_name>
+          <stream_name>total_social_posts</stream_name>
         </field>
         <field>
           <column_name>total_review</column_name>
@@ -924,8 +1175,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>980</xloc>
-      <yloc>539</yloc>
+      <xloc>1311</xloc>
+      <yloc>657</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -957,6 +1208,58 @@
     </step>
 
   <step>
+    <name>overview_user 2</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa; user_id&#xd;&#xa;, social_posts&#xd;&#xa;, month&#xd;&#xa;, year&#xd;&#xa;,concat&#x28;year,&#x22;_&#x22;,month&#x29; as TRX_MONTH&#xd;&#xa;FROM overview_user_month&#xd;&#xa;order by user_id&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>45</xloc>
+      <yloc>508</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>region_input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  REGION_ID&#xd;&#xa;FROM region&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;and STATUS &#x3d; 1&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>480</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>social_post</name>
     <type>TableInput</type>
     <description/>
@@ -976,8 +1279,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>88</xloc>
-      <yloc>322</yloc>
+      <xloc>78</xloc>
+      <yloc>275</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1010,8 +1313,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>366</xloc>
-      <yloc>322</yloc>
+      <xloc>356</xloc>
+      <yloc>275</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1044,8 +1347,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>369</xloc>
-      <yloc>539</yloc>
+      <xloc>353</xloc>
+      <yloc>357</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1070,8 +1373,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>90</xloc>
-      <yloc>539</yloc>
+      <xloc>74</xloc>
+      <yloc>357</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1096,8 +1399,125 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>83</xloc>
-      <yloc>49</yloc>
+      <xloc>84</xloc>
+      <yloc>48</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>user_profile 2</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>select distinct user_id , region_id , branch_id from user_profile where branch_id in &#x28;Select branch_id from branch  where is_default_by_system &#x3d; 1 &#x29;&#xd;&#xa;order by user_id,region_id&#xd;&#xa;&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>45</xloc>
+      <yloc>427</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Modified Java Script Value 3</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;month &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	if&#x28;month.toString&#x28;&#x29;.length &#x3d;&#x3d; 1 &#x29;&#x7b;&#xd;&#xa; var month &#x3d; &#x22;0&#x22;&#x2b;month&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>month</name>
+        <rename>month</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>729</xloc>
+      <yloc>487</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Modified Java Script Value 3 2</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;month &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	if&#x28;month.toString&#x28;&#x29;.length &#x3d;&#x3d; 1 &#x29;&#x7b;&#xd;&#xa; var month &#x3d; &#x22;0&#x22;&#x2b;month&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>month</name>
+        <rename>month</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>760</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Multiway Merge Join</name>
+    <type>MultiwayMergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <join_type>FULL OUTER</join_type>
+    <step0>SortRegion</step0>
+    <step1>SortRegion_Social</step1>
+    <step2>SortBasedOnRegionId</step2>
+    <step3>SortBasedOnRegionId 2</step3>
+    <number_input>4</number_input>
+    <keys>
+      <key>REGION_ID,month,year</key>
+      <key>ENTITY_ID,MONTH_Data,Year_Data</key>
+      <key>region_id,month,year</key>
+      <key>REGION_ID,month,year</key>
+    </keys>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1125</xloc>
+      <yloc>373</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
