@@ -77,6 +77,9 @@ public class CloudUploadServiceImpl implements FileUploadService
 
     @Value ( "${AMAZON_SECRET_KEY}")
     private String secretKey;
+    
+    @Value ( "${AMAZON_REPORTS_BUCKET}")
+    private String reportBucket;
 
 
     @Override
@@ -128,6 +131,12 @@ public class CloudUploadServiceImpl implements FileUploadService
     }
 
 
+    @Override
+    public void uploadReport( File file, String fileName ) throws NonFatalException
+    {
+        uploadFileAtSpeicifiedBucket( file, fileName, bucket + CommonConstants.FILE_SEPARATOR + reportBucket, false );
+    }
+    
     @Override
     public void uploadFileAtDefautBucket( File file, String fileName ) throws NonFatalException
     {

@@ -783,7 +783,7 @@ public class OrganizationManagementController
             }
 
             //enocode before sending to UI
-            encodeSurveySettings( surveySettings );
+            encodeSurveySettings( unitSettings.getSurvey_settings() );
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
 
             //get default setting and store in model
@@ -2256,6 +2256,9 @@ public class OrganizationManagementController
                 throw new InvalidInputException( "Null or empty value found in storeTextForFlow() for mood." );
             }
 
+            //decode text
+            text = new String( DatatypeConverter.parseBase64Binary(text) );
+            
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
 
             SurveySettings surveySettings = companySettings.getSurvey_settings();

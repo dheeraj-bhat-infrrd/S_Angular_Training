@@ -70,4 +70,7 @@ public interface FileUploadService {
 	
     public String uploadFileAtSurveyCsvBucket( MultipartFile tempFile, String fileName ) throws NonFatalException;
 
+
+    public void uploadReport( File file, String fileName ) throws NonFatalException;
+
 }

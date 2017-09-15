@@ -2006,7 +2006,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String mood,
+    public void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String agentName, String mood,
         String rating, String surveySourceId, String surveyDetail ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -2017,6 +2017,11 @@ public class EmailServicesImpl implements EmailServices
         if ( customerMailId == null || customerMailId.isEmpty() ) {
             LOG.error( "Customer email Id is empty or null " );
             throw new InvalidInputException( "Customer email Id is empty or null " );
+        }
+        
+        if ( agentName == null || agentName.isEmpty() ) {
+            LOG.error( "Agent Name  is empty or null " );
+            throw new InvalidInputException( "Agent Name is empty or null " );
         }
 
         //SS-1435: Send survey details too. Check that it is not null.
@@ -2040,7 +2045,7 @@ public class EmailServicesImpl implements EmailServices
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLAINT_HANDLER_MAIL_BODY );
 
         //SS-1435: Send survey details too.
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, customerName, customerMailId, mood,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, customerName, customerMailId, agentName, mood,
             rating, surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId, surveyDetail ) );
 
         LOG.debug( "Calling email sender to send mail" );

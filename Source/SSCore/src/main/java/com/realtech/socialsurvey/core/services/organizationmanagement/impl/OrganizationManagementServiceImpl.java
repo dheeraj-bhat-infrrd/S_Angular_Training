@@ -92,6 +92,7 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
@@ -700,6 +701,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         companySettings.setSurvey_settings( surveySettings );
 
+        //set Ranking Settings
+        RankingRequirements rankingRequirements = new RankingRequirements();
+        rankingRequirements.setMinCompletedPercentage(CommonConstants.MIN_COMPLETED_PERCENTAGE);
+        rankingRequirements.setMinDaysOfRegistration(CommonConstants.MIN_DAYS_OF_REGISTRATION);
+        rankingRequirements.setMinNoOfReviews(CommonConstants.MIN_NO_OF_REVIEWS);
+        rankingRequirements.setMonthOffset(CommonConstants.MONTH_OFFSET);
+        rankingRequirements.setYearOffset(CommonConstants.YEAR_OFFSET);
+        
+        companySettings.setRankingRequirements(rankingRequirements);
+        
         // set seo content flag
         companySettings.setSeoContentModified( true );
 

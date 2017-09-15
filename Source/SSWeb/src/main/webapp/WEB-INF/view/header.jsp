@@ -177,6 +177,8 @@
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item" onclick="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></div>
+				<div class="header-links-item" onclick="showMainContent('./showreportingpage.do')">New Dashboard (Beta)</div>
+				<div class="header-links-item" onclick="showMainContent('./showreportspage.do')">Generate Reports</div>
 				<c:if test="${(accountMasterId == 2 || accountMasterId == 3 || accountMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
 					<div class="header-links-item" onclick="showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></div>
 				</c:if>
@@ -205,6 +207,9 @@
 				</c:if>
 				<c:if test="${!hiddenSectionDashboard}">
 					<div class="header-links-item" onclick="showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></div>
+				</c:if>
+				<c:if test="${ highestrole == 1 }">
+					<div class="header-links-item" onclick="javascript:showMainContent('./showrankingsettings.do')"><spring:message code="label.ranking.settings.key" /></div>
 				</c:if>
 				<c:if test="${ not empty realTechAdminId }">
 					<div id="vndsta-setting-one" class="header-links-item hide" onclick="showMainContent('./showlistingsmanagersettings.do')"><spring:message code="label.vendastaproductsettings.key" /></div>
@@ -252,9 +257,22 @@
 		<div class="container hdr-container clearfix">
 			<div class="float-left hdr-logo cursor-pointer"></div>
 			<div class="float-left hdr-links clearfix">
-				<div class="hdr-link-item hdr-link-active">
+				<div id="hdr-dashboard-item" class="hdr-link-item hdr-link-active hdr-link-item hdr-link-item-config pos-relative">
 					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')" onclick="showOverlay();"><spring:message code="label.header.dashboard.key" /></a>
+					<div id="hdr-dashboard-dropdown" class="hdr-link-item-dropdown-icn"></div>
+						<div id="hdr-link-item-dropdown-dash" class="hdr-link-item-dropdown hide">
+							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./dashboard.do');">
+								<spring:message code="label.header.dashboard.key" />
+							</div>
+							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportingpage.do');">New Dashboard (Beta)</div>
+							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportspage.do');">
+								Generate Reports
+							</div>
+						</div>
 				</div>
+<!-- 				<div class="hdr-link-item hdr-link-active"> -->
+<%-- 					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')" onclick="showOverlay();"><spring:message code="label.header.dashboard.key" /></a> --%>
+<!-- 				</div> -->
 				<c:if test="${accountMasterId > 1 && accountMasterId < 5 && highestrole != 4 }">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showusermangementpage.do')" onclick="showOverlay();"><spring:message code="label.header.usermanagement.key" /></a>
@@ -292,6 +310,11 @@
 									<spring:message code="label.appsettings.key" />
 								</div>
 							</c:if>
+							<c:if test="${ highestrole == 1 }">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showrankingsettings.do');">
+									<spring:message code="label.ranking.settings.key" />
+								</div>
+							</c:if>
 							<c:if test="${ not empty realTechAdminId }">
 								<div id="vndsta-setting-two" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showlistingsmanagersettings.do');">
 									<spring:message code="label.vendastaproductsettings.key" />
@@ -324,6 +347,11 @@
 							<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showapps.do');">
 									<spring:message code="label.appsettings.key" />
+								</div>
+							</c:if>
+							<c:if test="${ highestrole == 1 }">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showrankingsettings.do');">
+									<spring:message code="label.ranking.settings.key" />
 								</div>
 							</c:if>
 							<c:if test="${ not empty realTechAdminId }">
@@ -361,6 +389,7 @@
 					<a href="javascript:showMainContent('./showprofilepage.do')" onclick="showOverlay();"><spring:message code="label.editprofile.key" /></a>
 				</div>
 				</c:if>
+				
 				<div class="hdr-link-item">
 					<a href="javascript:showMainContent('./showhelppage.do')" onclick="showOverlay();"><spring:message code="label.help.key" /></a>
 				</div>

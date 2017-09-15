@@ -370,7 +370,7 @@ public interface EmailServices
 
 
     //SS-1435: Send survey details too
-    void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String mood,
+    void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String agentName, String mood,
         String rating, String surveySourceId, String surveyDetail ) throws InvalidInputException, UndeliveredEmailException;
 
 

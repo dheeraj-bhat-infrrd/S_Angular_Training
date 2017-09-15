@@ -1,3 +1,42 @@
+@media (max-width: 769px){
+	.rep-prof-details{
+    border-bottom: 1px solid #d2cdcd;
+    display: inline-grid;
+    width: 100%;
+    margin-left: 0px;
+    }
+    
+    .rep-user-details{
+    width: 100%;
+    }
+    
+    .rep-dash-btns{
+    width: 100%;
+    margin-bottom: 20px;
+    }
+    
+    .rep-send-survey-div{
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    text-align: center;
+    padding-top: 15px;
+    height: 130px;
+    width: 48%;
+    margin-left: auto;
+    }
+   
+   	.rep-social-media-div {
+    margin-left: 26px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    text-align: center;
+    padding-top: 15px;
+    height: 130px;
+    width: 48%;
+	}
+
+}
+
 /* ============== SMARTPHONES ==============*/
 @media (max-width: 767px) {
 	body{
@@ -1195,6 +1234,7 @@
 		width: 6.666666%;
 		min-width: 30px;
 	}
+
 	.v-tbl-uname{
     	width: 30%;
     	padding-right: 10px;
@@ -1760,6 +1800,215 @@
 		margin-top: 15px;
 		margin-left: 0px;
 	}
+	
+	/* reporting */
+	#zillow-details{
+	    margin-bottom: 0px;
+	}
+	
+	.rep-sps-scores {
+    display: grid;
+    margin-top: 0;
+    margin-bottom: 45px;
+	}
+	
+	.rep-det-div{
+	margin-left: 18%;
+    width: 100%;
+	}
+	
+	#reportingDashTabs,#overview-tab,#overviewSuccess,#spsGaugeSuccess{
+	width:100%;
+	}
+	
+	.rep-dash-sel-lbl-det{
+		margin-right: -70px;
+	}
+	
+	.rep-dash-sel-lbl-pas{
+		margin-right: -51px;
+	}
+	
+	.rep-dash-lbl-sel-prom{
+		margin-right: -44px;
+	}
+	
+	.rep-sps-div{
+	width:0%;
+	}
+	
+	.rep-tab-content{
+	margin-left:0;
+	margin-right:0;
+	}
+	.processed-trans-div,.rep-trans-graphs,.unprocessed-trans-div{
+	width:60.7%;
+	}
+		
+	.reporting-trans-details{
+	display: inline-grid;
+    margin-left: 0;
+	width:100%;
+	}
+	
+	.time-frame-prof-sel {
+	width: 140px;
+    border: 1px solid #d2cdcd;
+    background: #ffffff;
+    height: 36px;
+    border-radius: 3px;
+    margin-top: 6px !important;
+    padding-left:0;
+	}
+	
+	.time-frame-sel{
+	height: 90%;
+    line-height: 33px !important;
+    font-size: 10px;
+    width: 100%;
+	}
+	
+	.time-frame-wrapper {
+	z-index: 999;
+    border: 1px solid #dcdcdc;
+    position: absolute;
+    background-color: #fff;
+    border-radius: 3px;
+    width: 140px;
+    color: #666;
+    text-align: left;
+    top: 163px;
+    right: 114px;
+    max-height: 400px;
+    box-shadow: 3px 3px 30px #444;
+	}
+	
+	.rep-prof-details{
+	border-bottom: 1px solid #d2cdcd;
+    display: inline-grid;
+    width: 100%;
+    margin-left: 0px !important;
+	}
+	
+	.rep-user-details{
+	display: inline-grid;
+    width: 100% !important;
+    }
+    
+    .rep-rank-prof-pic{
+   	height: 150px;
+    width: 100%;
+    }
+    
+    .rep-rank-rect{
+    margin-left: 4%;
+    }
+    
+    .rep-prof-circle-user{
+    margin-left: 41.2% !important;
+    }
+    
+    .rep-prof-pic-circle {
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    border: 7px solid #4983ca;
+    border-radius: 50%;
+    margin-left: 26%;
+    background: #fff;
+	}
+
+	.rep-user-info{
+	padding:0;
+	margin-top: 15px;
+    width: 100%;
+    text-align: center;
+	}
+	
+	.rep-prof-rating{
+	margin-left: 17%;
+    margin-top: 30px;
+    }
+    
+    .rep-dash-btns{
+    display: inline-grid;
+    width: 100%;
+    }
+    
+    .rep-send-survey-div {
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    text-align: center;
+    padding-top: 15px;
+    height: 130px;
+    width: 100%;
+    margin: 0 auto;
+	}
+	
+	.rep-social-media-div {
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    text-align: center;
+    padding-top: 15px;
+    height: 130px;
+    width: 100%;
+    margin: 10px auto;
+	}
+	
+	.generate-report-div{
+		display: inline-grid !important;
+		margin-left:5%;
+		width: 90%;
+	}
+	
+	.report-selector{
+	width:40%
+	}
+	
+	.report-selector-choice{
+		font-size:11px;
+	}
+	
+	.generate-report-date-range{
+		display: inline-grid;
+		margin-left: 0;
+	}
+	
+	.report-date{
+		width: 40%;
+	}
+	
+	.generate-report-btn{
+		float:left;
+		margin-left: 20px;
+		margin-top: 20px;
+		width:120px;
+		font-size:11px;
+	}
+	
+	.generate-report-span-report,.generate-report-span-date{
+		padding-left:20px;
+	}
+	
+	.generate-report-span-dash{
+		padding-left:25%
+	}
+	.v-tbl-recent-activity {
+		width: 30%;
+		padding-left: 10px;
+		font-size:11px !important;
+	}
+
+	.v-tbl-recent-activity-wide {
+		width: 50%;
+		padding-left: 10px;
+		font-size:11px !important;
+	}
+	
+	.recent-activity-date-range{
+		position: absolute;
+    	padding: 10px 8%;
+	}
 
 }
 
@@ -2181,7 +2430,101 @@
    .review-sm-screen{
 	 clear:both;
 	}
+	
+		/* reporting */
+		
+	.generate-report-div{
+		display: inline-grid ;
+		margin-left:5%;
+		width: 90%;
+	}
+	
+	.report-selector{
+	width:40%
+	}
+	
+	.report-selector-choice{
+		font-size:11px;
+	}
+	
+	.generate-report-date-range{
+		display: inline-grid !important;
+		margin-left: 0;
+	}
+	
+	.report-date{
+		width: 40%;
+	}
+	
+	.generate-report-btn{
+		float:left;
+		margin-left: 20px;
+		margin-top: 20px;
+		width:120px;
+		font-size:11px;
+	}
+	
+	.generate-report-span-report,.generate-report-span-date{
+		padding-left:20px;
+	}
+	
+	.generate-report-span-dash{
+		padding-left:25%
+	}
+	
+	.v-tbl-recent-activity {
+		width: 30%;
+		padding-left: 10px;
+		font-size:11px !important;
+	}
 
+	.v-tbl-recent-activity-wide {
+		width: 50%;
+		padding-left: 10px;
+		font-size:11px !important;
+	}
+	
+	.recent-activity-date-range{
+		position: absolute;
+    	padding: 10px 8%;
+	}
+	
+	.rep-prof-details{
+    border-bottom: 1px solid #d2cdcd;
+    display: inline-grid;
+    width: 100%;
+    margin-left: 0px;
+    }
+    
+    .rep-user-details{
+    width: 100%;
+    }
+    
+    .rep-dash-btns{
+    width: 100%;
+    margin-bottom: 20px;
+    }
+    
+    .rep-send-survey-div{
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    text-align: center;
+    padding-top: 15px;
+    height: 130px;
+    width: 48%;
+    margin-left: auto;
+    }
+   
+   	.rep-social-media-div {
+    margin-left: 26px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    text-align: center;
+    padding-top: 15px;
+    height: 130px;
+    width: 48%;
+	}
+	
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -2364,8 +2707,96 @@
     -moz-transform: scale(0.888);
     -webkit-transform-origin:0 0;
     }
+    .rep-prof-details{
+    border-bottom: 1px solid #d2cdcd;
+    display: inline-grid;
+    width: 100%;
+    margin-left: 0px;
+    }
+    
+    .rep-user-details{
+    width: 100%;
+    }
+    
+    .rep-dash-btns{
+    width: 100%;
+    margin-bottom: 20px;
+    }
+    
+    .rep-send-survey-div{
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    text-align: center;
+    padding-top: 15px;
+    height: 130px;
+    width: 48%;
+    }
    
+   	.rep-social-media-div {
+    margin-left: 26px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    text-align: center;
+    padding-top: 15px;
+    height: 130px;
+    width: 48%;
 }
+}
+
+@media(max-width: 370px){
+	
+	 .rep-rank-rect{
+    margin-left: 5%;
+    }
+    
+    .rep-prof-circle-user{
+    margin-left: 45.2% !important;
+    }
+    
+	.rep-prof-pic-circle {
+   	margin-left: 23%;
+	}
+	
+	.rep-prof-rating {
+    margin-left: 10% !important;
+	}
+	
+	.processed-trans-div,.rep-trans-graphs,.unprocessed-trans-div{
+	width:52.7%;
+	}
+	
+	.reporting-trans-details{
+		width:100%;
+	}
+}
+
+@media(max-width: 330px){
+	
+	 .rep-rank-rect{
+    margin-left: -4%;
+    }
+    
+    .rep-prof-circle-user{
+    margin-left: 44% !important;
+    }
+    
+	.rep-prof-pic-circle {
+  	margin-left: 18% ;
+	}
+	
+	.rep-prof-rating {
+    margin-left: 3% !important;
+	}
+	
+	.processed-trans-div,.rep-trans-graphs,.unprocessed-trans-div{
+	width:47%;
+	}
+	
+	.reporting-trans-details{
+		width:100%;
+	}
+}
+
 
 /* ============== LARGE SIZED SCREENS ==============*/
 @media (min-width: 1200px) {
@@ -2393,40 +2824,6 @@
    }
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* ============== ANTHING ABOVE SMARTPHONES ==============*/
 @media (min-width: 768px) {
@@ -2506,4 +2903,6 @@
 	.st-subject-input-cont{
 	 width:66%;
 	}
+	
 }
+

@@ -532,6 +532,31 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-grph-sel-item');
 }
 
+function paintReportingDashboard(profileMasterId, newProfileName, newProfileValue, typeoOfAccount) {
+	accountType = typeoOfAccount;
+	startIndexCmp = 0;
+	batchSizeCmp = 9;
+	doStopPaginationDashboard = false;
+	isDashboardReviewRequestRunning = false;
+	reviewsFetchedSoFar = 0;
+	startIndexInc = 0;
+	batchSizeInc = 10;
+	totalReviewsInc = 0;
+	surveyFetchedSoFarInc = 0;
+
+	lastColNameForCount = newProfileName;
+	lastColValueForCount = newProfileValue;
+
+	colName = newProfileName;
+	colValue = newProfileValue;
+
+	fetchReviewsOnDashboard(false);
+}
+
+function reportingSocialMediaButtons(data){
+	
+}
+
 function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
 	// Bind keyup on search for region, branch, individual for dashboard
 	$('#' + elementId).on('keyup', function(e) {
@@ -861,7 +886,6 @@ function updateDashboardProfileEvents() {
 			callAjaxGetWithPayloadData('./socialmediatofix.do', paintFixSocialMedia, payload, true);
 	});
 }
-
 
 function paintFixSocialMedia(data){
 	
@@ -1937,6 +1961,11 @@ $(document).click(function(e) {
 	if ($('#srch-crtria-list').css('display') == "block") {
 		$('#srch-crtria-list').toggle();
 	}
+	
+	if ($('#time-frame-options').css('display') == "block") {
+		$('#time-frame-options').toggle();
+	}
+	
 
 	/*
 	 * if($('.v-tbl-icn-wraper').is(':visible')) { $('.v-tbl-icn-wraper').hide(); }
@@ -4609,6 +4638,8 @@ function resetTextForMoodFlow(mood, resetId) {
 }
 
 function saveTextForMoodFlow(content, mood) {
+	//encode text before sending to server
+	var content = window.btoa( unescape( encodeURIComponent( content ) ) );
 	var payload = {
 		"text" : content,
 		"mood" : mood
@@ -4624,13 +4655,13 @@ function saveTextForMoodFlow(content, mood) {
 }
 
 function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete) {
-	$('#happy-text').val(atob(happyText));
-	$('#neutral-text').val(atob(neutralText));
-	$('#sad-text').val(atob(sadText));
+	$('#happy-text').text(decodeURIComponent( escape( window.atob( happyText ) ) ));
+	$('#neutral-text').text(decodeURIComponent( escape( window.atob( neutralText ) ) ));
+	$('#sad-text').text(decodeURIComponent( escape( window.atob( sadText ) ) ));
 
-	$('#happy-text-complete').val(atob(happyTextComplete));
-	$('#neutral-text-complete').val(atob(neutralTextComplete));
-	$('#sad-text-complete').val(atob(sadTextComplete));
+	$('#happy-text-complete').text(decodeURIComponent( escape( window.atob( happyTextComplete ) ) ));
+	$('#neutral-text-complete').text(decodeURIComponent( escape( window.atob( neutralTextComplete ) ) ));
+	$('#sad-text-complete').text(decodeURIComponent( escape( window.atob( sadTextComplete ) ) ));
 }
 
 // User management
@@ -6011,9 +6042,12 @@ function retakeSurveyRequest() {
  */
 function storeCustomerAnswer(customerResponse) {
 	var success = false;
+	//encode question and response
+	var encodedCustomerResponse = window.btoa( unescape( encodeURIComponent( customerResponse ) ) );
+	var encodedQuestion =  window.btoa( unescape( encodeURIComponent( questionDetails.question ) ) );
 	var payload = {
-		"answer" : customerResponse,
-		"question" : questionDetails.question,
+		"answer" : encodedCustomerResponse,
+		"question" : encodedQuestion,
 		"questionType" : questionDetails.questionType,
 		"isUserRankingQuestion" : questionDetails.isUserRankingQuestion,
 		"stage" : qno + 1,
@@ -8559,6 +8593,8 @@ $(document).on('click', '#dsh-dwnld-report-btn', function(e) {
 	$('#overlay-main').show();
 });
 
+
+
 // function to switch to admin
 function userSwitchToAdmin() {
 	callAjaxGET("/switchtoadmin.do", function(data) {
@@ -9483,6 +9519,18 @@ $(document).on('mouseout', '#hdr-link-item-sm', function(e) {
 $(document).on('click', '.hdr-link-item-dropdown-item-sm', function(e) {
 	$('#hdr-link-item-dropdown-sm').hide();
 	showOverlay();
+});
+
+$(document).on('click', '#hdr-dashboard-dropdown', function(e) {
+	$('#hdr-link-item-dropdown-dash').toggle();
+});
+
+$(document).on('mouseover', '#hdr-dashboard-item', function(e) {
+	$('#hdr-link-item-dropdown-dash').show();
+});
+
+$(document).on('mouseout', '#hdr-dashboard-item', function(e) {
+	$('#hdr-link-item-dropdown-dash').hide();
 });
 
 // Help page onclick function
