@@ -1,0 +1,17 @@
+package com.realtech.socialsurvey.core.dao;
+
+import java.util.List;
+
+import com.realtech.socialsurvey.core.entities.UserRankingThisMonthBranch;
+
+public interface UserRankingThisMonthBranchDao extends GenericReportingDao<UserRankingThisMonthBranch, String>{
+
+    int fetchUserRankingRankForThisMonthBranch( Long userId, Long branchId, int year );
+
+    long fetchUserRankingCountForThisMonthBranch( Long branchId,  int month,int year );
+
+    List<UserRankingThisMonthBranch> fetchUserRankingReportForThisMonthBranch( Long branchId, int month, int year );
+
+    List<UserRankingThisMonthBranch> fetchUserRankingWithProfileForThisMonthBranch( Long branchId, int month, int year,
+        int startIndex, int batchSize );
+}

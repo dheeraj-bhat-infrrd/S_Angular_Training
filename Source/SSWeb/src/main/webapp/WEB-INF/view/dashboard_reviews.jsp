@@ -101,7 +101,7 @@
 							</div>
 						</c:otherwise>
 					</c:choose>
-					<div class="ppl-head-1 " style="clear:both">
+					<div class="ppl-head-1 " style="clear:both; text-align:left;">
 					<span class="float-left"> Reviewed by </span>
 					<c:choose>
 						<c:when

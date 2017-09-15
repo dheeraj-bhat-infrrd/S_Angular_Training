@@ -107,8 +107,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_VENDASTA_RM_SETTINGS = "vendasta_rm_settings";
     public static final String KEY_REVIEW_SORT_CRITERIA = "reviewSortCriteria";
     public static final String KEY_SEND_EMAIL_THROUGH = "sendEmailThrough";
+    public static final String KEY_RANKING_REQUIREMENTS = "ranking_requirements";
     public static final String KEY_ALLOW_PARTNER_SURVEY = "allowPartnerSurvey";
-
 
 
     @Value ( "${CDN_PATH}")
@@ -235,7 +235,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             + " wtih value: " + updatedRecord );
         Query query = new Query();
         query.addCriteria( Criteria.where( "_id" ).is( unitSettings.getId() ) );
-        Update update = new Update().set( keyToUpdate, updatedRecord );
+        Update update = new Update();
+        update.set( keyToUpdate, updatedRecord );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
         LOG.debug( "Updating the unit settings" );
         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
         LOG.debug( "Updated the unit setting" );

@@ -36,6 +36,7 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
  */
 @Primary
 @Component ( "generic")
+@Transactional
 public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T, ID>
 {
 
