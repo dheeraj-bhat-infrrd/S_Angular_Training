@@ -9461,6 +9461,7 @@ ul.accordion li>a:before {
 
 /* reporting styles*/
 .generate-report-div{
+	display: -webkit-box;
 	display:inline-flex; 
 	margin-left:5%;
 }
@@ -9482,6 +9483,7 @@ ul.accordion li>a:before {
 }
 
 .generate-report-date-range{
+	display: -webkit-box;
 	display:inline-flex; 
 	margin-left:40px;
 }
@@ -9818,6 +9820,7 @@ ul.accordion li>a:before {
 }
 
 .rep-det-div{
+	display: -webkit-box;
 	display: inline-flex; 
 	margin-top: 10px;
 }
@@ -9901,6 +9904,7 @@ ul.accordion li>a:before {
 }
 
 .leaderboard-name-div{
+	display: -webkit-box;
 	display: inline-flex;
     width: 100%;
     height: 42px;

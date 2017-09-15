@@ -1,0 +1,4 @@
+CURRENTDATE=`date +"%Y%m%d_%H%M%S"`
+echo Current Date and Time is: ${CURRENTDATE}
+
+sh /home/ec2-user/centralized_db_files/staging/pdi-ce-5.4.0.1-130/data-integration/kitchen.sh -file=/home/ec2-user/centralized_db_files/staging/ETLs/centralized_etls/FinalJob.kjb -logfile=/home/ec2-user/centralized_db_files/staging/LogFiles/stage_centralized_${CURRENTDATE}.txt -level=Basic && sh /home/ec2-user/centralized_db_files/staging/pdi-ce-5.4.0.1-130/data-integration/kitchen.sh -file=/home/ec2-user/centralized_db_files/staging/ETLs/reporting_etls/ReportingJobMain.kjb -logfile=/home/ec2-user/centralized_db_files/staging/LogFiles/stage_reporting_${CURRENTDATE}.txt -level=Basic
