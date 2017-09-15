@@ -1517,6 +1517,7 @@ function drawQuestionScoreStatsGraph(entityId,entityType){
 			questionScoreStatsArray[questionScoreStatsIndex++] = scoreStatsArray;
 		}
 		
+		$('#question-ratings-div').html('');
 		for(var i=0; i<questionScoreStatsArray.length ; i++){
 			
 			var graphDivHtml = '';

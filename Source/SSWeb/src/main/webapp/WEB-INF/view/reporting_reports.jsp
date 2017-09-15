@@ -58,7 +58,7 @@
 						</div>
 					</div>
 					<div class="generate-report-date-range" id="date-pickers">
-						<div style="display:inline-flex;">
+						<div style="display: -webkit-box; display:inline-flex;">
 							<span class="generate-report-span-date">Date</span>
 							<span class="generate-report-span-date" style="margin-left: 3px; padding-left:0 !important">Range</span>
 						</div>
