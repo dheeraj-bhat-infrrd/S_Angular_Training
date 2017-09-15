@@ -9358,7 +9358,7 @@ ul.accordion li>a:before {
 .survey-csv-upload-logo {
 	width: 100px;
     height: 62px;
-    background: url(http://www.localhost:8080/resources/images/upload.png);
+    background: url('../images/upload.png');
     margin: 0 auto;
 }
 
