@@ -4,6 +4,14 @@ var monthNamesList = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct
 var overviewData=getOverviewData();
 var socialMediaList = new Array();
 
+function isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+}
+
 function paintForReportingDash() {
 	
 	showDashOverlay('#unclicked-graph-dash');
@@ -18,7 +26,7 @@ function paintForReportingDash() {
     	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
     }
 	
-	if(overviewYearData != null){
+	if(overviewYearData != null && !isEmpty(overviewYearData)){
 		var avgRating = overviewYearData.Rating;
 		var reviewCount=  overviewYearData.TotalReview;
 		paintAvgRating(avgRating);
@@ -32,7 +40,7 @@ function paintForReportingDash() {
 	}
 	
 	//Paint the transactions section of the reporting the dashboard
-	if(overviewYearData!=null){
+	if(overviewYearData!=null && !isEmpty(overviewYearData)){
 		drawUnclickedDonutChart(overviewYearData);
 		drawProcessedDonutChart(overviewYearData);
 		drawUnprocessedDonutChart(overviewYearData);
@@ -75,6 +83,24 @@ function paintForReportingDash() {
 		$('#empty-rep-chart-div').removeClass('hide');
 	}	
 	
+	var processed=parseInt($('#processed-lbl-span').html());
+	var unprocessed=parseInt($('#unprocessed-lbl-span').html());
+	if(processed != 0 || unprocessed != 0){
+		$('#unclicked-trans-graph').removeClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		if(!($('#empty-rep-chart-div').hasClass('hide'))){
+			$('#empty-rep-chart-div').addClass('hide');
+		}	
+	}else{
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		if($('#empty-rep-chart-div').hasClass('hide')){
+			$('#empty-rep-chart-div').removeClass('hide');
+		}	
+	}
+	
 	$(window).resize(function(){
 		 showDashOverlay('#unclicked-graph-dash');
 		 $('#unclicked-trans-graph').removeClass('hide');
@@ -89,8 +115,23 @@ function paintForReportingDash() {
 		 		drawUnprocessedDonutChart(overviewYearData);
 		 	}
 			
-			$('#unprocessed-trans-graph').addClass('hide');
-			$('#processed-trans-graph').addClass('hide');
+			var processed=parseInt($('#processed-lbl-span').html());
+			var unprocessed=parseInt($('#unprocessed-lbl-span').html());
+			if(processed != 0 || unprocessed != 0){
+				$('#unclicked-trans-graph').removeClass('hide');
+				$('#unprocessed-trans-graph').addClass('hide');
+				$('#processed-trans-graph').addClass('hide');
+				if(!($('#empty-rep-chart-div').hasClass('hide'))){
+					$('#empty-rep-chart-div').addClass('hide');
+				}	
+			}else{
+				$('#unclicked-trans-graph').addClass('hide');
+				$('#unprocessed-trans-graph').addClass('hide');
+				$('#processed-trans-graph').addClass('hide');
+				if($('#empty-rep-chart-div').hasClass('hide')){
+					$('#empty-rep-chart-div').removeClass('hide');
+				}	
+			}
 			setTimeout(function(){
 				hideDashOverlay('#unclicked-graph-dash');
 			}, 3000);
@@ -404,7 +445,7 @@ function drawUnclickedDonutChart(overviewYearData){
      var processed;
      var unprocessed;
      
-     if(overviewYearData !=null){
+     if(overviewYearData !=null && !isEmpty(overviewYearData)){
     	 processed = overviewYearData.Processed;
          unprocessed = overviewYearData.Unprocessed;
      }else{
@@ -500,7 +541,7 @@ function drawProcessedDonutChart(overviewYearData){
      var incomplete;
      var completed;
      
-     if(overviewYearData !=null){
+     if(overviewYearData !=null && !isEmpty(overviewYearData)){
     	 incomplete = overviewYearData.Incomplete;
     	 completed = overviewYearData.Completed;
      }else{
@@ -558,7 +599,7 @@ function drawUnprocessedDonutChart(overviewYearData){
     var corrupted;
     var other;
     
-    if(overviewYearData != null){
+    if(overviewYearData != null && !isEmpty(overviewYearData)){
     	unassigned = overviewYearData.Unassigned;
         duplicate = overviewYearData.Duplicate;
         corrupted = overviewYearData.Corrupted;
@@ -696,7 +737,7 @@ function getTimeFrameValue(){
 
 function drawSpsGauge(){
 	
-	if(overviewData != null){
+	if(overviewData != null && !isEmpty(overviewData)){
 		var detractorEndAngle;
 		var passivesEndAngle;
 		var promotersEndAngle;
@@ -732,7 +773,7 @@ function drawSpsGauge(){
 						
 				var spsScore = overviewData.SpsScore;
 				
-				if(overviewData != null){
+				if(overviewData != null && !isEmpty(overviewData)){
 					
 					$('#spsScorebox').html(spsScore);
 					var detractors = overviewData.DetractorPercentage;
@@ -814,8 +855,7 @@ function drawSpsGauge(){
 				
 				var marginLeft = parseInt($("#metre-needle").css("margin-left"));
 				var marginTop = parseInt($("#metre-needle").css("margin-top"));
-				
-				
+			
 				var needleDegree;
 				var marginNeedle = Math.abs(spsScore - 20)/2;
 				
@@ -862,7 +902,7 @@ function drawSpsGauge(){
 
 function drawOverviewPage(){
 	
-	if(overviewData != null){
+	if(overviewData != null && !isEmpty(overviewData)){
 		
 		var detractors = overviewData.DetractorPercentage;
 		var passives =   overviewData.PassivesPercentage;
@@ -876,6 +916,21 @@ function drawOverviewPage(){
 				$('#spsGaugeFailure').hide();
 				$('#spsGaugeSuccess').show();
 			}
+			
+			//detractors,passives and promoters bar and values assignment
+			$('#detractorsBar').css('width',detractors+'%');
+			$('#detractorsValue').html(detractors+'%');
+			$('#passivesBar').css('width',passives+'%');
+			$('#passivesValue').html(passives+'%');
+			$('#promotersBar').css('width',promoters+'%');
+			$('#promotersValue').html(promoters+'%');	
+	}else{
+			var detractors = 0;
+			var passives =   0;
+			var promoters =  0;
+		
+			$('#spsGaugeSuccess').hide();
+			$('#spsGaugeFailure').show();
 			
 			//detractors,passives and promoters bar and values assignment
 			$('#detractorsBar').css('width',detractors+'%');
@@ -1142,7 +1197,7 @@ function updateReportingDashboard(){
     	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
     }
 	
-	if(overviewYearData!=null){
+	if(overviewYearData!=null && !isEmpty(overviewYearData)){
 		$('#processed-lbl-span').html(overviewYearData.Processed);
 		$('#completed-lbl-span').html(overviewYearData.Completed+' ('+overviewYearData.CompletePercentage+'%)');
 		$('#incomplete-lbl-span').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
