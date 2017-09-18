@@ -1128,14 +1128,14 @@ public class DashboardController
             
             //check if max survey reminder has been reached
             if(survey.getReminderCounts() >= maxReminderCount){
-                response.put("success" ,  "No more reminder mails are allowed for " + survey.getCustomerEmailId()  );
+                response.put("success" ,  "Cannot send the reminder email to " +  survey.getCustomerEmailId() + ". No more reminders are allowed." );
                 return new Gson().toJson( response );
             }
             
             Calendar yesterDayDate = Calendar.getInstance();
             yesterDayDate.add( Calendar.DATE, -1 );
             if(survey.getLastReminderTime().after(  yesterDayDate.getTime() )  ){
-                response.put("success" ,  "Can't send reminder email. A reminder has already been sent in last 24 hours to " + survey.getCustomerEmailId()   );
+                response.put("success" ,  "Cannot send the reminder email to " +  survey.getCustomerEmailId() + ". You have sent a reminder in last 24 hrs");
                 return new Gson().toJson( response );
             }
             
@@ -1199,14 +1199,14 @@ public class DashboardController
                     
                     //check if max survey reminder has been reached
                     if(survey.getReminderCounts() >= maxReminderCount){
-                        responseMsg +=  "No more reminder mails are allowed to " + survey.getCustomerEmailId();
+                        responseMsg +=  "Cannot send the reminder email to " +  survey.getCustomerEmailId() + ". No more reminders are allowed. ";
                         continue;
                     }
                     
                     Calendar yesterDayDate = Calendar.getInstance();
                     yesterDayDate.add( Calendar.DATE, -1 );
                     if(survey.getLastReminderTime().after(  yesterDayDate.getTime() )  ){
-                        responseMsg += "Can't send reminder email. A reminder has already been sent in last 24 hours for " + survey.getCustomerEmailId() ;
+                        responseMsg += "Cannot send the reminder email to " +  survey.getCustomerEmailId() + ". You have sent a reminder in last 24 hrs. ";
                         continue;
                     }
                     
@@ -1214,6 +1214,9 @@ public class DashboardController
                     // Increasing value of reminder count by 1.
                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
                     responseMsg += "Reminder mail sent successfully to " + survey.getCustomerEmailId();
+                    
+                    responseMsg += "\n";
+                    
                 } catch ( NumberFormatException e ) {
                     throw new NonFatalException(
                         "Number format exception occured while parsing incomplete survey id : " + incompleteSurveyIdStr, e );

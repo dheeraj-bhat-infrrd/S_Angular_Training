@@ -8934,6 +8934,7 @@ $(document).on('click', '#resend-mult-sur-icn.mult-sur-icn-active', function() {
 function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
 	showOverlay();
 	callAjaxPOSTWithTextData("/resendmultipleincompletesurveyrequest.do?surveysSelected=" + incompleteSurveyIds, function(data) {
+		data = JSON.parse(data);
 		if (data.errMsg == undefined || data.errMsg == "") {
 			// unselect all the options after deleting
 			$('#icn-sur-popup-cont').data('selected-survey', []);
