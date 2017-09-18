@@ -118,7 +118,6 @@
   <hop> <from>Merge Join</from><to>Filter Sentrows</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>FilterCompleted</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 2</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join 3</from><to>SortMood</to><enabled>Y</enabled> </hop>
   <hop> <from>MergeSurveyDetailsID</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Multiway Merge Join</from><to>Select values</to><enabled>Y</enabled> </hop>
@@ -168,10 +167,11 @@
   <hop> <from>Sort rows 8 2</from><to>Merge Join 5</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 11</from><to>Merge Join 5</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 5</from><to>Sort rows 11 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 11 2</from><to>Merge Join 3</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 5</from><to>Sort rows 10 3</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>If field value is null 2</to><enabled>Y</enabled> </hop>
   <hop> <from>If field value is null 2</from><to>jsForMainValues</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 11 2</from><to>SortMood</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 11 2</from><to>Merge Join 3</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AverageScoreGroupBy</name>
@@ -1125,8 +1125,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>383</xloc>
-      <yloc>234</yloc>
+      <xloc>428</xloc>
+      <yloc>198</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1650,7 +1650,7 @@
     <name>Sort rows 11 2</name>
     <type>SortRows</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
