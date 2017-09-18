@@ -168,6 +168,34 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
   <hop> <from>user_profile</from><to>GroupUserByRegion</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupUserByRegion</from><to>MergeOnUserId</to><enabled>Y</enabled> </hop>
@@ -178,13 +206,10 @@
   <hop> <from>Select All Values</from><to>jsForMainBranch</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForMainBranch</from><to>UUID_overview_region</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForPercentage</from><to>jsForIncompleteSurveys</to><enabled>Y</enabled> </hop>
-  <hop> <from>jsToConvertNullToZero</from><to>overview_region_output</to><enabled>Y</enabled> </hop>
-  <hop> <from>overview_region_output</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>MergeOnUserId</from><to>Group byRegionId2</to><enabled>Y</enabled> </hop>
   <hop> <from>Group byRegionId2</from><to>SortBasedOnRegionId</to><enabled>Y</enabled> </hop>
   <hop> <from>SortByEntityId</from><to>GroupByRegionId</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupByRegionId</from><to>SortOnEntityId</to><enabled>Y</enabled> </hop>
-  <hop> <from>jsForIncompleteSurveys</from><to>jsToConvertNullToZero</to><enabled>Y</enabled> </hop>
   <hop> <from>MergeOnUserId 2</from><to>Group byRegionId2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>overview_user 2</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows</from><to>MergeOnUserId 2</to><enabled>Y</enabled> </hop>
@@ -200,6 +225,9 @@
   <hop> <from>UUID_overview_region</from><to>jsForPercentage</to><enabled>Y</enabled> </hop>
   <hop> <from>user_profile 2</from><to>GroupByRegionId 2</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupByRegionId 2</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>jsForIncompleteSurveys</from><to>If field value is null</to><enabled>Y</enabled> </hop>
+  <hop> <from>If field value is null</from><to>overview_region_output</to><enabled>Y</enabled> </hop>
+  <hop> <from>overview_region_output</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Database_branch_social</name>
@@ -244,8 +272,8 @@
            </partitioning>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>170</xloc>
-      <yloc>578</yloc>
+      <xloc>150</xloc>
+      <yloc>584</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -507,6 +535,34 @@
     </step>
 
   <step>
+    <name>If field value is null</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <replaceAllByValue/>
+      <replaceAllMask/>
+      <selectFields>N</selectFields>
+      <selectValuesType>N</selectValuesType>
+      <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>629</xloc>
+      <yloc>584</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>MergeOnUserId</name>
     <type>MergeJoin</type>
     <description/>
@@ -700,7 +756,7 @@
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1039</xloc>
-      <yloc>269</yloc>
+      <yloc>265</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1079,7 +1135,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1039</xloc>
-      <yloc>417</yloc>
+      <yloc>467</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1099,7 +1155,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;total_processed &#x21;&#x3d; 0 &#x7c;&#x7c; total_processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;total_survey_completed_count&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;total_incomplete_transactions_count&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var total_social_posts &#x3d; total_shared_by  &#x2b; branch_social_post &#x2b; direct_user_social_post &#x3b; </jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;total_processed &#x21;&#x3d; 0 &#x26;&#x26; total_processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;total_survey_completed_count&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;total_incomplete_transactions_count&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var total_social_posts &#x3d; total_shared_by  &#x2b; branch_social_post &#x2b; direct_user_social_post &#x3b; </jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>complete_percentage</name>
         <rename>complete_percentage</rename>
         <type>Number</type>
@@ -1120,8 +1176,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>788</xloc>
-      <yloc>578</yloc>
+      <xloc>854</xloc>
+      <yloc>584</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1156,8 +1212,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1032</xloc>
-      <yloc>347</yloc>
+      <xloc>1039</xloc>
+      <yloc>378</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1204,152 +1260,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1034</xloc>
-      <yloc>576</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>jsToConvertNullToZero</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;total_social_posts &#x3d;&#x3d; null&#x29;var  total_social_posts  &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_detractors_count &#x3d;&#x3d; null&#x29;var total_detractors_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_passives_count &#x3d;&#x3d; null&#x29;var total_passives_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_promoters_count&#x3d;&#x3d; null&#x29;var total_promoters_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_corrupted_count &#x3d;&#x3d; null&#x29;var total_corrupted_count&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_mismatched_count &#x3d;&#x3d; null&#x29;var total_mismatched_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_duplicate_count &#x3d;&#x3d; null&#x29;var total_duplicate_count&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_archieved_count&#x3d;&#x3d; null&#x29;var total_archieved_count&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_incomplete_transactions_count&#x3d;&#x3d; null&#x29;var total_incomplete_transactions_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_survey_sent_count &#x3d;&#x3d; null&#x29;var total_survey_sent_count&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_survey_completed_count &#x3d;&#x3d; null&#x29;var total_survey_completed_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_zillow_reviews_count &#x3d;&#x3d; null&#x29;var total_zillow_reviews_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_reviews_count &#x3d;&#x3d; null&#x29;var total_reviews_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;rating_count &#x3d;&#x3d; null&#x29;var rating_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_processed &#x3d;&#x3d; null&#x29;var total_processed&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_unprocessed&#x3d;&#x3d; null&#x29;var total_unprocessed&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;rating &#x3d;&#x3d; null&#x29;var rating &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;sps_score_var&#x3d;&#x3d; null&#x29;var promoter_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;detractors_percentage_var&#x3d;&#x3d; null&#x29;var detractors_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;passives_percentage_var&#x3d;&#x3d; null&#x29;var passives_percentage_var &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;promoter_percentage_var &#x3d;&#x3d; null&#x29;var promoter_percentage_var&#x3d; 0&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>total_shared_by</name>
-        <rename>total_shared_by</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_detractors_count</name>
-        <rename>total_detractors_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_passives_count</name>
-        <rename>total_passives_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_promoters_count</name>
-        <rename>total_promoters_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_corrupted_count</name>
-        <rename>total_corrupted_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_mismatched_count</name>
-        <rename>total_mismatched_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_duplicate_count</name>
-        <rename>total_duplicate_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_archieved_count</name>
-        <rename>total_archieved_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_incomplete_transactions_count</name>
-        <rename>total_incomplete_transactions_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_survey_sent_count</name>
-        <rename>total_survey_sent_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_survey_completed_count</name>
-        <rename>total_survey_completed_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_zillow_reviews_count</name>
-        <rename>total_zillow_reviews_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_reviews_count</name>
-        <rename>total_reviews_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>rating_count</name>
-        <rename>rating_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_processed</name>
-        <rename>total_processed</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>total_unprocessed</name>
-        <rename>total_unprocessed</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>rating</name>
-        <rename>rating</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>promoter_percentage_var</name>
-        <rename>promoter_percentage_var</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>detractors_percentage_var</name>
-        <rename>detractors_percentage_var</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>passives_percentage_var</name>
-        <rename>passives_percentage_var</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>588</xloc>
-      <yloc>578</yloc>
+      <xloc>1039</xloc>
+      <yloc>584</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1513,7 +1425,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>380</xloc>
-      <yloc>578</yloc>
+      <yloc>584</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
