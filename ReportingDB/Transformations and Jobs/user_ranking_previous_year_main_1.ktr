@@ -121,7 +121,6 @@
   <hop> <from>Merge Join</from><to>Filter Sentrows</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>FilterCompleted</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 2</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join 3</from><to>SortMood</to><enabled>Y</enabled> </hop>
   <hop> <from>MergeSurveyDetailsID</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Multiway Merge Join</from><to>Select values</to><enabled>Y</enabled> </hop>
@@ -168,6 +167,7 @@
   <hop> <from>Sort rows 12</from><to>Merge Join 5</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 5</from><to>Sort rows 8 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 5</from><to>Sort rows 8 2 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 8 2</from><to>SortMood</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AverageScoreGroupBy</name>
@@ -1985,7 +1985,7 @@
     <name>Sort rows 8 2</name>
     <type>SortRows</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
