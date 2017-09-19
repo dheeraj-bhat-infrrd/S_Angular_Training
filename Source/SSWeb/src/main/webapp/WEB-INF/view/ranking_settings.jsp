@@ -46,7 +46,17 @@
 		</div>
 	</div>
 </div>
-
+<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background-color: #009fe0;">
+	<div class="container">
+		<div class="hm-header-row clearfix" style="color: #f2f2f2;">
+			<div id="rep-beta-disclaimer">
+				<div style="text-align:center; margin-top:15px;">
+					<span style="text-align: center; line-height: 15px; font-size:small; font-weight: bold !important;">Please note that this is a beta version of the page which is still undergoing final testing before its official release. Should you encounter any bugs, glitches or other problems on the page / reports, please notify us immediately. Your help in this regard is greatly appreciated.</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div id="min-req-container" class="container pos-relative">
 		<div id="min-req-settings">
@@ -87,18 +97,6 @@
 				</div>
 			</div>
 		</c:if>
-	</div>
-</div>
-
-<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background-color: #009fe0; margin-bottom: 2px;">
-	<div class="container">
-		<div class="hm-header-row clearfix" style="color: #f2f2f2;">
-			<div id="rep-beta-disclaimer">
-				<div style="text-align:center; margin-top:15px;">
-					<span style="text-align: center; font-variant: small-caps; line-height: 15px; font-size:medium; font-weight: bold !important;">Please note that this is a beta version of the page which is still undergoing final testing before its official release. Should you encounter any bugs, glitches or other problems on the page / reports, please notify us immediately. Your help in this regard is greatly appreciated.</span>
-				</div>
-			</div>
-		</div>
 	</div>
 </div>
 <script>
