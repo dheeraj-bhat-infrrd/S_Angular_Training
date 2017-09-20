@@ -1116,7 +1116,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<join_type>INNER</join_type>
+<join_type>FULL OUTER</join_type>
 <step1>Sort rows 4</step1>
 <step2>Sort rows 5</step2>
     <keys_1>
