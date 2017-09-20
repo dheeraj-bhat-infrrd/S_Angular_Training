@@ -1302,9 +1302,9 @@ function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
 				
 				profileImageUrl = userRankingList[i][10];
 				if(profileImageUrl != null && profileImageUrl!="" && profileImageUrl != 'null'){
-					imageDiv='<img id="lead-prof-image-edit" class="prof-image prof-image-edit pos-relative leaderboard-pic-circle" src="'+profileImageUrl+'"></img>';
+					imageDiv='<img id="lead-prof-image-edit" class="prof-image-edit pos-relative leaderboard-pic-circle" src="'+profileImageUrl+'"></img>';
 				}else{
-					imageDiv='<div id="lead-prof-image-edit" class="prof-image prof-image-edit pers-default-big pos-relative leaderboard-pic-circle"></div>';
+					imageDiv='<div id="lead-prof-image-edit" class="prof-image-edit pers-default-big pos-relative leaderboard-pic-circle"></div>';
 				}
 				if(userRankingList[i][0] == userId  && profileMasterId == 4){
 					tableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
@@ -1328,9 +1328,9 @@ function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
 				
 				profileImageUrl = userRankingList[i][10];
 				if(profileImageUrl != null && profileImageUrl!="" && profileImageUrl != 'null'){
-					imageDiv='<img id="lead-prof-image-edit" class="prof-image prof-image-edit pos-relative leaderboard-pic-circle" src="'+profileImageUrl+'"></img>';
+					imageDiv='<img id="lead-prof-image-edit" class="prof-image-edit pos-relative leaderboard-pic-circle" src="'+profileImageUrl+'"></img>';
 				}else{
-					imageDiv='<div id="lead-prof-image-edit" class="prof-image prof-image-edit pers-default-big pos-relative leaderboard-pic-circle"></div>';
+					imageDiv='<div id="lead-prof-image-edit" class="prof-image-edit pers-default-big pos-relative leaderboard-pic-circle"></div>';
 				}
 				
 				if(userRankingList[i][0] == userId  && profileMasterId == 4){
