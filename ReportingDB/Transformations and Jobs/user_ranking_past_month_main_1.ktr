@@ -1266,7 +1266,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var total_sent &#x3d; Sent &#x2b; Completed&#xd;&#xa;if&#x28;total_sent &#x21;&#x3d; 0 &#x26;&#x26; total_sent  &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;		complete_percentage &#x3d; &#x28;Completed&#x2f;total_sent &#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID_temp &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp  &#x3d; AGENT_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var COMPANY_ID_temp &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp  &#x3d; COMPANY_ID_1&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var total_sent &#x3d; Sent &#x2b; Completed&#xd;&#xa;if&#x28;total_sent &#x21;&#x3d; 0 &#x26;&#x26; total_sent  &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;		complete_percentage &#x3d; &#x28;Completed&#x2f;total_sent &#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID_temp &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp  &#x3d; AGENT_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var COMPANY_ID_temp &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp  &#x3d; COMPANY_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var first_name&#xd;&#xa;&#xd;&#xa;if&#x28;first_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;first_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var last_name&#xd;&#xa;&#xd;&#xa;if&#x28;last_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;last_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var month_data&#xd;&#xa;&#xd;&#xa;if&#x28;month_data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; month_data &#x3d; month_data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;month_data_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  month_data &#x3d; month_data_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var year_data&#xd;&#xa;&#xd;&#xa;if&#x28;year_data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; year_data &#x3d; year_data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;year_data_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  year_data &#x3d; year_data_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var days_of_registration&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; days_of_registration &#x3d; days_of_registration&#x3b;&#xd;&#xa;&#x7d;else if&#x28;days_of_registration_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  days_of_registration &#x3d; days_of_registration_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var month_row&#xd;&#xa;&#xd;&#xa;if&#x28;month_row &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; month_row &#x3d; month_row&#x3b;&#xd;&#xa;&#x7d;else if&#x28;month_row_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  month_row &#x3d; month_row_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var MonthString&#xd;&#xa;&#xd;&#xa;if&#x28;MonthString &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; MonthString &#x3d; MonthString&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MonthString_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  MonthString &#x3d; MonthString_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var YearString&#xd;&#xa;&#xd;&#xa;if&#x28;YearString &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;YearString &#x3d; YearString&#x3b;&#xd;&#xa;&#x7d;else if&#x28;YearString_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  YearString&#x3d; YearString_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var EMAIL_ID&#xd;&#xa;&#xd;&#xa;if&#x28;EMAIL_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;EMAIL_ID &#x3d; EMAIL_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;EMAIL_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  EMAIL_ID&#x3d; EMAIL_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>complete_percentage</name>
         <rename>complete_percentage</rename>
         <type>Number</type>
@@ -1291,6 +1291,60 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
+      </field>      <field>        <name>first_name</name>
+        <rename>first_name</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>last_name</name>
+        <rename>last_name</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>month_data</name>
+        <rename>month_data</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>year_data</name>
+        <rename>year_data</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>days_of_registration</name>
+        <rename>days_of_registration</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>month_row</name>
+        <rename>month_row</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>MonthString</name>
+        <rename>MonthString</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>YearString</name>
+        <rename>YearString</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>EMAIL_ID</name>
+        <rename>EMAIL_ID</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1318</xloc>
