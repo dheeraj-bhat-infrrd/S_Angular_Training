@@ -124,6 +124,9 @@
 		$(document).on('click','#prof-company-review-count',function(e){
 			e.stopPropagation();
 			activaTab('reviews-tab');
+			delay(function(){
+				$(window).scrollTop($('#rep-reviews-container').offset().top);
+			},300);
 		});
 		
 		$('#rep-social-media').on('click','#rep-dismiss-social-media',function(e){
