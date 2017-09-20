@@ -154,13 +154,9 @@
   <hop> <from>Sort rows 14</from><to>Merge Join 5</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 12 2</from><to>Merge Join 5</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 9</from><to>MergeSurveyDetailsID</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join 5</from><to>Filter rows 4 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join 5</from><to>Filter rows 4 3</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 4 3</from><to>SortMood</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 4 2</from><to>Sort rowsCompleted</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join 5</from><to>Filter rows 4 4</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 4 4</from><to>Sort rows 9</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join 5</from><to>Filter rows 4</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 4</from><to>Sort rows 10 3</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 10 3</from><to>GroupByZillow</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
@@ -170,6 +166,11 @@
   <hop> <from>Multiway Merge Join</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 13</from><to>Unique rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Unique rows</from><to>Generate random value</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join 5</from><to>companyFinal</to><enabled>Y</enabled> </hop>
+  <hop> <from>companyFinal</from><to>Filter rows 4 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>companyFinal</from><to>Filter rows 4 4</to><enabled>Y</enabled> </hop>
+  <hop> <from>companyFinal</from><to>Filter rows 4</to><enabled>Y</enabled> </hop>
+  <hop> <from>companyFinal</from><to>Filter rows 4 2</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AverageScoreGroupBy</name>
@@ -771,7 +772,7 @@
         </field>
         <field>
           <aggregate>COMPANY_ID</aggregate>
-          <subject>COMPANY_ID_1</subject>
+          <subject>COMPANY_ID</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -879,7 +880,7 @@
         </field>
         <field>
           <aggregate>COMPANY_ID</aggregate>
-          <subject>COMPANY_ID_1</subject>
+          <subject>COMPANY_ID</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1066,7 +1067,7 @@
         </field>
         <field>
           <aggregate>COMPANY_ID</aggregate>
-          <subject>COMPANY_ID_1</subject>
+          <subject>COMPANY_ID</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1120,7 +1121,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<join_type>RIGHT OUTER</join_type>
+<join_type>FULL OUTER</join_type>
 <step1>Sort rows 4</step1>
 <step2>Sort rows 5</step2>
     <keys_1>
@@ -1136,7 +1137,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1188</xloc>
-      <yloc>79</yloc>
+      <yloc>78</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1191,8 +1192,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>310</xloc>
-      <yloc>224</yloc>
+      <xloc>211</xloc>
+      <yloc>207</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1261,13 +1262,13 @@
         <replace>Y</replace>
       </field>      <field>        <name>MONTH_Data</name>
         <rename>MONTH_Data</rename>
-        <type>Integer</type>
+        <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>Year_Data</name>
         <rename>Year_Data</rename>
-        <type>Integer</type>
+        <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
@@ -2949,6 +2950,36 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1428</xloc>
       <yloc>691</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>companyFinal</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var COMPANY_ID&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; COMPANY_ID &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; COMPANY_ID &#x3d;COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>COMPANY_ID</name>
+        <rename>COMPANY_ID</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>308</xloc>
+      <yloc>211</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
