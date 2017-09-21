@@ -206,7 +206,6 @@
   <hop> <from>jsForMainBranch</from><to>UUID_overview_branch</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForPercentage</from><to>jsForIncompleteSurveys</to><enabled>Y</enabled> </hop>
   <hop> <from>jsToConvertNullToZero</from><to>overview_branch_output</to><enabled>Y</enabled> </hop>
-  <hop> <from>overview_branch_output</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>MergeOnUserId</from><to>Group byBranchId2</to><enabled>Y</enabled> </hop>
   <hop> <from>Group byBranchId2</from><to>SortBasedOnBranchId</to><enabled>Y</enabled> </hop>
   <hop> <from>SortByEntityId</from><to>GroupByBranchId</to><enabled>Y</enabled> </hop>
@@ -223,25 +222,6 @@
   <hop> <from>jsForIncompleteSurveys</from><to>jsToConvertNullToZero</to><enabled>Y</enabled> </hop>
   <hop> <from>Extra Zillow group</from><to>Sort BranchId</to><enabled>Y</enabled> </hop>
   </order>
-  <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>532</xloc>
-      <yloc>702</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step>
     <name>Extra Zillow group</name>
     <type>MemoryGroupBy</type>

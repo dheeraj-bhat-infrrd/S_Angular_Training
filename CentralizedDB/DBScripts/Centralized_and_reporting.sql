@@ -1770,9 +1770,7 @@ CREATE TABLE `overview_branch` (
   `incomplete_percentage` decimal(10,2) NOT NULL DEFAULT '0.00',
   `processed` int(11) NOT NULL DEFAULT '0',
   `unprocessed` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`overview_branch_id`),
-  KEY `FX_OVERVIEW_BRANCH_idx` (`branch_id`),
-  CONSTRAINT `FX_OVERVIEW_BRANCH` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`overview_branch_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1867,9 +1865,7 @@ CREATE TABLE `overview_company` (
   `incomplete_percentage` decimal(10,2) NOT NULL DEFAULT '0.00',
   `processed` int(11) NOT NULL DEFAULT '0',
   `unprocessed` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`overview_company_id`),
-  KEY `FX_OVERVIEW_COMPANY_idx` (`company_id`),
-  CONSTRAINT `FX_OVERVIEW_COMPANY` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`overview_company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1964,9 +1960,7 @@ CREATE TABLE `overview_region` (
   `incomplete_percentage` decimal(10,2) NOT NULL DEFAULT '0.00',
   `processed` int(11) NOT NULL DEFAULT '0',
   `unprocessed` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`overview_region_id`),
-  KEY `FX_OVERVIEW_REGION_idx` (`region_id`),
-  CONSTRAINT `FX_OVERVIEW_REGION` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`overview_region_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
