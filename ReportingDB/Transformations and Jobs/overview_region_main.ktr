@@ -203,8 +203,7 @@
   <hop> <from>social_post_input</from><to>jsToCountPost</to><enabled>Y</enabled> </hop>
   <hop> <from>jsToCountPost</from><to>SortByEntityId</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>MergeOnUserId</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select All Values</from><to>jsForMainBranch</to><enabled>Y</enabled> </hop>
-  <hop> <from>jsForMainBranch</from><to>UUID_overview_region</to><enabled>Y</enabled> </hop>
+  <hop> <from>jsForMainRegion</from><to>UUID_overview_region</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForPercentage</from><to>jsForIncompleteSurveys</to><enabled>Y</enabled> </hop>
   <hop> <from>MergeOnUserId</from><to>Group byRegionId2</to><enabled>Y</enabled> </hop>
   <hop> <from>Group byRegionId2</from><to>SortBasedOnRegionId</to><enabled>Y</enabled> </hop>
@@ -217,17 +216,23 @@
   <hop> <from>Group byRegionId2 2</from><to>SortBasedOnRegionId 2</to><enabled>Y</enabled> </hop>
   <hop> <from>region_input</from><to>Database_branch_social</to><enabled>Y</enabled> </hop>
   <hop> <from>Database_branch_social</from><to>SortBasedOnRegionId 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortBasedOnRegionId</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortOnEntityId</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortBasedOnRegionId 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortBasedOnRegionId 3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Multiway Merge Join</from><to>Select All Values</to><enabled>Y</enabled> </hop>
   <hop> <from>UUID_overview_region</from><to>jsForPercentage</to><enabled>Y</enabled> </hop>
   <hop> <from>user_profile 2</from><to>GroupByRegionId 2</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupByRegionId 2</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForIncompleteSurveys</from><to>If field value is null</to><enabled>Y</enabled> </hop>
   <hop> <from>If field value is null</from><to>overview_region_output</to><enabled>Y</enabled> </hop>
   <hop> <from>overview_region_output</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey_details extra zillow</from><to>Extra Zillow group</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey details total reviews</from><to>Memory Group by</to><enabled>Y</enabled> </hop>
+  <hop> <from>Memory Group by</from><to>Sort RegionId 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Extra Zillow group</from><to>Sort RegionId</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortBasedOnRegionId</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortOnEntityId</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortBasedOnRegionId 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortBasedOnRegionId 3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort RegionId</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort RegionId 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Multiway Merge Join</from><to>jsForMainRegion</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Database_branch_social</name>
@@ -253,8 +258,8 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>503</xloc>
-      <yloc>472</yloc>
+      <xloc>610</xloc>
+      <yloc>477</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -272,8 +277,8 @@
            </partitioning>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>150</xloc>
-      <yloc>584</yloc>
+      <xloc>886</xloc>
+      <yloc>880</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -357,24 +362,6 @@
           <valuefield/>
         </field>
         <field>
-          <aggregate>total_zillow_reviews_count</aggregate>
-          <subject>zillow_reviews</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>total_reviews_count</aggregate>
-          <subject>total_reviews</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>rating_count</aggregate>
-          <subject>rating</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
           <aggregate>total_processed</aggregate>
           <subject>processed</subject>
           <type>SUM</type>
@@ -395,8 +382,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>551</xloc>
-      <yloc>116</yloc>
+      <xloc>610</xloc>
+      <yloc>93</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -428,7 +415,7 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>571</xloc>
+      <xloc>610</xloc>
       <yloc>369</yloc>
       <draw>Y</draw>
       </GUI>
@@ -461,8 +448,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>541</xloc>
-      <yloc>239</yloc>
+      <xloc>610</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -547,17 +534,155 @@
            </partitioning>
       <replaceAllByValue/>
       <replaceAllMask/>
-      <selectFields>N</selectFields>
+      <selectFields>Y</selectFields>
       <selectValuesType>N</selectValuesType>
       <setEmptyStringAll>N</setEmptyStringAll>
     <valuetypes>
       </valuetypes>
     <fields>
+      <field>
+        <name>total_detractors_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_passives_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_promoters_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_corrupted_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_mismatched_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_duplicate_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_archieved_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_incomplete_transactions_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_survey_sent_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_survey_completed_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_processed</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_unprocessed</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_shared_by</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>extra_zillow</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_reviews</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>rating</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>sps_score_var</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>detractors_percentage_var</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>passives_percentage_var</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>promoter_percentage_var</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>complete_percentage</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>incomplete_percentage</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_social_posts</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>629</xloc>
-      <yloc>584</yloc>
+      <xloc>1361</xloc>
+      <yloc>877</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -584,8 +709,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>430</xloc>
-      <yloc>117</yloc>
+      <xloc>431</xloc>
+      <yloc>93</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -614,37 +739,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>431</xloc>
       <yloc>369</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <join_type>FULL OUTER</join_type>
-    <step0>SortBasedOnRegionId</step0>
-    <step1>SortOnEntityId</step1>
-    <step2>SortBasedOnRegionId 2</step2>
-    <step3>SortBasedOnRegionId 3</step3>
-    <number_input>4</number_input>
-    <keys>
-      <key>REGION_ID</key>
-      <key>ENTITY_ID</key>
-      <key>REGION_ID</key>
-      <key>REGION_ID</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>870</xloc>
-      <yloc>265</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -755,8 +849,8 @@
       </field>        <select_unspecified>N</select_unspecified>
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1039</xloc>
-      <yloc>265</yloc>
+      <xloc>1135</xloc>
+      <yloc>148</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -973,8 +1067,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>668</xloc>
-      <yloc>127</yloc>
+      <xloc>810</xloc>
+      <yloc>93</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1007,8 +1101,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>731</xloc>
-      <yloc>369</yloc>
+      <xloc>810</xloc>
+      <yloc>370</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1041,8 +1135,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>701</xloc>
-      <yloc>469</yloc>
+      <xloc>810</xloc>
+      <yloc>477</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1075,7 +1169,7 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>425</xloc>
+      <xloc>431</xloc>
       <yloc>239</yloc>
       <draw>Y</draw>
       </GUI>
@@ -1109,7 +1203,7 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>671</xloc>
+      <xloc>810</xloc>
       <yloc>240</yloc>
       <draw>Y</draw>
       </GUI>
@@ -1134,8 +1228,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1039</xloc>
-      <yloc>467</yloc>
+      <xloc>1350</xloc>
+      <yloc>511</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1176,14 +1270,14 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>854</xloc>
-      <yloc>584</yloc>
+      <xloc>1358</xloc>
+      <yloc>737</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>jsForMainBranch</name>
+    <name>jsForMainRegion</name>
     <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
@@ -1197,23 +1291,17 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var main_RegionId &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;REGION_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_RegionId&#x3d;REGION_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;ENTITY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_RegionId&#x3d;ENTITY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;REGION_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_RegionId&#x3d;REGION_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;REGION_ID_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_RegionId&#x3d;REGION_ID_2&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;total_reviews_count &#x21;&#x3d; null &#x26;&#x26; total_reviews_count &#x21;&#x3d; 0&#x29;&#xd;&#xa;var rating &#x3d; rating_count &#x2f; num_of_users&#x3b;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var main_RegionId &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;REGION_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_RegionId&#x3d;REGION_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;ENTITY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_RegionId&#x3d;ENTITY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;REGION_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_RegionId&#x3d;REGION_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;REGION_ID_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_RegionId&#x3d;REGION_ID_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;REGION_ID_3&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_RegionId&#x3d;REGION_ID_3&#x3b;&#xd;&#xa;&#x7d;else if&#x28;REGION_ID_4&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	main_RegionId&#x3d;REGION_ID_4&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>main_RegionId</name>
         <rename>main_RegionId</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
-      </field>      <field>        <name>rating</name>
-        <rename>rating</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1039</xloc>
-      <yloc>378</yloc>
+      <xloc>1344</xloc>
+      <yloc>390</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1260,8 +1348,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1039</xloc>
-      <yloc>584</yloc>
+      <xloc>1356</xloc>
+      <yloc>628</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1310,7 +1398,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>overview_region</table>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
     <use_batch>N</use_batch>
@@ -1326,24 +1414,72 @@
     <return_field/>
     <fields>
         <field>
-          <column_name>sps_score</column_name>
-          <stream_name>sps_score_var</stream_name>
+          <column_name>completed</column_name>
+          <stream_name>total_survey_completed_count</stream_name>
+        </field>
+        <field>
+          <column_name>completed_percentage</column_name>
+          <stream_name>complete_percentage</stream_name>
         </field>
         <field>
           <column_name>detractors_percentage</column_name>
           <stream_name>detractors_percentage_var</stream_name>
         </field>
         <field>
+          <column_name>incomplete</column_name>
+          <stream_name>total_incomplete_transactions_count</stream_name>
+        </field>
+        <field>
+          <column_name>incomplete_percentage</column_name>
+          <stream_name>incomplete_percentage</stream_name>
+        </field>
+        <field>
+          <column_name>overview_region_id</column_name>
+          <stream_name>overview_region_id</stream_name>
+        </field>
+        <field>
           <column_name>passives_percentage</column_name>
           <stream_name>passives_percentage_var</stream_name>
+        </field>
+        <field>
+          <column_name>processed</column_name>
+          <stream_name>total_processed</stream_name>
         </field>
         <field>
           <column_name>promoter_percentage</column_name>
           <stream_name>promoter_percentage_var</stream_name>
         </field>
         <field>
+          <column_name>rating</column_name>
+          <stream_name>rating</stream_name>
+        </field>
+        <field>
+          <column_name>region_id</column_name>
+          <stream_name>main_RegionId</stream_name>
+        </field>
+        <field>
+          <column_name>social_posts</column_name>
+          <stream_name>total_social_posts</stream_name>
+        </field>
+        <field>
+          <column_name>sps_score</column_name>
+          <stream_name>sps_score_var</stream_name>
+        </field>
+        <field>
+          <column_name>total_archieved</column_name>
+          <stream_name>total_archieved_count</stream_name>
+        </field>
+        <field>
+          <column_name>total_corrupted</column_name>
+          <stream_name>total_corrupted_count</stream_name>
+        </field>
+        <field>
           <column_name>total_detractors</column_name>
           <stream_name>total_detractors_count</stream_name>
+        </field>
+        <field>
+          <column_name>total_duplicate</column_name>
+          <stream_name>total_duplicate_count</stream_name>
         </field>
         <field>
           <column_name>total_passives</column_name>
@@ -1354,78 +1490,30 @@
           <stream_name>total_promoters_count</stream_name>
         </field>
         <field>
-          <column_name>total_corrupted</column_name>
-          <stream_name>total_corrupted_count</stream_name>
-        </field>
-        <field>
-          <column_name>total_duplicate</column_name>
-          <stream_name>total_duplicate_count</stream_name>
-        </field>
-        <field>
-          <column_name>total_archieved</column_name>
-          <stream_name>total_archieved_count</stream_name>
+          <column_name>total_reviews</column_name>
+          <stream_name>total_reviews</stream_name>
         </field>
         <field>
           <column_name>total_survey_sent</column_name>
           <stream_name>total_survey_sent_count</stream_name>
         </field>
         <field>
-          <column_name>overview_region_id</column_name>
-          <stream_name>overview_region_id</stream_name>
-        </field>
-        <field>
-          <column_name>region_id</column_name>
-          <stream_name>main_RegionId</stream_name>
-        </field>
-        <field>
-          <column_name>rating</column_name>
-          <stream_name>rating</stream_name>
-        </field>
-        <field>
-          <column_name>total_reviews</column_name>
-          <stream_name>total_reviews_count</stream_name>
-        </field>
-        <field>
           <column_name>unassigned</column_name>
           <stream_name>total_mismatched_count</stream_name>
-        </field>
-        <field>
-          <column_name>incomplete</column_name>
-          <stream_name>total_incomplete_transactions_count</stream_name>
-        </field>
-        <field>
-          <column_name>completed</column_name>
-          <stream_name>total_survey_completed_count</stream_name>
-        </field>
-        <field>
-          <column_name>social_posts</column_name>
-          <stream_name>total_social_posts</stream_name>
-        </field>
-        <field>
-          <column_name>zillow_reviews</column_name>
-          <stream_name>total_zillow_reviews_count</stream_name>
-        </field>
-        <field>
-          <column_name>completed_percentage</column_name>
-          <stream_name>complete_percentage</stream_name>
-        </field>
-        <field>
-          <column_name>incomplete_percentage</column_name>
-          <stream_name>incomplete_percentage</stream_name>
-        </field>
-        <field>
-          <column_name>processed</column_name>
-          <stream_name>total_processed</stream_name>
         </field>
         <field>
           <column_name>unprocessed</column_name>
           <stream_name>total_unprocessed</stream_name>
         </field>
+        <field>
+          <column_name>zillow_reviews</column_name>
+          <stream_name>extra_zillow</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>380</xloc>
-      <yloc>584</yloc>
+      <xloc>1149</xloc>
+      <yloc>879</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1450,7 +1538,7 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>93</xloc>
+      <xloc>90</xloc>
       <yloc>146</yloc>
       <draw>Y</draw>
       </GUI>
@@ -1502,8 +1590,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>360</xloc>
-      <yloc>475</yloc>
+      <xloc>431</xloc>
+      <yloc>477</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1528,7 +1616,7 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>102</xloc>
+      <xloc>90</xloc>
       <yloc>238</yloc>
       <draw>Y</draw>
       </GUI>
@@ -1554,7 +1642,7 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>92</xloc>
+      <xloc>90</xloc>
       <yloc>43</yloc>
       <draw>Y</draw>
       </GUI>
@@ -1582,6 +1670,233 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>90</xloc>
       <yloc>314</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>survey_details extra zillow</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;FROM survey_details&#xd;&#xa;where AGENT_ID &#x3d; 0 AND BRANCH_ID &#x3d; 0 AND REGION_ID &#x21;&#x3d; 0 AND SOURCE like &#x27;Zillow&#x27;&#xd;&#xa;order by REGION_ID&#x3b;&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>90</xloc>
+      <yloc>579</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Extra Zillow group</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>REGION_ID</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>extra_zillow</aggregate>
+          <subject>SURVEY_DETAILS_ID</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>431</xloc>
+      <yloc>579</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort RegionId</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>Y</unique_rows>
+    <fields>
+      <field>
+        <name>REGION_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>810</xloc>
+      <yloc>579</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>survey details total reviews</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SCORE&#xd;&#xa;FROM survey_details&#xd;&#xa;where REGION_ID &#x21;&#x3d; 0 and IS_ABUSIVE&#x3d;0 and STAGE&#x3d;-1&#xd;&#xa;order by REGION_ID</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>90</xloc>
+      <yloc>720</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Memory Group by</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>REGION_ID</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>total_reviews</aggregate>
+          <subject>SURVEY_DETAILS_ID</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>rating</aggregate>
+          <subject>SCORE</subject>
+          <type>AVERAGE</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>431</xloc>
+      <yloc>720</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort RegionId 2</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>Y</unique_rows>
+    <fields>
+      <field>
+        <name>REGION_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>810</xloc>
+      <yloc>720</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Multiway Merge Join</name>
+    <type>MultiwayMergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <join_type>FULL OUTER</join_type>
+    <step0>SortBasedOnRegionId</step0>
+    <step1>SortOnEntityId</step1>
+    <step2>SortBasedOnRegionId 2</step2>
+    <step3>SortBasedOnRegionId 3</step3>
+    <step4>Sort RegionId</step4>
+    <step5>Sort RegionId 2</step5>
+    <number_input>6</number_input>
+    <keys>
+      <key>REGION_ID</key>
+      <key>ENTITY_ID</key>
+      <key>REGION_ID</key>
+      <key>REGION_ID</key>
+      <key>REGION_ID</key>
+      <key>REGION_ID</key>
+    </keys>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1081</xloc>
+      <yloc>390</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
