@@ -64,7 +64,7 @@ public class SurveyResultsCompanyReport implements Serializable {
 	private String surveySourceId;
 
 	@Column(name = "SURVEY_SCORE")
-	private long surveyScore;
+	private double surveyScore;
 
 	@Column(name = "GATEWAY")
 	private String gateway;
@@ -201,11 +201,11 @@ public class SurveyResultsCompanyReport implements Serializable {
 		this.surveySourceId = surveySourceId;
 	}
 
-	public long getSurveyScore() {
+	public double getSurveyScore() {
 		return surveyScore;
 	}
 
-	public void setSurveyScore(long surveyScore) {
+	public void setSurveyScore(double surveyScore) {
 		this.surveyScore = surveyScore;
 	}
 

@@ -2940,7 +2940,7 @@ CREATE TABLE `survey_results_company_report` (
   `TIME_INTERVAL` int(10) DEFAULT NULL,
   `SURVEY_SOURCE` varchar(450) DEFAULT NULL,
   `SURVEY_SOURCE_ID` text,
-  `SURVEY_SCORE` int(11) DEFAULT NULL,
+  `SURVEY_SCORE` decimal(10,2) DEFAULT NULL,
   `GATEWAY` varchar(450) DEFAULT NULL,
   `CUSTOMER_COMMENTS` text,
   `AGREED_TO_SHARE` varchar(450) DEFAULT NULL,
@@ -2953,6 +2953,7 @@ CREATE TABLE `survey_results_company_report` (
   `IS_DELETED` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`SURVEY_RESULTS_COMPANY_REPORT_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3030,8 +3031,8 @@ CREATE TABLE `survey_stats_report` (
   `clicked_count` int(11) DEFAULT '0',
   `completed` int(11) DEFAULT '0',
   `partially_completed` int(11) DEFAULT '0',
-  `complete_percentage` float DEFAULT '0',
   `delta` int(11) DEFAULT '0',
+  `complete_percentage` decimal(10,2) DEFAULT '0.00',
   `created_date` datetime DEFAULT NULL,
   `year` int(11) NOT NULL,
   `month` int(11) NOT NULL,
@@ -3073,8 +3074,8 @@ CREATE TABLE `survey_stats_report_company` (
   `clicked_count` int(11) DEFAULT '0',
   `completed` int(11) DEFAULT '0',
   `partially_completed` int(11) DEFAULT '0',
-  `complete_percentage` float DEFAULT '0',
   `delta` int(11) DEFAULT '0',
+  `complete_percentage` decimal(10,2) DEFAULT '0.00',
   `created_date` datetime DEFAULT NULL,
   `year` int(11) NOT NULL,
   `month` int(11) NOT NULL,
@@ -3113,7 +3114,7 @@ CREATE TABLE `survey_stats_report_region` (
   `clicked_count` int(11) DEFAULT '0',
   `completed` int(11) DEFAULT '0',
   `partially_completed` int(11) DEFAULT '0',
-  `complete_percentage` float DEFAULT '0',
+  `complete_percentage` decimal(10,2) DEFAULT '0.00',
   `delta` int(11) DEFAULT '0',
   `created_date` datetime DEFAULT NULL,
   `year` int(11) NOT NULL,
@@ -3154,7 +3155,7 @@ CREATE TABLE `survey_stats_report_user` (
   `clicked_count` int(11) DEFAULT '0',
   `completed` int(11) DEFAULT '0',
   `partially_completed` int(11) DEFAULT '0',
-  `complete_percentage` float DEFAULT '0',
+  `complete_percentage` decimal(10,2) DEFAULT '0.00',
   `delta` int(11) DEFAULT '0',
   `created_date` datetime DEFAULT NULL,
   `year` int(11) NOT NULL,
