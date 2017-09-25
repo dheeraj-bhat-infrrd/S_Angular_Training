@@ -2061,9 +2061,7 @@ CREATE TABLE `overview_user` (
   `incomplete_percentage` decimal(10,2) NOT NULL DEFAULT '0.00',
   `processed` int(11) NOT NULL DEFAULT '0',
   `unprocessed` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`overview_user_id`),
-  KEY `FX_OVERVIEW_USER_idx` (`user_id`),
-  CONSTRAINT `FX_OVERVIEW_USER` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`overview_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET character_set_client = @saved_cs_client */;

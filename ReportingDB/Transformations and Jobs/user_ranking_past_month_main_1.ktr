@@ -102,6 +102,34 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
   <hop> <from>jsGenerateRows</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value 2</from><to>jsArrays</to><enabled>Y</enabled> </hop>
@@ -3051,7 +3079,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var is_eligable &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;days_of_registration_final &#x3e;&#x3d; MIN_DAYS_OF_REGISTRATION&#x29;&#x7b;&#xd;&#xa;	if&#x28;complete_percentage &#x3e;&#x3d; MIN_COMPLETED_PERCENTAGE &#x29;&#x7b;&#xd;&#xa;			if&#x28;total_reviews &#x3e;&#x3d; math.round&#x28;MIN_NO_OF_REVIEWS&#x2f;12&#x29;&#x29;&#x7b;&#xd;&#xa;				is_eligable &#x3d; 1&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d; &#xd;&#xa;&#xd;&#xa;var RankingScore &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;Completed &#x21;&#x3d; 0 &#x26;&#x26; Completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var RankingScore &#x3d; &#x28;&#x28;AverageScore &#x2a; Completed&#x29; &#x2b; MONTH_OFFSET&#x29; &#x2f; &#x28;Completed &#x2b; 1&#x29;&#x3b; &#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var is_eligable &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;days_of_registration_final &#x3e;&#x3d; MIN_DAYS_OF_REGISTRATION&#x29;&#x7b;&#xd;&#xa;	if&#x28;complete_percentage &#x3e;&#x3d; MIN_COMPLETED_PERCENTAGE &#x29;&#x7b;&#xd;&#xa;			if&#x28;total_reviews &#x3e;&#x3d; Math.round&#x28;MIN_NO_OF_REVIEWS&#x2f;12&#x29;&#x29;&#x7b;&#xd;&#xa;				is_eligable &#x3d; 1&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d; &#xd;&#xa;&#xd;&#xa;var RankingScore &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;Completed &#x21;&#x3d; 0 &#x26;&#x26; Completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var RankingScore &#x3d; &#x28;&#x28;AverageScore &#x2a; Completed&#x29; &#x2b; MONTH_OFFSET&#x29; &#x2f; &#x28;Completed &#x2b; 1&#x29;&#x3b; &#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>is_eligable</name>
         <rename>is_eligable</rename>
         <type>Number</type>
