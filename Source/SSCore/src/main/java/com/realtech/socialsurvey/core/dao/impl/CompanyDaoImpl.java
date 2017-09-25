@@ -13,6 +13,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -108,7 +109,10 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         boolean inCompleteCompany , Timestamp startDate )
     {
         Criteria criteria = getSession().createCriteria( Company.class );
-        criteria.add( Restrictions.ilike( "company", namePattern, MatchMode.START ) );
+        Disjunction or = Restrictions.disjunction();
+        or.add( Restrictions.ilike( "company", namePattern, MatchMode.START ) );
+        or.add( Restrictions.ilike( "company", "% "+namePattern+"%" ) );
+        criteria.add(or);
         
         if(startDate != null)
             criteria.add( Restrictions.ge( "createdOn", startDate ) );
@@ -131,7 +135,7 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
             }
         }
         criteria.setProjection(Projections.property("companyId"));
-        //criteria.addOrder( Order.asc( "company" ) );
+        criteria.addOrder( Order.asc( "company" ).ignoreCase() );
         return criteria.list();
     }
 
