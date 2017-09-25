@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.workbook.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -7,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -675,20 +677,20 @@ public class WorkbookData
             surveyStatsReportToPopulate.add(String.valueOf( row.get( 1 ) ));
             surveyStatsReportToPopulate.add(String.valueOf( row.get( 2 ) ));
             surveyStatsReportToPopulate.add(String.valueOf( row.get( 3 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 4 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 5 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 6 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 7 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 8 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 9 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 10 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 11 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 12 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 13 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 14 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 15 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 16 ) ));
-            surveyStatsReportToPopulate.add(String.valueOf( row.get( 17 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 4 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 5 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 6 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 7 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 8 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 9 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 10 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 11 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 12 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 13 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 14 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 15 ) ));
+            surveyStatsReportToPopulate.add(Double.valueOf( row.get( 16 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 17 ) ));
             surveyStatsData.put(++surveyStatsCounter ,surveyStatsReportToPopulate );
             surveyStatsReportToPopulate = new ArrayList<>();
             
@@ -763,6 +765,7 @@ public class WorkbookData
         int count=0;
         List<String> LastRow = surveyResultsCompany.get( surveyResultsCompany.size() - 1 );
         maxNumberOfQuestions = Integer.valueOf(LastRow.get(1));
+        SimpleDateFormat date = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a", Locale.US);
         /*for(List<String> row : surveyResultsCompany ){
             if(maxNumberOfQuestions < Integer.valueOf(row.get(10))){
                 maxNumberOfQuestions =  Integer.valueOf(row.get(10));
@@ -774,12 +777,16 @@ public class WorkbookData
                 surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 1 ) ));
                 surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 2 ) ));
                 surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 3 ) ));
-                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 4 ) ));
-                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 5 ) ));
-                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 6 ) ));
+                try {
+                    surveyResultsCompanyReportToPopulate.add(date.parse( row.get( 4 ) ));
+                    surveyResultsCompanyReportToPopulate.add(date.parse( row.get( 5 ) ));
+                } catch ( ParseException e ) {
+                    LOG.error( "Error while parsing the data fetched from mongo for survey count", e );
+                }
+                surveyResultsCompanyReportToPopulate.add(Integer.valueOf( row.get( 6 ) ));
                 surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 7 ) ));
                 surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 8 ) ));
-                surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 9 ) ));
+                surveyResultsCompanyReportToPopulate.add(Double.valueOf( row.get( 9 ) ));
         
                int numberOfQuestions = Integer.valueOf(row.get(10));
               

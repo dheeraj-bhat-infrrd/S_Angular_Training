@@ -197,7 +197,11 @@ public class PrepareBillingReport implements Runnable
                             
                         } catch ( InvalidInputException | UndeliveredEmailException e1 ) {
                             LOG.error( "error while sende report bug mail to admin ", e1 );
+                        } catch ( Exception exception ) {
+                            LOG.error( "General Error in setting fail and sending mail , in generating billing report generator ", exception );
+                            break;
                         }
+                        
                         continue;
                     }
                 }
@@ -208,7 +212,13 @@ public class PrepareBillingReport implements Runnable
                 } catch ( InterruptedException e1 ) {
                     LOG.warn( "Thread interrupted" );
                     break;
+                }  catch ( Exception exception ) {
+                    LOG.error( "General Error in the first catch block when no record is fetched in generating billing report generator ", exception );
+                    break;
                 }
+            }  catch ( Exception exception ) {
+                LOG.error( "General Error in the first try block in generating billing report generator ", exception );
+                break;
             }
         }
     }

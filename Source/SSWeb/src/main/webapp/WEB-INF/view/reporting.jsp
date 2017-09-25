@@ -75,7 +75,6 @@
 	<input type="hidden" id="rep-real-tech-check" value="${isRealTechOrSSAdmin}" />
 
 </div>
-
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
 	<div class="container">
 		<div class="hm-header-row clearfix">
@@ -87,7 +86,17 @@
 		</div>
 	</div>
 </div>
-
+<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background-color: #009fe0; margin-bottom:-1px">
+	<div class="container">
+		<div class="hm-header-row clearfix" style="color: #f2f2f2;">
+			<div id="rep-beta-disclaimer">
+				<div style="text-align:center; margin-top:15px;">
+					<span class="incomplete-trans-span" style="font-size:small;font-variant: none;">Please note that this is a beta version of the page which is still undergoing final testing before its official release. Should you encounter any bugs, glitches or other problems on the page / reports, please notify us immediately. Your help in this regard is greatly appreciated.</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 <div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background:#2f69aa">
 	<div class="container">
 		<div class="hm-header-row clearfix">
@@ -144,19 +153,6 @@
 					<div class="tab-pane fade" id="incomplete-surveys-tab" style="max-height:600px; margin-top: 30px;">
 						<jsp:include page="reporting_incomplete_surveys.jsp"></jsp:include>
 					</div>
-				</div>
-			</div>
-		</div>
-
-	</div>
-</div>
-
-<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background-color: #009fe0; margin-bottom: 2px;">
-	<div class="container">
-		<div class="hm-header-row clearfix" style="color: #f2f2f2;">
-			<div id="rep-beta-disclaimer">
-				<div style="text-align:center; margin-top:15px;">
-					<span class="incomplete-trans-span" style="font-size:medium">Please note that this is a beta version of the page which is still undergoing final testing before its official release. Should you encounter any bugs, glitches or other problems on the page / reports, please notify us immediately. Your help in this regard is greatly appreciated.</span>
 				</div>
 			</div>
 		</div>

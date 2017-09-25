@@ -102,6 +102,34 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
   <hop> <from>overview_user</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>user_profile</from><to>Merge Join</to><enabled>Y</enabled> </hop>
@@ -118,11 +146,17 @@
   <hop> <from>sort survey details</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_details</from><to>sort survey details</to><enabled>Y</enabled> </hop>
   <hop> <from>Memory Group by Social</from><to>SortBranch_Social</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortBranch_Social</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Multiway Merge Join</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortBranch</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value 2</from><to>If field value is null</to><enabled>Y</enabled> </hop>
   <hop> <from>If field value is null</from><to>Generate random value</to><enabled>Y</enabled> </hop>
+  <hop> <from>Extra Zillow group</from><to>Sort BranchId</to><enabled>Y</enabled> </hop>
+  <hop> <from>Memory Group by 2</from><to>Sort BranchId 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey details total reviews</from><to>Memory Group by 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey_details extra zillow</from><to>Extra Zillow group</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortBranch</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>SortBranch_Social</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort BranchId</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort BranchId 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Multiway Merge Join</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Generate random value</name>
@@ -143,8 +177,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1247</xloc>
-      <yloc>533</yloc>
+      <xloc>1491</xloc>
+      <yloc>754</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -211,7 +245,7 @@
         <set_empty_string>N</set_empty_string>
         </field>
       <field>
-        <name>total_review</name>
+        <name>total_reviews</name>
         <value>0</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
@@ -229,7 +263,7 @@
         <set_empty_string>N</set_empty_string>
         </field>
       <field>
-        <name>zillow_reviews</name>
+        <name>extra_zillow</name>
         <value>0</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
@@ -255,8 +289,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1245</xloc>
-      <yloc>461</yloc>
+      <xloc>1492</xloc>
+      <yloc>620</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -319,18 +353,6 @@
           <valuefield/>
         </field>
         <field>
-          <aggregate>rating</aggregate>
-          <subject>rating</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>total_review</aggregate>
-          <subject>total_review</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
           <aggregate>unassigned</aggregate>
           <subject>unassigned</subject>
           <type>SUM</type>
@@ -339,12 +361,6 @@
         <field>
           <aggregate>unprocessed</aggregate>
           <subject>unprocessed</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>zillow_reviews</aggregate>
-          <subject>zillow_reviews</subject>
           <type>SUM</type>
           <valuefield/>
         </field>
@@ -476,7 +492,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;processed &#x21;&#x3d; 0 &#x26;&#x26; processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;completed&#x2f;processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;incomplete&#x2f;processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;total_review &#x21;&#x3d; null &#x26;&#x26; total_review &#x21;&#x3d; 0&#x29;&#xd;&#xa;var rating &#x3d; rating &#x2f; num_of_users&#x3b;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;processed &#x21;&#x3d; 0 &#x26;&#x26; processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;completed&#x2f;processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;incomplete&#x2f;processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>complete_percentage</name>
         <rename>complete_percentage</rename>
         <type>Number</type>
@@ -489,12 +505,6 @@
         <length>16</length>
         <precision>2</precision>
         <replace>N</replace>
-      </field>      <field>        <name>rating</name>
-        <rename>rating</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>741</xloc>
@@ -518,7 +528,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var FINAL_BRANCH_ID &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;BRANCH_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;ENTITY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; ENTITY_ID&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var FINAL_YEAR_VAL &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;year &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; year&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var total_social_posts &#x3d; user_social_posts &#x2b; total_shared_by &#x3b;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var FINAL_BRANCH_ID &#x3d; 0&#x3b;&#xd;&#xa;var FINAL_YEAR_VAL &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;BRANCH_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;ENTITY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; ENTITY_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID_2&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;year &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; year&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data_2&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var total_social_posts &#x3d; user_social_posts &#x2b; total_shared_by &#x3b;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>FINAL_BRANCH_ID</name>
         <rename>FINAL_BRANCH_ID</rename>
         <type>String</type>
@@ -539,35 +549,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1245</xloc>
-      <yloc>380</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <join_type>FULL OUTER</join_type>
-    <step0>SortBranch</step0>
-    <step1>SortBranch_Social</step1>
-    <number_input>2</number_input>
-    <keys>
-      <key>BRANCH_ID,year</key>
-      <key>ENTITY_ID,Year_Data</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1249</xloc>
-      <yloc>226</yloc>
+      <xloc>1489</xloc>
+      <yloc>478</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -647,7 +630,7 @@
         </field>
         <field>
           <column_name>total_review</column_name>
-          <stream_name>total_review</stream_name>
+          <stream_name>total_reviews</stream_name>
         </field>
         <field>
           <column_name>unassigned</column_name>
@@ -663,7 +646,7 @@
         </field>
         <field>
           <column_name>zillow_reviews</column_name>
-          <stream_name>zillow_reviews</stream_name>
+          <stream_name>extra_zillow</stream_name>
         </field>
         <field>
           <column_name>overview_branch_year_id</column_name>
@@ -672,8 +655,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>980</xloc>
-      <yloc>533</yloc>
+      <xloc>1489</xloc>
+      <yloc>879</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -752,7 +735,7 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>963</xloc>
+      <xloc>1025</xloc>
       <yloc>127</yloc>
       <draw>Y</draw>
       </GUI>
@@ -1036,6 +1019,247 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>83</xloc>
       <yloc>43</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Extra Zillow group</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>BRANCH_ID</name>
+        </field>
+        <field>
+          <name>Year_Data</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>extra_zillow</aggregate>
+          <subject>SURVEY_DETAILS_ID</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>581</xloc>
+      <yloc>668</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Memory Group by 2</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>BRANCH_ID</name>
+        </field>
+        <field>
+          <name>Year_Data</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>total_reviews</aggregate>
+          <subject>SURVEY_DETAILS_ID</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>rating</aggregate>
+          <subject>SCORE</subject>
+          <type>AVERAGE</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>576</xloc>
+      <yloc>800</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort BranchId</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>Y</unique_rows>
+    <fields>
+      <field>
+        <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1025</xloc>
+      <yloc>668</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort BranchId 2</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>Y</unique_rows>
+    <fields>
+      <field>
+        <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1025</xloc>
+      <yloc>800</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>survey details total reviews</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SCORE&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where BRANCH_ID &#x21;&#x3d; 0 and IS_ABUSIVE&#x3d;0 and STAGE&#x3d;-1&#xd;&#xa;order by BRANCH_ID</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>119</xloc>
+      <yloc>800</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>survey_details extra zillow</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where BRANCH_ID &#x21;&#x3d; 0 AND SOURCE like &#x27;Zillow&#x27;&#xd;&#xa;order by BRANCH_ID&#x3b;&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>118</xloc>
+      <yloc>668</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Multiway Merge Join</name>
+    <type>MultiwayMergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <join_type>FULL OUTER</join_type>
+    <step0>SortBranch</step0>
+    <step1>SortBranch_Social</step1>
+    <step2>Sort BranchId</step2>
+    <step3>Sort BranchId 2</step3>
+    <number_input>4</number_input>
+    <keys>
+      <key>BRANCH_ID,year</key>
+      <key>ENTITY_ID,Year_Data</key>
+      <key>BRANCH_ID,Year_Data</key>
+      <key>BRANCH_ID,Year_Data</key>
+    </keys>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1269</xloc>
+      <yloc>478</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
