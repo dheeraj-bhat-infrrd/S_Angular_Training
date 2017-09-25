@@ -3305,7 +3305,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var is_eligable &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;days_of_registration_final &#x3e;&#x3d; MIN_DAYS_OF_REGISTRATION &#x26;&#x26; complete_percentage &#x3e;&#x3d; MIN_COMPLETED_PERCENTAGE &#x26;&#x26; total_reviews &#x3e;&#x3d; Math.round&#x28;MIN_NO_OF_REVIEWS&#x2f;12&#x29;&#x7b;&#xd;&#xa;				is_eligable &#x3d; 1&#xd;&#xa;&#x7d; &#xd;&#xa;&#xd;&#xa;var RankingScore &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;Completed &#x21;&#x3d; 0 &#x26;&#x26; Completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var RankingScore &#x3d; &#x28;&#x28;AverageScore &#x2a; Completed&#x29; &#x2b; MONTH_OFFSET&#x29; &#x2f; &#x28;Completed &#x2b; 1&#x29;&#x3b; &#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var is_eligable &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;days_of_registration_final &#x3e;&#x3d; MIN_DAYS_OF_REGISTRATION &#x26;&#x26; complete_percentage &#x3e;&#x3d; MIN_COMPLETED_PERCENTAGE &#x26;&#x26; total_reviews &#x3e;&#x3d; Math.round&#x28;MIN_NO_OF_REVIEWS&#x2f;12&#x29;&#x29;&#x7b;&#xd;&#xa;				is_eligable &#x3d; 1&#xd;&#xa;&#x7d; &#xd;&#xa;&#xd;&#xa;var RankingScore &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;Completed &#x21;&#x3d; 0 &#x26;&#x26; Completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var RankingScore &#x3d; &#x28;&#x28;AverageScore &#x2a; Completed&#x29; &#x2b; MONTH_OFFSET&#x29; &#x2f; &#x28;Completed &#x2b; 1&#x29;&#x3b; &#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>is_eligable</name>
         <rename>is_eligable</rename>
         <type>Number</type>
