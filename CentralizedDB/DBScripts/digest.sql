@@ -19,5 +19,6 @@ CREATE TABLE `digest` (
   `passives` int(10) DEFAULT NULL,
   `total_completed_reviews` int(10) DEFAULT NULL,
   `trx_month` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`digest_id`)
+  PRIMARY KEY (`digest_id`),
+  UNIQUE KEY `unique_digest_key` (`company_id`,`month`,`year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
