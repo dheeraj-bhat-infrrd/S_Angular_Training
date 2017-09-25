@@ -67,7 +67,7 @@ public class SurveyStatsReportCompany
     private long partiallyCompleted;
     
     @Column( name = "complete_percentage")
-    private long completePercentage;
+    private double completePercentage;
     
     @Column( name = "delta")
     private long delta;
@@ -259,12 +259,12 @@ public class SurveyStatsReportCompany
         this.partiallyCompleted = partiallyCompleted;
     }
 
-    public long getCompletePercentage()
+    public double getCompletePercentage()
     {
         return completePercentage;
     }
 
-    public void setCompletePercentage( long completePercentage )
+    public void setCompletePercentage( double completePercentage )
     {
         this.completePercentage = completePercentage;
     }

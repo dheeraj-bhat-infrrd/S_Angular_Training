@@ -17,7 +17,6 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
 	<div class="container">
 		<div class="hm-header-row clearfix">
@@ -26,6 +25,17 @@
 			</div>
 			<!-- Add user assignment dropdown -->
 			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
+		</div>
+	</div>
+</div>
+<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background-color: #009fe0;">
+	<div class="container">
+		<div class="hm-header-row clearfix" style="color: #f2f2f2;">
+			<div id="rep-beta-disclaimer">
+				<div style="text-align:center; margin-top:15px;">
+					<span style="text-align: center; line-height: 15px; font-size:small; font-weight: bold !important;">Please note that this is a beta version of the page which is still undergoing final testing before its official release. Should you encounter any bugs, glitches or other problems on the page / reports, please notify us immediately. Your help in this regard is greatly appreciated.</span>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -101,18 +111,6 @@
 				<div id="rec-act-page-previous" class="float-left paginate-button"><spring:message code="label.previous.key" /></div>
 				<div id="rec-act-page-next" class="float-right paginate-button"><spring:message code="label.next.key" /></div>
 			</div>		
-</div>
-
-<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background-color: #009fe0; margin-bottom: 2px;">
-	<div class="container">
-		<div class="hm-header-row clearfix" style="color: #f2f2f2;">
-			<div id="rep-beta-disclaimer">
-				<div style="text-align:center; margin-top:15px;">
-					<span style="text-align: center; font-variant: small-caps; line-height: 15px; font-size:medium; font-weight: bold !important;">Please note that this is a beta version of the page which is still undergoing final testing before its official release. Should you encounter any bugs, glitches or other problems on the page / reports, please notify us immediately. Your help in this regard is greatly appreciated.</span>
-				</div>
-			</div>
-		</div>
-	</div>
 </div>
 <script>
 $(document).ready(function() {

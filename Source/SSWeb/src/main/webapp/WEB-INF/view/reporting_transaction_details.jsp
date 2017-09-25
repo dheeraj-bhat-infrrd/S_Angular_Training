@@ -162,6 +162,11 @@ $(document).ready(function(){
 	$(document).on('click','#incompleted-lbl-sel',function(e){
 		e.stopPropagation();
 		activaTab('incomplete-surveys-tab');
+		
+		delay(function(){
+			$(window).scrollTop($('#rep-dash-survey-incomplete').offset().top);
+		},300);
+		
 	});
 	
 	$(document).on('click','#unassigned-lbl-sel-span',function(e){

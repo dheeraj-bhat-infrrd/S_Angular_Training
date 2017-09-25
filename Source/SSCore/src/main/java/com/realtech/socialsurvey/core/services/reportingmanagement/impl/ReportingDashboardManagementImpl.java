@@ -648,7 +648,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     companyUserReportList.add( "" );
                 }
                 if(companyUserReport.getLinkedinConnectionStatus() != null && !companyUserReport.getLinkedinConnectionStatus().isEmpty()){
-                    companyUserReportList.add( companyUserReport.getLinkedinConnectionStatus() );
+                    companyUserReportList.add( companyUserReport.getLinkedinDataConnection() );
                 }else{
                     companyUserReportList.add( "" );
                 }
