@@ -322,6 +322,7 @@ public interface CommonConstants
     public static final String AGREE_SHARE_COLUMN_TRUE = "true";
     public static final String AGREE_SHARE_COLUMN_FALSE = "false";
     public static final String PROFILE_IMAGE_THUMBNAIL_COLUMN = "profileImageUrlThumbnail";
+    public static final String PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN = "profileImageUrlRectangularThumbnail";
     public static final String LOGO_THUMBNAIL_COLUMN = "logoThumbnail";
     public static final String IS_PROFILE_IMAGE_PROCESSED_COLUMN = "isProfileImageProcessed";
     public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN = "isLogoImageProcessed";
@@ -1386,6 +1387,7 @@ public interface CommonConstants
     public static final int MONTH_OFFSET = 3;
     public static final int YEAR_OFFSET = -1;
     
-    
+    public static final String SQUARE_THUMBNAIL = "squareThumbnail";
+    public static final String RECTANGULAR_THUMBNAIL = "rectangularThumbnail";
     
 }

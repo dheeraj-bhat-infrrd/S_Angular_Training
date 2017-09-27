@@ -848,12 +848,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 
     @Override
-    public void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
+    public void updateImageForOrganizationUnitSetting( long iden, String imgFileName,  String imgThumbnailFileName, String rectangularThumbnailFileName, String collectionName, String imageType,
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException
     {
         LOG.debug( "Updating thumbnail image details for collection : " + collectionName + " ID: " + iden + " imageType : "
-            + imageType + " with filename : " + fileName );
-        if ( iden <= 0l || fileName == null || fileName.isEmpty() || collectionName == null || collectionName.isEmpty()
+            + imageType + " with filename : " + imgFileName );
+        if ( iden <= 0l ||  collectionName == null || collectionName.isEmpty()
             || imageType == null || imageType.isEmpty() ) {
             throw new InvalidInputException( "Invalid input provided to the method updateImage" );
         }
@@ -864,18 +864,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         //If the image you're updating isn't a thumbnail, set the same value for the image column and it's thumbnail column
         if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
             if ( isThumbnail ) {
-                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, fileName );
+                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, imgThumbnailFileName );
+                update.set( CommonConstants.PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN, rectangularThumbnailFileName );
             } else {
-                update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, fileName );
-                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, fileName );
+                update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, imgFileName );
+                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, imgFileName );
             }
             update.set( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN, flagValue );
         } else if ( imageType == CommonConstants.IMAGE_TYPE_LOGO ) {
             if ( isThumbnail ) {
-                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, fileName );
+                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, imgThumbnailFileName );
             } else {
-                update.set( CommonConstants.LOGO_COLUMN, fileName );
-                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, fileName );
+                update.set( CommonConstants.LOGO_COLUMN, imgFileName );
+                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, imgFileName );
             }
             update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, flagValue );
         } else {
