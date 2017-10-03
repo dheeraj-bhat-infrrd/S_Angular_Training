@@ -801,6 +801,9 @@
         <field>
           <name>Year_Data</name>
         </field>
+        <field>
+          <name>MOOD</name>
+        </field>
       </group>
       <fields>
         <field>
@@ -812,12 +815,6 @@
         <field>
           <aggregate>COMPANY_ID</aggregate>
           <subject>COMPANY_ID</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>MOOD</aggregate>
-          <subject>MOOD</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1067,6 +1064,12 @@
         </field>
       <field>
         <name>NMLS_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_sent</name>
         <value>0</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
