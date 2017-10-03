@@ -646,12 +646,6 @@
  <conditions>
   <condition>
    <negated>N</negated>
-   <leftvalue>stage</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>-1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
-  <condition>
-   <negated>N</negated>
    <operator>AND</operator>
    <leftvalue>SURVEY_SOURCE</leftvalue>
    <function>&#x3c;&#x3e;</function>
@@ -823,6 +817,9 @@
         <field>
           <name>Year_Data</name>
         </field>
+        <field>
+          <name>MOOD</name>
+        </field>
       </group>
       <fields>
         <field>
@@ -834,12 +831,6 @@
         <field>
           <aggregate>COMPANY_ID</aggregate>
           <subject>COMPANY_ID</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>MOOD</aggregate>
-          <subject>MOOD</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1575,7 +1566,7 @@
     </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1676</xloc>
-      <yloc>13</yloc>
+      <yloc>0</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
