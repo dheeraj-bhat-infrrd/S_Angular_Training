@@ -37,8 +37,8 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 
             if(startDate != null && endDate != null){
             Criterion criterion = Restrictions.and(
-                    Restrictions.ge( CommonConstants.SURVEY_RESULTS_REPORT_MODIFIED_ON, startDate),
-                    Restrictions.le( CommonConstants.SURVEY_RESULTS_REPORT_MODIFIED_ON, endDate) );
+                    Restrictions.ge( CommonConstants.SURVEY_RESULTS_COMPLETED_DATE, startDate),
+                    Restrictions.le( CommonConstants.SURVEY_RESULTS_COMPLETED_DATE, endDate) );
                 criteria.add( criterion );
                
             }
