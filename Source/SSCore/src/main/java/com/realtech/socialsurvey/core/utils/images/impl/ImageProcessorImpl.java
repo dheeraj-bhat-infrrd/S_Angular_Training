@@ -1,9 +1,6 @@
 package com.realtech.socialsurvey.core.utils.images.impl;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -45,11 +42,13 @@ public class ImageProcessorImpl implements ImageProcessor {
 	@Value("${AMAZON_LOGO_BUCKET}")
 	private String amazonLogoBucket;
 
+	@Value("${RECTANGULAR_THUMBNAIL_IMG_PATH}")
+    private String rectangularThumbnailImgPath;
+	
+	
 	@Autowired
 	private FileUploadService fileUploadService;
 	
-	private static final GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-
 	
 	private static final String THUMBNAIL_APPENDER = "-th.";
 	private static final String RECTANGULAR_THUMBNAIL_APPENDER = "-rctTh.";
@@ -88,7 +87,7 @@ public class ImageProcessorImpl implements ImageProcessor {
 		
 		
 		
-	    File processedRectangularImg = processImageAsRectangular(sourceImage, THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, extension);
+	    File processedRectangularImg = processImageAsRectangular(sourceImage, RECTANGULAR_THUMBNAIL_WIDTH, RECTANGULAR_THUMBNAIL_HEIGHT, extension);
 		String linkedInThumbnailImageName = getThumbnailImageName(imageFileName, extension ,RECTANGULAR_THUMBNAIL_APPENDER);
         String linkedInThumbnailFileName = writeImage(linkedInThumbnailImageName, processedRectangularImg, imageType);
         deleteTempFile(processedRectangularImg);
@@ -134,6 +133,7 @@ public class ImageProcessorImpl implements ImageProcessor {
 	@Override
     public File processImageAsRectangular(BufferedImage image, int width, int height, String imageExtension) throws ImageProcessingException,
             InvalidInputException {
+	    LOG.info( "Method processImageAsRectangular started" );
         if (image == null || imageExtension == null || imageExtension.isEmpty()) {
             LOG.error("Could not find file to process");
             throw new InvalidInputException("Could not find file to process");
@@ -142,12 +142,19 @@ public class ImageProcessorImpl implements ImageProcessor {
         scaledImage = Scalr.resize(image, Method.SPEED, Mode.AUTOMATIC, width, height);
         File processedFile = null;
         
-        BufferedImage newRectangularImage = config.createCompatibleImage((scaledImage.getWidth()) * 2, scaledImage.getHeight() );
+        BufferedImage newRectangularImage = null;
+        try {
+            newRectangularImage = getBackgroundImageForRectangularThumbnail();
+        } catch ( IOException e ) {
+            LOG.error("Error while getting black image for rectangular thumbnail", e);
+            throw new ImageProcessingException("Error while processing image.", e);
+        }
+        
+        int xCordiate = (newRectangularImage.getWidth() - scaledImage.getWidth())/2 ;
+        int yCordinate = (newRectangularImage.getHeight() - scaledImage.getHeight())/2;
+        
         Graphics2D graphics = newRectangularImage.createGraphics();
-        graphics.setColor(Color.BLACK);
-        graphics.fillRect(0, 0 , scaledImage.getWidth() / 2, scaledImage.getHeight());
-        graphics.fillRect((scaledImage.getWidth() / 2 ) * 3, 0 , scaledImage.getWidth() / 2, scaledImage.getHeight());
-        graphics.drawImage(scaledImage, scaledImage.getWidth() / 2 , 0, null);
+        graphics.drawImage(scaledImage, xCordiate , yCordinate , null);
         graphics.dispose();
         
         processedFile = new File(CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + String.valueOf(System.currentTimeMillis()) + "-"
@@ -163,6 +170,9 @@ public class ImageProcessorImpl implements ImageProcessor {
             LOG.error("Error while processing image.", e);
             throw new ImageProcessingException("Error while processing image.", e);
         }
+        
+        LOG.info( "Method processImageAsRectangular finished" );
+
         return processedFile;
     }
 	
@@ -250,4 +260,16 @@ public class ImageProcessorImpl implements ImageProcessor {
 		FileUtils.deleteQuietly(file);
 	}
 
+	/**
+	 * @throws IOException 
+	 * 
+	 */
+	private  BufferedImage getBackgroundImageForRectangularThumbnail() throws IOException{
+	    LOG.info( "method getBackgroundImageForRectangularThumbnail started" );
+	    BufferedImage image = ImageIO.read(getClass().getClassLoader().getResource(rectangularThumbnailImgPath));
+	       LOG.info( "method getBackgroundImageForRectangularThumbnail finished" );
+	    return image;
+	}
+	
+	
 }
