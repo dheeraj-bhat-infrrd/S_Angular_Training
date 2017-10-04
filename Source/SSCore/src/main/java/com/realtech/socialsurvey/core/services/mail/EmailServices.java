@@ -491,4 +491,14 @@ public interface EmailServices
 
     void sendCancelSubscriptionRequestAlertMail( String recipientMailId, String displayName, String companyName )
         throws InvalidInputException, UndeliveredEmailException;
+    
+    /**
+     * Send mail caught from web app
+     * @param recipientMailId
+     * @param stackTrace
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    void sendWebExceptionEmail( String recipientMailId, String stackTrace )
+        throws InvalidInputException, UndeliveredEmailException;
 }

@@ -113,24 +113,23 @@ public class EmailServicesImpl implements EmailServices
     public void sendRegistrationInviteMail( String url, String recipientMailId, String firstName, String lastName )
         throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Method for sending registration invite mail called with url : " + url + " firstName :" + firstName
-            + " and lastName : " + lastName );
+        LOG.info( "Method for sending registration invite mail called with url : %s firstName : %s and lastName : %s", url,  firstName, lastName);
         if ( url == null || url.isEmpty() ) {
-            LOG.error( "Url is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Url is empty or null for sending registration invite mail " );
+            LOG.error( "Url in sendRegistrationInviteMail is empty or null." );
+            throw new InvalidInputException( "Url in sendRegistrationInviteMail is empty or null." );
         }
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.error( "Recipient email Id is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending registration invite mail " );
+            LOG.error( "Recipient email Id in sendRegistrationInviteMail is empty or null." );
+            throw new InvalidInputException( "Recipient email Id in sendRegistrationInviteMail is empty or null." );
         }
         if ( firstName == null || firstName.isEmpty() ) {
-            LOG.error( "Firstname is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Firstname is empty or null for sending registration invite mail " );
+            LOG.error( "Firstname is in sendRegistrationInviteMail empty or null." );
+            throw new InvalidInputException( "Firstname is in sendRegistrationInviteMail empty or null." );
         }
 
-        LOG.info( "Initiating URL Service to shorten the url " + url );
-        url = urlService.shortenUrl( url );
-        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
+        LOG.debug( "Initiating URL Service to shorten the url: %s", url );
+        String shortUrl = urlService.shortenUrl( url );
+        LOG.debug( "Finished calling URL Service to shorten the url in sendRegistrationInviteMail. Shortened URL : %s", shortUrl );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -145,9 +144,9 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName(
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.REGISTRATION_INVITATION_MAIL_BODY );
         messageBodyReplacements.setReplacementArgs(
-            Arrays.asList( appLogoUrl, fullName, url, url, url, recipientMailId, appBaseUrl, appBaseUrl ) );
+            Arrays.asList( appLogoUrl, fullName, shortUrl, shortUrl, shortUrl, recipientMailId, appBaseUrl, appBaseUrl ) );
 
-        LOG.debug( "Calling email sender to send mail" );
+        LOG.debug( "Sending mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
         LOG.info( "Successfully sent registration invite mail" );
     }
@@ -158,24 +157,23 @@ public class EmailServicesImpl implements EmailServices
     public void sendNewRegistrationInviteMail( String url, String recipientMailId, String firstName, String lastName,
         int planId ) throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Method sendNewRegistrationInviteMail started for url : " + url + " firstName : " + firstName + " lastName : "
-            + lastName + " and planId : " + planId );
+        LOG.info( "Method sendNewRegistrationInviteMail started for url : %s firstName : %s lastName : %s and planId : %s", url, firstName, lastName, planId );
         if ( url == null || url.isEmpty() ) {
-            LOG.error( "Url is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Url is empty or null for sending registration invite mail " );
+            LOG.error( "Url in sendNewRegistrationInviteMail is empty or null." );
+            throw new InvalidInputException( "Url in sendNewRegistrationInviteMail is empty or null." );
         }
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.error( "Recipient email Id is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending registration invite mail " );
+            LOG.error( "Recipient email Id in sendNewRegistrationInviteMail is empty or null." );
+            throw new InvalidInputException( "Recipient email Id in sendNewRegistrationInviteMail is empty or null." );
         }
         if ( firstName == null || firstName.isEmpty() ) {
-            LOG.error( "Firstname is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Firstname is empty or null for sending registration invite mail " );
+            LOG.error( "Firstname in sendNewRegistrationInviteMail is empty or null." );
+            throw new InvalidInputException( "Firstname in sendNewRegistrationInviteMail is empty or null." );
         }
 
-        LOG.info( "Initiating URL Service to shorten the url " + url );
-        url = urlService.shortenUrl( url );
-        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
+        LOG.debug( "Initiating URL Service to shorten the url %s", url );
+        String shortUrl = urlService.shortenUrl( url );
+        LOG.debug( "Finished calling URL Service to shorten the url in sendNewRegistrationInviteMail. Shortened URL : %s", shortUrl );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -196,12 +194,10 @@ public class EmailServicesImpl implements EmailServices
                 EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.NEW_REGISTRATION_ENTERPRISE_MAIL_BODY );
         }
         messageBodyReplacements.setReplacementArgs(
-            Arrays.asList( appLogoUrl, fullName, url, url, url, recipientMailId, appBaseUrl, appBaseUrl ) );
+            Arrays.asList( appLogoUrl, fullName, shortUrl, shortUrl, shortUrl, recipientMailId, appBaseUrl, appBaseUrl ) );
 
-        LOG.debug( "Calling email sender to send mail" );
+        LOG.debug( "Sending mail in sendNewRegistrationInviteMail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
-        LOG.info( "Method sendNewRegistrationInviteMail finished for url : " + url + " firstName : " + firstName
-            + " lastName : " + lastName + " and planId : " + planId );
     }
 
 
@@ -228,9 +224,8 @@ public class EmailServicesImpl implements EmailServices
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.COMPANY_REGISTRATION_STAGE_MAIL_SUBJECT;
 
-        if ( details == null ) {
-            details = "";
-        }
+        String modDetails = (details == null) ? "" : details;
+        
         String agentName = "";
         if ( firstName != null && !firstName.isEmpty() ) {
             agentName += firstName;
@@ -244,7 +239,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName(
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.COMPANY_REGISTRATION_STAGE_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, entityName, registrationStage, details ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, entityName, registrationStage, modDetails ) );
         emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements,
             isImmediate, false );
     }
@@ -272,7 +267,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setReplacementArgs(
             Arrays.asList( appLogoUrl, survey.getAgentName(), customerName, survey.getCustomerEmailId(), customerName ) );
 
-        LOG.debug( "Calling email sender to send mail" );
+        LOG.debug( "Sending mail for sendAgentSurveyReminderMail." );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
         LOG.info( "Successfully sent registration invite mail" );
     }
@@ -291,24 +286,23 @@ public class EmailServicesImpl implements EmailServices
     public void sendResetPasswordEmail( String url, String recipientMailId, String name, String loginName )
         throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Method to send Email to reset the password link with URL : " + url + "\t and Recipients Mail ID : "
-            + recipientMailId );
+        LOG.info( "Method to send Email to reset the password link with URL : %s \t and Recipients Mail ID : %s", url, recipientMailId );
         if ( url == null || url.isEmpty() ) {
-            LOG.error( "URL generated can not be null or empty" );
-            throw new InvalidInputException( "URL generated can not be null or empty" );
+            LOG.error( "URL in sendResetPasswordEmail can not be null or empty." );
+            throw new InvalidInputException( "URL in sendResetPasswordEmail can not be null or empty." );
         }
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.error( "Recipients Email Id can not be null or empty" );
-            throw new InvalidInputException( "Recipients Email Id can not be null or empty" );
+            LOG.error( "Recipients Email Id in sendResetPasswordEmail can not be null or empty." );
+            throw new InvalidInputException( "Recipients Email Id in sendResetPasswordEmail can not be null or empty." );
         }
         if ( name == null || name.isEmpty() ) {
-            LOG.error( "Recipients name can not be null or empty" );
-            throw new InvalidInputException( "Recipients name can not be null or empty" );
+            LOG.error( "Recipients name in sendResetPasswordEmail can not be null or empty" );
+            throw new InvalidInputException( "Recipients name in sendResetPasswordEmail can not be null or empty" );
         }
 
-        LOG.info( "Initiating URL Service to shorten the url " + url );
-        url = urlService.shortenUrl( url );
-        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
+        LOG.debug( "Initiating URL Service to shorten the url %s", url );
+        String shortUrl = urlService.shortenUrl( url );
+        LOG.debug( "Finished calling URL Service to shorten the url in sendResetPasswordEmail. Shortened URL : %s", shortUrl );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -318,11 +312,10 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements
             .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RESET_PASSWORD_MAIL_BODY );
         messageBodyReplacements
-            .setReplacementArgs( Arrays.asList( appLogoUrl, name, loginName, url, url, url, appBaseUrl, appBaseUrl ) );
+            .setReplacementArgs( Arrays.asList( appLogoUrl, name, loginName, shortUrl, shortUrl, shortUrl, appBaseUrl, appBaseUrl ) );
 
-        LOG.debug( "Calling email sender to send mail" );
+        LOG.debug( "Sending mail in sendResetPasswordEmail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
-        LOG.info( "Successfully sent reset password mail" );
     }
 
 
@@ -2375,6 +2368,31 @@ public class EmailServicesImpl implements EmailServices
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
         LOG.info( "Successfully sent payment faield alert mail" );
+    }
+    
+    @Async
+    @Override
+    public void sendWebExceptionEmail( String recipientMailId, String stackTrace )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Sending WebException email to the admin." );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending web exception mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending web exception mail " );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.WEB_EXCEPTION_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FATAL_EXCEPTION_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, stackTrace ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+        LOG.info( "Successfully sent web exception mail" );
     }
 
 

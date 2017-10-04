@@ -48,6 +48,9 @@ public final class EmailTemplateConstants {
 
 	public static final String FATAL_EXCEPTION_MAIL_BODY = "FatalExceptionMailBody.html";
 	public static final String FATAL_EXCEPTION_MAIL_SUBJECT = "FatalExceptionMailSubject.txt";
+	
+	public static final String WEB_EXCEPTION_MAIL_BODY = "FatalExceptionMailBody.html";
+    public static final String WEB_EXCEPTION_MAIL_SUBJECT = "WebExceptionMailSubject.txt";
 
 	public static final String MANUAL_REGISTRATION_MAIL_BODY = "ManualRegistrationBody.html";
 	public static final String MANUAL_REGISTRATION_MAIL_SUBJECT = "ManualRegistrationSubject.txt";
