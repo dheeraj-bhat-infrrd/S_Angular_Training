@@ -236,7 +236,7 @@ public interface OrganizationUnitSettingsDao
         throws InvalidInputException;
 
 
-    void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
+    void updateImageForOrganizationUnitSetting( long iden, String imgFileName, String imgThumbnailFileName, String rectangularThumbnailFileName, String collectionName, String imageType,
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException;
 
 

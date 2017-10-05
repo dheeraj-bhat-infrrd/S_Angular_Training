@@ -48,6 +48,7 @@ public class OrganizationUnitSettings
     private String disclaimer;
     // image processing
     private String profileImageUrlThumbnail;
+    private String profileImageUrlRectangularThumbnail;
     private String logoThumbnail;
     private boolean isProfileImageProcessed;
     private boolean isLogoImageProcessed;
@@ -656,6 +657,17 @@ public class OrganizationUnitSettings
     public void setHideFromBreadCrumb( boolean hideFromBreadCrumb )
     {
         this.hideFromBreadCrumb = hideFromBreadCrumb;
+    }
+    
+    public String getProfileImageUrlRectangularThumbnail()
+    {
+        return profileImageUrlRectangularThumbnail;
+    }
+
+
+    public void setProfileImageUrlRectangularThumbnail( String profileImageUrlRectangularThumbnail )
+    {
+        this.profileImageUrlRectangularThumbnail = profileImageUrlRectangularThumbnail;
     }
 
 

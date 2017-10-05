@@ -5968,21 +5968,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
+    public void updateImageForOrganizationUnitSetting( long iden, String imgFileName, String thumbnailFileName, String rectangularThumbnailFileName,  String collectionName, String imageType,
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException
     {
         LOG.debug( "Method updateImageForOrganizationUnitSetting called" );
         LOG.debug( "updating mongodb" );
-        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, flagValue,
+        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( iden, imgFileName, thumbnailFileName, rectangularThumbnailFileName, collectionName, imageType, flagValue,
             isThumbnail );
         LOG.debug( "updated mongodb" );
         if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
             LOG.debug( "updating solr" );
             Map<String, Object> updateMap = new HashMap<String, Object>();
-            updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, fileName );
             if ( !( isThumbnail ) ) {
-                updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, fileName );
+                updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, imgFileName );
+                updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, imgFileName );
                 updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+            }else{
+                updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, thumbnailFileName );
             }
             try {
                 solrSearchService.editUserInSolrWithMultipleValues( iden, updateMap );
@@ -7564,12 +7566,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             Map<Long, String> images = null;
             // get unprocessed company profile images
             images = getUnprocessedProfileImages( CommonConstants.COMPANY_SETTINGS_COLLECTION );
-            String fileName = null;
+            Map<String, String> processedImgs = null;
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.COMPANY_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
 
                     } catch ( Exception e ) {
@@ -7596,8 +7598,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.REGION_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7623,8 +7625,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.BRANCH_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7651,8 +7653,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id, fileName, CommonConstants.AGENT_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.AGENT_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7678,8 +7680,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.COMPANY_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7700,8 +7702,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.REGION_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7722,8 +7724,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.BRANCH_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7745,8 +7747,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.AGENT_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.AGENT_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7855,10 +7857,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    private void updateImage( long iden, String fileName, String collectionName, String imageType ) throws InvalidInputException
+    private void updateImage( long iden, String imgThumbnailFileName, String rectangularThumbnailFileName, String collectionName, String imageType ) throws InvalidInputException
     {
         LOG.debug( "Method updateImage started" );
-        updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, true, true );
+        updateImageForOrganizationUnitSetting( iden, null, imgThumbnailFileName, rectangularThumbnailFileName, collectionName, imageType, true, true );
         LOG.debug( "Method updateImage finished" );
     }
 

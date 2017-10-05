@@ -4483,10 +4483,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 
                 LOG.info( "getting reminder information for company with id " + company.getCompanyId()  );
                 
-                Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
-                int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
-                int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
-                LOG.info( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
+                Map<String, Object> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
+                int reminderInterval = (int) reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
+                int reminderCount = (int) reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
+                boolean isReminderDisabled = (boolean) reminderMap.get( CommonConstants.IS_SURVEY_REMINDER_DISABLED );
+                
+                if(isReminderDisabled){
+                    LOG.info( "Auto Reminder is diabled for company : " + company.getCompanyId() );
+                    continue;
+                }
                 
                 //getting epoch date
                 SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
