@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.core.utils.images;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Map;
+
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.utils.images.impl.ImageProcessingException;
 
@@ -14,6 +16,9 @@ public interface ImageProcessor {
 	public static final int THUMBNAIL_WIDTH = 200;
 	public static final int THUMBNAIL_HEIGHT = 200;
 	
+	public static final int RECTANGULAR_THUMBNAIL_WIDTH = 200;
+    public static final int RECTANGULAR_THUMBNAIL_HEIGHT = 200;
+	
 	/**
 	 * Processes and updates the provided
 	 * @param imageFileName
@@ -22,7 +27,7 @@ public interface ImageProcessor {
 	 * @throws ImageProcessingException
 	 * @throws InvalidInputException
 	 */
-	public String processImage(String imageFileName, String imageType)  throws ImageProcessingException, InvalidInputException;
+	public Map<String,String> processImage(String imageFileName, String imageType)  throws ImageProcessingException, InvalidInputException;
 	
 	/**
 	 * Processed the image and return a buffered image
@@ -34,7 +39,7 @@ public interface ImageProcessor {
 	 * @throws ImageProcessingException
 	 * @throws InvalidInputException
 	 */
-	public File processImage(BufferedImage image, int width, int length, String imageExtension) throws ImageProcessingException, InvalidInputException;
+	public File processImageForThumbnail(BufferedImage image, int width, int length, String imageExtension) throws ImageProcessingException, InvalidInputException;
 	
 	/**
 	 * Gets the image file
@@ -55,6 +60,11 @@ public interface ImageProcessor {
 	 * @throws InvalidInputException
 	 */
 	public String writeImage(String destFileName, File image, String imageType) throws ImageProcessingException, InvalidInputException;
+
+   
+
+    public File processImageAsRectangular( BufferedImage image,  int width, int height, String imageExtension ) throws ImageProcessingException,
+        InvalidInputException;
 	
 	
 }
