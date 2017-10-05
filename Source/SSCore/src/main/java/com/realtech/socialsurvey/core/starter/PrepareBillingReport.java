@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +20,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
+import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.reports.BillingReportsService;
 import com.realtech.socialsurvey.core.services.upload.CsvUploadService;
 
@@ -37,6 +41,9 @@ public class PrepareBillingReport implements Runnable
 
     @Autowired
     private BatchTrackerService batchTrackerService;
+    
+    @Autowired
+    private ReportingDashboardManagement reportingDashboardManagement;
 
 
     @Override
@@ -51,6 +58,8 @@ public class PrepareBillingReport implements Runnable
                     FileUpload fileUpload = filesToBeUploadedGenerated.get( 0 );
                     //FileName stores the recipient mail ID
                     String recipientMailId = fileUpload.getFileName();
+                    //Stored Filename in S3
+                    String locationInS3 = null;
 
                     try {
                         // update the status to be processing
@@ -102,15 +111,54 @@ public class PrepareBillingReport implements Runnable
                             dashboardService.generateUserAdoptionReportAndMail( fileUpload.getStartDate(),
                                 fileUpload.getEndDate(), fileUpload.getProfileLevel(), fileUpload.getProfileValue(),
                                 fileUpload.getAdminUserId(), fileUpload.getCompany().getCompanyId(), recipientMailId, null );
-                        }
+                        } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT ){
+                            locationInS3 = reportingDashboardManagement.generateSurveyStatsForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                fileUpload.getAdminUserId() );
+                        } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT ){
+                            locationInS3 = reportingDashboardManagement.generateUserAdoptionForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                fileUpload.getAdminUserId() );
+                        } else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
+                            locationInS3 = reportingDashboardManagement.generateCompanyUserForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                fileUpload.getAdminUserId() );
+                        } else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
+                        	locationInS3 = reportingDashboardManagement.generateSurveyResultsCompanyForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                    fileUpload.getAdminUserId(),fileUpload.getStartDate(),fileUpload.getEndDate());
+                         
+                        }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
+                             locationInS3 = reportingDashboardManagement.generateSurveyTransactionForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                 fileUpload.getAdminUserId(),fileUpload.getStartDate(),fileUpload.getEndDate() );
 
+                        }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT){
+                            //change this to have user ranking report 
+                            int type = 2;
+                            locationInS3 = reportingDashboardManagement.generateUserRankingForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                fileUpload.getAdminUserId(),fileUpload.getStartDate() , type);
+
+                       }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+                           //change this to have user ranking report 
+                           int type = 1;
+                           locationInS3 = reportingDashboardManagement.generateUserRankingForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                               fileUpload.getAdminUserId(),fileUpload.getStartDate() , type);
+
+                      }
+                        
                         // update the status to be processed
-                        fileUpload.setStatus( CommonConstants.STATUS_INACTIVE );
+                        fileUpload.setStatus( CommonConstants.STATUS_DONE );
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                        if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT 
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+                            fileUpload.setFileName( locationInS3 );
+                        }
                         csvUploadService.updateFileUploadRecord( fileUpload );
                     } catch ( Exception e ) {
                         LOG.error( "Error in generating billing report generator ", e );
+                        
                         try {
+                            // update the status to be processed
+                            fileUpload.setStatus( CommonConstants.STATUS_FAIL );
+                            fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                            csvUploadService.updateFileUploadRecord( fileUpload );
                             String reportType = null;
                             if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_BILLING_REPORT ) {
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT;
@@ -131,13 +179,29 @@ public class PrepareBillingReport implements Runnable
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_INCOMPLETE_SURVEY_REPORT;
                             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_USER_ADOPTION_REPORT ) {
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT;
+                            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT ){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_STATS_REPORT;
+                            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT ){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_VERIFIED_USERS_REPORT;
+                            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT ){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_COMPANY_USER_REPORT;
+                            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_RESULTS_COMPANY_REPORT;
+                            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_MONTHLY_REPORT;
+                            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_YEARLY_REPORT;
                             }
                             String batchName = CommonConstants.BATCH_NAME_FILE_UPLOAD_REPORTS_GENERATOR + " For " + reportType;
-
                             batchTrackerService.sendMailToAdminRegardingBatchError( batchName, System.currentTimeMillis(), e );
+                            
                         } catch ( InvalidInputException | UndeliveredEmailException e1 ) {
                             LOG.error( "error while sende report bug mail to admin ", e1 );
+                        } catch ( Exception exception ) {
+                            LOG.error( "General Error in setting fail and sending mail , in generating billing report generator ", exception );
+                            break;
                         }
+                        
                         continue;
                     }
                 }
@@ -148,7 +212,13 @@ public class PrepareBillingReport implements Runnable
                 } catch ( InterruptedException e1 ) {
                     LOG.warn( "Thread interrupted" );
                     break;
+                }  catch ( Exception exception ) {
+                    LOG.error( "General Error in the first catch block when no record is fetched in generating billing report generator ", exception );
+                    break;
                 }
+            }  catch ( Exception exception ) {
+                LOG.error( "General Error in the first try block in generating billing report generator ", exception );
+                break;
             }
         }
     }

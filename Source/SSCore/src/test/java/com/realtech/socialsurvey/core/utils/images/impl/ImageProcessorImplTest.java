@@ -68,21 +68,21 @@ public class ImageProcessorImplTest
     @Test ( expected = InvalidInputException.class)
     public void testProcessImageWithNullImage() throws ImageProcessingException, InvalidInputException
     {
-        imageProcessorImpl.processImage( null, 100, 100, ".jpeg" );
+        imageProcessorImpl.processImageForThumbnail( null, 100, 100, ".jpeg" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testProcessImageWithNullImageExtension() throws ImageProcessingException, InvalidInputException
     {
-        imageProcessorImpl.processImage( new BufferedImage( 100, 100, BufferedImage.TYPE_INT_RGB ), 100, 100, null );
+        imageProcessorImpl.processImageForThumbnail( new BufferedImage( 100, 100, BufferedImage.TYPE_INT_RGB ), 100, 100, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testProcessImageWithEmptyImageExtension() throws ImageProcessingException, InvalidInputException
     {
-        imageProcessorImpl.processImage( new BufferedImage( 100, 100, BufferedImage.TYPE_INT_RGB ), 100, 100,
+        imageProcessorImpl.processImageForThumbnail( new BufferedImage( 100, 100, BufferedImage.TYPE_INT_RGB ), 100, 100,
             TestConstants.TEST_EMPTY_STRING );
     }
 

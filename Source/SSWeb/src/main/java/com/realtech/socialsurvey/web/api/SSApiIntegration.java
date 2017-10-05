@@ -109,4 +109,80 @@ public interface SSApiIntegration
     Response createVendastaRmAccount( @Body VendastaRmCreateRequest accountDetails, @Query ( "isForced" ) boolean isForced );
     
     //vendasta: END
+    
+    //reporting: BEGIN
+    
+    @GET ( "/v1/getcompletionrate" )
+    Response getReportingCompletionRateApi(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
+    
+    
+    @GET ( "/v1/getspsstats" )
+    Response getReportingSpsStats(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
+    
+    @GET("/v1/getspsfromoverview")
+    Response getSpsStatsFromOverview(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
+ 
+    @GET("/v1/getalltimefromoverview")
+    Response getAllTimeDataOverview(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
+ 
+    @GET("/v1/getrecentactivityforreporting")
+    Response getRecentActivity(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("startIndex") int startIndex , @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getmonthdataoverviewfordashboard")
+    Response getMonthDataOverviewForDashboard(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("month") int month , @Query ("year") int year);
+    
+    @GET("/v1/getyeardataoverviewfordashboard")
+    Response getYearDataOverviewForDashboard(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("year") int year);
+    
+    @GET("/v1/getuserrankingforthisyear")
+    Response getUserRankingForThisYear(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("year") int year, @Query ("startIndex") int startIndex, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingforpastyear")
+    Response getUserRankingForPastYear(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("year") int year, @Query ("startIndex") int startIndex, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingforthismonth")
+    Response getUserRankingForThisMonth(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("month") int month, @Query ("year") int year, @Query ("startIndex") int startIndex, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingforpastmonth")
+    Response getUserRankingForPastMonth(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("month") int month, @Query ("year") int year, @Query ("startIndex") int startIndex, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingforpastyears")
+    Response getUserRankingForPastYears(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("startIndex") int startIndex, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingrankcountthisyear")
+    Response getUserRankingRankCountForThisYear(@Query ("userId") Long userId, @Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("year") int year, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingrankcountthismonth")
+    Response getUserRankingRankCountForThisMonth(@Query ("userId") Long userId, @Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("month") int month, @Query ("year") int year, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingrankcountpastyears")
+    Response getUserRankingRankCountForPastYears(@Query ("userId") Long userId, @Query ("entityId") Long entityId, @Query ("entityType") String entityType,  @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingrankcountpastmonth")
+    Response getUserRankingRankCountForPastMonth(@Query ("userId") Long userId, @Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("month") int month, @Query ("year") int year, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingrankcountpastyear")
+    Response getUserRankingRankCountForPastYear(@Query ("userId") Long userId, @Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("year") int year, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingcountthisyear")
+    Response getUserRankingCountForThisYear(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("year") int year, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingcountthismonth")
+    Response getUserRankingCountForThisMonth(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("month") int month, @Query ("year") int year, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingcountpastyear")
+    Response getUserRankingCountForPastYear(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("year") int year, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingcountpastmonth")
+    Response getUserRankingCountForPastMonth(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("month") int month, @Query ("year") int year, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getuserrankingcountpastyears")
+    Response getUserRankingCountForPastYears(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("batchSize") int batchSize);
+    
+    @GET("/v1/getscorestatsoverall")
+    Response getScoreStatsOverall(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("currentMonth") int currentMonth, @Query ("currentYear") int currentYear);
+    
+    @GET("/v1/getscorestatsquestion")
+    Response getScoreStatsQuestion(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("currentMonth") int currentMonth, @Query ("currentYear") int currentYear);
+    //reporting:END
 }

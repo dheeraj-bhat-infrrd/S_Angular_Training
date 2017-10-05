@@ -1526,3 +1526,8 @@ span.footer-ul a:hover {
     font-family: 'opensanssemibold';
     text-align: center;
 }
+
+.hdr-container{
+	padding-left:0 !important;
+	padding-right:0 !important;
+}
