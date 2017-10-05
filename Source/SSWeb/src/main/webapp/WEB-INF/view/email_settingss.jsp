@@ -267,6 +267,7 @@
 							<c:if test="${cannonicalusersettings.companySettings != null && cannonicalusersettings.companySettings.survey_settings!= null}">
 								<c:set var="reminderinterval" value="${cannonicalusersettings.companySettings.survey_settings.survey_reminder_interval_in_days}" />
 								<c:set var="isreminderdisabled" value="${cannonicalusersettings.companySettings.survey_settings.isReminderDisabled}" />
+								<c:set var="maxSurveyReminders" value="${cannonicalusersettings.companySettings.survey_settings.max_number_of_survey_reminders}" />
 							</c:if>
 							<div class="clearfix st-bottom-wrapper st-reminder-wrapper">
 								<div class="float-left">
@@ -287,6 +288,7 @@
 									<div class="float-left">
 										<spring:message code="label.days.key" />
 									</div>
+									<div class="float-left margin-left-20">|</div>
 								</div>
 								<div class="clearfix st-check-main float-left">
 									<div class="float-left st-check-wrapper">
@@ -304,6 +306,14 @@
 									</div>
 									<div class="float-left st-check-txt-OR">
 										<spring:message code="label.noreminder.key" />
+									</div>
+								</div>
+								<div class="float-left margin-left-20">|</div>
+								<div class="float-left margin-left-10">Max number of reminders</div>
+								<div class="clearfix float-left">
+									<div class="float-left st-input-reminder">
+										<input class="st-rating-input" name="max-reminder-count" id="max-reminder-count" value="${maxSurveyReminders}">
+										<div id="reminder-interval-error" class="hm-item-err-2"></div>
 									</div>
 								</div>
 							</div>
@@ -802,6 +812,16 @@
 			}
 		});
 
+		
+		//for reminder count
+		$('#max-reminder-count').change(function() {
+			$('#mailcategory').val('max-reminder-count');
+			if (validateReminderInterval('max-reminder-count')) {
+				updateReminderSettings("mail-body-settings-form");
+			}
+		});
+
+		
 		$('#st-reminder-on').click(function() {
 			$('#mailcategory').val('reminder-needed');
 

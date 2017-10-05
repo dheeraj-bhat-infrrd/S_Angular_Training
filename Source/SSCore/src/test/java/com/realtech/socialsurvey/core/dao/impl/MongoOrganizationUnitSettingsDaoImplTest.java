@@ -126,56 +126,43 @@ public class MongoOrganizationUnitSettingsDaoImplTest
     @Test ( expected = InvalidInputException.class)
     public void updateImageForOrganizationUnitSettingTestIdenInvalid() throws InvalidInputException
     {
-        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( -1, "test", "test", "test", false, false );
+        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( -1, "test",  "test", "test",  "test", "test", false, false );
     }
 
-
-    @Test ( expected = InvalidInputException.class)
-    public void updateImageForOrganizationUnitSettingTestFileNameNull() throws InvalidInputException
-    {
-        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, null, "test", "test", false, false );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void updateImageForOrganizationUnitSettingTestFileNameEmpty() throws InvalidInputException
-    {
-        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "", "test", "test", false, false );
-    }
 
 
     @Test ( expected = InvalidInputException.class)
     public void updateImageForOrganizationUnitSettingTestCollectionNameNull() throws InvalidInputException
     {
-        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test", null, "test", false, false );
+        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test",  "test", "test",  null, "test", false, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void updateImageForOrganizationUnitSettingTestCollectionNameEmpty() throws InvalidInputException
     {
-        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test", "", "test", false, false );
+        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test",  "test", "test",  "", "test", false, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void updateImageForOrganizationUnitSettingTestImageTypeNull() throws InvalidInputException
     {
-        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test", "test", null, false, false );
+        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test",  "test", "test",  "test", null, false, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void updateImageForOrganizationUnitSettingTestImageTypeEmpty() throws InvalidInputException
     {
-        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test", "test", "", false, false );
+        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test",  "test", "test",  "test", "", false, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void updateImageForOrganizationUnitSettingTestImageTypeInvalid() throws InvalidInputException
     {
-        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test", "test", "test", false, false );
+        mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test",  "test", "test",  "test", "test", false, false );
     }
 
 
