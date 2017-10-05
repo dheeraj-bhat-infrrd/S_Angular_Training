@@ -1,9 +1,12 @@
 package com.realtech.socialsurvey.core.utils.images.impl;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -39,11 +42,20 @@ public class ImageProcessorImpl implements ImageProcessor {
 	@Value("${AMAZON_LOGO_BUCKET}")
 	private String amazonLogoBucket;
 
+	@Value("${RECTANGULAR_THUMBNAIL_IMG_PATH}")
+    private String rectangularThumbnailImgPath;
+	
+	
 	@Autowired
 	private FileUploadService fileUploadService;
-
+	
+	
+	private static final String THUMBNAIL_APPENDER = "-th.";
+	private static final String RECTANGULAR_THUMBNAIL_APPENDER = "-rctTh.";
+	
+	
 	@Override
-	public String processImage(String imageFileName, String imageType)
+	public Map<String,String> processImage(String imageFileName, String imageType)
 			throws ImageProcessingException, InvalidInputException {
         if ( imageFileName == null || imageFileName.isEmpty() ) {
             LOG.error( "Image File Name is empty" );
@@ -53,6 +65,9 @@ public class ImageProcessorImpl implements ImageProcessor {
             LOG.error( "Image Type is empty" );
             throw new InvalidInputException( "Image Type is empty" );
         }
+        
+        Map<String, String> processedImgs = new HashMap<String, String>();
+        
 		LOG.info("Processing images for " + imageFileName);
 		// get the image
 		BufferedImage sourceImage = getImageFromCloud(imageFileName);
@@ -62,16 +77,31 @@ public class ImageProcessorImpl implements ImageProcessor {
 		if(imageFileName.contains( "media.licdn.com" )){
 		    extension = "jpg";
 		}
-		File processedImage = processImage(sourceImage, THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, extension);
+		
+		//generate Thumbnail image
+		File processedImage = processImageForThumbnail(sourceImage, THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, extension);
 		// name the file that needs to be uploaded
-		String thumbnailImageName = getThumbnailImageName(imageFileName, extension);
-		String uploadedFileName = writeImage(thumbnailImageName, processedImage, imageType);
+		String thumbnailImageName = getThumbnailImageName(imageFileName, extension ,THUMBNAIL_APPENDER);
+		String thumbnailFileName = writeImage(thumbnailImageName, processedImage, imageType);
 		deleteTempFile(processedImage);
-		return uploadedFileName;
+		
+		
+		
+	    File processedRectangularImg = processImageAsRectangular(sourceImage, RECTANGULAR_THUMBNAIL_WIDTH, RECTANGULAR_THUMBNAIL_HEIGHT, extension);
+		String linkedInThumbnailImageName = getThumbnailImageName(imageFileName, extension ,RECTANGULAR_THUMBNAIL_APPENDER);
+        String linkedInThumbnailFileName = writeImage(linkedInThumbnailImageName, processedRectangularImg, imageType);
+        deleteTempFile(processedRectangularImg);
+		
+        processedImgs.put( CommonConstants.SQUARE_THUMBNAIL, thumbnailFileName );
+        processedImgs.put( CommonConstants.RECTANGULAR_THUMBNAIL, linkedInThumbnailFileName );
+       
+		return processedImgs;
 	}
+	
+	
 
 	@Override
-	public File processImage(BufferedImage image, int width, int height, String imageExtension) throws ImageProcessingException,
+	public File processImageForThumbnail(BufferedImage image, int width, int height, String imageExtension) throws ImageProcessingException,
 			InvalidInputException {
 		if (image == null || imageExtension == null || imageExtension.isEmpty()) {
 			LOG.error("Could not find file to process");
@@ -99,6 +129,53 @@ public class ImageProcessorImpl implements ImageProcessor {
 		return processedFile;
 	}
 
+	
+	@Override
+    public File processImageAsRectangular(BufferedImage image, int width, int height, String imageExtension) throws ImageProcessingException,
+            InvalidInputException {
+	    LOG.info( "Method processImageAsRectangular started" );
+        if (image == null || imageExtension == null || imageExtension.isEmpty()) {
+            LOG.error("Could not find file to process");
+            throw new InvalidInputException("Could not find file to process");
+        }
+        BufferedImage scaledImage = null;
+        scaledImage = Scalr.resize(image, Method.SPEED, Mode.AUTOMATIC, width, height);
+        File processedFile = null;
+        
+        BufferedImage newRectangularImage = null;
+        try {
+            newRectangularImage = getBackgroundImageForRectangularThumbnail();
+        } catch ( IOException e ) {
+            LOG.error("Error while getting black image for rectangular thumbnail", e);
+            throw new ImageProcessingException("Error while processing image.", e);
+        }
+        
+        int xCordiate = (newRectangularImage.getWidth() - scaledImage.getWidth())/2 ;
+        int yCordinate = (newRectangularImage.getHeight() - scaledImage.getHeight())/2;
+        
+        Graphics2D graphics = newRectangularImage.createGraphics();
+        graphics.drawImage(scaledImage, xCordiate , yCordinate , null);
+        graphics.dispose();
+        
+        processedFile = new File(CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + String.valueOf(System.currentTimeMillis()) + "-"
+                  + "." + imageExtension);
+        try {
+            LOG.debug( "File path of processed file : " + processedFile.getAbsolutePath() );
+            processedFile.createNewFile();
+            if (processedFile.exists()) {
+                ImageIO.write(newRectangularImage, imageExtension, processedFile);
+            }
+        }
+        catch (IOException e) {
+            LOG.error("Error while processing image.", e);
+            throw new ImageProcessingException("Error while processing image.", e);
+        }
+        
+        LOG.info( "Method processImageAsRectangular finished" );
+
+        return processedFile;
+    }
+	
 	@Override
 	public BufferedImage getImageFromCloud(String imageFileName) throws ImageProcessingException, InvalidInputException {
 		LOG.info("Downloading file from cloud: " + imageFileName);
@@ -142,7 +219,14 @@ public class ImageProcessorImpl implements ImageProcessor {
 	}
 
 
-    String getThumbnailImageName( String originalImageName, String extension ) throws InvalidInputException
+	/**
+	 * 
+	 * @param originalImageName
+	 * @param extension
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private String getThumbnailImageName( String originalImageName, String extension , String thumbnailAppender ) throws InvalidInputException
     {
         LOG.debug( "Getting thumbnail name for " + originalImageName );
         String thumbnailImg = "";
@@ -150,11 +234,11 @@ public class ImageProcessorImpl implements ImageProcessor {
             if(thumbnailImg.contains( "." + extension  )){
                 thumbnailImg = originalImageName.substring( originalImageName.lastIndexOf( "/" ) + 1,
                     originalImageName.lastIndexOf( "." + extension ) )
-                    + "-th." + extension;
+                    + thumbnailAppender + extension;
             }else{
                 thumbnailImg = originalImageName.substring( originalImageName.lastIndexOf( "/" ) + 1,
                     originalImageName.length() -1 )
-                    + "-th." + extension;
+                    + thumbnailAppender + extension;
             }
             
         } catch ( StringIndexOutOfBoundsException e ) {
@@ -164,9 +248,28 @@ public class ImageProcessorImpl implements ImageProcessor {
         return thumbnailImg;
     }
 
-	 void deleteTempFile(File file) {
+    
+	
+	
+    /**
+     * 
+     * @param file
+     */
+	void deleteTempFile(File file) {
 		LOG.debug("Deleting file: " + file.getAbsolutePath());
 		FileUtils.deleteQuietly(file);
 	}
 
+	/**
+	 * @throws IOException 
+	 * 
+	 */
+	private  BufferedImage getBackgroundImageForRectangularThumbnail() throws IOException{
+	    LOG.info( "method getBackgroundImageForRectangularThumbnail started" );
+	    BufferedImage image = ImageIO.read(getClass().getClassLoader().getResource(rectangularThumbnailImgPath));
+	       LOG.info( "method getBackgroundImageForRectangularThumbnail finished" );
+	    return image;
+	}
+	
+	
 }
