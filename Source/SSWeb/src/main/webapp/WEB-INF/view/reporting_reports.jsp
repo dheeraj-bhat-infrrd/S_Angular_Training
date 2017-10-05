@@ -17,7 +17,6 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
 	<div class="container">
 		<div class="hm-header-row clearfix">
@@ -29,6 +28,17 @@
 		</div>
 	</div>
 </div>
+<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background-color: #009fe0;">
+	<div class="container">
+		<div class="hm-header-row clearfix" style="color: #f2f2f2;">
+			<div id="rep-beta-disclaimer">
+				<div style="text-align:center; margin-top:15px;">
+					<span style="text-align: center; line-height: 15px; font-size:small; font-weight: bold !important;">Please note that this is a beta version of the page which is still undergoing final testing before its official release. Should you encounter any bugs, glitches or other problems on the page / reports, please notify us immediately. Your help in this regard is greatly appreciated.</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 <div class="dash-stats-wrapper bord-bot-dc clearfix">
 	
 				<div class="generate-report-div">
@@ -37,7 +47,7 @@
 						<select id="generate-survey-reports" class="float-left dash-download-sel-item report-selector-choice">
 							<c:if test="${profilemasterid != 4}">
 								<option value=101 data-report="survey-stats">Survey Statistics</option>
-								<option value=102 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option>
+								<option value=102 data-report="user-adoption"><spring:message code="label.reports.verfied.users.report.key" /></option>
 								<option value=106 data-report="user-ranking">User Ranking</option>
 							</c:if>
 							<c:if test="${profilemasterid == 1}"> 
@@ -48,7 +58,7 @@
 						</select>	
 					</div>
 					<div id="report-time-div" class="float-left board-div hide">
-						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px">
+						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
 							<select id="report-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
 								<option value=1 data-report="thisYear">This Year</option>
 								<option value=2 data-report="thisMonth">This Month</option>
@@ -58,7 +68,7 @@
 						</div>
 					</div>
 					<div class="generate-report-date-range" id="date-pickers">
-						<div style="display:inline-flex;">
+						<div style="display: -webkit-box; display:inline-flex;">
 							<span class="generate-report-span-date">Date</span>
 							<span class="generate-report-span-date" style="margin-left: 3px; padding-left:0 !important">Range</span>
 						</div>
@@ -102,7 +112,6 @@
 				<div id="rec-act-page-next" class="float-right paginate-button"><spring:message code="label.next.key" /></div>
 			</div>		
 </div>
-
 <script>
 $(document).ready(function() {
 	$(document).attr("title", "Reports");

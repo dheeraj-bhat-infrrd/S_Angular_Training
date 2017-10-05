@@ -102,20 +102,51 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
   <hop> <from>Region Input 2</from><to>SortRegion</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort USERpROFILE</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
   <hop> <from>User Profile</from><to>Sort USERpROFILE</to><enabled>Y</enabled> </hop>
   <hop> <from>SortRegion</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>DatabaseUsers</from><to>Stream lookup</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort User Profile</from><to>DatabaseUsers</to><enabled>Y</enabled> </hop>
-  <hop> <from>Stream lookup</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
-  <hop> <from>Table input</from><to>Stream lookup</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 2</from><to>Sort User Profile</to><enabled>Y</enabled> </hop>
   <hop> <from>Generate random value</from><to>Unique rows</to><enabled>Y</enabled> </hop>
-  <hop> <from>Unique rows</from><to>Table SURVEY TRANSACTION Region</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>Database join</to><enabled>Y</enabled> </hop>
   <hop> <from>Database join</from><to>Generate random value</to><enabled>Y</enabled> </hop>
+  <hop> <from>DatabaseUsers</from><to>Unique UserId</to><enabled>Y</enabled> </hop>
+  <hop> <from>Unique UserId</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Table input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
+  <hop> <from>Unique rows</from><to>If field value is null</to><enabled>Y</enabled> </hop>
+  <hop> <from>If field value is null</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Database join</name>
@@ -136,17 +167,17 @@
     <parameter>
       <field>
         <name>finalRegionId</name>
-        <type>None</type>
+        <type>Integer</type>
       </field>
       <field>
         <name>finalAgentId</name>
-        <type>None</type>
+        <type>Integer</type>
       </field>
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>689</xloc>
-      <yloc>396</yloc>
+      <xloc>1047</xloc>
+      <yloc>572</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -170,13 +201,13 @@
     <parameter>
       <field>
         <name>USER_ID</name>
-        <type>None</type>
+        <type>Integer</type>
       </field>
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>730</xloc>
-      <yloc>156</yloc>
+      <xloc>752</xloc>
+      <yloc>107</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -200,8 +231,383 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>688</xloc>
-      <yloc>480</yloc>
+      <xloc>867</xloc>
+      <yloc>572</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>If field value is null</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <replaceAllByValue>0</replaceAllByValue>
+      <replaceAllMask/>
+      <selectFields>Y</selectFields>
+      <selectValuesType>N</selectValuesType>
+      <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>total_3rd_party_reviews</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_abusive_reviews</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_retake_completed</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_retake_reviews</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_reviews</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_social_survey_reviews</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_unverified_customer_reviews</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_verified_customer_reviews</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_zillow_reviews</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>transaction_clicked</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>transaction_completed_</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>transaction_duplicates</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>transaction_mismatched</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>transaction_partially_completed</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>transaction_received_by_source</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>transaction_sent</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>transaction_unassigned</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>transaction_unopened</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>transaction_unprocessable</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>503</xloc>
+      <yloc>571</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>survey_transaction_report_region</table>
+      <key>
+        <name>finalAgentId</name>
+        <field>user_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>finalRegionId</name>
+        <field>region_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>month</name>
+        <field>month</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>year</name>
+        <field>year</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>branch_name</name>
+        <rename>branch</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>company_id</name>
+        <rename>finalCompanyId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>company_name</name>
+        <rename>company_name</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>license_id</name>
+        <rename>license_id</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>month</name>
+        <rename>month</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>nmls</name>
+        <rename>nmls</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>region_id</name>
+        <rename>finalRegionId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>region_name</name>
+        <rename>REGION</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>survey_transaction_report_region_id</name>
+        <rename>survey_transaction_report_region_id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>total_3rd_party_reviews</name>
+        <rename>total_3rd_party_reviews</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>total_abusive_reviews</name>
+        <rename>total_abusive_reviews</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>total_retake_completed</name>
+        <rename>total_retake_completed</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>total_retake_reviews</name>
+        <rename>total_retake_reviews</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>total_reviews</name>
+        <rename>total_reviews</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>total_social_survey_reviews</name>
+        <rename>total_social_survey_reviews</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>total_unverified_customer_reviews</name>
+        <rename>total_unverified_customer_reviews</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>total_verified_customer_reviews</name>
+        <rename>total_verified_customer_reviews</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>total_zillow_reviews</name>
+        <rename>total_zillow_reviews</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>transaction_clicked</name>
+        <rename>transaction_clicked</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>transaction_completed_</name>
+        <rename>transaction_completed_</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>transaction_duplicates</name>
+        <rename>transaction_duplicates</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>transaction_mismatched</name>
+        <rename>transaction_mismatched</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>transaction_partially_completed</name>
+        <rename>transaction_partially_completed</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>transaction_received_by_source</name>
+        <rename>transaction_received_by_source</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>transaction_sent</name>
+        <rename>transaction_sent</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>transaction_unassigned</name>
+        <rename>transaction_unassigned</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>transaction_unopened</name>
+        <rename>transaction_unopened</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>transaction_unprocessable</name>
+        <rename>transaction_unprocessable</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>user_id</name>
+        <rename>finalAgentId</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>user_name</name>
+        <rename>final_user_name</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>year</name>
+        <rename>year</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>293</xloc>
+      <yloc>572</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Merge Join</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>INNER</join_type>
+<step1>Sort rows</step1>
+<step2>Table input</step2>
+    <keys_1>
+      <key>final_user_id</key>
+    </keys_1>
+    <keys_2>
+      <key>user_id</key>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1047</xloc>
+      <yloc>272</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -228,8 +634,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>489</xloc>
-      <yloc>66</yloc>
+      <xloc>449</xloc>
+      <yloc>107</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -249,35 +655,41 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var finalBranchId &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;BRANCH_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalBranchId &#x3d; BRANCH_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;BRANCH_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalBranchId &#x3d; BRANCH_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var finalCompanyId &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalCompanyId &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalCompanyId &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;company_id_3&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalCompanyId &#x3d; company_id_3&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var finalRegionId &#x3d; null&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;REGION_ID&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalRegionId &#x3d;REGION_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;REGION_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalRegionId &#x3d; REGION_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var finalAgentId &#x3d; null&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;USER_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalAgentId &#x3d; USER_ID&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID&#x29;&#x7b;&#xd;&#xa;	finalAgentId &#x3d; AGENT_ID&#xd;&#xa;&#x7d;else if&#x28;user_id_2&#x29;&#x7b;&#xd;&#xa;	finalAgentId &#x3d; user_id_2&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var finalBranchId &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;BRANCH_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalBranchId &#x3d; BRANCH_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;BRANCH_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalBranchId &#x3d; BRANCH_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var finalCompanyId &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalCompanyId &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalCompanyId &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;company_id_3&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalCompanyId &#x3d; company_id_3&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var finalRegionId &#x3d; null&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;REGION_ID&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalRegionId &#x3d;REGION_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;REGION_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalRegionId &#x3d; REGION_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var finalAgentId &#x3d; null&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;USER_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	finalAgentId &#x3d; USER_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID&#x29;&#x7b;&#xd;&#xa;	finalAgentId &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_1&#x29;&#x7b;&#xd;&#xa;	finalAgentId &#x3d; USER_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;final_user_id&#x29;&#x7b;&#xd;&#xa;	finalAgentId &#x3d; final_user_id&#x3b;&#xd;&#xa;&#x7d;else if&#x28;user_id_2&#x29;&#x7b;&#xd;&#xa;	finalAgentId &#x3d; user_id_2&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var final_user_name &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;if&#x28;user_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_user_name &#x3d; user_name&#x3b;&#xd;&#xa;&#x7d; else if&#x28;user_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_user_name &#x3d; user_name_1&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>finalBranchId</name>
         <rename>finalBranchId</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>finalCompanyId</name>
         <rename>finalCompanyId</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>finalRegionId</name>
         <rename>finalRegionId</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>finalAgentId</name>
         <rename>finalAgentId</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_user_name</name>
+        <rename>final_user_name</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>688</xloc>
-      <yloc>330</yloc>
+      <xloc>1047</xloc>
+      <yloc>424</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -302,8 +714,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>189</xloc>
-      <yloc>0</yloc>
+      <xloc>98</xloc>
+      <yloc>36</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -336,8 +748,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>379</xloc>
-      <yloc>120</yloc>
+      <xloc>295</xloc>
+      <yloc>150</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -346,7 +758,7 @@
     <name>Sort User Profile</name>
     <type>SortRows</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -370,8 +782,42 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>724</xloc>
-      <yloc>64</yloc>
+      <xloc>586</xloc>
+      <yloc>107</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>final_user_id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1047</xloc>
+      <yloc>107</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -404,380 +850,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>381</xloc>
-      <yloc>0</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Stream lookup</name>
-    <type>StreamLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <from>Table input</from>
-    <input_sorted>N</input_sorted>
-    <preserve_memory>Y</preserve_memory>
-    <sorted_list>N</sorted_list>
-    <integer_pair>N</integer_pair>
-    <lookup>
-      <key>
-        <name>USER_ID</name>
-        <field>user_id</field>
-      </key>
-      <key>
-        <name>USER_ID_1</name>
-        <field>user_id</field>
-      </key>
-      <value>
-        <name>survey_transaction_report_id</name>
-        <rename>survey_transaction_report_id</rename>
-        <default/>
-        <type>String</type>
-      </value>
-      <value>
-        <name>month</name>
-        <rename>month</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>year</name>
-        <rename>year</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>user_name</name>
-        <rename>user_name</rename>
-        <default/>
-        <type>String</type>
-      </value>
-      <value>
-        <name>user_id</name>
-        <rename>user_id</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>nmls</name>
-        <rename>nmls</rename>
-        <default/>
-        <type>String</type>
-      </value>
-      <value>
-        <name>license_id</name>
-        <rename>license_id</rename>
-        <default/>
-        <type>String</type>
-      </value>
-      <value>
-        <name>company_name</name>
-        <rename>company_name</rename>
-        <default/>
-        <type>String</type>
-      </value>
-      <value>
-        <name>company_id</name>
-        <rename>company_id</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>region_name</name>
-        <rename>region_name</rename>
-        <default/>
-        <type>String</type>
-      </value>
-      <value>
-        <name>branch_name</name>
-        <rename>branch_name</rename>
-        <default/>
-        <type>String</type>
-      </value>
-      <value>
-        <name>total_reviews</name>
-        <rename>total_reviews</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>total_zillow_reviews</name>
-        <rename>total_zillow_reviews</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>total_3rd_party_reviews</name>
-        <rename>total_3rd_party_reviews</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>total_verified_customer_reviews</name>
-        <rename>total_verified_customer_reviews</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>total_unverified_customer_reviews</name>
-        <rename>total_unverified_customer_reviews</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>total_social_survey_reviews</name>
-        <rename>total_social_survey_reviews</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>total_abusive_reviews</name>
-        <rename>total_abusive_reviews</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>total_retake_reviews</name>
-        <rename>total_retake_reviews</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>total_retake_completed</name>
-        <rename>total_retake_completed</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>transaction_received_by_source</name>
-        <rename>transaction_received_by_source</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>transaction_sent</name>
-        <rename>transaction_sent</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>transaction_unprocessable</name>
-        <rename>transaction_unprocessable</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>transaction_clicked</name>
-        <rename>transaction_clicked</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>transaction_completed_</name>
-        <rename>transaction_completed_</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>transaction_partially_completed</name>
-        <rename>transaction_partially_completed</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>transaction_unopened</name>
-        <rename>transaction_unopened</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>transaction_duplicates</name>
-        <rename>transaction_duplicates</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>transaction_mismatched</name>
-        <rename>transaction_mismatched</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-      <value>
-        <name>transaction_unassigned</name>
-        <rename>transaction_unassigned</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>690</xloc>
-      <yloc>257</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Table SURVEY TRANSACTION Region</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>survey_transaction_report_region</table>
-    <commit>1000</commit>
-    <truncate>Y</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>month</column_name>
-          <stream_name>month</stream_name>
-        </field>
-        <field>
-          <column_name>year</column_name>
-          <stream_name>year</stream_name>
-        </field>
-        <field>
-          <column_name>user_name</column_name>
-          <stream_name>user_name</stream_name>
-        </field>
-        <field>
-          <column_name>nmls</column_name>
-          <stream_name>nmls</stream_name>
-        </field>
-        <field>
-          <column_name>license_id</column_name>
-          <stream_name>license_id</stream_name>
-        </field>
-        <field>
-          <column_name>company_name</column_name>
-          <stream_name>company_name</stream_name>
-        </field>
-        <field>
-          <column_name>total_retake_reviews</column_name>
-          <stream_name>total_reviews</stream_name>
-        </field>
-        <field>
-          <column_name>transaction_received_by_source</column_name>
-          <stream_name>transaction_received_by_source</stream_name>
-        </field>
-        <field>
-          <column_name>transaction_sent</column_name>
-          <stream_name>transaction_sent</stream_name>
-        </field>
-        <field>
-          <column_name>transaction_clicked</column_name>
-          <stream_name>transaction_clicked</stream_name>
-        </field>
-        <field>
-          <column_name>transaction_unassigned</column_name>
-          <stream_name>transaction_unassigned</stream_name>
-        </field>
-        <field>
-          <column_name>transaction_mismatched</column_name>
-          <stream_name>transaction_mismatched</stream_name>
-        </field>
-        <field>
-          <column_name>transaction_duplicates</column_name>
-          <stream_name>transaction_duplicates</stream_name>
-        </field>
-        <field>
-          <column_name>transaction_unopened</column_name>
-          <stream_name>transaction_unopened</stream_name>
-        </field>
-        <field>
-          <column_name>transaction_partially_completed</column_name>
-          <stream_name>transaction_partially_completed</stream_name>
-        </field>
-        <field>
-          <column_name>transaction_completed_</column_name>
-          <stream_name>transaction_completed_</stream_name>
-        </field>
-        <field>
-          <column_name>transaction_unprocessable</column_name>
-          <stream_name>transaction_unprocessable</stream_name>
-        </field>
-        <field>
-          <column_name>total_retake_completed</column_name>
-          <stream_name>total_retake_completed</stream_name>
-        </field>
-        <field>
-          <column_name>total_abusive_reviews</column_name>
-          <stream_name>total_abusive_reviews</stream_name>
-        </field>
-        <field>
-          <column_name>total_social_survey_reviews</column_name>
-          <stream_name>total_social_survey_reviews</stream_name>
-        </field>
-        <field>
-          <column_name>total_zillow_reviews</column_name>
-          <stream_name>total_zillow_reviews</stream_name>
-        </field>
-        <field>
-          <column_name>total_3rd_party_reviews</column_name>
-          <stream_name>total_3rd_party_reviews</stream_name>
-        </field>
-        <field>
-          <column_name>total_verified_customer_reviews</column_name>
-          <stream_name>total_verified_customer_reviews</stream_name>
-        </field>
-        <field>
-          <column_name>total_unverified_customer_reviews</column_name>
-          <stream_name>total_unverified_customer_reviews</stream_name>
-        </field>
-        <field>
-          <column_name>user_id</column_name>
-          <stream_name>finalAgentId</stream_name>
-        </field>
-        <field>
-          <column_name>company_id</column_name>
-          <stream_name>finalCompanyId</stream_name>
-        </field>
-        <field>
-          <column_name>survey_transaction_report_region_id</column_name>
-          <stream_name>survey_transaction_report_region_id</stream_name>
-        </field>
-        <field>
-          <column_name>region_id</column_name>
-          <stream_name>finalRegionId</stream_name>
-        </field>
-        <field>
-          <column_name>region_name</column_name>
-          <stream_name>REGION</stream_name>
-        </field>
-        <field>
-          <column_name>branch_name</column_name>
-          <stream_name>branch</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>686</xloc>
-      <yloc>660</yloc>
+      <xloc>295</xloc>
+      <yloc>36</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -794,7 +868,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  survey_transaction_report_id&#xd;&#xa;, month&#xd;&#xa;, year&#xd;&#xa;, user_name&#xd;&#xa;, user_id&#xd;&#xa;, nmls&#xd;&#xa;, license_id&#xd;&#xa;, company_name&#xd;&#xa;, company_id&#xd;&#xa;, region_name&#xd;&#xa;, branch_name&#xd;&#xa;, total_reviews&#xd;&#xa;, total_zillow_reviews&#xd;&#xa;, total_3rd_party_reviews&#xd;&#xa;, total_verified_customer_reviews&#xd;&#xa;, total_unverified_customer_reviews&#xd;&#xa;, total_social_survey_reviews&#xd;&#xa;, total_abusive_reviews&#xd;&#xa;, total_retake_reviews&#xd;&#xa;, total_retake_completed&#xd;&#xa;, transaction_received_by_source&#xd;&#xa;, transaction_sent&#xd;&#xa;, transaction_unprocessable&#xd;&#xa;, transaction_clicked&#xd;&#xa;, transaction_completed_&#xd;&#xa;, transaction_partially_completed&#xd;&#xa;, transaction_unopened&#xd;&#xa;, transaction_duplicates&#xd;&#xa;, transaction_mismatched&#xd;&#xa;, transaction_unassigned&#xd;&#xa;FROM survey_transaction_report&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  survey_transaction_report_id&#xd;&#xa;, month&#xd;&#xa;, year&#xd;&#xa;, user_name&#xd;&#xa;, user_id&#xd;&#xa;, nmls&#xd;&#xa;, license_id&#xd;&#xa;, company_name&#xd;&#xa;, company_id&#xd;&#xa;, region_name&#xd;&#xa;, branch_name&#xd;&#xa;, total_reviews&#xd;&#xa;, total_zillow_reviews&#xd;&#xa;, total_3rd_party_reviews&#xd;&#xa;, total_verified_customer_reviews&#xd;&#xa;, total_unverified_customer_reviews&#xd;&#xa;, total_social_survey_reviews&#xd;&#xa;, total_abusive_reviews&#xd;&#xa;, total_retake_reviews&#xd;&#xa;, total_retake_completed&#xd;&#xa;, transaction_received_by_source&#xd;&#xa;, transaction_sent&#xd;&#xa;, transaction_unprocessable&#xd;&#xa;, transaction_clicked&#xd;&#xa;, transaction_completed_&#xd;&#xa;, transaction_partially_completed&#xd;&#xa;, transaction_unopened&#xd;&#xa;, transaction_duplicates&#xd;&#xa;, transaction_mismatched&#xd;&#xa;, transaction_unassigned&#xd;&#xa;FROM survey_transaction_report&#xd;&#xa;order by user_id&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -802,8 +876,44 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>503</xloc>
-      <yloc>241</yloc>
+      <xloc>1287</xloc>
+      <yloc>272</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Unique UserId</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#xd;&#xa;var final_user_id &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;USER_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_user_id &#x3d; USER_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_user_id &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;USER_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_user_id &#x3d; USER_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var user_name &#x3d; FIRST_NAME &#x2b; &#x22; &#x22; &#x2b; LAST_NAME&#x3b;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>final_user_id</name>
+        <rename>final_user_id</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>user_name</name>
+        <rename>user_name</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>906</xloc>
+      <yloc>107</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -833,8 +943,8 @@
         <case_insensitive>N</case_insensitive>
         </field>      </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>691</xloc>
-      <yloc>562</yloc>
+      <xloc>690</xloc>
+      <yloc>572</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -851,7 +961,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  USER_PROFILE_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, PROFILES_MASTER_ID&#xd;&#xa;, USER_PROFILE_TYPE&#xd;&#xa;, PROFILE_COMPLETION_STAGE&#xd;&#xa;, IS_PROFILE_COMPLETE&#xd;&#xa;, IS_PRIMARY&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;FROM user_profile where REGION_ID &#x21;&#x3d; 0  and status &#x3d; 1 order by REGION_ID&#xd;&#xa;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  distinct USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, PROFILES_MASTER_ID&#xd;&#xa;, USER_PROFILE_TYPE&#xd;&#xa;, PROFILE_COMPLETION_STAGE&#xd;&#xa;, IS_PROFILE_COMPLETE&#xd;&#xa;, IS_PRIMARY&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;FROM user_profile where REGION_ID &#x21;&#x3d; 0 order by REGION_ID&#xd;&#xa;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -859,8 +969,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>184</xloc>
-      <yloc>122</yloc>
+      <xloc>98</xloc>
+      <yloc>150</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

@@ -272,7 +272,8 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_INCOMPLETE_SURVEY_REPORT = "Incomplete survey data report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT = "User adoption report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_STATS_REPORT = "Survey stats report for reporting";
-    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_ADOPTION_REPORT = "User adoption report for reporting";
+  //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_VERIFIED_USERS_REPORT = "Verified users report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_COMPANY_USER_REPORT = "Company user report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = "Survey results company report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_TRANSACTION_REPORT = "Survey transaction report for reporting";
@@ -321,6 +322,7 @@ public interface CommonConstants
     public static final String AGREE_SHARE_COLUMN_TRUE = "true";
     public static final String AGREE_SHARE_COLUMN_FALSE = "false";
     public static final String PROFILE_IMAGE_THUMBNAIL_COLUMN = "profileImageUrlThumbnail";
+    public static final String PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN = "profileImageUrlRectangularThumbnail";
     public static final String LOGO_THUMBNAIL_COLUMN = "logoThumbnail";
     public static final String IS_PROFILE_IMAGE_PROCESSED_COLUMN = "isProfileImageProcessed";
     public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN = "isLogoImageProcessed";
@@ -500,7 +502,7 @@ public interface CommonConstants
     public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
     public static final float DEFAULT_COMPLAINT_RES_SCORE = 2.5f;
     public static final int DEFAULT_REMINDERMAIL_INTERVAL = 3;
-    public static final int DEFAULT_MAX_REMINDER_COUNT = 1;
+    public static final int DEFAULT_MAX_REMINDER_COUNT = 3;
     public static final int DEFAULT_SOCIAL_POST_REMINDERMAIL_INTERVAL = 1;
     public static final int DEFAULT_MAX_SOCIAL_POST_REMINDER_COUNT = 1;
     public static final String USER_SELECTION_TYPE_SINGLE = "single";
@@ -887,6 +889,7 @@ public interface CommonConstants
 
     public static final String SURVEY_REMINDER_COUNT = "reminderCounts";
     public static final String SURVEY_REMINDER_INTERVAL = "reminderInterval";
+    public static final String IS_SURVEY_REMINDER_DISABLED = "isReminderDisabled";
 
     //Session variable
     public static final String REALTECH_USER_ID = "realTechAdminId";
@@ -958,7 +961,8 @@ public interface CommonConstants
     
     //reporting file upload status 
     public static final int FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT = 101;
-    public static final int FILE_UPLOAD_REPORTING_USER_ADOPTION_REPORT = 102;
+    //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
+    public static final int FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT = 102;
     public static final int FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT = 103;
     public static final int FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = 104;
     public static final int FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT = 105;
@@ -1338,7 +1342,8 @@ public interface CommonConstants
     
     //Reporting constants
     public static final String REPORTING_SURVEY_STATS_REPORT = "Survey Stats Report";
-    public static final String REPORTING_USER_ADOPTION_REPORT = "User Adoption Report";
+    //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
+    public static final String REPORTING_VERIFIED_USERS_REPORT = "Verified Users Report";
     public static final String REPORTING_COMPANY_USERS_REPORT = "Company User Report";
     public static final String REPORTING_SURVEY_REUSLTS_COMPANY_REPORT = "Survey Results Company Report";
     public static final String REPORTING_SURVEY_TRANSACTION_REPORT = "Survey Transaction Report";
@@ -1374,4 +1379,15 @@ public interface CommonConstants
 
     //Encompass test connection htt prequest initial
     public static final String HTTP_REQUEST_URL_INITIAL = "http://";
+
+    //Ranking Requirements Defaults
+    public static final float MIN_COMPLETED_PERCENTAGE = 40.0f;
+    public static final int MIN_DAYS_OF_REGISTRATION = 90;
+    public static final int MIN_NO_OF_REVIEWS = 25;
+    public static final int MONTH_OFFSET = 3;
+    public static final int YEAR_OFFSET = -1;
+    
+    public static final String SQUARE_THUMBNAIL = "squareThumbnail";
+    public static final String RECTANGULAR_THUMBNAIL = "rectangularThumbnail";
+    
 }

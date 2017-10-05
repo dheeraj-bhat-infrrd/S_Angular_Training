@@ -1,18 +1,24 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "survey_results_company_report")
-public class SurveyResultsCompanyReport {
+public class SurveyResultsCompanyReport implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -58,7 +64,7 @@ public class SurveyResultsCompanyReport {
 	private String surveySourceId;
 
 	@Column(name = "SURVEY_SCORE")
-	private long surveyScore;
+	private double surveyScore;
 
 	@Column(name = "GATEWAY")
 	private String gateway;
@@ -87,21 +93,10 @@ public class SurveyResultsCompanyReport {
 	@Column(name = "REPORT_MODIFIED_ON")
 	private Timestamp reportModifiedOn;
 	
-	@Override
-	public String toString() {
-		return "SurveyResultsCompanyReport [surveyStatsReportId=" + surveyStatsReportId + ", surveyDetailsId="
-				+ surveyDetailsId + ", companyId=" + companyId + ", agentId=" + agentId + ", userFirstName="
-				+ userFirstName + ", userLastName=" + userLastName + ", customerFirstName=" + customerFirstName
-				+ ", customerLastName=" + customerLastName + ", surveySentDate=" + surveySentDate
-				+ ", surveyCompletedDate=" + surveyCompletedDate + ", timeInterval=" + timeInterval + ", surveySource="
-				+ surveySource + ", surveySourceId=" + surveySourceId + ", surveyScore=" + surveyScore + ", gateway="
-				+ gateway + ", customerComments=" + customerComments + ", agreedToShare=" + agreedToShare
-				+ ", branchName=" + branchName + ", clickTroughForCompany=" + clickTroughForCompany
-				+ ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
-				+ ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn
-				+ ", isDeleted=" + isDeleted + "]";
-	}
 
+    @Column(name = "IS_DELETED")
+    private boolean isDeleted;
+  
 	public String getSurveyStatsReportId() {
 		return surveyStatsReportId;
 	}
@@ -206,11 +201,11 @@ public class SurveyResultsCompanyReport {
 		this.surveySourceId = surveySourceId;
 	}
 
-	public long getSurveyScore() {
+	public double getSurveyScore() {
 		return surveyScore;
 	}
 
-	public void setSurveyScore(long surveyScore) {
+	public void setSurveyScore(double surveyScore) {
 		this.surveyScore = surveyScore;
 	}
 
@@ -294,8 +289,21 @@ public class SurveyResultsCompanyReport {
 		this.isDeleted = isDeleted;
 	}
 
-	@Column(name = "IS_DELETED")
-	private boolean isDeleted;
+    @Override
+    public String toString()
+    {
+        return "SurveyResultsCompanyReport [surveyStatsReportId=" + surveyStatsReportId + ", surveyDetailsId=" + surveyDetailsId
+            + ", companyId=" + companyId + ", agentId=" + agentId + ", userFirstName=" + userFirstName + ", userLastName="
+            + userLastName + ", customerFirstName=" + customerFirstName + ", customerLastName=" + customerLastName
+            + ", surveySentDate=" + surveySentDate + ", surveyCompletedDate=" + surveyCompletedDate + ", timeInterval="
+            + timeInterval + ", surveySource=" + surveySource + ", surveySourceId=" + surveySourceId + ", surveyScore="
+            + surveyScore + ", gateway=" + gateway + ", customerComments=" + customerComments + ", agreedToShare="
+            + agreedToShare + ", branchName=" + branchName + ", clickTroughForCompany=" + clickTroughForCompany
+            + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
+            + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn + ", isDeleted="
+            + isDeleted + "]";
+    }
+
 	
 	
 }

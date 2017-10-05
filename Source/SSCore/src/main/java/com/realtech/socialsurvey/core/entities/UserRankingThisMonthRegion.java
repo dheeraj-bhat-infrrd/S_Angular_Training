@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name= "user_ranking_this_month_region")
@@ -71,7 +72,7 @@ public class UserRankingThisMonthRegion
     private int totalReviews;
     
     @Column(name = "average_rating")
-    private int averageRating;
+    private float averageRating;
     
     @Column(name = "is_eligible")
     private	int isEligible;
@@ -82,11 +83,14 @@ public class UserRankingThisMonthRegion
     @Column(name = "nmls_id")
     private String nmlsId;    
     
-	public int getAverageRating() {
+    @Transient
+    private String profileImageUrlThumbnail;
+    
+	public float getAverageRating() {
 		return averageRating;
 	}
 
-	public void setAverageRating(int averageRating) {
+	public void setAverageRating(float averageRating) {
 		this.averageRating = averageRating;
 	}
 
@@ -263,6 +267,17 @@ public class UserRankingThisMonthRegion
 		this.nmlsId = nmlsId;
 	}
 
+	
+    public String getProfileImageUrlThumbnail()
+    {
+        return profileImageUrlThumbnail;
+    }
+
+    public void setProfileImageUrlThumbnail( String profileImageUrlThumbnail )
+    {
+        this.profileImageUrlThumbnail = profileImageUrlThumbnail;
+    }
+
     @Override
     public String toString()
     {
@@ -272,7 +287,8 @@ public class UserRankingThisMonthRegion
             + ", rankingScore=" + rankingScore + ", rank=" + rank + ", sps=" + sps + ", daysOfRegistration="
             + daysOfRegistration + ", completed=" + completed + ", sent=" + sent + ", completedPercentage="
             + completedPercentage + ", totalReviews=" + totalReviews + ", averageRating=" + averageRating + ", isEligible="
-            + isEligible + ", internalRegionRank=" + internalRegionRank + ", nmlsId=" + nmlsId + "]";
+            + isEligible + ", internalRegionRank=" + internalRegionRank + ", nmlsId=" + nmlsId + ", profileImageUrlThumbnail="
+            + profileImageUrlThumbnail + "]";
     }
 
 }

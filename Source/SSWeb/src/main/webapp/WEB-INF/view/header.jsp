@@ -177,7 +177,7 @@
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item" onclick="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></div>
-				<%-- <div class="header-links-item" onclick="showMainContent('./showreportingpage.do')"><spring:message code="label.reporting.key"/></div> --%>
+				<div class="header-links-item" onclick="showMainContent('./showreportingpage.do')">New Dashboard (Beta)</div>
 				<div class="header-links-item" onclick="showMainContent('./showreportspage.do')">Generate Reports</div>
 				<c:if test="${(accountMasterId == 2 || accountMasterId == 3 || accountMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
 					<div class="header-links-item" onclick="showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></div>
@@ -264,14 +264,15 @@
 							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./dashboard.do');">
 								<spring:message code="label.header.dashboard.key" />
 							</div>
-							<%-- <div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportingpage.do');">
-								<spring:message code="label.reporting.key" />
-							</div> --%>
+							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportingpage.do');">New Dashboard (Beta)</div>
 							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportspage.do');">
 								Generate Reports
 							</div>
 						</div>
 				</div>
+<!-- 				<div class="hdr-link-item hdr-link-active"> -->
+<%-- 					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')" onclick="showOverlay();"><spring:message code="label.header.dashboard.key" /></a> --%>
+<!-- 				</div> -->
 				<c:if test="${accountMasterId > 1 && accountMasterId < 5 && highestrole != 4 }">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showusermangementpage.do')" onclick="showOverlay();"><spring:message code="label.header.usermanagement.key" /></a>

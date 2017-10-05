@@ -1,5 +1,5 @@
-CREATE DATABASE  IF NOT EXISTS `ss_report_demo` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `ss_report_demo`;
+CREATE DATABASE  IF NOT EXISTS `ss_report` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `ss_report`;
 -- MySQL dump 10.13  Distrib 5.7.12, for Win64 (x86_64)
 --
 -- Host: ss-report-demo.c3n1qsdsmjxc.us-west-2.rds.amazonaws.com    Database: ss_report_demo
@@ -1770,9 +1770,7 @@ CREATE TABLE `overview_branch` (
   `incomplete_percentage` decimal(10,2) NOT NULL DEFAULT '0.00',
   `processed` int(11) NOT NULL DEFAULT '0',
   `unprocessed` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`overview_branch_id`),
-  KEY `FX_OVERVIEW_BRANCH_idx` (`branch_id`),
-  CONSTRAINT `FX_OVERVIEW_BRANCH` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`BRANCH_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`overview_branch_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1867,9 +1865,7 @@ CREATE TABLE `overview_company` (
   `incomplete_percentage` decimal(10,2) NOT NULL DEFAULT '0.00',
   `processed` int(11) NOT NULL DEFAULT '0',
   `unprocessed` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`overview_company_id`),
-  KEY `FX_OVERVIEW_COMPANY_idx` (`company_id`),
-  CONSTRAINT `FX_OVERVIEW_COMPANY` FOREIGN KEY (`company_id`) REFERENCES `company` (`COMPANY_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`overview_company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1964,9 +1960,7 @@ CREATE TABLE `overview_region` (
   `incomplete_percentage` decimal(10,2) NOT NULL DEFAULT '0.00',
   `processed` int(11) NOT NULL DEFAULT '0',
   `unprocessed` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`overview_region_id`),
-  KEY `FX_OVERVIEW_REGION_idx` (`region_id`),
-  CONSTRAINT `FX_OVERVIEW_REGION` FOREIGN KEY (`region_id`) REFERENCES `region` (`REGION_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`overview_region_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2061,9 +2055,7 @@ CREATE TABLE `overview_user` (
   `incomplete_percentage` decimal(10,2) NOT NULL DEFAULT '0.00',
   `processed` int(11) NOT NULL DEFAULT '0',
   `unprocessed` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`overview_user_id`),
-  KEY `FX_OVERVIEW_USER_idx` (`user_id`),
-  CONSTRAINT `FX_OVERVIEW_USER` FOREIGN KEY (`user_id`) REFERENCES `users` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`overview_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2948,7 +2940,7 @@ CREATE TABLE `survey_results_company_report` (
   `TIME_INTERVAL` int(10) DEFAULT NULL,
   `SURVEY_SOURCE` varchar(450) DEFAULT NULL,
   `SURVEY_SOURCE_ID` text,
-  `SURVEY_SCORE` int(11) DEFAULT NULL,
+  `SURVEY_SCORE` decimal(10,2) DEFAULT NULL,
   `GATEWAY` varchar(450) DEFAULT NULL,
   `CUSTOMER_COMMENTS` text,
   `AGREED_TO_SHARE` varchar(450) DEFAULT NULL,
@@ -2961,6 +2953,7 @@ CREATE TABLE `survey_results_company_report` (
   `IS_DELETED` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`SURVEY_RESULTS_COMPANY_REPORT_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3038,8 +3031,8 @@ CREATE TABLE `survey_stats_report` (
   `clicked_count` int(11) DEFAULT '0',
   `completed` int(11) DEFAULT '0',
   `partially_completed` int(11) DEFAULT '0',
-  `complete_percentage` float DEFAULT '0',
   `delta` int(11) DEFAULT '0',
+  `complete_percentage` decimal(10,2) DEFAULT '0.00',
   `created_date` datetime DEFAULT NULL,
   `year` int(11) NOT NULL,
   `month` int(11) NOT NULL,
@@ -3081,8 +3074,8 @@ CREATE TABLE `survey_stats_report_company` (
   `clicked_count` int(11) DEFAULT '0',
   `completed` int(11) DEFAULT '0',
   `partially_completed` int(11) DEFAULT '0',
-  `complete_percentage` float DEFAULT '0',
   `delta` int(11) DEFAULT '0',
+  `complete_percentage` decimal(10,2) DEFAULT '0.00',
   `created_date` datetime DEFAULT NULL,
   `year` int(11) NOT NULL,
   `month` int(11) NOT NULL,
@@ -3121,7 +3114,7 @@ CREATE TABLE `survey_stats_report_region` (
   `clicked_count` int(11) DEFAULT '0',
   `completed` int(11) DEFAULT '0',
   `partially_completed` int(11) DEFAULT '0',
-  `complete_percentage` float DEFAULT '0',
+  `complete_percentage` decimal(10,2) DEFAULT '0.00',
   `delta` int(11) DEFAULT '0',
   `created_date` datetime DEFAULT NULL,
   `year` int(11) NOT NULL,
@@ -3162,7 +3155,7 @@ CREATE TABLE `survey_stats_report_user` (
   `clicked_count` int(11) DEFAULT '0',
   `completed` int(11) DEFAULT '0',
   `partially_completed` int(11) DEFAULT '0',
-  `complete_percentage` float DEFAULT '0',
+  `complete_percentage` decimal(10,2) DEFAULT '0.00',
   `delta` int(11) DEFAULT '0',
   `created_date` datetime DEFAULT NULL,
   `year` int(11) NOT NULL,

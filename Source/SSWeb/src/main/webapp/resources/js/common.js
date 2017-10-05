@@ -398,7 +398,7 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 
 function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	var ratingIntVal = 0;
-	var roundedFloatingVal = parseFloat(rating).toFixed(1);
+	var roundedFloatingVal = parseFloat(rating).toFixed(2);
 	var ratingFloat= parseFloat(roundedFloatingVal).toFixed(2);
 	var ratingInt= parseInt(ratingFloat*4);
 	ratingIntVal=(ratingInt/4).toFixed(2);
@@ -421,6 +421,7 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	ratingParent.append(ratingImgHtml);
 	ratingParent.append(ratingValHtml);
 };
+
 function proRatingPattern(rating, ratingParent, isOverallRating, source) {
 	var ratingIntVal = 0;
 	var roundedFloatingVal = parseFloat(rating).toFixed(1);

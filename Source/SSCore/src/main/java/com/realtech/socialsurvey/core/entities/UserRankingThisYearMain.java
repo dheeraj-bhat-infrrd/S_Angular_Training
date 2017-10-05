@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name= "user_ranking_this_year_main")
@@ -68,19 +69,22 @@ public class UserRankingThisYearMain
     private int totalReviews;
     
     @Column(name = "average_rating")
-    private int averageRating;
+    private float averageRating;
     
     @Column(name = "is_eligible")
     private	int isEligible;
 
     @Column(name = "nmls_id")
-    private String nmlsId;     
+    private String nmlsId;   
     
-	public int getAverageRating() {
+    @Transient
+    private String profileImageUrlThumbnail;
+    
+    public float getAverageRating() {
 		return averageRating;
 	}
 
-	public void setAverageRating(int averageRating) {
+	public void setAverageRating(float averageRating) {
 		this.averageRating = averageRating;
 	}
 
@@ -243,6 +247,16 @@ public class UserRankingThisYearMain
 		this.nmlsId = nmlsId;
 	}
 	
+    public String getProfileImageUrlThumbnail()
+    {
+        return profileImageUrlThumbnail;
+    }
+
+    public void setProfileImageUrlThumbnail( String profileImageUrlThumbnail )
+    {
+        this.profileImageUrlThumbnail = profileImageUrlThumbnail;
+    }
+
     @Override
     public String toString()
     {
@@ -251,6 +265,7 @@ public class UserRankingThisYearMain
             + ", firstName=" + firstName + ", lastName=" + lastName + ", emailId=" + emailId + ", rankingScore=" + rankingScore
             + ", rank=" + rank + ", sps=" + sps + ", daysOfRegistration=" + daysOfRegistration + ", completed=" + completed
             + ", sent=" + sent + ", completedPercentage=" + completedPercentage + ", totalReviews=" + totalReviews
-            + ", averageRating=" + averageRating + ", isEligible=" + isEligible + ", nmlsId=" + nmlsId + "]";
+            + ", averageRating=" + averageRating + ", isEligible=" + isEligible + ", nmlsId=" + nmlsId
+            + ", profileImageUrlThumbnail=" + profileImageUrlThumbnail + "]";
     }
 }

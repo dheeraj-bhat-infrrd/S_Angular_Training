@@ -535,12 +535,12 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 function paintReportingDashboard(profileMasterId, newProfileName, newProfileValue, typeoOfAccount) {
 	accountType = typeoOfAccount;
 	startIndexCmp = 0;
-	batchSizeCmp = 5;
+	batchSizeCmp = 9;
 	doStopPaginationDashboard = false;
 	isDashboardReviewRequestRunning = false;
 	reviewsFetchedSoFar = 0;
 	startIndexInc = 0;
-	batchSizeInc = 6;
+	batchSizeInc = 10;
 	totalReviewsInc = 0;
 	surveyFetchedSoFarInc = 0;
 
@@ -550,10 +550,6 @@ function paintReportingDashboard(profileMasterId, newProfileName, newProfileValu
 	colName = newProfileName;
 	colValue = newProfileValue;
 
-	if (newProfileName != null) {
-		showDashboardButtons(newProfileName, newProfileValue);
-	}
-	
 	fetchReviewsOnDashboard(false);
 }
 
@@ -1159,7 +1155,7 @@ function displayIncompleteSurveysOnDashboard() {
 $(document).on('click', '.dash-lp-rt-img', function() {
 	var surveyPreInitiationId = $(this).data("surveypreinitiationid");
 	var customerName = $(this).data("custname");
-	sendSurveyReminderMail(surveyPreInitiationId, customerName, '.dash-lp-rt-img');
+	sendSurveyReminderMail(surveyPreInitiationId, customerName, '#dsh-inc-srvey');
 });
 
 var isDashboardReviewRequestRunning = false;
@@ -1753,7 +1749,6 @@ function sendSurveyReminderMail(surveyPreInitiationId, customerName, disableEle)
 	}
 
 	disable(disableEle);
-	var success = false;
 	var payload = {
 		"surveyPreInitiationId" : surveyPreInitiationId
 	};
@@ -1764,15 +1759,20 @@ function sendSurveyReminderMail(surveyPreInitiationId, customerName, disableEle)
 		cache : false,
 		data : payload,
 		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
+			if (data.errMsg == undefined || data.errMsg == ""){
+				var toastmsg = data.success;
+				$('#overlay-toast').html(toastmsg);
+				showToastLong();
+			}else{
+				var toastmsg = data.errMsg;
+				$('#overlay-toast').html(toastmsg);
+				showToastLong();
+			}
+			
 		},
 		complete : function(data) {
 			enable(disableEle);
-			if (success) {
-				$('#overlay-toast').html("Reminder Mail sent successfully to " + customerName);
-				showToast();
-			}
+			
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -5940,6 +5940,7 @@ function paintSurveyPageFromJson() {
 		$("#ques-text").html(question);
 		$("#sq-stars").show();
 		if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
+			$('#sq-stars').attr('selected-star-no' , questionDetails.customerResponse);
 			increaseOpacityOfStars(parseInt(questionDetails.customerResponse));
 			$("#next-star").removeClass("btn-com-disabled");
 		}
@@ -5948,6 +5949,7 @@ function paintSurveyPageFromJson() {
 		$("#ques-text-smiley").html(question);
 		$("#sq-smiles").show();
 		if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
+			$('#sq-smiles').attr('selected-smiles-no' , questionDetails.customerResponse);
 			increaseOpacityOfStars(parseInt(questionDetails.customerResponse));
 			$("#next-smile").removeClass("btn-com-disabled");
 		}
@@ -6057,6 +6059,7 @@ function storeCustomerAnswer(customerResponse) {
 		"stage" : qno + 1,
 		"surveyId" : surveyId
 	};
+	showOverlay();
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
 		url : getLocationOrigin() + surveyUrl + "data/storeAnswer",
@@ -6069,6 +6072,7 @@ function storeCustomerAnswer(customerResponse) {
 				success = true;
 		},
 		complete : function(data) {
+			hideOverlay();
 			if (success) {
 				if (swearWords.length <= 0) {
 					var parsed = data.responseJSON;
@@ -6428,6 +6432,7 @@ $('.sq-star').click(function() {
 	$(this).parent().find('.sq-star').removeClass('sq-full-star');
 	$(this).parent().find('.sq-star').removeClass('sq-full-star-click');
 	var starVal = $(this).attr('star-no');
+	$('#sq-stars').attr('selected-star-no' , starVal);
 	$(this).parent().find('.sq-star').each(function(index) {
 		if (index < starVal) {
 			$(this).removeClass('opacity-red');
@@ -6440,7 +6445,6 @@ $('.sq-star').click(function() {
 	if (qno != questions.length - 1) {
 		$("#next-star").removeClass("btn-com-disabled");
 	}
-	storeCustomerAnswer(starVal);
 });
 
 $('.sq-star').hover(function() {
@@ -6481,6 +6485,8 @@ $('.sq-np-item-next').click(function() {
 			showToast();
 			return;
 		}
+		var starVal = $('#sq-stars').attr('selected-star-no');
+		storeCustomerAnswer(starVal);
 	} else if (questionDetails.questionType == "sb-range-smiles") {
 		reduceOpacityOfSmiles();
 		if ($('#next-smile').hasClass("btn-com-disabled")) {
@@ -6488,6 +6494,8 @@ $('.sq-np-item-next').click(function() {
 			showToast();
 			return;
 		}
+		var smileVal = $('#sq-smiles').attr('selected-smiles-no');
+		storeCustomerAnswer(smileVal);
 	} else if (questionDetails.questionType == "sb-range-scale") {
 		if ($('#next-scale').hasClass("btn-com-disabled")) {
 			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
@@ -6598,6 +6606,7 @@ $('.sq-smile').click(function() {
 	$(this).parent().find('.sq-smile').removeClass('sq-full-smile');
 	$(this).parent().find('.sq-smile').removeClass('sq-full-smile-click');
 	var smileVal = $(this).attr('smile-no');
+	$('#sq-smiles').attr('selected-smiles-no' , smileVal);
 	$(this).parent().find('.sq-smile').each(function(index) {
 		if (index < smileVal) {
 			$(this).removeClass('opacity-red');
@@ -6610,7 +6619,6 @@ $('.sq-smile').click(function() {
 	if (qno != questions.length - 1) {
 		$("#next-smile").removeClass("btn-com-disabled");
 	}
-	storeCustomerAnswer(smileVal);
 	$("#next-star").removeClass("btn-com-disabled");
 });
 
@@ -7913,62 +7921,6 @@ function paintForProfile() {
 	fetchReviewsOnEditProfile(attrName, attrVal, false);
 }
 
-function paintForReportingDash() {
-	profileId = $('#profile-id').val();
-	var companyId = $('#prof-company-id').val();
-	var regionId = $('#prof-region-id').val();
-	var branchId = $('#prof-branch-id').val();
-	var agentId = $('#prof-agent-id').val();
-
-	if (companyId != undefined) {
-		attrName = "companyId";
-		attrVal = companyId;
-
-		fetchHierarchy("companyProfileName", $("#company-profile-name").val());
-	} else if (regionId != undefined) {
-		attrName = "regionId";
-		attrVal = regionId;
-
-		fetchHierarchy(attrName, attrVal);
-	} else if (branchId != undefined) {
-		attrName = "branchId";
-		attrVal = branchId;
-
-		fetchHierarchy(attrName, attrVal);
-	} else if (agentId != undefined) {
-		attrName = "agentId";
-		attrVal = agentId;
-	}
-	startIndex = 0;
-	doStopReviewsPaginationEditProfile = false;
-	isReviewsRequestRunningEditProfile = false;
-	$('#prof-review-item').html('');
-	
-	// Common call for all cases
-	var monthYear = getTimeFrameValue();
-	var overviewYearData;
-	
-	if(monthYear.month == 14){
-		overviewYearData = getoverviewAllTimeData();
-	}else if(monthYear.month == 13){
-    	overviewYearData =  getoverviewYearData(monthYear.year);
-    }else{
-    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
-    }
-	if(overviewYearData != null){
-		var avgRating = overviewYearData.Rating;
-		var reviewCount=  overviewYearData.TotalReview;
-		paintAvgRating(avgRating);
-		paintReviewCount(reviewCount);
-	}else{
-		var avgRating = 0;
-		var reviewCount=  0;
-		paintAvgRating(avgRating);
-		paintReviewCount(reviewCount);
-	}
-	fetchReviewsOnEditProfile(attrName, attrVal, false);
-}
-
 function focusOnElement() {
 	if (editProfileForYelp) {
 		$('#social-token-text').show();
@@ -8920,13 +8872,17 @@ $(document).on('click', '#resend-mult-sur-icn.mult-sur-icn-active', function() {
 });
 
 function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
+	showOverlay();
 	callAjaxPOSTWithTextData("/resendmultipleincompletesurveyrequest.do?surveysSelected=" + incompleteSurveyIds, function(data) {
-		if (data == "success") {
+		data = JSON.parse(data);
+		if (data.errMsg == undefined || data.errMsg == "") {
 			// unselect all the options after deleting
 			$('#icn-sur-popup-cont').data('selected-survey', []);
 
-			$('#overlay-toast').html('Survey reminder request resent successfully');
-			showToast();
+			var toastmsg = data.success;
+			$('#overlay-toast').html(toastmsg);
+			showToastLong();
+			
 			$('#del-mult-sur-icn').removeClass('mult-sur-icn-active');
 			$('#resend-mult-sur-icn').removeClass('mult-sur-icn-active');
 			$('#icn-sur-popup-cont').data('selected-survey', []);
@@ -8941,6 +8897,10 @@ function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
 			// update the page
 			var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
 			paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
+		}else{
+			var toastmsg = data.errMsg;
+			$('#overlay-toast').html(errCode);
+			showToastLong();
 		}
 	}, true, {});
 }

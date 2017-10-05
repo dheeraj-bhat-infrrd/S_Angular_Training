@@ -21,9 +21,11 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
@@ -34,6 +36,9 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
 
     @Autowired
     private CompanyDao companyDao;
+    
+    @Autowired
+    private RegionDao regionDao;
 
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -130,6 +135,66 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
         } else
             return branchList;
     }
+    
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<Branch> getBranchesForRegion( long regionId, int isDefault,int start, int batch ) throws InvalidInputException
+    {
+        if ( regionId <= 0 )
+            throw new InvalidInputException( "Invalid company id is passed in getBranchesForCompany()" );
+        LOG.debug( "Method to get all branches for company,getBranchesForCompany() started." );
+        Criteria criteria = getSession().createCriteria( Branch.class );
+        criteria.add( Restrictions.eq( CommonConstants.REGION_COLUMN, regionDao.findById( Region.class, regionId ) ) );
+        criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, isDefault ) );
+        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+        criteria.addOrder(Order.asc("branch"));
+        if ( start > 0 )
+            criteria.setFirstResult( start );
+        if ( batch > 0 )
+            criteria.setFetchSize( batch );
+
+        List<Branch> branchList = criteria.list();
+        if ( isDefault == CommonConstants.NO ) {
+            Set<Long> branchIdList = new LinkedHashSet<Long>();
+            Map<Long, Branch> branchIdObjMap = new TreeMap<>();
+            if ( branchList != null && branchList.size() > 0 ) {
+                for ( Branch branch : branchList ) {
+                    branchIdList.add( branch.getBranchId() );
+                    branchIdObjMap.put( branch.getBranchId(), branch );
+                }
+            }
+
+            List<Branch> finalBranchList = new ArrayList<>();
+            if ( branchIdList.size() > 0 ) {
+                LOG.debug( "Fetching branch settings for the fetched branches" );
+                List<OrganizationUnitSettings> branchSettingList = organizationUnitSettingsDao
+                    .fetchOrganizationUnitSettingsForMultipleIds( branchIdList,
+                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                LOG.debug( "Adding address, state city and zipcode info into branches" );
+                if ( branchSettingList != null && branchSettingList.size() > 0 ) {
+                    for ( OrganizationUnitSettings branchSettings : branchSettingList ) {
+                        if ( branchIdObjMap.get( branchSettings.getIden() ) != null ) {
+                            Branch branch = branchIdObjMap.get( branchSettings.getIden() );
+                            branch.setAddress1( branchSettings.getContact_details().getAddress1() );
+                            branch.setAddress2( branchSettings.getContact_details().getAddress2() );
+                            branch.setCity( branchSettings.getContact_details().getCity() );
+                            branch.setState( branchSettings.getContact_details().getState() );
+                            branch.setZipcode( branchSettings.getContact_details().getZipcode() );
+
+                            finalBranchList.add( branch );
+                        }
+                    }
+                }
+            }
+            LOG.debug( "Method to get all branches for company,getBranchesForCompany() ended." );
+            if ( finalBranchList.size() > 0 )
+                return finalBranchList;
+            else
+                return branchList;
+        } else
+            return branchList;
+    }
 
 
     /**
@@ -170,7 +235,7 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
 	@Override
 	public long getRegionIdByBranchId(long branchId) {
 		LOG.info( "method to fetch regionId from branchId getRegionIdByBranchId() started" );
-		Query query = getSession().createSQLQuery( "SELECT region_id FROM branch WHERE branch_id = :branchId " );
+		Query query = getSession().createSQLQuery( "SELECT region_id FROM BRANCH WHERE branch_id = :branchId " );
         query.setParameter( "branchId", branchId  );
         long regionId = (int) query.uniqueResult();
         LOG.info( "method to fetch regionId from branchId getRegionIdByBranchId() finished" );

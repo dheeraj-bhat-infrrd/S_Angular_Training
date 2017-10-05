@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearMainDao;
+import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
 import com.realtech.socialsurvey.core.entities.UserRankingThisYearMain;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
@@ -22,29 +26,54 @@ public class UserRankingThisYearMainDaoImpl extends GenericReportingDaoImpl<User
 	
 	private static final Logger LOG = LoggerFactory.getLogger( UserRankingThisYearMainDaoImpl.class );
 	
+	private static final String getForThisYearQuery = "select u.user_id, u.rank, u.first_name, u.last_name, u.ranking_score, u.total_reviews,"
+        + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_this_year_main u left outer join agent_settings a "
+	    +"  on a.USER_ID = u.user_id where u.company_id=? and u.this_year=? order by u.rank asc limit ?, ?;";
+
+	
 	@Override
-	public List<UserRankingThisYearMain> fetchUserRankingForThisYearMain(Long companyId, int year , int startIndex , int batchSize) {
-		LOG.info( "method to fetch user ranking Main list for this year, fetchUserRankingForThisYearMain() started" );
+    public List<UserRankingThisYearMain> fetchUserRankingWithProfileForThisYearMain(Long companyId, int year , int startIndex , int batchSize) {
+        LOG.info( "method to fetch user ranking Main list for this year, fetchUserRankingWithProfileForThisYearMain() started" );
         Criteria criteria = getSession().createCriteria( UserRankingThisYearMain.class );
+        List<UserRankingThisYearMain> userRankingList = new ArrayList<>();
+
         try {
-            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );    
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
+            Query query = getSession().createSQLQuery( getForThisYearQuery );
+            query.setParameter( 0, companyId );
+            query.setParameter( 1, year );
+            query.setParameter( 2, startIndex );
+            query.setParameter( 3, batchSize );
+
+            LOG.debug( "QUERY : " + query.getQueryString() );
+            List<Object[]> rows = (List<Object[]>) query.list();
+            
+            for ( Object[] row : rows ) {
+                UserRankingThisYearMain userRankingThisYearMain = new UserRankingThisYearMain();
+                userRankingThisYearMain.setUserId( Long.valueOf( String.valueOf( row[0] ) )  );
+                userRankingThisYearMain.setRank( Integer.valueOf( String.valueOf( row[1] ) ) );
+                userRankingThisYearMain.setFirstName( String.valueOf( row[2] ) );
+                userRankingThisYearMain.setLastName( String.valueOf( row[3] ) );
+                userRankingThisYearMain.setRankingScore( Float.valueOf( String.valueOf( row[4] ) ) );
+                userRankingThisYearMain.setTotalReviews( Integer.valueOf( String.valueOf( row[5] ) ) );
+                userRankingThisYearMain.setAverageRating( Float.valueOf( String.valueOf( row[6] ) )  );
+                userRankingThisYearMain.setSps(  Float.valueOf( String.valueOf( row[7] ) )  );
+                userRankingThisYearMain.setCompletedPercentage(  Float.valueOf( String.valueOf( row[8] ) ) );
+                userRankingThisYearMain.setIsEligible( Integer.valueOf( String.valueOf( row[9] ) ) );
+                userRankingThisYearMain.setProfileImageUrlThumbnail( String.valueOf( row[10] ) );
+                userRankingList.add( userRankingThisYearMain );
+                
+                
             }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.RANK ) );
             }
         catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForThisYearMain() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForThisYearMain() ", hibernateException );
+            LOG.error( "Exception caught in fetchUserRankingWithProfileForThisYearMain() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingWithProfileForThisYearMain() ", hibernateException );
         }
 
-        LOG.info( "method to fetch user ranking main list for this year, fetchUserRankingForThisYearMain() finished." );
-        return (List<UserRankingThisYearMain>) criteria.list();
-	}
+        LOG.info( "method to fetch user ranking main list for this year, fetchUserRankingWithProfileForThisYearMain() finished." );
+        return userRankingList;
+    }
+    
 	
 	@Override
     public List<UserRankingThisYearMain> fetchUserRankingReportForThisYearMain(Long companyId, int year) {

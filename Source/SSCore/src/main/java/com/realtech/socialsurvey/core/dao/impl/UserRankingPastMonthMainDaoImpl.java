@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -23,30 +24,54 @@ public class UserRankingPastMonthMainDaoImpl extends GenericReportingDaoImpl<Use
 	
 	private static final Logger LOG = LoggerFactory.getLogger( UserRankingPastMonthMainDaoImpl.class );
 	
+	private static final String getForThisYearQuery = "select u.user_id, u.rank, u.first_name, u.last_name, u.ranking_score, u.total_reviews,"
+        + " u.average_rating, u.sps, u.completed_percentage, u.is_eligible, " + "  a.PROFILE_IMAGE_URL_THUMBNAIL from user_ranking_past_month_main u left outer join agent_settings a "
+        +"  on a.USER_ID = u.user_id where u.company_id=? and u.month=? and u.year=? order by u.rank asc limit ?, ?;";
+	
+
 	@Override
-	public List<UserRankingPastMonthMain> fetchUserRankingForPastMonthMain(Long companyId, int month, int year , int startIndex , int batchSize) {
-		LOG.info( "method to fetch user ranking Main list for past month, fetchUserRankingForPastMonthMain() started" );
+    public List<UserRankingPastMonthMain> fetchUserRankingWithProfileForPastMonthMain(Long companyId, int month, int year , int startIndex , int batchSize) {
+        LOG.info( "method to fetch user ranking Main list for past month, fetchUserRankingWithProfileForPastMonthMain() started" );
         Criteria criteria = getSession().createCriteria( UserRankingPastMonthMain.class );
+        List<UserRankingPastMonthMain> userRankingList = new ArrayList<>();
+
         try {
-            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_MONTH, month ) );
-            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) );
-            if ( startIndex > -1 ) {
-                criteria.setFirstResult( startIndex );
+            Query query = getSession().createSQLQuery( getForThisYearQuery );
+            query.setParameter( 0, companyId );
+            query.setParameter( 1, month );
+            query.setParameter( 2, year );
+            query.setParameter( 3, startIndex );
+            query.setParameter( 4, batchSize );
+
+            LOG.debug( "QUERY : " + query.getQueryString() );
+            List<Object[]> rows = (List<Object[]>) query.list();
+            
+            for ( Object[] row : rows ) {
+                UserRankingPastMonthMain userRankingPastMonthMain = new UserRankingPastMonthMain();
+                userRankingPastMonthMain.setUserId( Long.valueOf( String.valueOf( row[0] ) )  );
+                userRankingPastMonthMain.setRank( Integer.valueOf( String.valueOf( row[1] ) ) );
+                userRankingPastMonthMain.setFirstName( String.valueOf( row[2] ) );
+                userRankingPastMonthMain.setLastName( String.valueOf( row[3] ) );
+                userRankingPastMonthMain.setRankingScore( Float.valueOf( String.valueOf( row[4] ) ) );
+                userRankingPastMonthMain.setTotalReviews( Integer.valueOf( String.valueOf( row[5] ) ) );
+                userRankingPastMonthMain.setAverageRating( Float.valueOf( String.valueOf( row[6] ) )  );
+                userRankingPastMonthMain.setSps(  Float.valueOf( String.valueOf( row[7] ) )  );
+                userRankingPastMonthMain.setCompletedPercentage(  Float.valueOf( String.valueOf( row[8] ) ) );
+                userRankingPastMonthMain.setIsEligible( Integer.valueOf( String.valueOf( row[9] ) ) );
+                userRankingPastMonthMain.setProfileImageUrlThumbnail( String.valueOf( row[10] ) );
+                userRankingList.add( userRankingPastMonthMain );
+                
+                
             }
-            if ( batchSize > -1 ) {
-                criteria.setMaxResults( batchSize );
-            }
-            criteria.addOrder( Order.asc( CommonConstants.RANK ) );
             }
         catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingForPastMonthMain() ", hibernateException );
-            throw new DatabaseException( "Exception caught in fetchUserRankingForPastMonthMain() ", hibernateException );
+            LOG.error( "Exception caught in fetchUserRankingWithProfileForPastMonthMain() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUserRankingWithProfileForPastMonthMain() ", hibernateException );
         }
 
-        LOG.info( "method to fetch user ranking main list for past month, fetchUserRankingForPastMonthMain() finished." );
-        return (List<UserRankingPastMonthMain>) criteria.list();
-	}
+        LOG.info( "method to fetch user ranking main list for past month, fetchUserRankingWithProfileForPastMonthMain() finished." );
+        return userRankingList;
+    }
 	
 	@Override
     public List<UserRankingPastMonthMain> fetchUserRankingrReportForPastMonthMain(Long companyId, int month, int year) {

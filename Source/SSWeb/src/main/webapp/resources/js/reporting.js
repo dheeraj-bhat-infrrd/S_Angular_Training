@@ -2,8 +2,198 @@
 
 var monthNamesList = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];	
 var overviewData=getOverviewData();
+var socialMediaList = new Array();
 
+function isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+}
+
+function paintForReportingDash() {
+	
+	showDashOverlay('#unclicked-graph-dash');
+	var monthYear = getTimeFrameValue();
+	var overviewYearData = null;
+	
+	if(monthYear.month == 14){
+		overviewYearData = getoverviewAllTimeData();
+	}else if(monthYear.month == 13){
+    	overviewYearData =  getoverviewYearData(monthYear.year);
+    }else{
+    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
+    }
+	
+	if(overviewYearData != null && !isEmpty(overviewYearData)){
+		var avgRating = overviewYearData.Rating;
+		var reviewCount=  overviewYearData.TotalReview;
+		paintAvgRating(avgRating);
+		paintReviewCount(reviewCount);
+	
+	}else{
+		var avgRating = 0;
+		var reviewCount=  0;
+		paintAvgRating(avgRating);
+		paintReviewCount(reviewCount);
+	}
+	
+	//Paint the transactions section of the reporting the dashboard
+	if(overviewYearData!=null && !isEmpty(overviewYearData)){
+		drawUnclickedDonutChart(overviewYearData);
+		drawProcessedDonutChart(overviewYearData);
+		drawUnprocessedDonutChart(overviewYearData);
+		$('#processed-lbl-span').html(overviewYearData.Processed);
+		$('#completed-lbl-span').html(overviewYearData.Completed+' ('+overviewYearData.CompletePercentage+'%)');
+		$('#incomplete-lbl-span').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
+		$('#incomplete-lbl-span-sel').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
+		$('#social-posts-lbl-span').html(overviewYearData.SocialPosts);
+		$('#zillow-lbl-span').html(overviewYearData.ZillowReviews);
+		$('#unprocessed-lbl-span').html(overviewYearData.Unprocessed);
+		$('#unassigned-lbl-span').html(overviewYearData.Unassigned);
+		$('#duplicate-lbl-span').html(overviewYearData.Duplicate);
+		$('#unassigned-lbl-span-sel').html(overviewYearData.Unassigned);
+		$('#corrupted-lbl-span').html(overviewYearData.Corrupted);
+		var other = overviewYearData.Unprocessed - (overviewYearData.Unassigned + overviewYearData.Duplicate + overviewYearData.Corrupted);
+		$('#other-lbl-span').html(other);
+		$('#unclicked-trans-graph').removeClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#empty-rep-chart-div').addClass('hide');
+	}else{
+		drawUnclickedDonutChart(overviewYearData);
+		drawProcessedDonutChart(overviewYearData);
+		drawUnprocessedDonutChart(overviewYearData);
+		$('#processed-lbl-span').html(0);
+		$('#completed-lbl-span').html(0+' ('+0+'%)');
+		$('#incomplete-lbl-span').html(0+' ('+0+'%)');
+		$('#incomplete-lbl-span-sel').html(0);
+		$('#social-posts-lbl-span').html(0);
+		$('#zillow-lbl-span').html(0);
+		$('#unprocessed-lbl-span').html(0);
+		$('#unassigned-lbl-span').html(0);
+		$('#duplicate-lbl-span').html(0);
+		$('#unassigned-lbl-span-sel').html(0);
+		$('#corrupted-lbl-span').html(0);
+		$('#other-lbl-span').html(0);
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#empty-rep-chart-div').removeClass('hide');
+	}	
+	
+	var processed=parseInt($('#processed-lbl-span').html());
+	var unprocessed=parseInt($('#unprocessed-lbl-span').html());
+	if(processed != 0 || unprocessed != 0){
+		$('#unclicked-trans-graph').removeClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		if(!($('#empty-rep-chart-div').hasClass('hide'))){
+			$('#empty-rep-chart-div').addClass('hide');
+		}	
+	}else{
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		if($('#empty-rep-chart-div').hasClass('hide')){
+			$('#empty-rep-chart-div').removeClass('hide');
+		}	
+	}
+	
+	$(window).resize(function(){
+		 showDashOverlay('#unclicked-graph-dash');
+		 $('#unclicked-trans-graph').removeClass('hide');
+		 	if($('#donutchart').length > 0 ){
+		 		drawUnclickedDonutChart(overviewYearData);
+		 	}
+		 	if($('#processedDonutchart').length > 0 ){
+		 		drawProcessedDonutChart(overviewYearData);
+		 	}
+			
+		 	if($('#unprocessedDonutchart').length > 0 ){
+		 		drawUnprocessedDonutChart(overviewYearData);
+		 	}
+			
+			var processed=parseInt($('#processed-lbl-span').html());
+			var unprocessed=parseInt($('#unprocessed-lbl-span').html());
+			if(processed != 0 || unprocessed != 0){
+				$('#unclicked-trans-graph').removeClass('hide');
+				$('#unprocessed-trans-graph').addClass('hide');
+				$('#processed-trans-graph').addClass('hide');
+				if(!($('#empty-rep-chart-div').hasClass('hide'))){
+					$('#empty-rep-chart-div').addClass('hide');
+				}	
+			}else{
+				$('#unclicked-trans-graph').addClass('hide');
+				$('#unprocessed-trans-graph').addClass('hide');
+				$('#processed-trans-graph').addClass('hide');
+				if($('#empty-rep-chart-div').hasClass('hide')){
+					$('#empty-rep-chart-div').removeClass('hide');
+				}	
+			}
+			setTimeout(function(){
+				hideDashOverlay('#unclicked-graph-dash');
+			}, 3000);
+	 });
+	setTimeout(function(){
+		hideDashOverlay('#unclicked-graph-dash');
+	}, 3000);
+	
+}
+
+function drawLeaderboardPage(columnName, columnId,profileMasterId,userId,companyId){
+	showDashOverlay('#leaderboard-dash');
+	var batchSize = 10;
+	var startIndex=0;
+	var count=0;
+	var timeFrame = 1;
+	var currentDate = new Date();
+	var currentYear = currentDate.getFullYear();
+	var currentMonth = currentDate.getMonth()+1;
+	var userRankingCount =null;
+	
+	if(profileMasterId != 4){
+		userRankingCount = getUserRankingCountForAdmins(columnName, columnId, currentYear, currentMonth, batchSize, timeFrame)
+		if(userRankingCount != null){
+			startIndex= 0;
+			count=userRankingCount.Count;
+		}
+	}else{
+		userRankingCount = getUserRankingCount("companyId", companyId, currentYear, currentMonth, batchSize, timeFrame);
+		if(userRankingCount != null){
+			startIndex= userRankingCount.startIndex;
+			count=userRankingCount.Count;
+		}
+	}
+	
+	$('#rank-count').html('/'+count);
+	
+	var userRankingList = null;
+	if(profileMasterId != 4){
+		userRankingList = getUserRankingList(columnName,columnId, currentYear, currentMonth, startIndex, batchSize, timeFrame);
+	}else{
+		userRankingList = getUserRankingList("companyId",companyId, currentYear, currentMonth, startIndex, batchSize, timeFrame);
+	}
+	
+	var tableData='';
+	if(userRankingList != null && userRankingList.length != 0){
+		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
+		$('#leaderboard-list').removeClass('hide');
+		$('#leaderboard-tbl').html(tableData);
+		$('#leaderboard-empty-list-msg-div').addClass('hide');
+	}else{
+		$('#leaderboard-list').addClass('hide');
+		$('#leaderboard-empty-list-msg-div').removeClass('hide');
+	}
+	
+	setTimeout(function(){
+		hideDashOverlay('#leaderboard-dash');
+	}, 2000);
+}
+//draw sps graphs and completion rate graphs functions
 function drawSpsStatsGraph(){
+	showDashOverlay('#sps-dash');
 	var chartData;
 	var spsChartData = [[ 'SPS', 'Detractors', 'Passives', 'Promoters'],[]];
 	google.charts.load('current', {	packages : [ 'corechart', 'bar' ]});
@@ -41,22 +231,14 @@ function drawSpsStatsGraph(){
 	
 	function drawStacked() {
 		$.ajax({
-					async : false,
 					url : "/fetchreportingspsstats.do",
 					type : "GET",
 					cache : false,
 					dataType : "json",
-					success : function(data) {
-						if (data.status == 200) {
-							$.ajax({
-										url : data.url,
-										type : "GET",
-										cache : false,
-										dataType : "json",
-										success : function(response) {
+					success : function(response) {
 											chartData = JSON.parse(response);
 
-											if (chartData.length == 0) {
+											if (chartData.length == 0 || chartData == null) {
 												drawEmptyChart();
 											} else {
 												var spsChartData = new Array(
@@ -105,19 +287,9 @@ function drawSpsStatsGraph(){
 																.getElementById('chart_div'));
 												chart.draw(data, options);
 											}
-										},
-										error : function(e) {
-
-											if (e.status == 504) {
-												redirectToLoginPageOnSessionTimeOut(e.status);
-												return;
-											}
-											drawEmptyChart();
-										}
-									});
-						}else{
-							drawEmptyChart();
-						}
+					},
+					complete:function(){
+						hideDashOverlay('#sps-dash');
 					},
 					error : function(e) {
 						if (e.status == 504) {
@@ -125,12 +297,14 @@ function drawSpsStatsGraph(){
 							return;
 						}
 						drawEmptyChart();
+						hideDashOverlay('#sps-dash')
 					}
 				});
 	}
 }
 
 function drawCompletionRateGraph(){
+	showDashOverlay('#completion-graph-dash');
 	google.charts.load('current', {'packages':['corechart']});
 	google.charts.setOnLoadCallback(drawChart);
 
@@ -168,22 +342,14 @@ function drawCompletionRateGraph(){
 	
 	function drawChart() {
 		$.ajax({
-					async : false,
 					url : "/fetchreportingcompletionrate.do",
 					type : "GET",
 					cache : false,
 					dataType : "json",
-					success : function(data) {
-						if (data.status == 200) {
-							$.ajax({
-										url : data.url,
-										type : "GET",
-										cache : false,
-										dataType : "json",
-										success : function(response) {
+					success : function(response) {
 											chartData = JSON.parse(response);
 
-											if (chartData.length == 0) {
+											if (chartData.length == 0 || chartData == null) {
 												drawEmptyChart();
 											} else {
 												var maxTransactionValue = 0;
@@ -202,7 +368,6 @@ function drawCompletionRateGraph(){
 													var monthName = monthNamesList[(chartData[i - 1][1]) - 1];
 													var yearStr = (chartData[i-1][0]).toString();
 													var yearValue = yearStr.match(/.{1,2}/g)[1];
-													console.log(yearStr.match(/.{1,2}/g)[1]);
 													compRateChartData[i][0] = monthName
 															+ " "
 															+ yearValue;
@@ -253,19 +418,9 @@ function drawCompletionRateGraph(){
 
 												chart.draw(data, options);
 											}
-										},
-										error : function(e) {
-
-											if (e.status == 504) {
-												redirectToLoginPageOnSessionTimeOut(e.status);
-												return;
-											}
-											drawEmptyChart();
-										}
-									});
-						}else{
-							drawEmptyChart();
-						}
+					},
+					complete: function(){
+						hideDashOverlay('#completion-graph-dash');
 					},
 					error : function(e) {
 						if (e.status == 504) {
@@ -273,199 +428,31 @@ function drawCompletionRateGraph(){
 							return;
 						}
 						drawEmptyChart();
+						hideDashOverlay('#completion-graph-dash');
 					}
 				});
 	}
 }
 
-function getOverviewMonthData(month,year) {
-
-	// var overviewData;
-	$.ajax({
-		async : false,
-		url : "/fetchmonthdataforoverview.do?month="+month+"&year="+year,
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-					async : false,
-					url : data.url,
-					type : "GET",
-					cache : false,
-					dataType : "json",
-					success : function(response) {
-						if (response.length == 0) {
-							overviewMonthData = null;
-						} else {
-							if(response == "{}"){
-								overviewMonthData = null;
-							}else{
-								overviewMonthData = JSON.parse(response);
-							}
-						}
-					},
-					error : function(e) {
-						if (e.status == 504) {
-							redirectToLoginPageOnSessionTimeOut(e.status);
-							return;
-						}
-						overviewMonthData = null;
-					}
-				});
-			}else{
-				overviewMonthData = null;
-			}
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			overviewMonthData = null;
-		}
-	});
-	
-	return overviewMonthData;
-
-}
-
-
-function getoverviewYearData(year) {
-
-// var overviewData;
-$.ajax({
-	async : false,
-	url : "/fetchyeardataforoverview.do?year="+year,
-	type : "GET",
-	cache : false,
-	dataType : "json",
-	success : function(data) {
-		if (data.status == 200) {
-			$.ajax({
-				async : false,
-				url : data.url,
-				type : "GET",
-				cache : false,
-				dataType : "json",
-				success : function(response) {
-					if (response.length == 0) {
-						overviewYearData = null;
-					} else {
-						if(response == "{}"){
-							overviewYearData = null;
-						}else{
-							overviewYearData = JSON.parse(response);
-						}
-						
-					}
-				},
-				error : function(e) {
-					if (e.status == 504) {
-						redirectToLoginPageOnSessionTimeOut(e.status);
-						return;
-					}
-					overviewYearData = null;
-				}
-			});
-		}else{
-			overviewYearData = null;
-		}
-	},
-	error : function(e) {
-		if (e.status == 504) {
-			redirectToLoginPageOnSessionTimeOut(e.status);
-			return;
-		}
-		overviewYearData = null;
-	}
-});
-
-return overviewYearData;
-
-}
-
-function getoverviewAllTimeData() {
-
-	// var overviewData;
-	$.ajax({
-		async : false,
-		url : "/fetchalltimefromreportingoverview.do",
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-					async : false,
-					url : data.url,
-					type : "GET",
-					cache : false,
-					dataType : "json",
-					success : function(response) {
-						if (response.length == 0) {
-							overviewAllTimeData = null;
-						} else {
-							if(response == "{}"){
-								overviewAllTimeData = null;
-							}else{
-								overviewAllTimeData = JSON.parse(response);
-							}
-							
-						}
-					},
-					error : function(e) {
-						if (e.status == 504) {
-							redirectToLoginPageOnSessionTimeOut(e.status);
-							return;
-						}
-						overviewAllTimeData = null;
-					}
-				});
-			}else{
-				overviewAllTimeData = null;
-			}
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			overviewAllTimeData = null;
-		}
-	});
-
-	return overviewAllTimeData;
-
-	}
-
-function drawUnclickedDonutChart(){
+//draw Unclicked, Processed and Unprocessed Pie charts functions
+function drawUnclickedDonutChart(overviewYearData){
 	 
 	var monthYear = getTimeFrameValue();
-	var overviewYearData;
-	
-	if(monthYear.month == 14){
-		overviewYearData = getoverviewAllTimeData();
-	}else if(monthYear.month == 13){
-    	overviewYearData =  getoverviewYearData(monthYear.year);
-    }else{
-    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
-    }
 	
 	 google.charts.load("current", {packages:["corechart"]});
      google.charts.setOnLoadCallback(drawChart);
      
      var processed;
      var unprocessed;
-     if(overviewYearData !=null){
+     
+     if(overviewYearData !=null && !isEmpty(overviewYearData)){
     	 processed = overviewYearData.Processed;
          unprocessed = overviewYearData.Unprocessed;
      }else{
     	 processed = 0;
          unprocessed = 0;
      }
-     
+     var chart;
      function drawChart() {
     	 
 	        var data = google.visualization.arrayToDataTable([
@@ -476,7 +463,7 @@ function drawUnclickedDonutChart(){
 
 	        var options = {
 	          pieStartAngle: 130,
-	          backgroundColor: '#f9f9fb',
+	          backgroundColor: '#f1f0f2',
 	          pieHole: 0.5,
 	          legend: { 
 	      	    position : 'none'
@@ -496,34 +483,65 @@ function drawUnclickedDonutChart(){
 	                 bold: true
 	             }
 	      	 },
-	      	tooltip: { trigger: 'none' }
+	      	tooltip: { trigger: 'none' },
+	      	sliceVisibilityThreshold: 0
 	        };
 
-	        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+	        chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+	        
+	        
+	        function selectHandler(){
+	        	 var selectedItem = chart.getSelection()[0];
+	             if (selectedItem) {
+	               var slice = data.getValue(selectedItem.row, 0);
+
+	               if( slice == 'Processed'){
+	            	   clickProcessedDiv();
+	               }else if( slice == 'Unprocessed'){
+	            	   clickUnprocessedDiv();
+	               }
+	             }
+	        }
+	        
+	        google.visualization.events.addListener(chart, 'select', selectHandler);
 	        chart.draw(data, options);
+	       
+	        
+	        var optionsChartIcn = {
+		  	          pieStartAngle: 130,
+			          backgroundColor: '#f1f0f2',
+			          pieHole: 0.3,
+			          legend: { 
+			      	    position : 'none'
+			      	  },
+			      	  pieSliceText:'none',
+			      	  width:32,
+			      	  height:32,
+			      	  slices: [{color : '#0072c2'},{color: '#fa5b00'}],
+			      	  legend: 'none',
+			      	  tooltip: { trigger: 'none' },
+			      	  enableInteractivity: false
+			        };
+		        
+		        var icnChart = new google.visualization.PieChart(document.getElementById('chart-icn-chart'));
+		        
+		        icnChart.draw(data, optionsChartIcn);
+		        
+		        
 	      }
 }
 
-function drawProcessedDonutChart(){
+function drawProcessedDonutChart(overviewYearData){
 	
 	var monthYear = getTimeFrameValue();
-	var overviewYearData;
-	
-	if(monthYear.month == 14){
-		overviewYearData = getoverviewAllTimeData();
-	}else if(monthYear.month == 13){
-    	overviewYearData =  getoverviewYearData(monthYear.year);
-    }else{
-    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
-    }
-    
+	    
 	 google.charts.load("current", {packages:["corechart"]});
      google.charts.setOnLoadCallback(drawChart);
      
      var incomplete;
      var completed;
      
-     if(overviewYearData !=null){
+     if(overviewYearData !=null && !isEmpty(overviewYearData)){
     	 incomplete = overviewYearData.Incomplete;
     	 completed = overviewYearData.Completed;
      }else{
@@ -541,7 +559,7 @@ function drawProcessedDonutChart(){
 
 	        var options = {
 	          pieStartAngle: 130,
-	          backgroundColor: '#f9f9fb',
+	          backgroundColor: '#f1f0f2',
 	          pieHole: 0.5,
 	          legend: { 
 	      	    position : 'none'
@@ -562,36 +580,26 @@ function drawProcessedDonutChart(){
 	                 bold: true
 	             }
 	      	 },
-	      	tooltip: { trigger: 'none' }
+	      	tooltip: { trigger: 'none' },
+	      	sliceVisibilityThreshold: 0
 	        };
 
 	        var chart = new google.visualization.PieChart(document.getElementById('processedDonutchart'));
 	        chart.draw(data, options);
+	       
 	      }
 }
 
-function drawUnprocessedDonutChart(){
+function drawUnprocessedDonutChart(overviewYearData){
 	 google.charts.load("current", {packages:["corechart"]});
     google.charts.setOnLoadCallback(drawChart);
-    
-    var monthYear = getTimeFrameValue();
-    var overviewYearData;
-    
-    if(monthYear.month == 14){
-		overviewYearData = getoverviewAllTimeData();
-	}else if(monthYear.month == 13){
-    	overviewYearData =  getoverviewYearData(monthYear.year);
-    }else{
-    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
-    }
-    
     
     var unassigned;
     var duplicate;
     var corrupted;
     var other;
     
-    if(overviewYearData != null){
+    if(overviewYearData != null && !isEmpty(overviewYearData)){
     	unassigned = overviewYearData.Unassigned;
         duplicate = overviewYearData.Duplicate;
         corrupted = overviewYearData.Corrupted;
@@ -615,7 +623,7 @@ function drawUnprocessedDonutChart(){
 
 	        var options = {
 	          pieStartAngle: 90,
-	          backgroundColor: '#f9f9fb',
+	          backgroundColor: '#f1f0f2',
 	          pieHole: 0.5,
 	          legend: { 
 	      	    position : 'none'
@@ -636,7 +644,8 @@ function drawUnprocessedDonutChart(){
 	                 bold: true
 	             }
 	      	 },
-	      	tooltip: { trigger: 'none' }
+	      	tooltip: { trigger: 'none' },
+	      	sliceVisibilityThreshold: 0
 	        };
 
 	        var chart = new google.visualization.PieChart(document.getElementById('unprocessedDonutchart'));
@@ -644,6 +653,7 @@ function drawUnprocessedDonutChart(){
 	      }
 }
 
+//Get time frame value function
 function getTimeFrameValue(){
 	var currentDate =  new Date();
 	var currentMonth = currentDate.getMonth();
@@ -672,7 +682,7 @@ function getTimeFrameValue(){
   				return monthYear;
 		
 		case 104: monthYear.month=13;
-  				monthYear.year=currentYear+1;
+  				monthYear.year=currentYear-1;
   				return monthYear;
   		
 		case 1: monthYear.month=1;
@@ -727,7 +737,7 @@ function getTimeFrameValue(){
 
 function drawSpsGauge(){
 	
-	if(overviewData != null){
+	if(overviewData != null && !isEmpty(overviewData)){
 		var detractorEndAngle;
 		var passivesEndAngle;
 		var promotersEndAngle;
@@ -763,7 +773,7 @@ function drawSpsGauge(){
 						
 				var spsScore = overviewData.SpsScore;
 				
-				if(overviewData != null){
+				if(overviewData != null && !isEmpty(overviewData)){
 					
 					$('#spsScorebox').html(spsScore);
 					var detractors = overviewData.DetractorPercentage;
@@ -845,8 +855,7 @@ function drawSpsGauge(){
 				
 				var marginLeft = parseInt($("#metre-needle").css("margin-left"));
 				var marginTop = parseInt($("#metre-needle").css("margin-top"));
-				
-				
+			
 				var needleDegree;
 				var marginNeedle = Math.abs(spsScore - 20)/2;
 				
@@ -893,7 +902,7 @@ function drawSpsGauge(){
 
 function drawOverviewPage(){
 	
-	if(overviewData != null){
+	if(overviewData != null && !isEmpty(overviewData)){
 		
 		var detractors = overviewData.DetractorPercentage;
 		var passives =   overviewData.PassivesPercentage;
@@ -915,56 +924,22 @@ function drawOverviewPage(){
 			$('#passivesValue').html(passives+'%');
 			$('#promotersBar').css('width',promoters+'%');
 			$('#promotersValue').html(promoters+'%');	
+	}else{
+			var detractors = 0;
+			var passives =   0;
+			var promoters =  0;
+		
+			$('#spsGaugeSuccess').hide();
+			$('#spsGaugeFailure').show();
+			
+			//detractors,passives and promoters bar and values assignment
+			$('#detractorsBar').css('width',detractors+'%');
+			$('#detractorsValue').html(detractors+'%');
+			$('#passivesBar').css('width',passives+'%');
+			$('#passivesValue').html(passives+'%');
+			$('#promotersBar').css('width',promoters+'%');
+			$('#promotersValue').html(promoters+'%');	
 	}
-}
-
-function getOverviewData() {
-
-	// get sps from overview data
-	$.ajax({
-		async : false,
-		url : "/fetchspsfromreportingoverview.do",
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-					async : false,
-					url : data.url,
-					type : "GET",
-					cache : false,
-					dataType : "json",
-					success : function(response) {
-						if (response.length == 0) {
-							overviewData = null;
-						} else {
-							overviewData = JSON.parse(response);
-						}
-					},
-					error : function(e) {
-						if (e.status == 504) {
-							redirectToLoginPageOnSessionTimeOut(e.status);
-							return;
-						}
-						overviewData = null;
-					}
-				});
-			}else{
-				overviewData = null;
-			}
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			overviewData = null;
-		}
-	});
-	
-	return overviewData;
-
 }
 
 //javascript for reporting_reports page
@@ -1077,74 +1052,6 @@ $(document).on('click', '.err-close-rep', function() {
 	location.reload(true);
 });
 
-function getRecentActivityList(startIndex,batchSize){
-	var recentActivityList=null;
-	var payload={
-			"startIndex" : startIndex,
-			"batchSize" : batchSize
-	}
-	$.ajax({
-		async : false,
-		url : "/fetchrecentactivities.do?startIndex="+payload.startIndex+"&batchSize="+payload.batchSize,
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-					async : false,
-					url : data.url,
-					type : "GET",
-					cache : false,
-					dataType : "json",
-					success : function(response) {
-						recentActivityList = JSON.parse(response);
-					},
-					error : function(e) {
-						if (e.status == 504) {
-							redirectToLoginPageOnSessionTimeOut(e.status);
-							return;
-						}
-						recentActivityList = null;
-					}
-				});
-			}else{
-				recentActivityList = null;
-			}
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			recentActivityList = null;
-		}
-	});	
-	return recentActivityList;
-}
-
-function getRecentActivityCount(){
-	var recentActivityCount=0;
-	$.ajax({
-		async : false,
-		url : "/fetchrecentactivitiescount.do",
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(response) {
-			recentActivityCount = parseInt(response);
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			recentActivityCount = 0;
-		}
-	});
-	
-	return recentActivityCount;
-}
 
 function getStatusString(status){
 		var statusString;
@@ -1175,12 +1082,13 @@ function drawRecentActivity(start,batchSize,tableHeader){
 		var statusString = getStatusString(recentActivityList[i][6]);
 		var startDate = getDateFromDateTime(recentActivityList[i][2]);
 		var endDate =getDateFromDateTime(recentActivityList[i][3]);
+		var monthStartDate = getMonthFromDateTime(recentActivityList[i][2]);
 		
 		tableData += "<tr id='recent-activity-row"+i+"' class=\"u-tbl-row user-row \">"
 			+"<td class=\"v-tbl-recent-activity fetch-name hide\">"+i+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>"
-			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("recent-activity-date-range\">"+" "):("\">"+startDate))+" - "+(endDate==null?" ":endDate)+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("\">"+"All Time till date "):("\">"+(endDate==null?monthStartDate:startDate)))+(endDate==null?" ":" - "+endDate)+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
 		
 		if(recentActivityList[i][6]==0){	
@@ -1217,48 +1125,12 @@ function getDateFromDateTime(dateTime){
 	return null;
 }
 
-function deleteRecentActivity(fileUploadId,idIndex){
-	showOverlay();
-	$.ajax({
-		url : "./deletefromrecentactivities.do?fileUploadId="+fileUploadId,
-		type : "POST",
-		dataType:"TEXT",
-		async:false,
-		success : function(data) {
-			success=true;
-			messageToDisplay = data;
-			
-		},
-		complete : function() {	
-			hideOverlay();
-			
-			var recentActivityCount=getRecentActivityCount();
-			$('#recent-activity-row'+idIndex).fadeOut(500)
-				.promise()
-				.done(function(){
-					if(recentActivityCount <= startIndex){
-						drawRecentActivity(startIndex-10,batchSize,tableHeaderData);
-					}else if(recentActivityCount>=10){
-						drawRecentActivity(startIndex,batchSize,tableHeaderData);
-					}
-					showHidePaginateButtons(startIndex, recentActivityCount);
-					
-					if(recentActivityCount == 0){
-						var tableData='';
-						tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
-						$('#recent-activity-list-table').html(tableData);
-					}
-				});
-			},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			messageToDisplay="Sorry! Failed to delete the activity. Please try again later";
-			showError(messageToDisplay);
+function getMonthFromDateTime(dateTime){
+	if(dateTime != null){
+		return (dateTime.match(/[a-zA-z]{3}/)[0] + " " + dateTime.match(/\d{4}/)[0]);
 		}
-	});
+		
+		return null;
 }
 
 $(document).on('click','.downloadLink',function(e){
@@ -1269,6 +1141,7 @@ $(document).on('click','.downloadLink',function(e){
 });
 
 $(document).on('click','.recent-act-delete-x',function(e){
+	showOverlay();
 	var clickedID = this.id;
 	var indexRecentActivity = clickedID.match(/\d+$/)[0];
 	var fileUploadId=recentActivityList[indexRecentActivity][8];
@@ -1324,11 +1197,11 @@ function updateReportingDashboard(){
     	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
     }
 	
-	if(overviewYearData!=null){
+	if(overviewYearData!=null && !isEmpty(overviewYearData)){
 		$('#processed-lbl-span').html(overviewYearData.Processed);
 		$('#completed-lbl-span').html(overviewYearData.Completed+' ('+overviewYearData.CompletePercentage+'%)');
 		$('#incomplete-lbl-span').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
-		$('#incomplete-lbl-span-sel').html(overviewYearData.Incomplete);
+		$('#incomplete-lbl-span-sel').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
 		$('#social-posts-lbl-span').html(overviewYearData.SocialPosts);
 		$('#zillow-lbl-span').html(overviewYearData.ZillowReviews);
 		$('#unprocessed-lbl-span').html(overviewYearData.Unprocessed);
@@ -1390,115 +1263,21 @@ function updateReportingDashboard(){
 	$('#corrupted-lbl-rect').hide();
 	$('#other-lbl-rect').hide();
 	
-	drawUnclickedDonutChart();
-	drawProcessedDonutChart();
-	drawUnprocessedDonutChart();
-}
-
-function getUserRankingList(entityType,entityId,year,month,startIndex,batchSize,timeFrame){
-	var userRankingList =null;	
+	drawUnclickedDonutChart(overviewYearData);
+	drawProcessedDonutChart(overviewYearData);
+	drawUnprocessedDonutChart(overviewYearData);
+	$(window).resize();
+	hideOverlay();
 	
-	$.ajax({
-		async : false,
-		url : "/getuserranking.do?entityId="+entityId+"&entityType="+entityType+"&month="+month+"&year="+year+"&startIndex="+startIndex+"&batchSize="+batchSize+"&timeFrame="+timeFrame,
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({	
-							async : false,
-							url : data.url,
-							type : "GET",
-							cache : false,
-							dataType : "json",
-							success : function(response) {
-								userRankingList = JSON.parse(response);		
-							}
-				});
-			}
-		},	
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-		}
-	});
-	return userRankingList;
-}
-
-function getUserRankingCountForAdmins(entityType,entityId,year,month,batchSize,timeFrame){
+	if(overviewYearData==null){
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+	}
 	
-	var userRankingCount=null;
-	
-	$.ajax({
-		async : false,
-		url : "/getuserrankingcount.do?entityId="+entityId+"&entityType="+entityType+"&month="+month+"&year="+year+"&batchSize="+batchSize+"&timeFrame="+timeFrame,
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-							async:false,
-							url : data.url,
-							type : "GET",
-							cache : false,
-							dataType : "json",
-							success : function(response) {
-								userRankingCount = JSON.parse(response);
-							}
-						});
-			}
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}	
-		}
-	});
-	return userRankingCount;
-	
-}
-
-function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame){
-	
-	var userRankingCount=null;
-	
-	$.ajax({
-		async : false,
-		url : "/getuserrankingrankandcount.do?entityId="+entityId+"&entityType="+entityType+"&month="+month+"&year="+year+"&batchSize="+batchSize+"&timeFrame="+timeFrame,
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-							async:false,
-							url : data.url,
-							type : "GET",
-							cache : false,
-							dataType : "json",
-							success : function(response) {
-								userRankingCount = JSON.parse(response);
-							}
-						});
-			}
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}	
-		}
-	});
-	return userRankingCount;
 }
 
 function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
-	
 	var tableHeaderData='<table id="leaderboard-table" class="v-um-tbl leaderboard-table">'
 		+'<tr id="u-tbl-header" class="u-tbl-header">'
 		+'<td class="lead-tbl-ln-of text-center">Rank</td>'
@@ -1521,11 +1300,11 @@ function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
 			if(userRankingList[i][9] == 1){
 				rank='#' + userRankingList[i][1];
 				
-				profileImageUrl = getProfileImageByUserId(userRankingList[i][0]);
-				if(profileImageUrl != null && profileImageUrl!=""){
-					imageDiv='<img id="lead-prof-image-edit" class="prof-image prof-image-edit pos-relative leaderboard-pic-circle" src="'+profileImageUrl+'"></img>';
+				profileImageUrl = userRankingList[i][10];
+				if(profileImageUrl != null && profileImageUrl!="" && profileImageUrl != 'null'){
+					imageDiv='<img id="lead-prof-image-edit" class="prof-image-edit pos-relative leaderboard-pic-circle" src="'+profileImageUrl+'"></img>';
 				}else{
-					imageDiv='<div id="lead-prof-image-edit" class="prof-image prof-image-edit pers-default-big pos-relative leaderboard-pic-circle"></div>';
+					imageDiv='<div id="lead-prof-image-edit" class="prof-image-edit pers-default-big pos-relative leaderboard-pic-circle"></div>';
 				}
 				if(userRankingList[i][0] == userId  && profileMasterId == 4){
 					tableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
@@ -1547,14 +1326,14 @@ function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
 				+'</tr>'
 			}else{
 				
-				profileImageUrl = getProfileImageByUserId(userRankingList[i][0]);
-				if(profileImageUrl != null && profileImageUrl!=""){
-					imageDiv='<img id="lead-prof-image-edit" class="prof-image prof-image-edit pos-relative leaderboard-pic-circle" src="'+profileImageUrl+'"></img>';
+				profileImageUrl = userRankingList[i][10];
+				if(profileImageUrl != null && profileImageUrl!="" && profileImageUrl != 'null'){
+					imageDiv='<img id="lead-prof-image-edit" class="prof-image-edit pos-relative leaderboard-pic-circle" src="'+profileImageUrl+'"></img>';
 				}else{
-					imageDiv='<div id="lead-prof-image-edit" class="prof-image prof-image-edit pers-default-big pos-relative leaderboard-pic-circle"></div>';
+					imageDiv='<div id="lead-prof-image-edit" class="prof-image-edit pers-default-big pos-relative leaderboard-pic-circle"></div>';
 				}
 				
-				if(userRankingList[i][0] == "${userId}"){
+				if(userRankingList[i][0] == userId  && profileMasterId == 4){
 					nonRankedTableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
 					$('#rank-span').html('NR');
 					$('#user-score-span').html(userRankingList[i][4]);
@@ -1601,55 +1380,6 @@ function showHideRankPaginateBtns(startIndex,count){
 		$('#lead-ranks-below').addClass('block-display');
 	}
 	
-}
-
-function getProfileImageByUserId(userId){
-	var profileImageUrlData=null;
-	$.ajax({
-		async : false,
-		url : "/getuserprofimageforleaderboard.do?userId="+userId,
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(data) {
-			profileImageUrlData = data;						
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}	
-		}
-	});
-	
-	return profileImageUrlData;
-}
-
-function saveRankingSettings(minDaysOfRegistration, minCompletedPercentage, minNoOfReviews, monthOffset, yearOffset){
-	
-	var url = "/saverankingsettings.do?minDaysOfRegistration="+minDaysOfRegistration
-		+"&minCompletedPercentage="+minCompletedPercentage
-		+"&minNoOfReviews="+minNoOfReviews
-		+"&monthOffset="+monthOffset
-		+"&yearOffset="+yearOffset;
-	$.ajax({
-		async : false,
-		url : url,
-		type : "PUT",
-		cache : false,
-		dataType : "text",
-		success : function(data) {
-			message = data;						
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			message = "Setting for Ranking Could not be Saved"; 
-		}
-	});
-	return message;
 }
 
 function getAndSaveRankingSettingsVal(columnName,isRealTechOrSSAdmin,monthOff,yearOff){
@@ -1727,87 +1457,6 @@ function drawLineGraphForScoreStats(chartDiv,chartData){
 	});
 }
 
-function getOverallScoreStats(entityId,entityType){
-	
-	var currentDate = new Date();
-	var currentMonth = currentDate.getMonth();
-	var currentYear = currentDate.getFullYear();
-	
-	var url = "/getoverallscorestats.do?entityId="+entityId+"&entityType="+entityType+"&currentMonth="+currentMonth+"&currentYear="+currentYear;
-	
-	var overallScoreStats=null;
-	
-	$.ajax({
-		async : false,
-		url : url,
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-							async:false,
-							url : data.url,
-							type : "GET",
-							cache : false,
-							dataType : "json",
-							success : function(response) {
-								overallScoreStats = JSON.parse(response);
-							}
-						});
-			}
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}	
-		}
-	});
-	console.log(overallScoreStats);
-	return overallScoreStats;
-}
-
-function getQuestionScoreStats(entityId,entityType){
-	var currentDate = new Date();
-	var currentMonth = currentDate.getMonth();
-	var currentYear = currentDate.getFullYear();
-	
-	var url = "/getquestionscorestats.do?entityId="+entityId+"&entityType="+entityType+"&currentMonth="+currentMonth+"&currentYear="+currentYear;
-	
-	var questionScoreStats=null;
-	
-	$.ajax({
-		async : false,
-		url : url,
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(data) {
-			if (data.status == 200) {
-				$.ajax({
-							async:false,
-							url : data.url,
-							type : "GET",
-							cache : false,
-							dataType : "json",
-							success : function(response) {
-								questionScoreStats = JSON.parse(response);
-							}
-						});
-			}
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}	
-		}
-	});
-	console.log(questionScoreStats);
-	return questionScoreStats;
-}
-
 function splitAndEditDate(monthYear){
 	
 	var splitStr = monthYear.split('/');
@@ -1851,6 +1500,7 @@ function splitAndEditDate(monthYear){
 }
 
 function drawOverallScoreStatsGraph(entityId, entityType){
+		
 	var overallChartDiv = "overall-rating-chart";
 	var overallScoreStats = getOverallScoreStats(entityId, entityType);
 	
@@ -1880,6 +1530,7 @@ function drawOverallScoreStatsGraph(entityId, entityType){
 }
 
 function drawQuestionScoreStatsGraph(entityId,entityType){
+	
 	var questionScoreStats = getQuestionScoreStats(entityId, entityType);
 	
 	if(questionScoreStats != null && questionScoreStats.length != 0){
@@ -1921,6 +1572,7 @@ function drawQuestionScoreStatsGraph(entityId,entityType){
 			questionScoreStatsArray[questionScoreStatsIndex++] = scoreStatsArray;
 		}
 		
+		$('#question-ratings-div').html('');
 		for(var i=0; i<questionScoreStatsArray.length ; i++){
 			
 			var graphDivHtml = '';
@@ -1948,4 +1600,653 @@ function isContainsQuestion(array,questionId){
 	}
 	
 	return false;
+}
+
+function drawReportingDashButtons(columnName, columnValue){
+	
+	var stages = getReportingSocialMediaConnections(columnName, columnValue);
+	
+	var max = 1;
+	
+	if(columnName == null){
+		return;
+	}
+	
+	if (stages != undefined && stages.length != 0) {
+		if (stages.length < max) {
+			$('#rep-social-media').addClass('hide');
+			$('#empty-rep-social-media').removeClass('hide');
+			max = stages.length;
+		}
+		for (var i = 0; i < max; i++) {
+			var contentToDisplay = '';
+			if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
+				contentToDisplay = '<div class="rep-fb-btn"></div>';
+			} else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
+				contentToDisplay = '<div class="rep-zillow-btn"></div>';
+			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
+				contentToDisplay = '<div class="rep-google-btn"></div>';
+			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
+				contentToDisplay = '<div class="rep-twitter-btn"></div>';
+			} else if (stages[i].profileStageKey == 'YELP_PRF') {
+				contentToDisplay = '<div class="rep-yelp-btn"></div>';
+			} else if (stages[i].profileStageKey == 'LINKEDIN_PRF') {
+				contentToDisplay = '<div class="rep-linked-in-btn"></div>';
+			} else if (stages[i].profileStageKey == 'LICENSE_PRF') {
+				contentToDisplay = 'Enter license details';
+			} else if (stages[i].profileStageKey == 'HOBBIES_PRF') {
+				contentToDisplay = 'Enter hobbies';
+			} else if (stages[i].profileStageKey == 'ACHIEVEMENTS_PRF') {
+				contentToDisplay = 'Enter achievements';
+			}
+			
+			if (i == 0) {
+				$('#rep-social-media').removeClass('hide');
+				$('#empty-rep-social-media').addClass('hide');
+				$('#dsh-btn2').data('social', stages[i].profileStageKey);
+				$('#dsh-btn2').html(contentToDisplay);
+				$('#dsh-btn2').removeClass('hide');
+				updateSocialMediaList(stages, stages[i].profileStageKey);
+			}
+		}
+		
+	}else{
+		$('#rep-social-media').addClass('hide');
+		$('#empty-rep-social-media').removeClass('hide');
+	}
+	
+	
+}
+
+function changeSocialMedia(columnName, columnValue){
+	
+	var profileStageKey = $('#dsh-btn2').data('social');
+	
+	var stages = getReportingSocialMediaConnections(columnName, columnValue);
+	
+	var max = 2;
+		
+	if (stages != undefined && stages.length != 0) {
+		if (stages.length < max) {
+			$('#rep-social-media').fadeIn(500);
+			$('#empty-rep-social-media').addClass('hide');
+		}else{
+			max = stages.length;
+			
+			for (var i = 0; i < max; i++) {
+				var contentToDisplay = '';
+				var isContainsSocialMedia = false;
+				for(var j=0; j<socialMediaList.length; j++){
+					if(stages[i].profileStageKey == socialMediaList[j]){
+						isContainsSocialMedia = true;
+					}
+				}
+				
+				if(isContainsSocialMedia){
+					continue;
+				}
+				
+				if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
+					contentToDisplay = '<div class="rep-fb-btn"></div>';
+				} else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
+					contentToDisplay = '<div class="rep-zillow-btn"></div>';
+				} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
+					contentToDisplay = '<div class="rep-google-btn"></div>';
+				} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
+					contentToDisplay = '<div class="rep-twitter-btn"></div>';
+				} else if (stages[i].profileStageKey == 'YELP_PRF') {
+					contentToDisplay = '<div class="rep-yelp-btn"></div>';
+				} else if (stages[i].profileStageKey == 'LINKEDIN_PRF') {
+					contentToDisplay = '<div class="rep-linked-in-btn"></div>';
+				} else if (stages[i].profileStageKey == 'LICENSE_PRF') {
+					contentToDisplay = 'Enter license details';
+				} else if (stages[i].profileStageKey == 'HOBBIES_PRF') {
+					contentToDisplay = 'Enter hobbies';
+				} else if (stages[i].profileStageKey == 'ACHIEVEMENTS_PRF') {
+					contentToDisplay = 'Enter achievements';
+				}
+				
+				if(contentToDisplay != ''){
+					$('#empty-rep-social-media').addClass('hide');
+					$('#dsh-btn2').data('social', stages[i].profileStageKey);
+					$('#dsh-btn2').html(contentToDisplay);
+					$('#dsh-btn2').removeClass('hide');
+					$('#rep-social-media').fadeIn(500);
+					updateSocialMediaList(stages, stages[i].profileStageKey);
+					break;
+				}
+			}
+			
+		}
+	}else{
+		$('#rep-social-media').addClass('hide');
+		$('#empty-rep-social-media').removeClass('hide');	
+	}
+	
+}
+
+function updateSocialMediaList(stages,socialMedia){
+	
+	socialMediaList.push(socialMedia);
+	
+}
+
+function clickProcessedDiv(){
+	$('#incompleted-details-selectable').hide();
+	$('#incompleted-details').removeClass('hide');
+	$('#incompleted-details').addClass('inline-flex-class');
+	$('#unassigned-details-selectable').hide();
+	$('#unassigned-details').removeClass('hide');
+	$('#unassigned-details').addClass('inline-flex-class');
+	$('.unprocessed-background-rect').show();
+	$('#unprocessed-background-rect').show();
+	$('#unprocessed-lbl-rect').hide();
+	$('#completed-lbl-rect').show();
+	$('#incompleted-lbl-rect').show();
+	$('#social-posts-lbl-rect').show();
+	$('#zillow-lbl-rect').show();
+	$('#unassigned-lbl-rect').hide();
+	$('#duplicate-lbl-rect').hide();
+	$('#corrupted-lbl-rect').hide();
+	$('#other-lbl-rect').hide();
+	$('#processed-trans-div').fadeTo('fast','1.0');
+	$('#unprocessed-trans-div').fadeTo('fast','0.2');
+	
+	var processed=parseInt($('#processed-lbl-span').html());
+	if(processed != 0){
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#processed-trans-graph').removeClass('hide');
+		$('#empty-rep-chart-div').addClass('hide');
+	}else{
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+	}
+}
+
+function clickUnprocessedDiv(){
+	$('#incompleted-details-selectable').hide();
+	$('#incompleted-details').removeClass('hide');
+	$('#incompleted-details').addClass('inline-flex-class');
+	$('#unassigned-details-selectable').hide();
+	$('#unassigned-details').removeClass('hide');
+	$('#unassigned-details').addClass('inline-flex-class');
+	$('.processed-background-rect').show();
+	$('#processed-background-rect').show();
+	$('#processed-lbl-rect').hide();
+	$('#completed-lbl-rect').hide();
+	$('#incompleted-lbl-rect').hide();
+	$('#social-posts-lbl-rect').hide();
+	$('#zillow-lbl-rect').hide();
+	$('#unassigned-lbl-rect').show();
+	$('#duplicate-lbl-rect').show();
+	$('#corrupted-lbl-rect').show();
+	$('#other-lbl-rect').show();
+	$('#unprocessed-trans-div').fadeTo('fast','1.0');
+	$('#processed-trans-div').fadeTo('fast','0.2');
+	
+	var unprocessed=parseInt($('#unprocessed-lbl-span').html());
+	if(unprocessed != 0){
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').removeClass('hide');
+		$('#empty-rep-chart-div').addClass('hide');
+	}else{
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+	}
+}
+
+//api calls functions
+
+function getOverviewMonthData(month,year) {
+
+	$.ajax({
+		async : false,
+		url : "/fetchmonthdataforoverview.do?month="+month+"&year="+year,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+						if (response.length == 0 || response == null) {
+							overviewMonthData = null;
+						} else {
+							if(response == "{}"){
+								overviewMonthData = null;
+							}else{
+								overviewMonthData = JSON.parse(response);
+							}
+						}
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			overviewMonthData = null;
+		}
+	});
+	
+	return overviewMonthData;
+
+}
+
+
+function getoverviewYearData(year) {
+
+$.ajax({
+	async : false,
+	url : "/fetchyeardataforoverview.do?year="+year,
+	type : "GET",
+	cache : false,
+	dataType : "json",
+	success : function(response) {
+					if (response.length == 0 || response == null) {
+						overviewYearData = null;
+					} else {
+						if(response == "{}"){
+							overviewYearData = null;
+						}else{
+							overviewYearData = JSON.parse(response);
+						}
+						
+					}
+	},
+	error : function(e) {
+		if (e.status == 504) {
+			redirectToLoginPageOnSessionTimeOut(e.status);
+			return;
+		}
+		overviewYearData = null;
+	}
+});
+
+return overviewYearData;
+
+}
+
+function getoverviewAllTimeData() {
+
+	$.ajax({
+		async : false,
+		url : "/fetchalltimefromreportingoverview.do",
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+						if (response.length == 0) {
+							overviewAllTimeData = null;
+						} else {
+							if(response == "{}"){
+								overviewAllTimeData = null;
+							}else{
+								overviewAllTimeData = JSON.parse(response);
+							}
+							
+						}
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			overviewAllTimeData = null;
+		}
+	});
+
+	return overviewAllTimeData;
+
+	}
+
+function getOverviewData() {
+
+	// get sps from overview data
+	$.ajax({
+		async : false,
+		url : "/fetchspsfromreportingoverview.do",
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+						if (response.length == 0) {
+							overviewData = null;
+						} else {
+							overviewData = JSON.parse(response);
+						}
+					},
+		complete:function(){
+			hideOverlay();
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			overviewData = null;
+		}
+	});
+	
+	return overviewData;
+
+}
+
+function getRecentActivityList(startIndex,batchSize){
+	var recentActivityList=null;
+	var payload={
+			"startIndex" : startIndex,
+			"batchSize" : batchSize
+	}
+	$.ajax({
+		async : false,
+		url : "/fetchrecentactivities.do?startIndex="+payload.startIndex+"&batchSize="+payload.batchSize,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+						recentActivityList = JSON.parse(response);
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			recentActivityList = null;
+		}
+	});	
+	return recentActivityList;
+}
+
+function getRecentActivityCount(){
+	var recentActivityCount=0;
+	$.ajax({
+		async : false,
+		url : "/fetchrecentactivitiescount.do",
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+			recentActivityCount = parseInt(response);
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			recentActivityCount = 0;
+		}
+	});
+	
+	return recentActivityCount;
+}
+
+function deleteRecentActivity(fileUploadId,idIndex){
+	showOverlay();
+	$.ajax({
+		url : "./deletefromrecentactivities.do?fileUploadId="+fileUploadId,
+		type : "POST",
+		dataType:"TEXT",
+		async:false,
+		success : function(data) {
+			success=true;
+			messageToDisplay = data;
+			
+		},
+		complete : function() {	
+			hideOverlay();
+			
+			var recentActivityCount=getRecentActivityCount();
+			$('#recent-activity-row'+idIndex).fadeOut(500)
+				.promise()
+				.done(function(){
+					if(recentActivityCount <= startIndex){
+						drawRecentActivity(startIndex-10,batchSize,tableHeaderData);
+					}else if(recentActivityCount>=10){
+						drawRecentActivity(startIndex,batchSize,tableHeaderData);
+					}
+					showHidePaginateButtons(startIndex, recentActivityCount);
+					
+					if(recentActivityCount == 0){
+						var tableData='';
+						tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+						$('#recent-activity-list-table').html(tableData);
+					}
+				});
+			},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			messageToDisplay="Sorry! Failed to delete the activity. Please try again later";
+			showError(messageToDisplay);
+		}
+	});
+}
+
+function getReportingSocialMediaConnections(columnName,columnValue){
+	var payload = {
+			"columnName" : columnName,
+			"columnValue" : columnValue
+		};
+		
+		var stages = null;
+		$.ajax({
+			url : './dashboardbuttonsorder.do',
+			headers: {          
+	            Accept : "text/plain; charset=utf-8"   
+			},
+			type : "GET",
+			data : payload,
+			async : false,
+			cache : false,
+			success : function(data){
+				data = $.parseJSON(data);
+				stages = data.stages;
+			},
+			complete: function(){
+				hideOverlay();
+				hideDashOverlay('#mid-dash');
+				hideDashOverlay('#top-dash');
+				hideDashOverlay('#latest-post-ep');
+			},
+			error : function(e) {
+				if(e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
+				if(e.status == 0) {
+					return;
+				}
+				redirectErrorpage();
+			}
+		});
+		return stages;
+}
+
+function getOverallScoreStats(entityId,entityType){
+	
+	var currentDate = new Date();
+	var currentMonth = currentDate.getMonth();
+	var currentYear = currentDate.getFullYear();
+	
+	var url = "/getoverallscorestats.do?entityId="+entityId+"&entityType="+entityType+"&currentMonth="+currentMonth+"&currentYear="+currentYear;
+	
+	var overallScoreStats=null;
+	
+	$.ajax({
+		async : false,
+		url : url,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+					overallScoreStats = JSON.parse(response);
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+	return overallScoreStats;
+}
+
+function getQuestionScoreStats(entityId,entityType){
+	var currentDate = new Date();
+	var currentMonth = currentDate.getMonth();
+	var currentYear = currentDate.getFullYear();
+	
+	var url = "/getquestionscorestats.do?entityId="+entityId+"&entityType="+entityType+"&currentMonth="+currentMonth+"&currentYear="+currentYear;
+	
+	var questionScoreStats=null;
+	
+	$.ajax({
+		async : false,
+		url : url,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+					questionScoreStats = JSON.parse(response);
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+	return questionScoreStats;
+}
+
+function getProfileImageByUserId(userId){
+	var profileImageUrlData=null;
+	$.ajax({
+		async : false,
+		url : "/getuserprofimageforleaderboard.do?userId="+userId,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(data) {
+			profileImageUrlData = data;						
+		},
+		complete:function(){
+			hideOverlay();
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+	
+	return profileImageUrlData;
+}
+
+function saveRankingSettings(minDaysOfRegistration, minCompletedPercentage, minNoOfReviews, monthOffset, yearOffset){
+	
+	if(minCompletedPercentage>100 || minCompletedPercentage<0){
+		return "Invalid Value for Completion Percentage. Setting for Ranking Could not be Saved";
+	}
+	
+	var url = "/saverankingsettings.do?minDaysOfRegistration="+minDaysOfRegistration
+		+"&minCompletedPercentage="+minCompletedPercentage
+		+"&minNoOfReviews="+minNoOfReviews
+		+"&monthOffset="+monthOffset
+		+"&yearOffset="+yearOffset;
+	$.ajax({
+		async : false,
+		url : url,
+		type : "PUT",
+		cache : false,
+		dataType : "text",
+		success : function(data) {
+			message = data;						
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			message = "Setting for Ranking Could not be Saved"; 
+		}
+	});
+	
+	return message;
+}
+
+function getUserRankingList(entityType,entityId,year,month,startIndex,batchSize,timeFrame){
+	var userRankingList =null;	
+	
+	$.ajax({
+		async : false,
+		url : "/getuserranking.do?entityId="+entityId+"&entityType="+entityType+"&month="+month+"&year="+year+"&startIndex="+startIndex+"&batchSize="+batchSize+"&timeFrame="+timeFrame,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+					userRankingList = JSON.parse(response);	
+		},
+		complete: function(){
+			hideOverlay();
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+	return userRankingList;
+}
+
+function getUserRankingCountForAdmins(entityType,entityId,year,month,batchSize,timeFrame){
+	
+	var userRankingCount=null;
+	
+	$.ajax({
+		async : false,
+		url : "/getuserrankingcount.do?entityId="+entityId+"&entityType="+entityType+"&month="+month+"&year="+year+"&batchSize="+batchSize+"&timeFrame="+timeFrame,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+					userRankingCount = JSON.parse(response);
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+	return userRankingCount;
+	
+}
+
+function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame){
+	
+	var userRankingCount=null;
+	
+	$.ajax({
+		async : false,
+		url : "/getuserrankingrankandcount.do?entityId="+entityId+"&entityType="+entityType+"&month="+month+"&year="+year+"&batchSize="+batchSize+"&timeFrame="+timeFrame,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success :function(response) {
+					userRankingCount = JSON.parse(response);
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+	return userRankingCount;
 }

@@ -370,7 +370,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1210</xloc>
+      <xloc>1216</xloc>
       <yloc>261</yloc>
       </entry>
     <entry>
@@ -470,8 +470,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1210</xloc>
-      <yloc>378</yloc>
+      <xloc>1216</xloc>
+      <yloc>403</yloc>
       </entry>
     <entry>
       <name>GetLastModifiedTime</name>
@@ -511,15 +511,6 @@
     <hop>
       <from>CreateJobLog</from>
       <to>GetJobLogID</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>CompanySettings</from>
-      <to>FinishJobLog</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -592,6 +583,15 @@
     <hop>
       <from>Mysql MasterTable Updates</from>
       <to>RegionSettings</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>CompanySettings</from>
+      <to>FinishJobLog</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

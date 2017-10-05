@@ -22,26 +22,35 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 
 	private static final Logger LOG = LoggerFactory.getLogger( SurveyResultsCompanyReportDaoImpl.class );
 	
-	@Override
+	
+
+	
+	@SuppressWarnings ( "unchecked")
+    @Override
 	public List<SurveyResultsCompanyReport> fetchSurveyResultsCompanyReportByCompanyId(Long companyId,Timestamp startDate, Timestamp endDate) {
 		LOG.info( "method to fetch survey results company report based on companyId,fetchSurveyResultsCompanyReportByCompanyId() started" );
         Criteria criteria = getSession().createCriteria( SurveyResultsCompanyReport.class );
+        List<SurveyResultsCompanyReport> testSurveyResult;
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.eq( CommonConstants.SURVEY_RESULTS_IS_DELETED, false ) );
-            
+
             if(startDate != null && endDate != null){
             Criterion criterion = Restrictions.and(
                     Restrictions.ge( CommonConstants.SURVEY_RESULTS_REPORT_MODIFIED_ON, startDate),
                     Restrictions.le( CommonConstants.SURVEY_RESULTS_REPORT_MODIFIED_ON, endDate) );
                 criteria.add( criterion );
+               
             }
-        } catch ( HibernateException hibernateException ) {
+            criteria.setResultTransformer( Criteria.DISTINCT_ROOT_ENTITY );
+
+        } catch ( Exception hibernateException ) {
             LOG.error( "Exception caught in fetchSurveyResultsCompanyReportByCompanyId() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchSurveyResultsCompanyReportByCompanyId() ", hibernateException );
         }
-
-        LOG.info( "method to fetch branch based on companyId, fetchSurveyResultsCompanyReportByCompanyId() finished." );
+        LOG.info( "method to fetch results company report based on companyId, fetchSurveyResultsCompanyReportByCompanyId() finished." );
         return (List<SurveyResultsCompanyReport>) criteria.list();
+
+       
 	}
 }
