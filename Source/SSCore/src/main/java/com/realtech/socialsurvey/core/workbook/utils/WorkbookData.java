@@ -1020,7 +1020,7 @@ public class WorkbookData
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 22 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 23 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 24 ) ));
-     
+            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 25 ) ));
 
 
             surveyTransactionData.put(++surveyTransactionCounter ,surveyTransactionReportToPopulate );
