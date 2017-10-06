@@ -75,6 +75,33 @@
   <notepads>
   </notepads>
   <connection>
+    <name>Local instance MySQL57</name>
+    <server>&#x24;&#x7b;mysql_host &#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;mysql_schema_name &#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no &#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password &#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no &#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
     <name>SS_Centralized_Mysql_Conn</name>
     <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
@@ -87,9 +114,8 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -104,24 +130,23 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
-    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
-    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
-    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -161,7 +186,6 @@
   <hop> <from>Group Promoters</from><to>Report Id Promoters</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Sent</from><to>Report Id Sent</to><enabled>Y</enabled> </hop>
   <hop> <from>Group TRX_RCVD</from><to>Report Id TRX_RCVD</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey</from><to>Filter Completed</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Corrupted</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Ignored</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Mismatched</to><enabled>Y</enabled> </hop>
@@ -169,7 +193,6 @@
   <hop> <from>Join User Survey</from><to>Filter Pending</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Pending Duplicate</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Sent</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey</from><to>Sort Survey Pre Initiation</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Abusive</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Detractors</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Passives</to><enabled>Y</enabled> </hop>
@@ -197,7 +220,6 @@
   <hop> <from>Sort Mismatched</from><to>Group Mismatched</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Old Records</from><to>Group Old Records</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Sent</from><to>Group Sent</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort Survey Pre Initiation</from><to>Join User Survey Details</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort TRX_RCVD</from><to>Group TRX_RCVD</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows Abusive</from><to>Group Abusive</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows Avg Rating</from><to>Group AVg rating</to><enabled>Y</enabled> </hop>
@@ -211,7 +233,6 @@
   <hop> <from>Survey Details</from><to>Join User Survey Details</to><enabled>Y</enabled> </hop>
   <hop> <from>Survey Pre Initiation</from><to>Join User Survey</to><enabled>Y</enabled> </hop>
   <hop> <from>Users</from><to>Join User Survey</to><enabled>Y</enabled> </hop>
-  <hop> <from>Modified Java Script Value</from><to>survey_stats_report_id</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter RCVD</from><to>Sort TRX_RCVD</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter RCVD</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Incomplete</from><to>Sort Incomplete</to><enabled>Y</enabled> </hop>
@@ -243,6 +264,10 @@
   <hop> <from>Join User Survey</from><to>Filter Partially Complete</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_stats_report_id</from><to>If field value is null</to><enabled>Y</enabled> </hop>
   <hop> <from>If field value is null</from><to>Select values</to><enabled>Y</enabled> </hop>
+  <hop> <from>Users</from><to>Join User Survey Details</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey Details</from><to>Filter Completed</to><enabled>Y</enabled> </hop>
+  <hop> <from>Modified Java Script Value</from><to>delta </to><enabled>Y</enabled> </hop>
+  <hop> <from>delta </from><to>survey_stats_report_id</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Filter Abusive</name>
@@ -309,22 +334,24 @@
  <conditions>
   <condition>
    <negated>N</negated>
-   <conditions>
-    <condition>
-     <negated>N</negated>
-     <leftvalue>STATUS</leftvalue>
-     <function>&#x3d;</function>
-     <rightvalue/>
-     <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>     </condition>
-    <condition>
-     <negated>N</negated>
-     <operator>OR</operator>
-     <leftvalue>STATUS</leftvalue>
-     <function>&#x3d;</function>
-     <rightvalue/>
-     <value><name>constant</name><type>Integer</type><text>7</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>     </condition>
-    </conditions>
-   </condition>
+   <leftvalue>STATUS</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
   </conditions>
  </condition>
     </compare>
@@ -352,15 +379,34 @@
     <compare>
 <condition>
  <negated>N</negated>
- <leftvalue>STATUS</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>7</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value> </condition>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>STAGE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>-1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>857</xloc>
-      <yloc>574</yloc>
+      <xloc>1432</xloc>
+      <yloc>533</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -410,10 +456,29 @@
     <compare>
 <condition>
  <negated>N</negated>
- <leftvalue>MOOD</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>String</type><text>Unpleasant</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>MOOD</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Unpleasant</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -471,23 +536,42 @@
  <conditions>
   <condition>
    <negated>N</negated>
-   <leftvalue>STATUS</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+   <conditions>
+    <condition>
+     <negated>N</negated>
+     <leftvalue>STATUS</leftvalue>
+     <function>&#x3d;</function>
+     <rightvalue/>
+     <value><name>constant</name><type>Integer</type><text>1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>     </condition>
+    <condition>
+     <negated>N</negated>
+     <operator>OR</operator>
+     <leftvalue>STATUS</leftvalue>
+     <function>&#x3d;</function>
+     <rightvalue/>
+     <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>     </condition>
+    </conditions>
+   </condition>
   <condition>
    <negated>N</negated>
-   <operator>OR</operator>
-   <leftvalue>STATUS</leftvalue>
-   <function>&#x3d;</function>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
    <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
   </conditions>
  </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1075</xloc>
+      <xloc>1076</xloc>
       <yloc>591</yloc>
       <draw>Y</draw>
       </GUI>
@@ -574,6 +658,20 @@
    <function>&#x3d;</function>
    <rightvalue/>
    <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
   </conditions>
  </condition>
     </compare>
@@ -601,10 +699,29 @@
     <compare>
 <condition>
  <negated>N</negated>
- <leftvalue>MOOD</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>String</type><text>OK</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>MOOD</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>OK</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -688,10 +805,29 @@
     <compare>
 <condition>
  <negated>N</negated>
- <leftvalue>MOOD</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>String</type><text>Great</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>MOOD</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Great</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -720,24 +856,43 @@
  <conditions>
   <condition>
    <negated>N</negated>
-   <leftvalue>STATUS</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+   <conditions>
+    <condition>
+     <negated>N</negated>
+     <leftvalue>STATUS</leftvalue>
+     <function>&#x3d;</function>
+     <rightvalue/>
+     <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>     </condition>
+    <condition>
+     <negated>N</negated>
+     <operator>OR</operator>
+     <leftvalue>STATUS</leftvalue>
+     <function>&#x3d;</function>
+     <rightvalue/>
+     <value><name>constant</name><type>Integer</type><text>1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>     </condition>
+    <condition>
+     <negated>N</negated>
+     <operator>OR</operator>
+     <leftvalue>STATUS</leftvalue>
+     <function>&#x3d;</function>
+     <rightvalue/>
+     <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>     </condition>
+    </conditions>
+   </condition>
   <condition>
    <negated>N</negated>
-   <operator>OR</operator>
-   <leftvalue>STATUS</leftvalue>
-   <function>&#x3d;</function>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
    <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
   <condition>
    <negated>N</negated>
-   <operator>OR</operator>
-   <leftvalue>STATUS</leftvalue>
-   <function>&#x3d;</function>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
    <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>7</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
   </conditions>
  </condition>
     </compare>
@@ -768,13 +923,7 @@
  <conditions>
   <condition>
    <negated>N</negated>
-   <leftvalue>STATUS</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>7</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>OR</operator>
+   <operator>AND</operator>
    <conditions>
     <condition>
      <negated>N</negated>
@@ -785,24 +934,33 @@
     <condition>
      <negated>N</negated>
      <operator>OR</operator>
-     <conditions>
-      <condition>
-       <negated>N</negated>
-       <leftvalue>STATUS</leftvalue>
-       <function>&#x3d;</function>
-       <rightvalue/>
-       <value><name>constant</name><type>Integer</type><text>1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>       </condition>
-      <condition>
-       <negated>N</negated>
-       <operator>OR</operator>
-       <leftvalue>STATUS</leftvalue>
-       <function>&#x3d;</function>
-       <rightvalue/>
-       <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>       </condition>
-      </conditions>
-     </condition>
+     <leftvalue>STATUS</leftvalue>
+     <function>&#x3d;</function>
+     <rightvalue/>
+     <value><name>constant</name><type>Integer</type><text>1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>     </condition>
+    <condition>
+     <negated>N</negated>
+     <operator>OR</operator>
+     <leftvalue>STATUS</leftvalue>
+     <function>&#x3d;</function>
+     <rightvalue/>
+     <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>     </condition>
     </conditions>
    </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
   </conditions>
  </condition>
     </compare>
@@ -911,7 +1069,7 @@
       <fields>
         <field>
           <aggregate>Abusive</aggregate>
-          <subject>SURVEY_PRE_INITIATION_ID</subject>
+          <subject>SURVEY_DETAILS_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
         </field>
@@ -1045,7 +1203,7 @@
       <fields>
         <field>
           <aggregate>Completed</aggregate>
-          <subject>SURVEY_PRE_INITIATION_ID</subject>
+          <subject>SURVEY_DETAILS_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
         </field>
@@ -1076,8 +1234,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>859</xloc>
-      <yloc>758</yloc>
+      <xloc>1434</xloc>
+      <yloc>717</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1179,7 +1337,7 @@
       <fields>
         <field>
           <aggregate>Detractors</aggregate>
-          <subject>SURVEY_PRE_INITIATION_ID</subject>
+          <subject>SURVEY_DETAILS_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
         </field>
@@ -1648,7 +1806,7 @@
       <fields>
         <field>
           <aggregate>Passives</aggregate>
-          <subject>SURVEY_PRE_INITIATION_ID</subject>
+          <subject>SURVEY_DETAILS_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
         </field>
@@ -1782,7 +1940,7 @@
       <fields>
         <field>
           <aggregate>Promoters</aggregate>
-          <subject>SURVEY_PRE_INITIATION_ID</subject>
+          <subject>SURVEY_DETAILS_ID</subject>
           <type>COUNT_DISTINCT</type>
           <valuefield/>
         </field>
@@ -2021,13 +2179,13 @@
            <schema_name/>
            </partitioning>
 <join_type>INNER</join_type>
-<step1>Sort Survey Pre Initiation</step1>
+<step1>Users</step1>
 <step2>Survey Details</step2>
     <keys_1>
-      <key>SURVEY_PRE_INITIATION_ID</key>
+      <key>USER_ID</key>
     </keys_1>
     <keys_2>
-      <key>SURVEY_PRE_INTITIATION_ID</key>
+      <key>AGENT_ID</key>
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -2052,117 +2210,39 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;Sent &#x3e; 0&#x29;&#x7b;&#xd;&#xa;	var complete_percentage &#x3d; &#x28;Completed&#x2f;Sent&#x29;&#x2a;100&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa;	var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;var delta &#x3d; TRX_RCVD - Duplicate - Corrupted - Abusive - Sent&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var final_agent_id &#x3d; 0&#x3b;&#xd;&#xa;var final_trx_month &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_report_id &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_agent_name &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;report_id &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;TRX_MONTH &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var final_date &#x3d; getCurrentDate&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;function getCurrentDate&#x28;&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;var date &#x3d; new Date&#x28;&#x29;&#x3b;&#xd;&#xa;var year &#x3d; date.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;var month &#x3d; date.getMonth&#x28;&#x29;&#x2b;1&#x3b;&#xd;&#xa;var day &#x3d; date.getDate&#x28;&#x29;&#x3b;&#xd;&#xa;var hour &#x3d; date.getHours&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var min &#x3d; date.getMinutes&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var sec &#x3d; date.getSeconds&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;hour.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;hour &#x3d; &#x22;0&#x22;&#x2b;hour&#x3b;&#xd;&#xa;&#x7d; &#xd;&#xa;if&#x28;min.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;min &#x3d; &#x22;0&#x22;&#x2b;min&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sec.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;sec &#x3d; &#x22;0&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;hour&#x2b;&#x22;&#x3a;&#x22;&#x2b;min&#x2b;&#x22;&#x3a;&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var final_month_val &#x3d; final_trx_month.substring&#x28;5, 7&#x29;&#x3b;&#xd;&#xa;var final_year_val &#x3d; final_trx_month.substring&#x28;0, 4&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;first_name &#x21;&#x3d; null &#x7c;&#x7c; last_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name &#x2b; &#x22; &#x22; &#x2b; last_name&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_1 &#x21;&#x3d; null &#x7c;&#x7c; last_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_1 &#x2b; &#x22; &#x22; &#x2b; last_name_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_2 &#x21;&#x3d; null &#x7c;&#x7c; last_name_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_2 &#x2b; &#x22; &#x22; &#x2b; last_name_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_3 &#x21;&#x3d; null &#x7c;&#x7c; last_name_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_3 &#x2b; &#x22; &#x22; &#x2b; last_name_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_4 &#x21;&#x3d; null &#x7c;&#x7c; last_name_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_4 &#x2b; &#x22; &#x22; &#x2b; last_name_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_5 &#x21;&#x3d; null &#x7c;&#x7c; last_name_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_5 &#x2b; &#x22; &#x22; &#x2b; last_name_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_6 &#x21;&#x3d; null &#x7c;&#x7c; last_name_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_6 &#x2b; &#x22; &#x22; &#x2b; last_name_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_7 &#x21;&#x3d; null &#x7c;&#x7c; last_name_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_7 &#x2b; &#x22; &#x22; &#x2b; last_name_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_8 &#x21;&#x3d; null &#x7c;&#x7c; last_name_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_8 &#x2b; &#x22; &#x22; &#x2b; last_name_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_9 &#x21;&#x3d; null &#x7c;&#x7c; last_name_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_9 &#x2b; &#x22; &#x22; &#x2b; last_name_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_10 &#x21;&#x3d; null &#x7c;&#x7c; last_name_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_10 &#x2b; &#x22; &#x22; &#x2b; last_name_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_11 &#x21;&#x3d; null &#x7c;&#x7c; last_name_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_11 &#x2b; &#x22; &#x22; &#x2b; last_name_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_12 &#x21;&#x3d; null &#x7c;&#x7c; last_name_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_12 &#x2b; &#x22; &#x22; &#x2b; last_name_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_13 &#x21;&#x3d; null &#x7c;&#x7c; last_name_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_13 &#x2b; &#x22; &#x22; &#x2b; last_name_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_14 &#x21;&#x3d; null &#x7c;&#x7c; last_name_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_14 &#x2b; &#x22; &#x22; &#x2b; last_name_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_15 &#x21;&#x3d; null &#x7c;&#x7c; last_name_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_15 &#x2b; &#x22; &#x22; &#x2b; last_name_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;TRX_RCVD &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var TRX_RCVD &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Pending &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	 var Pending &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Duplicate &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Duplicate &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Corrupted &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Corrupted &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Old_Records &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Old_Records &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Ignored &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Ignored &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Mismatched &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Mismatched &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Completed &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Completed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Clicked &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Clicked &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Partially_Completed &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Partially_Completed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Sent &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Sent &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Abusive &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Abusive &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;avg_rating &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var avg_rating &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Detractors &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Detractors &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Passives &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Passives &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Promoters &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Promoters &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;incomplete &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var incomplete &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>Abusive</name>
-        <rename>Abusive</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Clicked</name>
-        <rename>Clicked</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Completed</name>
-        <rename>Completed</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Corrupted</name>
-        <rename>Corrupted</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Detractors</name>
-        <rename>Detractors</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Duplicate</name>
-        <rename>Duplicate</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Ignored</name>
-        <rename>Ignored</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Mismatched</name>
-        <rename>Mismatched</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Old_Records</name>
-        <rename>Old_Records</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Partially_Completed</name>
-        <rename>Partially_Completed</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Passives</name>
-        <rename>Passives</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Pending</name>
-        <rename>Pending</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Promoters</name>
-        <rename>Promoters</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Sent</name>
-        <rename>Sent</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>TRX_RCVD</name>
-        <rename>TRX_RCVD</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>avg_rating</name>
-        <rename>avg_rating</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>complete_percentage</name>
-        <rename>complete_percentage</rename>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var total_sent &#x3d; Sent &#x2b; Completed&#x3b; &#xd;&#xa;var total_TRX_RCVD  &#x3d; TRX_RCVD  &#x2b; Completed&#x3b;&#xd;&#xa;&#xd;&#xa;var total_clicked &#x3d; Clicked &#x2b; Completed&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var final_agent_id &#x3d; 0&#x3b;&#xd;&#xa;var final_trx_month &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_report_id &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_agent_name &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;report_id &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;report_id_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_report_id &#x3d; report_id_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;TRX_MONTH &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;TRX_MONTH_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_trx_month &#x3d; TRX_MONTH_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var final_date &#x3d; getCurrentDate&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;function getCurrentDate&#x28;&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;var date &#x3d; new Date&#x28;&#x29;&#x3b;&#xd;&#xa;var year &#x3d; date.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;var month &#x3d; date.getMonth&#x28;&#x29;&#x2b;1&#x3b;&#xd;&#xa;var day &#x3d; date.getDate&#x28;&#x29;&#x3b;&#xd;&#xa;var hour &#x3d; date.getHours&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var min &#x3d; date.getMinutes&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var sec &#x3d; date.getSeconds&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;hour.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;hour &#x3d; &#x22;0&#x22;&#x2b;hour&#x3b;&#xd;&#xa;&#x7d; &#xd;&#xa;if&#x28;min.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;min &#x3d; &#x22;0&#x22;&#x2b;min&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sec.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;sec &#x3d; &#x22;0&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;hour&#x2b;&#x22;&#x3a;&#x22;&#x2b;min&#x2b;&#x22;&#x3a;&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var final_month_val &#x3d; final_trx_month.substring&#x28;5, 7&#x29;&#x3b;&#xd;&#xa;var final_year_val &#x3d; final_trx_month.substring&#x28;0, 4&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;first_name &#x21;&#x3d; null &#x7c;&#x7c; last_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name &#x2b; &#x22; &#x22; &#x2b; last_name&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_1 &#x21;&#x3d; null &#x7c;&#x7c; last_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_1 &#x2b; &#x22; &#x22; &#x2b; last_name_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_2 &#x21;&#x3d; null &#x7c;&#x7c; last_name_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_2 &#x2b; &#x22; &#x22; &#x2b; last_name_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_3 &#x21;&#x3d; null &#x7c;&#x7c; last_name_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_3 &#x2b; &#x22; &#x22; &#x2b; last_name_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_4 &#x21;&#x3d; null &#x7c;&#x7c; last_name_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_4 &#x2b; &#x22; &#x22; &#x2b; last_name_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_5 &#x21;&#x3d; null &#x7c;&#x7c; last_name_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_5 &#x2b; &#x22; &#x22; &#x2b; last_name_5&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_6 &#x21;&#x3d; null &#x7c;&#x7c; last_name_6 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_6 &#x2b; &#x22; &#x22; &#x2b; last_name_6&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_7 &#x21;&#x3d; null &#x7c;&#x7c; last_name_7 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_7 &#x2b; &#x22; &#x22; &#x2b; last_name_7&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_8 &#x21;&#x3d; null &#x7c;&#x7c; last_name_8 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_8 &#x2b; &#x22; &#x22; &#x2b; last_name_8&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_9 &#x21;&#x3d; null &#x7c;&#x7c; last_name_9 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_9 &#x2b; &#x22; &#x22; &#x2b; last_name_9&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_10 &#x21;&#x3d; null &#x7c;&#x7c; last_name_10 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_10 &#x2b; &#x22; &#x22; &#x2b; last_name_10&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_11 &#x21;&#x3d; null &#x7c;&#x7c; last_name_11 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_11 &#x2b; &#x22; &#x22; &#x2b; last_name_11&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_12 &#x21;&#x3d; null &#x7c;&#x7c; last_name_12 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_12 &#x2b; &#x22; &#x22; &#x2b; last_name_12&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_13 &#x21;&#x3d; null &#x7c;&#x7c; last_name_13 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_13 &#x2b; &#x22; &#x22; &#x2b; last_name_13&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_14 &#x21;&#x3d; null &#x7c;&#x7c; last_name_14 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_14 &#x2b; &#x22; &#x22; &#x2b; last_name_14&#x3b;&#xd;&#xa;&#x7d; else if&#x28;first_name_15 &#x21;&#x3d; null &#x7c;&#x7c; last_name_15 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_name &#x3d; first_name_15 &#x2b; &#x22; &#x22; &#x2b; last_name_15&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;TRX_RCVD &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var TRX_RCVD &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Pending &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	 var Pending &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Duplicate &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Duplicate &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Corrupted &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Corrupted &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Old_Records &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Old_Records &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Ignored &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Ignored &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Mismatched &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Mismatched &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Completed &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Completed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Clicked &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Clicked &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Partially_Completed &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Partially_Completed &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Sent &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Sent &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Abusive &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Abusive &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;avg_rating &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var avg_rating &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Detractors &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Detractors &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Passives &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Passives &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;Promoters &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var Promoters &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;incomplete &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var incomplete &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>total_sent</name>
+        <rename>total_sent</rename>
         <type>Number</type>
         <length>16</length>
         <precision>2</precision>
         <replace>N</replace>
-      </field>      <field>        <name>delta</name>
-        <rename>delta</rename>
+      </field>      <field>        <name>total_TRX_RCVD</name>
+        <rename>total_TRX_RCVD</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>total_clicked</name>
+        <rename>total_clicked</rename>
         <type>Number</type>
         <length>16</length>
         <precision>2</precision>
         <replace>N</replace>
       </field>      <field>        <name>final_agent_id</name>
         <rename>final_agent_id</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_trx_month</name>
+        <rename>final_trx_month</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_report_id</name>
+        <rename>final_report_id</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -2179,20 +2259,14 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
+      </field>      <field>        <name>getCurrentDate</name>
+        <rename>getCurrentDate</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
       </field>      <field>        <name>final_month_val</name>
         <rename>final_month_val</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>final_report_id</name>
-        <rename>final_report_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>final_trx_month</name>
-        <rename>final_trx_month</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -2203,12 +2277,108 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
+      </field>      <field>        <name>TRX_RCVD</name>
+        <rename>TRX_RCVD</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Pending</name>
+        <rename>Pending</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Duplicate</name>
+        <rename>Duplicate</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Corrupted</name>
+        <rename>Corrupted</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Old_Records</name>
+        <rename>Old_Records</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Ignored</name>
+        <rename>Ignored</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Mismatched</name>
+        <rename>Mismatched</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Completed</name>
+        <rename>Completed</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Clicked</name>
+        <rename>Clicked</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Partially_Completed</name>
+        <rename>Partially_Completed</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Sent</name>
+        <rename>Sent</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Abusive</name>
+        <rename>Abusive</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>avg_rating</name>
+        <rename>avg_rating</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Detractors</name>
+        <rename>Detractors</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Passives</name>
+        <rename>Passives</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>Promoters</name>
+        <rename>Promoters</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>      <field>        <name>incomplete</name>
         <rename>incomplete</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>980</xloc>
@@ -2418,8 +2588,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>859</xloc>
-      <yloc>862</yloc>
+      <xloc>1434</xloc>
+      <yloc>821</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2914,9 +3084,8 @@
       </remove>      <remove>        <name>year_data_16</name>
       </remove>      <remove>        <name>last_name_16</name>
       </remove>      <remove>        <name>report_id_16</name>
-      </remove>      <remove>        <name>incomplete</name>
-      </remove>      <meta>        <name>TRX_RCVD</name>
-        <rename>trx_rcvd</rename>
+      </remove>      <meta>        <name>total_TRX_RCVD</name>
+        <rename>trx_rcvd_final</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -3035,7 +3204,7 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>Sent</name>
+      </meta>      <meta>        <name>total_sent</name>
         <rename>sent_count</rename>
         <type>Integer</type>
         <length>-2</length>
@@ -3050,7 +3219,7 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>Clicked</name>
+      </meta>      <meta>        <name>total_clicked</name>
         <rename>clicked_count</rename>
         <type>Integer</type>
         <length>-2</length>
@@ -3290,11 +3459,11 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>incomplete_1</name>
-        <rename>incomplete</rename>
-        <type>Integer</type>
-        <length>16</length>
-        <precision>2</precision>
+      </meta>      <meta>        <name>survey_stats_report_id</name>
+        <rename>survey_stats_report_id</rename>
+        <type>String</type>
+        <length>36</length>
+        <precision>-2</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
         <date_format_locale/>
@@ -3305,10 +3474,10 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>      <meta>        <name>survey_stats_report_id</name>
-        <rename>survey_stats_report_id</rename>
-        <type>String</type>
-        <length>36</length>
+      </meta>      <meta>        <name>incomplete</name>
+        <rename>incomplete</rename>
+        <type>Integer</type>
+        <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
@@ -3454,8 +3623,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>859</xloc>
-      <yloc>645</yloc>
+      <xloc>1434</xloc>
+      <yloc>604</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3834,40 +4003,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>236</xloc>
       <yloc>1272</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort Survey Pre Initiation</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>SURVEY_PRE_INITIATION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>976</xloc>
-      <yloc>427</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4366,8 +4501,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>859</xloc>
-      <yloc>980</yloc>
+      <xloc>1434</xloc>
+      <yloc>939</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4882,7 +5017,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, CUSTOMER_EMAIL&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, STAGE&#xd;&#xa;, STATE&#xd;&#xa;, MOOD&#xd;&#xa;, SURVEY_CLICKED&#xd;&#xa;, SURVEY_COMPLETED_DATE&#xd;&#xa;, SURVEY_TRANSACTION_DATE&#xd;&#xa;, SURVEY_UPDATED_DATE&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, CITY&#xd;&#xa;, COMPLETE_PROFILE_URL&#xd;&#xa;, EDITABLE&#xd;&#xa;, IS_ABUSE_REP_BY_USER&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST&#xd;&#xa;, REMINDER_COUNT&#xd;&#xa;, REMINDERS_FOR_SOCIAL_POSTS&#xd;&#xa;, RETAKE_SURVEY&#xd;&#xa;, REVIEW&#xd;&#xa;, SCORE&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details order by SURVEY_PRE_INTITIATION_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, CUSTOMER_EMAIL&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, SOURCE as SURVEY_SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, STAGE&#xd;&#xa;, STATE&#xd;&#xa;, MOOD&#xd;&#xa;, SURVEY_CLICKED&#xd;&#xa;, SURVEY_COMPLETED_DATE&#xd;&#xa;, SURVEY_TRANSACTION_DATE&#xd;&#xa;, SURVEY_UPDATED_DATE&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, CITY&#xd;&#xa;, COMPLETE_PROFILE_URL&#xd;&#xa;, EDITABLE&#xd;&#xa;, IS_ABUSE_REP_BY_USER&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST&#xd;&#xa;, REMINDER_COUNT&#xd;&#xa;, REMINDERS_FOR_SOCIAL_POSTS&#xd;&#xa;, RETAKE_SURVEY&#xd;&#xa;, REVIEW&#xd;&#xa;, SCORE&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details WHERE STAGE&#x3d;-1 order by AGENT_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -4926,7 +5061,7 @@
     <name>Users</name>
     <type>TableInput</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -4944,6 +5079,42 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>614</xloc>
       <yloc>255</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>delta </name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var delta &#x3d; total_TRX_RCVD - Duplicate - Corrupted - Abusive - total_sent&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;total_sent &#x3e; 0&#x29;&#x7b;&#xd;&#xa; var complete_percentage &#x3d; &#x28;Completed&#x2f;total_sent&#x29;&#x2a;100&#x3b;&#xd;&#xa;&#x7d; else &#x7b;&#xd;&#xa; var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>delta</name>
+        <rename>delta</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>complete_percentage</name>
+        <rename>complete_percentage</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>833</xloc>
+      <yloc>1275</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4967,8 +5138,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>743</xloc>
-      <yloc>1272</yloc>
+      <xloc>715</xloc>
+      <yloc>1268</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -5010,7 +5181,7 @@
       </key>
       <value>
         <name>trx_rcvd</name>
-        <rename>trx_rcvd</rename>
+        <rename>trx_rcvd_final</rename>
         <update>Y</update>
       </value>
       <value>

@@ -760,6 +760,17 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 
                 surveyTransactionReportList.add( surveyTransactionReport.getUserId() );
                 
+                int month = surveyTransactionReport.getMonth();
+                int length = Integer.valueOf(month).toString().length();
+                String monthString = "";
+                if(length == 1){
+                	monthString = "0" + month;
+                }else{
+                	monthString = month+"";
+                }
+                
+                surveyTransactionReportList.add( surveyTransactionReport.getYear() + "_" +  monthString);
+                
                 if(surveyTransactionReport.getNmls() != null && !surveyTransactionReport.getNmls().isEmpty()){
                     surveyTransactionReportList.add( surveyTransactionReport.getNmls() );
                 }else{
@@ -817,6 +828,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 
                 surveyTransactionReportList.add( surveyTransactionReportRegion.getUserId() );
                 
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getMonth() + " " +  surveyTransactionReportRegion.getYear());
+                
                 if(surveyTransactionReportRegion.getNmls() != null && !surveyTransactionReportRegion.getNmls().isEmpty()){
                     surveyTransactionReportList.add( surveyTransactionReportRegion.getNmls() );
                 }else{
@@ -873,6 +886,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 }
                 
                 surveyTransactionReportList.add( surveyTransactionReportBranch.getUserId() );
+                
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getMonth() + " " +  surveyTransactionReportBranch.getYear());
                 
                 if(surveyTransactionReportBranch.getNmls() != null && !surveyTransactionReportBranch.getNmls().isEmpty()){
                     surveyTransactionReportList.add( surveyTransactionReportBranch.getNmls() );
