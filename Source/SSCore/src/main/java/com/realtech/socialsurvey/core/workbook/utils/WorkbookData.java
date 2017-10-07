@@ -778,12 +778,12 @@ public class WorkbookData
                 surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 2 ) ));
                 surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 3 ) ));
                 try {
-                    if(String.valueOf( row.get( 4 ) ) != null && !String.valueOf( row.get( 4 ) ).isEmpty()){
+                    if(String.valueOf( row.get( 4 ) ) != null && !String.valueOf( row.get( 4 ) ).isEmpty() && !String.valueOf( row.get( 4 ) ).equals( "" )){
                         surveyResultsCompanyReportToPopulate.add(date.parse( row.get( 4 ) ));
                     }else{
                         surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
                     }
-                    if(String.valueOf( row.get( 5 ) ) != null && !String.valueOf( row.get( 5 ) ).isEmpty()){
+                    if(String.valueOf( row.get( 5 ) ) != null && !String.valueOf( row.get( 5 ) ).isEmpty() && !String.valueOf( row.get( 5 ) ).equals( "" )){
                         surveyResultsCompanyReportToPopulate.add(date.parse( row.get( 5 ) ));
                     }else{
                         surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
