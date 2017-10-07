@@ -1020,7 +1020,7 @@ public class WorkbookData
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 22 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 23 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 24 ) ));
-     
+            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 25 ) ));
 
 
             surveyTransactionData.put(++surveyTransactionCounter ,surveyTransactionReportToPopulate );
@@ -1031,6 +1031,7 @@ public class WorkbookData
         // Setting up user sheet headers
         surveyTransactionReportToPopulate.add( "Name" );
         surveyTransactionReportToPopulate.add( "User ID" );
+        surveyTransactionReportToPopulate.add( "TRX_MONTH" );
         surveyTransactionReportToPopulate.add( "NMLS" );
         surveyTransactionReportToPopulate.add( "License ID" );
         surveyTransactionReportToPopulate.add( "Company Name" );
