@@ -778,10 +778,18 @@ public class WorkbookData
                 surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 2 ) ));
                 surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 3 ) ));
                 try {
-                    surveyResultsCompanyReportToPopulate.add(date.parse( row.get( 4 ) ));
-                    surveyResultsCompanyReportToPopulate.add(date.parse( row.get( 5 ) ));
+                    if(String.valueOf( row.get( 4 ) ) != null && !String.valueOf( row.get( 4 ) ).isEmpty()){
+                        surveyResultsCompanyReportToPopulate.add(date.parse( row.get( 4 ) ));
+                    }else{
+                        surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
+                    }
+                    if(String.valueOf( row.get( 5 ) ) != null && !String.valueOf( row.get( 5 ) ).isEmpty()){
+                        surveyResultsCompanyReportToPopulate.add(date.parse( row.get( 5 ) ));
+                    }else{
+                        surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
+                    }
                 } catch ( ParseException e ) {
-                    LOG.error( "Error while parsing the data fetched from mongo for survey count", e );
+                    LOG.error( "Error while parsing the date fetched from survey results company for report", e );
                 }
                 surveyResultsCompanyReportToPopulate.add(Integer.valueOf( row.get( 6 ) ));
                 surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 7 ) ));
@@ -1020,7 +1028,7 @@ public class WorkbookData
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 22 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 23 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 24 ) ));
-     
+            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 25 ) ));
 
 
             surveyTransactionData.put(++surveyTransactionCounter ,surveyTransactionReportToPopulate );
