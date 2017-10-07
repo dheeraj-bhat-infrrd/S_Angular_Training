@@ -25,7 +25,7 @@ public class SurveyResponseTableDaoImpl extends GenericReportingDaoImpl<SurveyRe
 	private static final Logger LOG = LoggerFactory.getLogger( SurveyResponseTableDaoImpl.class );
 	
 	private static final String getSurveyResponseByCompanyIdQuery = "select sr.SURVEY_DETAILS_ID,sr.answer"
-        + " from survey_results_company_report srcr " + "inner join survey_response sr on srcr.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID"+" where srcr.COMPANY_ID = ? order by sr.SURVEY_DETAILS_ID";
+        + " from survey_results_company_report srcr " + "inner join survey_response sr on srcr.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID"+" where srcr.COMPANY_ID = ? order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID";
 	
 	@Override
 	public List<SurveyResponseTable> fetchSurveyResponsesBySurveyDetailsId(String surveyDetailsId) {
