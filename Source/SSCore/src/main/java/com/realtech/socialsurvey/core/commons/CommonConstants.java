@@ -132,7 +132,7 @@ public interface CommonConstants
     //Reporting status in file upload table 
     public static final int STATUS_PENDING = 1;
     public static final int STATUS_DONE = 0;
-    public static final int STATUS_FAIL = 2;
+    public static final int STATUS_FAIL = 4; // changing the status failed to 4 since the status under processing is 2
     public static final int STATUS_DELETE = 3;
 
     public static final int IS_PRIMARY_FALSE = 0;

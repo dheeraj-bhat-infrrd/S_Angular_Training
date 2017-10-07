@@ -1060,8 +1060,10 @@ function getStatusString(status){
 			break;
 		case 0: statusString='Download';
 			break;
-		case 2: statusString='Failed';
+		case 2: statusString='Pending';
 			break;
+		case 4: statusString='Failed';
+		break;
 		default: statusString='Failed'
 		}
 		return statusString;
@@ -1095,7 +1097,7 @@ function drawRecentActivity(start,batchSize,tableHeader){
 		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"downloadLink"+i+"\"class='txt-bold tbl-blue-text downloadLink cursor-pointer'>"+statusString+"</a></td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
 			+"</tr>";
-		}else if(recentActivityList[i][6]==2){
+		}else if(recentActivityList[i][6]==4){
 			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
 			+"</tr>";
