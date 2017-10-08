@@ -552,7 +552,7 @@
  <negated>N</negated>
  <leftvalue>PRESENT_YEAR</leftvalue>
  <function>&#x3c;&#x3e;</function>
- <rightvalue>Year_Data_1</rightvalue>
+ <rightvalue>Year_Data</rightvalue>
  </condition>
     </compare>
      <cluster_schema/>
@@ -941,7 +941,7 @@
           <name>AGENT_ID</name>
         </field>
         <field>
-          <name>Year_Data_1</name>
+          <name>Year_Data</name>
         </field>
       </group>
       <fields>
@@ -1185,7 +1185,7 @@
     </keys_1>
     <keys_2>
       <key>AGENT_ID</key>
-      <key>Year_Data_1</key>
+      <key>Year_Data</key>
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1266,7 +1266,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var total_sent &#x3d; Sent &#x2b; Completed&#xd;&#xa;if&#x28; total_sent&#x21;&#x3d; 0 &#x26;&#x26; total_sent &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;		complete_percentage &#x3d; &#x28;Completed&#x2f; total_sent&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID_temp &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_COMB &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp  &#x3d;AGENT_ID_COMB&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var COMPANY_ID_temp &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp  &#x3d; COMPANY_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var year_data_temp &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	year_data_temp &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	year_data_temp  &#x3d; Year_Data&#xd;&#xa;&#x7d;else if&#x28;year_data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	year_data_temp  &#x3d; year_data_2&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var total_sent &#x3d; Sent &#x2b; Completed&#xd;&#xa;if&#x28; total_sent&#x21;&#x3d; 0 &#x26;&#x26; total_sent &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;		complete_percentage &#x3d; &#x28;Completed&#x2f; total_sent&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID_temp &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_COMB &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp  &#x3d;AGENT_ID_COMB&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var COMPANY_ID_temp &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp  &#x3d; COMPANY_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var year_data_temp &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	year_data_temp &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	year_data_temp  &#x3d; Year_Data&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>complete_percentage</name>
         <rename>complete_percentage</rename>
         <type>Number</type>
@@ -1331,6 +1331,35 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>221</xloc>
       <yloc>22</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Multiway Merge Join</name>
+    <type>MultiwayMergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <join_type>FULL OUTER</join_type>
+    <step0>Sort rows 2</step0>
+    <step1>Sort rows 2 2</step1>
+    <step2>Sort rows 2 3</step2>
+    <number_input>3</number_input>
+    <keys>
+      <key>AGENT_ID_temp,year_data_temp</key>
+      <key>AGENT_ID_COMB,Year_Data</key>
+      <key>AGENT_ID_COMB,Year_Data</key>
+    </keys>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1645</xloc>
+      <yloc>373</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2152,7 +2181,7 @@
         <presorted>N</presorted>
       </field>
       <field>
-        <name>Year_Data_1</name>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2386,7 +2415,7 @@
         <presorted>N</presorted>
       </field>
       <field>
-        <name>Year_Data_1</name>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2685,7 +2714,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;,EMAIL_ID&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, CREATED_ON&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM users&#xd;&#xa;where status in &#x28;1,2&#x29;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;,EMAIL_ID&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, CREATED_ON&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS User_Year_Data&#xd;&#xa;FROM users&#xd;&#xa;where status in &#x28;1,2&#x29;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2744,7 +2773,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var  year_arr &#x3d; &#x5b;&#x5d;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;USER_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var index&#x3d;0&#x3b;&#xd;&#xa;   for&#x28;var year_val &#x3d; Year_Data  &#x3b;  year_val &#x3c;  PRESENT_YEAR &#x3b; year_val&#x2b;&#x2b;&#x29;&#x7b;&#xd;&#xa;					year_arr&#x5b;index&#x2b;&#x2b;&#x5d; &#x3d; year_val&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var  year_arr &#x3d; &#x5b;&#x5d;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;USER_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var index&#x3d;0&#x3b;&#xd;&#xa;   for&#x28;var year_val &#x3d; User_Year_Data  &#x3b;  year_val &#x3c;  PRESENT_YEAR &#x3b; year_val&#x2b;&#x2b;&#x29;&#x7b;&#xd;&#xa;					year_arr&#x5b;index&#x2b;&#x2b;&#x5d; &#x3d; year_val&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>year_arr</name>
         <rename>year_arr</rename>
         <type>String</type>
@@ -2947,35 +2976,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1812</xloc>
       <yloc>836</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <join_type>FULL OUTER</join_type>
-    <step0>Sort rows 2</step0>
-    <step1>Sort rows 2 2</step1>
-    <step2>Sort rows 2 3</step2>
-    <number_input>3</number_input>
-    <keys>
-      <key>AGENT_ID_temp,year_data_temp</key>
-      <key>AGENT_ID_COMB,Year_Data</key>
-      <key>AGENT_ID_COMB,Year_Data</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1645</xloc>
-      <yloc>373</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
