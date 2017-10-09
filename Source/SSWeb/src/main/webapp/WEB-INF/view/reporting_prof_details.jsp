@@ -107,36 +107,12 @@
 
 <script>
 	$(document).ready(function(){
-		$('#rep-pro-cmplt-stars').on('click', '#dsh-btn2', function(e) {
-			e.stopPropagation();
-			var buttonId = 'dsh-btn2';
-			var task = $('#dsh-btn2').data('social');
-			dashboardButtonAction(buttonId, task, colName, colValue);
-			$('#rep-social-media').fadeOut(500);
-			delay(function(){
-				e.stopPropagation();
-				var currentProfileName = $('#prof-container').attr('data-column-name');
-				var currentProfileValue = $('#prof-container').attr('data-column-value');
-				changeSocialMedia(currentProfileName, currentProfileValue);
-			},500);
-		});
-		
 		$(document).on('click','#prof-company-review-count',function(e){
 			e.stopPropagation();
 			activaTab('reviews-tab');
 			delay(function(){
 				$(window).scrollTop($('#rep-reviews-container').offset().top);
 			},300);
-		});
-		
-		$('#rep-social-media').on('click','#rep-dismiss-social-media',function(e){
-			$('#rep-social-media').fadeOut(500);
-			delay(function(){
-				e.stopPropagation();
-				var currentProfileName = $('#prof-container').attr('data-column-name');
-				var currentProfileValue = $('#prof-container').attr('data-column-value');
-				changeSocialMedia(currentProfileName, currentProfileValue);
-			},500);
 		});
 	});
 </script>
