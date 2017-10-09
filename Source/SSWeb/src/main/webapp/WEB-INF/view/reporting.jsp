@@ -166,8 +166,6 @@
 		
 		paintForReportingDash()
 		
-		$(window).resize();
-		
 	$('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
 			e.stopPropagation();
 			if (colName == 'agentId') {
@@ -197,6 +195,8 @@
 			$('#overviewSuccess').show();
 			$('#overviewFailure').hide();
 		}
+		
+		$(window).resize();
 		
 	//Score stats
 		var entityType = "${columnName}";
