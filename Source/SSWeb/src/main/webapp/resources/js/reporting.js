@@ -41,9 +41,16 @@ function paintForReportingDash() {
 	
 	//Paint the transactions section of the reporting the dashboard
 	if(overviewYearData!=null && !isEmpty(overviewYearData)){
-		drawUnclickedDonutChart(overviewYearData);
-		drawProcessedDonutChart(overviewYearData);
-		drawUnprocessedDonutChart(overviewYearData);
+		if($('#donutchart').length > 0 ){
+	 		drawUnclickedDonutChart(overviewYearData);
+	 	}
+	 	if($('#processedDonutchart').length > 0 ){
+	 		drawProcessedDonutChart(overviewYearData);
+	 	}
+		
+	 	if($('#unprocessedDonutchart').length > 0 ){
+	 		drawUnprocessedDonutChart(overviewYearData);
+	 	}
 		$('#processed-lbl-span').html(overviewYearData.Processed);
 		$('#completed-lbl-span').html(overviewYearData.Completed+' ('+overviewYearData.CompletePercentage+'%)');
 		$('#incomplete-lbl-span').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
@@ -62,9 +69,16 @@ function paintForReportingDash() {
 		$('#unprocessed-trans-graph').addClass('hide');
 		$('#empty-rep-chart-div').addClass('hide');
 	}else{
-		drawUnclickedDonutChart(overviewYearData);
-		drawProcessedDonutChart(overviewYearData);
-		drawUnprocessedDonutChart(overviewYearData);
+		if($('#donutchart').length > 0 ){
+	 		drawUnclickedDonutChart(overviewYearData);
+	 	}
+	 	if($('#processedDonutchart').length > 0 ){
+	 		drawProcessedDonutChart(overviewYearData);
+	 	}
+		
+	 	if($('#unprocessedDonutchart').length > 0 ){
+	 		drawUnprocessedDonutChart(overviewYearData);
+	 	}
 		$('#processed-lbl-span').html(0);
 		$('#completed-lbl-span').html(0+' ('+0+'%)');
 		$('#incomplete-lbl-span').html(0+' ('+0+'%)');
@@ -1265,9 +1279,16 @@ function updateReportingDashboard(){
 	$('#corrupted-lbl-rect').hide();
 	$('#other-lbl-rect').hide();
 	
-	drawUnclickedDonutChart(overviewYearData);
-	drawProcessedDonutChart(overviewYearData);
-	drawUnprocessedDonutChart(overviewYearData);
+	if($('#donutchart').length > 0 ){
+ 		drawUnclickedDonutChart(overviewYearData);
+ 	}
+ 	if($('#processedDonutchart').length > 0 ){
+ 		drawProcessedDonutChart(overviewYearData);
+ 	}
+	
+ 	if($('#unprocessedDonutchart').length > 0 ){
+ 		drawUnprocessedDonutChart(overviewYearData);
+ 	}
 	$(window).resize();
 	hideOverlay();
 	

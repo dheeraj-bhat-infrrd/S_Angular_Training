@@ -21,8 +21,8 @@
 <script>
 $(document).ready(function() {
 	
-	var currentProfileName = $('#prof-container').attr('data-column-name');
-	var currentProfileValue = $('#prof-container').attr('data-column-value');
+	var currentProfileName = $('#rep-prof-container').attr('data-column-name');
+	var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
 	
 	var scrollContainer = document.getElementById('dsh-inc-srvey');
 	scrollContainer.onscroll = function() {
