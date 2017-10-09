@@ -88,6 +88,9 @@ public class EmailServicesImpl implements EmailServices
 
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
+    
+    @Value ( "${CURRENT_PROFILE}")
+    private String currentProfile;
 
     @Autowired
     private UrlService urlService;
@@ -680,7 +683,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements
             .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FATAL_EXCEPTION_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, stackTrace ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, currentProfile, stackTrace ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
@@ -2388,7 +2391,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements
             .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FATAL_EXCEPTION_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, stackTrace ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, currentProfile, stackTrace ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
