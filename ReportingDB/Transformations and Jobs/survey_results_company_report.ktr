@@ -150,9 +150,8 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -167,24 +166,23 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
-    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
-    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
-    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -579,7 +577,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;company&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -613,7 +611,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;agent&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -647,7 +645,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;region&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -681,7 +679,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, CREATED_ON_EST AS CREATED_ON&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;WHERE SURVEY_PRE_INITIATION_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -711,7 +709,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;FROM users&#xd;&#xa;WHERE USER_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -741,7 +739,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;branch&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -913,7 +911,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <join_type>INNER</join_type>
+    <join_type>FULL OUTER</join_type>
     <step0>Sort user</step0>
     <step1>Sort branch</step1>
     <step2>Sort surveyPreinitiation</step2>
@@ -2748,7 +2746,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT BRANCH_ID,BRANCH FROM branch WHERE BRANCH_ID IN&#x28;&#xd;&#xa;SELECT BRANCH_ID&#xd;&#xa;FROM user_profile&#xd;&#xa;WHERE USER_ID&#x3d;&#x3f;&#x29; AND IS_DEFAULT_BY_SYSTEM &#x3d; 0</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -2778,7 +2776,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT REGION_ID,REGION FROM region WHERE REGION_ID IN&#x28;&#xd;&#xa;SELECT REGION_ID&#xd;&#xa;FROM user_profile&#xd;&#xa;WHERE USER_ID&#x3d;&#x3f;&#x29; AND IS_DEFAULT_BY_SYSTEM &#x3d; 0</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
