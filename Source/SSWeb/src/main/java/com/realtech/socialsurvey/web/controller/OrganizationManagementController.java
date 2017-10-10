@@ -801,6 +801,10 @@ public class OrganizationManagementController
                 model.addAttribute("sendEmailThrough",companySettings.getSendEmailThrough()); 
             }
 
+            // add send monthly digest email flag
+            if( CommonConstants.ENTITY_TYPE_COLUMN.equals( entityType ) ){
+                model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
+            }
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
