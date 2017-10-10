@@ -307,12 +307,19 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT );            
         }
         
+        //get the time 23:59:59 in milliseconds
+        long duration = (((23*60)*60)+(59*60)+59)*1000;
+               
         if ( startDate != null ) {
             fileUpload.setStartDate(new Timestamp(startDate.getTime()) );            
         }
         if ( endDate != null ) {
-            fileUpload.setEndDate( new Timestamp( endDate.getTime() ) );          
+        	Timestamp endTimeStamp = new Timestamp(endDate.getTime());
+        	//add the the duration(23:59:59 in milliseconds) to the current endDate timestamp and store it 
+            endTimeStamp.setTime(endTimeStamp.getTime()+duration);
+            fileUpload.setEndDate( endTimeStamp);          
         }
+        
         fileUpload.setProfileValue( entityId );
         fileUpload.setProfileLevel( entityType );
         fileUpload.setStatus( CommonConstants.STATUS_PENDING );
