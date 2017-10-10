@@ -4591,7 +4591,7 @@ function updateSendDigestMailSiteSetting(issenddigestmailenabled, disableEle) {
 	};
 	
 	callAjaxPostWithPayloadData("./updatesenddigestmailtoggle.do",function(data) {
-		if (data) {
+		if (data == "true") {
 			$('#overlay-toast').html("Send Monthly Digest Mail toggle Updated Sucessfully.");
 		} else {
 			$('#overlay-toast').html("Unable update send Monthly Digest Mail.");

@@ -1670,7 +1670,7 @@ public class OrganizationManagementController
      */
     @RequestMapping ( value = "/updatesenddigestmailtoggle", method = RequestMethod.POST)
     @ResponseBody
-    public boolean updateSendMonthlyDigestMailToggle( HttpServletRequest request )
+    public String updateSendMonthlyDigestMailToggle( HttpServletRequest request )
     {
         LOG.info( "Method updateSendMonthlyDigestMailToggle started" );
         HttpSession session = request.getSession();
@@ -1678,19 +1678,19 @@ public class OrganizationManagementController
         if ( !CommonConstants.COMPANY_ID_COLUMN
             .equals( (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN ) ) ) {
             LOG.error( "This is a company level settings and can to be set at any other hierarchy." );
-            return false;
+            return "false";
         }
 
         long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
 
         try {
-            return reportingDashboardManagement.updateSendDigestMailToggle( companyId,
-                Boolean.parseBoolean( request.getParameter( "sendMonthlyDigestMail" ) ) );
+            return String.valueOf( reportingDashboardManagement.updateSendDigestMailToggle( companyId,
+                Boolean.parseBoolean( request.getParameter( "sendMonthlyDigestMail" ) ) ) );
         } catch ( Exception error ) {
             LOG.error(
                 "Exception occured in updateSendMonthlyDigestMailToggle() while updating send montlhy digest mail flag. Nested exception is ",
                 error );
-            return false;
+            return "false";
         }
     }
 
