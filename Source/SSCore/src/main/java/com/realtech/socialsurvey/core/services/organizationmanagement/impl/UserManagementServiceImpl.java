@@ -4657,6 +4657,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( user.getStatus() == CommonConstants.STATUS_INACTIVE ) {
             survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD );
             survey.setErrorCode( SurveyErrorCode.USER_DELETED.name() );
+            survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiationDao.update( survey );
             return true;
         }
