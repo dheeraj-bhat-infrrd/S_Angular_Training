@@ -802,7 +802,7 @@ public class OrganizationManagementController
             }
 
             // add send monthly digest email flag
-            if( CommonConstants.ENTITY_TYPE_COLUMN.equals( entityType ) ){
+            if( CommonConstants.COMPANY_ID_COLUMN.equals( entityType ) ){
                 model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
             }
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
