@@ -177,7 +177,7 @@
 						<div id="pst-srvy-div" class="pst-srvy">
 							<div id="shr-post-chk-box" class="float-left bd-check-img"></div>
 -							<input type="hidden" id="shr-pst-cb" name="sharepost" value="true">
-							<div class="float-left bd-check-txt"><spring:message code="label.survey.authorize.key"/></div>
+							<div class="float-left bd-check-txt survey-authorize-font-size"><spring:message code="label.survey.authorize.key"/></div>
 						</div>
 						<div class="sq-np-wrapper clearfix">
 							<div id="prev-textarea-smiley" class="float-left sq-np-item sq-np-item-prev btn-com"><spring:message code="label.prev.btn.key"/></div>
