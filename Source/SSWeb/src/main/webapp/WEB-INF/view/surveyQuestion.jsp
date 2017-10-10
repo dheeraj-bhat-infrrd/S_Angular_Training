@@ -75,7 +75,7 @@
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
-						<div id="sq-stars" class="sq-star-wrapper clearfix">
+						<div id="sq-stars" class="sq-star-wrapper clearfix" selected-star-no="">
 							<div star-no="1" class="sq-star opacity-red"></div>
 							<div star-no="2" class="sq-star opacity-red"></div>
 							<div star-no="3" class="sq-star opacity-red"></div>
@@ -95,7 +95,7 @@
 						<i><span id="ques-text-smiley" class="sq-ques-txt"></span></i>
 					</div>
 					<div class="sq-bord-bot-sm"></div>
-					<div id="sq-smiles" class="sq-rat-wrapper">
+					<div id="sq-smiles" class="sq-rat-wrapper" selected-smiles-no="">
 						<div class="sq-star-wrapper clearfix">
 							<div smile-no="1" class="sq-smile sq-smile-1 opacity-red"></div>
 							<div smile-no="2" class="sq-smile sq-smile-2 opacity-red"></div>
@@ -177,7 +177,7 @@
 						<div id="pst-srvy-div" class="pst-srvy">
 							<div id="shr-post-chk-box" class="float-left bd-check-img"></div>
 -							<input type="hidden" id="shr-pst-cb" name="sharepost" value="true">
-							<div class="float-left bd-check-txt"><spring:message code="label.survey.authorize.key"/></div>
+							<div class="float-left bd-check-txt survey-authorize-font-size"><spring:message code="label.survey.authorize.key"/></div>
 						</div>
 						<div class="sq-np-wrapper clearfix">
 							<div id="prev-textarea-smiley" class="float-left sq-np-item sq-np-item-prev btn-com"><spring:message code="label.prev.btn.key"/></div>

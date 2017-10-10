@@ -5640,6 +5640,11 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	text-align: left;
 }
 
+.survey-authorize-font-size{
+	font-size:16px;	
+	line-height:20px !important;
+}
+
 .bd-check-txt-disclaimer {
 	display: flex;
 	font-family: opensanslight;
@@ -7956,7 +7961,7 @@ tr.u-tbl-header td {
 .pst-srvy {
 	width: 490px;
 	max-width: 50%;
-	height: 50px;
+	height: 100px;
 	margin: 0 auto;
 	padding: 0 10px;
 }
@@ -9694,7 +9699,7 @@ ul.accordion li>a:before {
     width: 140px;
     color: #666;
     text-align: left;
-    top: 163px;
+    top: 232px;
     right: 114px;
     max-height: 400px;
     box-shadow: 3px 3px 30px #444;

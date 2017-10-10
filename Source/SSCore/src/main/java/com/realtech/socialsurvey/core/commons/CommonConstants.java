@@ -132,7 +132,7 @@ public interface CommonConstants
     //Reporting status in file upload table 
     public static final int STATUS_PENDING = 1;
     public static final int STATUS_DONE = 0;
-    public static final int STATUS_FAIL = 2;
+    public static final int STATUS_FAIL = 4; // changing the status failed to 4 since the status under processing is 2
     public static final int STATUS_DELETE = 3;
 
     public static final int IS_PRIMARY_FALSE = 0;
@@ -325,6 +325,7 @@ public interface CommonConstants
     public static final String AGREE_SHARE_COLUMN_TRUE = "true";
     public static final String AGREE_SHARE_COLUMN_FALSE = "false";
     public static final String PROFILE_IMAGE_THUMBNAIL_COLUMN = "profileImageUrlThumbnail";
+    public static final String PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN = "profileImageUrlRectangularThumbnail";
     public static final String LOGO_THUMBNAIL_COLUMN = "logoThumbnail";
     public static final String IS_PROFILE_IMAGE_PROCESSED_COLUMN = "isProfileImageProcessed";
     public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN = "isLogoImageProcessed";
@@ -504,7 +505,7 @@ public interface CommonConstants
     public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
     public static final float DEFAULT_COMPLAINT_RES_SCORE = 2.5f;
     public static final int DEFAULT_REMINDERMAIL_INTERVAL = 3;
-    public static final int DEFAULT_MAX_REMINDER_COUNT = 1;
+    public static final int DEFAULT_MAX_REMINDER_COUNT = 3;
     public static final int DEFAULT_SOCIAL_POST_REMINDERMAIL_INTERVAL = 1;
     public static final int DEFAULT_MAX_SOCIAL_POST_REMINDER_COUNT = 1;
     public static final String USER_SELECTION_TYPE_SINGLE = "single";
@@ -891,6 +892,7 @@ public interface CommonConstants
 
     public static final String SURVEY_REMINDER_COUNT = "reminderCounts";
     public static final String SURVEY_REMINDER_INTERVAL = "reminderInterval";
+    public static final String IS_SURVEY_REMINDER_DISABLED = "isReminderDisabled";
 
     //Session variable
     public static final String REALTECH_USER_ID = "realTechAdminId";
@@ -1357,6 +1359,7 @@ public interface CommonConstants
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
     public static final String SURVEY_RESULTS_IS_DELETED = "isDeleted";
     public static final String TRX_MONTH = "trxMonth";
+    public static final String SURVEY_RESULTS_COMPLETED_DATE = "surveyCompletedDate";
     
     public static final String THIS_MONTH="thisMonth";
     public static final String THIS_YEAR="thisYear";
@@ -1388,7 +1391,8 @@ public interface CommonConstants
     public static final int MONTH_OFFSET = 3;
     public static final int YEAR_OFFSET = -1;
     
-    
+    public static final String SQUARE_THUMBNAIL = "squareThumbnail";
+    public static final String RECTANGULAR_THUMBNAIL = "rectangularThumbnail";
     
     //Digest
     public static final String MONTH = "month";

@@ -165,8 +165,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${APPLICATION_LOGO_URL}")
     private String appLogoUrl;
 
-    @Value ( "${MAX_SURVEY_REMINDERS}")
-    private int maxSurveyReminders;
+    @Value ( "${MAX_AUTO_SURVEY_REMINDERS}")
+    private int maxAutoSurveyReminders;
 
     @Value ( "${VALID_SURVEY_INTERVAL}")
     private int validSurveyInterval;
@@ -608,34 +608,38 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     @Transactional
-    public Map<String, Integer> getReminderInformationForCompany( long companyId )
+    public Map<String, Object> getReminderInformationForCompany( long companyId )
     {
         LOG.debug( "Inside method getReminderInformationForCompany" );
-        Map<String, Integer> map = new HashMap<String, Integer>();
+        Map<String, Object> map = new HashMap<String, Object>();
         int reminderInterval = 0;
         int maxReminders = 0;
+        boolean isReminderDisabled = false;
+        
         OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao
             .fetchOrganizationUnitSettingsById( companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         if ( organizationUnitSettings != null ) {
             SurveySettings surveySettings = organizationUnitSettings.getSurvey_settings();
             if ( surveySettings != null ) {
-                if ( !surveySettings.getIsReminderDisabled() && surveySettings.getSurvey_reminder_interval_in_days() > 0 ) {
+                //set reminder interval
+                if (  surveySettings.getSurvey_reminder_interval_in_days() > 0 ) {
                     reminderInterval = surveySettings.getSurvey_reminder_interval_in_days();
-                    maxReminders = surveySettings.getMax_number_of_survey_reminders();
                 }
+                //set is reminder disabled
+                isReminderDisabled = surveySettings.getIsReminderDisabled();
             }
         }
 
-        if ( maxReminders == 0 ) {
-            LOG.debug( "No Reminder count found for company " + companyId + " hence setting default value" );
-            maxReminders = maxSurveyReminders;
-        }
+        //set max reminder to the default value for auto reminder.
+        maxReminders = maxAutoSurveyReminders;
+        
         if ( reminderInterval == 0 ) {
             LOG.debug( "No Reminder interval found for company " + companyId + " hence setting default value " );
             reminderInterval = surveyReminderInterval;
         }
 
+        map.put( CommonConstants.IS_SURVEY_REMINDER_DISABLED, isReminderDisabled );
         map.put( CommonConstants.SURVEY_REMINDER_COUNT, maxReminders );
         map.put( CommonConstants.SURVEY_REMINDER_INTERVAL, reminderInterval );
         return map;

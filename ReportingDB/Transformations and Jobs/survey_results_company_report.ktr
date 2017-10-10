@@ -579,7 +579,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;company&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -613,7 +613,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;agent&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -647,7 +647,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;region&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -681,7 +681,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, CREATED_ON_EST AS CREATED_ON&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;WHERE SURVEY_PRE_INITIATION_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -711,7 +711,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;FROM users&#xd;&#xa;WHERE USER_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -741,7 +741,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;branch&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -913,7 +913,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <join_type>INNER</join_type>
+    <join_type>FULL OUTER</join_type>
     <step0>Sort user</step0>
     <step1>Sort branch</step1>
     <step2>Sort surveyPreinitiation</step2>
@@ -951,10 +951,10 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>survey_results_company_report</table>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
+    <use_batch>N</use_batch>
     <specify_fields>Y</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
     <partitioning_field/>
@@ -2563,10 +2563,10 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>survey_results_company_report</table>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
+    <use_batch>N</use_batch>
     <specify_fields>Y</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
     <partitioning_field/>
@@ -2696,7 +2696,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
+    <commit>10000</commit>
     <use_batch>N</use_batch>
     <error_ignored>N</error_ignored>
     <ignore_flag_field/>
@@ -2748,7 +2748,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT BRANCH_ID,BRANCH FROM branch WHERE BRANCH_ID IN&#x28;&#xd;&#xa;SELECT BRANCH_ID&#xd;&#xa;FROM user_profile&#xd;&#xa;WHERE USER_ID&#x3d;&#x3f;&#x29; AND IS_DEFAULT_BY_SYSTEM &#x3d; 0</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -2778,7 +2778,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT REGION_ID,REGION FROM region WHERE REGION_ID IN&#x28;&#xd;&#xa;SELECT REGION_ID&#xd;&#xa;FROM user_profile&#xd;&#xa;WHERE USER_ID&#x3d;&#x3f;&#x29; AND IS_DEFAULT_BY_SYSTEM &#x3d; 0</sql>
-    <outer_join>N</outer_join>
+    <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>

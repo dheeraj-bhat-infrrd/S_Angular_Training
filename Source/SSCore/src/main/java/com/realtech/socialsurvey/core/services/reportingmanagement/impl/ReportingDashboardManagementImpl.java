@@ -324,13 +324,18 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT );
-        }
-
+        }    
+        //get the time 23:59:59 in milliseconds
+        long duration = (((23*60)*60)+(59*60)+59)*1000;
+               
         if ( startDate != null ) {
             fileUpload.setStartDate( new Timestamp( startDate.getTime() ) );
         }
         if ( endDate != null ) {
-            fileUpload.setEndDate( new Timestamp( endDate.getTime() ) );
+        	Timestamp endTimeStamp = new Timestamp(endDate.getTime());
+        	//add the the duration(23:59:59 in milliseconds) to the current endDate timestamp and store it 
+            endTimeStamp.setTime(endTimeStamp.getTime()+duration);
+            fileUpload.setEndDate( endTimeStamp);          
         }
         fileUpload.setProfileValue( entityId );
         fileUpload.setProfileLevel( entityType );
@@ -805,8 +810,19 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 }
 
                 surveyTransactionReportList.add( surveyTransactionReport.getUserId() );
-
-                if ( surveyTransactionReport.getNmls() != null && !surveyTransactionReport.getNmls().isEmpty() ) {
+                
+                int month = surveyTransactionReport.getMonth();
+                int length = Integer.valueOf(month).toString().length();
+                String monthString = "";
+                if(length == 1){
+                	monthString = "0" + month;
+                }else{
+                	monthString = month+"";
+                }
+                
+                surveyTransactionReportList.add( surveyTransactionReport.getYear() + "_" +  monthString);
+                
+                if(surveyTransactionReport.getNmls() != null && !surveyTransactionReport.getNmls().isEmpty()){
                     surveyTransactionReportList.add( surveyTransactionReport.getNmls() );
                 } else {
                     surveyTransactionReportList.add( "" );
@@ -864,8 +880,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 }
 
                 surveyTransactionReportList.add( surveyTransactionReportRegion.getUserId() );
-
-                if ( surveyTransactionReportRegion.getNmls() != null && !surveyTransactionReportRegion.getNmls().isEmpty() ) {
+                
+                surveyTransactionReportList.add( surveyTransactionReportRegion.getMonth() + " " +  surveyTransactionReportRegion.getYear());
+                
+                if(surveyTransactionReportRegion.getNmls() != null && !surveyTransactionReportRegion.getNmls().isEmpty()){
                     surveyTransactionReportList.add( surveyTransactionReportRegion.getNmls() );
                 } else {
                     surveyTransactionReportList.add( "" );
@@ -927,8 +945,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 }
 
                 surveyTransactionReportList.add( surveyTransactionReportBranch.getUserId() );
-
-                if ( surveyTransactionReportBranch.getNmls() != null && !surveyTransactionReportBranch.getNmls().isEmpty() ) {
+                
+                surveyTransactionReportList.add( surveyTransactionReportBranch.getMonth() + " " +  surveyTransactionReportBranch.getYear());
+                
+                if(surveyTransactionReportBranch.getNmls() != null && !surveyTransactionReportBranch.getNmls().isEmpty()){
                     surveyTransactionReportList.add( surveyTransactionReportBranch.getNmls() );
                 } else {
                     surveyTransactionReportList.add( "" );

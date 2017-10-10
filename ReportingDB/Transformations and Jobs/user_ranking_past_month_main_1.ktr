@@ -76,6 +76,33 @@
   <notepads>
   </notepads>
   <connection>
+    <name>Local instance MySQL57</name>
+    <server>&#x24;&#x7b;mysql_host &#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;mysql_schema_name &#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no &#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password &#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no &#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
     <name>SS_Centralized_Mysql_Conn</name>
     <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
@@ -88,13 +115,39 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
       <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;CENTRALIZED_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
+    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
+    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
+    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -116,29 +169,22 @@
   <hop> <from>Filter rows 2</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 2 2</from><to>Sort rows 4</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 2 2 2</from><to>Sort rows 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 4</from><to>GroupByZillow</to><enabled>Y</enabled> </hop>
   <hop> <from>FilterCompleted</from><to>Sort rowsCompleted</to><enabled>Y</enabled> </hop>
   <hop> <from>Generate random value</from><to>Table output</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupByAgentId</from><to>Sort rows 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupByMood</from><to>jsForMood</to><enabled>Y</enabled> </hop>
-  <hop> <from>GroupByZillow</from><to>SortAgent 5</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupCompleted</from><to>Filter rows 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupSent</from><to>Filter rows 2 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 2</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
   <hop> <from>MergeSurveyDetailsID</from><to>Filter rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Multiway Merge Join</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>jsForMainValues</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows</from><to>Memory Group by</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 2 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 2 3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 3</from><to>GroupByAgentId</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 4</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 5</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rowsCompleted</from><to>GroupCompleted</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rowsSent</from><to>GroupSent</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortAgent 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SortMood</from><to>GroupByMood</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveyPreInitiation</from><to>Sort rows 7</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForMood</from><to>Sort rows 3</to><enabled>Y</enabled> </hop>
@@ -148,7 +194,6 @@
   <hop> <from>SurveyResponse</from><to>Sort rows 10</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 10</from><to>MergeSurveyDetailsID</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 10 2</from><to>MergeSurveyDetailsID</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 7 2 2 2</from><to>Filter rows 4</to><enabled>Y</enabled> </hop>
   <hop> <from>If field value is null</from><to>Generate random value</to><enabled>Y</enabled> </hop>
   <hop> <from>DatabaseId</from><to>Database join FOR NMLS</to><enabled>Y</enabled> </hop>
   <hop> <from>Database join FOR NMLS</from><to>Filter rows 3</to><enabled>Y</enabled> </hop>
@@ -165,16 +210,20 @@
   <hop> <from>DatabaseFirstNameLAst</from><to>DatabaseId</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 5</from><to>companyFinal</to><enabled>Y</enabled> </hop>
   <hop> <from>companyFinal</from><to>FilterCompleted</to><enabled>Y</enabled> </hop>
-  <hop> <from>companyFinal</from><to>SortMood</to><enabled>Y</enabled> </hop>
-  <hop> <from>companyFinal</from><to>Sort rows 10 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>companyFinal</from><to>Sort rows 7 2 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>javaComb</to><enabled>Y</enabled> </hop>
   <hop> <from>javaComb</from><to>Filter Sentrows</to><enabled>Y</enabled> </hop>
   <hop> <from>Null to Zero</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 2</from><to>jsMinRequirements</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 8</from><to>Database join</to><enabled>Y</enabled> </hop>
   <hop> <from>Database join</from><to>Null to Zero</to><enabled>Y</enabled> </hop>
-  <hop> <from>Database join</from><to>Microsoft Excel Output</to><enabled>Y</enabled> </hop>
+  <hop> <from>companyFinal</from><to>Filter rows 4 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows 4 2</from><to>SortMood</to><enabled>Y</enabled> </hop>
+  <hop> <from>companyFinal</from><to>Filter rows 4 2 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows 4 2 2</from><to>Sort rows 10 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 2 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 2 3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Multiway Merge Join</from><to>Select values</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AverageScoreGroupBy</name>
@@ -267,6 +316,36 @@
     </step>
 
   <step>
+    <name>Database join</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <rowlimit>0</rowlimit>
+    <sql>SELECT&#xd;&#xa;  MIN_REQUIREMENT_ID&#xd;&#xa;, COMPANY_ID as COMPANY_ID_MIN&#xd;&#xa;, MIN_DAYS_OF_REGISTRATION&#xd;&#xa;, MIN_COMPLETED_PERCENTAGE&#xd;&#xa;, MIN_NO_OF_REVIEWS&#xd;&#xa;, MONTH_OFFSET&#xd;&#xa;, YEAR_OFFSET&#xd;&#xa;FROM min_requirement_for_ranking&#xd;&#xa;WHERE COMPANY_ID &#x3d; &#x3f;&#xd;&#xa;order by COMPANY_ID_MIN</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>final_company_id</name>
+        <type>None</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1605</xloc>
+      <yloc>396</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Database join FOR NMLS</name>
     <type>DBJoin</type>
     <description/>
@@ -339,7 +418,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>select r.REGION_ID , b.BRANCH_ID from user_profile up &#xd;&#xa;left join region r on up.region_id &#x3d; r.region_id and r.IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;left join branch b on up.region_id &#x3d; b.branch_id and b.IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;where up.IS_PRIMARY &#x3d; 1 and up.STATUS &#x3d; 1 and up.USER_ID &#x3d; &#x3f;</sql>
+    <sql>select r.REGION_ID , b.BRANCH_ID from user_profile up &#xd;&#xa;left join region r on up.region_id &#x3d; r.region_id and r.IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;left join branch b on up.branch_id &#x3d; b.branch_id and b.IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;where up.IS_PRIMARY &#x3d; 1 and up.STATUS &#x3d; 1 and up.USER_ID &#x3d; &#x3f;</sql>
     <outer_join>Y</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -555,7 +634,7 @@
     </step>
 
   <step>
-    <name>Filter rows 4</name>
+    <name>Filter rows 4 2</name>
     <type>FilterRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -565,20 +644,73 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>GroupByZillow</send_true_to>
+<send_true_to>SortMood</send_true_to>
 <send_false_to/>
     <compare>
 <condition>
  <negated>N</negated>
- <leftvalue>SURVEY_SOURCE</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>637</xloc>
-      <yloc>528</yloc>
+      <xloc>529</xloc>
+      <yloc>322</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter rows 4 2 2</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows 10 2</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>420</xloc>
+      <yloc>369</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -606,6 +738,20 @@
    <function>&#x3d;</function>
    <rightvalue/>
    <value><name>constant</name><type>Integer</type><text>-1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
   </conditions>
  </condition>
     </compare>
@@ -755,57 +901,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>764</xloc>
       <yloc>333</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>GroupByZillow</name>
-    <type>MemoryGroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>AGENT_ID</name>
-        </field>
-        <field>
-          <name>MONTH_Data</name>
-        </field>
-        <field>
-          <name>Year_Data</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>zillow_count</aggregate>
-          <subject>SOURCE</subject>
-          <type>COUNT_ANY</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>COMPANY_ID</aggregate>
-          <subject>COMPANY_ID</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>TRX_MONTH</aggregate>
-          <subject>TRX_MONTH</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>809</xloc>
-      <yloc>530</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1297,7 +1392,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var total_sent &#x3d; Sent &#x2b; Completed&#xd;&#xa;if&#x28;total_sent &#x21;&#x3d; 0 &#x26;&#x26; total_sent  &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;		complete_percentage &#x3d; &#x28;Completed&#x2f;total_sent &#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp  &#x3d; AGENT_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var COMPANY_ID&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp  &#x3d; COMPANY_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var first_name&#xd;&#xa;&#xd;&#xa;if&#x28;first_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;first_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var last_name&#xd;&#xa;&#xd;&#xa;if&#x28;last_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;last_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_Data&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; MONTH_Data &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_DATA_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  MONTH_Data &#x3d;MONTH_DATA_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var Year_Data&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; Year_Data &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  Year_Data &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var days_of_registration&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; days_of_registration &#x3d; days_of_registration&#x3b;&#xd;&#xa;&#x7d;else if&#x28;days_of_registration_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  days_of_registration &#x3d; days_of_registration_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var MonthString&#xd;&#xa;&#xd;&#xa;if&#x28;MonthString &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; MonthString &#x3d; MonthString&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MonthString_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  MonthString &#x3d; MonthString_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var YearString&#xd;&#xa;&#xd;&#xa;if&#x28;YearString &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;YearString &#x3d; YearString&#x3b;&#xd;&#xa;&#x7d;else if&#x28;YearString_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  YearString&#x3d; YearString_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var EMAIL_ID&#xd;&#xa;&#xd;&#xa;if&#x28;EMAIL_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;EMAIL_ID &#x3d; EMAIL_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;EMAIL_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  EMAIL_ID&#x3d; EMAIL_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var total_sent &#x3d; Sent &#x2b; Completed&#xd;&#xa;if&#x28;total_sent &#x21;&#x3d; 0 &#x26;&#x26; total_sent  &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;		complete_percentage &#x3d; &#x28;Completed&#x2f;total_sent &#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID_temp &#x3d; 0&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp  &#x3d; AGENT_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var COMPANY_ID&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp  &#x3d; COMPANY_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var first_name&#xd;&#xa;&#xd;&#xa;if&#x28;first_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;first_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var last_name&#xd;&#xa;&#xd;&#xa;if&#x28;last_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;last_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_Data&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; MONTH_Data &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_DATA_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  MONTH_Data &#x3d;MONTH_DATA_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var Year_Data&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; Year_Data &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  Year_Data &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var days_of_registration&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; days_of_registration &#x3d; days_of_registration&#x3b;&#xd;&#xa;&#x7d;else if&#x28;days_of_registration_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  days_of_registration &#x3d; days_of_registration_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var MonthString&#xd;&#xa;&#xd;&#xa;if&#x28;MonthString &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; MonthString &#x3d; MonthString&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MonthString_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  MonthString &#x3d; MonthString_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var YearString&#xd;&#xa;&#xd;&#xa;if&#x28;YearString &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;YearString &#x3d; YearString&#x3b;&#xd;&#xa;&#x7d;else if&#x28;YearString_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  YearString&#x3d; YearString_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var EMAIL_ID&#xd;&#xa;&#xd;&#xa;if&#x28;EMAIL_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;EMAIL_ID &#x3d; EMAIL_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;EMAIL_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  EMAIL_ID&#x3d; EMAIL_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>complete_percentage</name>
         <rename>complete_percentage</rename>
         <type>Number</type>
@@ -1310,12 +1405,12 @@
         <length>16</length>
         <precision>2</precision>
         <replace>N</replace>
-      </field>      <field>        <name>AGENT_ID</name>
-        <rename>AGENT_ID</rename>
+      </field>      <field>        <name>AGENT_ID_temp</name>
+        <rename>AGENT_ID_temp</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>Y</replace>
+        <replace>N</replace>
       </field>      <field>        <name>COMPANY_ID</name>
         <rename>COMPANY_ID</rename>
         <type>String</type>
@@ -1427,37 +1522,6 @@
     </step>
 
   <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <join_type>FULL OUTER</join_type>
-    <step0>Sort rows 2</step0>
-    <step1>Sort rows 2 2</step1>
-    <step2>Sort rows 2 3</step2>
-    <step3>SortAgent 5</step3>
-    <number_input>4</number_input>
-    <keys>
-      <key>AGENT_ID,MONTH_Data,Year_Data</key>
-      <key>AGENT_ID,MONTH_Data,Year_Data</key>
-      <key>AGENT_ID,MONTH_Data,Year_Data</key>
-      <key>AGENT_ID,MONTH_Data,Year_Data</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1485</xloc>
-      <yloc>307</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Null to Zero</name>
     <type>ScriptValueMod</type>
     <description/>
@@ -1472,15 +1536,21 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var days_of_registration_final &#x3d; 0&#x3b;&#xd;&#xa;var avg_rating_final &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b; days_of_registration_final &#x3d; days_of_registration&#x3b; &#x7d;&#xd;&#xa;if&#x28;AverageScore &#x21;&#x3d; null&#x29;&#x7b;avg_rating_final &#x3d; AverageScore&#x3b; &#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var days_of_registration_final &#x3d; 0&#x3b;&#xd;&#xa;var avg_rating_final &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b; days_of_registration_final &#x3d; days_of_registration&#x3b; &#x7d;&#xd;&#xa;if&#x28;AverageScore &#x21;&#x3d; null&#x29;&#x7b;avg_rating_final &#x3d; AverageScore&#x3b; &#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_YEAR_FINAL&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data.length &#x3c; 2&#x29;&#x7b;&#xd;&#xa;				var	MONTH_YEAR_FINAL&#x3d; Year_Data&#x2b;&#x22;_0&#x22;&#x2b;MONTH_Data&#x3b;&#xd;&#xa;		&#x7d;else&#x7b;&#xd;&#xa;				var	MONTH_YEAR_FINAL&#x3d;Year_Data &#x2b;&#x22;_&#x22;&#x2b; MONTH_Data&#x3b;&#xd;&#xa;		&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>days_of_registration_final</name>
         <rename>days_of_registration_final</rename>
-        <type>Integer</type>
+        <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>avg_rating_final</name>
         <rename>avg_rating_final</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>MONTH_YEAR_FINAL</name>
+        <rename>MONTH_YEAR_FINAL</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1520,7 +1590,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_4</name>
+      </field>      <field>        <name>AGENT_ID_temp</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1541,10 +1611,6 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>COMPANY_ID_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>COMPANY_ID_4</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1573,10 +1639,6 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>MONTH_Data_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>MONTH_Data_4</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1616,10 +1678,6 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>TRX_MONTH_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
       </field>      <field>        <name>YearString</name>
         <rename/>
         <length>-2</length>
@@ -1641,10 +1699,6 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>Year_Data_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Year_Data_4</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1696,10 +1750,6 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>zillow_count</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
       <meta>        <name>MonthString_1</name>
         <rename>MonthString_1</rename>
@@ -1735,6 +1785,116 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1606</xloc>
       <yloc>149</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values 2</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>MIN_COMPLETED_PERCENTAGE</name>
+        <rename>MIN_COMPLETED_PERCENTAGE</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>complete_percentage</name>
+        <rename>complete_percentage</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>MIN_DAYS_OF_REGISTRATION</name>
+        <rename>MIN_DAYS_OF_REGISTRATION</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>days_of_registration_final</name>
+        <rename>days_of_registration_final</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>MIN_NO_OF_REVIEWS</name>
+        <rename>MIN_NO_OF_REVIEWS</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>total_reviews</name>
+        <rename>total_reviews</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1608</xloc>
+      <yloc>565</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1880,13 +2040,13 @@
     <fields>
       <field>
         <name>AGENT_ID</name>
-        <ascending>Y</ascending>
+        <ascending>N</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>TRX_MONTH_Final</name>
-        <ascending>Y</ascending>
+        <name>MONTH_YEAR_FINAL</name>
+        <ascending>N</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
@@ -1965,7 +2125,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>AGENT_ID_temp</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2382,52 +2542,6 @@
     </step>
 
   <step>
-    <name>Sort rows 7 2 2 2</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AGENT_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>MONTH_Data</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>Year_Data</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>186</xloc>
-      <yloc>505</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Sort rows 8</name>
     <type>SortRows</type>
     <description/>
@@ -2554,52 +2668,6 @@
     </step>
 
   <step>
-    <name>SortAgent 5</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AGENT_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>MONTH_Data</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>Year_Data</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1133</xloc>
-      <yloc>527</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>SortMood</name>
     <type>SortRows</type>
     <description/>
@@ -2645,8 +2713,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>595</xloc>
-      <yloc>334</yloc>
+      <xloc>617</xloc>
+      <yloc>318</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2663,7 +2731,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, MOOD&#xd;&#xa;,stage&#xd;&#xa;,SOURCE as SURVEY_SOURCE&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where stage &#x3d; -1&#xd;&#xa;and  date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;m&#x27;&#x29; &#x3d; 08&#xd;&#xa;and date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29;  &#x3d; 2017&#xd;&#xa;order by SURVEY_PRE_INTITIATION_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, MOOD&#xd;&#xa;,stage&#xd;&#xa;,SOURCE as SURVEY_SOURCE&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where stage &#x3d; -1&#xd;&#xa;order by SURVEY_PRE_INTITIATION_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2689,7 +2757,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, STATUS as SURVEY_STATUS&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;where  date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;m&#x27;&#x29; &#x3d; 08&#xd;&#xa;and date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29;  &#x3d; 2017&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, STATUS as SURVEY_STATUS&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;WHERE SURVEY_SOURCE NOT IN &#x28;&#x22;Zillow&#x22; , &#x22;3rd Party Review&#x22; &#x29;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2697,7 +2765,7 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>250</xloc>
+      <xloc>249</xloc>
       <yloc>282</yloc>
       <draw>Y</draw>
       </GUI>
@@ -2816,7 +2884,7 @@
         </field>
         <field>
           <column_name>month_year</column_name>
-          <stream_name>TRX_MONTH_Final</stream_name>
+          <stream_name>MONTH_YEAR_FINAL</stream_name>
         </field>
         <field>
           <column_name>month</column_name>
@@ -2876,7 +2944,7 @@
       <error_description/>
     <fields>      <field>        <name>AGENT_ID</name>
         <case_insensitive>N</case_insensitive>
-        </field>      <field>        <name>TRX_MONTH_Final</name>
+        </field>      <field>        <name>MONTH_YEAR_FINAL</name>
         <case_insensitive>N</case_insensitive>
         </field>      </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -3053,7 +3121,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var AGENT_ID &#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_1&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_2&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_3&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_3&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_4&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_4&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var final_company_id &#x3d; 0&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_3&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var TRX_MONTH_Final &#x3d; 0&#xd;&#xa;if&#x28;TRX_MONTH &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; TRX_MONTH_Final&#x3d; TRX_MONTH&#xd;&#xa;&#x7d;else if&#x28;TRX_MONTH_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; TRX_MONTH_Final  &#x3d;TRX_MONTH_1&#xd;&#xa;&#x7d;else if&#x28;TRX_MONTH_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; TRX_MONTH_Final  &#x3d; TRX_MONTH_2&#xd;&#xa;&#x7d;else if&#x28;TRX_MONTH_3&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; TRX_MONTH_Final  &#x3d; TRX_MONTH_3&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_Data&#xd;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_DATA_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_DATA_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_Data_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_Data_3&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_Data_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_Data_41&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var Year_Data&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data &#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data_1 &#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data_2 &#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data_3 &#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d;Year_Data_4 &#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var sps &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;&#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x21;&#x3d; 0 &#x26;&#x26; &#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var sps &#x3d; &#x28;&#x28;total_promoters - total_detractors&#x29; &#x2a; 100&#x29; &#x2f; &#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;zillow_count &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa; var zillow_count &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;var total_reviews &#x3d; Completed &#x2b; zillow_count&#x3b;&#xd;&#xa;&#xd;&#xa;var rank &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;var max_eligible_rank &#x3d; 0&#x3b;&#xd;&#xa;var TODAY &#x3d;  new Date&#x28;&#x29;&#x3b;&#xd;&#xa;var PRESENT_MONTH_FINAL_CHECK &#x3d; TODAY.getMonth &#x28;&#x29; &#x2b; 1&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;PRESENT_MONTH_FINAL_CHECK.length &#x3c; 2&#x29;&#x7b;&#xd;&#xa;				var	PRESENT_MONTH_CHECK&#x3d; &#x22;0&#x22;&#x2b;PRESENT_MONTH_FINAL_CHECK&#x3b;&#xd;&#xa;		&#x7d;else&#x7b;&#xd;&#xa;				var	PRESENT_MONTH_CHECK&#x3d; PRESENT_MONTH_FINAL_CHECK&#x3b;&#xd;&#xa;		&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var AGENT_ID &#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_1&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_2&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_3&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_3&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_temp&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_temp&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var final_company_id &#x3d; 0&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_3&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var TRX_MONTH_Final &#x3d; 0&#xd;&#xa;if&#x28;TRX_MONTH &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; TRX_MONTH_Final&#x3d; TRX_MONTH&#xd;&#xa;&#x7d;else if&#x28;TRX_MONTH_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; TRX_MONTH_Final  &#x3d;TRX_MONTH_1&#xd;&#xa;&#x7d;else if&#x28;TRX_MONTH_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; TRX_MONTH_Final  &#x3d; TRX_MONTH_2&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_Data&#xd;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_DATA_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_DATA_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_Data_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_Data_3&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var Year_Data&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data &#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data_1 &#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data_2 &#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data_3 &#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var sps &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;&#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x21;&#x3d; 0 &#x26;&#x26; &#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var sps &#x3d; &#x28;&#x28;total_promoters - total_detractors&#x29; &#x2a; 100&#x29; &#x2f; &#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var total_reviews &#x3d; Completed&#x3b;&#xd;&#xa;if&#x28;total_reviews &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	total_reviews &#x3d;0 &#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var rank &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;var max_eligible_rank &#x3d; 0&#x3b;&#xd;&#xa;var TODAY &#x3d;  new Date&#x28;&#x29;&#x3b;&#xd;&#xa;var PRESENT_MONTH_FINAL_CHECK &#x3d; TODAY.getMonth &#x28;&#x29; &#x2b; 1&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;PRESENT_MONTH_FINAL_CHECK.length &#x3c; 2&#x29;&#x7b;&#xd;&#xa;				var	PRESENT_MONTH_CHECK&#x3d; &#x22;0&#x22;&#x2b;PRESENT_MONTH_FINAL_CHECK&#x3b;&#xd;&#xa;		&#x7d;else&#x7b;&#xd;&#xa;				var	PRESENT_MONTH_CHECK&#x3d; PRESENT_MONTH_FINAL_CHECK&#x3b;&#xd;&#xa;		&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>AGENT_ID</name>
         <rename>AGENT_ID</rename>
         <type>String</type>
@@ -3090,12 +3158,6 @@
         <length>16</length>
         <precision>2</precision>
         <replace>N</replace>
-      </field>      <field>        <name>zillow_count</name>
-        <rename>zillow_count</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
       </field>      <field>        <name>total_reviews</name>
         <rename>total_reviews</rename>
         <type>Integer</type>
@@ -3233,7 +3295,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var is_eligable &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;parseInt&#x28;days_of_registration_final&#x29;&#x3e;&#x3d; parseInt&#x28;MIN_DAYS_OF_REGISTRATION&#x29;&#x29;&#x7b;&#xd;&#xa;	if&#x28;parseFloat&#x28;complete_percentage&#x29; &#x3e;&#x3d; parseFloat&#x28;MIN_COMPLETED_PERCENTAGE&#x29;&#x29;&#x7b;&#xd;&#xa;			if&#x28;parseInt&#x28;total_reviews&#x29; &#x3e;&#x3d; Math.round&#x28;parseInt&#x28;MIN_NO_OF_REVIEWS&#x29;&#x2f;12&#x29;&#x29;&#x7b;&#xd;&#xa;				is_eligable &#x3d; 1&#x3b;&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d; &#xd;&#xa;&#xd;&#xa;var RankingScore &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;Completed &#x21;&#x3d; 0 &#x26;&#x26; Completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var RankingScore &#x3d; &#x28;&#x28;AverageScore &#x2a; Completed&#x29; &#x2b; MONTH_OFFSET&#x29; &#x2f; &#x28;Completed &#x2b; 1&#x29;&#x3b; &#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var is_eligable &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;parseInt&#x28;days_of_registration_final&#x29;&#x3e;&#x3d; parseInt&#x28;MIN_DAYS_OF_REGISTRATION&#x29;&#x29;&#x7b;&#xd;&#xa;	if&#x28;parseFloat&#x28;complete_percentage&#x29; &#x3e;&#x3d; parseFloat&#x28;MIN_COMPLETED_PERCENTAGE&#x29;&#x29;&#x7b;&#xd;&#xa;			if&#x28;parseInt&#x28;total_reviews&#x29; &#x3e;&#x3d; Math.round&#x28;parseInt&#x28;MIN_NO_OF_REVIEWS&#x29;&#x2f;12&#x29;&#x29;&#x7b;&#xd;&#xa;				is_eligable &#x3d; 1&#x3b;&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d; &#xd;&#xa;&#xd;&#xa;var RankingScore &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;Completed &#x21;&#x3d; 0 &#x26;&#x26; Completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var RankingScore &#x3d; &#x28;&#x28;AverageScore &#x2a; Completed&#x29; &#x2b; MONTH_OFFSET&#x29; &#x2f; &#x28;Completed &#x2b; 1&#x29;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>is_eligable</name>
         <rename>is_eligable</rename>
         <type>Number</type>
@@ -3255,8 +3317,8 @@
     </step>
 
   <step>
-    <name>Select values 2</name>
-    <type>SelectValues</type>
+    <name>Multiway Merge Join</name>
+    <type>MultiwayMergeJoin</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -3265,238 +3327,20 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>MIN_COMPLETED_PERCENTAGE</name>
-        <rename>MIN_COMPLETED_PERCENTAGE</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>complete_percentage</name>
-        <rename>complete_percentage</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>MIN_DAYS_OF_REGISTRATION</name>
-        <rename>MIN_DAYS_OF_REGISTRATION</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>days_of_registration_final</name>
-        <rename>days_of_registration_final</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>MIN_NO_OF_REVIEWS</name>
-        <rename>MIN_NO_OF_REVIEWS</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>total_reviews</name>
-        <rename>total_reviews</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1608</xloc>
-      <yloc>565</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Database join</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <rowlimit>0</rowlimit>
-    <sql>SELECT&#xd;&#xa;  MIN_REQUIREMENT_ID&#xd;&#xa;, COMPANY_ID as COMPANY_ID_MIN&#xd;&#xa;, MIN_DAYS_OF_REGISTRATION&#xd;&#xa;, MIN_COMPLETED_PERCENTAGE&#xd;&#xa;, MIN_NO_OF_REVIEWS&#xd;&#xa;, MONTH_OFFSET&#xd;&#xa;, YEAR_OFFSET&#xd;&#xa;FROM min_requirement_for_ranking&#xd;&#xa;WHERE COMPANY_ID &#x3d; &#x3f;&#xd;&#xa;order by COMPANY_ID_MIN</sql>
-    <outer_join>N</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>final_company_id</name>
-        <type>None</type>
-      </field>
-    </parameter>
+    <join_type>FULL OUTER</join_type>
+    <step0>Sort rows 2</step0>
+    <step1>Sort rows 2 2</step1>
+    <step2>Sort rows 2 3</step2>
+    <number_input>3</number_input>
+    <keys>
+      <key>AGENT_ID_temp,MONTH_Data,Year_Data</key>
+      <key>AGENT_ID,MONTH_Data,Year_Data</key>
+      <key>AGENT_ID,MONTH_Data,Year_Data</key>
+    </keys>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1605</xloc>
-      <yloc>396</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Microsoft Excel Output</name>
-    <type>ExcelOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <header>Y</header>
-    <footer>N</footer>
-    <encoding/>
-    <append>N</append>
-    <add_to_result_filenames>Y</add_to_result_filenames>
-    <file>
-      <name>C&#x3a;&#x5c;Users&#x5c;sandr&#x5c;Desktop&#x5c;file.xls.xls</name>
-      <extention>xls</extention>
-      <do_not_open_newfile_init>N</do_not_open_newfile_init>
-      <create_parent_folder>N</create_parent_folder>
-      <split>N</split>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <sheetname>Sheet1</sheetname>
-      <autosizecolums>N</autosizecolums>
-      <nullisblank>N</nullisblank>
-      <protect_sheet>N</protect_sheet>
-      <password>Encrypted </password>
-      <splitevery>0</splitevery>
-      <usetempfiles>N</usetempfiles>
-      <tempdirectory/>
-      </file>
-    <template>
-      <enabled>N</enabled>
-      <append>N</append>
-      <filename>template.xls</filename>
-    </template>
-    <fields>
-      <field>
-        <name>COMPANY_ID_MIN</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>final_company_id</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>MIN_DAYS_OF_REGISTRATION</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>days_of_registration_1</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>MIN_COMPLETED_PERCENTAGE</name>
-        <type>Number</type>
-        <format/>
-      </field>
-      <field>
-        <name>complete_percentage</name>
-        <type>Number</type>
-        <format/>
-      </field>
-      <field>
-        <name>MIN_NO_OF_REVIEWS</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-      <field>
-        <name>total_reviews</name>
-        <type>Integer</type>
-        <format/>
-      </field>
-    </fields>
-    <custom>
-    <header_font_name>arial</header_font_name>
-    <header_font_size>10</header_font_size>
-    <header_font_bold>N</header_font_bold>
-    <header_font_italic>N</header_font_italic>
-    <header_font_underline>no</header_font_underline>
-    <header_font_orientation>horizontal</header_font_orientation>
-    <header_font_color>black</header_font_color>
-    <header_background_color>none</header_background_color>
-    <header_row_height>255</header_row_height>
-    <header_alignment>left</header_alignment>
-    <header_image/>
-    <row_font_name>arial</row_font_name>
-    <row_font_size>10</row_font_size>
-    <row_font_color>black</row_font_color>
-    <row_background_color>none</row_background_color>
-      </custom>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1499</xloc>
-      <yloc>467</yloc>
+      <xloc>1450</xloc>
+      <yloc>335</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

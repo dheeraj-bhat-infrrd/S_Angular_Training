@@ -157,7 +157,7 @@ public interface SurveyHandler
     public Map<String, Object> mapAgentsInSurveyPreInitiation();
 
 
-    public Map<String, Integer> getReminderInformationForCompany( long companyId );
+    public Map<String, Object> getReminderInformationForCompany( long companyId );
 
 
     public boolean checkSurveyReminderEligibility( long lastRemindedTime, long systemTime, int reminderInterval );

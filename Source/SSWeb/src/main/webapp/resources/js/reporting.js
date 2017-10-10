@@ -41,9 +41,16 @@ function paintForReportingDash() {
 	
 	//Paint the transactions section of the reporting the dashboard
 	if(overviewYearData!=null && !isEmpty(overviewYearData)){
-		drawUnclickedDonutChart(overviewYearData);
-		drawProcessedDonutChart(overviewYearData);
-		drawUnprocessedDonutChart(overviewYearData);
+		if($('#donutchart').length > 0 ){
+	 		drawUnclickedDonutChart(overviewYearData);
+	 	}
+	 	if($('#processedDonutchart').length > 0 ){
+	 		drawProcessedDonutChart(overviewYearData);
+	 	}
+		
+	 	if($('#unprocessedDonutchart').length > 0 ){
+	 		drawUnprocessedDonutChart(overviewYearData);
+	 	}
 		$('#processed-lbl-span').html(overviewYearData.Processed);
 		$('#completed-lbl-span').html(overviewYearData.Completed+' ('+overviewYearData.CompletePercentage+'%)');
 		$('#incomplete-lbl-span').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
@@ -62,9 +69,16 @@ function paintForReportingDash() {
 		$('#unprocessed-trans-graph').addClass('hide');
 		$('#empty-rep-chart-div').addClass('hide');
 	}else{
-		drawUnclickedDonutChart(overviewYearData);
-		drawProcessedDonutChart(overviewYearData);
-		drawUnprocessedDonutChart(overviewYearData);
+		if($('#donutchart').length > 0 ){
+	 		drawUnclickedDonutChart(overviewYearData);
+	 	}
+	 	if($('#processedDonutchart').length > 0 ){
+	 		drawProcessedDonutChart(overviewYearData);
+	 	}
+		
+	 	if($('#unprocessedDonutchart').length > 0 ){
+	 		drawUnprocessedDonutChart(overviewYearData);
+	 	}
 		$('#processed-lbl-span').html(0);
 		$('#completed-lbl-span').html(0+' ('+0+'%)');
 		$('#incomplete-lbl-span').html(0+' ('+0+'%)');
@@ -1060,8 +1074,10 @@ function getStatusString(status){
 			break;
 		case 0: statusString='Download';
 			break;
-		case 2: statusString='Failed';
+		case 2: statusString='Pending';
 			break;
+		case 4: statusString='Failed';
+		break;
 		default: statusString='Failed'
 		}
 		return statusString;
@@ -1095,7 +1111,7 @@ function drawRecentActivity(start,batchSize,tableHeader){
 		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"downloadLink"+i+"\"class='txt-bold tbl-blue-text downloadLink cursor-pointer'>"+statusString+"</a></td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
 			+"</tr>";
-		}else if(recentActivityList[i][6]==2){
+		}else if(recentActivityList[i][6]==4){
 			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
 			+"</tr>";
@@ -1263,9 +1279,16 @@ function updateReportingDashboard(){
 	$('#corrupted-lbl-rect').hide();
 	$('#other-lbl-rect').hide();
 	
-	drawUnclickedDonutChart(overviewYearData);
-	drawProcessedDonutChart(overviewYearData);
-	drawUnprocessedDonutChart(overviewYearData);
+	if($('#donutchart').length > 0 ){
+ 		drawUnclickedDonutChart(overviewYearData);
+ 	}
+ 	if($('#processedDonutchart').length > 0 ){
+ 		drawProcessedDonutChart(overviewYearData);
+ 	}
+	
+ 	if($('#unprocessedDonutchart').length > 0 ){
+ 		drawUnprocessedDonutChart(overviewYearData);
+ 	}
 	$(window).resize();
 	hideOverlay();
 	

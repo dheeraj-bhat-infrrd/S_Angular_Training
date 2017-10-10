@@ -46,7 +46,7 @@
 
 <div class="overlay-loader hide"></div>
 
-<div id="prof-container" data-profile-master-id="${profileMasterId}"
+<div id="rep-prof-container" data-profile-master-id="${profileMasterId}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
 			data-column-value="${columnValue}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
 			<div id="top-dash" class="hide" ></div>
@@ -88,10 +88,10 @@
 </div>
 <div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background-color: #009fe0; margin-bottom:-1px">
 	<div class="container">
-		<div class="hm-header-row clearfix" style="color: #f2f2f2;">
+		<div class="hm-header-row clearfix rep-disclaimer" style="color: #f2f2f2;">
 			<div id="rep-beta-disclaimer">
 				<div style="text-align:center; margin-top:15px;">
-					<span class="incomplete-trans-span" style="font-size:small;font-variant: none;">Please note that this is a beta version of the page which is still undergoing final testing before its official release. Should you encounter any bugs, glitches or other problems on the page / reports, please notify us immediately. Your help in this regard is greatly appreciated.</span>
+					<span class="incomplete-trans-span rep-disc-span" style="font-size:small;font-variant: none;">Please note that this is a beta version of the page which is still undergoing final testing before its official release. Should you encounter any bugs, glitches or other problems on the page / reports, please notify us immediately. Your help in this regard is greatly appreciated.</span>
 				</div>
 			</div>
 		</div>
@@ -166,8 +166,6 @@
 		
 		paintForReportingDash()
 		
-		$(window).resize();
-		
 	$('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
 			e.stopPropagation();
 			if (colName == 'agentId') {
@@ -179,10 +177,10 @@
 			}
 		});
 	
-	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
-	var currentProfileName = $('#prof-container').attr('data-column-name');
-	var currentProfileValue = $('#prof-container').attr('data-column-value');
-	var accountType = $('#prof-container').attr('data-account-type');
+	var profileMasterId = $('#rep-prof-container').attr('data-profile-master-id');
+	var currentProfileName = $('#rep-prof-container').attr('data-column-name');
+	var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
+	var accountType = $('#rep-prof-container').attr('data-account-type');
 		
 	drawReportingDashButtons(currentProfileName, currentProfileValue);
 	
@@ -197,6 +195,8 @@
 			$('#overviewSuccess').show();
 			$('#overviewFailure').hide();
 		}
+		
+		$(window).resize();
 		
 	//Score stats
 		var entityType = "${columnName}";
@@ -216,6 +216,29 @@
 		drawQuestionScoreStatsGraph(entityId, entityType);
 		
 		paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
+		
+		$('#rep-pro-cmplt-stars').on('click', '#dsh-btn2', function(e) {
+			e.stopPropagation();
+			var buttonId = 'dsh-btn2';
+			var task = $('#dsh-btn2').data('social');
+			dashboardButtonAction(buttonId, task, colName, colValue);
+			$('#rep-social-media').fadeOut(500);
+			if($('#rep-prof-container').length>0){
+					var currentProfileName = $('#rep-prof-container').attr('data-column-name');
+					var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
+					changeSocialMedia(currentProfileName, currentProfileValue);
+			}	
+		});
+		
+		$('#rep-social-media').on('click','#rep-dismiss-social-media',function(e){
+			$('#rep-social-media').fadeOut(500);
+			delay(function(){
+				e.stopPropagation();
+				var currentProfileName = $('#rep-prof-container').attr('data-column-name');
+				var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
+				changeSocialMedia(currentProfileName, currentProfileValue);
+			},500);
+		});
 		
 		hideOverlay();
 	});
