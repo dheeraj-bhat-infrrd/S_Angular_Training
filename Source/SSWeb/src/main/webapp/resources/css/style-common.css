@@ -5640,6 +5640,11 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	text-align: left;
 }
 
+.survey-authorize-font-size{
+	font-size:16px;	
+	line-height:20px !important;
+}
+
 .bd-check-txt-disclaimer {
 	display: flex;
 	font-family: opensanslight;
@@ -7956,7 +7961,7 @@ tr.u-tbl-header td {
 .pst-srvy {
 	width: 490px;
 	max-width: 50%;
-	height: 50px;
+	height: 100px;
 	margin: 0 auto;
 	padding: 0 10px;
 }
