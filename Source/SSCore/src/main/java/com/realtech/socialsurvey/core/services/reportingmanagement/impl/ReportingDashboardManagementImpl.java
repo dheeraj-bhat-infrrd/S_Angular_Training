@@ -10,7 +10,6 @@ import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -123,6 +122,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
@@ -271,6 +271,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private BatchTrackerService batchTrackerService;
+
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
 
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
@@ -3023,7 +3026,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 templateData.setTotalTransactions(
                     ( digest != null ) ? String.valueOf( digest.getTotalTransactions() ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setSurveyCompletionRate( ( digest != null )
-                    ? String.format( "%.2f", digest.getSurveyCompletionRate() * 100 ) + "%": CommonConstants.NOT_AVAILABLE );
+                    ? String.format( "%.2f", digest.getSurveyCompletionRate() * 100 ) + "%" : CommonConstants.NOT_AVAILABLE );
                 templateData.setSps(
                     ( digest != null ) ? String.valueOf( digest.getSps() > 0 ? "+" + digest.getSps() : digest.getSps() )
                         : CommonConstants.NOT_AVAILABLE );
@@ -3162,22 +3165,18 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
         // building conclusion text for survey completion rate
-        digestAggregate
-            .setSurveyPercentageTxt(
-                "Your survey completion rate "
-                    + ( surveyCompletionRate0 > surveyCompletionRate1
-                        ? "has increased by " + "<b>"
-                            + String.format( "%.2f", ( surveyCompletionRate0 - surveyCompletionRate1 ) * 100 )
-                            + "%</b>"
-                        : ( surveyCompletionRate0 == surveyCompletionRate1 ? "did not change"
-                            : "has dropped by " + "<b>"
-                                + String.format( "%.2f", ( surveyCompletionRate1 - surveyCompletionRate0 ) * 100 )
-                                + "%</b>" ) )
-                    + " and your transaction count " + ( transcationCount0 > transcationCount1
-                        ? "has increased by " + "<b>" + ( transcationCount0 - transcationCount1 ) + "</b>"
-                        : ( transcationCount0 == transcationCount1 ? "did not change"
-                            : "has dropped by " + "<b>" + ( transcationCount1 - transcationCount0 ) + "</b>" ) )
-                    + " from last month." );
+        digestAggregate.setSurveyPercentageTxt( "Your survey completion rate "
+            + ( surveyCompletionRate0 > surveyCompletionRate1
+                ? "has increased by " + "<b>" + String.format( "%.2f", ( surveyCompletionRate0 - surveyCompletionRate1 ) * 100 )
+                    + "%</b>"
+                : ( surveyCompletionRate0 == surveyCompletionRate1 ? "did not change"
+                    : "has dropped by " + "<b>"
+                        + String.format( "%.2f", ( surveyCompletionRate1 - surveyCompletionRate0 ) * 100 ) + "%</b>" ) )
+            + " and your transaction count " + ( transcationCount0 > transcationCount1
+                ? "has increased by " + "<b>" + ( transcationCount0 - transcationCount1 ) + "</b>"
+                : ( transcationCount0 == transcationCount1 ? "did not change"
+                    : "has dropped by " + "<b>" + ( transcationCount1 - transcationCount0 ) + "</b>" ) )
+            + " from last month." );
 
 
         // building conclusion text for average rating score
@@ -3317,6 +3316,27 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 LOG.error( "Error while sending report excption mail to admin " );
             }
         }
+    }
+
+
+    @Override
+    public boolean updateSendDigestMailToggle( long companyId, boolean sendMonthlyDigestMail ) throws InvalidInputException
+    {
+        LOG.debug( "method updateSendDigestMailToggle() started." );
+
+        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+
+        if ( companySettings == null ) {
+            LOG.error( "company settings is null" );
+            throw new InvalidInputException( "company settings is null" );
+        }
+
+        // update monthly digest mail toggle
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_SEND_MONTHLY_DIGEST_MAIL, sendMonthlyDigestMail, companySettings,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "method updateSendDigestMailToggle() finished." );
+        return true;
     }
 
 

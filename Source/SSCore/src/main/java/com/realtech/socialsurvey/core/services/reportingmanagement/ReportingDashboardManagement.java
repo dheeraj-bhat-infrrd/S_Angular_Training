@@ -121,4 +121,6 @@ public interface ReportingDashboardManagement
 
     public void startMonthlyDigestProcess();
 
+    public boolean updateSendDigestMailToggle( long companyId, boolean sendMonthlyDigestMail ) throws InvalidInputException;
+
 }

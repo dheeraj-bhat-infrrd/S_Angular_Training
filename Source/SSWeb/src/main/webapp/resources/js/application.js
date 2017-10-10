@@ -4585,6 +4585,22 @@ function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disabl
 	
 }
 
+function updateSendDigestMailSiteSetting(issenddigestmailenabled, disableEle) {
+	var payload = {
+		"sendMonthlyDigestMail" : issenddigestmailenabled
+	};
+	
+	callAjaxPostWithPayloadData("./updatesenddigestmailtoggle.do",function(data) {
+		if (data) {
+			$('#overlay-toast').html("Send Monthly Digest Mail toggle Updated Sucessfully.");
+		} else {
+			$('#overlay-toast').html("Unable update send Monthly Digest Mail.");
+		}
+		showToast();
+	}, payload, true, disableEle);
+	
+}
+
 function updateVendastaAccessSetting(hasVendastaAcess, disableEle) {
 	var payload = {
 		"hasVendastaAcess" : hasVendastaAcess
@@ -10251,6 +10267,15 @@ $('body').on('click', '#alw-ptnr-srvy-chk-box', function() {
 	}
 });
 
+$('body').on('click', '#survey-mail-thrhld-chk-box', function() {
+	if ($('#survey-mail-thrhld-chk-box').hasClass('bd-check-img-checked')) {
+		$('#survey-mail-thrhld-chk-box').removeClass('bd-check-img-checked');
+		updateSendDigestMailSiteSetting(true, '#survey-mail-thrhld-chk-box');
+	} else {
+		$('#survey-mail-thrhld-chk-box').addClass('bd-check-img-checked');
+		updateSendDigestMailSiteSetting(false, '#survey-mail-thrhld-chk-box');
+	}
+});
 
 $('body').on('click', '#alw-ptnr-srvy-for-usr-chk-box', function(e) {
 	e.stopPropagation();
