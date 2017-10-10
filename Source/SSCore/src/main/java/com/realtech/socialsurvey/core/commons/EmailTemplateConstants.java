@@ -165,5 +165,8 @@ public final class EmailTemplateConstants {
     
     public static final String CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_SUBJECT = "CancelSubscriptionRequestAlertMailSubject.txt";
     public static final String CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_BODY = "CancelSubscriptionRequestAlertMailBody.html";
+    
+    public static final String DIGEST_MAIL_SUBJECT = "DigestMailSubject.txt";
+    public static final String DIGEST_MAIL_BODY = "DigestMailBody.html";
 
 }

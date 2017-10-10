@@ -109,6 +109,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SEND_EMAIL_THROUGH = "sendEmailThrough";
     public static final String KEY_RANKING_REQUIREMENTS = "ranking_requirements";
     public static final String KEY_ALLOW_PARTNER_SURVEY = "allowPartnerSurvey";
+    public static final String KEY_SEND_MONTHLY_DIGEST_MAIL = "sendMonthlyDigestMail";
 
 
     @Value ( "${CDN_PATH}")
@@ -1009,5 +1010,25 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             }
         }
         return entityIds;
+    }
+    
+    /**
+     * Method to fetch the company ID list who have opted for monthly digest mail
+     */
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesOptedForSendingMonthlyDigest()
+    {
+        LOG.debug( "Method getCompaniesOptedForSendingMonthlyDigest() started." );
+
+        List<OrganizationUnitSettings> unitSettings = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        query.addCriteria( Criteria.where( KEY_SEND_MONTHLY_DIGEST_MAIL ).is( true ) );
+
+        LOG.debug( "Query: " + query.toString() );
+        unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Method getCompaniesOptedForSendingMonthlyDigest() finished." );
+        return unitSettings;
     }
 }

@@ -8,15 +8,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
-import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
+import com.realtech.socialsurvey.core.entities.UserRankingPastMonthMain;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
 public interface ReportingDashboardManagement
 {
@@ -113,5 +113,12 @@ public interface ReportingDashboardManagement
     
     List<List<Object>> getScoreStatsForQuestion(Long entityId, String entityType, int currentMonth, int currentYear);
     
-    
+    public Map<Integer, Digest> getDigestDataForLastFourMonths(long companyId, int monthUnderConcern, int year) throws InvalidInputException, NoRecordsFetchedException;
+
+    public boolean prepareAndSendMonthlyDigestMail( long companyId, String companyName, int monthUnderConcern, int year, String recipientMailId ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+
+    public List<UserRankingPastMonthMain> getTopTenUserRankingsThisMonthForACompany( long companyId, int monthUnderConcern, int year ) throws InvalidInputException;
+
+    public void startMonthlyDigestProcess();
+
 }

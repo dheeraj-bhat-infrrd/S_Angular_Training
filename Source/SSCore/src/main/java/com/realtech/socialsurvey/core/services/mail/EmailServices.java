@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.mail;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -491,4 +492,6 @@ public interface EmailServices
 
     void sendCancelSubscriptionRequestAlertMail( String recipientMailId, String displayName, String companyName )
         throws InvalidInputException, UndeliveredEmailException;
+    
+    void sendMonthlyDigestMail(MonthlyDigestAggregate digestAggregate) throws InvalidInputException, UndeliveredEmailException;
 }
