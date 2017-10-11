@@ -412,7 +412,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             Map<String, List<SurveyResponseTable>> surveyResponseMap = surveyResponseTableDao.geSurveyResponseForCompanyId( entityId );
             int maxQuestions = 0;
             for(SurveyResultsCompanyReport SurveyResultsCompanyReport: surveyResultsCompanyReportDao.fetchSurveyResultsCompanyReportByCompanyId(entityId,startDate,endDate)){
-                if(surveyResponseMap.containsKey( SurveyResultsCompanyReport.getSurveyDetailsId()  )){
                     List<Object> surveyResultsCompanyReportList = new ArrayList<>();
                     
                     if(SurveyResultsCompanyReport.getUserFirstName() == null){
@@ -468,25 +467,29 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     surveyResultsCompanyReportList.add(SurveyResultsCompanyReport.getSurveyScore());
                     
                     String surveyDetailsId = SurveyResultsCompanyReport.getSurveyDetailsId();
-                    
                     int questionCounter = 0;
-                    int surveyResponseSize = surveyResponseMap.get( surveyDetailsId ).size();
-                    if(surveyResponseSize > 0){
-                        questionCounter = surveyResponseSize;
-                        if(questionCounter > maxQuestions){
-                            maxQuestions = questionCounter;
-                        }
-                    }
+                    if(surveyResponseMap.containsKey( surveyDetailsId  )){
 
-                    surveyResultsCompanyReportList.add(questionCounter);
-                    
-                    for(SurveyResponseTable surveyResponse: surveyResponseMap.get( surveyDetailsId )){
-                        if(surveyResponse.getAnswer() == null){
-                            surveyResultsCompanyReportList.add("");
-                        }else{
-                            surveyResultsCompanyReportList.add(surveyResponse.getAnswer());
+                        int surveyResponseSize = surveyResponseMap.get( surveyDetailsId ).size();
+                        if(surveyResponseSize > 0){
+                            questionCounter = surveyResponseSize;
+                            if(questionCounter > maxQuestions){
+                                maxQuestions = questionCounter;
+                            }
+                        }
+
+                        surveyResultsCompanyReportList.add(questionCounter);
+                        
+                        for(SurveyResponseTable surveyResponse: surveyResponseMap.get( surveyDetailsId )){
+                            if(surveyResponse.getAnswer() == null){
+                                surveyResultsCompanyReportList.add("");
+                            }else{
+                                surveyResultsCompanyReportList.add(surveyResponse.getAnswer());
+                            }
                         }
                     }
+                    
+                    
                     if(questionCounter==0){
                         surveyResultsCompanyReportList.add("");
                     }
@@ -540,7 +543,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     }
                     
                     surveyResultsCompany.add(surveyResultsCompanyReportList);
-                }
+                
             } 
             List<Object> maxQuestionList = new ArrayList<>();
             maxQuestionList.add( "maxQuestions" );
