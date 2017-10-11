@@ -489,12 +489,13 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " started." );
-        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=? WHERE AGENT_ID = ?";
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=?, MODIFIED_ON=? WHERE AGENT_ID = ?";
         Query query = getSession().createSQLQuery( queryStr );
         query.setParameter( 0, toUser.getUserId() );
         query.setParameter( 1, toUser.getFirstName() + ( toUser.getLastName() == null ? "" : " " + toUser.getLastName() ) );
         query.setParameter( 2, toUser.getEmailId() );
-        query.setParameter( 3, fromUserId );
+        query.setParameter( 3, new Timestamp( System.currentTimeMillis() ) );
+        query.setParameter( 4, fromUserId );
         query.executeUpdate();
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " ended." );
@@ -641,11 +642,12 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
         LOG.info( "Method to update updateAgentIdOfPreInitiatedSurveys started." );
         String queryStr = "UPDATE SURVEY_PRE_INITIATION SET STATUS = "
-            + CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED + "  WHERE AGENT_EMAILID = ? AND STATUS IN ("
+            + CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED + ", MODIFIED_ON=? WHERE AGENT_EMAILID = ? AND STATUS IN ("
             + CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD + ", "
             + CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD + ") ";
         Query query = getSession().createSQLQuery( queryStr );
-        query.setParameter( 0, agentEmailAddress );
+        query.setParameter( 0, new Timestamp( System.currentTimeMillis() ) );
+        query.setParameter( 1, agentEmailAddress );
 
         query.executeUpdate();
         LOG.info( "Method updateAgentIdOfPreInitiatedSurveys  ended." );
@@ -660,11 +662,11 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
         LOG.info( "Method to update updateSurveyPreinitiationRecordsAsIgnored started." );
         String queryStr = "UPDATE SURVEY_PRE_INITIATION SET  STATUS = "
-            + CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD + "  WHERE AGENT_EMAILID = ? AND STATUS = "
+            + CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD + ", MODIFIED_ON=?  WHERE AGENT_EMAILID = ? AND STATUS = "
             + CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD;
         Query query = getSession().createSQLQuery( queryStr );
-        query.setParameter( 0, agentEmailAddress );
-
+        query.setParameter( 0, new Timestamp( System.currentTimeMillis() ) );
+        query.setParameter( 1, agentEmailAddress );
         query.executeUpdate();
         LOG.info( "Method updateSurveyPreinitiationRecordsAsIgnored  ended." );
     }
@@ -872,10 +874,11 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     {
         
         LOG.debug( "Method updateCompanyIdForAllRecordsForAgent started." );
-        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET  COMPANY_ID = ? WHERE AGENT_EMAILID = ?";
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET  COMPANY_ID = ?, MODIFIED_ON=? WHERE AGENT_EMAILID = ?";
         Query query = getSession().createSQLQuery( queryStr );
         query.setParameter( 0, companyId );
-        query.setParameter( 1, agentEmailId );
+        query.setParameter( 1, new Timestamp( System.currentTimeMillis() ) );
+        query.setParameter( 2, agentEmailId );
         LOG.info( "query to update company id is " + query.toString() );
         query.executeUpdate();
         LOG.debug( "Method updateCompanyIdForAllRecordsForAgent  ended." );
@@ -887,9 +890,10 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     {
         
         LOG.debug( "Method updateCompanyIdForAllRecordsForAgent started." );
-        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET  AGENT_ID = 0 WHERE AGENT_ID = ?";
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET  AGENT_ID = 0, MODIFIED_ON=? WHERE AGENT_ID = ?";
         Query query = getSession().createSQLQuery( queryStr );
-        query.setParameter( 0, agentId );
+        query.setParameter( 0, new Timestamp( System.currentTimeMillis() ) );
+        query.setParameter( 1, agentId );
         LOG.info( "query to update company id is " + query.toString() );
         query.executeUpdate();
         LOG.debug( "Method updateCompanyIdForAllRecordsForAgent  ended." );
