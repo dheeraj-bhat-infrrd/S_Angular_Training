@@ -797,58 +797,22 @@ function paintReviews(result){
 			}else{
 			    if(reviewItem.source != "customer") {
                     reviewsHtml +='<div style="clear:both">Completed transaction in';
-                    if(reviewsHtml.surveyTransactionDate !=null){
+                    if(reviewItem.surveyTransactionDate !=null){
                         reviewsHtml +=' <span>'+ new Date(reviewItem.surveyTransactionDate).toString("MMMM  yyyy")+'</span>';
-                        if(reviewItem.city !=null && reviewItem.state!=null){
-                        reviewsHtml +='<span> in '+reviewItem.city+', '+reviewItem.state+'.</span>';
-                        }
-                        reviewsHtml +='</div>';
                     }else{
                         reviewsHtml +=' <span>'+new Date(reviewItem.modifiedOn).toString("MMMM  yyyy")+'</span>';
-                        if(reviewItem.city !=null && reviewItem.state!=null){
-                            reviewsHtml +='<span> in '+reviewItem.city+', '+reviewItem.state+'.</span>';
-                            }
-                            reviewsHtml +='</div>';                    }
+                    }
+                    
+                    if(reviewItem.city && reviewItem.state){
+                        reviewsHtml +='<span> in '+reviewItem.city+', '+reviewItem.state+'.</span>';
+                    }
+                    reviewsHtml +='</div>';
 				}
 			}
-			
 		}
-		
-		
-		
-		
-		
 		reviewsHtml +='</div>';
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-	
-		
 		reviewsHtml += '		</div>';
-		
-		
-		
 		reviewsHtml += '	</div>';
-		
-		
-		
-		
-		
-		
-			
-			
-			
 			
 			/*<c:if test="${reviewItem.source =='encompass'}">
 		<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
