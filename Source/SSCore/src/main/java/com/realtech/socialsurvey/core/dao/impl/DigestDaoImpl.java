@@ -8,6 +8,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.DigestDao;
@@ -24,6 +25,7 @@ public class DigestDaoImpl extends GenericReportingDaoImpl<Digest, String> imple
 
     @SuppressWarnings ( "unchecked")
     @Override
+    @Transactional
     public List<Digest> fetchDigestDataForNMonthsInAYear( long companyId, int startMonth, int endMonth, int year )
         throws InvalidInputException
     {

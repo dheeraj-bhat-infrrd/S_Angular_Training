@@ -12,6 +12,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserRankingPastMonthMainDao;
@@ -124,6 +125,7 @@ public class UserRankingPastMonthMainDaoImpl extends GenericReportingDaoImpl<Use
     
     @SuppressWarnings ( "unchecked")
     @Override
+    @Transactional
     public List<UserRankingPastMonthMain> fetchTopTenUserRankingsForACompany( long companyId, int monthUnderConcern, int year )
     {
         LOG.debug( "method fetchTopTenUserRankingsForACompany() running" );
