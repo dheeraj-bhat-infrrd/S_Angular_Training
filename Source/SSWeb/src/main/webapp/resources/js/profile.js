@@ -809,44 +809,10 @@ function paintReviews(result){
                     reviewsHtml +='</div>';
 				}
 			}
-			
 		}
-		
-		
-		
-		
-		
 		reviewsHtml +='</div>';
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-	
-		
 		reviewsHtml += '		</div>';
-		
-		
-		
 		reviewsHtml += '	</div>';
-		
-		
-		
-		
-		
-		
-			
-			
-			
 			
 			/*<c:if test="${reviewItem.source =='encompass'}">
 		<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
