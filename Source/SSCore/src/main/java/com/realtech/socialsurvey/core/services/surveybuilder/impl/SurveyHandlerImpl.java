@@ -1737,6 +1737,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         LOG.debug( "Method deleteSurveyPreInitiationDetailsPermanently() started." );
         if ( surveyPreInitiation != null )
+            surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
         surveyPreInitiationDao.saveOrUpdate( surveyPreInitiation );
         //surveyPreInitiationDao.delete( surveyPreInitiation );
@@ -1770,6 +1771,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void markSurveyAsStarted( SurveyPreInitiation surveyPreInitiation )
     {
         LOG.debug( "Method markSurveyAsStarted() started." );
+        surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         surveyPreInitiation.setStatus( CommonConstants.SURVEY_STATUS_INITIATED );
         surveyPreInitiationDao.update( surveyPreInitiation );
         LOG.debug( "Method markSurveyAsStarted() finished." );
@@ -1864,6 +1866,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     if ( survey.getAgentId() == 0 ) {
                         survey.setAgentId( user.getUserId() );
                     }
+                    survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                     surveyPreInitiationDao.update( survey );
                 }
 
@@ -4320,6 +4323,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 throw new InvalidInputException("Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId());
             } 
 
+            survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             survey.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
         }
 
