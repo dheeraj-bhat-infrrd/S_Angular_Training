@@ -796,13 +796,17 @@ public class WorkbookData
                 surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( 8 ) ));
                 surveyResultsCompanyReportToPopulate.add(Double.valueOf( row.get( 9 ) ));
         
-               int numberOfQuestions = Integer.valueOf(row.get(10));
+               int numberOfQuestions = 0;
+               if(row.get( 10 )!= null && !row.get( 10 ).isEmpty() && !row.get( 10 ).equals( "" )){
+                   numberOfQuestions = Integer.valueOf(row.get(10));
+               }
+                   
               
                 for(int questionCounter=11;questionCounter<11+numberOfQuestions;questionCounter++){
                     surveyResultsCompanyReportToPopulate.add(String.valueOf( row.get( questionCounter ) ));
                 }
                 if(numberOfQuestions == 0){
-                    for(int questionDiffLoop = 0 ; questionDiffLoop < maxNumberOfQuestions-1 ;questionDiffLoop++){
+                    for(int questionDiffLoop = 0 ; questionDiffLoop < maxNumberOfQuestions ;questionDiffLoop++){
                         surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
                     }
                 }else if(numberOfQuestions < maxNumberOfQuestions){
