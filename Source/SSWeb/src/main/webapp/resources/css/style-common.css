@@ -9680,6 +9680,7 @@ ul.accordion li>a:before {
 	.time-frame-sel{
 		height:90%; 
 		line-height:35px !important;
+		padding-right:30px;
 	}
 	
 	.time-frame-item{
@@ -10003,4 +10004,8 @@ img.lead-img {
 .lead-ranks-below-btn{
 	font-size: 14px;
     font-weight: bold !important;
+}
+
+.rep-dash-bar-margin{
+		margin:auto 2px;
 }
