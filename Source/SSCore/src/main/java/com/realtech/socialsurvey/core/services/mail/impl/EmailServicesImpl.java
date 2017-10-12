@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.ForwardMailDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Plan;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -80,6 +82,9 @@ public class EmailServicesImpl implements EmailServices
     @Value ( "${APPLICATION_LOGO_URL}")
     private String appLogoUrl;
 
+    @Value ( "${APPLICATION_NEW_LOGO_URL}")
+    private String appNewLogoUrl;
+
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
 
@@ -88,6 +93,9 @@ public class EmailServicesImpl implements EmailServices
 
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
+
+    @Value ( "${APPLICATION_WORD_PRESS_SITE_URL}")
+    private String applicationWordPressSite;
 
     @Autowired
     private UrlService urlService;
@@ -2420,7 +2428,6 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
         }
         
-
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.HIGH_VOLUME_UNPROCESSED_TRANSACTION_ALERT_MAIL_SUBJECT;
@@ -2464,6 +2471,177 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
         LOG.info( "method sendLessVoulmeOfTransactionReceivedAlertMail ended" );    
       }
+
+    @Async
+    @Override
+    public void sendMonthlyDigestMail( MonthlyDigestAggregate digestAggregate )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( digestAggregate == null ) {
+            LOG.error( "sendMonthlyDigestMail(): Digest Aggregate object is null" );
+            throw new InvalidInputException( "Data for the monthly digest/snapshot mail is missing." );
+        }
+        if ( StringUtils.isEmpty( digestAggregate.getRecipientMailId() ) ) {
+            LOG.error( "Recipient email Id is empty or null for Monthly digest/snapshot mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for Monthly digest/snapshot mail." );
+        }
+
+        if ( digestAggregate.getDigestList() == null || digestAggregate.getDigestList().size() != 3 ) {
+            LOG.error( "Digest data for three months required." );
+            throw new InvalidInputException( "Digest data for three months required." );
+        }
+
+        if ( StringUtils.isEmpty( digestAggregate.getCompanyName() ) ) {
+            LOG.error( "Company name for the digest not specified." );
+            throw new InvalidInputException( "Company name for the digest not specified." );
+        }
+
+        if ( StringUtils.isEmpty( digestAggregate.getMonthUnderConcern() ) ) {
+            LOG.error( "Month for the digest not specified." );
+            throw new InvalidInputException( "Month for the digest not specified." );
+        }
+
+        if ( StringUtils.isEmpty( digestAggregate.getYearUnderConcern() ) ) {
+            LOG.error( "Year for the digest not specified." );
+            throw new InvalidInputException( "Year for the digest not specified." );
+        }
+
+        LOG.debug( "Sending Monthly digest/snapshot email to : " + digestAggregate.getRecipientMailId() );
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( digestAggregate.getRecipientMailId() );
+        String monthYearForDisplay = StringUtils.capitalize( digestAggregate.getMonthUnderConcern() ) + " "
+            + digestAggregate.getYearUnderConcern();
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        List<String> messageBodyReplacementsList = new ArrayList<>();
+
+
+        messageBodyReplacementsList.add( applicationWordPressSite );
+        messageBodyReplacementsList.add( appNewLogoUrl );
+        messageBodyReplacementsList.add( digestAggregate.getCompanyName() );
+        messageBodyReplacementsList.add( monthYearForDisplay );
+
+        // adding average rating score data
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getAverageScoreRatingIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getAverageScoreRating() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getUserCount() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getMonth() ) ) );
+
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getAverageScoreRatingIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getAverageScoreRating() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getUserCount() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getMonth() ) ) );
+
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getAverageScoreRatingIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getAverageScoreRating() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getUserCount() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getMonth() ) ) );
+
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getAvgRatingTxt() ) );
+
+
+        // adding survey completion rate data
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSurveyCompletionRateIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSurveyCompletionRate() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getCompletedTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getTotalTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getMonth() ) ) );
+
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSurveyCompletionRateIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSurveyCompletionRate() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getCompletedTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getTotalTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getMonth() ) ) );
+
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSurveyCompletionRateIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSurveyCompletionRate() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getCompletedTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getTotalTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getMonth() ) ) );
+
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getSurveyPercentageTxt() ) );
+
+
+        // adding satisfaction rating data
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSpsIcon() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSps() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getPromoters() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getDetractors() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getTotalCompletedReviews() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getMonth() ) ) );
+
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSpsIcon() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSps() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getPromoters() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getDetractors() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getTotalCompletedReviews() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getMonth() ) ) );
+
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSpsIcon() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSps() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getPromoters() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getDetractors() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getTotalCompletedReviews() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getMonth() ) ) );
+
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getStatisfactionRatingTxt() ) );
+
+
+        // top ten ranked users HTML
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getUserRankingHtmlRows() ) );
+
+        // email meta-data
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getRecipientMailId() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getRecipientMailId() ) );
+
+
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( monthYearForDisplay ) );
+
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( messageBodyReplacementsList );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements,
+            false, false );
+        LOG.debug( "Successfully sent Monthly digest/snapshot mail" );
+
+    }
 
 }
 

@@ -270,4 +270,7 @@ public interface OrganizationUnitSettingsDao
 
 
     public List<Long> fetchEntityIdsWithHiddenAttribute( String collection );
+
+
+    public List<OrganizationUnitSettings> getCompaniesOptedForSendingMonthlyDigest(int startIndex, int batchSize);
 }

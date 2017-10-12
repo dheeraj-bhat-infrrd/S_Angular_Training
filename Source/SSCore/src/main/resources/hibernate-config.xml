@@ -159,6 +159,7 @@
 				<value>com.realtech.socialsurvey.core.entities.ScoreStatsQuestionRegion</value>
 				<value>com.realtech.socialsurvey.core.entities.ScoreStatsQuestionBranch</value>
 				<value>com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser</value>
+				<value>com.realtech.socialsurvey.core.entities.Digest</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyTransactionsSourceStats</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats</value>
